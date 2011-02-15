@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<Settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ZcomIP>10.1.0.55</ZcomIP>
+  <ZcomPort>8084</ZcomPort>
+  <zHTTPListenEnabled>true</zHTTPListenEnabled>
+  <ZHTTPPort>8085</ZHTTPPort>
+</Settings>

@@ -1,0 +1,26 @@
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\obj\x86\Debug\zVirtualScenesApplication.Properties.Resources.resources
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\bin\Debug\zVirtualScenes.exe
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\bin\Debug\zVirtualScenes.pdb
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\obj\x86\Debug\zVirtualScenes.exe
+C:\Users\aaron-drabeck\AppData\Local\Temporary Projects\WindowsFormsApplication1\obj\x86\Debug\zVirtualScenes.pdb
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\zVirtualScenes.exe
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\zVirtualScenes.pdb
+D:\VirtualScenes\zVirtualScenes\bin\Debug\zVirtualScenes.exe
+D:\VirtualScenes\zVirtualScenes\bin\Debug\zVirtualScenes.pdb
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\zVirtualScenesApplication.Properties.Resources.resources
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\zVirtualScenesApplication.zVirtualScenes.resources
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\GenerateResource.read.1.tlog
+D:\VirtualScenes\zVirtualScenes\obj\x86\Debug\GenerateResource.write.1.tlog
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\zVirtualScenes.exe
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\zVirtualScenes.pdb
+P:\2 - Hobby\zVirtualScenes\bin\Debug\zVirtualScenes.exe
+P:\2 - Hobby\zVirtualScenes\bin\Debug\zVirtualScenes.pdb
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\ResolveAssemblyReference.cache
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\zVirtualScenesApplication.Properties.Resources.resources
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\zVirtualScenesApplication.zVirtualScenes.resources
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\GenerateResource.read.1.tlog
+P:\2 - Hobby\zVirtualScenes\obj\x86\Debug\GenerateResource.write.1.tlog
