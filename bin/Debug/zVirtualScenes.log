@@ -1,30 +1,18 @@
-2011-02-20T13:31:15 [INFO ] - zVirtualScenes - v1.1.0.1 - v1.1.0.1 START
+2011-02-20T23:12:33 [INFO ] - zVirtualScenes - v1.1.1.1 - v1.1.1.1 START
 
-2011-02-20T13:31:16 [INFO ] - Loaded Program Settings.
+2011-02-20T23:12:33 [INFO ] - Loaded Program Settings.
 
-2011-02-20T13:31:17 [INFO ] - ControlThink USB Loaded 6 Devices.
+2011-02-20T23:12:36 [INFO ] - ControlThink USB Loaded 6 Devices.
 
-2011-02-20T13:31:21 [INFO ] - Started HTTP Listening on all adapters.
+2011-02-20T23:12:36 [INFO ] - Started HTTP Listening on all adapters.
 
-2011-02-20T13:31:21 [INFO ] - LightSwitchInterface: Started Listening for LightSwitch clients on port 1337.
+2011-02-20T23:12:36 [INFO ] - LightSwitchInterface: Started Listening for LightSwitch clients on port 1337.
 
-2011-02-20T13:31:21 [INFO ] - ControlThink USB Connected to HomeId - 15101860
+2011-02-20T23:12:36 [INFO ] - ControlThink USB Connected to HomeId - 15101860
 
-2011-02-20T13:32:29 [INFO ] - ControlThink USB Loaded 6 Devices.
+2011-02-20T23:12:38 [INFO ] - Saved Settings XML.
 
-2011-02-20T13:33:07 [INFO ] - ControlThink USB Loaded 6 Devices.
+2011-02-20T23:12:38 [INFO ] - ControlThink USB Disconnected.
 
-2011-02-20T13:33:29 [INFO ] - ControlThink USB Loaded 6 Devices.
-
-2011-02-20T13:33:55 [INFO ] - ControlThink USB Loaded 6 Devices.
-
-2011-02-20T13:34:07 [INFO ] - ControlThink USB Loaded 6 Devices.
-
-2011-02-20T13:34:26 [INFO ] - ControlThink USB Loaded 6 Devices.
-
-2011-02-20T13:35:14 [INFO ] - Saved Settings XML.
-
-2011-02-20T13:35:14 [INFO ] - ControlThink USB Disconnected.
-
-2011-02-20T13:35:14 [INFO ] - Saved Settings XML.
+2011-02-20T23:12:38 [INFO ] - Saved Settings XML.
 

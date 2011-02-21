@@ -62,3 +62,19 @@ P:\2 - Hobby\zVirtualScenes 1.1\bin\Debug\zVirtualScenes.application
 P:\2 - Hobby\zVirtualScenes 1.1\obj\x86\Debug\zVirtualScenes.TrustInfo.xml
 P:\2 - Hobby\zVirtualScenes 1.1\obj\x86\Debug\zVirtualScenes.exe.manifest
 P:\2 - Hobby\zVirtualScenes 1.1\obj\x86\Debug\zVirtualScenes.application
+P:\2 - Hobby\zVirtualScenes\trunk\bin\Debug\zVirtualScenes.exe.manifest
+P:\2 - Hobby\zVirtualScenes\trunk\bin\Debug\zVirtualScenes.application
+P:\2 - Hobby\zVirtualScenes\trunk\bin\Debug\zVirtualScenes.exe
+P:\2 - Hobby\zVirtualScenes\trunk\bin\Debug\zVirtualScenes.pdb
+P:\2 - Hobby\zVirtualScenes\trunk\bin\Debug\ControlThink.ZWave.dll
+P:\2 - Hobby\zVirtualScenes\trunk\bin\Debug\ControlThink.ZWave.xml
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\ResolveAssemblyReference.cache
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenesApplication.Properties.Resources.resources
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenesApplication.zVirtualScenes.resources
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\GenerateResource.read.1.tlog
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\GenerateResource.write.1.tlog
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenes.TrustInfo.xml
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenes.exe.manifest
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenes.application
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenes.exe
+P:\2 - Hobby\zVirtualScenes\trunk\obj\x86\Debug\zVirtualScenes.pdb
