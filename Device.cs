@@ -11,80 +11,67 @@ namespace zVirtualScenesApplication
 
     public class Device : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
     {
+        public formzVirtualScenes zVirtualScenesMain;
         public event PropertyChangedEventHandler PropertyChanged;
-        public zVirtualScenes zVirtualScenesMain;
-
 
         #region Properties and Variables
         //Properties that require PropertyChangedEvent to fire to sync GUI
+        public uint HomeID { get; set; }
+        public byte NodeID { get; set; }
+        public string Type { get; set; }//Properties that require PropertyChangedEvent to fire to sync GUI
         private string _Name;
         public string Name
         {
             get { return _Name; }
             set { GlobalFunctions.Set(this, "Name", ref _Name, value, PropertyChanged); }
         }
+        public bool SendJabberNotifications { get; set; }
+        
 
-        private byte _Level; 
-        public byte Level
-        {
-            get { return _Level; }
-            set { GlobalFunctions.Set(this, "Level", ref _Level, value, PropertyChanged); }
-        }
-        private int _FanMode;
-        public int FanMode
-        {
-            get { return _FanMode; }
-            set { GlobalFunctions.Set(this, "FanMode", ref _FanMode, value, PropertyChanged); }
-        }
-        private int _HeatCoolMode;
-        public int HeatCoolMode
-        {
-            get { return _HeatCoolMode; }
-            set { GlobalFunctions.Set(this, "HeatCoolMode", ref _HeatCoolMode, value, PropertyChanged); }
-        }
-        private string _CurrentState;
-        public string CurrentState
-        {
-            get { return _CurrentState; }
-            set { GlobalFunctions.Set(this, "CurrentState", ref _CurrentState, value, PropertyChanged); }
-        }
-        private int _HeatPoint;
-        public int HeatPoint
-        {
-            get { return _HeatPoint; }
-            set { GlobalFunctions.Set(this, "HeatPoint", ref _HeatPoint, value, PropertyChanged); }
-        }
-        private int _CoolPoint;
-        public int CoolPoint
-        {
-            get { return _CoolPoint; }
-            set { GlobalFunctions.Set(this, "CoolPoint", ref _CoolPoint, value, PropertyChanged); }
-        }
-        private int _Temp;
-        public int Temp
-        {
-            get { return _Temp; }
-            set { GlobalFunctions.Set(this, "Temp", ref _Temp, value, PropertyChanged); }
-        }
-        //Standard Properties
-        public uint HomeID { get; set; }
-        public byte NodeID { get; set; }
-        public string Type { get; set; }
+        public byte Level { get; set; }
+        public byte prevLevel { get; set; }
+
+        public int Temp { get; set; }
+        public int prevTemp { get; set; }
+
+        public int FanMode { get; set; }
+        public int prevFanMode { get; set; }
+
+        public int HeatCoolMode { get; set; }
+        public int prevHeatCoolMode { get; set; }
+
+        public string CurrentState { get; set; }
+        public string prevCurrentState { get; set; }
+
+        public int HeatPoint { get; set; }
+        public int prevHeatPoint { get; set; }
+
+        public int CoolPoint { get; set; }
+        public int prevCoolPoint { get; set; }
+
+        public int MinAlertTemp { get; set; }
+        public int MaxAlertTemp { get; set; }
+        public int NotificationDetailLevel { get; set; }
+        
+        
         #endregion
 
         //Constructor
-        public Device(zVirtualScenes zvsm)
+        public Device(formzVirtualScenes zvsm)
         {
             zVirtualScenesMain = zvsm;
             this.HomeID = 0;
             this.NodeID = 0;
             _Name = "Default Device";
-            _Level = 0;
+            this.Level = 0;
             this.Type = "Unknown"; 
-            _FanMode = -1;
-            _HeatCoolMode = -1;
-            _CoolPoint = -1;
-            _HeatPoint = -1;
+            this.FanMode = -1;
+            this.HeatCoolMode = -1;
+            this.CoolPoint = -1;
+            this.HeatPoint = -1;
+            this.MinAlertTemp = 40;
+            this.MaxAlertTemp = 90;
+            this.NotificationDetailLevel = 1;
         }
 
         public enum ThermostatFanMode
@@ -125,19 +112,18 @@ namespace zVirtualScenesApplication
 
             public override string ToString()
             {
-                return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
+                return "(" + NodeID + ") " + _Name + " - " + GetFomattedType();
             }
 
             //Light Switch Socket Format - DEVICE~Bedroom Lights~0~60~MultiLevelSceneSwitch
             public string ToLightSwitchSocketString()
             {
                 if (Type != null && Type.Contains("MultilevelPowerSwitch"))
-                    return "DEVICE~" + _Name + "~" + this.NodeID + "~" + _Level + "~" + this.Type;
+                    return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
                 else if (Type != null && (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat")))
                     return "DEVICE~" + _Name + "~" + this.NodeID + "~" + Temp + "~" + this.Type;
                 return "Unknown Device";
             }
-
 
             public string GetFomattedType()
             {
@@ -146,13 +132,13 @@ namespace zVirtualScenesApplication
                     if (Level > 99)
                         return "Level: Unknown ON State";
                     else
-                        return "Level: " + _Level + "%";
+                        return "Level: " + this.Level + "%";
                 }
                 else if (Type != null && (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat")))
-                    return  "Mode:" + Enum.GetName(typeof(Device.ThermostatMode), _HeatCoolMode) +
-                            " | Fan:" + Enum.GetName(typeof(Device.ThermostatFanMode), _FanMode) +
-                            " | SetPoint:" + Enum.GetName(typeof(Device.EnergyMode), _Level) + "(" + _CoolPoint.ToString() + "/" + _HeatPoint.ToString() + ")" +
-                            " | Currently:" + Temp + "° " + _CurrentState;
+                    return  "Mode:" + Enum.GetName(typeof(Device.ThermostatMode), this.HeatCoolMode) +
+                            " | Fan:" + Enum.GetName(typeof(Device.ThermostatFanMode), this.FanMode) +
+                            " | SetPoint:" + Enum.GetName(typeof(Device.EnergyMode), this.Level) + "(" + this.CoolPoint.ToString() + "/" + this.HeatPoint.ToString() + ")" +
+                            " | Currently:" + Temp + "° " + this.CurrentState;
                 return "Unknown Device";
             }
 
@@ -163,14 +149,13 @@ namespace zVirtualScenesApplication
 
             //Type casting device to Action
             public static implicit operator Action(Device instance)
-            {
+            {                
                 Action action = new Action();
+                //ONLY INCLUDE NOT ACTION PROPERTIES HERE
                 action.Type = instance.Type;
                 action.Name = instance.Name;
                 action.NodeID = instance.NodeID;
                 action.HomeID = instance.HomeID;
-                action.Level = instance.Level; 
-                action.Level = instance.Level;
                 action.Temp = instance.Temp;             
                 return action;
             }

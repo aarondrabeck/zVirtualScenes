@@ -70,6 +70,12 @@ namespace zVirtualScenesApplication
             get { return _Temp; }
             set { GlobalFunctions.Set(this, "Temp", ref _Temp, value, PropertyChanged); }
         }
+        private string _EXEPath;
+        public string EXEPath
+        {
+            get { return _EXEPath; }
+            set { GlobalFunctions.Set(this, "EXEPath", ref _EXEPath, value, PropertyChanged); }
+        }
 
         //Standard Properties
         
@@ -88,7 +94,7 @@ namespace zVirtualScenesApplication
             _HeatCoolMode = -1;
             _EngeryMode = -1; 
             _HeatPoint = -1;
-            CoolPoint = -1; 
+            _CoolPoint = -1; 
             this.Type = "";
             this.NodeID = 0;                       
             this.Mode = -1;
@@ -99,12 +105,17 @@ namespace zVirtualScenesApplication
 
         public override string ToString()
         {
-            return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
+            if(Type == "LauchAPP")
+            {
+                return "Launch: " + EXEPath;
+            }
+            else
+                return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
         }
-
         
-        public void RunAction(zVirtualScenes zVirtualScenesMain)
+        public void RunAction(formzVirtualScenes zVirtualScenesMain)
         {
+            #region Switch
             if (this.Type.Contains("MultilevelPowerSwitch"))
             {
                 foreach (ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
@@ -112,16 +123,10 @@ namespace zVirtualScenesApplication
                     if (device.NodeID == this.NodeID)
                         device.Level = _Level;
                 }
-
-                //Update Level in MasterDevices rather than repolling controller
-                foreach (Device device in zVirtualScenesMain.MasterDevices)
-                {
-                    if (device.NodeID == this.NodeID)
-                    {
-                        device.Level = _Level;
-                    }
-                }
             }
+            #endregion
+
+            #region Thermostat
             else if (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat"))
             {
                 foreach (ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
@@ -139,14 +144,8 @@ namespace zVirtualScenesApplication
                             if (_FanMode != -1)
                                 thermostat.ThermostatFanMode = (ControlThink.ZWave.Devices.ThermostatFanMode)_FanMode;
 
-
-                            if (_EngeryMode != -1)
-                            {
-                                if (_EngeryMode == 0) //set EnergySavingMode
-                                    thermostat.Level = 0;
-                                else if (_EngeryMode == 255) //ComfortMode
-                                    thermostat.Level = 255;
-                            }
+                            if (_EngeryMode != -1)                                                            
+                                thermostat.Level = (byte)_EngeryMode;                            
 
                             if (_CoolPoint != -1)
                                 thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature = new Temperature(_CoolPoint, TemperatureScale.Fahrenheit);
@@ -159,11 +158,23 @@ namespace zVirtualScenesApplication
                             zVirtualScenesMain.LogThis(2, "Failed to set Thermostat. Mode might not be allowed. - " + e);
                         }
                     }
-                        
                 }
-                //REPOLL TERMOSTAT
-                zVirtualScenesMain.ControlThinkGetDevices();
             }
+            #endregion
+
+            #region Non Zwave
+            else if (Type == "LauchAPP")
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start(EXEPath);
+                }
+                catch (Exception e)
+                {
+                    zVirtualScenesMain.LogThis(2, "Failed to launch (" + EXEPath + ") - " + e);
+                }
+            }
+            #endregion
         }
 
         public string GetFomattedType()

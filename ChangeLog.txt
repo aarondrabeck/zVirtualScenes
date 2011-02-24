@@ -1,0 +1,18 @@
+ver 1.2.0.0 
+- Added ability launch an EXE as an action.
+- Added constant polling of devices to detect level changes.
+- Added Jabber interface allowing you to send an event to any Jabber Client such as GTalk. 
+- Added ability to change jabber notifications per device. 
+- Added ability to set min and max temperature levels, if reached alerts can be sent to jabber clients. 
+- Added multi popup forms and misc interface changes.
+
+ver 1.1.1.1
+ 2-20-11
+   - Modified General Thermostat Setpoint Layout in GUI (HTTP proccessor syntax updated accordingly) 
+
+ver 1.1.0.1
+ - 2-18-11
+
+    Added LightSwitch? (Android and Iphone App) interface.
+    Improved HTTP functionality
+    Many other things 

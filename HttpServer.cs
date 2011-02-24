@@ -14,9 +14,9 @@ namespace zVirtualScenesApplication
         protected int port;
         TcpListener listener;
         bool is_active = true;
-        private zVirtualScenes zVirtualScenesMain;
+        private formzVirtualScenes zVirtualScenesMain;
 
-        public HttpServer(int port, zVirtualScenes Form)
+        public HttpServer(int port, formzVirtualScenes Form)
         {
             this.port = port;
             this.zVirtualScenesMain = Form;

@@ -28,8 +28,8 @@
     <ProductName>zVirtualScenes</ProductName>
     <PublisherName>Drabeck Solutions</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>1</ApplicationRevision>
-    <ApplicationVersion>1.1.1.1</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.2.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -76,6 +76,12 @@
     <Reference Include="ControlThink.ZWave">
       <HintPath>.\ControlThink.ZWave.dll</HintPath>
     </Reference>
+    <Reference Include="jabber-net">
+      <HintPath>.\jabber-net.dll</HintPath>
+    </Reference>
+    <Reference Include="netlib.Dns">
+      <HintPath>.\netlib.Dns.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -86,9 +92,26 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="zlib.net">
+      <HintPath>.\zlib.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
+    <Compile Include="formSceneProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formSceneProperties.Designer.cs">
+      <DependentUpon>formSceneProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="formDeviceProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formDeviceProperties.Designer.cs">
+      <DependentUpon>formDeviceProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="JabberInterface.cs" />
+    <Compile Include="ControlThinkRefresh.cs" />
     <Compile Include="LightSwitchInterface.cs" />
     <Compile Include="CustomDeviceProperties.cs" />
     <Compile Include="HttpServer.cs" />
@@ -97,14 +120,20 @@
     <Compile Include="Scenes.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="GlobalFunctions.cs" />
-    <Compile Include="zVirtualScenes.cs">
+    <Compile Include="formzVirtualScenes.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="zVirtualScenes.Designer.cs">
-      <DependentUpon>zVirtualScenes.cs</DependentUpon>
+    <Compile Include="formzVirtualScenes.Designer.cs">
+      <DependentUpon>formzVirtualScenes.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="formSceneProperties.resx">
+      <DependentUpon>formSceneProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formDeviceProperties.resx">
+      <DependentUpon>formDeviceProperties.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -115,8 +144,8 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="zVirtualScenes.resx">
-      <DependentUpon>zVirtualScenes.cs</DependentUpon>
+    <EmbeddedResource Include="formzVirtualScenes.resx">
+      <DependentUpon>formzVirtualScenes.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\app.manifest" />
@@ -167,8 +196,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="audio-mixing-desk.ico" />
-    <Content Include="Resources\ChangeLog.txt" />
-    <Content Include="Resources\zVirtualScenes READ ME.txt" />
+    <Content Include="ChangeLog.txt" />
+    <Content Include="zVirtualScenes READ ME.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

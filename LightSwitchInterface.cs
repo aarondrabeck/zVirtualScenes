@@ -11,14 +11,14 @@ namespace zVirtualScenesApplication
 {
     class LightSwitchInterface
     {        
-        private zVirtualScenes zVirtualScenesMain;
+        private formzVirtualScenes zVirtualScenesMain;
         private Socket LightSwitchSocket;
         private readonly List<Socket> LightSwitchClients = new List<Socket>();
         public AsyncCallback pfnWorkerCallBack;
         private int m_cookie = new Random().Next(65536);
 
         //Contructor
-        public LightSwitchInterface(zVirtualScenes zvs)
+        public LightSwitchInterface(formzVirtualScenes zvs)
         {
             zVirtualScenesMain = zvs; 
         }
@@ -196,8 +196,7 @@ namespace zVirtualScenesApplication
                                 else if (cmd.StartsWith("ALIST"))
                                 {
                                     zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
-                                    zVirtualScenesMain.ControlThinkGetDevices();
-
+                                    
                                     foreach (Device device in zVirtualScenesMain.MasterDevices)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);   
 
@@ -209,8 +208,7 @@ namespace zVirtualScenesApplication
                                 else if (cmd.StartsWith("LIST"))
                                 {
                                     zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
-                                    zVirtualScenesMain.ControlThinkGetDevices();
-
+                                    
                                     foreach (Device device in zVirtualScenesMain.MasterDevices)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);
 
@@ -293,7 +291,7 @@ namespace zVirtualScenesApplication
         }
 
         /// <summary>
-        /// Send a Device Node and DEvice Level and translates to action.
+        /// Send a Device Node and Device Level and translates to action.
         /// </summary>
         /// <param name="Node">Node of device to run</param>
         /// <param name="Level">Desired Level of deivce</param>

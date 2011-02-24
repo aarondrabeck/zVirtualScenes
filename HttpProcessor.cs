@@ -23,9 +23,9 @@ namespace zVirtualScenesApplication
         public String http_protocol_versionstring;
         public Hashtable httpHeaders = new Hashtable();
 
-        private zVirtualScenes zVirtualScenesMain;
+        private formzVirtualScenes zVirtualScenesMain;
 
-        public HttpProcessor(TcpClient s, HttpServer srv, zVirtualScenes Form)
+        public HttpProcessor(TcpClient s, HttpServer srv, formzVirtualScenes Form)
         {
             this.socket = s;
             this.srv = srv;
@@ -249,8 +249,7 @@ namespace zVirtualScenesApplication
                     #region Device Listing
                     if (http_url.Contains(acceptedCMDs[3]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Refreshed device list and sent a device listing.");
-                        zVirtualScenesMain.ControlThinkGetDevices();
+                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Sent a device listing.");                        
 
                         outputStream.WriteLine("LIST START");
                         foreach (Device device in zVirtualScenesMain.MasterDevices)                        

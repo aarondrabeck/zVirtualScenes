@@ -13,10 +13,12 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using ControlThink.ZWave;
 using ControlThink.ZWave.Devices;
+using System.Timers;
+using jabber.client;
 
 namespace zVirtualScenesApplication
 {
-    public partial class zVirtualScenes : Form
+    public partial class formzVirtualScenes : Form
     {
         //Setup Log
         private string APP_PATH;
@@ -24,10 +26,14 @@ namespace zVirtualScenesApplication
         public readonly ZWaveController ControlThinkController = new ZWaveController();
         GlobalFunctions GlbFnct = new GlobalFunctions();
 
+        private formDeviceProperties formDeviceProperty;
+        private formSceneProperties formSceneProperties;
+
         //Simlpe Delegates for other threads and processes to interact with
         public delegate void LogThisDelegate(int type, string message);
-        public delegate void ControlThinkGetDevicesDelegate();
+        public delegate void ControlThinkRefreshDevicesDelegate();
         public delegate void RunSimpleActionDelegate(Action action);
+        public delegate void changeEventDelegate(string GlbUniqueID, string TypeOfChange);
 
         //DATA OBJECTS
         private BindingList<String> MasterLog = new BindingList<string>();
@@ -36,7 +42,10 @@ namespace zVirtualScenesApplication
         public BindingList<CustomDeviceProperties> CustomDeviceProperties = new BindingList<CustomDeviceProperties>();
         public Settings zVScenesSettings = new Settings();
 
-        public zVirtualScenes()
+
+        private JabberInterface jabber;
+
+        public formzVirtualScenes()
         {
             InitializeComponent();
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.zVirtualScenes_FormClosing);
@@ -49,7 +58,7 @@ namespace zVirtualScenesApplication
 
             //Setup Log
             listBoxLog.DataSource = MasterLog;
-            LogThis(1, ProgramName + " - v" + Application.ProductVersion + " START");
+            LogThis(1, ProgramName + " START");
 
             //Load XML Saved Settings
             LoadSettings();
@@ -77,7 +86,115 @@ namespace zVirtualScenesApplication
                 LightSwitchInterface LightSwitchInt = new LightSwitchInterface(this);
                 LightSwitchInt.OpenLightSwitchSocket();
             }
+
+            //Start Listening for device changes
+            ControlThinkRefresh refresher = new ControlThinkRefresh(this);
+            new Thread(new ThreadStart(refresher.RefreshThread)).Start();
+            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(refresher_DeviceInfoChange);        
+    
+            //JABBER
+            if (zVScenesSettings.JabberEnanbled)
+            {
+                jabber = new JabberInterface(this);
+                jabber.Connect();
+            }
         }
+       
+        void refresher_DeviceInfoChange(string GlbUniqueID, string TypeOfChange)
+        {
+            changeEvent(GlbUniqueID, TypeOfChange);
+        }
+
+        private void changeEvent(string GlbUniqueID, string TypeOfChange)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new changeEventDelegate(changeEvent), new object[] { GlbUniqueID, TypeOfChange });
+            else
+            {
+                foreach (Device device in MasterDevices)
+                {
+                    if (GlbUniqueID == device.GlbUniqueID())
+                    {
+                        string notification = "Event Notification Error";
+                        string notificationprefix = DateTime.Now.ToString("T") + ": ";
+                        
+                        if (device.Type == "MultilevelPowerSwitch" && TypeOfChange == "level")
+                        {
+                            notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";                            
+
+                            if(device.SendJabberNotifications)
+                                jabber.SendMessage(notificationprefix + notification);                        
+                        }
+                        else if (device.Type == "GeneralThermostatV2" || device.Type == "GeneralThermostat")
+                        {
+                            if (TypeOfChange == "Temp")
+                            {
+                                notification = device.Name + " temperature changed from " + device.prevTemp + " degrees to " + device.Temp + " degrees.";
+                                string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees."; 
+
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 0)
+                                {
+                                    if (device.Temp <= device.MaxAlertTemp || device.Temp >= device.MinAlertTemp)
+                                    {
+                                        jabber.SendMessage(notificationprefix + urgetnotification);
+                                        LogThis(1, urgetnotification);
+                                    }
+                                }
+
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 1)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                            if (TypeOfChange == "CoolPoint")
+                            {
+                                notification = device.Name + " cool point changed from " + device.prevCoolPoint + " to " + device.CoolPoint + ".";
+                                
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                            if (TypeOfChange == "HeatPoint")
+                            {
+                                notification = device.Name + " heat point changed from " + device.prevHeatPoint + " to " + device.HeatPoint + ".";
+
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                            if (TypeOfChange == "FanMode")
+                            {
+                                notification = device.Name + " fan mode changed from " + Enum.GetName(typeof(Device.ThermostatFanMode), device.prevFanMode) + " to " + Enum.GetName(typeof(Device.ThermostatFanMode), device.FanMode) + ".";
+                                
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                            if (TypeOfChange == "HeatCoolMode")
+                            {
+                                notification = device.Name + " mode changed from " + Enum.GetName(typeof(Device.ThermostatMode), device.prevHeatCoolMode) + " to " + Enum.GetName(typeof(Device.ThermostatMode), device.HeatCoolMode) + ".";
+                                
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                            if (TypeOfChange == "Level")
+                            {
+                                notification = device.Name + " energy state changed from " + Enum.GetName(typeof(Device.EnergyMode), device.prevLevel) + " to " + Enum.GetName(typeof(Device.EnergyMode), device.Level) + ".";
+                                
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                            if (TypeOfChange == "CurrentState")
+                            {
+                                notification = device.Name + " changed state from " + device.prevCurrentState + " to " + device.CurrentState + ".";
+
+                                if (device.SendJabberNotifications && device.NotificationDetailLevel > 3)
+                                    jabber.SendMessage(notificationprefix + notification);
+                            }
+                        }
+                        LogThis(1, notification);
+                        labelLastEvent.Text = notification;
+                    }                    
+                }                
+                listBoxDevices.DataSource = null;
+                listBoxDevices.DataSource = MasterDevices;
+            }
+        }        
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -85,7 +202,11 @@ namespace zVirtualScenesApplication
             if (ControlThinkController.IsConnected)
                 ControlThinkController.Disconnect();
 
-            SaveSettingsToFile();         
+            SaveSettingsToFile();
+
+            if(jabber != null)
+                jabber.Disconnect();         
+
 
             Environment.Exit(1);
         }      
@@ -102,7 +223,6 @@ namespace zVirtualScenesApplication
                 ControlThinkController.Connected += new System.EventHandler(ControlThinkUSBConnectedEvent);
                 ControlThinkController.Disconnected += new System.EventHandler(ControlThinkUSBDisconnectEvent);
                 ControlThinkController.ControllerNotResponding += new System.EventHandler(ControlThinkUSBNotRespondingEvent);
-                ControlThinkController.LevelChanged += new ZWaveController.LevelChangedEventHandler(ControlThinkUSBLevelChangedEvent);
                 ControlThinkController.Connect();
             }
             catch (Exception e)
@@ -113,13 +233,80 @@ namespace zVirtualScenesApplication
 
         public void ControlThinkGetDevices()
         {
+            int saveSelected = listBoxDevices.SelectedIndex; 
+            MasterDevices.Clear();
+
+            if (ControlThinkController.IsConnected)
+            {
+                foreach (ZWaveDevice device in ControlThinkController.Devices)
+                {
+                    try
+                    {
+                        //Allowed Z-wave Devices
+                        if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch ||
+                            device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 ||
+                            device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
+                        {
+                            //Convert Device to Action
+                            Device newDevice = new Device(this);
+                            newDevice.HomeID = ControlThinkController.HomeID;
+                            newDevice.NodeID = device.NodeID;
+                            newDevice.Level = device.Level;
+
+                            if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch)
+                            {
+                                newDevice.Type = "MultilevelPowerSwitch";
+                                newDevice.Name = "MultilevelPowerSwitch";
+                            }
+                            if (device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 || device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
+                            {
+                                newDevice.Type = "GeneralThermostatV2";
+                                newDevice.Name = "GeneralThermostatV2";
+
+                                ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
+                                newDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
+                                newDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
+                                newDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                newDevice.FanMode = (int)thermostat.ThermostatFanMode;
+                                newDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
+                                newDevice.Level = thermostat.Level;
+                                newDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
+                            }
+
+                            //Overwirte Name from the Custom Device Saved Data if present.
+                            foreach (CustomDeviceProperties cDevice in CustomDeviceProperties)
+                            {
+                                if (newDevice.GlbUniqueID() == cDevice.GlbUniqueID())
+                                {
+                                    newDevice.Name = cDevice.Name;
+                                    newDevice.NotificationDetailLevel = cDevice.NotificationDetailLevel;
+                                    newDevice.SendJabberNotifications = cDevice.SendJabberNotifications;
+                                    newDevice.MaxAlertTemp = cDevice.MaxAlertTemp;
+                                    newDevice.MinAlertTemp = cDevice.MinAlertTemp;
+                                }
+                            }
+                            MasterDevices.Add(newDevice);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        LogThis(2, "ControlThink USB Trouble Loading Devices: " + e);
+                    }
+                }
+                LogThis(1, "ControlThink USB Loaded " + MasterDevices.Count() + " Devices.");
+                    
+                //reset GUI items
+                try { listBoxDevices.SelectedIndex = saveSelected; }
+                catch { }
+            }            
+        }
+
+        public void ControlThinkRefreshDevices()
+        {
             if (this.InvokeRequired)
-                this.Invoke(new ControlThinkGetDevicesDelegate(ControlThinkGetDevices));
+                this.Invoke(new ControlThinkRefreshDevicesDelegate(ControlThinkRefreshDevices));
             else
             {
-                int saveSelected = listBoxDevices.SelectedIndex; 
-                MasterDevices.Clear();
-
                 if (ControlThinkController.IsConnected)
                 {
                     foreach (ZWaveDevice device in ControlThinkController.Devices)
@@ -131,52 +318,50 @@ namespace zVirtualScenesApplication
                                device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 ||
                                device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
                             {
-                                //Convert Device to Action
-                                Device newDevice = new Device(this);
-                                newDevice.HomeID = ControlThinkController.HomeID;
-                                newDevice.NodeID = device.NodeID;
-                                newDevice.Level = device.Level;
-
-                                if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch)
+                                foreach (Device thisDevice in MasterDevices)
                                 {
-                                    newDevice.Type = "MultilevelPowerSwitch";
-                                    newDevice.Name = "MultilevelPowerSwitch";
-                                }
-                                if (device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 || device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
-                                {
-                                    newDevice.Type = "GeneralThermostatV2";
-                                    newDevice.Name = "GeneralThermostatV2";
+                                    if (ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
+                                    {
+                                        if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch)
+                                            if(device.Level != thisDevice.Level)
+                                                thisDevice.Level = device.Level;
+                                        else if (device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 || device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
+                                        {
+                                            ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
 
-                                    ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
-                                    newDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
-                                    newDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
-                                    newDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
-                                    newDevice.FanMode = (int)thermostat.ThermostatFanMode;
-                                    newDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
-                                    newDevice.Level = thermostat.Level;
-                                    newDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
-                                }
+                                            if((int)thermostat.ThermostatTemperature.ToFahrenheit() != thisDevice.Temp)
+                                                thisDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
 
-                                //Overwirte Name from the Custom Device Saved Data if present.
-                                foreach (CustomDeviceProperties cDevice in CustomDeviceProperties)
-                                {
-                                    if (newDevice.GlbUniqueID() == cDevice.GlbUniqueID())
-                                        newDevice.Name = cDevice.Name;
-                                }
+                                            if (thisDevice.CoolPoint != (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit())
+                                                thisDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
 
-                                MasterDevices.Add(newDevice);
+                                            if (thisDevice.HeatPoint != (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit())
+                                            {
+                                                thisDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                            }
+                                                
+                                            if(thisDevice.FanMode != (int)thermostat.ThermostatFanMode)
+                                                    thisDevice.FanMode = (int)thermostat.ThermostatFanMode;
+
+                                            if(thisDevice.HeatCoolMode != (int)thermostat.ThermostatMode)
+                                                thisDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
+
+                                            if (device.Level != thermostat.Level)
+                                                    thisDevice.Level = thermostat.Level;
+                                                
+                                            if( thisDevice.CurrentState != thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString())
+                                                thisDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
+                                        }
+                                    }
+                                }
                             }
                         }
                         catch (Exception e)
                         {
-                            LogThis(2, "ControlThink USB Trouble Loading Devices: " + e);
+                            LogThis(2, "ControlThink USB Trouble Getting Device Status: " + e);
                         }
                     }
-                    LogThis(1, "ControlThink USB Loaded " + MasterDevices.Count() + " Devices.");
-                    
-                    //reset GUI items
-                    try { listBoxDevices.SelectedIndex = saveSelected; }
-                    catch { }
+                    LogThis(1, "ControlThink USB Refreshed all Devices.");
                 }
             }
         }
@@ -203,11 +388,6 @@ namespace zVirtualScenesApplication
             }
         }
 
-        private void ControlThinkUSBLevelChangedEvent(object sender, EventArgs e)
-        {
-            MessageBox.Show("Level Change");
-            LogThis(1, "ControlThink USB Level Change: " + e);
-        }
 
         #endregion 
 
@@ -263,66 +443,24 @@ namespace zVirtualScenesApplication
                  checkBoxLSDebugVerbose.Checked = true;
             else
                  checkBoxLSDebugVerbose.Checked = false;
+
+            //JAbber
+            textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
+            textBoxJabberUser.Text= zVScenesSettings.JabberUser;
+            textBoxJabberServer.Text = zVScenesSettings.JabberServer;
+            textBoxJabberUserTo.Text = zVScenesSettings.JabberSendToUser;
+            if (zVScenesSettings.JabberEnanbled == true )
+                checkBoxJabberEnabled.Checked = true;
+            else
+                checkBoxJabberEnabled.Checked = false;
+
+            if (zVScenesSettings.JabberVerbose == true)
+                checkBoxJabberVerbose.Checked = true;
+            else
+                checkBoxJabberVerbose.Checked = false;
         }
 
-        private void btn_SaveSettings_Click(object sender, EventArgs e)
-        {
-            bool saveOK = true;             
-
-            //HTTP Listen
-            try  {
-                zVScenesSettings.ZHTTPPort = Convert.ToInt32(txtb_httpPort.Text);
-            }
-            catch {
-                saveOK = false;
-                MessageBox.Show("Invalid HTTP Port.", ProgramName);
-            }
-
-            if (checkBoxHTTPEnable.Checked)
-                zVScenesSettings.zHTTPListenEnabled = true;
-            else
-                zVScenesSettings.zHTTPListenEnabled = false;
-
-            //LightSwitch
-            zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
-            if (checkBoxLSEnabled.Checked)
-                zVScenesSettings.LightSwitchEnabled = true;
-            else
-                zVScenesSettings.LightSwitchEnabled = false;
-            
-            if (checkBoxLSDebugVerbose.Checked)
-                zVScenesSettings.LightSwitchVerbose = true;
-            else
-                zVScenesSettings.LightSwitchVerbose = false;
-
-            try
-            {
-                zVScenesSettings.LightSwitchPort = Convert.ToInt32(textBoxLSport.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid LightSwitch Port.", ProgramName);
-            }
-            
-            try
-            {
-                zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid LightSwitch Max Connections.", ProgramName);
-            }
-
-
-            if(saveOK)
-                MessageBox.Show("Settings Saved. Please restart the program to enable or disable HTTP or LightSwitch servies.", ProgramName);
-
-            SaveSettingsToFile();
-
-        }
-
+       
         #endregion
 
     #region File I/O
@@ -439,7 +577,7 @@ namespace zVirtualScenesApplication
 
         private void btn_RefreshDevices_Click(object sender, EventArgs e)
         {
-            ControlThinkGetDevices();
+            
         }
 
         private void btn_AddtoScene_Click(object sender, EventArgs e)
@@ -477,35 +615,7 @@ namespace zVirtualScenesApplication
             else
                 MessageBox.Show("Please select a scene.", ProgramName);
         }
-
-        private void SaveScene_btn_Click(object sender, EventArgs e)
-        {
-            if (listBoxScenes.SelectedIndex != -1)
-            {
-                if (scenename_txtbx.Text != "")
-                {
-                    //GET ID OF SCENE SELECTED
-                    Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                    int sceneID = selectedscene.ID;
-
-                    //CHANGE NAME OF SELECTED SCENE
-                    foreach (Scene scene in MasterScenes)
-                    {
-                        if (sceneID == scene.ID)
-                            scene.Name = scenename_txtbx.Text;
-                    }
-
-                    lbl_sceneActions.Text = "Scene " + selectedscene.ID.ToString() + " Actions (" + selectedscene.Name + ")";
-
-                }
-                else
-                    MessageBox.Show("Please enter a scene name.", ProgramName);
-            }
-            else
-                MessageBox.Show("Please select a scene.", ProgramName);
-
-        }
-
+        
         private void btn_DelAction_Click(object sender, EventArgs e)
         {
             if (listBoxSceneActions.SelectedIndex != -1)
@@ -576,9 +686,6 @@ namespace zVirtualScenesApplication
             }
         }
 
-
-       
-
         private void btn_RunCommand_Click(object sender, EventArgs e)
         {
             if (listBoxDevices.SelectedIndex != -1)
@@ -586,56 +693,17 @@ namespace zVirtualScenesApplication
                 Action action = CreateActionFromUserInput((Device)listBoxDevices.SelectedItem);
 
                 if (action != null)
+                {
                     action.RunAction(this);
+                    LogThis(1, "Ran " + action.Name);
+                }
 
             }
         }
 
         private void btn_SetDeviceName_Click(object sender, EventArgs e)
         {
-            if (listBoxDevices.SelectedIndex != -1)
-            {
-                if (txtb_deviceName.Text != "")
-                {
-                    Device selecteddevice = (Device)listBoxDevices.SelectedItem;
-
-                    //Set Device List Name
-                    selecteddevice.Name = txtb_deviceName.Text;
-
-                    //Save into custom List for furture use
-                    bool found = false;
-                    foreach (CustomDeviceProperties cDevice in CustomDeviceProperties)
-                    {
-                        if (selecteddevice.HomeID == cDevice.HomeID && selecteddevice.NodeID == cDevice.NodeID)
-                        {
-                            cDevice.Name = txtb_deviceName.Text;
-                            found = true;
-                        }
-                    }
-                    if (!found)
-                    {
-                        CustomDeviceProperties newcDevice = new CustomDeviceProperties();
-                        newcDevice.Name = txtb_deviceName.Text;
-                        newcDevice.HomeID = selecteddevice.HomeID;
-                        newcDevice.NodeID = selecteddevice.NodeID;
-                        CustomDeviceProperties.Add(newcDevice);
-                    }
-
-                    //Replace name in each Action
-                    foreach (Scene scene in MasterScenes)
-                    {
-                        foreach (Action action in scene.Actions)
-                        {
-                            if (action.GlbUniqueID() == selecteddevice.GlbUniqueID())
-                                action.Name = selecteddevice.Name;
-                        }
-                    }
-                }
-                else
-                    MessageBox.Show("Invalid device name.", ProgramName);
-            }
-            else
-                MessageBox.Show("You must select a device.", ProgramName);
+           
         }
 
         private void buttonAddScene_Click(object sender, EventArgs e)
@@ -688,6 +756,7 @@ namespace zVirtualScenesApplication
 
             }
         }
+              
 
         private void listBoxDevices_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -708,9 +777,8 @@ namespace zVirtualScenesApplication
                     checkBoxeditCP.Enabled = false;
                     checkBoxeditHP.Enabled = false;
 
-                    txtbox_level.Text = selecteddevice.Level.ToString();
                 }
-                else if (selecteddevice.Type == "GeneralThermostatV2" || selecteddevice.Type == "GeneralThermostat")
+                else if (selecteddevice.Type.Contains("GeneralThermostat")) 
                 {
                     txtbox_level.Enabled = false;
                     comboBoxHeatCoolMode.Enabled = true;
@@ -721,19 +789,74 @@ namespace zVirtualScenesApplication
                     checkBoxeditHP.Enabled = true;
                     checkBoxeditHP.Checked = false;
 
-
                     comboBoxHeatCoolMode.SelectedIndex = comboBoxHeatCoolMode.Items.Count - 1;
                     comboBoxEnergyMode.SelectedIndex = comboBoxEnergyMode.Items.Count - 1;
                     comboBoxFanMode.SelectedIndex = comboBoxFanMode.Items.Count - 1;
 
                     txtbx_HeatPoint.Text = selecteddevice.HeatPoint.ToString();
                     textBoxCoolPoint.Text = selecteddevice.CoolPoint.ToString();
-                    labelCurrentTemp.Text = "Current Temperature: " + selecteddevice.Temp.ToString() + "°";                    
+                    labelCurrentTemp.Text = "Current Temperature: " + selecteddevice.Temp.ToString() + "°";  
                     
                 }
             }
         }
 
+        private void listBoxScenes_DoubleClick(object sender, EventArgs e)
+        {
+             if (listBoxScenes.SelectedIndex != -1)
+            {
+                if (formSceneProperties == null || formSceneProperties.IsDisposed)
+                {
+                    formSceneProperties = new formSceneProperties(this, listBoxScenes.SelectedIndex);
+                    formSceneProperties.Show();
+                }
+                formSceneProperties.Activate();
+            }
+            
+        }
+        
+        private void propertiesToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (listBoxScenes.SelectedIndex != -1)
+            {
+                if (formSceneProperties == null || formSceneProperties.IsDisposed)
+                {
+                    formSceneProperties = new formSceneProperties(this, listBoxScenes.SelectedIndex);
+                    formSceneProperties.Show();
+                }
+                formSceneProperties.Activate();
+            }
+        }
+
+        private void listBoxDevices_DoubleClick(object sender, EventArgs e)
+        {
+            if (listBoxDevices.SelectedIndex != -1)
+            {
+                if (formDeviceProperty == null || formDeviceProperty.IsDisposed)
+                {
+                    formDeviceProperty = new formDeviceProperties(this, listBoxDevices.SelectedIndex);
+                    formDeviceProperty.Show();
+
+                }
+                formDeviceProperty.Activate();
+            }
+        }       
+
+        private void propertiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+         
+            if (listBoxDevices.SelectedIndex != -1)
+            {
+                if (formDeviceProperty == null || formDeviceProperty.IsDisposed)
+                {
+                    formDeviceProperty = new formDeviceProperties(this, listBoxDevices.SelectedIndex);
+                    formDeviceProperty.Show();
+
+                }
+                formDeviceProperty.Activate();
+            }
+        }
+        
         private void listBoxScenes_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBoxScenes.SelectedIndex != -1)
@@ -743,6 +866,61 @@ namespace zVirtualScenesApplication
                 lbl_sceneActions.Text = "Scene " + selectedscene.ID.ToString() + " (" + selectedscene.Name + ") Actions";
             }
         }
+
+        private void checkBoxeditCP_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxeditCP.Checked == true)
+                textBoxCoolPoint.Enabled = true;
+            else
+                textBoxCoolPoint.Enabled = false;
+        }
+
+        private void checkBoxeditHP_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxeditHP.Checked == true)
+                txtbx_HeatPoint.Enabled = true;
+            else
+                txtbx_HeatPoint.Enabled = false;
+        }
+
+        private void btn_createnonzwaction_Click(object sender, EventArgs e)
+        {
+            if (listBoxScenes.SelectedIndex != -1)
+            {
+                if (comboBoxNonZWAction.SelectedIndex == 0)
+                {
+                    //Add EXE Action
+                    OpenFileDialog fdlg = new OpenFileDialog();
+                    fdlg.Title = "Please select the file to run with this action.";
+                    fdlg.Filter = "All files (*.*)|*.*|All files (*.*)|*.*";
+                    fdlg.FilterIndex = 2;
+
+                    if (fdlg.ShowDialog() == DialogResult.OK)
+                    {
+                        Action EXEAction = new Action();
+                        EXEAction.EXEPath = fdlg.FileName;
+                        EXEAction.Type = "LauchAPP";
+
+                        //GET ID OF SCENE SELECTED
+                        Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
+                        //ADD ACTION TO SELECTED SCENE
+                        foreach (Scene scene in MasterScenes)
+                        {
+                            if (selectedscene.ID == scene.ID)
+                            {
+
+                                scene.Actions.Add(EXEAction);
+                            }
+                        }
+                    }
+                }
+                else
+                    MessageBox.Show("Please select an action type from the drop down. ", ProgramName);
+            }
+            else
+                MessageBox.Show("Please select one device and one scene.", ProgramName);
+
+        } 
 
     #endregion
 
@@ -764,7 +942,7 @@ namespace zVirtualScenesApplication
             if (this.InvokeRequired)
                 this.Invoke(new LogThisDelegate(LogThis), new object[] { type, message });
             else
-                MasterLog.Add(datetime + " " + typename + " - " + message + "\n");            
+                MasterLog.Insert(0, datetime + " " + typename + " - " + message + "\n");            
         }
 
         public void RunSimpleAction(Action action)
@@ -803,7 +981,7 @@ namespace zVirtualScenesApplication
                 }
 
             }
-            else if (action.Type == "" || action.Type == "GeneralThermostat")
+            else if (action.Type.Contains("GeneralThermostat"))
             {   
                 action.HeatCoolMode = (int)Enum.Parse(typeof(Device.ThermostatMode),comboBoxHeatCoolMode.SelectedValue.ToString());
                 action.FanMode = (int)Enum.Parse(typeof(Device.ThermostatFanMode), comboBoxFanMode.SelectedValue.ToString());
@@ -853,24 +1031,105 @@ namespace zVirtualScenesApplication
             else
                 LogThis(1, "Attepmted to run scene with no action.");
         }
-
-        #endregion
-
-        private void checkBoxeditCP_CheckedChanged(object sender, EventArgs e)
+        
+        private void lookForNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (checkBoxeditCP.Checked == true)            
-                textBoxCoolPoint.Enabled = true;
-            else
-                textBoxCoolPoint.Enabled = false;            
+            ControlThinkGetDevices();
         }
 
-        private void checkBoxeditHP_CheckedChanged(object sender, EventArgs e)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (checkBoxeditHP.Checked == true)
-                txtbx_HeatPoint.Enabled = true;
-            else
-                txtbx_HeatPoint.Enabled = false;
+            this.Close();
         }
+
+        private void buttonSaveSettings_Click(object sender, EventArgs e)
+        {
+            bool saveOK = true;
+
+            //HTTP Listen
+            try
+            {
+                zVScenesSettings.ZHTTPPort = Convert.ToInt32(txtb_httpPort.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid HTTP Port.", ProgramName);
+            }
+
+            if (checkBoxHTTPEnable.Checked)
+                zVScenesSettings.zHTTPListenEnabled = true;
+            else
+                zVScenesSettings.zHTTPListenEnabled = false;
+
+            //LightSwitch
+            zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
+            if (checkBoxLSEnabled.Checked)
+                zVScenesSettings.LightSwitchEnabled = true;
+            else
+                zVScenesSettings.LightSwitchEnabled = false;
+
+            if (checkBoxLSDebugVerbose.Checked)
+                zVScenesSettings.LightSwitchVerbose = true;
+            else
+                zVScenesSettings.LightSwitchVerbose = false;
+
+            try
+            {
+                zVScenesSettings.LightSwitchPort = Convert.ToInt32(textBoxLSport.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid LightSwitch Port.", ProgramName);
+            }
+
+            try
+            {
+                zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid LightSwitch Max Connections.", ProgramName);
+            }
+
+            //JABBER
+            zVScenesSettings.JabberPassword = textBoxJabberPassword.Text;
+            zVScenesSettings.JabberUser = textBoxJabberUser.Text;
+            zVScenesSettings.JabberServer = textBoxJabberServer.Text;
+            zVScenesSettings.JabberSendToUser = textBoxJabberUserTo.Text;
+            if (checkBoxJabberEnabled.Checked)
+                zVScenesSettings.JabberEnanbled = true;
+            else
+                zVScenesSettings.JabberEnanbled = false;
+
+            if (checkBoxJabberVerbose.Checked)
+                zVScenesSettings.JabberVerbose = true;
+            else
+                zVScenesSettings.JabberVerbose = false;
+
+            if (saveOK)
+                MessageBox.Show("Settings Saved. Please restart the program to enable or disable HTTP or LightSwitch servies.", ProgramName);
+
+            SaveSettingsToFile();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveSettingsToFile();
+        }
+
+    #endregion
+
+       
+
+        
+
+
+
+
+
 
     }
 }

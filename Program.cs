@@ -15,7 +15,7 @@ namespace zVirtualScenesApplication
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new zVirtualScenes());
+            Application.Run(new formzVirtualScenes());
         }
     }
 }
