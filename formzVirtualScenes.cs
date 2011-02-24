@@ -134,7 +134,7 @@ namespace zVirtualScenesApplication
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 0)
                                 {
-                                    if (device.Temp <= device.MaxAlertTemp || device.Temp >= device.MinAlertTemp)
+                                    if (device.Temp >= device.MaxAlertTemp || device.Temp <= device.MinAlertTemp)
                                     {
                                         jabber.SendMessage(notificationprefix + urgetnotification);
                                         LogThis(1, urgetnotification);

@@ -64,7 +64,7 @@ namespace zVirtualScenesApplication
         private void jabberClient1_OnAuthenticate(object sender)
         {
             zVirtualScenesMain.LogThis(1, "JABBER: Connected");
-            j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zVirtualScenesMain.Name + " server.", ":chat", 0);
+            j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zVirtualScenesMain.ProgramName + " server.", ":chat", 0);
         }
 
         void jabberClient1_OnError(object sender, Exception ex)

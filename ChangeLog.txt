@@ -1,3 +1,7 @@
+ver 1.2.1.0
+- Temperature Alert Bug Fix
+- Jabber Presence Bug Fix
+
 ver 1.2.0.0 
 - Added ability launch an EXE as an action.
 - Added constant polling of devices to detect level changes.
