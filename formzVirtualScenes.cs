@@ -15,6 +15,8 @@ using ControlThink.ZWave;
 using ControlThink.ZWave.Devices;
 using System.Timers;
 using jabber.client;
+using System.Runtime.InteropServices;
+
 
 namespace zVirtualScenesApplication
 {
@@ -23,33 +25,33 @@ namespace zVirtualScenesApplication
         //Setup Log
         private string APP_PATH;
         public string ProgramName = "zVirtualScenes - v" + Application.ProductVersion;
-        public readonly ZWaveController ControlThinkController = new ZWaveController();
-        GlobalFunctions GlbFnct = new GlobalFunctions();
 
+        //Forms and Controllers
+        public readonly ZWaveController ControlThinkController = new ZWaveController();
         private formDeviceProperties formDeviceProperty;
         private formSceneProperties formSceneProperties;
+        private JabberInterface jabber;
+        private KeyboardHook hook = new KeyboardHook();
 
-        //Simlpe Delegates for other threads and processes to interact with
+        //Delegates
         public delegate void LogThisDelegate(int type, string message);
-        public delegate void ControlThinkRefreshDevicesDelegate();
-        public delegate void RunSimpleActionDelegate(Action action);
-        public delegate void changeEventDelegate(string GlbUniqueID, string TypeOfChange);
+        public delegate void ControlThinkConnectDelegate();
+        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, string TypeOfChange);
+        public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
 
-        //DATA OBJECTS
+        //CORE OBJECTS
         private BindingList<String> MasterLog = new BindingList<string>();
         public BindingList<Device> MasterDevices = new BindingList<Device>();
         public BindingList<Scene> MasterScenes = new BindingList<Scene>();
         public BindingList<CustomDeviceProperties> CustomDeviceProperties = new BindingList<CustomDeviceProperties>();
-        public Settings zVScenesSettings = new Settings();
-
-
-        private JabberInterface jabber;
+        public Settings zVScenesSettings = new Settings();        
 
         public formzVirtualScenes()
         {
             InitializeComponent();
+
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.zVirtualScenes_FormClosing);
-        }
+        }        
 
         private void zVirtualScenes_Load(object sender, EventArgs e)
         {
@@ -58,7 +60,7 @@ namespace zVirtualScenesApplication
 
             //Setup Log
             listBoxLog.DataSource = MasterLog;
-            LogThis(1, ProgramName + " START");
+            LogThis(1, ProgramName + " STARTED");
 
             //Load XML Saved Settings
             LoadSettings();
@@ -71,13 +73,11 @@ namespace zVirtualScenesApplication
             ControlThinkConnect();
             ControlThinkGetDevices();
 
-            //Bind GUI to data
+            //Bind data to GUI elements
             listBoxDevices.DataSource = MasterDevices;
             listBoxScenes.DataSource = MasterScenes;
 
-            comboBoxHeatCoolMode.SelectedIndex = 0;
-
-            //Start HTTP
+            //Start HTTP INTERFACE
             StartHTPP();
 
             //LightSwitch Clients
@@ -90,7 +90,7 @@ namespace zVirtualScenesApplication
             //Start Listening for device changes
             ControlThinkRefresh refresher = new ControlThinkRefresh(this);
             new Thread(new ThreadStart(refresher.RefreshThread)).Start();
-            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(refresher_DeviceInfoChange);        
+            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);        
     
             //JABBER
             if (zVScenesSettings.JabberEnanbled)
@@ -98,17 +98,77 @@ namespace zVirtualScenesApplication
                 jabber = new JabberInterface(this);
                 jabber.Connect();
             }
-        }
-       
-        void refresher_DeviceInfoChange(string GlbUniqueID, string TypeOfChange)
+
+            #region Register Global Hot Keys    
+            try
+            {
+                hook.form = this;
+                hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D0);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D1);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D2);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D3);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D4);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D5);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D6);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D7);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D8);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D9);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.A);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.B);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.C);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.E);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.F);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.G);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.H);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.I);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.J);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.K);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.L);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.M);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.N);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.O);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.P);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Q);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.R);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.S);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.T);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.U);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.V);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.W);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.X);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Y);
+                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Z);
+                LogThis(1, "Global HotKey Interface:  Registered global hotkeys.");
+            }
+            catch (Exception ex)
+            {
+                LogThis(2, "Global HotKey Interface:  Failed to register global hotkeys. - " + ex.Message);
+            }
+
+            #endregion
+    }       
+
+        private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
         {
-            changeEvent(GlbUniqueID, TypeOfChange);
+            SaveSettingsToFile();
+            if (ControlThinkController.IsConnected)
+                ControlThinkController.Disconnect();
+
+            SaveSettingsToFile();
+
+            if (jabber != null)
+                jabber.Disconnect();
+
+
+            Environment.Exit(1);
         }
 
-        private void changeEvent(string GlbUniqueID, string TypeOfChange)
+        private void DeviceInfoChange_Handler(string GlbUniqueID, string TypeOfChange)
         {
             if (this.InvokeRequired)
-                this.Invoke(new changeEventDelegate(changeEvent), new object[] { GlbUniqueID, TypeOfChange });
+                this.Invoke(new DeviceInfoChange_HandlerDelegate(DeviceInfoChange_Handler), new object[] { GlbUniqueID, TypeOfChange });
             else
             {
                 foreach (Device device in MasterDevices)
@@ -117,20 +177,20 @@ namespace zVirtualScenesApplication
                     {
                         string notification = "Event Notification Error";
                         string notificationprefix = DateTime.Now.ToString("T") + ": ";
-                        
+
                         if (device.Type == "MultilevelPowerSwitch" && TypeOfChange == "level")
                         {
-                            notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";                            
+                            notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";
 
-                            if(device.SendJabberNotifications)
-                                jabber.SendMessage(notificationprefix + notification);                        
+                            if (device.SendJabberNotifications)
+                                jabber.SendMessage(notificationprefix + notification);
                         }
                         else if (device.Type == "GeneralThermostatV2" || device.Type == "GeneralThermostat")
                         {
                             if (TypeOfChange == "Temp")
                             {
                                 notification = device.Name + " temperature changed from " + device.prevTemp + " degrees to " + device.Temp + " degrees.";
-                                string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees."; 
+                                string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees.";
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 0)
                                 {
@@ -147,7 +207,7 @@ namespace zVirtualScenesApplication
                             if (TypeOfChange == "CoolPoint")
                             {
                                 notification = device.Name + " cool point changed from " + device.prevCoolPoint + " to " + device.CoolPoint + ".";
-                                
+
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
@@ -161,21 +221,21 @@ namespace zVirtualScenesApplication
                             if (TypeOfChange == "FanMode")
                             {
                                 notification = device.Name + " fan mode changed from " + Enum.GetName(typeof(Device.ThermostatFanMode), device.prevFanMode) + " to " + Enum.GetName(typeof(Device.ThermostatFanMode), device.FanMode) + ".";
-                                
+
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
                             if (TypeOfChange == "HeatCoolMode")
                             {
                                 notification = device.Name + " mode changed from " + Enum.GetName(typeof(Device.ThermostatMode), device.prevHeatCoolMode) + " to " + Enum.GetName(typeof(Device.ThermostatMode), device.HeatCoolMode) + ".";
-                                
+
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
                             if (TypeOfChange == "Level")
                             {
                                 notification = device.Name + " energy state changed from " + Enum.GetName(typeof(Device.EnergyMode), device.prevLevel) + " to " + Enum.GetName(typeof(Device.EnergyMode), device.Level) + ".";
-                                
+
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
@@ -189,45 +249,104 @@ namespace zVirtualScenesApplication
                         }
                         LogThis(1, notification);
                         labelLastEvent.Text = notification;
-                    }                    
-                }                
+                    }
+                }
                 listBoxDevices.DataSource = null;
                 listBoxDevices.DataSource = MasterDevices;
             }
-        }        
+        }
 
-        private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
+    #region Hot Key Handling
+
+        void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
-            SaveSettingsToFile();
-            if (ControlThinkController.IsConnected)
-                ControlThinkController.Disconnect();
+            string modifiers = e.Modifier.ToString().Replace(", ", "_");
+            string KeysPresseed = modifiers + "_" + e.Key.ToString();
 
-            SaveSettingsToFile();
+            //Learn Mode
+            if (formSceneProperties != null && !formSceneProperties.IsDisposed)
+                formSceneProperties.SetGlobalHotKey(KeysPresseed);
+            //Run Mode
+            else
+            {
+                foreach (Scene thiscene in MasterScenes)
+                {
+                    if (Enum.GetName(typeof(CustomHotKeys), thiscene.GlobalHotKey) == KeysPresseed)
+                    {
+                        Scene.SceneResult result = thiscene.Run(ControlThinkController);
+                        LogThis(result.SuccessLevel, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
+                    }
+                }
+            }
 
-            if(jabber != null)
-                jabber.Disconnect();         
+        }
 
+        public enum CustomHotKeys
+        {
+            None = 0,
+            Alt_Control_Win_A = 1,
+            Alt_Control_Win_B = 2,
+            Alt_Control_Win_C = 3,
+            Alt_Control_Win_D = 4,
+            Alt_Control_Win_E = 5,
+            Alt_Control_Win_F = 6,
+            Alt_Control_Win_G = 7,
+            Alt_Control_Win_H = 8,
+            Alt_Control_Win_I = 9,
+            Alt_Control_Win_J = 10,
+            Alt_Control_Win_K = 11,
+            Alt_Control_Win_L = 12,
+            Alt_Control_Win_M = 13,
+            Alt_Control_Win_N = 14,
+            Alt_Control_Win_O = 15,
+            Alt_Control_Win_P = 16,
+            Alt_Control_Win_Q = 17,
+            Alt_Control_Win_R = 18,
+            Alt_Control_Win_S = 19,
+            Alt_Control_Win_T = 20,
+            Alt_Control_Win_U = 21,
+            Alt_Control_Win_V = 22,
+            Alt_Control_Win_W = 23,
+            Alt_Control_Win_X = 24,
+            Alt_Control_Win_Y = 25,
+            Alt_Control_Win_Z = 26,
+            Alt_Control_Win_D1 = 27,
+            Alt_Control_Win_D2 = 28,
+            Alt_Control_Win_D3 = 29,
+            Alt_Control_Win_D4 = 30,
+            Alt_Control_Win_D5 = 31,
+            Alt_Control_Win_D6 = 32,
+            Alt_Control_Win_D7 = 33,
+            Alt_Control_Win_D8 = 34,
+            Alt_Control_Win_D9 = 35,
+            Alt_Control_Win_D0 = 36
 
-            Environment.Exit(1);
-        }      
+        }
+
+        #endregion
 
     #region ControlThink ZWave Controller Code
 
-        private void ControlThinkConnect()
+        public void ControlThinkConnect()
         {
-            if (ControlThinkController.IsConnected)
-                return;
-            try
+            if (this.InvokeRequired)
+                this.Invoke(new ControlThinkConnectDelegate(ControlThinkConnect));
+            else
             {
-                ControlThinkController.SynchronizingObject = this;
-                ControlThinkController.Connected += new System.EventHandler(ControlThinkUSBConnectedEvent);
-                ControlThinkController.Disconnected += new System.EventHandler(ControlThinkUSBDisconnectEvent);
-                ControlThinkController.ControllerNotResponding += new System.EventHandler(ControlThinkUSBNotRespondingEvent);
-                ControlThinkController.Connect();
-            }
-            catch (Exception e)
-            {
-                LogThis(2,"ControlThink USB Cennection Error: " + e);
+                if (ControlThinkController.IsConnected)
+                    return;
+                try
+                {
+                    ControlThinkController.SynchronizingObject = this;
+                    ControlThinkController.Connected += new System.EventHandler(ControlThinkUSBConnectedEvent);
+                    ControlThinkController.Disconnected += new System.EventHandler(ControlThinkUSBDisconnectEvent);
+                    ControlThinkController.ControllerNotResponding += new System.EventHandler(ControlThinkUSBNotRespondingEvent);
+                    ControlThinkController.Connect();
+                }
+                catch (Exception e)
+                {
+                    LogThis(2, "ControlThink USB Cennection Error: " + e);
+                }
             }
         }
 
@@ -294,76 +413,13 @@ namespace zVirtualScenesApplication
                     }
                 }
                 LogThis(1, "ControlThink USB Loaded " + MasterDevices.Count() + " Devices.");
-                    
+
                 //reset GUI items
                 try { listBoxDevices.SelectedIndex = saveSelected; }
                 catch { }
-            }            
-        }
-
-        public void ControlThinkRefreshDevices()
-        {
-            if (this.InvokeRequired)
-                this.Invoke(new ControlThinkRefreshDevicesDelegate(ControlThinkRefreshDevices));
-            else
-            {
-                if (ControlThinkController.IsConnected)
-                {
-                    foreach (ZWaveDevice device in ControlThinkController.Devices)
-                    {
-                        try
-                        {
-                            //Allowed Z-wave Devices
-                            if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch ||
-                               device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 ||
-                               device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
-                            {
-                                foreach (Device thisDevice in MasterDevices)
-                                {
-                                    if (ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
-                                    {
-                                        if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch)
-                                            if(device.Level != thisDevice.Level)
-                                                thisDevice.Level = device.Level;
-                                        else if (device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 || device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
-                                        {
-                                            ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
-
-                                            if((int)thermostat.ThermostatTemperature.ToFahrenheit() != thisDevice.Temp)
-                                                thisDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
-
-                                            if (thisDevice.CoolPoint != (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit())
-                                                thisDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
-
-                                            if (thisDevice.HeatPoint != (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit())
-                                            {
-                                                thisDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
-                                            }
-                                                
-                                            if(thisDevice.FanMode != (int)thermostat.ThermostatFanMode)
-                                                    thisDevice.FanMode = (int)thermostat.ThermostatFanMode;
-
-                                            if(thisDevice.HeatCoolMode != (int)thermostat.ThermostatMode)
-                                                thisDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
-
-                                            if (device.Level != thermostat.Level)
-                                                    thisDevice.Level = thermostat.Level;
-                                                
-                                            if( thisDevice.CurrentState != thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString())
-                                                thisDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            LogThis(2, "ControlThink USB Trouble Getting Device Status: " + e);
-                        }
-                    }
-                    LogThis(1, "ControlThink USB Refreshed all Devices.");
-                }
             }
+            else
+                ControlThinkConnect();
         }
 
         private void ControlThinkUSBConnectedEvent(object sender, EventArgs e)
@@ -391,7 +447,7 @@ namespace zVirtualScenesApplication
 
         #endregion 
 
-    #region HTTP Handling
+    #region HTTP INTERFACE
 
         public void StartHTPP()
         {
@@ -402,15 +458,15 @@ namespace zVirtualScenesApplication
                     HttpServer httpServer = new HttpServer(zVScenesSettings.ZHTTPPort, this);
                     Thread thread = new Thread(new ThreadStart(httpServer.listen));
                     thread.Start();
-                    LogThis(1, "Started HTTP Listening on all adapters.");
+                    LogThis(1, "HTTP Interface: Started listening for HTTP commands on all adapters.");
                 }
                 catch (Exception e)
                 {
-                    LogThis(2, "FAILED to Start HTTP Listening: " + e);
+                    LogThis(2, "HTTP Interface: FAILED to Start HTTP Listening: " + e);
                 }
             }
             else
-                LogThis(1, "HTTP Listening DISABLED in settings.");
+                LogThis(1, "HTTP Interface: HTTP Listening DISABLED in settings.");
         }
 
         #endregion
@@ -497,7 +553,7 @@ namespace zVirtualScenesApplication
             {
                 StreamWriter SW = new System.IO.StreamWriter(APP_PATH + "zVirtualScenes.log",  false, Encoding.ASCII);                
                 foreach(string item in MasterLog)
-                    SW.WriteLine(item);
+                    SW.Write(item);
                 SW.Close();
             }
             catch (Exception e)
@@ -575,6 +631,94 @@ namespace zVirtualScenesApplication
 
     #region GUI Events
 
+        private void lookForNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ControlThinkGetDevices();
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void buttonSaveSettings_Click(object sender, EventArgs e)
+        {
+            bool saveOK = true;
+
+            //HTTP Listen
+            try
+            {
+                zVScenesSettings.ZHTTPPort = Convert.ToInt32(txtb_httpPort.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid HTTP Port.", ProgramName);
+            }
+
+            if (checkBoxHTTPEnable.Checked)
+                zVScenesSettings.zHTTPListenEnabled = true;
+            else
+                zVScenesSettings.zHTTPListenEnabled = false;
+
+            //LightSwitch
+            zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
+            if (checkBoxLSEnabled.Checked)
+                zVScenesSettings.LightSwitchEnabled = true;
+            else
+                zVScenesSettings.LightSwitchEnabled = false;
+
+            if (checkBoxLSDebugVerbose.Checked)
+                zVScenesSettings.LightSwitchVerbose = true;
+            else
+                zVScenesSettings.LightSwitchVerbose = false;
+
+            try
+            {
+                zVScenesSettings.LightSwitchPort = Convert.ToInt32(textBoxLSport.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid LightSwitch Port.", ProgramName);
+            }
+
+            try
+            {
+                zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid LightSwitch Max Connections.", ProgramName);
+            }
+
+            //JABBER
+            zVScenesSettings.JabberPassword = textBoxJabberPassword.Text;
+            zVScenesSettings.JabberUser = textBoxJabberUser.Text;
+            zVScenesSettings.JabberServer = textBoxJabberServer.Text;
+            zVScenesSettings.JabberSendToUser = textBoxJabberUserTo.Text;
+            if (checkBoxJabberEnabled.Checked)
+                zVScenesSettings.JabberEnanbled = true;
+            else
+                zVScenesSettings.JabberEnanbled = false;
+
+            if (checkBoxJabberVerbose.Checked)
+                zVScenesSettings.JabberVerbose = true;
+            else
+                zVScenesSettings.JabberVerbose = false;
+
+            if (saveOK)
+                MessageBox.Show("Settings Saved. Please restart the program to enable or disable HTTP or LightSwitch servies.", ProgramName);
+
+            SaveSettingsToFile();
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveSettingsToFile();
+        }
+
         private void btn_RefreshDevices_Click(object sender, EventArgs e)
         {
             
@@ -610,7 +754,8 @@ namespace zVirtualScenesApplication
             if (listBoxScenes.SelectedIndex != -1)
             {
                 Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                runScene(selectedscene);
+                Scene.SceneResult result = selectedscene.Run(ControlThinkController);
+                LogThis(result.SuccessLevel, "GUI: [USER] " + result.Description);
             }
             else
                 MessageBox.Show("Please select a scene.", ProgramName);
@@ -694,8 +839,8 @@ namespace zVirtualScenesApplication
 
                 if (action != null)
                 {
-                    action.RunAction(this);
-                    LogThis(1, "Ran " + action.Name);
+                    Action.ActionResult result = action.Run(ControlThinkController);
+                    LogThis(result.SuccessLevel, "GUI: [USER] " + result.Description);
                 }
 
             }
@@ -942,18 +1087,21 @@ namespace zVirtualScenesApplication
             if (this.InvokeRequired)
                 this.Invoke(new LogThisDelegate(LogThis), new object[] { type, message });
             else
-                MasterLog.Insert(0, datetime + " " + typename + " - " + message + "\n");            
-        }
-
-        public void RunSimpleAction(Action action)
-        {
-            if (this.InvokeRequired)
-                this.Invoke(new RunSimpleActionDelegate(RunSimpleAction), new object[] { action });
-            else
             {
-                action.RunAction(this);
+                MasterLog.Add(datetime + " " + typename + " - " + message + "\n");
+                listBoxLog.SelectedIndex = listBoxLog.Items.Count-1; 
             }
         }
+
+        //public void RunSimpleAction(Action action)
+        //{
+        //    if (this.InvokeRequired)
+        //        this.Invoke(new RunSimpleActionDelegate(RunSimpleAction), new object[] { action });
+        //    else
+        //    {
+        //        action.RunAction(this);
+        //    }
+        //}
         #endregion
 
     #region General Use Functions
@@ -1016,120 +1164,10 @@ namespace zVirtualScenesApplication
             }
             return action; 
         }
-
-        private void runScene(Scene _scene)
-        {
-            if (_scene.Actions.Count > 0)
-            {
-                foreach (Action action in _scene.Actions)
-                {
-                    action.RunAction(this);
-                }
-
-                LogThis(1, "Ran Scene #" + _scene.ID.ToString() + " (" + _scene.Name + ") with " + _scene.Actions.Count() + " actions.");
-            }
-            else
-                LogThis(1, "Attepmted to run scene with no action.");
-        }
         
-        private void lookForNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ControlThinkGetDevices();
-        }
-
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void buttonSaveSettings_Click(object sender, EventArgs e)
-        {
-            bool saveOK = true;
-
-            //HTTP Listen
-            try
-            {
-                zVScenesSettings.ZHTTPPort = Convert.ToInt32(txtb_httpPort.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid HTTP Port.", ProgramName);
-            }
-
-            if (checkBoxHTTPEnable.Checked)
-                zVScenesSettings.zHTTPListenEnabled = true;
-            else
-                zVScenesSettings.zHTTPListenEnabled = false;
-
-            //LightSwitch
-            zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
-            if (checkBoxLSEnabled.Checked)
-                zVScenesSettings.LightSwitchEnabled = true;
-            else
-                zVScenesSettings.LightSwitchEnabled = false;
-
-            if (checkBoxLSDebugVerbose.Checked)
-                zVScenesSettings.LightSwitchVerbose = true;
-            else
-                zVScenesSettings.LightSwitchVerbose = false;
-
-            try
-            {
-                zVScenesSettings.LightSwitchPort = Convert.ToInt32(textBoxLSport.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid LightSwitch Port.", ProgramName);
-            }
-
-            try
-            {
-                zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid LightSwitch Max Connections.", ProgramName);
-            }
-
-            //JABBER
-            zVScenesSettings.JabberPassword = textBoxJabberPassword.Text;
-            zVScenesSettings.JabberUser = textBoxJabberUser.Text;
-            zVScenesSettings.JabberServer = textBoxJabberServer.Text;
-            zVScenesSettings.JabberSendToUser = textBoxJabberUserTo.Text;
-            if (checkBoxJabberEnabled.Checked)
-                zVScenesSettings.JabberEnanbled = true;
-            else
-                zVScenesSettings.JabberEnanbled = false;
-
-            if (checkBoxJabberVerbose.Checked)
-                zVScenesSettings.JabberVerbose = true;
-            else
-                zVScenesSettings.JabberVerbose = false;
-
-            if (saveOK)
-                MessageBox.Show("Settings Saved. Please restart the program to enable or disable HTTP or LightSwitch servies.", ProgramName);
-
-            SaveSettingsToFile();
-        }
-
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            SaveSettingsToFile();
-        }
-
-    #endregion
-
        
 
-        
-
-
-
-
-
+    #endregion
 
     }
 }

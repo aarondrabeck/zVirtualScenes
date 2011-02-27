@@ -18,7 +18,6 @@ namespace zVirtualScenesApplication
             this.zVirtualScenesMain = _zVirtualScenesMain;
         }
 
-
         /// <summary>
         /// This continually looks for changes in device modes.  When one is detected, it will change MasterDeviceList and call the DeviceInfoChangeEventHandler. 
         /// </summary>
@@ -56,52 +55,77 @@ namespace zVirtualScenesApplication
                                         {
                                             ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
 
-                                            if ((int)thermostat.ThermostatTemperature.ToFahrenheit() != thisDevice.Temp)
+                                            int coolpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
+                                            //If ThermostatSetpoints[x] returns 0 C and gets converted to 32 F recheck to make sure it is the intended figure. 
+                                            //Either the ControlThink Stick or certian thermostats falsely return Heat and Cool points of 32 F, upon a 
+                                            //second query they return the proper value therefor we will requery if we initially get 32
+                                            if (coolpoint == 32)
+                                            {
+                                                Thread.Sleep(200);
+                                                coolpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
+                                            }
+                                            
+                                            int heatpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                            if (heatpoint == 32)
+                                            {
+                                                Thread.Sleep(200);
+                                                heatpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                            }
+
+                                            int currenttemp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
+                                            int fanmode = (int)thermostat.ThermostatFanMode;
+                                            int mode = (int)thermostat.ThermostatMode;
+                                            byte level = thermostat.Level;
+                                            string currentstate = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
+
+                                            
+
+                                            if (thisDevice.Temp != currenttemp)
                                             {
                                                 thisDevice.prevTemp = thisDevice.Temp; //Save old temp
-                                                thisDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit(); //Save new Temp
+                                                thisDevice.Temp = currenttemp; //Save new Temp
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "Temp"); //call event 
                                             }
 
-                                            if (thisDevice.CoolPoint != (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit())
+                                            if (thisDevice.CoolPoint != coolpoint)
                                             {
                                                 thisDevice.prevCoolPoint = thisDevice.CoolPoint; //Save old temp
-                                                thisDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
+                                                thisDevice.CoolPoint = coolpoint;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "CoolPoint"); //call event
                                             }
 
-                                            if (thisDevice.HeatPoint != (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit())
+                                            if (thisDevice.HeatPoint != heatpoint)
                                             {
                                                 thisDevice.prevHeatPoint = thisDevice.HeatPoint; //Save old temp
-                                                thisDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                                thisDevice.HeatPoint = heatpoint;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "HeatPoint"); //call event
                                             }
 
-                                            if (thisDevice.FanMode != (int)thermostat.ThermostatFanMode)
+                                            if (thisDevice.FanMode != fanmode)
                                             {
                                                 thisDevice.prevFanMode = thisDevice.FanMode; //Save old temp
-                                                thisDevice.FanMode = (int)thermostat.ThermostatFanMode;
+                                                thisDevice.FanMode = fanmode;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "FanMode"); //call event
                                             }
 
-                                            if (thisDevice.HeatCoolMode != (int)thermostat.ThermostatMode)
+                                            if (thisDevice.HeatCoolMode != mode)
                                             {
                                                 thisDevice.prevHeatCoolMode = thisDevice.HeatCoolMode; //Save old temp
-                                                thisDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
+                                                thisDevice.HeatCoolMode = mode;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "HeatCoolMode"); //call event
                                             }
 
-                                            if (thisDevice.Level != thermostat.Level)
+                                            if (thisDevice.Level != level)
                                             {
                                                 thisDevice.prevLevel = thisDevice.Level; //Save old temp
-                                                thisDevice.Level = thermostat.Level;
+                                                thisDevice.Level = level;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "Level"); //call event
                                             }
 
-                                            if (thisDevice.CurrentState != thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString())
+                                            if (thisDevice.CurrentState != currentstate)
                                             {
                                                 thisDevice.prevCurrentState = thisDevice.CurrentState; //Save old temp
-                                                thisDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
+                                                thisDevice.CurrentState = currentstate;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "CurrentState"); //call event
                                             }
                                         }
@@ -115,8 +139,10 @@ namespace zVirtualScenesApplication
                         }
                     }
                 }
+                else
+                    zVirtualScenesMain.ControlThinkConnect();
                 Thread.Sleep(10000);
-            }
+            }          
 
         }
     }

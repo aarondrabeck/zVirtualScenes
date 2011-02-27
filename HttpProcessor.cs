@@ -57,7 +57,7 @@ namespace zVirtualScenesApplication
             }
             catch (Exception e)
             {
-               zVirtualScenesMain.LogThis(1,"HTTP Processor: Exception -" + e.ToString());
+               zVirtualScenesMain.LogThis(1,"HTTP Interface: Exception -" + e.ToString());
             }
             outputStream.Flush();
             // bs.Flush(); // flush any remaining output
@@ -72,14 +72,14 @@ namespace zVirtualScenesApplication
             string[] tokens = request.Split(' ');
 
             if (tokens.Length != 3)
-                zVirtualScenesMain.LogThis(1,"HTTP Processor: ["+userIP+"] Sent invalid http request.");
+                zVirtualScenesMain.LogThis(1,"HTTP Interface: ["+userIP+"] Sent invalid http request.");
             else
             {
                 http_method = tokens[0].ToUpper();
 
                 if (http_method == "GET")
                 {
-                    zVirtualScenesMain.LogThis(1,"HTTP Processor: ["+userIP+"] Sent - " + request);
+                    zVirtualScenesMain.LogThis(1,"HTTP Interface: ["+userIP+"] " + request);
                     http_url = tokens[1];
 
                     //http:/localhost:8085//zVirtualScene?cmd=RunScene&Scene=0 
@@ -100,7 +100,7 @@ namespace zVirtualScenesApplication
                         try { sceneID = Convert.ToInt32(http_url.Remove(0, acceptedCMDs[0].Length)); }
                         catch  
                         { 
-                            zVirtualScenesMain.LogThis(1,"HTTP Processor: ["+userIP+"] No such scene.");  //LOG
+                            zVirtualScenesMain.LogThis(1,"HTTP Interface: ["+userIP+"] No such scene.");  //LOG
                             outputStream.WriteLine("ERR: No such scene.  ({0})", http_url); //FEEDBACK to USER
                             return; 
                         }
@@ -108,25 +108,14 @@ namespace zVirtualScenesApplication
                         {
                             foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                                 if (scene.ID == sceneID)
-                                {
-                                    if (scene.Actions.Count > 0)
-                                    {
-                                        foreach (Action action in scene.Actions)
-                                            zVirtualScenesMain.RunSimpleAction(action);
-                                            
-                                        zVirtualScenesMain.LogThis(1, "HTTP Processor: ["+userIP+"] Ran Scene " + scene.Name + " with " + scene.Actions.Count() + " actions.");
-                                        outputStream.WriteLine("OK : Scene " + scene.Name + " Executed. ({0})", http_url); 
-                                        return;
-                                    }
-                                    else
-                                    {
-                                        zVirtualScenesMain.LogThis(1, "HTTP Processor: ["+userIP+"] Attepmted to run scene with no action.");
-                                        outputStream.WriteLine("ERR: Scene " + scene.Name + " has no actions. ({0})", http_url); 
-                                        return;
-                                    }
+                                {                                    
+                                    Scene.SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
+                                    zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                    outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + ". ({0})", http_url);
+                                    return;
                                 } 
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Processor: ["+userIP+"] Cannot find scene.");
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: ["+userIP+"] Cannot find scene.");
                         outputStream.WriteLine("ERR: Cannot find scene. ({0})", http_url); 
                         return;
                     }
@@ -147,7 +136,7 @@ namespace zVirtualScenesApplication
                         }
                         catch
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Error parsing command. ");  //LOG
+                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Error parsing command. ");  //LOG
                             outputStream.WriteLine("ERR: Error parsing command, check syntax. ({0})", http_url); //FEEDBACK to USER
                             return;
                         }
@@ -167,16 +156,16 @@ namespace zVirtualScenesApplication
                                             level = 99;
                                         action.Level = level;
 
-                                        zVirtualScenesMain.RunSimpleAction(action); //Run
 
-                                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Ran action on " + action.Name + ".");
-                                        outputStream.WriteLine("OK : Ran action on " + action.Name + ". ({0})", http_url);
+                                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                                        zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                        outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + " ({0})", http_url);
                                         return;
                                     }
                                 }
                             }
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Cannot find device.");
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
                         outputStream.WriteLine("ERR: Cannot find device.", http_url);
                         return;
                     }
@@ -206,7 +195,7 @@ namespace zVirtualScenesApplication
                         }
                         catch (Exception e) 
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Error parsing command - " + e);  //LOG
+                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Error parsing command - " + e);  //LOG
                             outputStream.WriteLine("ERR: Error parsing command, check syntax. ({0})", http_url); //FEEDBACK to USER
                             return;
                         }
@@ -214,7 +203,7 @@ namespace zVirtualScenesApplication
                         //Make sure atleast one thermo action was chosen
                         if (HeatCoolMode == -1 && FanMode == -1 && EngeryMode == -1 && HeatPoint == -1 && CoolPoint == -1)
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Please define at least one Temperature Mode.");  //LOG
+                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Please define at least one Temperature Mode.");  //LOG
                             outputStream.WriteLine("ERR: Please define at least one Temperature Mode. ({0})", http_url); //FEEDBACK to USER
                             return;
                         }                       
@@ -230,17 +219,18 @@ namespace zVirtualScenesApplication
                                     action.FanMode = FanMode;
                                     action.EngeryMode = EngeryMode;
                                     action.HeatPoint = HeatPoint;
-                                    action.CoolPoint = CoolPoint; 
+                                    action.CoolPoint = CoolPoint;
 
-                                    zVirtualScenesMain.RunSimpleAction(action); //Run
 
-                                    zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Ran action " + action.ToString() + ".");
-                                    outputStream.WriteLine("OK : Ran action " + action.ToString() + ". ({0})", http_url);
+                                    Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                                    zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                    outputStream.WriteLine("HTTP Interface: [" + userIP + "] " + result.Description + ". ({0})", http_url);
+
                                     return;
                                 }
                             }
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Cannot find device.");
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
                         outputStream.WriteLine("ERR: Cannot find device.", http_url);
                         return;
                     } 
@@ -249,7 +239,7 @@ namespace zVirtualScenesApplication
                     #region Device Listing
                     if (http_url.Contains(acceptedCMDs[3]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Sent a device listing.");                        
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Sent a device listing.");                        
 
                         outputStream.WriteLine("LIST START");
                         foreach (Device device in zVirtualScenesMain.MasterDevices)                        
@@ -263,7 +253,7 @@ namespace zVirtualScenesApplication
                     #region scene Listing
                     if (http_url.Contains(acceptedCMDs[4]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Requested a scene listing.");
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Requested a scene listing.");
 
                         outputStream.WriteLine("LIST START");
                         foreach (Scene scene in zVirtualScenesMain.MasterScenes)
@@ -275,7 +265,7 @@ namespace zVirtualScenesApplication
                     #endregion
 
                 outputStream.WriteLine("ERR: Command not recognized. Ignored...", http_url);
-                zVirtualScenesMain.LogThis(1, "HTTP Processor: [" + userIP + "] Command not recognized. Ignored...");
+                zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Command not recognized. Ignored...");
                 }                   
             }
         }

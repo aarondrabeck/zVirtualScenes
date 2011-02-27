@@ -13,8 +13,6 @@ namespace zVirtualScenesApplication
 {
     public class Action : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
     {
-        
-       
         GlobalFunctions GlbFnct = new GlobalFunctions();
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -112,13 +110,14 @@ namespace zVirtualScenesApplication
             else
                 return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
         }
-        
-        public void RunAction(formzVirtualScenes zVirtualScenesMain)
+
+        public ActionResult Run(ZWaveController ControlThinkController)
         {
+
             #region Switch
             if (this.Type.Contains("MultilevelPowerSwitch"))
             {
-                foreach (ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
+                foreach (ZWaveDevice device in ControlThinkController.Devices)
                 {
                     if (device.NodeID == this.NodeID)
                         device.Level = _Level;
@@ -127,9 +126,9 @@ namespace zVirtualScenesApplication
             #endregion
 
             #region Thermostat
-            else if (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat"))
+            else if (this.Type.Contains("GeneralThermostatV2") || this.Type.Contains("GeneralThermostat"))
             {
-                foreach (ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
+                foreach (ZWaveDevice device in ControlThinkController.Devices)
                 {
                     if (device.NodeID == this.NodeID)
                     {
@@ -155,7 +154,7 @@ namespace zVirtualScenesApplication
                         }
                         catch (Exception e)
                         {
-                            zVirtualScenesMain.LogThis(2, "Failed to set Thermostat. Mode might not be allowed. - " + e);
+                            return new ActionResult { SuccessLevel = 2, Description = "Failed to set Thermostat. Mode might not be allowed. - " + e};
                         }
                     }
                 }
@@ -163,7 +162,7 @@ namespace zVirtualScenesApplication
             #endregion
 
             #region Non Zwave
-            else if (Type == "LauchAPP")
+            else if (this.Type == "LauchAPP")
             {
                 try
                 {
@@ -171,10 +170,12 @@ namespace zVirtualScenesApplication
                 }
                 catch (Exception e)
                 {
-                    zVirtualScenesMain.LogThis(2, "Failed to launch (" + EXEPath + ") - " + e);
+                    return new ActionResult { SuccessLevel = 2, Description = "Failed to launch (" + EXEPath + ") - " + e };
                 }
             }
             #endregion
+
+           return new ActionResult { SuccessLevel = 1, Description = "Ran action on " + this.Type + "(" + this.Name +")." }; 
         }
 
         public string GetFomattedType()
@@ -221,6 +222,12 @@ namespace zVirtualScenesApplication
         public string GlbUniqueID()
         {
             return this.HomeID.ToString() + this.NodeID.ToString();
+        }
+
+        public class ActionResult
+        {
+            public int SuccessLevel { get; set; }
+            public string Description { get; set; }
         }
     }
 }

@@ -36,11 +36,11 @@ namespace zVirtualScenesApplication
                 LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, zVirtualScenesMain.zVScenesSettings.LightSwitchPort));
                 LightSwitchSocket.Listen(zVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections);
                 LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                zVirtualScenesMain.LogThis(1, "LightSwitchInterface: Started Listening for LightSwitch clients on port " + zVirtualScenesMain.zVScenesSettings.LightSwitchPort + ".");
+                zVirtualScenesMain.LogThis(1, "Light Switch Interface: Started listening for LightSwitch clients on port " + zVirtualScenesMain.zVScenesSettings.LightSwitchPort + ".");
             }
             catch (SocketException e)
             {
-                zVirtualScenesMain.LogThis(2, "LightSwitchInterface: Socket Failed to Open - " + e);
+                zVirtualScenesMain.LogThis(2, "Light Switch Interface: Socket Failed to Open - " + e);
             }
 
         }
@@ -59,7 +59,7 @@ namespace zVirtualScenesApplication
                 lock (LightSwitchClients)
                     LightSwitchClients.Add(LightSwitchClientsSocket);
 
-                zVirtualScenesMain.LogThis(1, "LightSwitchInterface: Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
+                zVirtualScenesMain.LogThis(1, "Light Switch Interface: Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
 
                 // Send a welcome message to client
                 string msg = "6004 ZWaveCommander Server (Connections " + LightSwitchClients.Count() + ")" + Environment.NewLine;
@@ -73,11 +73,11 @@ namespace zVirtualScenesApplication
             }
             catch (ObjectDisposedException e)
             {
-                zVirtualScenesMain.LogThis(2, "LightSwitchInterface: Socket Connection Closed: " + e);
+                zVirtualScenesMain.LogThis(2, "Light Switch Interface: Socket Connection Closed: " + e);
             }
             catch (SocketException e)
             {
-                zVirtualScenesMain.LogThis(2, "LightSwitchInterface: Socket Exception: " + e);
+                zVirtualScenesMain.LogThis(2, "Light Switch Interface: Socket Exception: " + e);
             }
         }
 
@@ -101,7 +101,7 @@ namespace zVirtualScenesApplication
             }
             catch (SocketException e)
             {
-                zVirtualScenesMain.LogThis(2, "LightSwitchInterface: Socket Exception: " + e);
+                zVirtualScenesMain.LogThis(2, "Light Switch Interface: Socket Exception: " + e);
             }
         }
 
@@ -138,7 +138,7 @@ namespace zVirtualScenesApplication
                     string data = new string(chars);
 
                     if(zVirtualScenesMain.zVScenesSettings.LightSwitchVerbose)
-                        zVirtualScenesMain.LogThis(1, "LightSwitchInterface: Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
+                        zVirtualScenesMain.LogThis(1, "Light Switch Interface: Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
 
                     string[] commands = data.Split('\n');
 
@@ -173,7 +173,7 @@ namespace zVirtualScenesApplication
                                     {
                                         socketData.m_verified = true;
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
-                                        zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
+                                        zVirtualScenesMain.LogThis(1, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
                                     }
                                     else
                                     {
@@ -195,7 +195,7 @@ namespace zVirtualScenesApplication
                                 
                                 else if (cmd.StartsWith("ALIST"))
                                 {
-                                    zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
+                                    zVirtualScenesMain.LogThis(1, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
                                     
                                     foreach (Device device in zVirtualScenesMain.MasterDevices)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);   
@@ -207,7 +207,7 @@ namespace zVirtualScenesApplication
                                 }
                                 else if (cmd.StartsWith("LIST"))
                                 {
-                                    zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
+                                    zVirtualScenesMain.LogThis(1, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
                                     
                                     foreach (Device device in zVirtualScenesMain.MasterDevices)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);
@@ -267,20 +267,20 @@ namespace zVirtualScenesApplication
             }
             catch (ObjectDisposedException)
             {
-                zVirtualScenesMain.LogThis(2, "LightSwitchInterface: OnDataReceived - Socket has been closed");
+                zVirtualScenesMain.LogThis(2, "Light Switch Interface: OnDataReceived - Socket has been closed");
             }
             catch (SocketException se)
             {
                 if (se.ErrorCode == 10054) // Error code for Connection reset by peer
-                    zVirtualScenesMain.LogThis(2, "LightSwitchInterface: Client " + socketData.m_clientNumber + " Disconnected.");                
+                    zVirtualScenesMain.LogThis(2, "Light Switch Interface: Client " + socketData.m_clientNumber + " Disconnected.");                
                 else
-                    zVirtualScenesMain.LogThis(2, "LightSwitchInterface: SocketException - " + se.Message);
+                    zVirtualScenesMain.LogThis(2, "Light Switch Interface: SocketException - " + se.Message);
                 
                 DisconnectClientSocket(socketData);
             }
             catch (Exception e)
             {
-                zVirtualScenesMain.LogThis(2, "LightSwitchInterface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
+                zVirtualScenesMain.LogThis(2, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
                 
                 //SEND ERROR TO CLIENT
                 SendMessagetoClientsSocket(LightSwitchClientSocket, "ERR~" + e.Message + Environment.NewLine);
@@ -312,9 +312,11 @@ namespace zVirtualScenesApplication
                             Level = 99;
                         action.Level = Level;
 
-                        //Run
-                        zVirtualScenesMain.RunSimpleAction(action);
-                        zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + Client.RemoteEndPoint.ToString() + "] Ran action on " + action.Name + ".");
+                        //Run and log
+                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
+
+                        //return result to app
                         return action.Name + " set to " + action.Level + "."; 
                     }
                 }
@@ -335,11 +337,8 @@ namespace zVirtualScenesApplication
                 {
                     if (scene.Actions.Count > 0)
                     {
-                        foreach (Action action in scene.Actions)
-                        {
-                            zVirtualScenesMain.RunSimpleAction(action);
-                        }
-                        zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + Client.RemoteEndPoint.ToString() + "] Ran Scene " + scene.Name + " with " + scene.Actions.Count() + " actions.");
+                        Scene.SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
+                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
                         return "Scene " + scene.Name + " Executed.";
                     }
                     else
@@ -373,8 +372,8 @@ namespace zVirtualScenesApplication
 
                     if (resultResponse != null)
                     {
-                        zVirtualScenesMain.RunSimpleAction(action);
-                        zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + Client.RemoteEndPoint.ToString() + "] Ran action on " + action.Name + ".");
+                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
                         return resultResponse;
                     }
                 }
@@ -432,8 +431,8 @@ namespace zVirtualScenesApplication
 
                     if (resultResponse != null)
                     {
-                        zVirtualScenesMain.RunSimpleAction(action);
-                        zVirtualScenesMain.LogThis(1, "LightSwitchInterface: [" + Client.RemoteEndPoint.ToString() + "] Ran action on " + action.Name + ".");
+                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
                         return resultResponse;
                     }                        
                 }
@@ -457,7 +456,7 @@ namespace zVirtualScenesApplication
                         workerSocket.Send(byData);
                 
                 if (zVirtualScenesMain.zVScenesSettings.LightSwitchVerbose)
-                    zVirtualScenesMain.LogThis(1, "LightSwitchInterface: SENT TO ALL - " + msg);
+                    zVirtualScenesMain.LogThis(1, "Light Switch Interface: SENT TO ALL - " + msg);
             }
         }
 
@@ -474,7 +473,7 @@ namespace zVirtualScenesApplication
                 LightSwitchClientSocket.Send(byData);
 
                 if (zVirtualScenesMain.zVScenesSettings.LightSwitchVerbose)
-                    zVirtualScenesMain.LogThis(1, "LightSwitchInterface: SENT - " + msg);
+                    zVirtualScenesMain.LogThis(1, "Light Switch Interface: SENT - " + msg);
             }
         }
 
@@ -490,7 +489,7 @@ namespace zVirtualScenesApplication
             LightSwitchClientsSocket.Send(byData);
 
             if (zVirtualScenesMain.zVScenesSettings.LightSwitchVerbose)
-                zVirtualScenesMain.LogThis(1, "LightSwitchInterface: SENT " + msg);
+                zVirtualScenesMain.LogThis(1, "Light Switch Interface: SENT " + msg);
         }
 
         private void DisconnectClientSocket(SocketPacket socketData)
@@ -507,7 +506,7 @@ namespace zVirtualScenesApplication
             }
             catch (Exception e)
             {
-                zVirtualScenesMain.LogThis(1, "LightSwitchInterface: Socket Disconnect: " + e);
+                zVirtualScenesMain.LogThis(1, "Light Switch Interface: Socket Disconnect: " + e);
             }
         }
 
