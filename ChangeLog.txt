@@ -1,4 +1,7 @@
-*ver 1.2.2.0 - 2-24-11*
+*ver 1.2.5.0 - 2-28-11*
+  * Added Support for BinaryPowerSwitch
+
+*ver 1.2.2.0 - 2-27-11*
   * Tweaks to device refresh event handling
   * Added Global Hotkeys for scenes.  
   * Official support for EventGhost. Now you can control your ZWave devices with virtually ANY remote control or HID device.    

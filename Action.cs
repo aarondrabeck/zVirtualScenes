@@ -115,7 +115,7 @@ namespace zVirtualScenesApplication
         {
 
             #region Switch
-            if (this.Type.Contains("MultilevelPowerSwitch"))
+            if (this.Type.Contains("MultilevelPowerSwitch") || this.Type.Contains("BinaryPowerSwitch"))
             {
                 foreach (ZWaveDevice device in ControlThinkController.Devices)
                 {
@@ -180,6 +180,10 @@ namespace zVirtualScenesApplication
 
         public string GetFomattedType()
         {
+            if (Type != null && Type.Contains("BinaryPowerSwitch"))
+            {
+                return (Level > 0 ? "State: ON" : "State: OFF");
+            }
             if (Type != null && Type.Contains("MultilevelPowerSwitch"))
             {
                 if (Level > 255)
@@ -187,7 +191,7 @@ namespace zVirtualScenesApplication
                 else
                     return "Level: " + Level + "%";
             }
-            else if (Type != null && (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat")))
+            else if (Type != null && Type.Contains("GeneralThermostat"))
             {
                 string actions = "(";
 

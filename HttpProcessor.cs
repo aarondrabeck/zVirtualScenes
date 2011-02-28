@@ -87,11 +87,13 @@ namespace zVirtualScenesApplication
                     //http://localhost:8085/zVirtualScene?cmd=ThermoStat&node=7&HeatCoolMode=-1&FanMode=-1&EngeryMode=-1&HeatPoint=-1&CoolPoint=-1
                     //http://localhost:8085/zVirtualScene?cmd=ListDevices            
                     //http://localhost:8085/zVirtualScene?cmd=ListScenes
+                    ///http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&state=ON
                     string[] acceptedCMDs = new string[] { "/zVirtualScene?cmd=RunScene&Scene=" , 
-                                                           "/zVirtualScene?cmd=MultilevelPowerSwitch&", 
+                                                           "/zVirtualScene?cmd=MultilevelPowerSwitch&",
                                                            "/zVirtualScene?cmd=ThermoStat&", 
                                                            "/zVirtualScene?cmd=ListDevices",
-                                                           "/zVirtualScene?cmd=ListScenes"};
+                                                           "/zVirtualScene?cmd=ListScenes",                     
+                                                           "/zVirtualScene?cmd=BinaryPowerSwitch&"};
 
                     #region RUN SCENE
                     if (http_url.Contains(acceptedCMDs[0]))  
@@ -121,7 +123,7 @@ namespace zVirtualScenesApplication
                     }
 #endregion
 
-                    #region RUN DEVICE
+                    #region Run MultilevelPowerSwitch
                     if (http_url.Contains(acceptedCMDs[1]))
                     {
                         int node = 0;
@@ -212,7 +214,7 @@ namespace zVirtualScenesApplication
                         {
                             foreach (Device device in zVirtualScenesMain.MasterDevices)
                             {
-                                if (device.NodeID == node && (device.Type == "GeneralThermostatV2" || device.Type == "GeneralThermostat"))
+                                if (device.NodeID == node && device.Type.Contains("GeneralThermostat"))
                                 {
                                     Action action = (Action)device;
                                     action.HeatCoolMode = HeatCoolMode;
@@ -260,6 +262,56 @@ namespace zVirtualScenesApplication
                             outputStream.WriteLine(scene.ToStringForHTTP());
                         
                         outputStream.WriteLine("LIST END");
+                        return;
+                    }
+                    #endregion
+
+                    #region Run BinaryPowerSwitch
+                    if (http_url.Contains(acceptedCMDs[1]))
+                    {
+                        int node = 0;
+                        string state = "";
+                        try
+                        {
+                            string prams = http_url.Remove(0, acceptedCMDs[1].Length); //Strip CMD
+                            string[] values = prams.Split('&'); //Get values
+
+                            node = Convert.ToInt32(values[0].Remove(0, "node=".Length));
+                            state = values[1].Remove(0, "state=".Length);
+                        }
+                        catch
+                        {
+                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Error parsing command. ");  //LOG
+                            outputStream.WriteLine("ERR: Error parsing command, check syntax. ({0})", http_url); //FEEDBACK to USER
+                            return;
+                        }
+
+                        if (node > 0)
+                        {
+                            foreach (Device device in zVirtualScenesMain.MasterDevices)
+                            {
+                                if (device.NodeID == node && device.Type == "BinaryPowerSwitch")
+                                {
+                                    Action action = (Action)device;
+
+                                    if (action != null)
+                                    {
+                                        //set Level
+                                        if (state == "ON")
+                                            action.Level = 1; 
+                                        else
+                                            action.Level = 0;
+
+                                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                                        zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                        outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + " ({0})", http_url);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
+                        outputStream.WriteLine("ERR: Cannot find device.", http_url);
                         return;
                     }
                     #endregion

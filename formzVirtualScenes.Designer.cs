@@ -53,7 +53,6 @@
             this.groupBoxCommands = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtbox_level = new System.Windows.Forms.TextBox();
             this.btn_RunCommand = new System.Windows.Forms.Button();
@@ -63,7 +62,6 @@
             this.labelCurrentTemp = new System.Windows.Forms.Label();
             this.textBoxCoolPoint = new System.Windows.Forms.TextBox();
             this.comboBoxEnergyMode = new System.Windows.Forms.ComboBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.label7 = new System.Windows.Forms.Label();
             this.comboBoxFanMode = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -102,18 +100,23 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.listBoxLog = new System.Windows.Forms.ListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.groupBox8 = new System.Windows.Forms.GroupBox();
+            this.comboBoxBinaryONOFF = new System.Windows.Forms.ComboBox();
             this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.lookForNewDevicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.propertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.propertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -121,15 +124,17 @@
             this.groupBox4.SuspendLayout();
             this.groupBoxCommands.SuspendLayout();
             this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBoxtTemp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox6.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.toolStrip1.SuspendLayout();
+            this.groupBox8.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // MainTabControl
@@ -348,6 +353,7 @@
             // 
             // groupBoxCommands
             // 
+            this.groupBoxCommands.Controls.Add(this.groupBox8);
             this.groupBoxCommands.Controls.Add(this.groupBox3);
             this.groupBoxCommands.Controls.Add(this.btn_RunCommand);
             this.groupBoxCommands.Controls.Add(this.groupBoxtTemp);
@@ -365,31 +371,21 @@
             this.groupBox3.Controls.Add(this.pictureBox1);
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.txtbox_level);
-            this.groupBox3.Location = new System.Drawing.Point(6, 21);
+            this.groupBox3.Location = new System.Drawing.Point(9, 80);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(141, 85);
+            this.groupBox3.Size = new System.Drawing.Size(141, 77);
             this.groupBox3.TabIndex = 13;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Switches";
+            this.groupBox3.Text = "Multi Level Switch";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(63, 65);
+            this.label5.Location = new System.Drawing.Point(65, 50);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(70, 13);
             this.label5.TabIndex = 15;
             this.label5.Text = "Dim = 0 to 99";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
-            this.pictureBox1.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
-            this.pictureBox1.Location = new System.Drawing.Point(6, 27);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(31, 36);
-            this.pictureBox1.TabIndex = 9;
-            this.pictureBox1.TabStop = false;
             // 
             // label4
             // 
@@ -489,15 +485,6 @@
             this.comboBoxEnergyMode.Name = "comboBoxEnergyMode";
             this.comboBoxEnergyMode.Size = new System.Drawing.Size(133, 21);
             this.comboBoxEnergyMode.TabIndex = 16;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.thermometer;
-            this.pictureBox2.Location = new System.Drawing.Point(262, 16);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
-            this.pictureBox2.TabIndex = 13;
-            this.pictureBox2.TabStop = false;
             // 
             // label7
             // 
@@ -876,6 +863,30 @@
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
+            // groupBox8
+            // 
+            this.groupBox8.Controls.Add(this.comboBoxBinaryONOFF);
+            this.groupBox8.Controls.Add(this.pictureBox3);
+            this.groupBox8.Location = new System.Drawing.Point(7, 16);
+            this.groupBox8.Name = "groupBox8";
+            this.groupBox8.Size = new System.Drawing.Size(143, 58);
+            this.groupBox8.TabIndex = 16;
+            this.groupBox8.TabStop = false;
+            this.groupBox8.Text = "Binary Switch";
+            // 
+            // comboBoxBinaryONOFF
+            // 
+            this.comboBoxBinaryONOFF.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxBinaryONOFF.Enabled = false;
+            this.comboBoxBinaryONOFF.FormattingEnabled = true;
+            this.comboBoxBinaryONOFF.Items.AddRange(new object[] {
+            "OFF",
+            "ON"});
+            this.comboBoxBinaryONOFF.Location = new System.Drawing.Point(68, 22);
+            this.comboBoxBinaryONOFF.Name = "comboBoxBinaryONOFF";
+            this.comboBoxBinaryONOFF.Size = new System.Drawing.Size(53, 21);
+            this.comboBoxBinaryONOFF.TabIndex = 23;
+            // 
             // toolStripDropDownButton1
             // 
             this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -928,6 +939,11 @@
             this.lookForNewDevicesToolStripMenuItem.Text = "Look for new devices";
             this.lookForNewDevicesToolStripMenuItem.Click += new System.EventHandler(this.lookForNewDevicesToolStripMenuItem_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
+            // 
             // propertiesToolStripMenuItem
             // 
             this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
@@ -948,6 +964,11 @@
             this.toolStripDropDownButton3.Text = "Scenes";
             this.toolStripDropDownButton3.ToolTipText = "Scenes";
             // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(124, 6);
+            // 
             // propertiesToolStripMenuItem1
             // 
             this.propertiesToolStripMenuItem1.Name = "propertiesToolStripMenuItem1";
@@ -955,15 +976,34 @@
             this.propertiesToolStripMenuItem1.Text = "Properties";
             this.propertiesToolStripMenuItem1.Click += new System.EventHandler(this.propertiesToolStripMenuItem1_Click);
             // 
-            // toolStripSeparator2
+            // pictureBox3
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
+            this.pictureBox3.Image = global::zVirtualScenesApplication.Properties.Resources.switch_32;
+            this.pictureBox3.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
+            this.pictureBox3.Location = new System.Drawing.Point(8, 18);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(31, 36);
+            this.pictureBox3.TabIndex = 9;
+            this.pictureBox3.TabStop = false;
             // 
-            // toolStripSeparator3
+            // pictureBox1
             // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(149, 6);
+            this.pictureBox1.Image = global::zVirtualScenesApplication.Properties.Resources.dial_32;
+            this.pictureBox1.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
+            this.pictureBox1.Location = new System.Drawing.Point(6, 27);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(31, 36);
+            this.pictureBox1.TabIndex = 9;
+            this.pictureBox1.TabStop = false;
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.thermometer;
+            this.pictureBox2.Location = new System.Drawing.Point(262, 16);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
+            this.pictureBox2.TabIndex = 13;
+            this.pictureBox2.TabStop = false;
             // 
             // formzVirtualScenes
             // 
@@ -989,10 +1029,8 @@
             this.groupBoxCommands.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBoxtTemp.ResumeLayout(false);
             this.groupBoxtTemp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
@@ -1003,6 +1041,10 @@
             this.tabPage2.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.groupBox8.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1097,6 +1139,9 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.GroupBox groupBox8;
+        private System.Windows.Forms.ComboBox comboBoxBinaryONOFF;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }
 

@@ -115,18 +115,37 @@ namespace zVirtualScenesApplication
                 return "(" + NodeID + ") " + _Name + " - " + GetFomattedType();
             }
 
-            //Light Switch Socket Format - DEVICE~Bedroom Lights~0~60~MultiLevelSceneSwitch
+            //Light Switch Socket Format 
+            //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Bedroom Lights~0~60~MultiLevelSceneSwitch" + Environment.NewLine);
+            //workerSocket.Send(byData);
+            //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Garage Light~1~0~BinarySwitch" + Environment.NewLine);
+            //workerSocket.Send(byData);
+            //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Thermostat~3~75~Thermostat" + Environment.NewLine);
+            //workerSocket.Send(byData);
+            //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Electric Blinds~4~100~WindowCovering" + Environment.NewLine);
+            //workerSocket.Send(byData);
+            //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Motion Detector~5~0~Sensor" + Environment.NewLine);
+            //workerSocket.Send(byData);
+            //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~House (AWAY MODE)~6~0~Status" + Environment.NewLine);
+            //workerSocket.Send(byData);
             public string ToLightSwitchSocketString()
-            {
-                if (Type != null && Type.Contains("MultilevelPowerSwitch"))
+            {                
+                if (Type != null && Type.Contains("BinaryPowerSwitch"))                    
+                    return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + "BinarySwitch";
+                else if (Type != null && Type.Contains("MultilevelPowerSwitch"))
                     return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
                 else if (Type != null && (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat")))
                     return "DEVICE~" + _Name + "~" + this.NodeID + "~" + Temp + "~" + this.Type;
-                return "Unknown Device";
+                else
+                    return "Unknown Device";
             }
 
             public string GetFomattedType()
             {
+                if (Type != null && Type.Contains("BinaryPowerSwitch"))
+                {
+                    return (Level > 0 ? "State: ON": "State: OFF");
+                }                
                 if (Type != null && Type.Contains("MultilevelPowerSwitch"))
                 {
                     if (Level > 99)
@@ -134,7 +153,7 @@ namespace zVirtualScenesApplication
                     else
                         return "Level: " + this.Level + "%";
                 }
-                else if (Type != null && (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat")))
+                else if (Type != null && (Type.Contains("GeneralThermostat")))
                     return  "Mode:" + Enum.GetName(typeof(Device.ThermostatMode), this.HeatCoolMode) +
                             " | Fan:" + Enum.GetName(typeof(Device.ThermostatFanMode), this.FanMode) +
                             " | SetPoint:" + Enum.GetName(typeof(Device.EnergyMode), this.Level) + "(" + this.CoolPoint.ToString() + "/" + this.HeatPoint.ToString() + ")" +

@@ -60,6 +60,20 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap dial_32 {
+            get {
+                object obj = ResourceManager.GetObject("dial_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap switch_32 {
+            get {
+                object obj = ResourceManager.GetObject("switch_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap switch_icon32 {
             get {
                 object obj = ResourceManager.GetObject("switch_icon32", resourceCulture);

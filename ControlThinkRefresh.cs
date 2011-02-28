@@ -27,31 +27,35 @@ namespace zVirtualScenesApplication
             {
                 if (zVirtualScenesMain.ControlThinkController.IsConnected)
                 {
+                    //For each device on Control Stick 
                     foreach (ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
                     {
                         try
                         {
-                            //Allowed Z-wave Devices
-                            if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch ||
-                               device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 ||
-                               device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
+                            //If device type on Control Stick is allowed
+                            if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
                             {
-                                foreach (Device thisDevice in zVirtualScenesMain.MasterDevices)
+                                //get type
+                                string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
+
+                                //for each device previously saved in memory
+                                foreach (Device thisDevice in zVirtualScenesMain.MasterDevices)  
                                 {
+                                    //if Control Stick device == device in memory
                                     if (zVirtualScenesMain.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
                                     {
-                                        #region MultilevelPowerSwitch
-                                        if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch)
+                                        #region DETECT LEVEL CHANGES IN ALL DEVICES
+                                        //Check to see if any device state/level has changed.
+                                        if (device.Level != thisDevice.Level)
                                         {
-                                            if (device.Level != thisDevice.Level)
-                                            {
-                                                thisDevice.prevLevel = thisDevice.Level;
-                                                thisDevice.Level = device.Level; //set MasterDeviceList
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "level"); //call event                                                
-                                            }
+                                            thisDevice.prevLevel = thisDevice.Level;
+                                            thisDevice.Level = device.Level; //set MasterDeviceList
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), "level"); //call event                                                
                                         }
                                         #endregion
-                                        else if (device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 || device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
+
+                                        #region DETECT THERMOSTAT SPECIFIC CHANGES
+                                        if (devicetype.Contains("GeneralThermostat"))
                                         {
                                             ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
 
@@ -77,8 +81,7 @@ namespace zVirtualScenesApplication
                                             int mode = (int)thermostat.ThermostatMode;
                                             byte level = thermostat.Level;
                                             string currentstate = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
-
-                                            
+                                                                                        
 
                                             if (thisDevice.Temp != currenttemp)
                                             {
@@ -89,46 +92,40 @@ namespace zVirtualScenesApplication
 
                                             if (thisDevice.CoolPoint != coolpoint)
                                             {
-                                                thisDevice.prevCoolPoint = thisDevice.CoolPoint; //Save old temp
+                                                thisDevice.prevCoolPoint = thisDevice.CoolPoint; 
                                                 thisDevice.CoolPoint = coolpoint;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "CoolPoint"); //call event
                                             }
 
                                             if (thisDevice.HeatPoint != heatpoint)
                                             {
-                                                thisDevice.prevHeatPoint = thisDevice.HeatPoint; //Save old temp
+                                                thisDevice.prevHeatPoint = thisDevice.HeatPoint; 
                                                 thisDevice.HeatPoint = heatpoint;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "HeatPoint"); //call event
                                             }
 
                                             if (thisDevice.FanMode != fanmode)
                                             {
-                                                thisDevice.prevFanMode = thisDevice.FanMode; //Save old temp
+                                                thisDevice.prevFanMode = thisDevice.FanMode;
                                                 thisDevice.FanMode = fanmode;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "FanMode"); //call event
                                             }
 
                                             if (thisDevice.HeatCoolMode != mode)
                                             {
-                                                thisDevice.prevHeatCoolMode = thisDevice.HeatCoolMode; //Save old temp
+                                                thisDevice.prevHeatCoolMode = thisDevice.HeatCoolMode; 
                                                 thisDevice.HeatCoolMode = mode;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "HeatCoolMode"); //call event
-                                            }
-
-                                            if (thisDevice.Level != level)
-                                            {
-                                                thisDevice.prevLevel = thisDevice.Level; //Save old temp
-                                                thisDevice.Level = level;
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "Level"); //call event
-                                            }
+                                            }                                            
 
                                             if (thisDevice.CurrentState != currentstate)
                                             {
-                                                thisDevice.prevCurrentState = thisDevice.CurrentState; //Save old temp
+                                                thisDevice.prevCurrentState = thisDevice.CurrentState; 
                                                 thisDevice.CurrentState = currentstate;
                                                 this.DeviceInfoChange(thisDevice.GlbUniqueID(), "CurrentState"); //call event
                                             }
                                         }
+#endregion
                                     }
                                 }
                             }

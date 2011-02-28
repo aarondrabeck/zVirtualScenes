@@ -178,14 +178,21 @@ namespace zVirtualScenesApplication
                         string notification = "Event Notification Error";
                         string notificationprefix = DateTime.Now.ToString("T") + ": ";
 
-                        if (device.Type == "MultilevelPowerSwitch" && TypeOfChange == "level")
+                        if (device.Type == "BinaryPowerSwitch" && TypeOfChange == "level")
+                        {
+                            notification = device.Name + " state changed from " + (device.prevLevel > 0 ? "ON" : "OFF") + " to " + (device.Level > 0 ? "ON" : "OFF") + ".";
+
+                            if (device.SendJabberNotifications)
+                                jabber.SendMessage(notificationprefix + notification);
+                        }
+                        if (device.Type == "MultilevelPowerSwitch"  && TypeOfChange == "level")
                         {
                             notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";
 
                             if (device.SendJabberNotifications)
                                 jabber.SendMessage(notificationprefix + notification);
                         }
-                        else if (device.Type == "GeneralThermostatV2" || device.Type == "GeneralThermostat")
+                        else if (device.Type.Contains("GeneralThermostat"))
                         {
                             if (TypeOfChange == "Temp")
                             {
@@ -361,27 +368,20 @@ namespace zVirtualScenesApplication
                 {
                     try
                     {
-                        //Allowed Z-wave Devices
-                        if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch ||
-                            device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 ||
-                            device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
+                        LogThis(1, "Found " + device.ToString() + ".");
+                        
+                        if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
                         {
                             //Convert Device to Action
                             Device newDevice = new Device(this);
                             newDevice.HomeID = ControlThinkController.HomeID;
                             newDevice.NodeID = device.NodeID;
                             newDevice.Level = device.Level;
-
-                            if (device is ControlThink.ZWave.Devices.Specific.MultilevelPowerSwitch)
+                            newDevice.Type = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
+                            newDevice.Name = newDevice.Type;
+                           
+                            if (newDevice.Type.Contains("GeneralThermostat"))
                             {
-                                newDevice.Type = "MultilevelPowerSwitch";
-                                newDevice.Name = "MultilevelPowerSwitch";
-                            }
-                            if (device is ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 || device is ControlThink.ZWave.Devices.Specific.GeneralThermostat)
-                            {
-                                newDevice.Type = "GeneralThermostatV2";
-                                newDevice.Name = "GeneralThermostatV2";
-
                                 ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
                                 newDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
                                 newDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
@@ -900,8 +900,7 @@ namespace zVirtualScenesApplication
                 listBoxScenes.SelectedIndex = ActionID + 1;
 
             }
-        }
-              
+        }              
 
         private void listBoxDevices_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -910,9 +909,24 @@ namespace zVirtualScenesApplication
                 Device selecteddevice = (Device)listBoxDevices.SelectedItem;
                 groupBoxCommands.Text = "Create Action for " + selecteddevice.Name + " (" + selecteddevice.Type + ")";
 
-                if (selecteddevice.Type == "MultilevelPowerSwitch")
+
+                if (selecteddevice.Type == "BinaryPowerSwitch")
+                {
+                    comboBoxBinaryONOFF.Enabled = true;
+                    txtbox_level.Enabled = false;
+                    comboBoxHeatCoolMode.Enabled = false;
+                    comboBoxEnergyMode.Enabled = false;
+                    comboBoxFanMode.Enabled = false;
+
+                    checkBoxeditCP.Checked = false;
+                    checkBoxeditHP.Checked = false;
+                    checkBoxeditCP.Enabled = false;
+                    checkBoxeditHP.Enabled = false;
+                }
+                if (selecteddevice.Type == "MultilevelPowerSwitch" )
                 {
                     txtbox_level.Enabled = true;
+                    comboBoxBinaryONOFF.Enabled = false;
                     comboBoxHeatCoolMode.Enabled = false;
                     comboBoxEnergyMode.Enabled = false;
                     comboBoxFanMode.Enabled = false;
@@ -926,6 +940,7 @@ namespace zVirtualScenesApplication
                 else if (selecteddevice.Type.Contains("GeneralThermostat")) 
                 {
                     txtbox_level.Enabled = false;
+                    comboBoxBinaryONOFF.Enabled = false;
                     comboBoxHeatCoolMode.Enabled = true;
                     comboBoxEnergyMode.Enabled = true;
                     comboBoxFanMode.Enabled = true;
@@ -1111,7 +1126,11 @@ namespace zVirtualScenesApplication
             //Cast device to action            
             Action action = (Action)_device;
 
-            if (action.Type == "MultilevelPowerSwitch")
+            if (action.Type == "BinaryPowerSwitch")
+            {
+                action.Level = (byte)comboBoxBinaryONOFF.SelectedIndex;
+            }
+            else if (action.Type == "MultilevelPowerSwitch")
             {
                 //ERROR CHECK INPUTS
                 try
