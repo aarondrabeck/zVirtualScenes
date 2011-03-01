@@ -1,0 +1,333 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace zVirtualScenesApplication 
+{
+    public sealed class RawInputInterface : NativeWindow
+    {
+        private formzVirtualScenes _form;
+        public delegate void RemoteControlDeviceEventHandler(string msg, string param1, string param2);
+        public event RemoteControlDeviceEventHandler MCEButtonPressed;
+
+        #region dll imports
+
+        
+
+        [DllImport("User32.dll")]
+        extern static bool RegisterRawInputDevices(RAWINPUTDEVICE[] pRawInputDevice, uint uiNumDevices, uint cbSize);
+
+        [DllImport("User32.dll")]
+        extern static uint GetRawInputData(IntPtr hRawInput, uint uiCommand, IntPtr pData, ref uint pcbSize, uint cbSizeHeader);
+
+        #endregion
+
+        #region const definitions and Enums
+
+        private const int RIDEV_INPUTSINK = 0x00000100;
+        private const int RID_INPUT = 0x10000003;
+
+        public enum MCEMessageTypes
+        {
+            WM_KEYDOWN = 0x0100,
+            WM_APPCOMMAND = 0x319,
+            WM_INPUT = 0x00FF,
+        }
+
+        public enum MCE_RAWINPUT
+        {
+            RAWINPUT_BROWSER_BACKWARD = 548,
+            RAWINPUT_VOLUME_MUTE = 226,
+            RAWINPUT_VOLUME_DOWN = 234,
+            RAWINPUT_VOLUME_UP = 233,
+            RAWINPUT_MEDIA_NEXTTRACK = 181,
+            RAWINPUT_MEDIA_PREVIOUSTRACK = 182,
+            RAWINPUT_MEDIA_STOP = 183,
+            RAWINPUT_MEDIA_PLAY_PAUSE = 14,
+            RAWINPUT_MEDIA_PLAY = 176,
+            RAWINPUT_MEDIA_PAUSE = 177,
+            RAWINPUT_MEDIA_RECORD = 178,
+            RAWINPUT_MEDIA_FAST_FORWARD = 179,
+            RAWINPUT_MEDIA_REWIND = 180,
+            RAWINPUT_MEDIA_CHANNEL_UP = 156,
+            RAWINPUT_MEDIA_CHANNEL_DOWN = 157,
+            RAWINPUT_RED = 91,
+            RAWINPUT_GREEN = 92,
+            RAWINPUT_YELLOW = 93,
+            RAWINPUT_BLUE = 94,
+            RAWINPUT_DETAILS = 0x209,
+            RAWINPUT_GUIDE = 0x8D,
+            RAWINPUT_TVJUMP = 0x25,
+            RAWINPUT_STANDBY = 0x82,
+            RAWINPUT_OEM1 = 0x80,
+            RAWINPUT_OEM2 = 0x81,
+            RAWINPUT_MYTV = 0x46,
+            RAWINPUT_MYVIDEOS = 0x4A,
+            RAWINPUT_MYPICTURES = 0x49,
+            RAWINPUT_MYMUSIC = 0x47,
+            RAWINPUT_RECORDEDTV = 0x48,
+            RAWINPUT_DVDANGLE = 0x4B,
+            RAWINPUT_DVDAUDIO = 0x4C,
+            RAWINPUT_DVDMENU = 0x24,
+            RAWINPUT_DVDSUBTITLE = 0x4D
+        }
+
+        public enum APPCOMMAND_LParam
+        {
+            BROWSER_BACKWARD = 1,
+            BROWSER_FORWARD = 2,
+            BROWSER_REFRESH = 3,
+            BROWSER_STOP = 4,
+            BROWSER_SEARCH = 5,
+            BROWSER_FAVORITES = 6,
+            BROWSER_HOME = 7,
+            VOLUME_MUTE = 8,
+            VOLUME_DOWN = 9,
+            VOLUME_UP = 10,
+            MEDIA_NEXTTRACK = 11,
+            MEDIA_PREVIOUSTRACK = 12,
+            MEDIA_STOP = 13,
+            MEDIA_PLAY_PAUSE = 14,
+            LAUNCH_MAIL = 15,
+            LAUNCH_MEDIA_SELECT = 16,
+            LAUNCH_APP1 = 17,
+            LAUNCH_APP2 = 18,
+            BASS_DOWN = 19,
+            BASS_BOOST = 20,
+            BASS_UP = 21,
+            TREBLE_DOWN = 22,
+            TREBLE_UP = 23,
+            MICROPHONE_VOLUME_MUTE = 24,
+            MICROPHONE_VOLUME_DOWN = 25,
+            MICROPHONE_VOLUME_UP = 26,
+            HELP = 27,
+            FIND = 28,
+            NEW = 29,
+            OPEN = 30,
+            CLOSE = 31,
+            SAVE = 32,
+            PRINT = 33,
+            UNDO = 34,
+            REDO = 35,
+            COPY = 36,
+            CUT = 37,
+            PASTE = 38,
+            REPLY_TO_MAIL = 39,
+            FORWARD_MAIL = 40,
+            SEND_MAIL = 41,
+            SPELL_CHECK = 42,
+            DICTATE_OR_COMMAND_CONTROL_TOGGLE = 43,
+            MIC_ON_OFF_TOGGLE = 44,
+            CORRECTION_LIST = 45,
+            MEDIA_PLAY = 46,
+            MEDIA_RECORD = 48,
+            MEDIA_FAST_FORWARD = 49,
+            MEDIA_REWIND = 50,
+            MEDIA_CHANNEL_UP = 51,
+            MEDIA_CHANNEL_DOWN = 52,
+            RECORD = 4144
+        }
+        #endregion
+
+        #region Windows.h structure declarations
+
+        // The following structures are defined in Windows.h
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RAWINPUTDEVICELIST
+        {
+            public IntPtr hDevice;
+            [MarshalAs(UnmanagedType.U4)]
+            public int dwType;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct RAWINPUT
+        {
+            [FieldOffset(0)]
+            public RAWINPUTHEADER header;
+            [FieldOffset(16)]
+            public RAWMOUSE mouse;
+            [FieldOffset(16)]
+            public RAWKEYBOARD keyboard;
+            [FieldOffset(16)]
+            public RAWHID hid;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RAWINPUTHEADER
+        {
+            [MarshalAs(UnmanagedType.U4)]
+            public int dwType;
+            [MarshalAs(UnmanagedType.U4)]
+            public int dwSize;
+            public IntPtr hDevice;
+            [MarshalAs(UnmanagedType.U4)]
+            public int wParam;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RAWHID
+        {
+            [MarshalAs(UnmanagedType.U4)]
+            public int dwSizHid;
+            [MarshalAs(UnmanagedType.U4)]
+            public int dwCount;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct BUTTONSSTR
+        {
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort usButtonFlags;
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort usButtonData;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        internal struct RAWMOUSE
+        {
+            [MarshalAs(UnmanagedType.U2)]
+            [FieldOffset(0)]
+            public ushort usFlags;
+            [MarshalAs(UnmanagedType.U4)]
+            [FieldOffset(4)]
+            public uint ulButtons;
+            [FieldOffset(4)]
+            public BUTTONSSTR buttonsStr;
+            [MarshalAs(UnmanagedType.U4)]
+            [FieldOffset(8)]
+            public uint ulRawButtons;
+            [FieldOffset(12)]
+            public int lLastX;
+            [FieldOffset(16)]
+            public int lLastY;
+            [MarshalAs(UnmanagedType.U4)]
+            [FieldOffset(20)]
+            public uint ulExtraInformation;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RAWKEYBOARD
+        {
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort MakeCode;
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort Flags;
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort Reserved;
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort VKey;
+            [MarshalAs(UnmanagedType.U4)]
+            public uint Message;
+            [MarshalAs(UnmanagedType.U4)]
+            public uint ExtraInformation;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct RAWINPUTDEVICE
+        {
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort usUsagePage;
+            [MarshalAs(UnmanagedType.U2)]
+            public ushort usUsage;
+            [MarshalAs(UnmanagedType.U4)]
+            public int dwFlags;
+            public IntPtr hwndTarget;
+        }
+        #endregion Windows.h structure declarations
+
+        public RawInputInterface(IntPtr hwnd, formzVirtualScenes form)
+        {
+            //Register MCE Remote RAW Input so messages are sent to us.
+            RAWINPUTDEVICE[] rid = new RAWINPUTDEVICE[3];
+            rid[0].usUsagePage = 0xFFBC;      // adds HID remote control
+            rid[0].usUsage = 0x88;
+            rid[0].dwFlags = RIDEV_INPUTSINK;
+            rid[0].hwndTarget = hwnd;
+
+            rid[1].usUsagePage = 0x0C;      // adds HID remote control
+            rid[1].usUsage = 0x01;
+            rid[1].dwFlags = RIDEV_INPUTSINK;
+            rid[1].hwndTarget = hwnd;
+
+            rid[2].usUsagePage = 0x0C;      // adds HID remote control
+            rid[2].usUsage = 0x80;
+            rid[2].dwFlags = RIDEV_INPUTSINK;
+            rid[2].hwndTarget = hwnd;
+            if (!RegisterRawInputDevices(rid, (uint)rid.Length, (uint)Marshal.SizeOf(rid[0])))
+                form.LogThis(2, "RAW INPUT: Failed to register raw input devices.");
+            else
+                form.LogThis(1, "RAW INPUT: Registered " + rid.Length + " raw input devices.");
+
+            this._form = form;
+        }
+     
+        public void ProcessMessage(Message message)
+        {          
+            if (message.Msg == (int)MCEMessageTypes.WM_APPCOMMAND)
+            {
+                string KeyName = Enum.GetName(typeof(APPCOMMAND_LParam), message.LParam.ToInt32() / 65536);
+
+                if (KeyName == "")  //Save command even if not in Enum/ Unknown
+                    KeyName = message.LParam.ToString();
+
+                _form.LogThis(1, "RAW INPUT: WM_APPCOMMAND - " + KeyName + " , W:" + message.LParam.ToString());
+                
+                this.MCEButtonPressed(Enum.GetName(typeof(MCEMessageTypes), message.Msg), KeyName, "");
+                return;
+            }
+
+            if (message.Msg == (int)MCEMessageTypes.WM_KEYDOWN)
+            {
+                string KeyName =  Enum.GetName(typeof(Keys), message.WParam.ToInt32());
+                _form.LogThis(1, "RAW INPUT: WM_KEYDOWN: " + KeyName);
+
+                if (KeyName == "")  //Save command even if not in Enum/ Unknown
+                    KeyName = message.WParam.ToString();
+
+                this.MCEButtonPressed(Enum.GetName(typeof(MCEMessageTypes), message.Msg), KeyName, "");
+                return;
+            }
+            if (message.Msg == (int)MCEMessageTypes.WM_INPUT)
+                ProcessInputCommand(ref message);
+        }
+        
+        private void ProcessInputCommand(ref Message message)
+        {
+           uint dwSize = 0;
+
+           GetRawInputData(message.LParam, RID_INPUT, IntPtr.Zero, ref  dwSize, (uint) Marshal.SizeOf(typeof(RAWINPUTHEADER)));
+           IntPtr buffer = Marshal.AllocHGlobal((int) dwSize);
+
+           try
+           {
+              if (GetRawInputData(message.LParam,  RID_INPUT, buffer, ref  dwSize, (uint) Marshal.SizeOf(typeof(RAWINPUTHEADER))) != dwSize)
+                 return;
+      
+              RAWINPUT raw = (RAWINPUT) Marshal.PtrToStructure(buffer, typeof(RAWINPUT));
+      
+              byte[] bRawData = new byte[raw.hid.dwSizHid];
+              int pRawData = buffer.ToInt32() + Marshal.SizeOf(typeof(RAWINPUT)) + 1;
+
+              Marshal.Copy(new IntPtr(pRawData), bRawData, 0, raw.hid.dwSizHid - 1);
+              int rawData = bRawData[0] | bRawData[1] << 8;   // do a little bit shifting to assign the button value
+
+              if (rawData == 0)
+                  return;
+
+              _form.LogThis(1, "RAW INPUT: WM_INPUT: Header Type: " + raw.header.dwType.ToString() + raw + ", RawData: " + rawData );                             
+              
+           }
+           finally
+           {
+              Marshal.FreeHGlobal(buffer);
+           }
+        }
+        
+
+    }
+}
