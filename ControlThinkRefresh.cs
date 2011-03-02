@@ -7,10 +7,10 @@ using ControlThink.ZWave.Devices;
 
 namespace zVirtualScenesApplication
 {
-    class ControlThinkRefresh
+    public class ControlThinkRefresh
     {
         formzVirtualScenes zVirtualScenesMain;
-        public delegate void DeviceInfoChangeEventHandler(string GlbUniqueID, string TypeOfChange);
+        public delegate void DeviceInfoChangeEventHandler(string GlbUniqueID, changeType TypeOfChange);
         public event DeviceInfoChangeEventHandler DeviceInfoChange;
 
         public ControlThinkRefresh(formzVirtualScenes _zVirtualScenesMain)
@@ -50,7 +50,7 @@ namespace zVirtualScenesApplication
                                         {
                                             thisDevice.prevLevel = thisDevice.Level;
                                             thisDevice.Level = device.Level; //set MasterDeviceList
-                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), "level"); //call event                                                
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged); //call event                                                
                                         }
                                         #endregion
 
@@ -87,42 +87,42 @@ namespace zVirtualScenesApplication
                                             {
                                                 thisDevice.prevTemp = thisDevice.Temp; //Save old temp
                                                 thisDevice.Temp = currenttemp; //Save new Temp
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "Temp"); //call event 
+                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.TempChanged); //call event 
                                             }
 
                                             if (thisDevice.CoolPoint != coolpoint)
                                             {
                                                 thisDevice.prevCoolPoint = thisDevice.CoolPoint; 
                                                 thisDevice.CoolPoint = coolpoint;
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "CoolPoint"); //call event
+                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.CoolPointChanged); //call event
                                             }
 
                                             if (thisDevice.HeatPoint != heatpoint)
                                             {
                                                 thisDevice.prevHeatPoint = thisDevice.HeatPoint; 
                                                 thisDevice.HeatPoint = heatpoint;
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "HeatPoint"); //call event
+                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.HeatPointChanged); //call event
                                             }
 
                                             if (thisDevice.FanMode != fanmode)
                                             {
                                                 thisDevice.prevFanMode = thisDevice.FanMode;
                                                 thisDevice.FanMode = fanmode;
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "FanMode"); //call event
+                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.FanModeChanged); //call event
                                             }
 
                                             if (thisDevice.HeatCoolMode != mode)
                                             {
                                                 thisDevice.prevHeatCoolMode = thisDevice.HeatCoolMode; 
                                                 thisDevice.HeatCoolMode = mode;
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "HeatCoolMode"); //call event
+                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.HeatCoolModeChanged); //call event
                                             }                                            
 
                                             if (thisDevice.CurrentState != currentstate)
                                             {
                                                 thisDevice.prevCurrentState = thisDevice.CurrentState; 
                                                 thisDevice.CurrentState = currentstate;
-                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), "CurrentState"); //call event
+                                                this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.CurrentStateChanged); //call event
                                             }
                                         }
 #endregion
@@ -141,6 +141,17 @@ namespace zVirtualScenesApplication
                 Thread.Sleep(10000);
             }          
 
+        }
+
+        public enum changeType
+        {
+            LevelChanged = 0,
+            TempChanged = 1,
+            CoolPointChanged = 2,
+            HeatPointChanged = 3,
+            FanModeChanged = 4,
+            HeatCoolModeChanged = 5,
+            CurrentStateChanged = 6
         }
     }
 }

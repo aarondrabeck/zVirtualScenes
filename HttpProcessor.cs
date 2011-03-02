@@ -111,8 +111,8 @@ namespace zVirtualScenesApplication
                             foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                                 if (scene.ID == sceneID)
                                 {                                    
-                                    Scene.SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
-                                    zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                    SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
+                                    zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
                                     outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + ". ({0})", http_url);
                                     return;
                                 } 
@@ -159,8 +159,8 @@ namespace zVirtualScenesApplication
                                         action.Level = level;
 
 
-                                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                                        zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                                        zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
                                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + " ({0})", http_url);
                                         return;
                                     }
@@ -224,8 +224,8 @@ namespace zVirtualScenesApplication
                                     action.CoolPoint = CoolPoint;
 
 
-                                    Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                                    zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                                    zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
                                     outputStream.WriteLine("HTTP Interface: [" + userIP + "] " + result.Description + ". ({0})", http_url);
 
                                     return;
@@ -302,8 +302,8 @@ namespace zVirtualScenesApplication
                                         else
                                             action.Level = 0;
 
-                                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                                        zVirtualScenesMain.LogThis(result.SuccessLevel, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                                        zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
                                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + " ({0})", http_url);
                                         return;
                                     }

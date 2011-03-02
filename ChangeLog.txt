@@ -1,3 +1,7 @@
+*ver 1.2.6.0 - 3-2-11*
+  * Added delay-timer action types
+  * Added Multithreaded scene execution
+
 *ver 1.2.5.0 - 2-28-11*
   * Added Support for BinaryPowerSwitch
 

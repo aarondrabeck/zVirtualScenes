@@ -313,11 +313,11 @@ namespace zVirtualScenesApplication
                         action.Level = Level;
 
                         //Run and log
-                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
+                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                        zVirtualScenesMain.LogThis((int)result.ResultType, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
 
                         //return result to app
-                        return action.Name + " set to " + action.Level + "."; 
+                        return result.ResultType + " " + result.Description; 
                     }
                 }
             }
@@ -325,7 +325,7 @@ namespace zVirtualScenesApplication
         }
 
         /// <summary>
-        /// Send a scene ID and translates to action. 
+        /// Runs a zVirtualScene Scene
         /// </summary>
         /// <param name="SceneID">Scene ID</param>
         /// <param name="Client">Clients Socket.</param>
@@ -334,23 +334,17 @@ namespace zVirtualScenesApplication
         {
             foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                 if (scene.ID == SceneID)
-                {
-                    if (scene.Actions.Count > 0)
-                    {
-                        Scene.SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
-                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
-                        return "Scene " + scene.Name + " Executed.";
-                    }
-                    else
-                        zVirtualScenesMain.LogThis(1, "Attepmted to run scene with no action.");                    
-                }           
-            return "Error executing device.";         
+                {                   
+                    SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
+                    zVirtualScenesMain.LogThis((int)result.ResultType, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
+
+                    return result.ResultType.ToString() + " " + result.Description;
+                 }           
+            return "Error executing scene.";         
         }
 
         private string TranslateToThermoTEMPATUREAction(byte Node, byte Mode, int Temp, Socket Client)
         {
-            string resultResponse = null;
-
             foreach (Device device in zVirtualScenesMain.MasterDevices)
             {
                 if (device.NodeID == Node)
@@ -362,20 +356,14 @@ namespace zVirtualScenesApplication
                     {                        
                         case 2:
                             action.HeatPoint = Temp;
-                            resultResponse = device.Name + " Heat point set to " + Temp;
                             break;
                         case 3:
                             action.CoolPoint = Temp;
-                            resultResponse = device.Name + " Cool point set to " + Temp;
                             break;                        
-                    }
-
-                    if (resultResponse != null)
-                    {
-                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
-                        return resultResponse;
-                    }
+                    }                   
+                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                    zVirtualScenesMain.LogThis((int)result.ResultType, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);                         
+                    return result.ResultType + " " + result.Description; ;                    
                 }
             }
             return "Error Setting Thermostat.";
@@ -383,7 +371,7 @@ namespace zVirtualScenesApplication
 
         private string TranslateToThermoAction(byte Node, byte Mode, Socket Client)
         {
-            string resultResponse = null; 
+            
 
 
             foreach (Device device in zVirtualScenesMain.MasterDevices)
@@ -397,44 +385,32 @@ namespace zVirtualScenesApplication
                     {
                         case 0:
                             action.HeatCoolMode = (int)Device.ThermostatMode.Off;
-                            resultResponse = device.Name + " Mode set to Off.";
                             break; 
                         case 1:
                             action.HeatCoolMode = (int)Device.ThermostatMode.Auto;
-                            resultResponse = device.Name + " Mode set to Auto.";
                             break;
                         case 2:
                             action.HeatCoolMode = (int)Device.ThermostatMode.Heat;
-                            resultResponse = device.Name + " Mode set to Heat.";
                             break;
                         case 3:
                             action.HeatCoolMode = (int)Device.ThermostatMode.Cool;
-                            resultResponse = device.Name + " Thermostat Mode set to Cool.";
                             break;
                         case 4:
                             action.FanMode = (int)Device.ThermostatFanMode.OnLow;
-                            resultResponse = device.Name + " Fan set to On/OnLow.";
                             break;
                         case 5:
                             action.FanMode = (int)Device.ThermostatFanMode.AutoLow;
-                            resultResponse = device.Name + " Fan set to Auto/AutoLow.";
                             break;
                         case 6:
                             action.EngeryMode = (int)Device.EnergyMode.EnergySavingMode;
-                            resultResponse = device.Name + " Energy Saving Mode Enabled.";
                             break;
                         case 7:
                             action.EngeryMode = (int)Device.EnergyMode.ComfortMode;
-                            resultResponse = device.Name + " Comfort Mode Enabled.";
                             break;
-                    }
-
-                    if (resultResponse != null)
-                    {
-                        Action.ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                        zVirtualScenesMain.LogThis(result.SuccessLevel, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);
-                        return resultResponse;
-                    }                        
+                    }                   
+                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
+                    zVirtualScenesMain.LogThis((int)result.ResultType, "Light Switch Interface: [" + Client.RemoteEndPoint.ToString() + "] " + result.Description);                        
+                    return result.ResultType + " " + result.Description;                                           
                 }
             }
             return "Error Setting Thermostat.";

@@ -30,13 +30,15 @@ namespace zVirtualScenesApplication
         public readonly ZWaveController ControlThinkController = new ZWaveController();
         private formDeviceProperties formDeviceProperty;
         private formSceneProperties formSceneProperties;
+        private formCreateTimeDelay formCreateTimeDelay;
+        private LightSwitchInterface LightSwitchInt;
         private JabberInterface jabber;
         private KeyboardHook hook = new KeyboardHook();
 
         //Delegates
         public delegate void LogThisDelegate(int type, string message);
         public delegate void ControlThinkConnectDelegate();
-        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, string TypeOfChange);
+        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRefresh.changeType TypeOfChange);
         public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
 
         //CORE OBJECTS
@@ -77,20 +79,24 @@ namespace zVirtualScenesApplication
             listBoxDevices.DataSource = MasterDevices;
             listBoxScenes.DataSource = MasterScenes;
 
+            //Register event handlers for each scene
+            RegisterSceneHandlers();
+
             //Start HTTP INTERFACE
             StartHTPP();
 
             //LightSwitch Clients
             if (zVScenesSettings.LightSwitchEnabled)
             {
-                LightSwitchInterface LightSwitchInt = new LightSwitchInterface(this);
+                LightSwitchInt = new LightSwitchInterface(this);
                 LightSwitchInt.OpenLightSwitchSocket();
             }
 
             //Start Listening for device changes
             ControlThinkRefresh refresher = new ControlThinkRefresh(this);
             new Thread(new ThreadStart(refresher.RefreshThread)).Start();
-            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);        
+            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler); 
+            
     
             //JABBER
             if (zVScenesSettings.JabberEnanbled)
@@ -148,7 +154,12 @@ namespace zVirtualScenesApplication
             }
 
             #endregion
-    }       
+    }
+        private void RegisterSceneHandlers()
+        {
+            foreach (Scene thisScene in MasterScenes)
+                thisScene.SceneExecutionFinishedEvent += new Scene.SceneExecutionFinished(SceneExecutionFinsihed_Handler);
+        }
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -165,7 +176,7 @@ namespace zVirtualScenesApplication
             Environment.Exit(1);
         }
 
-        private void DeviceInfoChange_Handler(string GlbUniqueID, string TypeOfChange)
+        private void DeviceInfoChange_Handler(string GlbUniqueID, ControlThinkRefresh.changeType TypeOfChange)
         {
             if (this.InvokeRequired)
                 this.Invoke(new DeviceInfoChange_HandlerDelegate(DeviceInfoChange_Handler), new object[] { GlbUniqueID, TypeOfChange });
@@ -178,14 +189,14 @@ namespace zVirtualScenesApplication
                         string notification = "Event Notification Error";
                         string notificationprefix = DateTime.Now.ToString("T") + ": ";
 
-                        if (device.Type == "BinaryPowerSwitch" && TypeOfChange == "level")
+                        if (device.Type == "BinaryPowerSwitch" && TypeOfChange == ControlThinkRefresh.changeType.LevelChanged)
                         {
                             notification = device.Name + " state changed from " + (device.prevLevel > 0 ? "ON" : "OFF") + " to " + (device.Level > 0 ? "ON" : "OFF") + ".";
 
                             if (device.SendJabberNotifications)
                                 jabber.SendMessage(notificationprefix + notification);
                         }
-                        if (device.Type == "MultilevelPowerSwitch"  && TypeOfChange == "level")
+                        if (device.Type == "MultilevelPowerSwitch" && TypeOfChange == ControlThinkRefresh.changeType.LevelChanged)
                         {
                             notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";
 
@@ -194,7 +205,7 @@ namespace zVirtualScenesApplication
                         }
                         else if (device.Type.Contains("GeneralThermostat"))
                         {
-                            if (TypeOfChange == "Temp")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.TempChanged)
                             {
                                 notification = device.Name + " temperature changed from " + device.prevTemp + " degrees to " + device.Temp + " degrees.";
                                 string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees.";
@@ -211,42 +222,42 @@ namespace zVirtualScenesApplication
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 1)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
-                            if (TypeOfChange == "CoolPoint")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.CoolPointChanged)
                             {
                                 notification = device.Name + " cool point changed from " + device.prevCoolPoint + " to " + device.CoolPoint + ".";
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
-                            if (TypeOfChange == "HeatPoint")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.HeatPointChanged)
                             {
                                 notification = device.Name + " heat point changed from " + device.prevHeatPoint + " to " + device.HeatPoint + ".";
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
-                            if (TypeOfChange == "FanMode")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.FanModeChanged)
                             {
                                 notification = device.Name + " fan mode changed from " + Enum.GetName(typeof(Device.ThermostatFanMode), device.prevFanMode) + " to " + Enum.GetName(typeof(Device.ThermostatFanMode), device.FanMode) + ".";
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
-                            if (TypeOfChange == "HeatCoolMode")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.HeatCoolModeChanged)
                             {
                                 notification = device.Name + " mode changed from " + Enum.GetName(typeof(Device.ThermostatMode), device.prevHeatCoolMode) + " to " + Enum.GetName(typeof(Device.ThermostatMode), device.HeatCoolMode) + ".";
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
-                            if (TypeOfChange == "Level")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.LevelChanged)
                             {
                                 notification = device.Name + " energy state changed from " + Enum.GetName(typeof(Device.EnergyMode), device.prevLevel) + " to " + Enum.GetName(typeof(Device.EnergyMode), device.Level) + ".";
 
                                 if (device.SendJabberNotifications && device.NotificationDetailLevel > 2)
                                     jabber.SendMessage(notificationprefix + notification);
                             }
-                            if (TypeOfChange == "CurrentState")
+                            if (TypeOfChange == ControlThinkRefresh.changeType.CurrentStateChanged)
                             {
                                 notification = device.Name + " changed state from " + device.prevCurrentState + " to " + device.CurrentState + ".";
 
@@ -280,8 +291,8 @@ namespace zVirtualScenesApplication
                 {
                     if (Enum.GetName(typeof(CustomHotKeys), thiscene.GlobalHotKey) == KeysPresseed)
                     {
-                        Scene.SceneResult result = thiscene.Run(ControlThinkController);
-                        LogThis(result.SuccessLevel, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
+                        SceneResult result = thiscene.Run(ControlThinkController);
+                        LogThis((int)result.ResultType, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
                     }
                 }
             }
@@ -749,13 +760,28 @@ namespace zVirtualScenesApplication
                 MessageBox.Show("Please select one device and one scene.", ProgramName);
         }
 
+        private void SceneExecutionFinsihed_Handler(SceneResult _SceneResult)
+        {
+            LogThis((int)_SceneResult.ResultType, _SceneResult.Description);
+
+            //Send to LightSwitchClients
+            if (zVScenesSettings.LightSwitchEnabled)
+            {
+                LightSwitchInt.BroadcastMessage("MSG~" + _SceneResult.Description);
+            }
+        }
+
+        
+
         private void btn_runScene_Click(object sender, EventArgs e)
         {
             if (listBoxScenes.SelectedIndex != -1)
             {
                 Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                Scene.SceneResult result = selectedscene.Run(ControlThinkController);
-                LogThis(result.SuccessLevel, "GUI: [USER] " + result.Description);
+                    
+
+                SceneResult result = selectedscene.Run(ControlThinkController);
+                LogThis((int)result.ResultType, "GUI: [USER] " + result.Description);
             }
             else
                 MessageBox.Show("Please select a scene.", ProgramName);
@@ -839,8 +865,8 @@ namespace zVirtualScenesApplication
 
                 if (action != null)
                 {
-                    Action.ActionResult result = action.Run(ControlThinkController);
-                    LogThis(result.SuccessLevel, "GUI: [USER] " + result.Description);
+                    ActionResult result = action.Run(ControlThinkController);
+                    LogThis((int)result.ResultType, "GUI: [USER] " + result.Description);
                 }
 
             }
@@ -865,13 +891,20 @@ namespace zVirtualScenesApplication
             Scene scene = new Scene();
             scene.ID = max;
             scene.Name = "Scene " + max;
+            //Register Handler
+            scene.SceneExecutionFinishedEvent += new Scene.SceneExecutionFinished(SceneExecutionFinsihed_Handler);
             MasterScenes.Add(scene);
+            
         }
 
         private void buttonDelScene_Click(object sender, EventArgs e)
         {
             if (listBoxScenes.SelectedIndex != -1)
+            {
+                //Unregister Handler
+                MasterScenes[listBoxScenes.SelectedIndex].SceneExecutionFinishedEvent -= new Scene.SceneExecutionFinished(SceneExecutionFinsihed_Handler);
                 MasterScenes.RemoveAt(listBoxScenes.SelectedIndex);
+            }            
         }
 
         private void btn_SceneMoveUp_Click(object sender, EventArgs e)
@@ -1047,9 +1080,18 @@ namespace zVirtualScenesApplication
         {
             if (listBoxScenes.SelectedIndex != -1)
             {
-                if (comboBoxNonZWAction.SelectedIndex == 0)
+                if (comboBoxNonZWAction.SelectedIndex == 0)  //Create Timer
                 {
-                    //Add EXE Action
+                    if (formCreateTimeDelay == null || formCreateTimeDelay.IsDisposed)
+                    {
+                        formCreateTimeDelay = new formCreateTimeDelay(this, listBoxScenes.SelectedIndex);
+                        formCreateTimeDelay.Show();
+                    }
+                    formCreateTimeDelay.Activate();
+                }
+                else if (comboBoxNonZWAction.SelectedIndex == 1) //Add EXE Action
+                {
+                    
                     OpenFileDialog fdlg = new OpenFileDialog();
                     fdlg.Title = "Please select the file to run with this action.";
                     fdlg.Filter = "All files (*.*)|*.*|All files (*.*)|*.*";

@@ -29,7 +29,7 @@
     <PublisherName>Drabeck Solutions</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.2.5.0</ApplicationVersion>
+    <ApplicationVersion>1.2.7.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -98,6 +98,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
+    <Compile Include="formCreateTimeDelay.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formCreateTimeDelay.Designer.cs">
+      <DependentUpon>formCreateTimeDelay.cs</DependentUpon>
+    </Compile>
     <Compile Include="KeyboardHook.cs" />
     <Compile Include="formSceneProperties.cs">
       <SubType>Form</SubType>
@@ -129,6 +135,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="formCreateTimeDelay.resx">
+      <DependentUpon>formCreateTimeDelay.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="formSceneProperties.resx">
       <DependentUpon>formSceneProperties.cs</DependentUpon>
     </EmbeddedResource>

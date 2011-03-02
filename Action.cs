@@ -80,7 +80,8 @@ namespace zVirtualScenesApplication
         public uint HomeID { get; set; }
         public byte NodeID { get; set; }
         public string Type { get; set; }
-        public int Mode { get; set; }        
+        public int Mode { get; set; }
+        public int TimerDuration { get; set; } 
 
         #endregion
 
@@ -103,9 +104,13 @@ namespace zVirtualScenesApplication
 
         public override string ToString()
         {
-            if(Type == "LauchAPP")
+            if(this.Type == "LauchAPP")
             {
                 return "Launch: " + EXEPath;
+            }
+            else if (this.Type == "DelayTimer")
+            {
+                return "Wait " + this.TimerDuration / 1000 + " second(s)."; 
             }
             else
                 return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
@@ -114,47 +119,82 @@ namespace zVirtualScenesApplication
         public ActionResult Run(ZWaveController ControlThinkController)
         {
 
-            #region Switch
-            if (this.Type.Contains("MultilevelPowerSwitch") || this.Type.Contains("BinaryPowerSwitch"))
-            {
-                foreach (ZWaveDevice device in ControlThinkController.Devices)
-                {
-                    if (device.NodeID == this.NodeID)
-                        device.Level = _Level;
-                }
-            }
-            #endregion
+            #region Switches
 
-            #region Thermostat
-            else if (this.Type.Contains("GeneralThermostatV2") || this.Type.Contains("GeneralThermostat"))
+            if (this.Type.Contains("BinaryPowerSwitch"))
             {
                 foreach (ZWaveDevice device in ControlThinkController.Devices)
                 {
                     if (device.NodeID == this.NodeID)
                     {
+                        device.Level = _Level;
+                        return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + (this.Level > 0 ? "ON" : "OFF") + "." };
+                    }
+                }
+            }  
+
+            if (this.Type.Contains("MultilevelPowerSwitch"))
+            {
+                foreach (ZWaveDevice device in ControlThinkController.Devices)
+                {
+                    if (device.NodeID == this.NodeID)
+                    {                         
+                        device.Level = _Level;
+                        return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + this.Level.ToString() + "." };
+                    }
+                }
+            }               
+            #endregion
+
+            #region Thermostat
+            else if (this.Type.Contains("GeneralThermostat") )
+            {
+                foreach (ZWaveDevice device in ControlThinkController.Devices)
+                {
+                    if (device.NodeID == this.NodeID)
+                    {
+                        string ActionLog = "Ran Action. '" + this.Name + "'";
                         try
                         {
                             ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
 
                             //Set Heat Cool Mode
                             if (_HeatCoolMode != -1)
+                            {
                                 thermostat.ThermostatMode = (ControlThink.ZWave.Devices.ThermostatMode)_HeatCoolMode;
+                                ActionLog += " Mode set to: " + Enum.GetName(typeof(Device.ThermostatMode), _HeatCoolMode) + "  ";
+                            }
 
                             if (_FanMode != -1)
+                            {
                                 thermostat.ThermostatFanMode = (ControlThink.ZWave.Devices.ThermostatFanMode)_FanMode;
+                                ActionLog += " FanMode set to: " + Enum.GetName(typeof(Device.ThermostatFanMode), _FanMode) + "  ";
+                            }
 
-                            if (_EngeryMode != -1)                                                            
-                                thermostat.Level = (byte)_EngeryMode;                            
+                            if (_EngeryMode != -1)                       
+                            {     
+                                thermostat.Level = (byte)_EngeryMode;
+                                ActionLog += " EnergyMode set to: " + Enum.GetName(typeof(Device.EnergyMode), _EngeryMode) + "  ";
+                            }
 
                             if (_CoolPoint != -1)
+                            {
                                 thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature = new Temperature(_CoolPoint, TemperatureScale.Fahrenheit);
+                                ActionLog += " CoolPoint set to: " + _CoolPoint.ToString() + "  ";
+                            }
 
                             if (_HeatPoint != -1)
+                            {
                                 thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature = new Temperature(_HeatPoint, TemperatureScale.Fahrenheit);
+                                ActionLog += " HeatPoint set to: " + _HeatPoint.ToString() + "  ";
+                            }
+
+                            return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = ActionLog};
+                    
                         }
                         catch (Exception e)
                         {
-                            return new ActionResult { SuccessLevel = 2, Description = "Failed to set Thermostat. Mode might not be allowed. - " + e};
+                            return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to set Thermostat. Mode might not be allowed. - " + e};
                         }
                     }
                 }
@@ -167,19 +207,24 @@ namespace zVirtualScenesApplication
                 try
                 {
                     System.Diagnostics.Process.Start(EXEPath);
+                    return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. Launched (" + EXEPath + ") ." };
                 }
                 catch (Exception e)
                 {
-                    return new ActionResult { SuccessLevel = 2, Description = "Failed to launch (" + EXEPath + ") - " + e };
+                    return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to launch (" + EXEPath + ") - " + e };
                 }
+            }
+            else if (this.Type == "DelayTimer")
+            {
+                System.Threading.Thread.Sleep((int)this.TimerDuration);
             }
             #endregion
 
-           return new ActionResult { SuccessLevel = 1, Description = "Ran action on " + this.Type + "(" + this.Name +")." }; 
+           return new ActionResult { ResultType= ActionResult.ResultTypes.Success, Description = "Ran action on " + this.Type + "(" + this.Name +")." }; 
         }
 
         public string GetFomattedType()
-        {
+        {                       
             if (Type != null && Type.Contains("BinaryPowerSwitch"))
             {
                 return (Level > 0 ? "State: ON" : "State: OFF");
@@ -226,12 +271,18 @@ namespace zVirtualScenesApplication
         public string GlbUniqueID()
         {
             return this.HomeID.ToString() + this.NodeID.ToString();
+        }        
+    }
+
+    public class ActionResult
+    {
+        public enum ResultTypes
+        {
+            Success = 1,
+            Error = 2
         }
 
-        public class ActionResult
-        {
-            public int SuccessLevel { get; set; }
-            public string Description { get; set; }
-        }
+        public ResultTypes ResultType { get; set; }
+        public string Description { get; set; }
     }
 }
