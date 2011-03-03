@@ -81,6 +81,10 @@ namespace zVirtualScenesApplication
         public byte NodeID { get; set; }
         public string Type { get; set; }
         public int Mode { get; set; }
+
+        /// <summary>
+        /// In Milliseconds
+        /// </summary>
         public int TimerDuration { get; set; } 
 
         #endregion
@@ -93,13 +97,14 @@ namespace zVirtualScenesApplication
             _HeatCoolMode = -1;
             _EngeryMode = -1; 
             _HeatPoint = -1;
-            _CoolPoint = -1; 
+            _CoolPoint = -1;
+            _EXEPath = "";
             this.Type = "";
             this.NodeID = 0;                       
             this.Mode = -1;
             this.Temp = 0;
             this.HomeID = 0;
-
+            this.TimerDuration = 5000;
         }
 
         public override string ToString()

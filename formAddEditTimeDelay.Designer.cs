@@ -1,6 +1,6 @@
 ﻿namespace zVirtualScenesApplication
 {
-    partial class formCreateTimeDelay
+    partial class formAddEditTimeDelay
     {
         /// <summary>
         /// Required designer variable.
@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formCreateTimeDelay));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formAddEditTimeDelay));
             this.txtb_duration = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.btn_Save = new System.Windows.Forms.Button();
-            this.groupBoxDevice = new System.Windows.Forms.GroupBox();
+            this.groupBoxAction = new System.Windows.Forms.GroupBox();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBoxDevice.SuspendLayout();
+            this.groupBoxAction.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtb_duration
@@ -53,51 +53,49 @@
             this.label12.Size = new System.Drawing.Size(132, 13);
             this.label12.TabIndex = 25;
             this.label12.Text = "Delay Duration (seconds): ";
-            this.label12.Click += new System.EventHandler(this.label12_Click);
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(257, 20);
+            this.btn_Save.Location = new System.Drawing.Point(268, 61);
             this.btn_Save.Name = "btn_Save";
-            this.btn_Save.Size = new System.Drawing.Size(79, 20);
+            this.btn_Save.Size = new System.Drawing.Size(83, 20);
             this.btn_Save.TabIndex = 34;
-            this.btn_Save.Text = "Create";
+            this.btn_Save.Text = "Save Action";
             this.btn_Save.UseVisualStyleBackColor = true;
             this.btn_Save.Click += new System.EventHandler(this.btn_Save_Click);
             // 
-            // groupBoxDevice
+            // groupBoxAction
             // 
-            this.groupBoxDevice.Controls.Add(this.txtb_duration);
-            this.groupBoxDevice.Controls.Add(this.btn_Save);
-            this.groupBoxDevice.Controls.Add(this.label12);
-            this.groupBoxDevice.Location = new System.Drawing.Point(2, 4);
-            this.groupBoxDevice.Name = "groupBoxDevice";
-            this.groupBoxDevice.Size = new System.Drawing.Size(348, 53);
-            this.groupBoxDevice.TabIndex = 35;
-            this.groupBoxDevice.TabStop = false;
-            this.groupBoxDevice.Text = "Timer Properties";
+            this.groupBoxAction.Controls.Add(this.txtb_duration);
+            this.groupBoxAction.Controls.Add(this.label12);
+            this.groupBoxAction.Location = new System.Drawing.Point(3, 5);
+            this.groupBoxAction.Name = "groupBoxAction";
+            this.groupBoxAction.Size = new System.Drawing.Size(348, 53);
+            this.groupBoxAction.TabIndex = 35;
+            this.groupBoxAction.TabStop = false;
+            this.groupBoxAction.Text = "Timer Properties";
             // 
             // toolTipNotificationLevel
             // 
             this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
             // 
-            // formCreateTimeDelay
+            // formAddEditTimeDelay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(350, 62);
-            this.Controls.Add(this.groupBoxDevice);
+            this.ClientSize = new System.Drawing.Size(356, 85);
+            this.Controls.Add(this.groupBoxAction);
+            this.Controls.Add(this.btn_Save);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(366, 100);
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(366, 100);
-            this.Name = "formCreateTimeDelay";
+            this.Name = "formAddEditTimeDelay";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Create a timer";
-            this.groupBoxDevice.ResumeLayout(false);
-            this.groupBoxDevice.PerformLayout();
+            this.Text = "Timed Delay Action Properties";
+            this.groupBoxAction.ResumeLayout(false);
+            this.groupBoxAction.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -107,7 +105,7 @@
         private System.Windows.Forms.TextBox txtb_duration;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button btn_Save;
-        private System.Windows.Forms.GroupBox groupBoxDevice;
+        private System.Windows.Forms.GroupBox groupBoxAction;
         private System.Windows.Forms.ToolTip toolTipNotificationLevel;
     }
 }

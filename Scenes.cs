@@ -13,11 +13,11 @@ using System.Xml.Serialization;
 namespace zVirtualScenesApplication 
 {
     public delegate SceneResult RunWorkerDelegate(ZWaveController ControlThinkController);
+    public delegate void SceneExecutionFinished(object sender, SceneResult SceneResultArgs);
 
     public class Scene : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        public delegate void  SceneExecutionFinished(SceneResult sceneresult);
         public event SceneExecutionFinished SceneExecutionFinishedEvent;
 
         //Properties that require PropertyChangedEvent to fire to sync GUI
@@ -44,7 +44,7 @@ namespace zVirtualScenesApplication
         }
 
         /// <summary>
-        /// Actual Scene Run Worker to be run in a seperate threads.  
+        /// Actual Scene worker to be run in a seperate threads.  
         /// </summary>
         /// <param name="ControlThinkController"></param>
         /// <returns></returns>
@@ -61,7 +61,7 @@ namespace zVirtualScenesApplication
             }
 
             if (errors == "")
-                return new SceneResult { ResultType = SceneResult.ResultTypes.Success, Description = "Scene '" + this.Name + "' successfully finished executing.  " + this.Actions.Count() + " action(s) executed." };
+                return new SceneResult { ResultType = SceneResult.ResultTypes.Success, Description = "Scene '" + this.Name + "' successfully finished executing.  " + this.Actions.Count() + " action(s) ran." };
             else
                 return new SceneResult { ResultType = SceneResult.ResultTypes.Error, Description = "Scene '" + this.Name + "' finished with the following errors: " + errors };
         }
@@ -105,7 +105,7 @@ namespace zVirtualScenesApplication
             this.isRunning = false; 
 
             if (SceneExecutionFinishedEvent != null)  //Call Event ONLY IF someone is subscribed.
-                 this.SceneExecutionFinishedEvent(Sceneresult);             
+                 SceneExecutionFinishedEvent(this, Sceneresult);             
         }       
 
         public override string ToString()

@@ -9,22 +9,17 @@ using System.Windows.Forms;
 
 namespace zVirtualScenesApplication
 {
-    public partial class formSceneProperties : Form
+    public partial class formPropertiesScene : Form
     {
-        private formzVirtualScenes _zVirtualScenesMain;
-        private int _SelectedSceneIndex;     
+        public bool isOpen { get; set; }
+        public formzVirtualScenes _zVirtualScenesMain;
+        public int _SelectedSceneIndex;     
 
-        public formSceneProperties(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex)
+        public formPropertiesScene()
         {
             InitializeComponent();
-            _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedSceneIndex = SelectedSceneIndex;
-
-            txtb_sceneName.Text = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Name;
-            
-
-            comboBoxHotKeys.DataSource = Enum.GetNames(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys));
-            comboBoxHotKeys.SelectedIndex = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].GlobalHotKey;
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.formSceneProperties_Close);
+            this.isOpen = false;            
         }
 
         private void btn_Save_Click(object sender, EventArgs e)
@@ -48,6 +43,20 @@ namespace zVirtualScenesApplication
         public void SetGlobalHotKey(string HotKeyString)
         {
             comboBoxHotKeys.SelectedIndex = (int)Enum.Parse(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys), HotKeyString);
+        }
+
+        private void formSceneProperties_Close(object sender, EventArgs e)
+        {
+            this.isOpen = false;
+        }
+
+        private void formSceneProperties_Load(object sender, EventArgs e)
+        {
+            this.isOpen = true;
+
+            txtb_sceneName.Text = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Name;
+            comboBoxHotKeys.DataSource = Enum.GetNames(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys));
+            comboBoxHotKeys.SelectedIndex = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].GlobalHotKey;
         }
     }       
 }

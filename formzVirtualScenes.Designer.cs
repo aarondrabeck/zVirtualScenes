@@ -33,10 +33,18 @@
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonChangeDeviceLevel = new System.Windows.Forms.Button();
+            this.btn_EditDevice = new System.Windows.Forms.Button();
             this.labelLastEvent = new System.Windows.Forms.Label();
             this.listBoxDevices = new System.Windows.Forms.ListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.buttonEditAction = new System.Windows.Forms.Button();
+            this.btn_AddAction = new System.Windows.Forms.Button();
+            this.btn_EditScene = new System.Windows.Forms.Button();
+            this.labelSceneRunStatus = new System.Windows.Forms.Label();
+            this.btn_createnonzwaction = new System.Windows.Forms.Button();
             this.btn_sceneMoveDown = new System.Windows.Forms.Button();
+            this.comboBoxNonZWAction = new System.Windows.Forms.ComboBox();
             this.btn_SceneMoveUp = new System.Windows.Forms.Button();
             this.buttonDelScene = new System.Windows.Forms.Button();
             this.buttonAddScene = new System.Windows.Forms.Button();
@@ -47,33 +55,6 @@
             this.lbl_sceneActions = new System.Windows.Forms.Label();
             this.listBoxSceneActions = new System.Windows.Forms.ListBox();
             this.btn_runScene = new System.Windows.Forms.Button();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.btn_createnonzwaction = new System.Windows.Forms.Button();
-            this.comboBoxNonZWAction = new System.Windows.Forms.ComboBox();
-            this.groupBoxCommands = new System.Windows.Forms.GroupBox();
-            this.groupBox8 = new System.Windows.Forms.GroupBox();
-            this.comboBoxBinaryONOFF = new System.Windows.Forms.ComboBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txtbox_level = new System.Windows.Forms.TextBox();
-            this.btn_RunCommand = new System.Windows.Forms.Button();
-            this.groupBoxtTemp = new System.Windows.Forms.GroupBox();
-            this.checkBoxeditHP = new System.Windows.Forms.CheckBox();
-            this.checkBoxeditCP = new System.Windows.Forms.CheckBox();
-            this.labelCurrentTemp = new System.Windows.Forms.Label();
-            this.textBoxCoolPoint = new System.Windows.Forms.TextBox();
-            this.comboBoxEnergyMode = new System.Windows.Forms.ComboBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.comboBoxFanMode = new System.Windows.Forms.ComboBox();
-            this.label6 = new System.Windows.Forms.Label();
-            this.txtbx_HeatPoint = new System.Windows.Forms.TextBox();
-            this.comboBoxHeatCoolMode = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.btn_AddtoScene = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.buttonSaveSettings = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
@@ -110,25 +91,14 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.reconnectToControlThinkUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lookForNewDevicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.propertiesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox4.SuspendLayout();
-            this.groupBoxCommands.SuspendLayout();
-            this.groupBox8.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
-            this.groupBox3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.groupBoxtTemp.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.tabPage3.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -145,38 +115,58 @@
             this.MainTabControl.Location = new System.Drawing.Point(0, 25);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
-            this.MainTabControl.Size = new System.Drawing.Size(786, 561);
+            this.MainTabControl.Size = new System.Drawing.Size(786, 448);
             this.MainTabControl.TabIndex = 0;
             // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.groupBox1);
             this.tabPage1.Controls.Add(this.groupBox2);
-            this.tabPage1.Controls.Add(this.groupBox4);
-            this.tabPage1.Controls.Add(this.groupBoxCommands);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(778, 535);
+            this.tabPage1.Size = new System.Drawing.Size(778, 422);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Scenes";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.buttonChangeDeviceLevel);
+            this.groupBox1.Controls.Add(this.btn_EditDevice);
             this.groupBox1.Controls.Add(this.labelLastEvent);
             this.groupBox1.Controls.Add(this.listBoxDevices);
-            this.groupBox1.Location = new System.Drawing.Point(6, 3);
+            this.groupBox1.Location = new System.Drawing.Point(8, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(760, 135);
+            this.groupBox1.Size = new System.Drawing.Size(760, 139);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "ZWave Devices";
             // 
+            // buttonChangeDeviceLevel
+            // 
+            this.buttonChangeDeviceLevel.Location = new System.Drawing.Point(613, 113);
+            this.buttonChangeDeviceLevel.Name = "buttonChangeDeviceLevel";
+            this.buttonChangeDeviceLevel.Size = new System.Drawing.Size(91, 23);
+            this.buttonChangeDeviceLevel.TabIndex = 28;
+            this.buttonChangeDeviceLevel.Text = "Change Level";
+            this.buttonChangeDeviceLevel.UseVisualStyleBackColor = true;
+            this.buttonChangeDeviceLevel.Click += new System.EventHandler(this.buttonChangeDeviceLevel_Click);
+            // 
+            // btn_EditDevice
+            // 
+            this.btn_EditDevice.Location = new System.Drawing.Point(708, 113);
+            this.btn_EditDevice.Name = "btn_EditDevice";
+            this.btn_EditDevice.Size = new System.Drawing.Size(46, 23);
+            this.btn_EditDevice.TabIndex = 27;
+            this.btn_EditDevice.Text = "Edit";
+            this.btn_EditDevice.UseVisualStyleBackColor = true;
+            this.btn_EditDevice.Click += new System.EventHandler(this.btn_EditDevice_Click_1);
+            // 
             // labelLastEvent
             // 
             this.labelLastEvent.AutoSize = true;
-            this.labelLastEvent.Location = new System.Drawing.Point(6, 115);
+            this.labelLastEvent.Location = new System.Drawing.Point(8, 118);
             this.labelLastEvent.Name = "labelLastEvent";
             this.labelLastEvent.Size = new System.Drawing.Size(64, 13);
             this.labelLastEvent.TabIndex = 22;
@@ -189,12 +179,17 @@
             this.listBoxDevices.Name = "listBoxDevices";
             this.listBoxDevices.Size = new System.Drawing.Size(748, 95);
             this.listBoxDevices.TabIndex = 0;
-            this.listBoxDevices.SelectedIndexChanged += new System.EventHandler(this.listBoxDevices_SelectedIndexChanged);
             this.listBoxDevices.DoubleClick += new System.EventHandler(this.listBoxDevices_DoubleClick);
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.buttonEditAction);
+            this.groupBox2.Controls.Add(this.btn_AddAction);
+            this.groupBox2.Controls.Add(this.btn_EditScene);
+            this.groupBox2.Controls.Add(this.labelSceneRunStatus);
+            this.groupBox2.Controls.Add(this.btn_createnonzwaction);
             this.groupBox2.Controls.Add(this.btn_sceneMoveDown);
+            this.groupBox2.Controls.Add(this.comboBoxNonZWAction);
             this.groupBox2.Controls.Add(this.btn_SceneMoveUp);
             this.groupBox2.Controls.Add(this.buttonDelScene);
             this.groupBox2.Controls.Add(this.buttonAddScene);
@@ -205,16 +200,66 @@
             this.groupBox2.Controls.Add(this.lbl_sceneActions);
             this.groupBox2.Controls.Add(this.listBoxSceneActions);
             this.groupBox2.Controls.Add(this.btn_runScene);
-            this.groupBox2.Location = new System.Drawing.Point(6, 340);
+            this.groupBox2.Location = new System.Drawing.Point(8, 148);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(760, 189);
+            this.groupBox2.Size = new System.Drawing.Size(760, 270);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Scenes";
             // 
+            // buttonEditAction
+            // 
+            this.buttonEditAction.Location = new System.Drawing.Point(407, 197);
+            this.buttonEditAction.Name = "buttonEditAction";
+            this.buttonEditAction.Size = new System.Drawing.Size(46, 20);
+            this.buttonEditAction.TabIndex = 26;
+            this.buttonEditAction.Text = "Edit";
+            this.buttonEditAction.UseVisualStyleBackColor = true;
+            this.buttonEditAction.Click += new System.EventHandler(this.buttonEditAction_Click);
+            // 
+            // btn_AddAction
+            // 
+            this.btn_AddAction.Location = new System.Drawing.Point(208, 198);
+            this.btn_AddAction.Name = "btn_AddAction";
+            this.btn_AddAction.Size = new System.Drawing.Size(132, 20);
+            this.btn_AddAction.TabIndex = 25;
+            this.btn_AddAction.Text = "Add ZWave Action";
+            this.btn_AddAction.UseVisualStyleBackColor = true;
+            this.btn_AddAction.Click += new System.EventHandler(this.btn_AddAction_Click);
+            // 
+            // btn_EditScene
+            // 
+            this.btn_EditScene.Location = new System.Drawing.Point(126, 219);
+            this.btn_EditScene.Name = "btn_EditScene";
+            this.btn_EditScene.Size = new System.Drawing.Size(53, 20);
+            this.btn_EditScene.TabIndex = 24;
+            this.btn_EditScene.Text = "Edit";
+            this.btn_EditScene.UseVisualStyleBackColor = true;
+            this.btn_EditScene.Click += new System.EventHandler(this.btn_EditScene_Click);
+            // 
+            // labelSceneRunStatus
+            // 
+            this.labelSceneRunStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.labelSceneRunStatus.AutoSize = true;
+            this.labelSceneRunStatus.Location = new System.Drawing.Point(211, 249);
+            this.labelSceneRunStatus.Name = "labelSceneRunStatus";
+            this.labelSceneRunStatus.Size = new System.Drawing.Size(158, 13);
+            this.labelSceneRunStatus.TabIndex = 23;
+            this.labelSceneRunStatus.Text = "Last Scene Completetion Status";
+            // 
+            // btn_createnonzwaction
+            // 
+            this.btn_createnonzwaction.Location = new System.Drawing.Point(209, 222);
+            this.btn_createnonzwaction.Name = "btn_createnonzwaction";
+            this.btn_createnonzwaction.Size = new System.Drawing.Size(131, 20);
+            this.btn_createnonzwaction.TabIndex = 21;
+            this.btn_createnonzwaction.Text = "Add Non-Zwave Action";
+            this.btn_createnonzwaction.UseVisualStyleBackColor = true;
+            this.btn_createnonzwaction.Click += new System.EventHandler(this.btn_createnonzwaction_Click);
+            // 
             // btn_sceneMoveDown
             // 
-            this.btn_sceneMoveDown.Location = new System.Drawing.Point(182, 49);
+            this.btn_sceneMoveDown.Location = new System.Drawing.Point(182, 40);
             this.btn_sceneMoveDown.Name = "btn_sceneMoveDown";
             this.btn_sceneMoveDown.Size = new System.Drawing.Size(17, 20);
             this.btn_sceneMoveDown.TabIndex = 20;
@@ -222,9 +267,21 @@
             this.btn_sceneMoveDown.UseVisualStyleBackColor = true;
             this.btn_sceneMoveDown.Click += new System.EventHandler(this.btn_sceneMoveDown_Click);
             // 
+            // comboBoxNonZWAction
+            // 
+            this.comboBoxNonZWAction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxNonZWAction.FormattingEnabled = true;
+            this.comboBoxNonZWAction.Items.AddRange(new object[] {
+            "Create Delay Timer",
+            "Launch EXE"});
+            this.comboBoxNonZWAction.Location = new System.Drawing.Point(346, 222);
+            this.comboBoxNonZWAction.Name = "comboBoxNonZWAction";
+            this.comboBoxNonZWAction.Size = new System.Drawing.Size(163, 21);
+            this.comboBoxNonZWAction.TabIndex = 23;
+            // 
             // btn_SceneMoveUp
             // 
-            this.btn_SceneMoveUp.Location = new System.Drawing.Point(182, 26);
+            this.btn_SceneMoveUp.Location = new System.Drawing.Point(182, 17);
             this.btn_SceneMoveUp.Name = "btn_SceneMoveUp";
             this.btn_SceneMoveUp.Size = new System.Drawing.Size(17, 20);
             this.btn_SceneMoveUp.TabIndex = 19;
@@ -234,27 +291,27 @@
             // 
             // buttonDelScene
             // 
-            this.buttonDelScene.Location = new System.Drawing.Point(87, 163);
+            this.buttonDelScene.Location = new System.Drawing.Point(65, 219);
             this.buttonDelScene.Name = "buttonDelScene";
-            this.buttonDelScene.Size = new System.Drawing.Size(92, 20);
+            this.buttonDelScene.Size = new System.Drawing.Size(55, 20);
             this.buttonDelScene.TabIndex = 18;
-            this.buttonDelScene.Text = "Delete Scene";
+            this.buttonDelScene.Text = "Delete";
             this.buttonDelScene.UseVisualStyleBackColor = true;
             this.buttonDelScene.Click += new System.EventHandler(this.buttonDelScene_Click);
             // 
             // buttonAddScene
             // 
-            this.buttonAddScene.Location = new System.Drawing.Point(6, 163);
+            this.buttonAddScene.Location = new System.Drawing.Point(6, 219);
             this.buttonAddScene.Name = "buttonAddScene";
-            this.buttonAddScene.Size = new System.Drawing.Size(75, 20);
+            this.buttonAddScene.Size = new System.Drawing.Size(53, 20);
             this.buttonAddScene.TabIndex = 17;
-            this.buttonAddScene.Text = "Add Scene";
+            this.buttonAddScene.Text = "Add";
             this.buttonAddScene.UseVisualStyleBackColor = true;
             this.buttonAddScene.Click += new System.EventHandler(this.buttonAddScene_Click);
             // 
             // btn_MoveDown
             // 
-            this.btn_MoveDown.Location = new System.Drawing.Point(739, 61);
+            this.btn_MoveDown.Location = new System.Drawing.Point(739, 57);
             this.btn_MoveDown.Name = "btn_MoveDown";
             this.btn_MoveDown.Size = new System.Drawing.Size(17, 20);
             this.btn_MoveDown.TabIndex = 16;
@@ -264,7 +321,7 @@
             // 
             // btn_MoveUp
             // 
-            this.btn_MoveUp.Location = new System.Drawing.Point(739, 39);
+            this.btn_MoveUp.Location = new System.Drawing.Point(739, 35);
             this.btn_MoveUp.Name = "btn_MoveUp";
             this.btn_MoveUp.Size = new System.Drawing.Size(17, 20);
             this.btn_MoveUp.TabIndex = 15;
@@ -274,20 +331,20 @@
             // 
             // btn_DelAction
             // 
-            this.btn_DelAction.Location = new System.Drawing.Point(657, 163);
+            this.btn_DelAction.Location = new System.Drawing.Point(346, 197);
             this.btn_DelAction.Name = "btn_DelAction";
-            this.btn_DelAction.Size = new System.Drawing.Size(81, 20);
+            this.btn_DelAction.Size = new System.Drawing.Size(56, 20);
             this.btn_DelAction.TabIndex = 14;
-            this.btn_DelAction.Text = "Delete Action";
+            this.btn_DelAction.Text = "Delete";
             this.btn_DelAction.UseVisualStyleBackColor = true;
             this.btn_DelAction.Click += new System.EventHandler(this.btn_DelAction_Click);
             // 
             // listBoxScenes
             // 
             this.listBoxScenes.FormattingEnabled = true;
-            this.listBoxScenes.Location = new System.Drawing.Point(7, 26);
+            this.listBoxScenes.Location = new System.Drawing.Point(7, 17);
             this.listBoxScenes.Name = "listBoxScenes";
-            this.listBoxScenes.Size = new System.Drawing.Size(172, 134);
+            this.listBoxScenes.Size = new System.Drawing.Size(172, 199);
             this.listBoxScenes.TabIndex = 3;
             this.listBoxScenes.SelectedIndexChanged += new System.EventHandler(this.listBoxScenes_SelectedIndexChanged);
             this.listBoxScenes.DoubleClick += new System.EventHandler(this.listBoxScenes_DoubleClick);
@@ -295,7 +352,7 @@
             // lbl_sceneActions
             // 
             this.lbl_sceneActions.AutoSize = true;
-            this.lbl_sceneActions.Location = new System.Drawing.Point(206, 23);
+            this.lbl_sceneActions.Location = new System.Drawing.Point(206, 20);
             this.lbl_sceneActions.Name = "lbl_sceneActions";
             this.lbl_sceneActions.Size = new System.Drawing.Size(76, 13);
             this.lbl_sceneActions.TabIndex = 6;
@@ -304,316 +361,21 @@
             // listBoxSceneActions
             // 
             this.listBoxSceneActions.FormattingEnabled = true;
-            this.listBoxSceneActions.Location = new System.Drawing.Point(208, 39);
+            this.listBoxSceneActions.Location = new System.Drawing.Point(208, 35);
             this.listBoxSceneActions.Name = "listBoxSceneActions";
-            this.listBoxSceneActions.Size = new System.Drawing.Size(528, 121);
+            this.listBoxSceneActions.Size = new System.Drawing.Size(528, 160);
             this.listBoxSceneActions.TabIndex = 5;
+            this.listBoxSceneActions.DoubleClick += new System.EventHandler(this.listBoxSceneActions_DoubleClick);
             // 
             // btn_runScene
             // 
-            this.btn_runScene.Location = new System.Drawing.Point(652, 12);
+            this.btn_runScene.Location = new System.Drawing.Point(6, 240);
             this.btn_runScene.Name = "btn_runScene";
-            this.btn_runScene.Size = new System.Drawing.Size(102, 20);
+            this.btn_runScene.Size = new System.Drawing.Size(173, 20);
             this.btn_runScene.TabIndex = 10;
             this.btn_runScene.Text = "Run Scene Now";
             this.btn_runScene.UseVisualStyleBackColor = true;
             this.btn_runScene.Click += new System.EventHandler(this.btn_runScene_Click);
-            // 
-            // groupBox4
-            // 
-            this.groupBox4.Controls.Add(this.btn_createnonzwaction);
-            this.groupBox4.Controls.Add(this.comboBoxNonZWAction);
-            this.groupBox4.Location = new System.Drawing.Point(589, 144);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(177, 83);
-            this.groupBox4.TabIndex = 21;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Non Zwave Actions";
-            // 
-            // btn_createnonzwaction
-            // 
-            this.btn_createnonzwaction.Location = new System.Drawing.Point(10, 51);
-            this.btn_createnonzwaction.Name = "btn_createnonzwaction";
-            this.btn_createnonzwaction.Size = new System.Drawing.Size(158, 20);
-            this.btn_createnonzwaction.TabIndex = 21;
-            this.btn_createnonzwaction.Text = "Create Non-Zwave Action";
-            this.btn_createnonzwaction.UseVisualStyleBackColor = true;
-            this.btn_createnonzwaction.Click += new System.EventHandler(this.btn_createnonzwaction_Click);
-            // 
-            // comboBoxNonZWAction
-            // 
-            this.comboBoxNonZWAction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxNonZWAction.FormattingEnabled = true;
-            this.comboBoxNonZWAction.Items.AddRange(new object[] {
-            "Create Delay Timer",
-            "Launch EXE"});
-            this.comboBoxNonZWAction.Location = new System.Drawing.Point(10, 24);
-            this.comboBoxNonZWAction.Name = "comboBoxNonZWAction";
-            this.comboBoxNonZWAction.Size = new System.Drawing.Size(158, 21);
-            this.comboBoxNonZWAction.TabIndex = 23;
-            // 
-            // groupBoxCommands
-            // 
-            this.groupBoxCommands.Controls.Add(this.groupBox8);
-            this.groupBoxCommands.Controls.Add(this.groupBox3);
-            this.groupBoxCommands.Controls.Add(this.btn_RunCommand);
-            this.groupBoxCommands.Controls.Add(this.groupBoxtTemp);
-            this.groupBoxCommands.Controls.Add(this.btn_AddtoScene);
-            this.groupBoxCommands.Location = new System.Drawing.Point(6, 142);
-            this.groupBoxCommands.Name = "groupBoxCommands";
-            this.groupBoxCommands.Size = new System.Drawing.Size(567, 192);
-            this.groupBoxCommands.TabIndex = 20;
-            this.groupBoxCommands.TabStop = false;
-            this.groupBoxCommands.Text = "Create Action";
-            // 
-            // groupBox8
-            // 
-            this.groupBox8.Controls.Add(this.comboBoxBinaryONOFF);
-            this.groupBox8.Controls.Add(this.pictureBox3);
-            this.groupBox8.Location = new System.Drawing.Point(7, 16);
-            this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Size = new System.Drawing.Size(143, 58);
-            this.groupBox8.TabIndex = 16;
-            this.groupBox8.TabStop = false;
-            this.groupBox8.Text = "Binary Switch";
-            // 
-            // comboBoxBinaryONOFF
-            // 
-            this.comboBoxBinaryONOFF.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxBinaryONOFF.Enabled = false;
-            this.comboBoxBinaryONOFF.FormattingEnabled = true;
-            this.comboBoxBinaryONOFF.Items.AddRange(new object[] {
-            "OFF",
-            "ON"});
-            this.comboBoxBinaryONOFF.Location = new System.Drawing.Point(68, 22);
-            this.comboBoxBinaryONOFF.Name = "comboBoxBinaryONOFF";
-            this.comboBoxBinaryONOFF.Size = new System.Drawing.Size(53, 21);
-            this.comboBoxBinaryONOFF.TabIndex = 23;
-            // 
-            // pictureBox3
-            // 
-            this.pictureBox3.Image = global::zVirtualScenesApplication.Properties.Resources.switch_32;
-            this.pictureBox3.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
-            this.pictureBox3.Location = new System.Drawing.Point(8, 18);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(31, 36);
-            this.pictureBox3.TabIndex = 9;
-            this.pictureBox3.TabStop = false;
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.label5);
-            this.groupBox3.Controls.Add(this.pictureBox1);
-            this.groupBox3.Controls.Add(this.label4);
-            this.groupBox3.Controls.Add(this.txtbox_level);
-            this.groupBox3.Location = new System.Drawing.Point(9, 80);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(141, 77);
-            this.groupBox3.TabIndex = 13;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Multi Level Switch";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(65, 50);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(70, 13);
-            this.label5.TabIndex = 15;
-            this.label5.Text = "Dim = 0 to 99";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::zVirtualScenesApplication.Properties.Resources.dial_32;
-            this.pictureBox1.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
-            this.pictureBox1.Location = new System.Drawing.Point(6, 27);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(31, 36);
-            this.pictureBox1.TabIndex = 9;
-            this.pictureBox1.TabStop = false;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(43, 23);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(33, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Level";
-            // 
-            // txtbox_level
-            // 
-            this.txtbox_level.Enabled = false;
-            this.txtbox_level.Location = new System.Drawing.Point(82, 20);
-            this.txtbox_level.Name = "txtbox_level";
-            this.txtbox_level.Size = new System.Drawing.Size(51, 20);
-            this.txtbox_level.TabIndex = 8;
-            // 
-            // btn_RunCommand
-            // 
-            this.btn_RunCommand.Location = new System.Drawing.Point(462, 12);
-            this.btn_RunCommand.Name = "btn_RunCommand";
-            this.btn_RunCommand.Size = new System.Drawing.Size(99, 20);
-            this.btn_RunCommand.TabIndex = 15;
-            this.btn_RunCommand.Text = "Run Action Now.";
-            this.btn_RunCommand.UseVisualStyleBackColor = true;
-            this.btn_RunCommand.Click += new System.EventHandler(this.btn_RunCommand_Click);
-            // 
-            // groupBoxtTemp
-            // 
-            this.groupBoxtTemp.Controls.Add(this.checkBoxeditHP);
-            this.groupBoxtTemp.Controls.Add(this.checkBoxeditCP);
-            this.groupBoxtTemp.Controls.Add(this.labelCurrentTemp);
-            this.groupBoxtTemp.Controls.Add(this.textBoxCoolPoint);
-            this.groupBoxtTemp.Controls.Add(this.comboBoxEnergyMode);
-            this.groupBoxtTemp.Controls.Add(this.pictureBox2);
-            this.groupBoxtTemp.Controls.Add(this.label7);
-            this.groupBoxtTemp.Controls.Add(this.comboBoxFanMode);
-            this.groupBoxtTemp.Controls.Add(this.label6);
-            this.groupBoxtTemp.Controls.Add(this.txtbx_HeatPoint);
-            this.groupBoxtTemp.Controls.Add(this.comboBoxHeatCoolMode);
-            this.groupBoxtTemp.Controls.Add(this.label2);
-            this.groupBoxtTemp.Location = new System.Drawing.Point(153, 21);
-            this.groupBoxtTemp.Name = "groupBoxtTemp";
-            this.groupBoxtTemp.Size = new System.Drawing.Size(303, 165);
-            this.groupBoxtTemp.TabIndex = 14;
-            this.groupBoxtTemp.TabStop = false;
-            this.groupBoxtTemp.Text = "Thermostat";
-            // 
-            // checkBoxeditHP
-            // 
-            this.checkBoxeditHP.AutoSize = true;
-            this.checkBoxeditHP.Enabled = false;
-            this.checkBoxeditHP.Location = new System.Drawing.Point(173, 142);
-            this.checkBoxeditHP.Name = "checkBoxeditHP";
-            this.checkBoxeditHP.Size = new System.Drawing.Size(97, 17);
-            this.checkBoxeditHP.TabIndex = 22;
-            this.checkBoxeditHP.Text = "Edit Heat Point";
-            this.checkBoxeditHP.UseVisualStyleBackColor = true;
-            this.checkBoxeditHP.CheckedChanged += new System.EventHandler(this.checkBoxeditHP_CheckedChanged);
-            // 
-            // checkBoxeditCP
-            // 
-            this.checkBoxeditCP.AutoSize = true;
-            this.checkBoxeditCP.Enabled = false;
-            this.checkBoxeditCP.Location = new System.Drawing.Point(47, 142);
-            this.checkBoxeditCP.Name = "checkBoxeditCP";
-            this.checkBoxeditCP.Size = new System.Drawing.Size(95, 17);
-            this.checkBoxeditCP.TabIndex = 21;
-            this.checkBoxeditCP.Text = "Edit Cool Point";
-            this.checkBoxeditCP.UseVisualStyleBackColor = true;
-            this.checkBoxeditCP.CheckedChanged += new System.EventHandler(this.checkBoxeditCP_CheckedChanged);
-            // 
-            // labelCurrentTemp
-            // 
-            this.labelCurrentTemp.AutoSize = true;
-            this.labelCurrentTemp.Location = new System.Drawing.Point(90, 13);
-            this.labelCurrentTemp.Name = "labelCurrentTemp";
-            this.labelCurrentTemp.Size = new System.Drawing.Size(110, 13);
-            this.labelCurrentTemp.TabIndex = 20;
-            this.labelCurrentTemp.Text = "Current Temperature: ";
-            // 
-            // textBoxCoolPoint
-            // 
-            this.textBoxCoolPoint.Enabled = false;
-            this.textBoxCoolPoint.Location = new System.Drawing.Point(69, 116);
-            this.textBoxCoolPoint.Name = "textBoxCoolPoint";
-            this.textBoxCoolPoint.Size = new System.Drawing.Size(51, 20);
-            this.textBoxCoolPoint.TabIndex = 19;
-            // 
-            // comboBoxEnergyMode
-            // 
-            this.comboBoxEnergyMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxEnergyMode.Enabled = false;
-            this.comboBoxEnergyMode.FormattingEnabled = true;
-            this.comboBoxEnergyMode.Location = new System.Drawing.Point(104, 86);
-            this.comboBoxEnergyMode.Name = "comboBoxEnergyMode";
-            this.comboBoxEnergyMode.Size = new System.Drawing.Size(133, 21);
-            this.comboBoxEnergyMode.TabIndex = 16;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.thermometer;
-            this.pictureBox2.Location = new System.Drawing.Point(262, 16);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
-            this.pictureBox2.TabIndex = 13;
-            this.pictureBox2.TabStop = false;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(26, 92);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(73, 13);
-            this.label7.TabIndex = 17;
-            this.label7.Text = "Energy Mode:";
-            // 
-            // comboBoxFanMode
-            // 
-            this.comboBoxFanMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxFanMode.Enabled = false;
-            this.comboBoxFanMode.FormattingEnabled = true;
-            this.comboBoxFanMode.Items.AddRange(new object[] {
-            "",
-            "AutoLow",
-            "OnLow"});
-            this.comboBoxFanMode.Location = new System.Drawing.Point(105, 59);
-            this.comboBoxFanMode.Name = "comboBoxFanMode";
-            this.comboBoxFanMode.Size = new System.Drawing.Size(132, 21);
-            this.comboBoxFanMode.TabIndex = 14;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(38, 65);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(61, 13);
-            this.label6.TabIndex = 15;
-            this.label6.Text = "Fan Mode: ";
-            // 
-            // txtbx_HeatPoint
-            // 
-            this.txtbx_HeatPoint.Enabled = false;
-            this.txtbx_HeatPoint.Location = new System.Drawing.Point(195, 116);
-            this.txtbx_HeatPoint.Name = "txtbx_HeatPoint";
-            this.txtbx_HeatPoint.Size = new System.Drawing.Size(51, 20);
-            this.txtbx_HeatPoint.TabIndex = 10;
-            // 
-            // comboBoxHeatCoolMode
-            // 
-            this.comboBoxHeatCoolMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxHeatCoolMode.Enabled = false;
-            this.comboBoxHeatCoolMode.FormattingEnabled = true;
-            this.comboBoxHeatCoolMode.Items.AddRange(new object[] {
-            "",
-            "Off",
-            "Auto",
-            "Heat",
-            "Cool"});
-            this.comboBoxHeatCoolMode.Location = new System.Drawing.Point(105, 32);
-            this.comboBoxHeatCoolMode.Name = "comboBoxHeatCoolMode";
-            this.comboBoxHeatCoolMode.Size = new System.Drawing.Size(132, 21);
-            this.comboBoxHeatCoolMode.TabIndex = 11;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 38);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(92, 13);
-            this.label2.TabIndex = 12;
-            this.label2.Text = "Heat/Cool Mode: ";
-            // 
-            // btn_AddtoScene
-            // 
-            this.btn_AddtoScene.Location = new System.Drawing.Point(462, 137);
-            this.btn_AddtoScene.Name = "btn_AddtoScene";
-            this.btn_AddtoScene.Size = new System.Drawing.Size(99, 49);
-            this.btn_AddtoScene.TabIndex = 9;
-            this.btn_AddtoScene.Text = "Add This Action to Scene";
-            this.btn_AddtoScene.UseVisualStyleBackColor = true;
-            this.btn_AddtoScene.Click += new System.EventHandler(this.btn_AddtoScene_Click);
             // 
             // tabPage3
             // 
@@ -623,14 +385,14 @@
             this.tabPage3.Controls.Add(this.groupBox6);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(778, 535);
+            this.tabPage3.Size = new System.Drawing.Size(778, 422);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Settings";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
             // buttonSaveSettings
             // 
-            this.buttonSaveSettings.Location = new System.Drawing.Point(629, 489);
+            this.buttonSaveSettings.Location = new System.Drawing.Point(631, 376);
             this.buttonSaveSettings.Name = "buttonSaveSettings";
             this.buttonSaveSettings.Size = new System.Drawing.Size(137, 38);
             this.buttonSaveSettings.TabIndex = 7;
@@ -890,7 +652,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(778, 535);
+            this.tabPage2.Size = new System.Drawing.Size(778, 422);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Log";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -902,15 +664,14 @@
             this.listBoxLog.HorizontalScrollbar = true;
             this.listBoxLog.Location = new System.Drawing.Point(4, 6);
             this.listBoxLog.Name = "listBoxLog";
-            this.listBoxLog.Size = new System.Drawing.Size(768, 524);
+            this.listBoxLog.Size = new System.Drawing.Size(768, 407);
             this.listBoxLog.TabIndex = 1;
             // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton1,
-            this.toolStripDropDownButton2,
-            this.toolStripDropDownButton3});
+            this.toolStripDropDownButton2});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(784, 25);
@@ -953,71 +714,46 @@
             // 
             this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.reconnectToControlThinkUSBToolStripMenuItem,
             this.lookForNewDevicesToolStripMenuItem,
-            this.toolStripSeparator2,
-            this.propertiesToolStripMenuItem});
+            this.toolStripSeparator2});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
             this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
             this.toolStripDropDownButton2.Size = new System.Drawing.Size(60, 22);
             this.toolStripDropDownButton2.Text = "Devices";
             // 
+            // reconnectToControlThinkUSBToolStripMenuItem
+            // 
+            this.reconnectToControlThinkUSBToolStripMenuItem.Name = "reconnectToControlThinkUSBToolStripMenuItem";
+            this.reconnectToControlThinkUSBToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.reconnectToControlThinkUSBToolStripMenuItem.Text = "Reconnect to ControlThink USB";
+            this.reconnectToControlThinkUSBToolStripMenuItem.Click += new System.EventHandler(this.reconnectToControlThinkUSBToolStripMenuItem_Click);
+            // 
             // lookForNewDevicesToolStripMenuItem
             // 
             this.lookForNewDevicesToolStripMenuItem.Name = "lookForNewDevicesToolStripMenuItem";
-            this.lookForNewDevicesToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.lookForNewDevicesToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
             this.lookForNewDevicesToolStripMenuItem.Text = "Look for new devices";
             this.lookForNewDevicesToolStripMenuItem.Click += new System.EventHandler(this.lookForNewDevicesToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
-            // 
-            // propertiesToolStripMenuItem
-            // 
-            this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
-            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.propertiesToolStripMenuItem.Text = "Properties";
-            this.propertiesToolStripMenuItem.Click += new System.EventHandler(this.propertiesToolStripMenuItem_Click);
-            // 
-            // toolStripDropDownButton3
-            // 
-            this.toolStripDropDownButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton3.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripSeparator3,
-            this.propertiesToolStripMenuItem1});
-            this.toolStripDropDownButton3.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton3.Image")));
-            this.toolStripDropDownButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton3.Name = "toolStripDropDownButton3";
-            this.toolStripDropDownButton3.Size = new System.Drawing.Size(56, 22);
-            this.toolStripDropDownButton3.Text = "Scenes";
-            this.toolStripDropDownButton3.ToolTipText = "Scenes";
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(124, 6);
-            // 
-            // propertiesToolStripMenuItem1
-            // 
-            this.propertiesToolStripMenuItem1.Name = "propertiesToolStripMenuItem1";
-            this.propertiesToolStripMenuItem1.Size = new System.Drawing.Size(127, 22);
-            this.propertiesToolStripMenuItem1.Text = "Properties";
-            this.propertiesToolStripMenuItem1.Click += new System.EventHandler(this.propertiesToolStripMenuItem1_Click);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(238, 6);
             // 
             // formzVirtualScenes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 585);
+            this.ClientSize = new System.Drawing.Size(784, 473);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.MainTabControl);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(800, 623);
-            this.MinimumSize = new System.Drawing.Size(800, 623);
             this.Name = "formzVirtualScenes";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.zVirtualScenes_Load);
             this.MainTabControl.ResumeLayout(false);
@@ -1026,16 +762,6 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBoxCommands.ResumeLayout(false);
-            this.groupBox8.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.groupBoxtTemp.ResumeLayout(false);
-            this.groupBoxtTemp.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.tabPage3.ResumeLayout(false);
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
@@ -1063,23 +789,12 @@
         private System.Windows.Forms.Label lbl_sceneActions;
         private System.Windows.Forms.ListBox listBoxSceneActions;
         private System.Windows.Forms.ListBox listBoxScenes;
-        private System.Windows.Forms.TextBox txtbox_level;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Button btn_AddtoScene;
         private System.Windows.Forms.Button btn_runScene;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btn_DelAction;
-        private System.Windows.Forms.GroupBox groupBoxtTemp;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox comboBoxHeatCoolMode;
-        private System.Windows.Forms.TextBox txtbx_HeatPoint;
         private System.Windows.Forms.Button btn_MoveUp;
         private System.Windows.Forms.Button btn_MoveDown;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.TextBox txtb_httpPort;
@@ -1087,12 +802,6 @@
         private System.Windows.Forms.CheckBox checkBoxHTTPEnable;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox txtb_exampleURL;
-        private System.Windows.Forms.Button btn_RunCommand;
-        private System.Windows.Forms.GroupBox groupBoxCommands;
-        private System.Windows.Forms.ComboBox comboBoxEnergyMode;
-        private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox comboBoxFanMode;
-        private System.Windows.Forms.Label label6;
         private System.Windows.Forms.ListBox listBoxLog;
         private System.Windows.Forms.Button buttonAddScene;
         private System.Windows.Forms.Button buttonDelScene;
@@ -1107,13 +816,8 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.TextBox textBoxLSLimit;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.TextBox textBoxCoolPoint;
-        private System.Windows.Forms.Label labelCurrentTemp;
-        private System.Windows.Forms.CheckBox checkBoxeditHP;
-        private System.Windows.Forms.CheckBox checkBoxeditCP;
         private System.Windows.Forms.Button btn_createnonzwaction;
         private System.Windows.Forms.ComboBox comboBoxNonZWAction;
-        private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Label labelLastEvent;
         private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.TextBox textBoxJabberUserTo;
@@ -1133,16 +837,16 @@
         private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton2;
         private System.Windows.Forms.ToolStripMenuItem lookForNewDevicesToolStripMenuItem;
         private System.Windows.Forms.Button buttonSaveSettings;
-        private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton3;
-        private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem1;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.GroupBox groupBox8;
-        private System.Windows.Forms.ComboBox comboBoxBinaryONOFF;
-        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.Label labelSceneRunStatus;
+        private System.Windows.Forms.Button btn_EditScene;
+        private System.Windows.Forms.Button btn_AddAction;
+        private System.Windows.Forms.Button buttonEditAction;
+        private System.Windows.Forms.Button btn_EditDevice;
+        private System.Windows.Forms.ToolStripMenuItem reconnectToControlThinkUSBToolStripMenuItem;
+        private System.Windows.Forms.Button buttonChangeDeviceLevel;
     }
 }
 

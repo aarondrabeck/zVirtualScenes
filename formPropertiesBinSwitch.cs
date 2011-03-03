@@ -9,45 +9,36 @@ using System.Windows.Forms;
 
 namespace zVirtualScenesApplication
 {
-    public partial class formDeviceProperties : Form
+    public partial class formPropertiesBinSwitch : Form
     {
         private formzVirtualScenes _zVirtualScenesMain;
         private int _SelectedDeviceIndex;
 
-        public formDeviceProperties(formzVirtualScenes zVirtualScenesMain, int SelectedDeviceIndex)
+        public formPropertiesBinSwitch(formzVirtualScenes zVirtualScenesMain, int SelectedDeviceIndex, int SelectedSceneIndex)
         {
             InitializeComponent();
+
             _zVirtualScenesMain = zVirtualScenesMain;
             _SelectedDeviceIndex = SelectedDeviceIndex;
 
-            //Load up current values
+            #region Load Common Feilds into form fields
+            groupBoxDeviceOptions.Text = "Node " + _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].NodeID + ",  '" + _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Name + "' Options";
             txtb_deviceName.Text = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Name;
-            groupBoxDevice.Text = "Node: " + _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].NodeID + "  -  Name: " + _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Name;
 
             if (_zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].SendJabberNotifications == true)
                 checkBoxPerDEviceJabberEnable.Checked = true;
             else
                 checkBoxPerDEviceJabberEnable.Checked = false;
-
-            if (_zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Type.Contains("GeneralThermostat"))
-            {
-                textBoxMaxAlert.Text = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].MaxAlertTemp.ToString();
-                textBoxMinAlert.Text = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].MinAlertTemp.ToString();
-                comboBoxJabberNotifLevel.SelectedIndex = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].NotificationDetailLevel - 1;
-            }
-            else
-            {
-                textBoxMaxAlert.Enabled = false;
-                textBoxMinAlert.Enabled = false;
-                comboBoxJabberNotifLevel.Enabled = false;
-            }
-
-
+            #endregion
+                      
         }
-
-        private void btn_Save_Click(object sender, EventArgs e)
+ 
+        private void btn_SaveOptions_Click(object sender, EventArgs e)
         {
             Device selecteddevice = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex];
+
+            #region Validate and Save Common Feilds into MasterDevices list
+            
             //HANDLE DEVICE NAME CHANGE
             if (txtb_deviceName.Text != "")
             {
@@ -75,40 +66,9 @@ namespace zVirtualScenesApplication
             else
                 _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].SendJabberNotifications = false;
 
-            //TEMP SPECIFIC DEVICES
-            if (_zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Type.Contains("GeneralThermostat"))
-            {
-                //MAX Temp            
-                int maxtemp;
-                try
-                {
-                    maxtemp = Convert.ToInt32(textBoxMaxAlert.Text);
-                }
-                catch
-                {
-                    MessageBox.Show("Max Temp not valid.", _zVirtualScenesMain.ProgramName);
-                    return;
-                }
-                selecteddevice.MaxAlertTemp = maxtemp;
+            #endregion
 
-                //Min Temp            
-                int mintemp;
-                try
-                {
-                    mintemp = Convert.ToInt32(textBoxMinAlert.Text);
-                }
-                catch
-                {
-                    MessageBox.Show("Max Temp not valid.", _zVirtualScenesMain.ProgramName);
-                    return;
-                }
-                selecteddevice.MinAlertTemp = mintemp;
-
-                //Notification Level
-                selecteddevice.NotificationDetailLevel = comboBoxJabberNotifLevel.SelectedIndex + 1;
-            }
-
-            //Save into custom List for furture use
+            #region Save into CustomDeviceProperties List which gets serialized.
             bool found = false;
             foreach (CustomDeviceProperties cDevice in _zVirtualScenesMain.CustomDeviceProperties)
             {
@@ -116,9 +76,6 @@ namespace zVirtualScenesApplication
                 {
                     cDevice.Name = selecteddevice.Name;
                     cDevice.SendJabberNotifications = selecteddevice.SendJabberNotifications;
-                    cDevice.MaxAlertTemp = selecteddevice.MaxAlertTemp;
-                    cDevice.MinAlertTemp = selecteddevice.MinAlertTemp;
-                    cDevice.NotificationDetailLevel = selecteddevice.NotificationDetailLevel;
                     found = true;
                 }
             }
@@ -127,17 +84,15 @@ namespace zVirtualScenesApplication
                 CustomDeviceProperties newcDevice = new CustomDeviceProperties();
                 newcDevice.HomeID = selecteddevice.HomeID;
                 newcDevice.NodeID = selecteddevice.NodeID;
-
                 newcDevice.Name = selecteddevice.Name;
                 newcDevice.SendJabberNotifications = selecteddevice.SendJabberNotifications;
-                newcDevice.MaxAlertTemp = selecteddevice.MaxAlertTemp;
-                newcDevice.MinAlertTemp = selecteddevice.MinAlertTemp;
-                newcDevice.NotificationDetailLevel = selecteddevice.NotificationDetailLevel;
-
                 _zVirtualScenesMain.CustomDeviceProperties.Add(newcDevice);
             }
 
+            #endregion
+
             this.Close();
         }
+        
     }       
 }

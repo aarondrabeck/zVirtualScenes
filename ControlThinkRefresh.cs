@@ -135,9 +135,7 @@ namespace zVirtualScenesApplication
                             zVirtualScenesMain.LogThis(2, "ControlThink USB Trouble Getting Device Status: " + ex.Message);
                         }
                     }
-                }
-                else
-                    zVirtualScenesMain.ControlThinkConnect();
+                }                    
                 Thread.Sleep(10000);
             }          
 

@@ -28,15 +28,15 @@ namespace zVirtualScenesApplication
 
         //Forms and Controllers
         public readonly ZWaveController ControlThinkController = new ZWaveController();
-        private formDeviceProperties formDeviceProperty;
-        private formSceneProperties formSceneProperties;
-        private formCreateTimeDelay formCreateTimeDelay;
+        private formPropertiesScene formSceneProperties = new formPropertiesScene();
+                
         private LightSwitchInterface LightSwitchInt;
         private JabberInterface jabber;
         private KeyboardHook hook = new KeyboardHook();
 
         //Delegates
         public delegate void LogThisDelegate(int type, string message);
+        public delegate void SetlabelSceneRunStatusDelegate(string text);
         public delegate void ControlThinkConnectDelegate();
         public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRefresh.changeType TypeOfChange);
         public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
@@ -59,6 +59,8 @@ namespace zVirtualScenesApplication
         {
             this.Text = ProgramName;
             APP_PATH = Path.GetDirectoryName(Application.ExecutablePath) + "\\";
+            labelSceneRunStatus.Text = "";
+            comboBoxNonZWAction.SelectedIndex = 0;
 
             //Setup Log
             listBoxLog.DataSource = MasterLog;
@@ -66,10 +68,7 @@ namespace zVirtualScenesApplication
 
             //Load XML Saved Settings
             LoadSettings();
-            UpdateSettingsGUI();
-            comboBoxHeatCoolMode.DataSource = Enum.GetNames(typeof(Device.ThermostatMode));
-            comboBoxFanMode.DataSource = Enum.GetNames(typeof(Device.ThermostatFanMode));
-            comboBoxEnergyMode.DataSource = Enum.GetNames(typeof(Device.EnergyMode));
+            UpdateSettingsGUI();            
 
             //Query Zcommander for Devices
             ControlThinkConnect();
@@ -95,8 +94,7 @@ namespace zVirtualScenesApplication
             //Start Listening for device changes
             ControlThinkRefresh refresher = new ControlThinkRefresh(this);
             new Thread(new ThreadStart(refresher.RefreshThread)).Start();
-            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler); 
-            
+            refresher.DeviceInfoChange += new ControlThinkRefresh.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);             
     
             //JABBER
             if (zVScenesSettings.JabberEnanbled)
@@ -155,10 +153,11 @@ namespace zVirtualScenesApplication
 
             #endregion
     }
+
         private void RegisterSceneHandlers()
         {
             foreach (Scene thisScene in MasterScenes)
-                thisScene.SceneExecutionFinishedEvent += new Scene.SceneExecutionFinished(SceneExecutionFinsihed_Handler);
+                thisScene.SceneExecutionFinishedEvent += new SceneExecutionFinished(SceneExecutionFinsihed_Handler);
         }
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
@@ -282,7 +281,7 @@ namespace zVirtualScenesApplication
             string KeysPresseed = modifiers + "_" + e.Key.ToString();
 
             //Learn Mode
-            if (formSceneProperties != null && !formSceneProperties.IsDisposed)
+            if (formSceneProperties.isOpen)
                 formSceneProperties.SetGlobalHotKey(KeysPresseed);
             //Run Mode
             else
@@ -455,8 +454,7 @@ namespace zVirtualScenesApplication
             }
         }
 
-
-        #endregion 
+     #endregion 
 
     #region HTTP INTERFACE
 
@@ -642,6 +640,11 @@ namespace zVirtualScenesApplication
 
     #region GUI Events
 
+        public void SelectListBoxActionItem(int ID)
+        {
+            listBoxSceneActions.SelectedIndex = ID;
+        }
+
         private void lookForNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ControlThinkGetDevices();
@@ -729,59 +732,29 @@ namespace zVirtualScenesApplication
         {
             SaveSettingsToFile();
         }
-
-        private void btn_RefreshDevices_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void btn_AddtoScene_Click(object sender, EventArgs e)
-        {
-            if (listBoxDevices.SelectedIndex != -1 && listBoxScenes.SelectedIndex != -1)
-            {
-                Device selecteddevice = (Device)listBoxDevices.SelectedItem;
-                Action action = CreateActionFromUserInput(selecteddevice);
-
-                if (action != null)
-                {
-                    //GET ID OF SCENE SELECTED
-                    Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                    //ADD ACTION TO SELECTED SCENE
-                    foreach (Scene scene in MasterScenes)
-                    {
-                        if (selectedscene.ID == scene.ID)
-                        {
-                            scene.Actions.Add(action);
-                        }
-                    }
-                }
-            }
-            else
-                MessageBox.Show("Please select one device and one scene.", ProgramName);
-        }
-
-        private void SceneExecutionFinsihed_Handler(SceneResult _SceneResult)
+        
+        private void SceneExecutionFinsihed_Handler(object sender, SceneResult _SceneResult)
         {
             LogThis((int)_SceneResult.ResultType, _SceneResult.Description);
 
             //Send to LightSwitchClients
             if (zVScenesSettings.LightSwitchEnabled)
             {
-                LightSwitchInt.BroadcastMessage("MSG~" + _SceneResult.Description);
+                LightSwitchInt.BroadcastMessage("MSG~" + _SceneResult.Description);              
             }
+            
+            //Invoke because called from another thread. 
+            SetlabelSceneRunStatus(_SceneResult.Description);
         }
-
         
-
         private void btn_runScene_Click(object sender, EventArgs e)
         {
             if (listBoxScenes.SelectedIndex != -1)
             {
                 Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                    
-
                 SceneResult result = selectedscene.Run(ControlThinkController);
                 LogThis((int)result.ResultType, "GUI: [USER] " + result.Description);
+                labelSceneRunStatus.Text = result.ResultType + " " + result.Description;
             }
             else
                 MessageBox.Show("Please select a scene.", ProgramName);
@@ -789,27 +762,14 @@ namespace zVirtualScenesApplication
         
         private void btn_DelAction_Click(object sender, EventArgs e)
         {
+            int savedIndex = listBoxSceneActions.SelectedIndex;
+
             if (listBoxSceneActions.SelectedIndex != -1)
             {
-                //GET ID OF SCENE SELECTED
-                Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                int ActionID = listBoxSceneActions.SelectedIndex;
-
-                //Locate Scene
-                foreach (Scene scene in MasterScenes)
-                {
-                    if (selectedscene.ID == scene.ID)
-                    {
-                        scene.Actions.RemoveAt(ActionID);
-                    }
-                }
-
-                if (listBoxSceneActions.Items.Count > 0)
-                    listBoxSceneActions.SelectedIndex = 0;
-
+                MasterScenes[listBoxScenes.SelectedIndex].Actions.RemoveAt(listBoxSceneActions.SelectedIndex);
             }
             else
-                MessageBox.Show("Please select a Action.", ProgramName);
+                MessageBox.Show("Please select an action.", ProgramName);
         }
 
         private void btn_MoveUp_Click(object sender, EventArgs e)
@@ -856,27 +816,7 @@ namespace zVirtualScenesApplication
                 listBoxSceneActions.SelectedIndex = ActionID + 1;
             }
         }
-
-        private void btn_RunCommand_Click(object sender, EventArgs e)
-        {
-            if (listBoxDevices.SelectedIndex != -1)
-            {
-                Action action = CreateActionFromUserInput((Device)listBoxDevices.SelectedItem);
-
-                if (action != null)
-                {
-                    ActionResult result = action.Run(ControlThinkController);
-                    LogThis((int)result.ResultType, "GUI: [USER] " + result.Description);
-                }
-
-            }
-        }
-
-        private void btn_SetDeviceName_Click(object sender, EventArgs e)
-        {
-           
-        }
-
+        
         private void buttonAddScene_Click(object sender, EventArgs e)
         {
             //Get the last used largest unique ID
@@ -892,19 +832,20 @@ namespace zVirtualScenesApplication
             scene.ID = max;
             scene.Name = "Scene " + max;
             //Register Handler
-            scene.SceneExecutionFinishedEvent += new Scene.SceneExecutionFinished(SceneExecutionFinsihed_Handler);
-            MasterScenes.Add(scene);
-            
+            scene.SceneExecutionFinishedEvent += new SceneExecutionFinished(SceneExecutionFinsihed_Handler);
+            MasterScenes.Add(scene);            
         }
 
         private void buttonDelScene_Click(object sender, EventArgs e)
         {
-            if (listBoxScenes.SelectedIndex != -1)
+            if (listBoxScenes.SelectedIndex != -1 && listBoxScenes.Items.Count > 1)
             {
                 //Unregister Handler
-                MasterScenes[listBoxScenes.SelectedIndex].SceneExecutionFinishedEvent -= new Scene.SceneExecutionFinished(SceneExecutionFinsihed_Handler);
+                MasterScenes[listBoxScenes.SelectedIndex].SceneExecutionFinishedEvent -= new SceneExecutionFinished(SceneExecutionFinsihed_Handler);
                 MasterScenes.RemoveAt(listBoxScenes.SelectedIndex);
-            }            
+            }
+            else
+                MessageBox.Show("Please select a scene.", ProgramName);
         }
 
         private void btn_SceneMoveUp_Click(object sender, EventArgs e)
@@ -933,121 +874,163 @@ namespace zVirtualScenesApplication
                 listBoxScenes.SelectedIndex = ActionID + 1;
 
             }
-        }              
-
-        private void listBoxDevices_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (listBoxDevices.SelectedIndex != -1)
-            {
-                Device selecteddevice = (Device)listBoxDevices.SelectedItem;
-                groupBoxCommands.Text = "Create Action for " + selecteddevice.Name + " (" + selecteddevice.Type + ")";
-
-
-                if (selecteddevice.Type == "BinaryPowerSwitch")
-                {
-                    comboBoxBinaryONOFF.Enabled = true;
-                    txtbox_level.Enabled = false;
-                    comboBoxHeatCoolMode.Enabled = false;
-                    comboBoxEnergyMode.Enabled = false;
-                    comboBoxFanMode.Enabled = false;
-
-                    checkBoxeditCP.Checked = false;
-                    checkBoxeditHP.Checked = false;
-                    checkBoxeditCP.Enabled = false;
-                    checkBoxeditHP.Enabled = false;
-                }
-                if (selecteddevice.Type == "MultilevelPowerSwitch" )
-                {
-                    txtbox_level.Enabled = true;
-                    comboBoxBinaryONOFF.Enabled = false;
-                    comboBoxHeatCoolMode.Enabled = false;
-                    comboBoxEnergyMode.Enabled = false;
-                    comboBoxFanMode.Enabled = false;
-
-                    checkBoxeditCP.Checked = false;
-                    checkBoxeditHP.Checked = false;
-                    checkBoxeditCP.Enabled = false;
-                    checkBoxeditHP.Enabled = false;
-
-                }
-                else if (selecteddevice.Type.Contains("GeneralThermostat")) 
-                {
-                    txtbox_level.Enabled = false;
-                    comboBoxBinaryONOFF.Enabled = false;
-                    comboBoxHeatCoolMode.Enabled = true;
-                    comboBoxEnergyMode.Enabled = true;
-                    comboBoxFanMode.Enabled = true;
-                    checkBoxeditCP.Enabled = true;
-                    checkBoxeditCP.Checked = false;
-                    checkBoxeditHP.Enabled = true;
-                    checkBoxeditHP.Checked = false;
-
-                    comboBoxHeatCoolMode.SelectedIndex = comboBoxHeatCoolMode.Items.Count - 1;
-                    comboBoxEnergyMode.SelectedIndex = comboBoxEnergyMode.Items.Count - 1;
-                    comboBoxFanMode.SelectedIndex = comboBoxFanMode.Items.Count - 1;
-
-                    txtbx_HeatPoint.Text = selecteddevice.HeatPoint.ToString();
-                    textBoxCoolPoint.Text = selecteddevice.CoolPoint.ToString();
-                    labelCurrentTemp.Text = "Current Temperature: " + selecteddevice.Temp.ToString() + "°";  
-                    
-                }
-            }
         }
+
+        private void OpenScenePropertiesWindow()
+        {
+            if (listBoxScenes.SelectedIndex != -1)
+            {
+                formSceneProperties = new formPropertiesScene();
+                formSceneProperties._zVirtualScenesMain = this;
+                formSceneProperties._SelectedSceneIndex = listBoxScenes.SelectedIndex;
+                formSceneProperties.ShowDialog();
+            }    
+        }        
 
         private void listBoxScenes_DoubleClick(object sender, EventArgs e)
         {
-             if (listBoxScenes.SelectedIndex != -1)
-            {
-                if (formSceneProperties == null || formSceneProperties.IsDisposed)
-                {
-                    formSceneProperties = new formSceneProperties(this, listBoxScenes.SelectedIndex);
-                    formSceneProperties.Show();
-                }
-                formSceneProperties.Activate();
-            }
-            
+            OpenScenePropertiesWindow();
+        }
+
+        private void btn_EditScene_Click(object sender, EventArgs e)
+        {
+            OpenScenePropertiesWindow();
         }
         
         private void propertiesToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            if (listBoxScenes.SelectedIndex != -1)
+            OpenScenePropertiesWindow();
+        }
+
+        private void OpenDevicePropertyWindow()
+        {
+            if (listBoxDevices.SelectedIndex != -1)
             {
-                if (formSceneProperties == null || formSceneProperties.IsDisposed)
+                Device selecteddevice = (Device)listBoxDevices.SelectedItem;
+
+                if (selecteddevice.Type == "BinaryPowerSwitch")
                 {
-                    formSceneProperties = new formSceneProperties(this, listBoxScenes.SelectedIndex);
-                    formSceneProperties.Show();
+                    formPropertiesBinSwitch formPropertiesBinSwitch = new formPropertiesBinSwitch(this, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex);
+                        formPropertiesBinSwitch.ShowDialog();                    
                 }
-                formSceneProperties.Activate();
+                else if (selecteddevice.Type == "MultilevelPowerSwitch")
+                {
+                    formPropertiesMultiLevelSwitch formPropertiesMultiLevelSwitch = new formPropertiesMultiLevelSwitch(this, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex);
+                        formPropertiesMultiLevelSwitch.ShowDialog();
+                }
+                else if (selecteddevice.Type.Contains("GeneralThermostat"))
+                {
+                    formPropertiesThermostat formPropertiesThermostat = new formPropertiesThermostat(this, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex);
+                        formPropertiesThermostat.ShowDialog();
+                }
             }
+            else
+                MessageBox.Show("You must select a ZWave device. ", ProgramName);
         }
 
         private void listBoxDevices_DoubleClick(object sender, EventArgs e)
         {
-            if (listBoxDevices.SelectedIndex != -1)
-            {
-                if (formDeviceProperty == null || formDeviceProperty.IsDisposed)
-                {
-                    formDeviceProperty = new formDeviceProperties(this, listBoxDevices.SelectedIndex);
-                    formDeviceProperty.Show();
+            OpenDevicePropertyWindow();
+        }
 
+        private void btn_EditDevice_Click_1(object sender, EventArgs e)
+        {
+            OpenDevicePropertyWindow();
+        }
+
+        /// <summary>
+        /// EDIT ANY TYPE OF ACTION
+        /// </summary>
+        private void editAction()
+        {
+            if (listBoxSceneActions.SelectedIndex != -1)
+            {
+                Action selectedaction = (Action)listBoxSceneActions.SelectedItem;
+
+                if (selectedaction.Type == "LauchAPP")
+                {
+                        formAddEditEXEC formAddEditEXEC = new formAddEditEXEC(this, true, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                        formAddEditEXEC.ShowDialog();
                 }
-                formDeviceProperty.Activate();
+                else if (selectedaction.Type == "DelayTimer")
+                {
+                    formAddEditTimeDelay formAddEditTimeDelay = new formAddEditTimeDelay(this, true, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                        formAddEditTimeDelay.ShowDialog();
+                }
+                else if (selectedaction.Type == "BinaryPowerSwitch")
+                {
+                    formAddEditActionBinSwitch formAddEditActionBinSwitch = new formAddEditActionBinSwitch(this, true, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                        formAddEditActionBinSwitch.ShowDialog();
+                }
+                else if (selectedaction.Type == "MultilevelPowerSwitch")
+                {
+                    formAddEditActionMultiLevelSwitch formAddEditActionMultiLevelSwitch = new formAddEditActionMultiLevelSwitch(this, true, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                        formAddEditActionMultiLevelSwitch.ShowDialog();
+                }
+                else if (selectedaction.Type.Contains("GeneralThermostat"))
+                {
+                    formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, true, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                        formAddEditActionThermostat.ShowDialog();
+                }
             }
-        }       
+            else
+                MessageBox.Show("Please select an action.", ProgramName);
+        }
+
+        private void listBoxSceneActions_DoubleClick(object sender, EventArgs e)
+        {
+            editAction();
+        }
+
+        private void buttonEditAction_Click(object sender, EventArgs e)
+        {
+            editAction();
+        }
+
+        /// <summary>
+        /// ADD ZWAVE DEIVCE ACTIONS
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CreateNewActionFromZWaveDevice()
+        {
+            if (listBoxDevices.SelectedIndex != -1 && listBoxScenes.SelectedIndex != -1)
+            {
+                Device selecteddevice = (Device)listBoxDevices.SelectedItem;
+
+                if (selecteddevice.Type == "BinaryPowerSwitch")
+                {
+                    formAddEditActionBinSwitch formAddEditActionBinSwitch = new formAddEditActionBinSwitch(this, false, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                    formAddEditActionBinSwitch.ShowDialog();
+                }
+                else if (selecteddevice.Type == "MultilevelPowerSwitch")
+                {
+                    formAddEditActionMultiLevelSwitch formAddEditActionMultiLevelSwitch = new formAddEditActionMultiLevelSwitch(this, false, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                    formAddEditActionMultiLevelSwitch.ShowDialog();
+                }
+                else if (selecteddevice.Type.Contains("GeneralThermostat"))
+                {
+                    formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, false, listBoxDevices.SelectedIndex, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                    formAddEditActionThermostat.ShowDialog();
+                }
+            }
+            else
+                MessageBox.Show("Please select a ZWave device. ", ProgramName);
+        }
+
+        private void buttonChangeDeviceLevel_Click(object sender, EventArgs e)
+        {
+            CreateNewActionFromZWaveDevice();
+        }
+
+        private void btn_AddAction_Click(object sender, EventArgs e)
+        {
+            CreateNewActionFromZWaveDevice();
+        }
 
         private void propertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-         
-            if (listBoxDevices.SelectedIndex != -1)
-            {
-                if (formDeviceProperty == null || formDeviceProperty.IsDisposed)
-                {
-                    formDeviceProperty = new formDeviceProperties(this, listBoxDevices.SelectedIndex);
-                    formDeviceProperty.Show();
-
-                }
-                formDeviceProperty.Activate();
-            }
+            OpenDevicePropertyWindow();
         }
         
         private void listBoxScenes_SelectedIndexChanged(object sender, EventArgs e)
@@ -1056,25 +1039,9 @@ namespace zVirtualScenesApplication
             {
                 Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
                 listBoxSceneActions.DataSource = selectedscene.Actions;
-                lbl_sceneActions.Text = "Scene " + selectedscene.ID.ToString() + " (" + selectedscene.Name + ") Actions";
+                lbl_sceneActions.Text = "Scene " + selectedscene.ID.ToString() + " '" + selectedscene.Name + "' Actions";
             }
-        }
-
-        private void checkBoxeditCP_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBoxeditCP.Checked == true)
-                textBoxCoolPoint.Enabled = true;
-            else
-                textBoxCoolPoint.Enabled = false;
-        }
-
-        private void checkBoxeditHP_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBoxeditHP.Checked == true)
-                txtbx_HeatPoint.Enabled = true;
-            else
-                txtbx_HeatPoint.Enabled = false;
-        }
+        }        
 
         private void btn_createnonzwaction_Click(object sender, EventArgs e)
         {
@@ -1082,39 +1049,13 @@ namespace zVirtualScenesApplication
             {
                 if (comboBoxNonZWAction.SelectedIndex == 0)  //Create Timer
                 {
-                    if (formCreateTimeDelay == null || formCreateTimeDelay.IsDisposed)
-                    {
-                        formCreateTimeDelay = new formCreateTimeDelay(this, listBoxScenes.SelectedIndex);
-                        formCreateTimeDelay.Show();
-                    }
-                    formCreateTimeDelay.Activate();
+                    formAddEditTimeDelay formAddEditTimeDelay = new formAddEditTimeDelay(this, false, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                   formAddEditTimeDelay.ShowDialog();
                 }
                 else if (comboBoxNonZWAction.SelectedIndex == 1) //Add EXE Action
                 {
-                    
-                    OpenFileDialog fdlg = new OpenFileDialog();
-                    fdlg.Title = "Please select the file to run with this action.";
-                    fdlg.Filter = "All files (*.*)|*.*|All files (*.*)|*.*";
-                    fdlg.FilterIndex = 2;
-
-                    if (fdlg.ShowDialog() == DialogResult.OK)
-                    {
-                        Action EXEAction = new Action();
-                        EXEAction.EXEPath = fdlg.FileName;
-                        EXEAction.Type = "LauchAPP";
-
-                        //GET ID OF SCENE SELECTED
-                        Scene selectedscene = (Scene)listBoxScenes.SelectedItem;
-                        //ADD ACTION TO SELECTED SCENE
-                        foreach (Scene scene in MasterScenes)
-                        {
-                            if (selectedscene.ID == scene.ID)
-                            {
-
-                                scene.Actions.Add(EXEAction);
-                            }
-                        }
-                    }
+                    formAddEditEXEC formAddEditEXEC = new formAddEditEXEC(this, false, listBoxScenes.SelectedIndex, listBoxSceneActions.SelectedIndex);
+                    formAddEditEXEC.ShowDialog();                 
                 }
                 else
                     MessageBox.Show("Please select an action type from the drop down. ", ProgramName);
@@ -1122,7 +1063,12 @@ namespace zVirtualScenesApplication
             else
                 MessageBox.Show("Please select one device and one scene.", ProgramName);
 
-        } 
+        }
+
+        private void reconnectToControlThinkUSBToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ControlThinkConnect();
+        }
 
     #endregion
 
@@ -1150,85 +1096,19 @@ namespace zVirtualScenesApplication
             }
         }
 
-        //public void RunSimpleAction(Action action)
-        //{
-        //    if (this.InvokeRequired)
-        //        this.Invoke(new RunSimpleActionDelegate(RunSimpleAction), new object[] { action });
-        //    else
-        //    {
-        //        action.RunAction(this);
-        //    }
-        //}
+        private void SetlabelSceneRunStatus(string text)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new SetlabelSceneRunStatusDelegate(SetlabelSceneRunStatus), new object[] { text });
+            else
+                labelSceneRunStatus.Text = text;
+        }
+       
         #endregion
 
-    #region General Use Functions
-
-        private Action CreateActionFromUserInput(Device _device)
-        {
-            //Cast device to action            
-            Action action = (Action)_device;
-
-            if (action.Type == "BinaryPowerSwitch")
-            {
-                action.Level = (byte)comboBoxBinaryONOFF.SelectedIndex;
-            }
-            else if (action.Type == "MultilevelPowerSwitch")
-            {
-                //ERROR CHECK INPUTS
-                try
-                {
-                    byte level = Convert.ToByte(txtbox_level.Text);
-                    if (level < 100 || level == 255)
-                        action.Level = level;
-                    else
-                        throw new ArgumentException("Invalid Level.");
-                }
-                catch   
-                {
-                    MessageBox.Show("Invalid Level.", ProgramName);
-                    return null;
-                }
-
-            }
-            else if (action.Type.Contains("GeneralThermostat"))
-            {   
-                action.HeatCoolMode = (int)Enum.Parse(typeof(Device.ThermostatMode),comboBoxHeatCoolMode.SelectedValue.ToString());
-                action.FanMode = (int)Enum.Parse(typeof(Device.ThermostatFanMode), comboBoxFanMode.SelectedValue.ToString());
-                action.EngeryMode = (int)Enum.Parse(typeof(Device.EnergyMode), comboBoxEnergyMode.SelectedValue.ToString());
-
-                //Make sure atleast one thermo action was chosen
-                if (action.HeatCoolMode == -1 && action.FanMode == -1 && action.EngeryMode == -1 && checkBoxeditHP.Checked == false && checkBoxeditCP.Checked == false )
-                {
-                    MessageBox.Show("Please select at least one Temperature Mode.", ProgramName);
-                    return null;
-                }
-
-                if (checkBoxeditHP.Checked == true)
-                {
-                    try { action.HeatPoint = Convert.ToInt32(txtbx_HeatPoint.Text); }
-                    catch
-                    {
-                        MessageBox.Show("Invalid Heat Point.", ProgramName);
-                        return null;
-                    }
-                }
-
-                if (checkBoxeditCP.Checked == true)
-                {
-                    try { action.CoolPoint = Convert.ToInt32(textBoxCoolPoint.Text); }
-                    catch
-                    {
-                        MessageBox.Show("Invalid Cool Point..", ProgramName);
-                        return null;
-                    }
-                }
-            }
-            return action; 
-        }
         
-       
 
-    #endregion
+        
 
     }
 }

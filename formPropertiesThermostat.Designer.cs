@@ -1,0 +1,224 @@
+﻿namespace zVirtualScenesApplication
+{
+    partial class formPropertiesThermostat
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formPropertiesThermostat));
+            this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
+            this.labelMoreInfo = new System.Windows.Forms.Label();
+            this.txtb_deviceName = new System.Windows.Forms.TextBox();
+            this.checkBoxPerDEviceJabberEnable = new System.Windows.Forms.CheckBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.groupBoxDeviceOptions = new System.Windows.Forms.GroupBox();
+            this.label19 = new System.Windows.Forms.Label();
+            this.textBoxMinAlert = new System.Windows.Forms.TextBox();
+            this.comboBoxJabberNotifLevel = new System.Windows.Forms.ComboBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.textBoxMaxAlert = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.btn_SaveOptions = new System.Windows.Forms.Button();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.groupBoxDeviceOptions.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // toolTipNotificationLevel
+            // 
+            this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
+            // 
+            // labelMoreInfo
+            // 
+            this.labelMoreInfo.AutoSize = true;
+            this.labelMoreInfo.Location = new System.Drawing.Point(146, 149);
+            this.labelMoreInfo.Name = "labelMoreInfo";
+            this.labelMoreInfo.Size = new System.Drawing.Size(59, 13);
+            this.labelMoreInfo.TabIndex = 47;
+            this.labelMoreInfo.Text = "more info...";
+            this.toolTipNotificationLevel.SetToolTip(this.labelMoreInfo, resources.GetString("labelMoreInfo.ToolTip"));
+            // 
+            // txtb_deviceName
+            // 
+            this.txtb_deviceName.Location = new System.Drawing.Point(122, 22);
+            this.txtb_deviceName.Name = "txtb_deviceName";
+            this.txtb_deviceName.Size = new System.Drawing.Size(250, 20);
+            this.txtb_deviceName.TabIndex = 39;
+            // 
+            // checkBoxPerDEviceJabberEnable
+            // 
+            this.checkBoxPerDEviceJabberEnable.AutoSize = true;
+            this.checkBoxPerDEviceJabberEnable.Location = new System.Drawing.Point(9, 59);
+            this.checkBoxPerDEviceJabberEnable.Name = "checkBoxPerDEviceJabberEnable";
+            this.checkBoxPerDEviceJabberEnable.Size = new System.Drawing.Size(254, 17);
+            this.checkBoxPerDEviceJabberEnable.TabIndex = 26;
+            this.checkBoxPerDEviceJabberEnable.Text = "Enable Jabber/Gtalk Notifcations for this Device";
+            this.checkBoxPerDEviceJabberEnable.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(47, 25);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(78, 13);
+            this.label12.TabIndex = 40;
+            this.label12.Text = "Device Name: ";
+            // 
+            // groupBoxDeviceOptions
+            // 
+            this.groupBoxDeviceOptions.Controls.Add(this.labelMoreInfo);
+            this.groupBoxDeviceOptions.Controls.Add(this.label19);
+            this.groupBoxDeviceOptions.Controls.Add(this.textBoxMinAlert);
+            this.groupBoxDeviceOptions.Controls.Add(this.comboBoxJabberNotifLevel);
+            this.groupBoxDeviceOptions.Controls.Add(this.label17);
+            this.groupBoxDeviceOptions.Controls.Add(this.textBoxMaxAlert);
+            this.groupBoxDeviceOptions.Controls.Add(this.label18);
+            this.groupBoxDeviceOptions.Controls.Add(this.btn_SaveOptions);
+            this.groupBoxDeviceOptions.Controls.Add(this.checkBoxPerDEviceJabberEnable);
+            this.groupBoxDeviceOptions.Controls.Add(this.txtb_deviceName);
+            this.groupBoxDeviceOptions.Controls.Add(this.label12);
+            this.groupBoxDeviceOptions.Controls.Add(this.pictureBox2);
+            this.groupBoxDeviceOptions.Location = new System.Drawing.Point(5, 4);
+            this.groupBoxDeviceOptions.Name = "groupBoxDeviceOptions";
+            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(515, 171);
+            this.groupBoxDeviceOptions.TabIndex = 37;
+            this.groupBoxDeviceOptions.TabStop = false;
+            this.groupBoxDeviceOptions.Text = "Options";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(6, 90);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(84, 13);
+            this.label19.TabIndex = 46;
+            this.label19.Text = "Min Alert Temp: ";
+            // 
+            // textBoxMinAlert
+            // 
+            this.textBoxMinAlert.Location = new System.Drawing.Point(87, 84);
+            this.textBoxMinAlert.Name = "textBoxMinAlert";
+            this.textBoxMinAlert.Size = new System.Drawing.Size(51, 20);
+            this.textBoxMinAlert.TabIndex = 44;
+            // 
+            // comboBoxJabberNotifLevel
+            // 
+            this.comboBoxJabberNotifLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxJabberNotifLevel.FormattingEnabled = true;
+            this.comboBoxJabberNotifLevel.Items.AddRange(new object[] {
+            "1",
+            "2",
+            "3",
+            "4"});
+            this.comboBoxJabberNotifLevel.Location = new System.Drawing.Point(93, 141);
+            this.comboBoxJabberNotifLevel.Name = "comboBoxJabberNotifLevel";
+            this.comboBoxJabberNotifLevel.Size = new System.Drawing.Size(51, 21);
+            this.comboBoxJabberNotifLevel.TabIndex = 42;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(6, 146);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(90, 13);
+            this.label17.TabIndex = 41;
+            this.label17.Text = "Notication Level: ";
+            // 
+            // textBoxMaxAlert
+            // 
+            this.textBoxMaxAlert.Location = new System.Drawing.Point(87, 110);
+            this.textBoxMaxAlert.Name = "textBoxMaxAlert";
+            this.textBoxMaxAlert.Size = new System.Drawing.Size(51, 20);
+            this.textBoxMaxAlert.TabIndex = 43;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(3, 116);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(87, 13);
+            this.label18.TabIndex = 45;
+            this.label18.Text = "Max Alert Temp: ";
+            // 
+            // btn_SaveOptions
+            // 
+            this.btn_SaveOptions.Location = new System.Drawing.Point(410, 144);
+            this.btn_SaveOptions.Name = "btn_SaveOptions";
+            this.btn_SaveOptions.Size = new System.Drawing.Size(101, 20);
+            this.btn_SaveOptions.TabIndex = 39;
+            this.btn_SaveOptions.Text = "Save and Close";
+            this.btn_SaveOptions.UseVisualStyleBackColor = true;
+            this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
+            // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.thermometer;
+            this.pictureBox2.Location = new System.Drawing.Point(6, 17);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
+            this.pictureBox2.TabIndex = 13;
+            this.pictureBox2.TabStop = false;
+            // 
+            // formPropertiesThermostat
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(527, 183);
+            this.Controls.Add(this.groupBoxDeviceOptions);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
+            this.Name = "formPropertiesThermostat";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Thermostat Properties";
+            this.groupBoxDeviceOptions.ResumeLayout(false);
+            this.groupBoxDeviceOptions.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.ToolTip toolTipNotificationLevel;
+        private System.Windows.Forms.TextBox txtb_deviceName;
+        private System.Windows.Forms.CheckBox checkBoxPerDEviceJabberEnable;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.GroupBox groupBoxDeviceOptions;
+        private System.Windows.Forms.Button btn_SaveOptions;
+        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.Label labelMoreInfo;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox textBoxMinAlert;
+        private System.Windows.Forms.ComboBox comboBoxJabberNotifLevel;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TextBox textBoxMaxAlert;
+        private System.Windows.Forms.Label label18;
+    }
+}
