@@ -118,6 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Broadcast48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Broadcast48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="dial_32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\dial-32.jpg;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -130,7 +133,16 @@
   <data name="switch_icon32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\switch-icon32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="temperature48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\temperature48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="thermometer" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\thermometer.gif;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="User48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\User48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="zvirtualscenes57" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\zvirtualscenes57.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

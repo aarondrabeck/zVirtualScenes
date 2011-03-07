@@ -36,6 +36,9 @@
             this.checkBoxPerDEviceJabberEnable = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBoxDeviceOptions = new System.Windows.Forms.GroupBox();
+            this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
+            this.txtb_GroupName = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
             this.textBoxMinAlert = new System.Windows.Forms.TextBox();
             this.comboBoxJabberNotifLevel = new System.Windows.Forms.ComboBox();
@@ -43,9 +46,8 @@
             this.textBoxMaxAlert = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.btn_SaveOptions = new System.Windows.Forms.Button();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.checkBoxGrowlEnabled = new System.Windows.Forms.CheckBox();
             this.groupBoxDeviceOptions.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
             // toolTipNotificationLevel
@@ -65,7 +67,7 @@
             // 
             // txtb_deviceName
             // 
-            this.txtb_deviceName.Location = new System.Drawing.Point(122, 22);
+            this.txtb_deviceName.Location = new System.Drawing.Point(87, 19);
             this.txtb_deviceName.Name = "txtb_deviceName";
             this.txtb_deviceName.Size = new System.Drawing.Size(250, 20);
             this.txtb_deviceName.TabIndex = 39;
@@ -73,7 +75,7 @@
             // checkBoxPerDEviceJabberEnable
             // 
             this.checkBoxPerDEviceJabberEnable.AutoSize = true;
-            this.checkBoxPerDEviceJabberEnable.Location = new System.Drawing.Point(9, 59);
+            this.checkBoxPerDEviceJabberEnable.Location = new System.Drawing.Point(181, 79);
             this.checkBoxPerDEviceJabberEnable.Name = "checkBoxPerDEviceJabberEnable";
             this.checkBoxPerDEviceJabberEnable.Size = new System.Drawing.Size(254, 17);
             this.checkBoxPerDEviceJabberEnable.TabIndex = 26;
@@ -83,7 +85,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(47, 25);
+            this.label12.Location = new System.Drawing.Point(12, 22);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(78, 13);
             this.label12.TabIndex = 40;
@@ -91,6 +93,10 @@
             // 
             // groupBoxDeviceOptions
             // 
+            this.groupBoxDeviceOptions.Controls.Add(this.checkBoxGrowlEnabled);
+            this.groupBoxDeviceOptions.Controls.Add(this.checkBoxDisplayinLightSwitch);
+            this.groupBoxDeviceOptions.Controls.Add(this.txtb_GroupName);
+            this.groupBoxDeviceOptions.Controls.Add(this.label1);
             this.groupBoxDeviceOptions.Controls.Add(this.labelMoreInfo);
             this.groupBoxDeviceOptions.Controls.Add(this.label19);
             this.groupBoxDeviceOptions.Controls.Add(this.textBoxMinAlert);
@@ -102,13 +108,38 @@
             this.groupBoxDeviceOptions.Controls.Add(this.checkBoxPerDEviceJabberEnable);
             this.groupBoxDeviceOptions.Controls.Add(this.txtb_deviceName);
             this.groupBoxDeviceOptions.Controls.Add(this.label12);
-            this.groupBoxDeviceOptions.Controls.Add(this.pictureBox2);
             this.groupBoxDeviceOptions.Location = new System.Drawing.Point(5, 4);
             this.groupBoxDeviceOptions.Name = "groupBoxDeviceOptions";
             this.groupBoxDeviceOptions.Size = new System.Drawing.Size(515, 171);
             this.groupBoxDeviceOptions.TabIndex = 37;
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Options";
+            // 
+            // checkBoxDisplayinLightSwitch
+            // 
+            this.checkBoxDisplayinLightSwitch.AutoSize = true;
+            this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(181, 124);
+            this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
+            this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
+            this.checkBoxDisplayinLightSwitch.TabIndex = 41;
+            this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
+            this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
+            // 
+            // txtb_GroupName
+            // 
+            this.txtb_GroupName.Location = new System.Drawing.Point(87, 45);
+            this.txtb_GroupName.Name = "txtb_GroupName";
+            this.txtb_GroupName.Size = new System.Drawing.Size(250, 20);
+            this.txtb_GroupName.TabIndex = 48;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(17, 48);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(73, 13);
+            this.label1.TabIndex = 49;
+            this.label1.Text = "Group Name: ";
             // 
             // label19
             // 
@@ -175,14 +206,15 @@
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
             // 
-            // pictureBox2
+            // checkBoxGrowlEnabled
             // 
-            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.thermometer;
-            this.pictureBox2.Location = new System.Drawing.Point(6, 17);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
-            this.pictureBox2.TabIndex = 13;
-            this.pictureBox2.TabStop = false;
+            this.checkBoxGrowlEnabled.AutoSize = true;
+            this.checkBoxGrowlEnabled.Location = new System.Drawing.Point(181, 101);
+            this.checkBoxGrowlEnabled.Name = "checkBoxGrowlEnabled";
+            this.checkBoxGrowlEnabled.Size = new System.Drawing.Size(219, 17);
+            this.checkBoxGrowlEnabled.TabIndex = 50;
+            this.checkBoxGrowlEnabled.Text = "Enable Growl Notifcations for this Device";
+            this.checkBoxGrowlEnabled.UseVisualStyleBackColor = true;
             // 
             // formPropertiesThermostat
             // 
@@ -196,10 +228,9 @@
             this.MinimizeBox = false;
             this.Name = "formPropertiesThermostat";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Thermostat Properties";
+            this.Text = "Edit this ZWave Thermostat Device";
             this.groupBoxDeviceOptions.ResumeLayout(false);
             this.groupBoxDeviceOptions.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -212,7 +243,6 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.GroupBox groupBoxDeviceOptions;
         private System.Windows.Forms.Button btn_SaveOptions;
-        private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label labelMoreInfo;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.TextBox textBoxMinAlert;
@@ -220,5 +250,9 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TextBox textBoxMaxAlert;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.TextBox txtb_GroupName;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkBoxDisplayinLightSwitch;
+        private System.Windows.Forms.CheckBox checkBoxGrowlEnabled;
     }
 }

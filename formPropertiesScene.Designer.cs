@@ -38,6 +38,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.comboBoxHotKeys = new System.Windows.Forms.ComboBox();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
+            this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
             this.groupBoxDevice.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -71,6 +72,7 @@
             // 
             // groupBoxDevice
             // 
+            this.groupBoxDevice.Controls.Add(this.checkBoxDisplayinLightSwitch);
             this.groupBoxDevice.Controls.Add(this.pictureBox2);
             this.groupBoxDevice.Controls.Add(this.groupBox1);
             this.groupBoxDevice.Controls.Add(this.txtb_sceneName);
@@ -116,7 +118,17 @@
             this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
             // 
-            // formSceneProperties
+            // checkBoxDisplayinLightSwitch
+            // 
+            this.checkBoxDisplayinLightSwitch.AutoSize = true;
+            this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(8, 113);
+            this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
+            this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
+            this.checkBoxDisplayinLightSwitch.TabIndex = 40;
+            this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
+            this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
+            // 
+            // formPropertiesScene
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -126,7 +138,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "formSceneProperties";
+            this.Name = "formPropertiesScene";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Edit Scene Properties";
             this.Load += new System.EventHandler(this.formSceneProperties_Load);
@@ -148,5 +160,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ComboBox comboBoxHotKeys;
         private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.CheckBox checkBoxDisplayinLightSwitch;
     }
 }

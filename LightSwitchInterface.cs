@@ -60,7 +60,7 @@ namespace zVirtualScenesApplication
                     LightSwitchClients.Add(LightSwitchClientsSocket);
 
                 zVirtualScenesMain.LogThis(1, "Light Switch Interface: Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
-
+             
                 // Send a welcome message to client
                 string msg = "6004 ZWaveCommander Server (Connections " + LightSwitchClients.Count() + ")" + Environment.NewLine;
                 SendMsgToLightSwitchClient(msg, LightSwitchClients.Count());
@@ -196,12 +196,15 @@ namespace zVirtualScenesApplication
                                 else if (cmd.StartsWith("ALIST"))
                                 {
                                     zVirtualScenesMain.LogThis(1, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
+
+                                    foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
+                                        if(device.ShowInLightSwitchGUI)
+                                            SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);
                                     
-                                    foreach (Device device in zVirtualScenesMain.MasterDevices)
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);   
 
                                     foreach (Scene scene in zVirtualScenesMain.MasterScenes)
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, scene.ToLightSwitchSocketString() + Environment.NewLine);
+                                        if (scene.ShowInLightSwitchGUI)
+                                            SendMessagetoClientsSocket(LightSwitchClientSocket, scene.ToLightSwitchSocketString() + Environment.NewLine);
 
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
                                 }
@@ -209,15 +212,17 @@ namespace zVirtualScenesApplication
                                 {
                                     zVirtualScenesMain.LogThis(1, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.");
                                     
-                                    foreach (Device device in zVirtualScenesMain.MasterDevices)
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);
+                                    foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
+                                        if (device.ShowInLightSwitchGUI)
+                                            SendMessagetoClientsSocket(LightSwitchClientSocket, device.ToLightSwitchSocketString() + Environment.NewLine);
 
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
                                 }
                                 else if (cmd.StartsWith("SLIST"))
                                 {
                                     foreach (Scene scene in zVirtualScenesMain.MasterScenes)
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, scene.ToLightSwitchSocketString() + Environment.NewLine);
+                                        if(scene.ShowInLightSwitchGUI)
+                                            SendMessagetoClientsSocket(LightSwitchClientSocket, scene.ToLightSwitchSocketString() + Environment.NewLine);
 
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
                                 }
@@ -299,7 +304,7 @@ namespace zVirtualScenesApplication
         /// <returns>Result of Device execution.</returns>
         private string TranslateToDeviceAction(byte Node, byte Level, Socket Client)
         {           
-            foreach (Device device in zVirtualScenesMain.MasterDevices)
+            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
             {
                 if (device.NodeID == Node)
                 {
@@ -345,7 +350,7 @@ namespace zVirtualScenesApplication
 
         private string TranslateToThermoTEMPATUREAction(byte Node, byte Mode, int Temp, Socket Client)
         {
-            foreach (Device device in zVirtualScenesMain.MasterDevices)
+            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
             {
                 if (device.NodeID == Node)
                 {
@@ -374,7 +379,7 @@ namespace zVirtualScenesApplication
             
 
 
-            foreach (Device device in zVirtualScenesMain.MasterDevices)
+            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
             {
                 if (device.NodeID == Node)
                 {
@@ -384,28 +389,28 @@ namespace zVirtualScenesApplication
                     switch (Mode)
                     {
                         case 0:
-                            action.HeatCoolMode = (int)Device.ThermostatMode.Off;
+                            action.HeatCoolMode = (int)ZWaveDevice.ThermostatMode.Off;
                             break; 
                         case 1:
-                            action.HeatCoolMode = (int)Device.ThermostatMode.Auto;
+                            action.HeatCoolMode = (int)ZWaveDevice.ThermostatMode.Auto;
                             break;
                         case 2:
-                            action.HeatCoolMode = (int)Device.ThermostatMode.Heat;
+                            action.HeatCoolMode = (int)ZWaveDevice.ThermostatMode.Heat;
                             break;
                         case 3:
-                            action.HeatCoolMode = (int)Device.ThermostatMode.Cool;
+                            action.HeatCoolMode = (int)ZWaveDevice.ThermostatMode.Cool;
                             break;
                         case 4:
-                            action.FanMode = (int)Device.ThermostatFanMode.OnLow;
+                            action.FanMode = (int)ZWaveDevice.ThermostatFanMode.OnLow;
                             break;
                         case 5:
-                            action.FanMode = (int)Device.ThermostatFanMode.AutoLow;
+                            action.FanMode = (int)ZWaveDevice.ThermostatFanMode.AutoLow;
                             break;
                         case 6:
-                            action.EngeryMode = (int)Device.EnergyMode.EnergySavingMode;
+                            action.EngeryMode = (int)ZWaveDevice.EnergyMode.EnergySavingMode;
                             break;
                         case 7:
-                            action.EngeryMode = (int)Device.EnergyMode.ComfortMode;
+                            action.EngeryMode = (int)ZWaveDevice.EnergyMode.ComfortMode;
                             break;
                     }                   
                     ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);

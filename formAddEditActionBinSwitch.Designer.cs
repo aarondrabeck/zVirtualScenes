@@ -39,6 +39,7 @@
             this.btn_RunCommand = new System.Windows.Forms.Button();
             this.btn_Save = new System.Windows.Forms.Button();
             this.lbl_Status = new System.Windows.Forms.Label();
+            this.labelMomentaryMode = new System.Windows.Forms.Label();
             this.groupBoxAction.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
@@ -50,6 +51,7 @@
             // 
             // groupBoxAction
             // 
+            this.groupBoxAction.Controls.Add(this.labelMomentaryMode);
             this.groupBoxAction.Controls.Add(this.label1);
             this.groupBoxAction.Controls.Add(this.label_DeviceName);
             this.groupBoxAction.Controls.Add(this.comboBoxBinaryONOFF);
@@ -57,7 +59,7 @@
             this.groupBoxAction.Controls.Add(this.btn_RunCommand);
             this.groupBoxAction.Location = new System.Drawing.Point(4, 6);
             this.groupBoxAction.Name = "groupBoxAction";
-            this.groupBoxAction.Size = new System.Drawing.Size(440, 82);
+            this.groupBoxAction.Size = new System.Drawing.Size(440, 97);
             this.groupBoxAction.TabIndex = 36;
             this.groupBoxAction.TabStop = false;
             this.groupBoxAction.Text = "Create or Edit Action";
@@ -114,7 +116,7 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(4, 108);
+            this.btn_Save.Location = new System.Drawing.Point(4, 124);
             this.btn_Save.Name = "btn_Save";
             this.btn_Save.Size = new System.Drawing.Size(440, 20);
             this.btn_Save.TabIndex = 42;
@@ -125,17 +127,26 @@
             // lbl_Status
             // 
             this.lbl_Status.AutoSize = true;
-            this.lbl_Status.Location = new System.Drawing.Point(1, 91);
+            this.lbl_Status.Location = new System.Drawing.Point(1, 107);
             this.lbl_Status.Name = "lbl_Status";
             this.lbl_Status.Size = new System.Drawing.Size(35, 13);
             this.lbl_Status.TabIndex = 38;
             this.lbl_Status.Text = "status";
             // 
+            // labelMomentaryMode
+            // 
+            this.labelMomentaryMode.AutoSize = true;
+            this.labelMomentaryMode.Location = new System.Drawing.Point(320, 78);
+            this.labelMomentaryMode.Name = "labelMomentaryMode";
+            this.labelMomentaryMode.Size = new System.Drawing.Size(115, 13);
+            this.labelMomentaryMode.TabIndex = 43;
+            this.labelMomentaryMode.Text = "Momentary Mode: OFF";
+            // 
             // formAddEditActionBinSwitch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(450, 133);
+            this.ClientSize = new System.Drawing.Size(450, 148);
             this.Controls.Add(this.btn_Save);
             this.Controls.Add(this.lbl_Status);
             this.Controls.Add(this.groupBoxAction);
@@ -165,5 +176,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lbl_Status;
         private System.Windows.Forms.Button btn_Save;
+        private System.Windows.Forms.Label labelMomentaryMode;
     }
 }

@@ -1,3 +1,13 @@
+*ver 1.3.3.1 - 3-6-11*
+  * Added support for BinaryRemoteSwitch, BinarySceneSwitch, BinaryToggleRemoteSwitch, MultilevelRemoteSwitch, MultilevelToggleRemoteSwitch, MultilevelSceneSwitch
+  * Added Option to set custom polling interval
+  * Added Option for Binary device "MomentaryOnMode".  When enabled, an on action will set device ON for 1 second and then turns OFF.
+  * Fixed bug with disabled jabber notifications.
+  * Added Device Menu Item "Manually Repoll Devices".
+  * Basic Growl Support
+  * Added Momentary Interval per device
+  * Added ability to hide scenes and devices in LightSwitch
+
 *ver 1.3.0.0 - 3-3-11*
   * Added ability to edit actions
   * Added multiple forms editing and creating actions, editing scenes and editng devices properties.   

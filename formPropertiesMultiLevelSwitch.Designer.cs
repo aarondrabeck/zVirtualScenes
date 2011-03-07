@@ -35,10 +35,12 @@
             this.checkBoxPerDEviceJabberEnable = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBoxDeviceOptions = new System.Windows.Forms.GroupBox();
+            this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
+            this.txtb_GroupName = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.btn_SaveOptions = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.checkBoxGrowlEnabled = new System.Windows.Forms.CheckBox();
             this.groupBoxDeviceOptions.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // toolTipNotificationLevel
@@ -48,7 +50,7 @@
             // 
             // txtb_deviceName
             // 
-            this.txtb_deviceName.Location = new System.Drawing.Point(122, 22);
+            this.txtb_deviceName.Location = new System.Drawing.Point(86, 19);
             this.txtb_deviceName.Name = "txtb_deviceName";
             this.txtb_deviceName.Size = new System.Drawing.Size(250, 20);
             this.txtb_deviceName.TabIndex = 39;
@@ -56,7 +58,7 @@
             // checkBoxPerDEviceJabberEnable
             // 
             this.checkBoxPerDEviceJabberEnable.AutoSize = true;
-            this.checkBoxPerDEviceJabberEnable.Location = new System.Drawing.Point(9, 59);
+            this.checkBoxPerDEviceJabberEnable.Location = new System.Drawing.Point(10, 80);
             this.checkBoxPerDEviceJabberEnable.Name = "checkBoxPerDEviceJabberEnable";
             this.checkBoxPerDEviceJabberEnable.Size = new System.Drawing.Size(254, 17);
             this.checkBoxPerDEviceJabberEnable.TabIndex = 26;
@@ -66,7 +68,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(47, 25);
+            this.label12.Location = new System.Drawing.Point(11, 22);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(78, 13);
             this.label12.TabIndex = 40;
@@ -74,21 +76,50 @@
             // 
             // groupBoxDeviceOptions
             // 
+            this.groupBoxDeviceOptions.Controls.Add(this.checkBoxGrowlEnabled);
+            this.groupBoxDeviceOptions.Controls.Add(this.checkBoxDisplayinLightSwitch);
+            this.groupBoxDeviceOptions.Controls.Add(this.txtb_GroupName);
+            this.groupBoxDeviceOptions.Controls.Add(this.label1);
             this.groupBoxDeviceOptions.Controls.Add(this.btn_SaveOptions);
-            this.groupBoxDeviceOptions.Controls.Add(this.pictureBox1);
             this.groupBoxDeviceOptions.Controls.Add(this.checkBoxPerDEviceJabberEnable);
             this.groupBoxDeviceOptions.Controls.Add(this.txtb_deviceName);
             this.groupBoxDeviceOptions.Controls.Add(this.label12);
             this.groupBoxDeviceOptions.Location = new System.Drawing.Point(4, 5);
             this.groupBoxDeviceOptions.Name = "groupBoxDeviceOptions";
-            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(515, 103);
+            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(515, 156);
             this.groupBoxDeviceOptions.TabIndex = 37;
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Options";
             // 
+            // checkBoxDisplayinLightSwitch
+            // 
+            this.checkBoxDisplayinLightSwitch.AutoSize = true;
+            this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(10, 126);
+            this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
+            this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
+            this.checkBoxDisplayinLightSwitch.TabIndex = 48;
+            this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
+            this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
+            // 
+            // txtb_GroupName
+            // 
+            this.txtb_GroupName.Location = new System.Drawing.Point(86, 45);
+            this.txtb_GroupName.Name = "txtb_GroupName";
+            this.txtb_GroupName.Size = new System.Drawing.Size(250, 20);
+            this.txtb_GroupName.TabIndex = 46;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 48);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(73, 13);
+            this.label1.TabIndex = 47;
+            this.label1.Text = "Group Name: ";
+            // 
             // btn_SaveOptions
             // 
-            this.btn_SaveOptions.Location = new System.Drawing.Point(408, 75);
+            this.btn_SaveOptions.Location = new System.Drawing.Point(408, 123);
             this.btn_SaveOptions.Name = "btn_SaveOptions";
             this.btn_SaveOptions.Size = new System.Drawing.Size(101, 20);
             this.btn_SaveOptions.TabIndex = 39;
@@ -96,21 +127,21 @@
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
             // 
-            // pictureBox1
+            // checkBoxGrowlEnabled
             // 
-            this.pictureBox1.Image = global::zVirtualScenesApplication.Properties.Resources.dial_32;
-            this.pictureBox1.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
-            this.pictureBox1.Location = new System.Drawing.Point(10, 17);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(31, 36);
-            this.pictureBox1.TabIndex = 45;
-            this.pictureBox1.TabStop = false;
+            this.checkBoxGrowlEnabled.AutoSize = true;
+            this.checkBoxGrowlEnabled.Location = new System.Drawing.Point(10, 103);
+            this.checkBoxGrowlEnabled.Name = "checkBoxGrowlEnabled";
+            this.checkBoxGrowlEnabled.Size = new System.Drawing.Size(219, 17);
+            this.checkBoxGrowlEnabled.TabIndex = 51;
+            this.checkBoxGrowlEnabled.Text = "Enable Growl Notifcations for this Device";
+            this.checkBoxGrowlEnabled.UseVisualStyleBackColor = true;
             // 
             // formPropertiesMultiLevelSwitch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(527, 113);
+            this.ClientSize = new System.Drawing.Size(527, 168);
             this.Controls.Add(this.groupBoxDeviceOptions);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -118,10 +149,9 @@
             this.MinimizeBox = false;
             this.Name = "formPropertiesMultiLevelSwitch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Multilevel Switch Properties";
+            this.Text = "Edit this ZWave Switch Device";
             this.groupBoxDeviceOptions.ResumeLayout(false);
             this.groupBoxDeviceOptions.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -134,6 +164,9 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.GroupBox groupBoxDeviceOptions;
         private System.Windows.Forms.Button btn_SaveOptions;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TextBox txtb_GroupName;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox checkBoxDisplayinLightSwitch;
+        private System.Windows.Forms.CheckBox checkBoxGrowlEnabled;
     }
 }

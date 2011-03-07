@@ -12,51 +12,50 @@ namespace zVirtualScenesApplication
     public partial class formPropertiesThermostat : Form
     {
         private formzVirtualScenes _zVirtualScenesMain;
-        private int _SelectedDeviceIndex;
+        private ZWaveDevice _DeviceToEdit;
 
-        public formPropertiesThermostat(formzVirtualScenes zVirtualScenesMain, int SelectedDeviceIndex, int SelectedSceneIndex)
+        public formPropertiesThermostat(formzVirtualScenes zVirtualScenesMain, ZWaveDevice DeviceToEdit)
         {
             InitializeComponent();
             _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedDeviceIndex = SelectedDeviceIndex;
+            _DeviceToEdit = DeviceToEdit;
 
             #region Load Common Feilds into form fields
-            groupBoxDeviceOptions.Text = "Node " + _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].NodeID + ",  '" + _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Name + "' Options";
-            txtb_deviceName.Text = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].Name;
 
-            if (_zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].SendJabberNotifications == true)
-                checkBoxPerDEviceJabberEnable.Checked = true;
-            else
-                checkBoxPerDEviceJabberEnable.Checked = false;
+            groupBoxDeviceOptions.Text = "Node " + _DeviceToEdit.NodeID + ",  '" + _DeviceToEdit.Name + "' Options";
+            txtb_deviceName.Text = _DeviceToEdit.Name;
+            txtb_GroupName.Text = _DeviceToEdit.GroupName;
+
+            checkBoxPerDEviceJabberEnable.Checked = _DeviceToEdit.SendJabberNotifications;
+            checkBoxDisplayinLightSwitch.Checked = _DeviceToEdit.ShowInLightSwitchGUI;
+            checkBoxGrowlEnabled.Checked = _DeviceToEdit.SendGrowlNotifications;
 
             #endregion
 
             #region Thermostat Specific Fields
-            textBoxMaxAlert.Text = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].MaxAlertTemp.ToString();
-            textBoxMinAlert.Text = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].MinAlertTemp.ToString();
-            comboBoxJabberNotifLevel.SelectedIndex = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].NotificationDetailLevel - 1;
+            textBoxMaxAlert.Text = _DeviceToEdit.MaxAlertTemp.ToString();
+            textBoxMinAlert.Text = _DeviceToEdit.MinAlertTemp.ToString();
+            comboBoxJabberNotifLevel.SelectedIndex = _DeviceToEdit.NotificationDetailLevel - 1;
             #endregion
 
         }
- 
-        private void btn_SaveOptions_Click(object sender, EventArgs e)
-        {
-            Device selecteddevice = _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex];
 
+        private void btn_SaveOptions_Click(object sender, EventArgs e)
+        {            
             #region Validate and Save Common Feilds into MasterDevices list
 
             //HANDLE DEVICE NAME CHANGE
             if (txtb_deviceName.Text != "")
             {
-                selecteddevice.Name = txtb_deviceName.Text;
+                _DeviceToEdit.Name = txtb_deviceName.Text;
 
                 //Replace name in each Action
                 foreach (Scene scene in _zVirtualScenesMain.MasterScenes)
                 {
                     foreach (Action action in scene.Actions)
                     {
-                        if (action.GlbUniqueID() == selecteddevice.GlbUniqueID())
-                            action.Name = selecteddevice.Name;
+                        if (action.GlbUniqueID() == _DeviceToEdit.GlbUniqueID())
+                            action.Name = _DeviceToEdit.Name;
                     }
                 }
             }
@@ -66,11 +65,22 @@ namespace zVirtualScenesApplication
                 return;
             }
 
-            //Jabber Notifications
-            if (checkBoxPerDEviceJabberEnable.Checked == true)
-                _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].SendJabberNotifications = true;
+            //HANDLE DEVICE GROUP NAME CHNAGE
+            if (txtb_GroupName.Text != "")
+                _DeviceToEdit.GroupName = txtb_GroupName.Text;
             else
-                _zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex].SendJabberNotifications = false;
+            {
+                MessageBox.Show("Invalid group name.", _zVirtualScenesMain.ProgramName);
+                return;
+            }
+
+            //Jabber Notifications
+            _DeviceToEdit.SendJabberNotifications = checkBoxPerDEviceJabberEnable.Checked;
+
+            //LightSwitch Options
+            _DeviceToEdit.ShowInLightSwitchGUI = checkBoxDisplayinLightSwitch.Checked;
+
+            _DeviceToEdit.SendGrowlNotifications = checkBoxGrowlEnabled.Checked;
 
             #endregion
 
@@ -86,7 +96,7 @@ namespace zVirtualScenesApplication
                 MessageBox.Show("Max Temp not valid.", _zVirtualScenesMain.ProgramName);
                 return;
             }
-            selecteddevice.MaxAlertTemp = maxtemp;
+            _DeviceToEdit.MaxAlertTemp = maxtemp;
 
             //Min Temp            
             int mintemp;
@@ -99,48 +109,29 @@ namespace zVirtualScenesApplication
                 MessageBox.Show("Max Temp not valid.", _zVirtualScenesMain.ProgramName);
                 return;
             }
-            selecteddevice.MinAlertTemp = mintemp;
+            _DeviceToEdit.MinAlertTemp = mintemp;
 
             //Notification Level
-            selecteddevice.NotificationDetailLevel = comboBoxJabberNotifLevel.SelectedIndex + 1;
-#endregion
+            _DeviceToEdit.NotificationDetailLevel = comboBoxJabberNotifLevel.SelectedIndex + 1;
+            #endregion
 
-            #region Save into CustomDeviceProperties List which gets serialized.
+            #region Save into SavedZWaveDeviceUserSettings List which gets serialized.
 
-            bool found = false;
-            foreach (CustomDeviceProperties cDevice in _zVirtualScenesMain.CustomDeviceProperties)
+            foreach (ZWaveDeviceUserSettings cDevice in _zVirtualScenesMain.SavedZWaveDeviceUserSettings)
             {
-                if (selecteddevice.GlbUniqueID() == cDevice.GlbUniqueID())
+                if (_DeviceToEdit.GlbUniqueID() == cDevice.GlbUniqueID())
                 {
-                    cDevice.Name = selecteddevice.Name;
-                    cDevice.SendJabberNotifications = selecteddevice.SendJabberNotifications;
-
-                    //Thermostat Specific
-                    cDevice.MaxAlertTemp = selecteddevice.MaxAlertTemp;
-                    cDevice.MinAlertTemp = selecteddevice.MinAlertTemp;
-                    cDevice.NotificationDetailLevel = selecteddevice.NotificationDetailLevel;
-                    found = true;
+                    _zVirtualScenesMain.SavedZWaveDeviceUserSettings.Remove(cDevice);
+                    break;
                 }
             }
-            if (!found)
-            {
-                CustomDeviceProperties newcDevice = new CustomDeviceProperties();
-                newcDevice.HomeID = selecteddevice.HomeID;
-                newcDevice.NodeID = selecteddevice.NodeID;
-                newcDevice.Name = selecteddevice.Name;
-                newcDevice.SendJabberNotifications = selecteddevice.SendJabberNotifications;
+            _zVirtualScenesMain.SavedZWaveDeviceUserSettings.Add((ZWaveDeviceUserSettings)_DeviceToEdit);
 
-                //Thermostat Specific
-                newcDevice.MaxAlertTemp = selecteddevice.MaxAlertTemp;
-                newcDevice.MinAlertTemp = selecteddevice.MinAlertTemp;
-                newcDevice.NotificationDetailLevel = selecteddevice.NotificationDetailLevel;
-                _zVirtualScenesMain.CustomDeviceProperties.Add(newcDevice);
-            }
-            #endregion
+            #endregion             
 
             this.Close();
         }
 
-       
-    }       
+
+    }
 }

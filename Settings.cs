@@ -7,17 +7,21 @@ namespace zVirtualScenesApplication
 {
     public class Settings
     {
+        //GENERAL SETTINGS
+        public int PollingInterval { get; set; }
+
+        //HTPP INTERFACE
         public bool zHTTPListenEnabled { get; set; }
         public int ZHTTPPort { get; set; }
 
-        //LightSwitch Settings
+        //LightSwitch INTERFACE
         public bool LightSwitchEnabled { get; set; }
         public bool LightSwitchVerbose { get; set; }
         public int LightSwitchPort { get; set; }
         public int LightSwitchMaxConnections { get; set; }
         public string LightSwitchPassword { get; set; }
 
-        //Jabber
+        //Jabber INTERFACE
         public bool JabberEnanbled { get; set; }
         public bool JabberVerbose { get; set; }
         public string JabberUser { get; set; }
@@ -27,6 +31,8 @@ namespace zVirtualScenesApplication
 
         public Settings()
         {
+            this.PollingInterval = 10;
+
             //Defaults
             this.zHTTPListenEnabled = true;
             this.ZHTTPPort = 8085;

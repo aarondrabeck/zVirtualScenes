@@ -13,7 +13,7 @@ namespace zVirtualScenesApplication
     {
         public bool isOpen { get; set; }
         public formzVirtualScenes _zVirtualScenesMain;
-        public int _SelectedSceneIndex;     
+        public Scene _SceneToEdit;
 
         public formPropertiesScene()
         {
@@ -23,19 +23,20 @@ namespace zVirtualScenesApplication
         }
 
         private void btn_Save_Click(object sender, EventArgs e)
-        {
-            Scene selectedscene = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex];
+        {           
             //HANDLE Scene NAME CHANGE
-            if (txtb_sceneName.Text != "")            
-                selectedscene.Name = txtb_sceneName.Text;            
+            if (txtb_sceneName.Text != "")
+                _SceneToEdit.Name = txtb_sceneName.Text;            
             else
             {
                 MessageBox.Show("Invalid scene name.", _zVirtualScenesMain.ProgramName);
                 return;
             }
 
+            _SceneToEdit.ShowInLightSwitchGUI = checkBoxDisplayinLightSwitch.Checked; 
+
             //Global Hotkey
-            selectedscene.GlobalHotKey = (int)Enum.Parse(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys), comboBoxHotKeys.SelectedValue.ToString());
+            _SceneToEdit.GlobalHotKey = (int)Enum.Parse(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys), comboBoxHotKeys.SelectedValue.ToString());
 
             this.Close();
         }
@@ -54,9 +55,10 @@ namespace zVirtualScenesApplication
         {
             this.isOpen = true;
 
-            txtb_sceneName.Text = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Name;
+            txtb_sceneName.Text = _SceneToEdit.Name;
             comboBoxHotKeys.DataSource = Enum.GetNames(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys));
-            comboBoxHotKeys.SelectedIndex = _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].GlobalHotKey;
+            comboBoxHotKeys.SelectedIndex = _SceneToEdit.GlobalHotKey;
+            checkBoxDisplayinLightSwitch.Checked = _SceneToEdit.ShowInLightSwitchGUI;
         }
     }       
 }

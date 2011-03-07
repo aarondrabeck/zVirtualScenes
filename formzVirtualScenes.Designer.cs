@@ -1,4 +1,8 @@
-﻿namespace zVirtualScenesApplication
+﻿using System.Windows.Forms;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System;
+namespace zVirtualScenesApplication
 {
     partial class formzVirtualScenes
     {
@@ -33,10 +37,19 @@
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.dataListViewDevices = new BrightIdeasSoftware.DataListView();
+            this.NodeCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.NameCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.LevelCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.LevelTextCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.ModeCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.FanModeCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SetPointCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.currStateCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.GroupCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.buttonChangeDeviceLevel = new System.Windows.Forms.Button();
             this.btn_EditDevice = new System.Windows.Forms.Button();
             this.labelLastEvent = new System.Windows.Forms.Label();
-            this.listBoxDevices = new System.Windows.Forms.ListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.buttonEditAction = new System.Windows.Forms.Button();
             this.btn_AddAction = new System.Windows.Forms.Button();
@@ -56,6 +69,9 @@
             this.listBoxSceneActions = new System.Windows.Forms.ListBox();
             this.btn_runScene = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.textBoxRepolling = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.buttonSaveSettings = new System.Windows.Forms.Button();
             this.groupBox7 = new System.Windows.Forms.GroupBox();
             this.textBoxJabberUserTo = new System.Windows.Forms.TextBox();
@@ -92,14 +108,19 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
             this.reconnectToControlThinkUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.manuallyRepollDevicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lookForNewDevicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSceduling = new System.Windows.Forms.ToolStripDropDownButton();
+            this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataListViewDevices)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox5.SuspendLayout();
             this.groupBox6.SuspendLayout();
@@ -112,10 +133,10 @@
             this.MainTabControl.Controls.Add(this.tabPage1);
             this.MainTabControl.Controls.Add(this.tabPage3);
             this.MainTabControl.Controls.Add(this.tabPage2);
-            this.MainTabControl.Location = new System.Drawing.Point(0, 25);
+            this.MainTabControl.Location = new System.Drawing.Point(0, 28);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
-            this.MainTabControl.Size = new System.Drawing.Size(786, 448);
+            this.MainTabControl.Size = new System.Drawing.Size(786, 489);
             this.MainTabControl.TabIndex = 0;
             // 
             // tabPage1
@@ -125,27 +146,124 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(778, 422);
+            this.tabPage1.Size = new System.Drawing.Size(778, 463);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Scenes";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.dataListViewDevices);
             this.groupBox1.Controls.Add(this.buttonChangeDeviceLevel);
             this.groupBox1.Controls.Add(this.btn_EditDevice);
             this.groupBox1.Controls.Add(this.labelLastEvent);
-            this.groupBox1.Controls.Add(this.listBoxDevices);
             this.groupBox1.Location = new System.Drawing.Point(8, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(760, 139);
+            this.groupBox1.Size = new System.Drawing.Size(760, 178);
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "ZWave Devices";
             // 
+            // dataListViewDevices
+            // 
+            this.dataListViewDevices.AllColumns.Add(this.NodeCol);
+            this.dataListViewDevices.AllColumns.Add(this.NameCol);
+            this.dataListViewDevices.AllColumns.Add(this.LevelCol);
+            this.dataListViewDevices.AllColumns.Add(this.LevelTextCol);
+            this.dataListViewDevices.AllColumns.Add(this.ModeCol);
+            this.dataListViewDevices.AllColumns.Add(this.FanModeCol);
+            this.dataListViewDevices.AllColumns.Add(this.SetPointCol);
+            this.dataListViewDevices.AllColumns.Add(this.currStateCol);
+            this.dataListViewDevices.AllColumns.Add(this.GroupCol);
+            this.dataListViewDevices.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.NodeCol,
+            this.NameCol,
+            this.LevelCol,
+            this.LevelTextCol,
+            this.ModeCol,
+            this.FanModeCol,
+            this.SetPointCol,
+            this.currStateCol,
+            this.GroupCol});
+            this.dataListViewDevices.DataSource = null;
+            this.dataListViewDevices.FullRowSelect = true;
+            this.dataListViewDevices.HasCollapsibleGroups = false;
+            this.dataListViewDevices.HeaderMaximumHeight = 15;
+            this.dataListViewDevices.Location = new System.Drawing.Point(6, 15);
+            this.dataListViewDevices.Name = "dataListViewDevices";
+            this.dataListViewDevices.OwnerDraw = true;
+            this.dataListViewDevices.ShowGroups = false;
+            this.dataListViewDevices.Size = new System.Drawing.Size(748, 136);
+            this.dataListViewDevices.TabIndex = 30;
+            this.dataListViewDevices.UseCompatibleStateImageBehavior = false;
+            this.dataListViewDevices.View = System.Windows.Forms.View.Details;
+            this.dataListViewDevices.DoubleClick += new System.EventHandler(this.dataListViewDevices_DoubleClick);
+            // 
+            // NodeCol
+            // 
+            this.NodeCol.AspectName = "NodeID";
+            this.NodeCol.IsEditable = false;
+            this.NodeCol.Text = "ID";
+            this.NodeCol.Width = 30;
+            // 
+            // NameCol
+            // 
+            this.NameCol.AspectName = "Name";
+            this.NameCol.IsEditable = false;
+            this.NameCol.Text = "Name";
+            this.NameCol.Width = 100;
+            // 
+            // LevelCol
+            // 
+            this.LevelCol.AspectName = "GetLevelMeter";
+            this.LevelCol.IsEditable = false;
+            this.LevelCol.Text = "Level";
+            // 
+            // LevelTextCol
+            // 
+            this.LevelTextCol.AspectName = "GetLevelText";
+            this.LevelTextCol.IsEditable = false;
+            this.LevelTextCol.Text = "";
+            this.LevelTextCol.Width = 40;
+            // 
+            // ModeCol
+            // 
+            this.ModeCol.AspectName = "GetMode";
+            this.ModeCol.IsEditable = false;
+            this.ModeCol.Text = "Mode";
+            this.ModeCol.Width = 80;
+            // 
+            // FanModeCol
+            // 
+            this.FanModeCol.AspectName = "GetFanMode";
+            this.FanModeCol.IsEditable = false;
+            this.FanModeCol.Text = "Fan Mode";
+            this.FanModeCol.Width = 80;
+            // 
+            // SetPointCol
+            // 
+            this.SetPointCol.AspectName = "GetSetPoint";
+            this.SetPointCol.IsEditable = false;
+            this.SetPointCol.Text = "Set Point";
+            this.SetPointCol.Width = 140;
+            // 
+            // currStateCol
+            // 
+            this.currStateCol.AspectName = "GetCurrentState";
+            this.currStateCol.IsEditable = false;
+            this.currStateCol.Text = "Currently";
+            this.currStateCol.Width = 80;
+            // 
+            // GroupCol
+            // 
+            this.GroupCol.AspectName = "GroupName";
+            this.GroupCol.IsEditable = false;
+            this.GroupCol.Text = "Group";
+            this.GroupCol.Width = 130;
+            // 
             // buttonChangeDeviceLevel
             // 
-            this.buttonChangeDeviceLevel.Location = new System.Drawing.Point(613, 113);
+            this.buttonChangeDeviceLevel.Location = new System.Drawing.Point(613, 152);
             this.buttonChangeDeviceLevel.Name = "buttonChangeDeviceLevel";
             this.buttonChangeDeviceLevel.Size = new System.Drawing.Size(91, 23);
             this.buttonChangeDeviceLevel.TabIndex = 28;
@@ -155,7 +273,7 @@
             // 
             // btn_EditDevice
             // 
-            this.btn_EditDevice.Location = new System.Drawing.Point(708, 113);
+            this.btn_EditDevice.Location = new System.Drawing.Point(708, 152);
             this.btn_EditDevice.Name = "btn_EditDevice";
             this.btn_EditDevice.Size = new System.Drawing.Size(46, 23);
             this.btn_EditDevice.TabIndex = 27;
@@ -166,20 +284,11 @@
             // labelLastEvent
             // 
             this.labelLastEvent.AutoSize = true;
-            this.labelLastEvent.Location = new System.Drawing.Point(8, 118);
+            this.labelLastEvent.Location = new System.Drawing.Point(8, 157);
             this.labelLastEvent.Name = "labelLastEvent";
             this.labelLastEvent.Size = new System.Drawing.Size(64, 13);
             this.labelLastEvent.TabIndex = 22;
             this.labelLastEvent.Text = "Last Event: ";
-            // 
-            // listBoxDevices
-            // 
-            this.listBoxDevices.FormattingEnabled = true;
-            this.listBoxDevices.Location = new System.Drawing.Point(6, 17);
-            this.listBoxDevices.Name = "listBoxDevices";
-            this.listBoxDevices.Size = new System.Drawing.Size(748, 95);
-            this.listBoxDevices.TabIndex = 0;
-            this.listBoxDevices.DoubleClick += new System.EventHandler(this.listBoxDevices_DoubleClick);
             // 
             // groupBox2
             // 
@@ -200,7 +309,7 @@
             this.groupBox2.Controls.Add(this.lbl_sceneActions);
             this.groupBox2.Controls.Add(this.listBoxSceneActions);
             this.groupBox2.Controls.Add(this.btn_runScene);
-            this.groupBox2.Location = new System.Drawing.Point(8, 148);
+            this.groupBox2.Location = new System.Drawing.Point(8, 187);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(760, 270);
             this.groupBox2.TabIndex = 14;
@@ -379,20 +488,48 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.groupBox3);
             this.tabPage3.Controls.Add(this.buttonSaveSettings);
             this.tabPage3.Controls.Add(this.groupBox7);
             this.tabPage3.Controls.Add(this.groupBox5);
             this.tabPage3.Controls.Add(this.groupBox6);
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(778, 422);
+            this.tabPage3.Size = new System.Drawing.Size(778, 463);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Settings";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.textBoxRepolling);
+            this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Location = new System.Drawing.Point(8, 13);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(342, 45);
+            this.groupBox3.TabIndex = 8;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "General Settings";
+            // 
+            // textBoxRepolling
+            // 
+            this.textBoxRepolling.Location = new System.Drawing.Point(229, 12);
+            this.textBoxRepolling.Name = "textBoxRepolling";
+            this.textBoxRepolling.Size = new System.Drawing.Size(107, 20);
+            this.textBoxRepolling.TabIndex = 14;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 15);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(217, 13);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "ZWave Device Repolling Interval (seconds):";
+            // 
             // buttonSaveSettings
             // 
-            this.buttonSaveSettings.Location = new System.Drawing.Point(631, 376);
+            this.buttonSaveSettings.Location = new System.Drawing.Point(631, 417);
             this.buttonSaveSettings.Name = "buttonSaveSettings";
             this.buttonSaveSettings.Size = new System.Drawing.Size(137, 38);
             this.buttonSaveSettings.TabIndex = 7;
@@ -412,9 +549,9 @@
             this.groupBox7.Controls.Add(this.label3);
             this.groupBox7.Controls.Add(this.checkBoxJabberVerbose);
             this.groupBox7.Controls.Add(this.checkBoxJabberEnabled);
-            this.groupBox7.Location = new System.Drawing.Point(3, 217);
+            this.groupBox7.Location = new System.Drawing.Point(5, 284);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(595, 127);
+            this.groupBox7.Size = new System.Drawing.Size(763, 127);
             this.groupBox7.TabIndex = 6;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Send Notifications to Jabber";
@@ -513,9 +650,9 @@
             this.groupBox5.Controls.Add(this.label8);
             this.groupBox5.Controls.Add(this.checkBoxLSDebugVerbose);
             this.groupBox5.Controls.Add(this.checkBoxLSEnabled);
-            this.groupBox5.Location = new System.Drawing.Point(3, 139);
+            this.groupBox5.Location = new System.Drawing.Point(5, 206);
             this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(595, 72);
+            this.groupBox5.Size = new System.Drawing.Size(763, 72);
             this.groupBox5.TabIndex = 5;
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "LightSwitch Settings";
@@ -595,9 +732,9 @@
             this.groupBox6.Controls.Add(this.checkBoxHTTPEnable);
             this.groupBox6.Controls.Add(this.txtb_httpPort);
             this.groupBox6.Controls.Add(this.label9);
-            this.groupBox6.Location = new System.Drawing.Point(6, 14);
+            this.groupBox6.Location = new System.Drawing.Point(8, 83);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(523, 117);
+            this.groupBox6.Size = new System.Drawing.Size(760, 117);
             this.groupBox6.TabIndex = 4;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "ZVirtualScene HTTP Listen ";
@@ -652,7 +789,7 @@
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(778, 422);
+            this.tabPage2.Size = new System.Drawing.Size(778, 463);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Log";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -671,7 +808,8 @@
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripDropDownButton1,
-            this.toolStripDropDownButton2});
+            this.toolStripDropDownButton2,
+            this.toolStripSceduling});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(784, 25);
@@ -715,6 +853,7 @@
             this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.reconnectToControlThinkUSBToolStripMenuItem,
+            this.manuallyRepollDevicesToolStripMenuItem,
             this.lookForNewDevicesToolStripMenuItem,
             this.toolStripSeparator2});
             this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
@@ -730,6 +869,13 @@
             this.reconnectToControlThinkUSBToolStripMenuItem.Text = "Reconnect to ControlThink USB";
             this.reconnectToControlThinkUSBToolStripMenuItem.Click += new System.EventHandler(this.reconnectToControlThinkUSBToolStripMenuItem_Click);
             // 
+            // manuallyRepollDevicesToolStripMenuItem
+            // 
+            this.manuallyRepollDevicesToolStripMenuItem.Name = "manuallyRepollDevicesToolStripMenuItem";
+            this.manuallyRepollDevicesToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.manuallyRepollDevicesToolStripMenuItem.Text = "Manually Repoll Devices";
+            this.manuallyRepollDevicesToolStripMenuItem.Click += new System.EventHandler(this.manuallyRepollDevicesToolStripMenuItem_Click);
+            // 
             // lookForNewDevicesToolStripMenuItem
             // 
             this.lookForNewDevicesToolStripMenuItem.Name = "lookForNewDevicesToolStripMenuItem";
@@ -742,11 +888,28 @@
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(238, 6);
             // 
+            // toolStripSceduling
+            // 
+            this.toolStripSceduling.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripSceduling.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.viewToolStripMenuItem});
+            this.toolStripSceduling.Image = ((System.Drawing.Image)(resources.GetObject("toolStripSceduling.Image")));
+            this.toolStripSceduling.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSceduling.Name = "toolStripSceduling";
+            this.toolStripSceduling.Size = new System.Drawing.Size(79, 22);
+            this.toolStripSceduling.Text = "Scheduling";
+            // 
+            // viewToolStripMenuItem
+            // 
+            this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
+            this.viewToolStripMenuItem.Text = "Scheduled Scenes ";
+            // 
             // formzVirtualScenes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 473);
+            this.ClientSize = new System.Drawing.Size(784, 514);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.MainTabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -760,9 +923,12 @@
             this.tabPage1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataListViewDevices)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.groupBox7.ResumeLayout(false);
             this.groupBox7.PerformLayout();
             this.groupBox5.ResumeLayout(false);
@@ -780,12 +946,9 @@
         #endregion
 
         
-        
-
         private System.Windows.Forms.TabControl MainTabControl;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.ListBox listBoxDevices;
         private System.Windows.Forms.Label lbl_sceneActions;
         private System.Windows.Forms.ListBox listBoxSceneActions;
         private System.Windows.Forms.ListBox listBoxScenes;
@@ -847,6 +1010,22 @@
         private System.Windows.Forms.Button btn_EditDevice;
         private System.Windows.Forms.ToolStripMenuItem reconnectToControlThinkUSBToolStripMenuItem;
         private System.Windows.Forms.Button buttonChangeDeviceLevel;
+        private BrightIdeasSoftware.DataListView dataListViewDevices;
+        private BrightIdeasSoftware.OLVColumn NodeCol;
+        private BrightIdeasSoftware.OLVColumn NameCol;
+        private BrightIdeasSoftware.OLVColumn GroupCol;
+        private BrightIdeasSoftware.OLVColumn ModeCol;
+        private BrightIdeasSoftware.OLVColumn LevelCol;
+        private BrightIdeasSoftware.OLVColumn LevelTextCol;
+        private BrightIdeasSoftware.OLVColumn FanModeCol;
+        private BrightIdeasSoftware.OLVColumn SetPointCol;
+        private BrightIdeasSoftware.OLVColumn currStateCol;
+        private ToolStripDropDownButton toolStripSceduling;
+        private ToolStripMenuItem viewToolStripMenuItem;
+        private GroupBox groupBox3;
+        private TextBox textBoxRepolling;
+        private Label label1;
+        private ToolStripMenuItem manuallyRepollDevicesToolStripMenuItem;
     }
 }
 

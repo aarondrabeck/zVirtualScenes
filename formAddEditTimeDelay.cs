@@ -15,18 +15,18 @@ namespace zVirtualScenesApplication
         private int _SelectedSceneIndex;
         private int _SelectedSceneActionIndex;
         Action TheAction = new Action();
-        private bool _edit;
+        private bool _CreateAction;
 
-        public formAddEditTimeDelay(formzVirtualScenes zVirtualScenesMain, bool edit, int SelectedSceneIndex, int SelectedSceneActionIndex)
+        public formAddEditTimeDelay(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, bool CreateAction = false)
         {
             InitializeComponent();
 
             _zVirtualScenesMain = zVirtualScenesMain;
             _SelectedSceneIndex = SelectedSceneIndex;
             _SelectedSceneActionIndex = SelectedSceneActionIndex;
-            _edit = edit;
+            _CreateAction = CreateAction;
 
-            if (edit)
+            if (!_CreateAction)
             {
                 groupBoxAction.Text = "Edit Action";
                 btn_Save.Text = "Save Action";
@@ -59,20 +59,25 @@ namespace zVirtualScenesApplication
             }
 
             //CREATE ACTION
-            TheAction.Type = "DelayTimer";
+            TheAction.Type = Action.ActionTypes.DelayTimer;
             TheAction.TimerDuration = duration * 1000;                       
 
             //SAVE
-            if (_edit) //replace action
+            if (!_CreateAction) //replace action
             {
                 _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
                 _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
                 _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
             }
-            else //add new action                
+            else
             {
-                _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Add(TheAction);
-                _zVirtualScenesMain.SelectListBoxActionItem(_zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Count()-1);
+                if (_SelectedSceneActionIndex == -1)  //First Action in Scene
+                    _SelectedSceneActionIndex = 0;
+                else
+                    _SelectedSceneActionIndex++;  //Add item below cuurent selection
+
+                _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
+                _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
             }
 
             this.Close();

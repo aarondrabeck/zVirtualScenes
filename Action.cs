@@ -79,8 +79,11 @@ namespace zVirtualScenesApplication
         
         public uint HomeID { get; set; }
         public byte NodeID { get; set; }
-        public string Type { get; set; }
+        public ZWaveDevice.ZWaveDeviceTypes ZWaveType { get; set; }
+        public ActionTypes Type { get; set; }
         public int Mode { get; set; }
+        public bool MomentaryOnMode { get; set; }
+        public int MomentaryTimespan { get; set; }
 
         /// <summary>
         /// In Milliseconds
@@ -99,115 +102,145 @@ namespace zVirtualScenesApplication
             _HeatPoint = -1;
             _CoolPoint = -1;
             _EXEPath = "";
-            this.Type = "";
+            this.Type = ActionTypes.ZWaveDevice;
+            this.ZWaveType = ZWaveDevice.ZWaveDeviceTypes.Unknown;
             this.NodeID = 0;                       
             this.Mode = -1;
             this.Temp = 0;
             this.HomeID = 0;
             this.TimerDuration = 5000;
+            this.MomentaryOnMode = false;
+            this.MomentaryTimespan = 1; 
+        }
+
+        public enum ActionTypes
+        {
+            ZWaveDevice = 1,
+            LauchAPP = 2,
+            DelayTimer = 3
         }
 
         public override string ToString()
         {
-            if(this.Type == "LauchAPP")
+            if (Type == ActionTypes.ZWaveDevice)
+            {
+                return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
+            }
+            else if (Type == ActionTypes.LauchAPP)
             {
                 return "Launch: " + EXEPath;
             }
-            else if (this.Type == "DelayTimer")
+            else if (Type == ActionTypes.DelayTimer)
             {
-                return "Wait " + this.TimerDuration / 1000 + " second(s)."; 
+                return "Wait " + this.TimerDuration / 1000 + " second(s).";
             }
-            else
-                return _Name + " - ID:" + NodeID + " - " + GetFomattedType();
+            return "Action Type Unknown!";
         }
 
         public ActionResult Run(ZWaveController ControlThinkController)
         {
-
-            #region Switches
-
-            if (this.Type.Contains("BinaryPowerSwitch"))
+            if (Type == ActionTypes.ZWaveDevice)
             {
-                foreach (ZWaveDevice device in ControlThinkController.Devices)
+                #region BinarySwitchs
+
+                if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
                 {
-                    if (device.NodeID == this.NodeID)
+                    foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
                     {
-                        device.Level = _Level;
-                        return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + (this.Level > 0 ? "ON" : "OFF") + "." };
-                    }
-                }
-            }  
-
-            if (this.Type.Contains("MultilevelPowerSwitch"))
-            {
-                foreach (ZWaveDevice device in ControlThinkController.Devices)
-                {
-                    if (device.NodeID == this.NodeID)
-                    {                         
-                        device.Level = _Level;
-                        return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + this.Level.ToString() + "." };
-                    }
-                }
-            }               
-            #endregion
-
-            #region Thermostat
-            else if (this.Type.Contains("GeneralThermostat") )
-            {
-                foreach (ZWaveDevice device in ControlThinkController.Devices)
-                {
-                    if (device.NodeID == this.NodeID)
-                    {
-                        string ActionLog = "Ran Action. '" + this.Name + "'";
-                        try
+                        if (device.NodeID == this.NodeID)
                         {
-                            ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
-
-                            //Set Heat Cool Mode
-                            if (_HeatCoolMode != -1)
+                            if (!MomentaryOnMode)
                             {
-                                thermostat.ThermostatMode = (ControlThink.ZWave.Devices.ThermostatMode)_HeatCoolMode;
-                                ActionLog += " Mode set to: " + Enum.GetName(typeof(Device.ThermostatMode), _HeatCoolMode) + "  ";
+                                device.Level = _Level;
+                                return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + (this.Level > 0 ? "ON" : "OFF") + "." };
                             }
-
-                            if (_FanMode != -1)
+                            else
                             {
-                                thermostat.ThermostatFanMode = (ControlThink.ZWave.Devices.ThermostatFanMode)_FanMode;
-                                ActionLog += " FanMode set to: " + Enum.GetName(typeof(Device.ThermostatFanMode), _FanMode) + "  ";
+                                device.Level = 1;
+                                System.Threading.Thread.Sleep(1000);
+                                device.Level = 0;
+                                return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' toggled on momentarily." };
                             }
 
-                            if (_EngeryMode != -1)                       
-                            {     
-                                thermostat.Level = (byte)_EngeryMode;
-                                ActionLog += " EnergyMode set to: " + Enum.GetName(typeof(Device.EnergyMode), _EngeryMode) + "  ";
-                            }
-
-                            if (_CoolPoint != -1)
-                            {
-                                thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature = new Temperature(_CoolPoint, TemperatureScale.Fahrenheit);
-                                ActionLog += " CoolPoint set to: " + _CoolPoint.ToString() + "  ";
-                            }
-
-                            if (_HeatPoint != -1)
-                            {
-                                thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature = new Temperature(_HeatPoint, TemperatureScale.Fahrenheit);
-                                ActionLog += " HeatPoint set to: " + _HeatPoint.ToString() + "  ";
-                            }
-
-                            return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = ActionLog};
-                    
-                        }
-                        catch (Exception e)
-                        {
-                            return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to set Thermostat. Mode might not be allowed. - " + e};
                         }
                     }
                 }
+
+                #endregion
+
+                #region MultiLevel Switch
+
+                else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                {
+                    foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
+                    {
+                        if (device.NodeID == this.NodeID)
+                        {
+                            device.Level = _Level;
+                            return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + this.Level.ToString() + "." };
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region Thermostat
+
+                else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                {
+                    foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
+                    {
+                        if (device.NodeID == this.NodeID)
+                        {
+                            string ActionLog = "Ran Action. '" + this.Name + "'";
+                            try
+                            {
+                                ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
+
+                                //Set Heat Cool Mode
+                                if (_HeatCoolMode != -1)
+                                {
+                                    thermostat.ThermostatMode = (ControlThink.ZWave.Devices.ThermostatMode)_HeatCoolMode;
+                                    ActionLog += " Mode set to: " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), _HeatCoolMode) + "  ";
+                                }
+
+                                if (_FanMode != -1)
+                                {
+                                    thermostat.ThermostatFanMode = (ControlThink.ZWave.Devices.ThermostatFanMode)_FanMode;
+                                    ActionLog += " FanMode set to: " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), _FanMode) + "  ";
+                                }
+
+                                if (_EngeryMode != -1)
+                                {
+                                    thermostat.Level = (byte)_EngeryMode;
+                                    ActionLog += " EnergyMode set to: " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), _EngeryMode) + "  ";
+                                }
+
+                                if (_CoolPoint != -1)
+                                {
+                                    thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature = new Temperature(_CoolPoint, TemperatureScale.Fahrenheit);
+                                    ActionLog += " CoolPoint set to: " + _CoolPoint.ToString() + "  ";
+                                }
+
+                                if (_HeatPoint != -1)
+                                {
+                                    thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature = new Temperature(_HeatPoint, TemperatureScale.Fahrenheit);
+                                    ActionLog += " HeatPoint set to: " + _HeatPoint.ToString() + "  ";
+                                }
+
+                                return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = ActionLog };
+
+                            }
+                            catch (Exception e)
+                            {
+                                return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to set Thermostat. Mode might not be allowed. - " + e };
+                            }
+                        }
+                    }
+                }
+                #endregion
             }
-            #endregion
-
-            #region Non Zwave
-            else if (this.Type == "LauchAPP")
+            else if (this.Type == ActionTypes.LauchAPP)
             {
                 try
                 {
@@ -219,53 +252,52 @@ namespace zVirtualScenesApplication
                     return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to launch (" + EXEPath + ") - " + e };
                 }
             }
-            else if (this.Type == "DelayTimer")
+            else if (this.Type == ActionTypes.DelayTimer)
             {
                 System.Threading.Thread.Sleep((int)this.TimerDuration);
             }
-            #endregion
 
            return new ActionResult { ResultType= ActionResult.ResultTypes.Success, Description = "Ran action on " + this.Type + "(" + this.Name +")." }; 
         }
 
         public string GetFomattedType()
-        {                       
-            if (Type != null && Type.Contains("BinaryPowerSwitch"))
+        {
+            if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
             {
                 return (Level > 0 ? "State: ON" : "State: OFF");
             }
-            if (Type != null && Type.Contains("MultilevelPowerSwitch"))
+            else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
             {
                 if (Level > 255)
                     return "Level: Unknown ON State";
                 else
                     return "Level: " + Level + "%";
             }
-            else if (Type != null && Type.Contains("GeneralThermostat"))
+            else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
             {
                 string actions = "(";
 
                 //Set Heat Cool Mode
                 if (_HeatCoolMode != -1)
-                    actions += " Set Mode: " + Enum.GetName(typeof(Device.ThermostatMode), _HeatCoolMode); 
-                
+                    actions += " Set Mode: " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), _HeatCoolMode);
+
                 if (_FanMode != -1)
-                    actions += " Set FanMode: " + Enum.GetName(typeof(Device.ThermostatFanMode), _FanMode);
+                    actions += " Set FanMode: " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), _FanMode);
 
                 if (_EngeryMode != -1)
                 {
-                      if (_EngeryMode == 0) //set EnergySavingMode
-                         actions += " Set EnergySavingMode.";
-                     else if (_EngeryMode == 255) //ComfortMode
-                         actions += " Set ComfortMode.";                    
+                    if (_EngeryMode == 0) //set EnergySavingMode
+                        actions += " Set EnergySavingMode.";
+                    else if (_EngeryMode == 255) //ComfortMode
+                        actions += " Set ComfortMode.";
                 }
 
-                if(_CoolPoint != -1)
+                if (_CoolPoint != -1)
                     actions += " Set CustomCoolpoint " + _CoolPoint.ToString() + "°.";
 
-                if(_HeatPoint != -1)
+                if (_HeatPoint != -1)
                     actions += " Set CustomHeatpoint " + _HeatPoint.ToString() + "°.";
-                   
+
                 actions += ")";
                 return actions;
             }

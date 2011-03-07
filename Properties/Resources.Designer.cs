@@ -60,6 +60,13 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap Broadcast48 {
+            get {
+                object obj = ResourceManager.GetObject("Broadcast48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap dial_32 {
             get {
                 object obj = ResourceManager.GetObject("dial_32", resourceCulture);
@@ -88,9 +95,30 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap temperature48 {
+            get {
+                object obj = ResourceManager.GetObject("temperature48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap thermometer {
             get {
                 object obj = ResourceManager.GetObject("thermometer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap User48 {
+            get {
+                object obj = ResourceManager.GetObject("User48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap zvirtualscenes57 {
+            get {
+                object obj = ResourceManager.GetObject("zvirtualscenes57", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

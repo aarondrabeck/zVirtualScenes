@@ -12,22 +12,31 @@ namespace zVirtualScenesApplication
     public partial class formAddEditActionThermostat : Form
     {
         private formzVirtualScenes _zVirtualScenesMain;
-        private int _SelectedDeviceIndex;
+        private ZWaveDevice _SelectedDevice;
         private int _SelectedSceneIndex;
         private int _SelectedSceneActionIndex;
         Action TheAction = new Action();
-        private bool _edit;
-
-        public formAddEditActionThermostat(formzVirtualScenes zVirtualScenesMain, bool edit, int SelectedDeviceIndex, int SelectedSceneIndex, int SelectedSceneActionIndex)
+        private bool CreateAction = false;
+        
+        /// <summary>
+        /// Creates OR Edits Action
+        /// </summary>
+        /// <param name="zVirtualScenesMain">Main Form</param>
+        /// <param name="SelectedSceneIndex">Index of Selected Scene</param>
+        /// <param name="SelectedSceneActionIndex">Selected Scene Action Index</param>
+        /// <param name="selectedDevice">OPTIONAL: ONLY USED IN CREATE NEW ACTION</param>
+        public formAddEditActionThermostat(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, ZWaveDevice selectedDevice = null)
         {
             InitializeComponent();
             _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedDeviceIndex = SelectedDeviceIndex;
+            _SelectedDevice = selectedDevice;
             _SelectedSceneIndex = SelectedSceneIndex;
             _SelectedSceneActionIndex = SelectedSceneActionIndex;
-            _edit = edit;
 
-            if (edit)
+            if (selectedDevice != null)
+                CreateAction = true;
+
+            if (!CreateAction)
             {
                 groupBoxAction.Text = "Edit Action";
 
@@ -39,7 +48,7 @@ namespace zVirtualScenesApplication
                 groupBoxAction.Text = "Create New Action";
                 btn_Save.Text = "Add Action to '" + _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Name + "'"; 
                 //Convert Device to Action id this is a new action and not an edit
-                TheAction = (Action)(_zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex]);
+                TheAction = (Action)_SelectedDevice;
             }
             #region Load Common Feilds into form fields
             lbl_Status.Text = "";
@@ -49,9 +58,9 @@ namespace zVirtualScenesApplication
             #region Thermostat Specific Fields            
 
             //Fill Thermo Option Dropdowns
-            comboBoxHeatCoolMode.DataSource = Enum.GetNames(typeof(Device.ThermostatMode));
-            comboBoxFanMode.DataSource = Enum.GetNames(typeof(Device.ThermostatFanMode));
-            comboBoxEnergyMode.DataSource = Enum.GetNames(typeof(Device.EnergyMode));
+            comboBoxHeatCoolMode.DataSource = Enum.GetNames(typeof(ZWaveDevice.ThermostatMode));
+            comboBoxFanMode.DataSource = Enum.GetNames(typeof(ZWaveDevice.ThermostatFanMode));
+            comboBoxEnergyMode.DataSource = Enum.GetNames(typeof(ZWaveDevice.EnergyMode));
 
             //Set Action Options 
             if (TheAction.HeatPoint != -1)
@@ -66,9 +75,9 @@ namespace zVirtualScenesApplication
                 textBoxCoolPoint.Text = TheAction.CoolPoint.ToString();
             }
 
-            comboBoxHeatCoolMode.SelectedItem = Enum.GetName(typeof(Device.ThermostatMode), TheAction.HeatCoolMode);
-            comboBoxEnergyMode.SelectedItem = Enum.GetName(typeof(Device.ThermostatFanMode), TheAction.EngeryMode);
-            comboBoxFanMode.SelectedItem = Enum.GetName(typeof(Device.EnergyMode), TheAction.FanMode);
+            comboBoxHeatCoolMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.ThermostatMode), TheAction.HeatCoolMode);
+            comboBoxEnergyMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), TheAction.EngeryMode);
+            comboBoxFanMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.EnergyMode), TheAction.FanMode);
             
             #endregion
 
@@ -77,9 +86,9 @@ namespace zVirtualScenesApplication
         private bool UpdateThermostatAction(Action myBinSwitchAction)
         {
             //ERROR CHECK INPUTS
-            TheAction.HeatCoolMode = (int)Enum.Parse(typeof(Device.ThermostatMode), comboBoxHeatCoolMode.SelectedValue.ToString());
-            TheAction.FanMode = (int)Enum.Parse(typeof(Device.ThermostatFanMode), comboBoxFanMode.SelectedValue.ToString());
-            TheAction.EngeryMode = (int)Enum.Parse(typeof(Device.EnergyMode), comboBoxEnergyMode.SelectedValue.ToString());
+            TheAction.HeatCoolMode = (int)Enum.Parse(typeof(ZWaveDevice.ThermostatMode), comboBoxHeatCoolMode.SelectedValue.ToString());
+            TheAction.FanMode = (int)Enum.Parse(typeof(ZWaveDevice.ThermostatFanMode), comboBoxFanMode.SelectedValue.ToString());
+            TheAction.EngeryMode = (int)Enum.Parse(typeof(ZWaveDevice.EnergyMode), comboBoxEnergyMode.SelectedValue.ToString());
 
             //Make sure atleast one thermo action was chosen
             if (TheAction.HeatCoolMode == -1 && TheAction.FanMode == -1 && TheAction.EngeryMode == -1 && checkBoxeditHP.Checked == false && checkBoxeditCP.Checked == false)
@@ -125,16 +134,21 @@ namespace zVirtualScenesApplication
         {
             if (UpdateThermostatAction(TheAction))
             {
-                if (_edit) //replace action
+                if (!CreateAction) //replace action
                 {
                     _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
                     _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
                     _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
                 }
-                else //add new action                
+                else
                 {
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Add(TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Count() - 1);
+                    if (_SelectedSceneActionIndex == -1)  //First Action in Scene
+                        _SelectedSceneActionIndex = 0;
+                    else
+                        _SelectedSceneActionIndex++;  //Add item below cuurent selection
+
+                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
+                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
                 }
 
                 this.Close();

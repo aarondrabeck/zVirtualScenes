@@ -9,7 +9,7 @@ using System.ComponentModel;
 namespace zVirtualScenesApplication 
 {
 
-    public class Device : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
+    public class ZWaveDevice : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
     {
         public formzVirtualScenes zVirtualScenesMain;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -18,15 +18,22 @@ namespace zVirtualScenesApplication
         //Properties that require PropertyChangedEvent to fire to sync GUI
         public uint HomeID { get; set; }
         public byte NodeID { get; set; }
-        public string Type { get; set; }//Properties that require PropertyChangedEvent to fire to sync GUI
+        public ZWaveDeviceTypes Type { get; set; }//Properties that require PropertyChangedEvent to fire to sync GUI
         private string _Name;
         public string Name
         {
             get { return _Name; }
             set { GlobalFunctions.Set(this, "Name", ref _Name, value, PropertyChanged); }
         }
-        public bool SendJabberNotifications { get; set; }
+
+        private string _GroupName;
+        public string GroupName
+        {
+            get { return _GroupName; }
+            set { GlobalFunctions.Set(this, "GroupName", ref _GroupName, value, PropertyChanged); }
+        }
         
+        public bool SendJabberNotifications { get; set; }        
 
         public byte Level { get; set; }
         public byte prevLevel { get; set; }
@@ -51,20 +58,24 @@ namespace zVirtualScenesApplication
 
         public int MinAlertTemp { get; set; }
         public int MaxAlertTemp { get; set; }
+
         public int NotificationDetailLevel { get; set; }
-        
+        public bool ShowInLightSwitchGUI { get; set; }
+        public bool MomentaryOnMode { get; set; }
+        public bool SendGrowlNotifications { get; set; }
+        public int MomentaryTimespan { get; set; }
         
         #endregion
 
         //Constructor
-        public Device(formzVirtualScenes zvsm)
+        public ZWaveDevice(formzVirtualScenes zvsm)
         {
             zVirtualScenesMain = zvsm;
             this.HomeID = 0;
             this.NodeID = 0;
             _Name = "Default Device";
             this.Level = 0;
-            this.Type = "Unknown"; 
+            this.Type = ZWaveDeviceTypes.Unknown; 
             this.FanMode = -1;
             this.HeatCoolMode = -1;
             this.CoolPoint = -1;
@@ -72,6 +83,20 @@ namespace zVirtualScenesApplication
             this.MinAlertTemp = 40;
             this.MaxAlertTemp = 90;
             this.NotificationDetailLevel = 1;
+            _GroupName = "<None>";
+            this.ShowInLightSwitchGUI = true;
+            this.MomentaryOnMode = false;
+            this.SendGrowlNotifications = true;
+            this.MomentaryTimespan = 0; 
+        }
+
+        public enum ZWaveDeviceTypes
+        {
+            Unknown = -1,
+            BinarySwitch = 1, 
+            MultiLevelSwitch = 2,
+            Thermostat = 3,
+            Sensor = 4
         }
 
         public enum ThermostatFanMode
@@ -112,7 +137,7 @@ namespace zVirtualScenesApplication
 
             public override string ToString()
             {
-                return "(" + NodeID + ") " + _Name + " - " + GetFomattedType();
+                return "(" + NodeID + ") " + _Name + " - " + GetStatus();
             }
 
             //Light Switch Socket Format 
@@ -130,35 +155,80 @@ namespace zVirtualScenesApplication
             //workerSocket.Send(byData);
             public string ToLightSwitchSocketString()
             {                
-                if (Type != null && Type.Contains("BinaryPowerSwitch"))                    
+                if (Type == ZWaveDeviceTypes.BinarySwitch)                    
                     return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + "BinarySwitch";
-                else if (Type != null && Type.Contains("MultilevelPowerSwitch"))
-                    return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
-                else if (Type != null && (Type.Contains("GeneralThermostatV2") || Type.Contains("GeneralThermostat")))
+                else if (Type == ZWaveDeviceTypes.Thermostat)
                     return "DEVICE~" + _Name + "~" + this.NodeID + "~" + Temp + "~" + this.Type;
                 else
-                    return "Unknown Device";
+                    return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
             }
 
-            public string GetFomattedType()
+            public int GetLevelMeter()
             {
-                if (Type != null && Type.Contains("BinaryPowerSwitch"))
+                if (Type == ZWaveDeviceTypes.Thermostat)
+                    return this.Temp;
+                else
+                    return this.Level;
+            }
+
+            public string GetLevelText()
+            {
+                if (Type == ZWaveDeviceTypes.Thermostat)
+                    return this.Temp + " F";
+                else
+                    return this.Level + "%";
+            }
+
+            public string GetStatus()
+            {
+                if (Type == ZWaveDeviceTypes.BinarySwitch)
                 {
                     return (Level > 0 ? "State: ON": "State: OFF");
-                }                
-                if (Type != null && Type.Contains("MultilevelPowerSwitch"))
+                }
+                else if (Type == ZWaveDeviceTypes.Thermostat)
+                    return  "Mode:" + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), this.HeatCoolMode) +
+                            " | Fan:" + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), this.FanMode) +
+                            " | SetPoint:" + Enum.GetName(typeof(ZWaveDevice.EnergyMode), this.Level) + "(" + this.CoolPoint.ToString() + "/" + this.HeatPoint.ToString() + ")" +
+                            " | Currently:" + Temp + "° " + this.CurrentState;
+                else
                 {
                     if (Level > 99)
                         return "Level: Unknown ON State";
                     else
                         return "Level: " + this.Level + "%";
                 }
-                else if (Type != null && (Type.Contains("GeneralThermostat")))
-                    return  "Mode:" + Enum.GetName(typeof(Device.ThermostatMode), this.HeatCoolMode) +
-                            " | Fan:" + Enum.GetName(typeof(Device.ThermostatFanMode), this.FanMode) +
-                            " | SetPoint:" + Enum.GetName(typeof(Device.EnergyMode), this.Level) + "(" + this.CoolPoint.ToString() + "/" + this.HeatPoint.ToString() + ")" +
-                            " | Currently:" + Temp + "° " + this.CurrentState;
-                return "Unknown Device";
+            }
+
+            public string GetMode()
+            {
+                if (Type == ZWaveDeviceTypes.Thermostat)
+                    return Enum.GetName(typeof(ZWaveDevice.ThermostatMode), this.HeatCoolMode);
+                else
+                    return null;
+            }
+
+            public string GetFanMode()
+            {
+                if (Type == ZWaveDeviceTypes.Thermostat)
+                    return Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), this.FanMode);
+                else
+                    return null;
+            }
+
+            public string GetSetPoint()
+            {
+                if (Type == ZWaveDeviceTypes.Thermostat)
+                    return Enum.GetName(typeof(ZWaveDevice.EnergyMode), this.Level) + "(" + this.CoolPoint.ToString() + "/" + this.HeatPoint.ToString() + ")";
+                else
+                    return null;
+            }
+
+            public string GetCurrentState()
+            {
+                if (Type == ZWaveDeviceTypes.Thermostat)
+                    return this.CurrentState;
+                else
+                    return null;
             }
 
             public string GlbUniqueID()
@@ -167,21 +237,22 @@ namespace zVirtualScenesApplication
             }
 
             //Type casting device to Action
-            public static implicit operator Action(Device instance)
+            public static implicit operator Action(ZWaveDevice instance)
             {                
                 Action action = new Action();
                 //ONLY INCLUDE NOT ACTION PROPERTIES HERE
-                action.Type = instance.Type;
+                action.Type = Action.ActionTypes.ZWaveDevice;
+                action.ZWaveType = instance.Type;
                 action.Name = instance.Name;
                 action.NodeID = instance.NodeID;
                 action.HomeID = instance.HomeID;
-                action.Temp = instance.Temp;             
+                action.Temp = instance.Temp;
+                action.MomentaryOnMode = instance.MomentaryOnMode;
+                action.MomentaryTimespan = instance.MomentaryTimespan;
                 return action;
+            }
             }
 
         #endregion
-
-
-
     }
-}
+

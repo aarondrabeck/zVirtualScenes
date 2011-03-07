@@ -145,9 +145,9 @@ namespace zVirtualScenesApplication
 
                         if (node > 0)
                         {
-                            foreach (Device device in zVirtualScenesMain.MasterDevices)
+                            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
                             {
-                                if (device.NodeID == node  && device.Type == "MultilevelPowerSwitch")
+                                if (device.NodeID == node && device.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch )
                                 {
                                     Action action = (Action)device;
 
@@ -212,9 +212,9 @@ namespace zVirtualScenesApplication
 
                         if (node > 0)
                         {
-                            foreach (Device device in zVirtualScenesMain.MasterDevices)
+                            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
                             {
-                                if (device.NodeID == node && device.Type.Contains("GeneralThermostat"))
+                                if (device.NodeID == node && device.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
                                 {
                                     Action action = (Action)device;
                                     action.HeatCoolMode = HeatCoolMode;
@@ -244,7 +244,7 @@ namespace zVirtualScenesApplication
                         zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Sent a device listing.");                        
 
                         outputStream.WriteLine("LIST START");
-                        foreach (Device device in zVirtualScenesMain.MasterDevices)                        
+                        foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)                        
                             outputStream.WriteLine(device.ToString());
                         
                         outputStream.WriteLine("LIST END");
@@ -288,9 +288,9 @@ namespace zVirtualScenesApplication
 
                         if (node > 0)
                         {
-                            foreach (Device device in zVirtualScenesMain.MasterDevices)
+                            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
                             {
-                                if (device.NodeID == node && device.Type == "BinaryPowerSwitch")
+                                if (device.NodeID == node && device.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
                                 {
                                     Action action = (Action)device;
 

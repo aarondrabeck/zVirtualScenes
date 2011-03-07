@@ -30,6 +30,7 @@ namespace zVirtualScenesApplication
         public int ID { get; set; }
         public BindingList<Action> Actions { get; set; }
         public int GlobalHotKey { get; set; }
+        public bool ShowInLightSwitchGUI { get; set; }
 
         [XmlIgnore]  //Dont serialize isRunning.
         public bool isRunning { get; set; } 
@@ -41,6 +42,7 @@ namespace zVirtualScenesApplication
             this.Actions = new BindingList<Action>();
             this.GlobalHotKey = 0;
             this.isRunning = false;
+            this.ShowInLightSwitchGUI = true; 
         }
 
         /// <summary>

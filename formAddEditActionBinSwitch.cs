@@ -12,23 +12,32 @@ namespace zVirtualScenesApplication
     public partial class formAddEditActionBinSwitch : Form
     {
         private formzVirtualScenes _zVirtualScenesMain;
-        private int _SelectedDeviceIndex;
+        private ZWaveDevice _SelectedDevice;
         private int _SelectedSceneIndex;
         private int _SelectedSceneActionIndex;
         Action TheAction = new Action();
-        private bool _edit;
+        private bool CreateAction = false; 
 
-        public formAddEditActionBinSwitch(formzVirtualScenes zVirtualScenesMain, bool edit, int SelectedDeviceIndex, int SelectedSceneIndex, int SelectedSceneActionIndex)
+        /// <summary>
+        /// Creates OR Edits Action
+        /// </summary>
+        /// <param name="zVirtualScenesMain">Main Form</param>
+        /// <param name="SelectedSceneIndex">Index of Selected Scene</param>
+        /// <param name="SelectedSceneActionIndex">Selected Scene Action Index</param>
+        /// <param name="selectedDevice">OPTIONAL: ONLY USED IN CREATE NEW ACTION</param>
+        public formAddEditActionBinSwitch(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, ZWaveDevice selectedDevice = null )
         {
             InitializeComponent();
 
             _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedDeviceIndex = SelectedDeviceIndex;
+            _SelectedDevice = selectedDevice;
             _SelectedSceneIndex = SelectedSceneIndex;
             _SelectedSceneActionIndex = SelectedSceneActionIndex;
-            _edit = edit;
 
-            if (edit)
+            if (selectedDevice != null)
+                CreateAction = true;
+
+            if (!CreateAction)
             {
                 groupBoxAction.Text = "Edit Action";
                 btn_Save.Text = "Save Action"; 
@@ -39,7 +48,7 @@ namespace zVirtualScenesApplication
                 groupBoxAction.Text = "Create New Action";
                 btn_Save.Text = "Add Action to '" + _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Name + "'";
                 //Convert Device to Action id this is a new action and not an edit
-                TheAction = (Action)(_zVirtualScenesMain.MasterDevices[_SelectedDeviceIndex]);
+                TheAction = (Action)_SelectedDevice;
             }
 
             #region Load Common Feilds into form fields
@@ -49,6 +58,7 @@ namespace zVirtualScenesApplication
 
             #region Binary Switch Specific Fields
             comboBoxBinaryONOFF.SelectedIndex = (TheAction.Level > 0 ? 1 : 0);
+            labelMomentaryMode.Text = "Momentary Mode: " + (TheAction.MomentaryOnMode ? "ON" : "OFF");
             #endregion
                       
         }
@@ -74,16 +84,21 @@ namespace zVirtualScenesApplication
         {
             if (UpdateBinarySwitchAction())
             {
-                if (_edit) //replace action
+                if (!CreateAction) //replace action
                 {
                     _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
                     _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
                     _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
                 }
-                else //add new action                
+                else
                 {
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Add(TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Count() - 1);
+                    if (_SelectedSceneActionIndex == -1)  //First Action in Scene
+                        _SelectedSceneActionIndex = 0;
+                    else
+                        _SelectedSceneActionIndex++;  //Add item below cuurent selection
+
+                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
+                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
                 }
 
                 this.Close();
