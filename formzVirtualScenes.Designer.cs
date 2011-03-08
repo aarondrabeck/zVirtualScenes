@@ -69,6 +69,13 @@ namespace zVirtualScenesApplication
             this.listBoxSceneActions = new System.Windows.Forms.ListBox();
             this.btn_runScene = new System.Windows.Forms.Button();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.Label_SunriseSet = new System.Windows.Forms.Label();
+            this.checkBoxEnableNOAA = new System.Windows.Forms.CheckBox();
+            this.textBox_Latitude = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.textBox_Longitude = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.textBoxRepolling = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -114,12 +121,15 @@ namespace zVirtualScenesApplication
             this.toolStripSceduling = new System.Windows.Forms.ToolStripDropDownButton();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.timer_TaskRunner = new System.Windows.Forms.Timer(this.components);
+            this.timerNOAA = new System.Windows.Forms.Timer(this.components);
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewDevices)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.tabPage3.SuspendLayout();
+            this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox7.SuspendLayout();
             this.groupBox5.SuspendLayout();
@@ -189,6 +199,7 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.FullRowSelect = true;
             this.dataListViewDevices.HasCollapsibleGroups = false;
             this.dataListViewDevices.HeaderMaximumHeight = 15;
+            this.dataListViewDevices.HideSelection = false;
             this.dataListViewDevices.Location = new System.Drawing.Point(6, 15);
             this.dataListViewDevices.Name = "dataListViewDevices";
             this.dataListViewDevices.OwnerDraw = true;
@@ -488,6 +499,7 @@ namespace zVirtualScenesApplication
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.groupBox4);
             this.tabPage3.Controls.Add(this.groupBox3);
             this.tabPage3.Controls.Add(this.buttonSaveSettings);
             this.tabPage3.Controls.Add(this.groupBox7);
@@ -499,6 +511,74 @@ namespace zVirtualScenesApplication
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "Settings";
             this.tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // groupBox4
+            // 
+            this.groupBox4.Controls.Add(this.Label_SunriseSet);
+            this.groupBox4.Controls.Add(this.checkBoxEnableNOAA);
+            this.groupBox4.Controls.Add(this.textBox_Latitude);
+            this.groupBox4.Controls.Add(this.label4);
+            this.groupBox4.Controls.Add(this.textBox_Longitude);
+            this.groupBox4.Controls.Add(this.label2);
+            this.groupBox4.Location = new System.Drawing.Point(8, 63);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(760, 47);
+            this.groupBox4.TabIndex = 15;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Automatic Sunrise and Sunsent Scene Activation";
+            // 
+            // Label_SunriseSet
+            // 
+            this.Label_SunriseSet.AutoSize = true;
+            this.Label_SunriseSet.Location = new System.Drawing.Point(499, 28);
+            this.Label_SunriseSet.Name = "Label_SunriseSet";
+            this.Label_SunriseSet.Size = new System.Drawing.Size(10, 13);
+            this.Label_SunriseSet.TabIndex = 17;
+            this.Label_SunriseSet.Text = "-";
+            // 
+            // checkBoxEnableNOAA
+            // 
+            this.checkBoxEnableNOAA.AutoSize = true;
+            this.checkBoxEnableNOAA.Location = new System.Drawing.Point(10, 20);
+            this.checkBoxEnableNOAA.Name = "checkBoxEnableNOAA";
+            this.checkBoxEnableNOAA.Size = new System.Drawing.Size(135, 17);
+            this.checkBoxEnableNOAA.TabIndex = 7;
+            this.checkBoxEnableNOAA.Text = "Enable Sunrise/Sunset";
+            this.checkBoxEnableNOAA.UseVisualStyleBackColor = true;
+            // 
+            // textBox_Latitude
+            // 
+            this.textBox_Latitude.Location = new System.Drawing.Point(204, 18);
+            this.textBox_Latitude.Name = "textBox_Latitude";
+            this.textBox_Latitude.Size = new System.Drawing.Size(107, 20);
+            this.textBox_Latitude.TabIndex = 16;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(151, 21);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(48, 26);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Latitude:\r\n\r\n";
+            this.toolTip1.SetToolTip(this.label4, "degrees,mins,seconds,direction{N or S]\r\n\r\nDEFAULT: 37,40,38,N");
+            // 
+            // textBox_Longitude
+            // 
+            this.textBox_Longitude.Location = new System.Drawing.Point(385, 18);
+            this.textBox_Longitude.Name = "textBox_Longitude";
+            this.textBox_Longitude.Size = new System.Drawing.Size(107, 20);
+            this.textBox_Longitude.TabIndex = 14;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(322, 21);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(57, 13);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Longitude:";
+            this.toolTip1.SetToolTip(this.label2, "degrees,mins,seconds,direction{E or W]\r\n\r\nDEFAULT: 113,3,42,W\r\n\r\n\r\n");
             // 
             // groupBox3
             // 
@@ -549,7 +629,7 @@ namespace zVirtualScenesApplication
             this.groupBox7.Controls.Add(this.label3);
             this.groupBox7.Controls.Add(this.checkBoxJabberVerbose);
             this.groupBox7.Controls.Add(this.checkBoxJabberEnabled);
-            this.groupBox7.Location = new System.Drawing.Point(5, 284);
+            this.groupBox7.Location = new System.Drawing.Point(5, 272);
             this.groupBox7.Name = "groupBox7";
             this.groupBox7.Size = new System.Drawing.Size(763, 127);
             this.groupBox7.TabIndex = 6;
@@ -650,7 +730,7 @@ namespace zVirtualScenesApplication
             this.groupBox5.Controls.Add(this.label8);
             this.groupBox5.Controls.Add(this.checkBoxLSDebugVerbose);
             this.groupBox5.Controls.Add(this.checkBoxLSEnabled);
-            this.groupBox5.Location = new System.Drawing.Point(5, 206);
+            this.groupBox5.Location = new System.Drawing.Point(5, 194);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(763, 72);
             this.groupBox5.TabIndex = 5;
@@ -732,9 +812,9 @@ namespace zVirtualScenesApplication
             this.groupBox6.Controls.Add(this.checkBoxHTTPEnable);
             this.groupBox6.Controls.Add(this.txtb_httpPort);
             this.groupBox6.Controls.Add(this.label9);
-            this.groupBox6.Location = new System.Drawing.Point(8, 83);
+            this.groupBox6.Location = new System.Drawing.Point(8, 116);
             this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(760, 117);
+            this.groupBox6.Size = new System.Drawing.Size(760, 72);
             this.groupBox6.TabIndex = 4;
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "ZVirtualScene HTTP Listen ";
@@ -743,7 +823,7 @@ namespace zVirtualScenesApplication
             // 
             this.label10.AutoSize = true;
             this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(6, 68);
+            this.label10.Location = new System.Drawing.Point(7, 50);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(110, 13);
             this.label10.TabIndex = 6;
@@ -751,7 +831,7 @@ namespace zVirtualScenesApplication
             // 
             // txtb_exampleURL
             // 
-            this.txtb_exampleURL.Location = new System.Drawing.Point(9, 84);
+            this.txtb_exampleURL.Location = new System.Drawing.Point(134, 43);
             this.txtb_exampleURL.Name = "txtb_exampleURL";
             this.txtb_exampleURL.ReadOnly = true;
             this.txtb_exampleURL.Size = new System.Drawing.Size(505, 20);
@@ -760,7 +840,7 @@ namespace zVirtualScenesApplication
             // checkBoxHTTPEnable
             // 
             this.checkBoxHTTPEnable.AutoSize = true;
-            this.checkBoxHTTPEnable.Location = new System.Drawing.Point(392, 15);
+            this.checkBoxHTTPEnable.Location = new System.Drawing.Point(9, 19);
             this.checkBoxHTTPEnable.Name = "checkBoxHTTPEnable";
             this.checkBoxHTTPEnable.Size = new System.Drawing.Size(122, 17);
             this.checkBoxHTTPEnable.TabIndex = 5;
@@ -769,7 +849,7 @@ namespace zVirtualScenesApplication
             // 
             // txtb_httpPort
             // 
-            this.txtb_httpPort.Location = new System.Drawing.Point(392, 38);
+            this.txtb_httpPort.Location = new System.Drawing.Point(291, 17);
             this.txtb_httpPort.Name = "txtb_httpPort";
             this.txtb_httpPort.Size = new System.Drawing.Size(111, 20);
             this.txtb_httpPort.TabIndex = 3;
@@ -777,7 +857,7 @@ namespace zVirtualScenesApplication
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(312, 44);
+            this.label9.Location = new System.Drawing.Point(210, 20);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(75, 13);
             this.label9.TabIndex = 1;
@@ -902,8 +982,21 @@ namespace zVirtualScenesApplication
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
-            this.viewToolStripMenuItem.Size = new System.Drawing.Size(171, 22);
-            this.viewToolStripMenuItem.Text = "Scheduled Scenes ";
+            this.viewToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.viewToolStripMenuItem.Text = "Scheduled Tasks";
+            this.viewToolStripMenuItem.Click += new System.EventHandler(this.viewToolStripMenuItem_Click);
+            // 
+            // timer_TaskRunner
+            // 
+            this.timer_TaskRunner.Enabled = true;
+            this.timer_TaskRunner.Interval = 1000;
+            this.timer_TaskRunner.Tick += new System.EventHandler(this.timer_TaskRunner_Tick);
+            // 
+            // timerNOAA
+            // 
+            this.timerNOAA.Enabled = true;
+            this.timerNOAA.Interval = 60000;
+            this.timerNOAA.Tick += new System.EventHandler(this.timerNOAA_Tick);
             // 
             // formzVirtualScenes
             // 
@@ -927,6 +1020,8 @@ namespace zVirtualScenesApplication
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.tabPage3.ResumeLayout(false);
+            this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox7.ResumeLayout(false);
@@ -1026,6 +1121,15 @@ namespace zVirtualScenesApplication
         private TextBox textBoxRepolling;
         private Label label1;
         private ToolStripMenuItem manuallyRepollDevicesToolStripMenuItem;
+        private Timer timer_TaskRunner;
+        private GroupBox groupBox4;
+        private CheckBox checkBoxEnableNOAA;
+        private TextBox textBox_Latitude;
+        private Label label4;
+        private TextBox textBox_Longitude;
+        private Label label2;
+        private Timer timerNOAA;
+        private Label Label_SunriseSet;
     }
 }
 

@@ -34,11 +34,13 @@
             this.label12 = new System.Windows.Forms.Label();
             this.btn_Save = new System.Windows.Forms.Button();
             this.groupBoxDevice = new System.Windows.Forms.GroupBox();
+            this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.comboBoxHotKeys = new System.Windows.Forms.ComboBox();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
-            this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
+            this.checkBoxSunrise = new System.Windows.Forms.CheckBox();
+            this.checkBoxSunset = new System.Windows.Forms.CheckBox();
             this.groupBoxDevice.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -72,6 +74,8 @@
             // 
             // groupBoxDevice
             // 
+            this.groupBoxDevice.Controls.Add(this.checkBoxSunset);
+            this.groupBoxDevice.Controls.Add(this.checkBoxSunrise);
             this.groupBoxDevice.Controls.Add(this.checkBoxDisplayinLightSwitch);
             this.groupBoxDevice.Controls.Add(this.pictureBox2);
             this.groupBoxDevice.Controls.Add(this.groupBox1);
@@ -84,6 +88,16 @@
             this.groupBoxDevice.TabIndex = 35;
             this.groupBoxDevice.TabStop = false;
             this.groupBoxDevice.Text = "Scene";
+            // 
+            // checkBoxDisplayinLightSwitch
+            // 
+            this.checkBoxDisplayinLightSwitch.AutoSize = true;
+            this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(8, 113);
+            this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
+            this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
+            this.checkBoxDisplayinLightSwitch.TabIndex = 40;
+            this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
+            this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
             // 
             // pictureBox2
             // 
@@ -118,15 +132,25 @@
             this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
             // 
-            // checkBoxDisplayinLightSwitch
+            // checkBoxSunrise
             // 
-            this.checkBoxDisplayinLightSwitch.AutoSize = true;
-            this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(8, 113);
-            this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
-            this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
-            this.checkBoxDisplayinLightSwitch.TabIndex = 40;
-            this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
-            this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
+            this.checkBoxSunrise.AutoSize = true;
+            this.checkBoxSunrise.Location = new System.Drawing.Point(8, 136);
+            this.checkBoxSunrise.Name = "checkBoxSunrise";
+            this.checkBoxSunrise.Size = new System.Drawing.Size(115, 17);
+            this.checkBoxSunrise.TabIndex = 41;
+            this.checkBoxSunrise.Text = "Activate at Sunrise";
+            this.checkBoxSunrise.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSunset
+            // 
+            this.checkBoxSunset.AutoSize = true;
+            this.checkBoxSunset.Location = new System.Drawing.Point(8, 159);
+            this.checkBoxSunset.Name = "checkBoxSunset";
+            this.checkBoxSunset.Size = new System.Drawing.Size(113, 17);
+            this.checkBoxSunset.TabIndex = 42;
+            this.checkBoxSunset.Text = "Activate at Sunset";
+            this.checkBoxSunset.UseVisualStyleBackColor = true;
             // 
             // formPropertiesScene
             // 
@@ -161,5 +185,7 @@
         private System.Windows.Forms.ComboBox comboBoxHotKeys;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.CheckBox checkBoxDisplayinLightSwitch;
+        private System.Windows.Forms.CheckBox checkBoxSunrise;
+        private System.Windows.Forms.CheckBox checkBoxSunset;
     }
 }

@@ -38,6 +38,10 @@ namespace zVirtualScenesApplication
             //Global Hotkey
             _SceneToEdit.GlobalHotKey = (int)Enum.Parse(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys), comboBoxHotKeys.SelectedValue.ToString());
 
+            //NOAA
+            _SceneToEdit.ActivateAtSunrise = checkBoxSunrise.Checked;
+            _SceneToEdit.ActivateAtSunset = checkBoxSunset.Checked;
+
             this.Close();
         }
 
@@ -59,6 +63,10 @@ namespace zVirtualScenesApplication
             comboBoxHotKeys.DataSource = Enum.GetNames(typeof(zVirtualScenesApplication.formzVirtualScenes.CustomHotKeys));
             comboBoxHotKeys.SelectedIndex = _SceneToEdit.GlobalHotKey;
             checkBoxDisplayinLightSwitch.Checked = _SceneToEdit.ShowInLightSwitchGUI;
+
+            //NOAA
+            checkBoxSunrise.Checked =  _SceneToEdit.ActivateAtSunrise;
+            checkBoxSunset.Checked = _SceneToEdit.ActivateAtSunset;
         }
     }       
 }

@@ -18,8 +18,7 @@ using jabber.client;
 using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
 using BrightIdeasSoftware;
-
-
+using System.Globalization;
 
 namespace zVirtualScenesApplication
 {
@@ -50,6 +49,7 @@ namespace zVirtualScenesApplication
         private BindingList<String> MasterLog = new BindingList<string>();
         public BindingList<ZWaveDevice> MasterDevices = new BindingList<ZWaveDevice>();
         public BindingList<Scene> MasterScenes = new BindingList<Scene>();
+        public BindingList<Task> MasterTimerEvents = new BindingList<Task>();
         public BindingList<ZWaveDeviceUserSettings> SavedZWaveDeviceUserSettings = new BindingList<ZWaveDeviceUserSettings>();
         public Settings zVScenesSettings = new Settings();        
 
@@ -557,44 +557,28 @@ namespace zVirtualScenesApplication
             //Http Listen
             txtb_httpPort.Text = Convert.ToString(zVScenesSettings.ZHTTPPort);            
             txtb_exampleURL.Text = "http://localhost:" + zVScenesSettings.ZHTTPPort + "/zVirtualScene?cmd=RunScene&Scene=1";
-
-            if (zVScenesSettings.zHTTPListenEnabled)
-                checkBoxHTTPEnable.Checked = true;
-            else
-                checkBoxHTTPEnable.Checked = false;
-
-
+            checkBoxHTTPEnable.Checked = zVScenesSettings.zHTTPListenEnabled;
+            
             //LightSwitch
             textBoxLSLimit.Text = Convert.ToString(zVScenesSettings.LightSwitchMaxConnections);
             textBoxLSPassword.Text = Convert.ToString(zVScenesSettings.LightSwitchPassword);
-            textBoxLSport.Text = Convert.ToString(zVScenesSettings.LightSwitchPort); 
-
-            if(zVScenesSettings.LightSwitchEnabled)
-                checkBoxLSEnabled.Checked = true;
-            else
-                checkBoxLSEnabled.Checked = false;
-
-            if (zVScenesSettings.LightSwitchVerbose)
-                 checkBoxLSDebugVerbose.Checked = true;
-            else
-                 checkBoxLSDebugVerbose.Checked = false;
+            textBoxLSport.Text = Convert.ToString(zVScenesSettings.LightSwitchPort);
+            checkBoxLSEnabled.Checked = zVScenesSettings.LightSwitchEnabled;
+            checkBoxLSDebugVerbose.Checked = zVScenesSettings.LightSwitchVerbose;
 
             //JAbber
             textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
             textBoxJabberUser.Text= zVScenesSettings.JabberUser;
             textBoxJabberServer.Text = zVScenesSettings.JabberServer;
             textBoxJabberUserTo.Text = zVScenesSettings.JabberSendToUser;
-            if (zVScenesSettings.JabberEnanbled == true )
-                checkBoxJabberEnabled.Checked = true;
-            else
-                checkBoxJabberEnabled.Checked = false;
+            checkBoxJabberEnabled.Checked = zVScenesSettings.JabberEnanbled;
+            checkBoxJabberVerbose.Checked = zVScenesSettings.JabberVerbose;
 
-            if (zVScenesSettings.JabberVerbose == true)
-                checkBoxJabberVerbose.Checked = true;
-            else
-                checkBoxJabberVerbose.Checked = false;
+            //NOAA
+            checkBoxEnableNOAA.Checked = zVScenesSettings.EnableNOAA;
+            textBox_Latitude.Text = zVScenesSettings.Latitude;
+            textBox_Longitude.Text = zVScenesSettings.Longitude;
         }
-
        
         #endregion
 
@@ -618,6 +602,11 @@ namespace zVirtualScenesApplication
                 XmlSerializer SCustomDeviceProperties = new XmlSerializer(SavedZWaveDeviceUserSettings.GetType());
                 SCustomDeviceProperties.Serialize(CustomDevicePropertiesStream, SavedZWaveDeviceUserSettings);
                 CustomDevicePropertiesStream.Close();
+
+                Stream TimerEventsStream = File.Open(APP_PATH + "zVirtualScenes-ScheduledTasks.xml", FileMode.Create);
+                XmlSerializer STimerEvents = new XmlSerializer(MasterTimerEvents.GetType());
+                STimerEvents.Serialize(TimerEventsStream, MasterTimerEvents);
+                TimerEventsStream.Close();
 
                 LogThis(1, "Saved Settings XML.");
                 
@@ -703,12 +692,37 @@ namespace zVirtualScenesApplication
                 }
             }
 
+            if (File.Exists(APP_PATH + "zVirtualScenes-ScheduledTasks.xml"))
+            {
+                try
+                {
+                    XmlSerializer TimerEventSerializer = new XmlSerializer(typeof(BindingList<Task>));
+                    FileStream TimerEventStream = new FileStream(APP_PATH + "zVirtualScenes-ScheduledTasks.xml", FileMode.Open);
+                    MasterTimerEvents = (BindingList<Task>)TimerEventSerializer.Deserialize(TimerEventStream);
+                    TimerEventStream.Close();
+                }
+                catch (Exception e)
+                {
+                    LogThis(2, "Error loading Settings XML: (" + e + ")");
+                }
+            }
             LogThis(1, "Loaded Program Settings.");
         }
 
         #endregion
 
     #region GUI Events
+
+        private void manuallyRepollDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            refresher.RePollDevices();
+        }
+
+        private void viewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formScheduledTasks formScheduledTasks = new formScheduledTasks(this);
+            formScheduledTasks.ShowDialog();
+        }
 
         public void SelectListBoxActionItem(int ID)
         {
@@ -751,22 +765,13 @@ namespace zVirtualScenesApplication
                 MessageBox.Show("Invalid HTTP Port.", ProgramName);
             }
 
-            if (checkBoxHTTPEnable.Checked)
-                zVScenesSettings.zHTTPListenEnabled = true;
-            else
-                zVScenesSettings.zHTTPListenEnabled = false;
+            zVScenesSettings.zHTTPListenEnabled = checkBoxHTTPEnable.Checked;
 
             //LightSwitch
             zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
-            if (checkBoxLSEnabled.Checked)
-                zVScenesSettings.LightSwitchEnabled = true;
-            else
-                zVScenesSettings.LightSwitchEnabled = false;
-
-            if (checkBoxLSDebugVerbose.Checked)
-                zVScenesSettings.LightSwitchVerbose = true;
-            else
-                zVScenesSettings.LightSwitchVerbose = false;
+            zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
+            zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
+                
 
             try
             {
@@ -793,15 +798,31 @@ namespace zVirtualScenesApplication
             zVScenesSettings.JabberUser = textBoxJabberUser.Text;
             zVScenesSettings.JabberServer = textBoxJabberServer.Text;
             zVScenesSettings.JabberSendToUser = textBoxJabberUserTo.Text;
-            if (checkBoxJabberEnabled.Checked)
-                zVScenesSettings.JabberEnanbled = true;
-            else
-                zVScenesSettings.JabberEnanbled = false;
+            zVScenesSettings.JabberEnanbled = checkBoxJabberEnabled.Checked;
+            zVScenesSettings.JabberVerbose = checkBoxJabberVerbose.Checked;
 
-            if (checkBoxJabberVerbose.Checked)
-                zVScenesSettings.JabberVerbose = true;
-            else
-                zVScenesSettings.JabberVerbose = false;
+            //NOAA
+            zVScenesSettings.EnableNOAA = checkBoxEnableNOAA.Checked;
+            if (checkBoxEnableNOAA.Checked)
+            {
+                if (ValidateLong() != null)
+                    zVScenesSettings.Longitude = textBox_Longitude.Text;
+                else
+                {
+                    MessageBox.Show("Invalid Longitude.", ProgramName);
+                    saveOK = false;
+                }
+
+                if (ValidateLat() != null)
+                    zVScenesSettings.Latitude = textBox_Latitude.Text;
+                else
+                {
+                    MessageBox.Show("Invalid Latitude.", ProgramName);
+                    saveOK = false;
+                }
+               
+                DisplaySunset();
+            }
 
             if (saveOK)
                 MessageBox.Show("Settings Saved. Please restart the program to enable or disable HTTP or LightSwitch servies.", ProgramName);
@@ -1201,10 +1222,245 @@ namespace zVirtualScenesApplication
        
         #endregion
 
-        private void manuallyRepollDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+    #region Task Scheduler
+
+        private void timer_TaskRunner_Tick(object sender, EventArgs e)
         {
-            refresher.RePollDevices();
+            foreach (Task task in MasterTimerEvents)
+            {
+                if (task.Enabled)
+                {
+                    switch (task.Frequency)
+                    {
+                        case Task.frequencys.Daily:
+                            double DaysBetween = (DateTime.Now.Date - task.StartTime.Date).TotalDays;
+                            if (DaysBetween % task.RecurDays == 0)
+                            {
+                                Double SecondsBetweenTime = (task.StartTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                                if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                    RunScheduledTaskScene(task.SceneID, task.Name);
+                            }
+                            break;
+                        case Task.frequencys.Weekly:
+                            int WeeksBetween = (Int32)(DateTime.Now.Date - task.StartTime.Date).TotalDays / 7;
+                            if (WeeksBetween % task.RecurWeeks == 0)  //IF RUN THIS WEEK
+                            {
+                                if (ShouldRunToday(task, DateTime.Now))  //IF RUN THIS DAY 
+                                {
+                                    Double SecondsBetweenTime = (task.StartTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                                    if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                        RunScheduledTaskScene(task.SceneID, task.Name);
+                                }
+                            }
+                            break;
+                        case Task.frequencys.OneTime:
+                            Double SecondsBetween = (DateTime.Now - task.StartTime).TotalSeconds;
+                            if (SecondsBetween < 1 && SecondsBetween > 0)
+                                RunScheduledTaskScene(task.SceneID, task.Name);
+                            break;
+                    }
+                }
+            }
         }
+
+        private bool ShouldRunToday(Task task, DateTime Today)
+        {
+            switch (Today.DayOfWeek)
+            {
+                case DayOfWeek.Monday:
+                    if (task.RecurMonday)
+                        return true;
+                    break;
+                        
+                case DayOfWeek.Tuesday:
+                    if (task.RecurTuesday)
+                        return true;
+                    break;
+
+                case DayOfWeek.Wednesday:
+                    if (task.RecurWednesday)
+                        return true;
+                    break;
+
+                case DayOfWeek.Thursday:
+                    if (task.RecurThursday)
+                        return true;
+                    break;
+
+                case DayOfWeek.Friday:
+                    if (task.RecurFriday)
+                        return true;
+                    break;
+
+                case DayOfWeek.Saturday:
+                    if (task.RecurSaturday)
+                        return true;
+                    break;
+
+                case DayOfWeek.Sunday:
+                    if (task.RecurTuesday)
+                        return true;
+                    break;
+            }
+
+            return false;
+        }
+
+        private void RunScheduledTaskScene(int SceneID, string taskname)
+        {            
+            foreach (Scene scene in MasterScenes)
+            {
+                if (SceneID == scene.ID)
+                {
+                    LogThis(1, "Scheduled task '" + taskname + "' exectued scene '" + scene.Name + "'.");
+                    scene.Run(ControlThinkController);
+                    return;
+                }
+            }
+            LogThis(2, "Scheduled task '" + taskname + "' failed to find scene ID '" + SceneID.ToString() + "'.");
+        }
+
+        public static int NumberOfWeeks(DateTime dateFrom, DateTime dateTo)
+        {
+            TimeSpan Span = dateTo.Subtract(dateFrom);
+
+            if (Span.Days <= 7)
+            {
+                if (dateFrom.DayOfWeek > dateTo.DayOfWeek)
+                {
+                    return 2;
+                }
+
+                return 1;
+            }
+
+            int Days = Span.Days - 7 + (int)dateFrom.DayOfWeek;
+            int WeekCount = 1;
+            int DayCount = 0;
+
+            for (WeekCount = 1; DayCount < Days; WeekCount++)
+            {
+                DayCount += 7;
+            }
+
+            return WeekCount;
+        }
+
+        #endregion
+
+    #region NOAA
+
+        private void timerNOAA_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                DateTime date = DateTime.Today;
+                bool isSunrise = false;
+                bool isSunset = false;
+                DateTime sunrise = DateTime.Now;
+                DateTime sunset = DateTime.Now;
+                SunTimes.LongitudeCoords longitude = ValidateLong();
+                SunTimes.LatitudeCoords latitude = ValidateLat();
+
+                if (longitude != null && latitude != null)                
+                    SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+                
+
+                Double SecondsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                if (SecondsBetweenTimeSunrise < 1 && SecondsBetweenTimeSunrise > 0)
+                {
+                    LogThis(1, "It is now sunrise. Activating sunrise scenes.");
+
+                    foreach (Scene scene in MasterScenes)
+                    {
+                        if (scene.ActivateAtSunrise)
+                            scene.Run(ControlThinkController);
+                    }
+                }
+
+                Double SecondsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                if (SecondsBetweenTimeSunset < 1 && SecondsBetweenTimeSunset > 0)
+                {
+                    LogThis(1, "It is now sunset. Activating sunset scenes.");
+
+                    foreach (Scene scene in MasterScenes)
+                    {
+                        if (scene.ActivateAtSunset)
+                            scene.Run(ControlThinkController);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogThis(2, "Error calulating Sunrise/Sunset. - " + ex.Message);
+            }
+        }
+        
+        private SunTimes.LatitudeCoords ValidateLat()
+        {
+            try
+            {
+                string[] userLat = textBox_Latitude.Text.Split(',');
+                int degrees = Convert.ToInt32(userLat[0]);
+                int mins = Convert.ToInt32(userLat[1]);
+                int seconds = Convert.ToInt32(userLat[2]);
+                string direction = userLat[3];
+
+                if (direction.ToUpper() == "N")
+                    return new SunTimes.LatitudeCoords(degrees, mins, seconds, SunTimes.LatitudeCoords.Direction.North);
+                else
+                    return new SunTimes.LatitudeCoords(degrees, mins, seconds, SunTimes.LatitudeCoords.Direction.South);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private SunTimes.LongitudeCoords ValidateLong()
+        {
+            try
+            {
+                string[] userLong = textBox_Longitude.Text.Split(',');
+                int degrees = Convert.ToInt32(userLong[0]);
+                int mins = Convert.ToInt32(userLong[1]);
+                int seconds = Convert.ToInt32(userLong[2]);
+                string direction = userLong[3];
+
+                if (direction.ToUpper() == "W")
+                    return new SunTimes.LongitudeCoords(degrees, mins, seconds, SunTimes.LongitudeCoords.Direction.West);
+                else
+                    return new SunTimes.LongitudeCoords(degrees, mins, seconds, SunTimes.LongitudeCoords.Direction.East);
+            }
+            catch
+            {               
+                return null;
+            }
+        }
+
+        private void DisplaySunset()
+        {
+            DateTime date = DateTime.Today;
+            bool isSunrise = false;
+            bool isSunset = false;
+            DateTime sunrise = DateTime.Now;
+            DateTime sunset = DateTime.Now;
+            SunTimes.LongitudeCoords longitude = ValidateLong();
+            SunTimes.LatitudeCoords latitude = ValidateLat();
+
+            if (longitude != null && latitude != null)
+            {
+
+                //113, 3, 42, SunTimes.LongitudeCoords.Direction.West
+                //37, 40, 38, SunTimes.LatitudeCoords.Direction.North
+                SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+                Label_SunriseSet.Text = "Today's Sunrise: " + sunrise.ToString("T") + ", Sunset: " + sunset.ToString("T");
+            }
+        }
+
+        #endregion
+
+        
 
     }
 }

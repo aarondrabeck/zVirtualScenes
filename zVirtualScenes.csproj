@@ -108,6 +108,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
+    <Compile Include="SunTimes.cs" />
+    <Compile Include="formAddEditScheduledEvent.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formAddEditScheduledEvent.Designer.cs">
+      <DependentUpon>formAddEditScheduledEvent.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Task.cs" />
     <Compile Include="GrowlInterface.cs" />
     <Compile Include="formAddEditEXEC.cs">
       <SubType>Form</SubType>
@@ -184,6 +192,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="formAddEditScheduledEvent.resx">
+      <DependentUpon>formAddEditScheduledEvent.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="formAddEditEXEC.resx">
       <DependentUpon>formAddEditEXEC.cs</DependentUpon>
     </EmbeddedResource>

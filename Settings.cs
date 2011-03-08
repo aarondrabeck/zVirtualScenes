@@ -29,6 +29,11 @@ namespace zVirtualScenesApplication
         public string JabberServer { get; set; }
         public string JabberSendToUser { get; set; }
 
+        //NOAA
+        public bool EnableNOAA { get; set; }
+        public string Longitude { get; set; }
+        public string Latitude { get; set; }
+
         public Settings()
         {
             this.PollingInterval = 10;
@@ -49,6 +54,11 @@ namespace zVirtualScenesApplication
             this.JabberUser = "";
             this.JabberPassword = "";
             this.JabberSendToUser = "";
+
+            //NOAA
+            this.EnableNOAA = false;
+            this.Longitude = "113,3,42,W";
+            this.Latitude = "37,40,38,N";
         }
 
     }
