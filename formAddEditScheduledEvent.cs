@@ -123,7 +123,12 @@ namespace zVirtualScenesApplication
                 {
                     try
                     {
-                        SelectedTask.RecurDays = Convert.ToInt32(textBox_DaysRecur.Text);
+                        int temp = Convert.ToInt32(textBox_DaysRecur.Text);
+
+                        if (temp < 1)
+                            throw new ArgumentException("Invalid Entry");
+
+                         SelectedTask.RecurDays = temp; 
                     }
                     catch
                     {
@@ -137,7 +142,12 @@ namespace zVirtualScenesApplication
 
                     try
                     {
-                        SelectedTask.RecurWeeks = Convert.ToInt32(textBox_RecurWeeks.Text);
+                        int temp = Convert.ToInt32(textBox_RecurWeeks.Text);
+
+                        if (temp < 1)
+                            throw new ArgumentException("Invalid Entry");
+
+                        SelectedTask.RecurWeeks = temp;
                     }
                     catch
                     {

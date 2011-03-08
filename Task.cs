@@ -39,7 +39,9 @@ namespace zVirtualScenesApplication
             this.Name = "New Scheduled Event";
             this.Frequency = frequencys.Daily;
             this.StartTime = DateTime.Now;
-            this.Enabled = false; 
+            this.Enabled = false;
+            this.RecurWeeks = 1;
+            this.RecurDays = 1; 
         }
 
         public string GetName()
