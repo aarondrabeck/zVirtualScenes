@@ -1,3 +1,10 @@
+*ver 1.4.0.2 - 3-7-11*
+  * Fixed HTTP bugs - Thanks to joela...@gmail.com
+  * Updated HTTP Documentation - Thanks to joela...@gmail.com
+  * Added HTTP CMD "zVirtualScene?cmd=RepollDevices" 
+  * Fixed Sunrise Sunst Bug
+  * Added LightSwitch Option 'Disable Authentication'.  Not recommended but is needed to support 'CommandFusion's iViewer'. 
+
 *ver 1.4.0.1 - 3-7-11*
   * Added Scheduled tasks manager
   * Added Surise/Sunset Scene Activation

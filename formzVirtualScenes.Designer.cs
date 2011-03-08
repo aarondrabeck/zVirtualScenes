@@ -123,6 +123,7 @@ namespace zVirtualScenesApplication
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.timer_TaskRunner = new System.Windows.Forms.Timer(this.components);
             this.timerNOAA = new System.Windows.Forms.Timer(this.components);
+            this.checkBoxLSDAuth = new System.Windows.Forms.CheckBox();
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -722,6 +723,7 @@ namespace zVirtualScenesApplication
             // 
             // groupBox5
             // 
+            this.groupBox5.Controls.Add(this.checkBoxLSDAuth);
             this.groupBox5.Controls.Add(this.textBoxLSLimit);
             this.groupBox5.Controls.Add(this.label14);
             this.groupBox5.Controls.Add(this.textBoxLSport);
@@ -998,6 +1000,16 @@ namespace zVirtualScenesApplication
             this.timerNOAA.Interval = 60000;
             this.timerNOAA.Tick += new System.EventHandler(this.timerNOAA_Tick);
             // 
+            // checkBoxLSDAuth
+            // 
+            this.checkBoxLSDAuth.AutoSize = true;
+            this.checkBoxLSDAuth.Location = new System.Drawing.Point(625, 24);
+            this.checkBoxLSDAuth.Name = "checkBoxLSDAuth";
+            this.checkBoxLSDAuth.Size = new System.Drawing.Size(132, 30);
+            this.checkBoxLSDAuth.TabIndex = 13;
+            this.checkBoxLSDAuth.Text = "Disable Authentication\r\n  (Not Recommened)";
+            this.checkBoxLSDAuth.UseVisualStyleBackColor = true;
+            // 
             // formzVirtualScenes
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1130,6 +1142,7 @@ namespace zVirtualScenesApplication
         private Label label2;
         private Timer timerNOAA;
         private Label Label_SunriseSet;
+        private CheckBox checkBoxLSDAuth;
     }
 }
 

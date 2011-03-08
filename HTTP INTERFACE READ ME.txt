@@ -9,7 +9,10 @@
 
    `http://localhost:8085/zVirtualScene?cmd=ThermoStat&node=7&HeatCoolMode=-1&FanMode=-1&EngeryMode=-1&HeatPoint=-1&CoolPoint=-1`
 
-   `http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&state=ON`
+   `http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&node=2&state=ON`
+
+   `http://localhost:8085/zVirtualScene?cmd=RepollDevices`
+
 
 == DETAIL ==
  === List all devices===
@@ -17,14 +20,17 @@
  
  === List all Scenes === 
     `zVirtualScene?cmd=ListScenes`
-    
+
+=== Repoll ZWave Devices ===
+	`zVirtualScene?cmd=RepollDevices`    
  
  === Run Scene === 
     `zVirtualScene?cmd=RunScene&Scene=0`
       * Scene = any valid seen ID
 
  === Control BinarySwitch ===
-    `zVirtualScene?cmd=BinaryPowerSwitch&state=OFF`
+    `zVirtualScene?cmd=BinaryPowerSwitch&node=2&state=ON`
+	  * node  = any valid MultilevelPowerSwitch node
       * state =  ON | OFF
 
  === Control MultilevelPowerSwitch ===

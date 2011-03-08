@@ -20,6 +20,7 @@ namespace zVirtualScenesApplication
         public int LightSwitchPort { get; set; }
         public int LightSwitchMaxConnections { get; set; }
         public string LightSwitchPassword { get; set; }
+        public bool LightSwitchDisableAuth { get; set; }
 
         //Jabber INTERFACE
         public bool JabberEnanbled { get; set; }
@@ -46,6 +47,7 @@ namespace zVirtualScenesApplication
             this.LightSwitchPort = 1337;
             this.LightSwitchMaxConnections = 50;
             this.LightSwitchPassword = "1234";
+            this.LightSwitchDisableAuth = false;
 
             //Jabber
             this.JabberEnanbled = false; 

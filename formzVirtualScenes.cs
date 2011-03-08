@@ -44,6 +44,7 @@ namespace zVirtualScenesApplication
         public delegate void ControlThinkConnectDelegate();
         public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRePoll.changeType TypeOfChange);
         public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
+        public delegate void RepollDevicesDelegate();
 
         //CORE OBJECTS
         private BindingList<String> MasterLog = new BindingList<string>();
@@ -565,6 +566,7 @@ namespace zVirtualScenesApplication
             textBoxLSport.Text = Convert.ToString(zVScenesSettings.LightSwitchPort);
             checkBoxLSEnabled.Checked = zVScenesSettings.LightSwitchEnabled;
             checkBoxLSDebugVerbose.Checked = zVScenesSettings.LightSwitchVerbose;
+            checkBoxLSDAuth.Checked = zVScenesSettings.LightSwitchDisableAuth;
 
             //JAbber
             textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
@@ -771,7 +773,7 @@ namespace zVirtualScenesApplication
             zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
             zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
             zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
-                
+            zVScenesSettings.LightSwitchDisableAuth = checkBoxLSDAuth.Checked;               
 
             try
             {
@@ -1212,13 +1214,23 @@ namespace zVirtualScenesApplication
             }
         }
 
-        private void SetlabelSceneRunStatus(string text)
+        public void SetlabelSceneRunStatus(string text)
         {
             if (this.InvokeRequired)
                 this.Invoke(new SetlabelSceneRunStatusDelegate(SetlabelSceneRunStatus), new object[] { text });
             else
                 labelSceneRunStatus.Text = text;
         }
+
+        public void RepollDevices()
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new RepollDevicesDelegate(RepollDevices));
+            else
+                refresher.RePollDevices();
+        }
+
+         
        
         #endregion
 
@@ -1352,47 +1364,50 @@ namespace zVirtualScenesApplication
 
         private void timerNOAA_Tick(object sender, EventArgs e)
         {
-            try
+            if (zVScenesSettings.EnableNOAA)
             {
-                DateTime date = DateTime.Today;
-                bool isSunrise = false;
-                bool isSunset = false;
-                DateTime sunrise = DateTime.Now;
-                DateTime sunset = DateTime.Now;
-                SunTimes.LongitudeCoords longitude = ValidateLong();
-                SunTimes.LatitudeCoords latitude = ValidateLat();
-
-                if (longitude != null && latitude != null)                
-                    SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-                
-
-                Double SecondsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
-                if (SecondsBetweenTimeSunrise < 1 && SecondsBetweenTimeSunrise > 0)
+                try
                 {
-                    LogThis(1, "It is now sunrise. Activating sunrise scenes.");
+                    DateTime date = DateTime.Today;
+                    bool isSunrise = false;
+                    bool isSunset = false;
+                    DateTime sunrise = DateTime.Now;
+                    DateTime sunset = DateTime.Now;
+                    SunTimes.LongitudeCoords longitude = ValidateLong();
+                    SunTimes.LatitudeCoords latitude = ValidateLat();
 
-                    foreach (Scene scene in MasterScenes)
+                    if (longitude != null && latitude != null)
+                        SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+
+
+                    Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
-                        if (scene.ActivateAtSunrise)
-                            scene.Run(ControlThinkController);
+                        LogThis(1, "It is now sunrise. Activating sunrise scenes.");
+
+                        foreach (Scene scene in MasterScenes)
+                        {
+                            if (scene.ActivateAtSunrise)
+                                scene.Run(ControlThinkController);
+                        }
+                    }
+
+                    Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
+                    {
+                        LogThis(1, "It is now sunset. Activating sunset scenes.");
+
+                        foreach (Scene scene in MasterScenes)
+                        {
+                            if (scene.ActivateAtSunset)
+                                scene.Run(ControlThinkController);
+                        }
                     }
                 }
-
-                Double SecondsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
-                if (SecondsBetweenTimeSunset < 1 && SecondsBetweenTimeSunset > 0)
+                catch (Exception ex)
                 {
-                    LogThis(1, "It is now sunset. Activating sunset scenes.");
-
-                    foreach (Scene scene in MasterScenes)
-                    {
-                        if (scene.ActivateAtSunset)
-                            scene.Run(ControlThinkController);
-                    }
+                    LogThis(2, "Error calulating Sunrise/Sunset. - " + ex.Message);
                 }
-            }
-            catch (Exception ex)
-            {
-                LogThis(2, "Error calulating Sunrise/Sunset. - " + ex.Message);
             }
         }
         

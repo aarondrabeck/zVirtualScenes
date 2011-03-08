@@ -151,14 +151,16 @@ namespace zVirtualScenesApplication
                             if (command.Length <= 2)
                                 continue;
                             
-                            string cmd = command.TrimEnd(Environment.NewLine.ToCharArray()).ToUpper(); 
-                           
+                            string cmd = command.TrimEnd(Environment.NewLine.ToCharArray()).ToUpper();
+                                                        
+
                             //CLient is not verified
                             if (cmd.StartsWith("IPHONE"))  //Send salt to phone
                             {
                                 socketData.m_verified = false;
                                 SendMessagetoClientsSocket(LightSwitchClientSocket, "COOKIE~" + Convert.ToString(m_cookie) + Environment.NewLine);
                             }
+                                                        
 
                             if (!socketData.m_verified)
                             {
@@ -177,8 +179,17 @@ namespace zVirtualScenesApplication
                                     }
                                     else
                                     {
-                                        socketData.m_verified = false;
-                                        throw new Exception("Passwords do not match");
+                                        if (zVirtualScenesMain.zVScenesSettings.LightSwitchDisableAuth)
+                                        {
+                                            socketData.m_verified = true;
+                                            SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
+                                            zVirtualScenesMain.LogThis(1, "Light Switch Interface: [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated due to authentication being disabled. (client sent wrong password)");
+                                        }
+                                        else
+                                        {
+                                            socketData.m_verified = false;
+                                            throw new Exception("Passwords do not match");
+                                        }
                                     }
                                 }
                             }

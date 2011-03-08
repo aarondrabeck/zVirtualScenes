@@ -87,13 +87,15 @@ namespace zVirtualScenesApplication
                     //http://localhost:8085/zVirtualScene?cmd=ThermoStat&node=7&HeatCoolMode=-1&FanMode=-1&EngeryMode=-1&HeatPoint=-1&CoolPoint=-1
                     //http://localhost:8085/zVirtualScene?cmd=ListDevices            
                     //http://localhost:8085/zVirtualScene?cmd=ListScenes
-                    ///http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&state=ON
+                    //http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&state=ON
+                    //zVirtualScene?cmd=RepollDevices
                     string[] acceptedCMDs = new string[] { "/zVirtualScene?cmd=RunScene&Scene=" , 
                                                            "/zVirtualScene?cmd=MultilevelPowerSwitch&",
                                                            "/zVirtualScene?cmd=ThermoStat&", 
                                                            "/zVirtualScene?cmd=ListDevices",
                                                            "/zVirtualScene?cmd=ListScenes",                     
-                                                           "/zVirtualScene?cmd=BinaryPowerSwitch&"};
+                                                           "/zVirtualScene?cmd=BinaryPowerSwitch&",
+                                                           "/zVirtualScene?cmd=RepollDevices"};
 
                     #region RUN SCENE
                     if (http_url.Contains(acceptedCMDs[0]))  
@@ -267,7 +269,7 @@ namespace zVirtualScenesApplication
                     #endregion
 
                     #region Run BinaryPowerSwitch
-                    if (http_url.Contains(acceptedCMDs[1]))
+                    if (http_url.Contains(acceptedCMDs[5]))
                     {
                         int node = 0;
                         string state = "";
@@ -312,6 +314,16 @@ namespace zVirtualScenesApplication
                         }
                         zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
                         outputStream.WriteLine("ERR: Cannot find device.", http_url);
+                        return;
+                    }
+                    #endregion
+
+                    #region Repoll Device
+                    if (http_url.Contains(acceptedCMDs[6]))
+                    {
+                        zVirtualScenesMain.RepollDevices();
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Repolled ZWave devices.");
+                        outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] Repolled ZWave devices. ({0})", http_url);                                    
                         return;
                     }
                     #endregion
