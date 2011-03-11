@@ -35,7 +35,9 @@
             this.btn_Save = new System.Windows.Forms.Button();
             this.groupBoxAction = new System.Windows.Forms.GroupBox();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.groupBoxAction.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
             // 
             // txtb_duration
@@ -56,7 +58,7 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(268, 61);
+            this.btn_Save.Location = new System.Drawing.Point(337, 73);
             this.btn_Save.Name = "btn_Save";
             this.btn_Save.Size = new System.Drawing.Size(83, 20);
             this.btn_Save.TabIndex = 34;
@@ -68,7 +70,7 @@
             // 
             this.groupBoxAction.Controls.Add(this.txtb_duration);
             this.groupBoxAction.Controls.Add(this.label12);
-            this.groupBoxAction.Location = new System.Drawing.Point(3, 5);
+            this.groupBoxAction.Location = new System.Drawing.Point(72, 14);
             this.groupBoxAction.Name = "groupBoxAction";
             this.groupBoxAction.Size = new System.Drawing.Size(348, 53);
             this.groupBoxAction.TabIndex = 35;
@@ -80,11 +82,21 @@
             this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
             // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Image = global::zVirtualScenesApplication.Properties.Resources.scheduled_tasks48;
+            this.pictureBox3.Location = new System.Drawing.Point(12, 12);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(54, 55);
+            this.pictureBox3.TabIndex = 37;
+            this.pictureBox3.TabStop = false;
+            // 
             // formAddEditTimeDelay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(356, 85);
+            this.ClientSize = new System.Drawing.Size(428, 101);
+            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.groupBoxAction);
             this.Controls.Add(this.btn_Save);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -96,6 +108,7 @@
             this.Text = "Timed Delay Action Properties";
             this.groupBoxAction.ResumeLayout(false);
             this.groupBoxAction.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -107,5 +120,6 @@
         private System.Windows.Forms.Button btn_Save;
         private System.Windows.Forms.GroupBox groupBoxAction;
         private System.Windows.Forms.ToolTip toolTipNotificationLevel;
+        private System.Windows.Forms.PictureBox pictureBox3;
     }
 }

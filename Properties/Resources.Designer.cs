@@ -60,6 +60,41 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap _20scene_icon {
+            get {
+                object obj = ResourceManager.GetObject("_20scene_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _20schedule_icon {
+            get {
+                object obj = ResourceManager.GetObject("_20schedule_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _20zwave_default {
+            get {
+                object obj = ResourceManager.GetObject("_20zwave_default", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap _48schedule_icon {
+            get {
+                object obj = ResourceManager.GetObject("_48schedule_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap Broadcast20 {
+            get {
+                object obj = ResourceManager.GetObject("Broadcast20", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap Broadcast48 {
             get {
                 object obj = ResourceManager.GetObject("Broadcast48", resourceCulture);
@@ -74,9 +109,23 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap programs_icon48 {
+            get {
+                object obj = ResourceManager.GetObject("programs_icon48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap scene_32 {
             get {
                 object obj = ResourceManager.GetObject("scene_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap scheduled_tasks48 {
+            get {
+                object obj = ResourceManager.GetObject("scheduled_tasks48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -102,13 +151,6 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap thermometer {
-            get {
-                object obj = ResourceManager.GetObject("thermometer", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap User48 {
             get {
                 object obj = ResourceManager.GetObject("User48", resourceCulture);
@@ -119,6 +161,13 @@ namespace zVirtualScenesApplication.Properties {
         internal static System.Drawing.Bitmap zvirtualscenes57 {
             get {
                 object obj = ResourceManager.GetObject("zvirtualscenes57", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap zwave48 {
+            get {
+                object obj = ResourceManager.GetObject("zwave48", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

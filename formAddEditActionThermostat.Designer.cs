@@ -81,7 +81,7 @@
             // checkBoxeditHP
             // 
             this.checkBoxeditHP.AutoSize = true;
-            this.checkBoxeditHP.Location = new System.Drawing.Point(116, 165);
+            this.checkBoxeditHP.Location = new System.Drawing.Point(134, 163);
             this.checkBoxeditHP.Name = "checkBoxeditHP";
             this.checkBoxeditHP.Size = new System.Drawing.Size(97, 17);
             this.checkBoxeditHP.TabIndex = 22;
@@ -92,7 +92,7 @@
             // checkBoxeditCP
             // 
             this.checkBoxeditCP.AutoSize = true;
-            this.checkBoxeditCP.Location = new System.Drawing.Point(232, 164);
+            this.checkBoxeditCP.Location = new System.Drawing.Point(250, 162);
             this.checkBoxeditCP.Name = "checkBoxeditCP";
             this.checkBoxeditCP.Size = new System.Drawing.Size(95, 17);
             this.checkBoxeditCP.TabIndex = 21;
@@ -103,7 +103,7 @@
             // textBoxCoolPoint
             // 
             this.textBoxCoolPoint.Enabled = false;
-            this.textBoxCoolPoint.Location = new System.Drawing.Point(250, 138);
+            this.textBoxCoolPoint.Location = new System.Drawing.Point(268, 136);
             this.textBoxCoolPoint.Name = "textBoxCoolPoint";
             this.textBoxCoolPoint.Size = new System.Drawing.Size(51, 20);
             this.textBoxCoolPoint.TabIndex = 19;
@@ -122,7 +122,7 @@
             // 
             this.comboBoxEnergyMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxEnergyMode.FormattingEnabled = true;
-            this.comboBoxEnergyMode.Location = new System.Drawing.Point(156, 104);
+            this.comboBoxEnergyMode.Location = new System.Drawing.Point(174, 102);
             this.comboBoxEnergyMode.Name = "comboBoxEnergyMode";
             this.comboBoxEnergyMode.Size = new System.Drawing.Size(133, 21);
             this.comboBoxEnergyMode.TabIndex = 16;
@@ -130,7 +130,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(60, 56);
+            this.label2.Location = new System.Drawing.Point(78, 54);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(92, 13);
             this.label2.TabIndex = 12;
@@ -139,7 +139,7 @@
             // label_DeviceName
             // 
             this.label_DeviceName.AutoSize = true;
-            this.label_DeviceName.Location = new System.Drawing.Point(48, 21);
+            this.label_DeviceName.Location = new System.Drawing.Point(66, 19);
             this.label_DeviceName.Name = "label_DeviceName";
             this.label_DeviceName.Size = new System.Drawing.Size(78, 13);
             this.label_DeviceName.TabIndex = 40;
@@ -148,7 +148,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(78, 110);
+            this.label7.Location = new System.Drawing.Point(96, 108);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(73, 13);
             this.label7.TabIndex = 17;
@@ -156,10 +156,10 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.thermometer;
+            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.temperature48;
             this.pictureBox2.Location = new System.Drawing.Point(7, 19);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
+            this.pictureBox2.Size = new System.Drawing.Size(53, 50);
             this.pictureBox2.TabIndex = 13;
             this.pictureBox2.TabStop = false;
             // 
@@ -173,7 +173,7 @@
             "Auto",
             "Heat",
             "Cool"});
-            this.comboBoxHeatCoolMode.Location = new System.Drawing.Point(157, 50);
+            this.comboBoxHeatCoolMode.Location = new System.Drawing.Point(175, 48);
             this.comboBoxHeatCoolMode.Name = "comboBoxHeatCoolMode";
             this.comboBoxHeatCoolMode.Size = new System.Drawing.Size(132, 21);
             this.comboBoxHeatCoolMode.TabIndex = 11;
@@ -186,7 +186,7 @@
             "",
             "AutoLow",
             "OnLow"});
-            this.comboBoxFanMode.Location = new System.Drawing.Point(157, 77);
+            this.comboBoxFanMode.Location = new System.Drawing.Point(175, 75);
             this.comboBoxFanMode.Name = "comboBoxFanMode";
             this.comboBoxFanMode.Size = new System.Drawing.Size(132, 21);
             this.comboBoxFanMode.TabIndex = 14;
@@ -194,7 +194,7 @@
             // txtbx_HeatPoint
             // 
             this.txtbx_HeatPoint.Enabled = false;
-            this.txtbx_HeatPoint.Location = new System.Drawing.Point(137, 138);
+            this.txtbx_HeatPoint.Location = new System.Drawing.Point(155, 136);
             this.txtbx_HeatPoint.Name = "txtbx_HeatPoint";
             this.txtbx_HeatPoint.Size = new System.Drawing.Size(51, 20);
             this.txtbx_HeatPoint.TabIndex = 10;
@@ -202,7 +202,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(90, 83);
+            this.label6.Location = new System.Drawing.Point(108, 81);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(61, 13);
             this.label6.TabIndex = 15;

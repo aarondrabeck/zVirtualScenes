@@ -124,6 +124,11 @@ namespace zVirtualScenesApplication
             return _Name + " - ID:" + ID; ;
         }
 
+        public string getIcon()
+        {
+            return "20scene_icon.jpg";
+        }
+
         //Light Switch Socket Format
         public string ToLightSwitchSocketString()
         {

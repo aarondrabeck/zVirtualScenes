@@ -87,7 +87,7 @@ namespace zVirtualScenesApplication
                     //http://localhost:8085/zVirtualScene?cmd=ThermoStat&node=7&HeatCoolMode=-1&FanMode=-1&EngeryMode=-1&HeatPoint=-1&CoolPoint=-1
                     //http://localhost:8085/zVirtualScene?cmd=ListDevices            
                     //http://localhost:8085/zVirtualScene?cmd=ListScenes
-                    //http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&state=ON
+                    //http://localhost:8085/zVirtualScene?cmd=BinaryPowerSwitch&node=2&state=ON
                     //zVirtualScene?cmd=RepollDevices
                     string[] acceptedCMDs = new string[] { "/zVirtualScene?cmd=RunScene&Scene=" , 
                                                            "/zVirtualScene?cmd=MultilevelPowerSwitch&",
@@ -275,7 +275,7 @@ namespace zVirtualScenesApplication
                         string state = "";
                         try
                         {
-                            string prams = http_url.Remove(0, acceptedCMDs[1].Length); //Strip CMD
+                            string prams = http_url.Remove(0, acceptedCMDs[5].Length); //Strip CMD
                             string[] values = prams.Split('&'); //Get values
 
                             node = Convert.ToInt32(values[0].Remove(0, "node=".Length));

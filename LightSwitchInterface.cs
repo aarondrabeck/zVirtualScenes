@@ -16,6 +16,7 @@ namespace zVirtualScenesApplication
         private readonly List<Socket> LightSwitchClients = new List<Socket>();
         public AsyncCallback pfnWorkerCallBack;
         private int m_cookie = new Random().Next(65536);
+        private bool isActive = false; 
 
         //Contructor
         public LightSwitchInterface(formzVirtualScenes zvs)
@@ -25,22 +26,45 @@ namespace zVirtualScenesApplication
 
         //Methods
 
+        public void CloseLightSwitchSocket()
+        {
+            if (LightSwitchSocket != null && isActive)
+            {
+                foreach (Socket client in LightSwitchClients)
+                {
+                    if (client.Connected)
+                    {
+                        client.Shutdown(SocketShutdown.Both);
+                        client.Close();
+                    }                    
+                }
+
+                LightSwitchSocket.Close();
+                isActive = false;
+                zVirtualScenesMain.LogThis(1, "Light Switch Interface: SHUTDOWN.");
+            }
+        }
+
         /// <summary>
         /// Starts listening for LightSwitch clients. 
         /// </summary>
         public void OpenLightSwitchSocket()
         {
-            try
+            if (LightSwitchSocket == null || !isActive)
             {
-                LightSwitchSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, zVirtualScenesMain.zVScenesSettings.LightSwitchPort));
-                LightSwitchSocket.Listen(zVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections);
-                LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                zVirtualScenesMain.LogThis(1, "Light Switch Interface: Started listening for LightSwitch clients on port " + zVirtualScenesMain.zVScenesSettings.LightSwitchPort + ".");
-            }
-            catch (SocketException e)
-            {
-                zVirtualScenesMain.LogThis(2, "Light Switch Interface: Socket Failed to Open - " + e);
+                try
+                {
+                    isActive = true;
+                    LightSwitchSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, zVirtualScenesMain.zVScenesSettings.LightSwitchPort));
+                    LightSwitchSocket.Listen(zVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections);
+                    LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
+                    zVirtualScenesMain.LogThis(1, "Light Switch Interface: Started listening for LightSwitch clients on port " + zVirtualScenesMain.zVScenesSettings.LightSwitchPort + ".");
+                }
+                catch (SocketException e)
+                {
+                    zVirtualScenesMain.LogThis(2, "Light Switch Interface: Socket Failed to Open - " + e);
+                }
             }
 
         }
@@ -517,7 +541,7 @@ namespace zVirtualScenesApplication
     }
 
     public class SocketPacket
-    {
+    {   
         // holds a reference to the socket
         public Socket m_currentSocket;
 

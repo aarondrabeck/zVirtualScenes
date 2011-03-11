@@ -29,8 +29,8 @@
     <ProductName>zVirtualScenes</ProductName>
     <PublisherName>Drabeck Solutions</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>2</ApplicationRevision>
-    <ApplicationVersion>1.4.0.2</ApplicationVersion>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.4.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -109,12 +109,6 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="SunTimes.cs" />
-    <Compile Include="formAddEditScheduledEvent.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="formAddEditScheduledEvent.Designer.cs">
-      <DependentUpon>formAddEditScheduledEvent.cs</DependentUpon>
-    </Compile>
     <Compile Include="Task.cs" />
     <Compile Include="GrowlInterface.cs" />
     <Compile Include="formAddEditEXEC.cs">
@@ -192,20 +186,19 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="formAddEditScheduledEvent.resx">
-      <DependentUpon>formAddEditScheduledEvent.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="formAddEditEXEC.resx">
       <DependentUpon>formAddEditEXEC.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="formAddEditActionBinSwitch.resx">
       <DependentUpon>formAddEditActionBinSwitch.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="formAddEditActionThermostat.resx">
       <DependentUpon>formAddEditActionThermostat.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="formAddEditActionMultiLevelSwitch.resx">
       <DependentUpon>formAddEditActionMultiLevelSwitch.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="formPropertiesThermostat.resx">
       <DependentUpon>formPropertiesThermostat.cs</DependentUpon>
@@ -281,11 +274,16 @@
     <None Include="switch-icon32.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="thermometer.gif" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="audio-mixing-desk.ico" />
     <Content Include="ChangeLog.txt" />
+    <None Include="Resources\20scene_icon.jpg" />
+    <None Include="Resources\48schedule_icon.jpg" />
+    <None Include="Resources\20schedule_icon.jpg" />
+    <None Include="Resources\20zwave-default.jpg" />
+    <None Include="Resources\zwave48.jpg" />
+    <None Include="Resources\scheduled_tasks48.png" />
+    <None Include="Resources\programs-icon48.png" />
+    <None Include="Resources\Broadcast20.png" />
     <EmbeddedResource Include="Resources\User48.png" />
     <EmbeddedResource Include="Resources\temperature48.png" />
     <EmbeddedResource Include="Resources\Broadcast48.png" />

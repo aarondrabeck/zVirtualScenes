@@ -13,8 +13,16 @@ namespace zVirtualScenesApplication
     {
         protected int port;
         TcpListener listener;
-        bool is_active = true;
+        private volatile bool is_active = true;
         private formzVirtualScenes zVirtualScenesMain;
+
+        public void RequestStop()
+        {
+            is_active = false;
+            listener.Server.Close();
+            listener.Stop();
+            
+        }
 
         public HttpServer(int port, formzVirtualScenes Form)
         {
@@ -25,15 +33,20 @@ namespace zVirtualScenesApplication
         public void listen()
         {
             listener = new TcpListener(IPAddress.Any, port);
-            listener.Start();                
+            listener.Start();
             while (is_active)
             {
-                TcpClient s = listener.AcceptTcpClient();
-                HttpProcessor processor = new HttpProcessor(s, this, zVirtualScenesMain);
-                Thread thread = new Thread(new ThreadStart(processor.process));
-                thread.Start();
-                Thread.Sleep(1);
+                try
+                {
+                    TcpClient s = listener.AcceptTcpClient();
+                    HttpProcessor processor = new HttpProcessor(s, this, zVirtualScenesMain);
+                    Thread thread = new Thread(new ThreadStart(processor.process));
+                    thread.Start();
+                    Thread.Sleep(1);
+                }
+                catch { }
             }
+            zVirtualScenesMain.LogThis(1, "HTTP Interface: SHUTDOWN.");
         }
                
     }

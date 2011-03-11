@@ -51,6 +51,7 @@ namespace zVirtualScenesApplication
             }            
 
             //CREATE ACTION
+            TheAction.Name = "Launch App";
             TheAction.Type = Action.ActionTypes.LauchAPP;
             TheAction.EXEPath = txtb_path.Text;                   
 

@@ -59,6 +59,7 @@ namespace zVirtualScenesApplication
             }
 
             //CREATE ACTION
+            TheAction.Name = "Delay";
             TheAction.Type = Action.ActionTypes.DelayTimer;
             TheAction.TimerDuration = duration * 1000;                       
 

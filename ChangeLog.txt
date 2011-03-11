@@ -1,4 +1,8 @@
-*ver 1.4.0.2 - 3-7-11*
+*ver 1.4.2.0 - 3-10-11*
+  * Fixed another HTTP Interface bug
+  * Major GUI enhancements - right-click and drag-and-drop handling.
+
+*ver 1.4.0.2 - 3-8-11*
   * Fixed HTTP bugs - Thanks to joela...@gmail.com
   * Updated HTTP Documentation - Thanks to joela...@gmail.com
   * Added HTTP CMD "zVirtualScene?cmd=RepollDevices" 

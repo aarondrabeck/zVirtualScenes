@@ -49,6 +49,11 @@ namespace zVirtualScenesApplication
             return this.Name;
         }
 
+        public string GetIcon()
+        {
+            return "20schedule_icon.jpg";
+        }
+
         public string isEnabled()
         {
             return (this.Enabled ? "Yes" : "No");

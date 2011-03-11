@@ -137,6 +137,36 @@ namespace zVirtualScenesApplication
             return "Action Type Unknown!";
         }
 
+        public string TypeIcon()
+        {
+            if (this.Type == ActionTypes.ZWaveDevice)
+            {
+                if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                    return "20zwave-thermostat.png";
+                else
+                    return "20zwave-default.jpg";
+            }                
+            else if (Type == ActionTypes.LauchAPP)
+                return "20exe.png";
+            else if (Type == ActionTypes.DelayTimer)
+                return "20delay.png";
+
+            return "";
+        }
+
+        public string ActionToString()
+        {
+            if (Type == ActionTypes.ZWaveDevice)
+                return GetFomattedType();
+            else if (Type == ActionTypes.LauchAPP)
+                return "Start: " + EXEPath;
+            else if (Type == ActionTypes.DelayTimer)
+                return "Wait " + this.TimerDuration / 1000 + " second(s).";
+
+            return "Unknown";
+        }
+
+
         public ActionResult Run(ZWaveController ControlThinkController)
         {
             if (Type == ActionTypes.ZWaveDevice)
@@ -264,45 +294,44 @@ namespace zVirtualScenesApplication
         {
             if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
             {
-                return (Level > 0 ? "State: ON" : "State: OFF");
+                return (Level > 0 ? "Set State: ON" : "Set State: OFF");
             }
             else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
             {
                 if (Level > 255)
-                    return "Level: Unknown ON State";
+                    return "Set Level: Unknown ON State";
                 else
-                    return "Level: " + Level + "%";
+                    return "Set Level: " + Level + "%";
             }
             else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
             {
-                string actions = "(";
+                string actions = "";
 
                 //Set Heat Cool Mode
-                if (_HeatCoolMode != -1)
-                    actions += " Set Mode: " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), _HeatCoolMode);
+                if (_HeatCoolMode != -1)                
+                    actions += (actions == "" ? "" : ", ") + "Set Mode to " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), _HeatCoolMode);
 
                 if (_FanMode != -1)
-                    actions += " Set FanMode: " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), _FanMode);
+                    actions += (actions == "" ? "" : ", ") + "Set FanMode to " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), _FanMode);
 
                 if (_EngeryMode != -1)
                 {
                     if (_EngeryMode == 0) //set EnergySavingMode
-                        actions += " Set EnergySavingMode.";
+                        actions += (actions == "" ? "" : ", ") + "Enable Energy Saving Mode";
                     else if (_EngeryMode == 255) //ComfortMode
-                        actions += " Set ComfortMode.";
+                        actions += (actions == "" ? "" : ", ") + "Enable Comfort Mode";
                 }
 
                 if (_CoolPoint != -1)
-                    actions += " Set CustomCoolpoint " + _CoolPoint.ToString() + "°.";
+                    actions += (actions == "" ? "" : ", ") + "Set Coolpoint to " + _CoolPoint.ToString() + "°";
 
                 if (_HeatPoint != -1)
-                    actions += " Set CustomHeatpoint " + _HeatPoint.ToString() + "°.";
+                    actions += (actions == "" ? "" : ", ") + "Set Heatpoint to " + _HeatPoint.ToString() + "°";
 
-                actions += ")";
                 return actions;
             }
            
-            return "Unknown Device"; 
+            return "Unknown Action "; 
         }
 
         public string GlbUniqueID()
