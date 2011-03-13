@@ -48,7 +48,7 @@ namespace zVirtualScenesApplication
         public delegate void ControlThinkConnectDelegate();
         public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRePoll.changeType TypeOfChange);
         public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
-        public delegate void RepollDevicesDelegate();
+        public delegate void RepollDevicesDelegate(byte node = 0);
 
         //CORE OBJECTS
         private BindingList<String> MasterLog = new BindingList<string>();
@@ -128,6 +128,7 @@ namespace zVirtualScenesApplication
             refresher = new ControlThinkRePoll(this);
             new Thread(new ThreadStart(refresher.RefreshThread)).Start();
             refresher.DeviceInfoChange += new ControlThinkRePoll.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);
+           
 
 
             //JABBER
@@ -347,6 +348,9 @@ namespace zVirtualScenesApplication
                         }
                         LogThis(1, notification);
                         labelLastEvent.Text = notification;
+
+                       LightSwitchInt.BroadcastMessage(device.ToLightSwitchSocketString(true) + Environment.NewLine);                        
+                       LightSwitchInt.BroadcastMessage("ENDLIST" + Environment.NewLine);
                     }
                 }
                 dataListViewDevices.DataSource = null;
@@ -518,6 +522,7 @@ namespace zVirtualScenesApplication
                     ControlThinkController.Connected += new System.EventHandler(ControlThinkUSBConnectedEvent);
                     ControlThinkController.Disconnected += new System.EventHandler(ControlThinkUSBDisconnectEvent);
                     ControlThinkController.ControllerNotResponding += new System.EventHandler(ControlThinkUSBNotRespondingEvent);
+                    ControlThinkController.LevelChanged += new ZWaveController.LevelChangedEventHandler(ControlThinkController_LevelChanged);
                     ControlThinkController.Connect();
                 }
                 catch (Exception e)
@@ -525,6 +530,12 @@ namespace zVirtualScenesApplication
                     LogThis(2, "ControlThink USB Cennection Error: " + e);
                 }
             }
+        }
+
+        private void ControlThinkController_LevelChanged(object sender, ControlThink.ZWave.ZWaveController.LevelChangedEventArgs e)
+        {
+            LogThis(1, "ZWave device sent level change notification. Node: " + e.OriginDevice.NodeID + ".");
+            refresher.RePollDevices(e.OriginDevice.NodeID);
         }
 
         public void ControlThinkGetDevices()
@@ -546,7 +557,8 @@ namespace zVirtualScenesApplication
                         if (!DeviceFoundOnNetowrk.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
                         {
                             //Convert Device to Action
-                            ZWaveDevice newDevice = new ZWaveDevice(this);
+                            ZWaveDevice newDevice = new ZWaveDevice();
+                            newDevice.zVirtualScenesMain = this;
                             newDevice.HomeID = ControlThinkController.HomeID;
                             newDevice.NodeID = DeviceFoundOnNetowrk.NodeID;
                             newDevice.Level = DeviceFoundOnNetowrk.Level;
@@ -687,6 +699,7 @@ namespace zVirtualScenesApplication
             checkBoxLSEnabled.Checked = zVScenesSettings.LightSwitchEnabled;
             checkBoxLSDebugVerbose.Checked = zVScenesSettings.LightSwitchVerbose;
             checkBoxLSDAuth.Checked = zVScenesSettings.LightSwitchDisableAuth;
+            checkBoxAllowiViewer.Checked = zVScenesSettings.LightSwitchAllowiViewerClients;
 
             //JAbber
             textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
@@ -1361,6 +1374,12 @@ namespace zVirtualScenesApplication
 
         private void manuallyRepollToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            ZWaveDevice device = (ZWaveDevice)dataListViewDevices.SelectedObject;
+            refresher.RePollDevices(device.NodeID);
+        }
+
+        private void repollAllDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
             refresher.RePollDevices();
         }
 
@@ -1469,6 +1488,7 @@ namespace zVirtualScenesApplication
             zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
             zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
             zVScenesSettings.LightSwitchDisableAuth = checkBoxLSDAuth.Checked;
+            zVScenesSettings.LightSwitchAllowiViewerClients = checkBoxAllowiViewer.Checked;
 
             if (checkBoxLSEnabled.Checked)
                 LightSwitchInt.OpenLightSwitchSocket();
@@ -1593,15 +1613,13 @@ namespace zVirtualScenesApplication
                 labelSceneRunStatus.Text = text;
         }
 
-        public void RepollDevices()
+        public void RepollDevices(byte node = 0)
         {
             if (this.InvokeRequired)
-                this.Invoke(new RepollDevicesDelegate(RepollDevices));
+                this.Invoke(new RepollDevicesDelegate(RepollDevices), new object[] { node });
             else
-                refresher.RePollDevices();
+                refresher.RePollDevices(node);
         }
-
-
 
         #endregion
 
@@ -2095,6 +2113,8 @@ namespace zVirtualScenesApplication
         }
 
         #endregion
+
+      
 
         #endregion
 

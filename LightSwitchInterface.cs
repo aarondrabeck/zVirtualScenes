@@ -85,8 +85,8 @@ namespace zVirtualScenesApplication
 
                 zVirtualScenesMain.LogThis(1, "Light Switch Interface: Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
              
-                // Send a welcome message to client
-                string msg = "6004 ZWaveCommander Server (Connections " + LightSwitchClients.Count() + ")" + Environment.NewLine;
+                // Send a welcome message to client                
+                string msg = "Hybrid LightSwitch / iViewer Server (Active Connections " + LightSwitchClients.Count() + ")" + Environment.NewLine;
                 SendMsgToLightSwitchClient(msg, LightSwitchClients.Count());
 
                 // Let the worker Socket do the further processing for the just connected client
@@ -175,18 +175,25 @@ namespace zVirtualScenesApplication
                             if (command.Length <= 2)
                                 continue;
                             
-                            string cmd = command.TrimEnd(Environment.NewLine.ToCharArray()).ToUpper();
-                                                        
-
-                            //CLient is not verified
+                            string cmd = command.TrimEnd(Environment.NewLine.ToCharArray()).ToUpper();                                                        
+                            
+                            
+                            if (cmd.StartsWith("IVIEWER") && zVirtualScenesMain.zVScenesSettings.LightSwitchAllowiViewerClients)  
+                            {
+                                socketData.iViewerClient = true;
+                                socketData.m_verified = true;
+                                SendMessagetoClientsSocket(LightSwitchClientSocket, "HELLO IVIEWER CLIENT, YOU ARE AUTHENTICATED." + Environment.NewLine);
+                                WaitForData(socketData.m_currentSocket, socketData.m_clientNumber, socketData.m_verified);
+                                return;
+                            }
                             if (cmd.StartsWith("IPHONE"))  //Send salt to phone
                             {
                                 socketData.m_verified = false;
                                 SendMessagetoClientsSocket(LightSwitchClientSocket, "COOKIE~" + Convert.ToString(m_cookie) + Environment.NewLine);
                             }
-                                                        
 
-                            if (!socketData.m_verified)
+
+                            if (!socketData.m_verified && !socketData.iViewerClient)
                             {
                                 //If not verified attept to verify                            
                                 if (cmd.StartsWith("PASSWORD"))
@@ -411,9 +418,6 @@ namespace zVirtualScenesApplication
 
         private string TranslateToThermoAction(byte Node, byte Mode, Socket Client)
         {
-            
-
-
             foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
             {
                 if (device.NodeID == Node)
@@ -477,7 +481,7 @@ namespace zVirtualScenesApplication
         }
 
         /// <summary>
-        /// Sends a message to ONE client
+        /// Sends a message to ONE client by socket
         /// </summary>
         /// <param name="msg">the message to send</param>
         public void SendMessagetoClientsSocket(Socket LightSwitchClientSocket, string msg)
@@ -494,7 +498,7 @@ namespace zVirtualScenesApplication
         }
 
         /// <summary>
-        /// Sends a message to ONE client
+        /// Sends a message to ONE client by client number
         /// </summary>
         private void SendMsgToLightSwitchClient(string msg, int clientNumber)
         {
@@ -548,6 +552,9 @@ namespace zVirtualScenesApplication
         // holds the client number for identification
         public int m_clientNumber;
 
+        //Is a IViewer Client?
+        public bool iViewerClient; 
+
         // Buffer to store the data sent by the client
         public byte[] dataBuffer = new byte[1024];
 
@@ -560,6 +567,7 @@ namespace zVirtualScenesApplication
             m_currentSocket = socket;
             m_clientNumber = clientNumber;
             m_verified = verified;
+            iViewerClient = false; 
         }
     }
 }

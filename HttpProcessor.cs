@@ -7,6 +7,7 @@ using System.IO;
 using System.Collections;
 using System.Threading;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 
 namespace zVirtualScenesApplication
 {
@@ -95,7 +96,8 @@ namespace zVirtualScenesApplication
                                                            "/zVirtualScene?cmd=ListDevices",
                                                            "/zVirtualScene?cmd=ListScenes",                     
                                                            "/zVirtualScene?cmd=BinaryPowerSwitch&",
-                                                           "/zVirtualScene?cmd=RepollDevices"};
+                                                           "/zVirtualScene?cmd=RepollDevices",
+                                                           "/zVirtualScene?cmd=RepollDevice&node="};
 
                     #region RUN SCENE
                     if (http_url.Contains(acceptedCMDs[0]))  
@@ -243,13 +245,11 @@ namespace zVirtualScenesApplication
                     #region Device Listing
                     if (http_url.Contains(acceptedCMDs[3]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Sent a device listing.");                        
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Requested a XML device listing.");                       
 
-                        outputStream.WriteLine("LIST START");
-                        foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)                        
-                            outputStream.WriteLine(device.ToString());
-                        
-                        outputStream.WriteLine("LIST END");
+                        XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zVirtualScenesMain.MasterDevices.GetType());
+                        DevicetoXML.Serialize(outputStream, zVirtualScenesMain.MasterDevices);
+
                         return;
                     }
                     #endregion
@@ -257,13 +257,11 @@ namespace zVirtualScenesApplication
                     #region scene Listing
                     if (http_url.Contains(acceptedCMDs[4]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Requested a scene listing.");
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Requested a XML scene listing.");
 
-                        outputStream.WriteLine("LIST START");
-                        foreach (Scene scene in zVirtualScenesMain.MasterScenes)
-                            outputStream.WriteLine(scene.ToStringForHTTP());
-                        
-                        outputStream.WriteLine("LIST END");
+                        XmlSerializer ScenetoXML = new System.Xml.Serialization.XmlSerializer(zVirtualScenesMain.MasterScenes.GetType());
+                        ScenetoXML.Serialize(outputStream, zVirtualScenesMain.MasterScenes);
+
                         return;
                     }
                     #endregion
@@ -318,12 +316,31 @@ namespace zVirtualScenesApplication
                     }
                     #endregion
 
-                    #region Repoll Device
+                    #region Repoll ALL Devices
                     if (http_url.Contains(acceptedCMDs[6]))
                     {
                         zVirtualScenesMain.RepollDevices();
                         zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Repolled ZWave devices.");
                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] Repolled ZWave devices. ({0})", http_url);                                    
+                        return;
+                    }
+                    #endregion
+
+                    #region Repoll Device
+                    if (http_url.Contains(acceptedCMDs[7]))
+                    {
+                        byte nodeID = 0;
+                        try { nodeID = Convert.ToByte(http_url.Remove(0, acceptedCMDs[7].Length)); }
+                        catch
+                        {
+                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Invalid Node.");  //LOG
+                            outputStream.WriteLine("ERR: Invalid Node.  ({0})", http_url); //FEEDBACK to USER
+                            return;
+                        }
+
+                        zVirtualScenesMain.RepollDevices(nodeID);
+                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Repolled,  " + (nodeID == 0 ? "ALL devices." : "node " + nodeID + "."));
+                        outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] Repolled,  " + (nodeID == 0 ? "ALL devices." : "node " + nodeID + "."));
                         return;
                     }
                     #endregion

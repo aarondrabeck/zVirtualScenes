@@ -31,13 +31,19 @@ namespace zVirtualScenesApplication
 
         }
 
-        public void RePollDevices()
+        public void RePollDevices(byte node = 0)
         {
             if (zVirtualScenesMain.ControlThinkController.IsConnected)
             {
                 //For each device on Control Stick 
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
                 {
+                    if (node != 0)  //JUST REPOLL ONE DEVICE REPOLL ALL DEVICES
+                    {
+                        if (device.NodeID != node)
+                            continue;
+                    }                    
+
                     try
                     {
                         //If device type on Control Stick is allowed

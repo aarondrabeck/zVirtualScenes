@@ -120,6 +120,7 @@ namespace zVirtualScenesApplication
             this.checkBoxJabberVerbose = new System.Windows.Forms.CheckBox();
             this.checkBoxJabberEnabled = new System.Windows.Forms.CheckBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.checkBoxAllowiViewer = new System.Windows.Forms.CheckBox();
             this.checkBox_HideLSPassword = new System.Windows.Forms.CheckBox();
             this.checkBoxLSDAuth = new System.Windows.Forms.CheckBox();
             this.textBoxLSLimit = new System.Windows.Forms.TextBox();
@@ -173,6 +174,7 @@ namespace zVirtualScenesApplication
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripDevicesNull = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.findNewDevicesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.repollAllDevicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reconnectToControlThinkUSBToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -1006,7 +1008,7 @@ namespace zVirtualScenesApplication
             // buttonSaveSettings
             // 
             this.buttonSaveSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSaveSettings.Location = new System.Drawing.Point(631, 405);
+            this.buttonSaveSettings.Location = new System.Drawing.Point(631, 417);
             this.buttonSaveSettings.Name = "buttonSaveSettings";
             this.buttonSaveSettings.Size = new System.Drawing.Size(137, 38);
             this.buttonSaveSettings.TabIndex = 7;
@@ -1031,7 +1033,7 @@ namespace zVirtualScenesApplication
             this.groupBox7.Controls.Add(this.checkBoxJabberEnabled);
             this.groupBox7.Location = new System.Drawing.Point(5, 272);
             this.groupBox7.Name = "groupBox7";
-            this.groupBox7.Size = new System.Drawing.Size(763, 127);
+            this.groupBox7.Size = new System.Drawing.Size(763, 139);
             this.groupBox7.TabIndex = 6;
             this.groupBox7.TabStop = false;
             this.groupBox7.Text = "Jabber/GTalk Interface";
@@ -1138,6 +1140,7 @@ namespace zVirtualScenesApplication
             // 
             this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Controls.Add(this.checkBoxAllowiViewer);
             this.groupBox5.Controls.Add(this.checkBox_HideLSPassword);
             this.groupBox5.Controls.Add(this.checkBoxLSDAuth);
             this.groupBox5.Controls.Add(this.textBoxLSLimit);
@@ -1155,6 +1158,16 @@ namespace zVirtualScenesApplication
             this.groupBox5.TabStop = false;
             this.groupBox5.Text = "LightSwitch Interface";
             // 
+            // checkBoxAllowiViewer
+            // 
+            this.checkBoxAllowiViewer.AutoSize = true;
+            this.checkBoxAllowiViewer.Location = new System.Drawing.Point(363, 39);
+            this.checkBoxAllowiViewer.Name = "checkBoxAllowiViewer";
+            this.checkBoxAllowiViewer.Size = new System.Drawing.Size(124, 30);
+            this.checkBoxAllowiViewer.TabIndex = 22;
+            this.checkBoxAllowiViewer.Text = "Allow iViewer Clients\r\n  (Not Recommened)";
+            this.checkBoxAllowiViewer.UseVisualStyleBackColor = true;
+            // 
             // checkBox_HideLSPassword
             // 
             this.checkBox_HideLSPassword.AutoSize = true;
@@ -1171,7 +1184,7 @@ namespace zVirtualScenesApplication
             // checkBoxLSDAuth
             // 
             this.checkBoxLSDAuth.AutoSize = true;
-            this.checkBoxLSDAuth.Location = new System.Drawing.Point(478, 40);
+            this.checkBoxLSDAuth.Location = new System.Drawing.Point(564, 39);
             this.checkBoxLSDAuth.Name = "checkBoxLSDAuth";
             this.checkBoxLSDAuth.Size = new System.Drawing.Size(132, 30);
             this.checkBoxLSDAuth.TabIndex = 13;
@@ -1326,7 +1339,7 @@ namespace zVirtualScenesApplication
             this.listBoxLog.HorizontalScrollbar = true;
             this.listBoxLog.Location = new System.Drawing.Point(3, 3);
             this.listBoxLog.Name = "listBoxLog";
-            this.listBoxLog.Size = new System.Drawing.Size(770, 432);
+            this.listBoxLog.Size = new System.Drawing.Size(770, 457);
             this.listBoxLog.TabIndex = 1;
             // 
             // timer_TaskRunner
@@ -1438,7 +1451,7 @@ namespace zVirtualScenesApplication
             this.toolStripSeparator5,
             this.devicePropertiesToolStripMenuItem});
             this.contextMenuStripDevices.Name = "contextMenuStripDevices";
-            this.contextMenuStripDevices.Size = new System.Drawing.Size(242, 126);
+            this.contextMenuStripDevices.Size = new System.Drawing.Size(242, 148);
             // 
             // adjustLevelToolStripMenuItem
             // 
@@ -1456,7 +1469,7 @@ namespace zVirtualScenesApplication
             // 
             this.manuallyRepollToolStripMenuItem.Name = "manuallyRepollToolStripMenuItem";
             this.manuallyRepollToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
-            this.manuallyRepollToolStripMenuItem.Text = "Manually Repoll";
+            this.manuallyRepollToolStripMenuItem.Text = "Repoll This Device";
             this.manuallyRepollToolStripMenuItem.Click += new System.EventHandler(this.manuallyRepollToolStripMenuItem_Click);
             // 
             // findNewDevicesToolStripMenuItem
@@ -1564,6 +1577,7 @@ namespace zVirtualScenesApplication
             // 
             this.contextMenuStripDevicesNull.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.findNewDevicesToolStripMenuItem1,
+            this.repollAllDevicesToolStripMenuItem,
             this.reconnectToControlThinkUSBToolStripMenuItem});
             this.contextMenuStripDevicesNull.Name = "contextMenuStripDevicesNull";
             this.contextMenuStripDevicesNull.Size = new System.Drawing.Size(242, 70);
@@ -1574,6 +1588,12 @@ namespace zVirtualScenesApplication
             this.findNewDevicesToolStripMenuItem1.Size = new System.Drawing.Size(241, 22);
             this.findNewDevicesToolStripMenuItem1.Text = "Find New Devices";
             this.findNewDevicesToolStripMenuItem1.Click += new System.EventHandler(this.findNewDevicesToolStripMenuItem1_Click);
+            // 
+            // repollAllDevicesToolStripMenuItem
+            // 
+            this.repollAllDevicesToolStripMenuItem.Name = "repollAllDevicesToolStripMenuItem";
+            this.repollAllDevicesToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.repollAllDevicesToolStripMenuItem.Text = "Repoll All Devices";
             // 
             // reconnectToControlThinkUSBToolStripMenuItem
             // 
@@ -1788,6 +1808,8 @@ namespace zVirtualScenesApplication
         private ContextMenuStrip contextMenuStripDevicesNull;
         private ToolStripMenuItem findNewDevicesToolStripMenuItem1;
         private ToolStripMenuItem reconnectToControlThinkUSBToolStripMenuItem;
+        private CheckBox checkBoxAllowiViewer;
+        private ToolStripMenuItem repollAllDevicesToolStripMenuItem;
     }
 }
 

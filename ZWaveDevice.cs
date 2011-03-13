@@ -5,12 +5,14 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization;
 using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace zVirtualScenesApplication 
 {
 
     public class ZWaveDevice : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
     {
+        [XmlIgnore]
         public formzVirtualScenes zVirtualScenesMain;
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -68,9 +70,8 @@ namespace zVirtualScenesApplication
         #endregion
 
         //Constructor
-        public ZWaveDevice(formzVirtualScenes zvsm)
+        public ZWaveDevice()
         {
-            zVirtualScenesMain = zvsm;
             this.HomeID = 0;
             this.NodeID = 0;
             _Name = "Default Device";
@@ -153,14 +154,19 @@ namespace zVirtualScenesApplication
         //workerSocket.Send(byData);
         //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~House (AWAY MODE)~6~0~Status" + Environment.NewLine);
         //workerSocket.Send(byData);
-        public string ToLightSwitchSocketString()
+        public string ToLightSwitchSocketString(bool Update=false)
         {
+            string prefix = "DEVICE~";
+
+            if (Update)
+                prefix = "UPDATE~"; 
+
             if (Type == ZWaveDeviceTypes.BinarySwitch)
-                return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + "BinarySwitch";
+                return prefix + _Name + "~" + this.NodeID + "~" + this.Level + "~" + "BinarySwitch";
             else if (Type == ZWaveDeviceTypes.Thermostat)
-                return "DEVICE~" + _Name + "~" + this.NodeID + "~" + Temp + "~" + this.Type;
+                return prefix + _Name + "~" + this.NodeID + "~" + Temp + "~" + this.Type;
             else
-                return "DEVICE~" + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
+                return prefix + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
         }
 
         public string DeviceIcon()

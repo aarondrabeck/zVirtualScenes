@@ -206,8 +206,16 @@ namespace zVirtualScenesApplication
                     {
                         if (device.NodeID == this.NodeID)
                         {
-                            device.Level = _Level;
-                            return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + this.Level.ToString() + "." };
+                            try
+                            {
+                                device.Level = _Level;
+                                return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' level set to " + this.Level.ToString() + "." };
+                            }
+                            catch (Exception e)
+                            {
+                                return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to set '" + this.Name + ". - "  + e.Message };
+                            
+                            }                            
                         }
                     }
                 }
