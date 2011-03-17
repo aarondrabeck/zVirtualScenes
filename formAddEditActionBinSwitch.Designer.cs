@@ -97,7 +97,7 @@
             // pictureBox3
             // 
             this.pictureBox3.Image = global::zVirtualScenesApplication.Properties.Resources.switch_32;
-            this.pictureBox3.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_icon32;
+            this.pictureBox3.InitialImage = global::zVirtualScenesApplication.Properties.Resources.switch_32;
             this.pictureBox3.Location = new System.Drawing.Point(8, 19);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(35, 37);

@@ -13,6 +13,7 @@ namespace zVirtualScenesApplication
 {
     public class HttpProcessor
     {
+        private static string LOG_INTERFACE = "HTTP";
         public TcpClient socket;
         public HttpServer srv;
 
@@ -58,7 +59,7 @@ namespace zVirtualScenesApplication
             }
             catch (Exception e)
             {
-               zVirtualScenesMain.LogThis(1,"HTTP Interface: Exception -" + e.ToString());
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, e.Message, LOG_INTERFACE);
             }
             outputStream.Flush();
             // bs.Flush(); // flush any remaining output
@@ -73,14 +74,14 @@ namespace zVirtualScenesApplication
             string[] tokens = request.Split(' ');
 
             if (tokens.Length != 3)
-                zVirtualScenesMain.LogThis(1,"HTTP Interface: ["+userIP+"] Sent invalid http request.");
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Sent invalid http request.", LOG_INTERFACE);
             else
             {
                 http_method = tokens[0].ToUpper();
 
                 if (http_method == "GET")
                 {
-                    zVirtualScenesMain.LogThis(1,"HTTP Interface: ["+userIP+"] " + request);
+                    zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] " + request, LOG_INTERFACE);
                     http_url = tokens[1];
 
                     //http:/localhost:8085//zVirtualScene?cmd=RunScene&Scene=0 
@@ -105,8 +106,8 @@ namespace zVirtualScenesApplication
                         int sceneID = 0;
                         try { sceneID = Convert.ToInt32(http_url.Remove(0, acceptedCMDs[0].Length)); }
                         catch  
-                        { 
-                            zVirtualScenesMain.LogThis(1,"HTTP Interface: ["+userIP+"] No such scene.");  //LOG
+                        {
+                            zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] No such scene.", LOG_INTERFACE);  //LOG
                             outputStream.WriteLine("ERR: No such scene.  ({0})", http_url); //FEEDBACK to USER
                             return; 
                         }
@@ -114,14 +115,14 @@ namespace zVirtualScenesApplication
                         {
                             foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                                 if (scene.ID == sceneID)
-                                {                                    
-                                    SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkController);
-                                    zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                {
+                                    SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                    zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] " + result.Description, LOG_INTERFACE);
                                     outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + ". ({0})", http_url);
                                     return;
                                 } 
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: ["+userIP+"] Cannot find scene.");
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Cannot find scene.", LOG_INTERFACE);
                         outputStream.WriteLine("ERR: Cannot find scene. ({0})", http_url); 
                         return;
                     }
@@ -142,7 +143,7 @@ namespace zVirtualScenesApplication
                         }
                         catch
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Error parsing command. ");  //LOG
+                            zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Error parsing command. ", LOG_INTERFACE);  //LOG
                             outputStream.WriteLine("ERR: Error parsing command, check syntax. ({0})", http_url); //FEEDBACK to USER
                             return;
                         }
@@ -163,15 +164,15 @@ namespace zVirtualScenesApplication
                                         action.Level = level;
 
 
-                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                                        zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] " + result.Description, LOG_INTERFACE);
                                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + " ({0})", http_url);
                                         return;
                                     }
                                 }
                             }
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Cannot find device.", LOG_INTERFACE);
                         outputStream.WriteLine("ERR: Cannot find device.", http_url);
                         return;
                     }
@@ -201,18 +202,10 @@ namespace zVirtualScenesApplication
                         }
                         catch (Exception e) 
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Error parsing command - " + e);  //LOG
+                            zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Error parsing command - " + e, LOG_INTERFACE);  //LOG
                             outputStream.WriteLine("ERR: Error parsing command, check syntax. ({0})", http_url); //FEEDBACK to USER
                             return;
-                        }
-
-                        //Make sure atleast one thermo action was chosen
-                        if (HeatCoolMode == -1 && FanMode == -1 && EngeryMode == -1 && HeatPoint == -1 && CoolPoint == -1)
-                        {
-                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Please define at least one Temperature Mode.");  //LOG
-                            outputStream.WriteLine("ERR: Please define at least one Temperature Mode. ({0})", http_url); //FEEDBACK to USER
-                            return;
-                        }                       
+                        }                      
 
                         if (node > 0)
                         {
@@ -228,15 +221,15 @@ namespace zVirtualScenesApplication
                                     action.CoolPoint = CoolPoint;
 
 
-                                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                                    zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                    zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + userIP + "] " + result.Description, LOG_INTERFACE);
                                     outputStream.WriteLine("HTTP Interface: [" + userIP + "] " + result.Description + ". ({0})", http_url);
 
                                     return;
                                 }
                             }
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Cannot find device.", LOG_INTERFACE);
                         outputStream.WriteLine("ERR: Cannot find device.", http_url);
                         return;
                     } 
@@ -245,7 +238,7 @@ namespace zVirtualScenesApplication
                     #region Device Listing
                     if (http_url.Contains(acceptedCMDs[3]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Requested a XML device listing.");                       
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] Requested a XML device listing.", LOG_INTERFACE);                       
 
                         XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zVirtualScenesMain.MasterDevices.GetType());
                         DevicetoXML.Serialize(outputStream, zVirtualScenesMain.MasterDevices);
@@ -257,7 +250,7 @@ namespace zVirtualScenesApplication
                     #region scene Listing
                     if (http_url.Contains(acceptedCMDs[4]))
                     {
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Requested a XML scene listing.");
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] Requested a XML scene listing.", LOG_INTERFACE);
 
                         XmlSerializer ScenetoXML = new System.Xml.Serialization.XmlSerializer(zVirtualScenesMain.MasterScenes.GetType());
                         ScenetoXML.Serialize(outputStream, zVirtualScenesMain.MasterScenes);
@@ -281,7 +274,7 @@ namespace zVirtualScenesApplication
                         }
                         catch
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Error parsing command. ");  //LOG
+                            zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Error parsing command. ", LOG_INTERFACE);  //LOG
                             outputStream.WriteLine("ERR: Error parsing command, check syntax. ({0})", http_url); //FEEDBACK to USER
                             return;
                         }
@@ -302,15 +295,15 @@ namespace zVirtualScenesApplication
                                         else
                                             action.Level = 0;
 
-                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkController);
-                                        zVirtualScenesMain.LogThis((int)result.ResultType, "HTTP Interface: [" + userIP + "] " + result.Description);
+                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                        zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + userIP + "] " + result.Description, LOG_INTERFACE);
                                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] " + result.Description + " ({0})", http_url);
                                         return;
                                     }
                                 }
                             }
                         }
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Cannot find device.");
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Cannot find device.", LOG_INTERFACE);
                         outputStream.WriteLine("ERR: Cannot find device.", http_url);
                         return;
                     }
@@ -320,7 +313,7 @@ namespace zVirtualScenesApplication
                     if (http_url.Contains(acceptedCMDs[6]))
                     {
                         zVirtualScenesMain.RepollDevices();
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Repolled ZWave devices.");
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] Repolled ZWave devices.", LOG_INTERFACE);
                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] Repolled ZWave devices. ({0})", http_url);                                    
                         return;
                     }
@@ -333,20 +326,20 @@ namespace zVirtualScenesApplication
                         try { nodeID = Convert.ToByte(http_url.Remove(0, acceptedCMDs[7].Length)); }
                         catch
                         {
-                            zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Invalid Node.");  //LOG
+                            zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Invalid Node.", LOG_INTERFACE);  //LOG
                             outputStream.WriteLine("ERR: Invalid Node.  ({0})", http_url); //FEEDBACK to USER
                             return;
                         }
 
                         zVirtualScenesMain.RepollDevices(nodeID);
-                        zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Repolled,  " + (nodeID == 0 ? "ALL devices." : "node " + nodeID + "."));
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + userIP + "] Repolled,  " + (nodeID == 0 ? "ALL devices." : "node " + nodeID + "."), LOG_INTERFACE);
                         outputStream.WriteLine("zVirtualScenes HTTP Interface: [" + userIP + "] Repolled,  " + (nodeID == 0 ? "ALL devices." : "node " + nodeID + "."));
                         return;
                     }
                     #endregion
 
                 outputStream.WriteLine("ERR: Command not recognized. Ignored...", http_url);
-                zVirtualScenesMain.LogThis(1, "HTTP Interface: [" + userIP + "] Command not recognized. Ignored...");
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "[" + userIP + "] Command not recognized. Ignored...", LOG_INTERFACE);
                 }                   
             }
         }

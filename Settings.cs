@@ -20,8 +20,6 @@ namespace zVirtualScenesApplication
         public int LightSwitchPort { get; set; }
         public int LightSwitchMaxConnections { get; set; }
         public string LightSwitchPassword { get; set; }
-        public bool LightSwitchDisableAuth { get; set; }
-        public bool LightSwitchAllowiViewerClients { get; set; }
 
         //Jabber INTERFACE
         public bool JabberEnanbled { get; set; }
@@ -36,20 +34,30 @@ namespace zVirtualScenesApplication
         public string Longitude { get; set; }
         public string Latitude { get; set; }
 
+        //XML Socket INTERFACE
+        public bool   XMLSocketEnabled         { get; set; }
+        public bool   XMLSocketVerbose         { get; set; }
+        public int    XMLSocketPort            { get; set; }
+        public int    XMLSocketMaxConnections  { get; set; }
+        public bool   XMLSocketAllowiViewer    { get; set; }
+        public bool   XMLSocketAllowAndroid    { get; set; }
+        public string XMLSocketAndroidPassword { get; set; }
+        
         public Settings()
         {
             this.PollingInterval = 10;
 
             //Defaults
+            //HTTP
             this.zHTTPListenEnabled = true;
             this.ZHTTPPort = 8085;
+
+            //LightSwitch
             this.LightSwitchEnabled = true;
             this.LightSwitchVerbose = false;
             this.LightSwitchPort = 1337;
             this.LightSwitchMaxConnections = 50;
             this.LightSwitchPassword = "1234";
-            this.LightSwitchDisableAuth = false;
-            this.LightSwitchAllowiViewerClients = false; 
 
             //Jabber
             this.JabberEnanbled = false; 
@@ -63,6 +71,15 @@ namespace zVirtualScenesApplication
             this.EnableNOAA = false;
             this.Longitude = "113,3,42,W";
             this.Latitude = "37,40,38,N";
+
+            //XML socket
+            this.XMLSocketEnabled = false;
+            this.XMLSocketVerbose = false;
+            this.XMLSocketPort = 1338;
+            this.XMLSocketMaxConnections = 50;
+            this.XMLSocketAllowiViewer = false;
+            this.XMLSocketAllowAndroid = false;
+            this.XMLSocketAndroidPassword = "changeme";
         }
 
     }

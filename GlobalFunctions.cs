@@ -37,6 +37,11 @@ namespace zVirtualScenesApplication
             }
         }
 
+        public static string ExtractNumbers(string expr)
+        {
+            return string.Join(null, System.Text.RegularExpressions.Regex.Split(expr, "[^\\d]"));
+        }
+
     }
     public class CustomeLevelRenderer : BarRenderer
     {

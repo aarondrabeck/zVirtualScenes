@@ -6,12 +6,12 @@ namespace zVirtualScenesApplication
 {
     class JabberInterface
     {
-        private formzVirtualScenes zVirtualScenesMain;
+        private static string LOG_INTERFACE = "JABBER"; 
+        public formzVirtualScenes zVirtualScenesMain;
         JabberClient j;
 
-        public JabberInterface(formzVirtualScenes zvs)
+        public JabberInterface()
         {
-            zVirtualScenesMain = zvs;
             j = new JabberClient();
             j.OnMessage += new MessageHandler(jabberClient1_OnMessage);
             j.OnDisconnect += new bedrock.ObjectHandler(jabberClient1_OnDisconnect);
@@ -57,44 +57,44 @@ namespace zVirtualScenesApplication
         {
             if (rp.Name == "failure")
             {
-                zVirtualScenesMain.LogThis(1, "JABBER: Invalid Username or Password.");
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "Invalid Username or Password.", LOG_INTERFACE);
             }
         }
 
         private void jabberClient1_OnAuthenticate(object sender)
         {
-            zVirtualScenesMain.LogThis(1, "JABBER: Connected");
+            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Connected using " + zVirtualScenesMain.zVScenesSettings.JabberUser +".", LOG_INTERFACE);
             j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zVirtualScenesMain.ProgramName + " server.", ":chat", 0);
         }
 
         void jabberClient1_OnError(object sender, Exception ex)
         {
-            zVirtualScenesMain.LogThis(1, "JABBER: Error connecting. - " + ex.Message);
+            zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, ex.Message, LOG_INTERFACE);
         }
 
         void jabberClient1_OnDisconnect(object sender)
         {
-            zVirtualScenesMain.LogThis(1, "JABBER: Disconnected");
+            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Disconnected.", LOG_INTERFACE);
         }
 
         private void jabberClient1_OnMessage(object sender, jabber.protocol.client.Message msg)
         {
-            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)            
-                zVirtualScenesMain.LogThis(1, "JABBER: " + msg.From.User + " Says : " + msg.Body + "\n");
+            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + msg.From.User +  "] says : " + msg.Body + "\n", LOG_INTERFACE);
         }
 
         private void j_OnWriteText(object sender, string txt)
         {
             if (txt == " ") return;
-            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)  
-                zVirtualScenesMain.LogThis(1, "JABBER SEND: " + txt);
+            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "SENT: " + txt, LOG_INTERFACE);
         }
 
         private void j_OnReadText(object sender, string txt)
         {
             if (txt == " ") return;  // ignore keep-alive spaces
-            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)            
-                zVirtualScenesMain.LogThis(1, "JABBER RECV: " + txt);
+            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "RECV: " + txt, LOG_INTERFACE);
         }
     }
 }

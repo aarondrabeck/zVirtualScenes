@@ -11,6 +11,7 @@ namespace zVirtualScenesApplication
 {
     public class HttpServer
     {
+        public static string LOG_INTERFACE = "HTTP";
         protected int port;
         TcpListener listener;
         private volatile bool is_active = true;
@@ -46,7 +47,7 @@ namespace zVirtualScenesApplication
                 }
                 catch { }
             }
-            zVirtualScenesMain.LogThis(1, "HTTP Interface: SHUTDOWN.");
+            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Stopped listening for new requests.", LOG_INTERFACE);
         }
                
     }

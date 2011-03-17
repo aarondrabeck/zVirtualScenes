@@ -9,6 +9,7 @@ namespace zVirtualScenesApplication
 {
     public sealed class KeyboardHook : IDisposable
     {
+        public static string LOG_INTERFACE = "GLOBALKEYS";
         public formzVirtualScenes form;
         // Registers a hot key with Windows.
         [DllImport("user32.dll")]
@@ -88,7 +89,7 @@ namespace zVirtualScenesApplication
 
             // register the hot key.
             if (!RegisterHotKey(_window.Handle, _currentId, (uint)modifier, (uint)key))
-                form.LogThis(2, "Could not register the hot key.");
+                form.AddLogEntry(UrgencyLevel.ERROR, "Could not register the hot key.", LOG_INTERFACE);
             
         }
 

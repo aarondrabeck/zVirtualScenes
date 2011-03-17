@@ -9,20 +9,21 @@ namespace zVirtualScenesApplication
 {
     class GrowlInterface
     {
+        private static string LOG_INTERFACE = "GROWL";
+        public formzVirtualScenes formzVirtualScenesMain;
         public const string NOTIFY_DEVICE_LEVEL_CHANGE = "DEVICE_LEVEL_CHANGE";
         public const string NOTIFY_TEMP_ALERT = "TEMP_ALERT";
-
         public GrowlConnector GrowlConnector = new GrowlConnector();
 
-        public GrowlInterface(formzVirtualScenes formzVirtualScenesMain)
-		{
-			try 
+        public void RegisterGrowl()
+        {
+            try
             {
                 System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formzVirtualScenes));
-				Growl.Connector.Application application = new  Growl.Connector.Application("zVirtualScenes");
-				string exePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+                Growl.Connector.Application application = new Growl.Connector.Application("zVirtualScenes");
+                string exePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
                 application.Icon = new Bitmap(System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream("zVirtualScenesApplication.Resources.zvirtualscenes57.png"));
-                
+
                 NotificationType DeviceLevelChange = new NotificationType(NOTIFY_DEVICE_LEVEL_CHANGE, "Device Level Changed");
                 DeviceLevelChange.Icon = new Bitmap(System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream("zVirtualScenesApplication.Resources.Broadcast48.png"));
 
@@ -30,13 +31,13 @@ namespace zVirtualScenesApplication
                 Temp.Icon = new Bitmap(System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream("zVirtualScenesApplication.Resources.temperature48.png"));
 
                 GrowlConnector.Register(application, new NotificationType[] { DeviceLevelChange, Temp });
-                formzVirtualScenesMain.LogThis(1, "Growl Interface: Registered Growl Interface");				
-			} 
-            catch (Exception ex) 
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Registered Growl Interface.", LOG_INTERFACE);
+            }
+            catch (Exception ex)
             {
-                formzVirtualScenesMain.LogThis(2, "Growl Interface: Growl Error: " + ex.Message);
-			}
-		}
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, "Error registering Growl. " + ex.Message, LOG_INTERFACE);
+            }
+        }
 
         public void Notify(string notificationName, string id, string title, string text)
         {

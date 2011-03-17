@@ -1,6 +1,13 @@
-* Changed HTTP ListScenes to output XML
-* Added LS client command IVIEWER for iViewer clients
-* Device updates sent to LightSwitch socket clients.
+*ver 1.5.4093.20328 - 3-17-11*
+  * Changed HTTP ListScenes to output XML
+  * Device updates sent to LightSwitch socket clients.
+  * Greater Log Detail
+  * Faster Loading Time
+  * Removed iViewer support for lightswitch socket server
+  * Added new XML sockets protocol.
+  * Added iViewer XML socket support. 
+  * Expanded Settings tab
+  * Binary Switch tweaks and bug fixes.
 
 *ver 1.4.2.0 - 3-10-11*
   * Fixed another HTTP Interface bug

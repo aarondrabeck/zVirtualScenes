@@ -124,8 +124,8 @@ namespace zVirtualScenesApplication
         {
             if (UpdateThermostatAction(TheAction))
             {
-                ActionResult result = TheAction.Run(_zVirtualScenesMain.ControlThinkController);
-                _zVirtualScenesMain.LogThis((int)result.ResultType, "GUI: [USER] " + result.Description);
+                ActionResult result = TheAction.Run(_zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                _zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "GUI: [USER] " + result.Description);
                 lbl_Status.Text = result.ResultType + " " + result.Description;
             }
         }

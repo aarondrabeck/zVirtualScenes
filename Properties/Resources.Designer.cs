@@ -137,13 +137,6 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
-        internal static System.Drawing.Bitmap switch_icon32 {
-            get {
-                object obj = ResourceManager.GetObject("switch_icon32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
         internal static System.Drawing.Bitmap temperature48 {
             get {
                 object obj = ResourceManager.GetObject("temperature48", resourceCulture);

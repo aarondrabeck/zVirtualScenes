@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using System.Drawing.Drawing2D;
 using BrightIdeasSoftware;
 using System.Globalization;
+using System.Reflection;
 
 namespace zVirtualScenesApplication
 {
@@ -29,29 +30,28 @@ namespace zVirtualScenesApplication
         public string ProgramName = "zVirtualScenes - v" + Application.ProductVersion;
 
         //Forms and Controllers
-        public readonly ZWaveController ControlThinkController = new ZWaveController();
+        public ControlThinkInterface ControlThinkInt = new ControlThinkInterface();
         private formPropertiesScene formSceneProperties = new formPropertiesScene();
-
-        private LightSwitchInterface LightSwitchInt;
-        private JabberInterface jabber;
-        private ControlThinkRePoll refresher;
+        private XMLSocketInterface SocketInt = new XMLSocketInterface();
+        private LightSwitchInterface LightSwitchInt = new LightSwitchInterface();
+        private JabberInterface jabber = new JabberInterface();
+        private ControlThinkRepoller refresher = new ControlThinkRepoller();
         private KeyboardHook hook = new KeyboardHook();
-        private GrowlInterface growl;
+        private GrowlInterface growl = new GrowlInterface();
 
         //Threads 
         Thread HTTPInterfaceTread;
         HttpServer httpServer;
 
         //Delegates
-        public delegate void LogThisDelegate(int type, string message);
+        public delegate void LogThisDelegate(UrgencyLevel urgency, string message, string theInterface);
         public delegate void SetlabelSceneRunStatusDelegate(string text);
-        public delegate void ControlThinkConnectDelegate();
-        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRePoll.changeType TypeOfChange);
+        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRepoller.changeType TypeOfChange);
         public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
         public delegate void RepollDevicesDelegate(byte node = 0);
 
         //CORE OBJECTS
-        private BindingList<String> MasterLog = new BindingList<string>();
+        private BindingList<LogItem> Masterlog = new BindingList<LogItem>();
         public BindingList<ZWaveDevice> MasterDevices = new BindingList<ZWaveDevice>();
         public BindingList<Scene> MasterScenes = new BindingList<Scene>();
         public BindingList<Task> MasterTimerEvents = new BindingList<Task>();
@@ -60,7 +60,8 @@ namespace zVirtualScenesApplication
 
         public formzVirtualScenes()
         {
-            InitializeComponent();
+            InitializeComponent();  
+
             //Load form size
             GeometryFromString(Properties.Settings.Default.WindowGeometry, this);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.zVirtualScenes_FormClosing);
@@ -82,6 +83,8 @@ namespace zVirtualScenesApplication
 
         }
 
+       
+        
         private void zVirtualScenes_Load(object sender, EventArgs e)
         {
             this.Text = ProgramName;
@@ -90,15 +93,16 @@ namespace zVirtualScenesApplication
             comboBoxNonZWAction.SelectedIndex = 0;
 
             //Setup Log
-            listBoxLog.DataSource = MasterLog;
-            LogThis(1, ProgramName + " STARTED");
+            dataListViewLog.DataSource = Masterlog;
+            AddLogEntry(UrgencyLevel.INFO, ProgramName + " STARTED");
 
             //Load XML Saved Settings
-            LoadSettings();
+            LoadSettingsFromXML();
+            PopulateSettingsTabWithUsersSettings();
 
-            //Query Zcommander for Devices
-            ControlThinkConnect();
-            ControlThinkGetDevices();
+            //Query USB for Devices
+            ControlThinkInt.formzVirtualScenesMain = this;
+            ControlThinkInt.ConnectAndLoadDevices();
 
             //Bind data to GUI elements
             // Devices
@@ -119,31 +123,34 @@ namespace zVirtualScenesApplication
             StartHTPP();
 
             //LightSwitch Clients
-            LightSwitchInt = new LightSwitchInterface(this);
+            LightSwitchInt.zVirtualScenesMain = this;
             if (zVScenesSettings.LightSwitchEnabled)
                 LightSwitchInt.OpenLightSwitchSocket();
 
-
             //Start Listening for device changes
-            refresher = new ControlThinkRePoll(this);
+            refresher.zVirtualScenesMain = this; 
             new Thread(new ThreadStart(refresher.RefreshThread)).Start();
-            refresher.DeviceInfoChange += new ControlThinkRePoll.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);
+            refresher.DeviceInfoChange += new ControlThinkRepoller.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);
            
-
+            //XML Socket Clients
+            SocketInt.zVirtualScenesMain = this;
+            if(zVScenesSettings.XMLSocketEnabled)
+                SocketInt.StartListening();
 
             //JABBER
-            jabber = new JabberInterface(this);
+            jabber.zVirtualScenesMain = this;
             if (zVScenesSettings.JabberEnanbled)
                 jabber.Connect();
 
-            growl = new GrowlInterface(this);
+            growl.formzVirtualScenesMain = this;
+            growl.RegisterGrowl();
 
             //Task Scheduler
             comboBox_FrequencyTask.DataSource = Enum.GetNames(typeof(Task.frequencys));
             dataListTasks.DataSource = MasterTimerEvents;
             comboBox_ActionsTask.DataSource = MasterScenes;
 
-            //Add default item if list is empty
+            //Add default timer item if list is empty
             if (MasterTimerEvents.Count < 1)
                 AddNewTask();
             else
@@ -190,11 +197,11 @@ namespace zVirtualScenesApplication
                 hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.X);
                 hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Y);
                 hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Z);
-                LogThis(1, "Global HotKey Interface:  Registered global hotkeys.");
+                AddLogEntry(UrgencyLevel.INFO, "Registered global hotkeys.", KeyboardHook.LOG_INTERFACE);
             }
             catch (Exception ex)
             {
-                LogThis(2, "Global HotKey Interface:  Failed to register global hotkeys. - " + ex.Message);
+                AddLogEntry(UrgencyLevel.ERROR, "Failed to register global hotkeys. - " + ex.Message, KeyboardHook.LOG_INTERFACE);
             }
 
             #endregion
@@ -207,23 +214,28 @@ namespace zVirtualScenesApplication
         }
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            SaveSettingsToFile();
-            if (ControlThinkController.IsConnected)
-                ControlThinkController.Disconnect();
+        {            
+            if (ControlThinkInt.ControlThinkController.IsConnected)
+                ControlThinkInt.ControlThinkController.Disconnect();
+
+            if (HTTPInterfaceTread != null && HTTPInterfaceTread.IsAlive)
+                httpServer.RequestStop();
+
+            jabber.Disconnect();
+            LightSwitchInt.CloseLightSwitchSocket();
+            SocketInt.StopListening();
+
+            dataListViewLog.DataSource = null;
 
             SaveSettingsToFile();
-
-            if (jabber != null)
-                jabber.Disconnect();
 
             Properties.Settings.Default.WindowGeometry = GeometryToString(this);
             Properties.Settings.Default.Save();
-
+            
             Environment.Exit(1);
         }
 
-        private void DeviceInfoChange_Handler(string GlbUniqueID, ControlThinkRePoll.changeType TypeOfChange)
+        private void DeviceInfoChange_Handler(string GlbUniqueID, ControlThinkRepoller.changeType TypeOfChange)
         {
             if (this.InvokeRequired)
                 this.Invoke(new DeviceInfoChange_HandlerDelegate(DeviceInfoChange_Handler), new object[] { GlbUniqueID, TypeOfChange });
@@ -236,7 +248,7 @@ namespace zVirtualScenesApplication
                         string notification = "Event Notification Error";
                         string notificationprefix = DateTime.Now.ToString("T") + ": ";
 
-                        if (device.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch && TypeOfChange == ControlThinkRePoll.changeType.LevelChanged)
+                        if (device.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch && TypeOfChange == ControlThinkRepoller.changeType.LevelChanged)
                         {
                             notification = device.Name + " state changed from " + (device.prevLevel > 0 ? "ON" : "OFF") + " to " + (device.Level > 0 ? "ON" : "OFF") + ".";
 
@@ -246,7 +258,7 @@ namespace zVirtualScenesApplication
                             if (growl != null && device.SendGrowlNotifications)
                                 growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Level Changed", notification);
                         }
-                        if (device.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch && TypeOfChange == ControlThinkRePoll.changeType.LevelChanged)
+                        if (device.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch && TypeOfChange == ControlThinkRepoller.changeType.LevelChanged)
                         {
                             notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";
 
@@ -258,7 +270,7 @@ namespace zVirtualScenesApplication
                         }
                         else if (device.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
                         {
-                            if (TypeOfChange == ControlThinkRePoll.changeType.TempChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.TempChanged)
                             {
                                 notification = device.Name + " temperature changed from " + device.prevTemp + " degrees to " + device.Temp + " degrees.";
                                 string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees.";
@@ -274,7 +286,7 @@ namespace zVirtualScenesApplication
                                         if (jabber != null && device.SendJabberNotifications)
                                             jabber.SendMessage(notificationprefix + urgetnotification);
 
-                                        LogThis(1, urgetnotification);
+                                        AddLogEntry(UrgencyLevel.INFO, urgetnotification);
                                     }
                                 }
 
@@ -285,7 +297,7 @@ namespace zVirtualScenesApplication
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
 
                             }
-                            if (TypeOfChange == ControlThinkRePoll.changeType.CoolPointChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.CoolPointChanged)
                             {
                                 notification = device.Name + " cool point changed from " + device.prevCoolPoint + " to " + device.CoolPoint + ".";
 
@@ -295,7 +307,7 @@ namespace zVirtualScenesApplication
                                 if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
-                            if (TypeOfChange == ControlThinkRePoll.changeType.HeatPointChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.HeatPointChanged)
                             {
                                 notification = device.Name + " heat point changed from " + device.prevHeatPoint + " to " + device.HeatPoint + ".";
 
@@ -305,7 +317,7 @@ namespace zVirtualScenesApplication
                                 if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
-                            if (TypeOfChange == ControlThinkRePoll.changeType.FanModeChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.FanModeChanged)
                             {
                                 notification = device.Name + " fan mode changed from " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), device.prevFanMode) + " to " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), device.FanMode) + ".";
 
@@ -315,7 +327,7 @@ namespace zVirtualScenesApplication
                                 if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
-                            if (TypeOfChange == ControlThinkRePoll.changeType.HeatCoolModeChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.HeatCoolModeChanged)
                             {
                                 notification = device.Name + " mode changed from " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), device.prevHeatCoolMode) + " to " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), device.HeatCoolMode) + ".";
 
@@ -325,7 +337,7 @@ namespace zVirtualScenesApplication
                                 if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
-                            if (TypeOfChange == ControlThinkRePoll.changeType.LevelChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.LevelChanged)
                             {
                                 notification = device.Name + " energy state changed from " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), device.prevLevel) + " to " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), device.Level) + ".";
 
@@ -335,7 +347,7 @@ namespace zVirtualScenesApplication
                                 if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
-                            if (TypeOfChange == ControlThinkRePoll.changeType.CurrentStateChanged)
+                            if (TypeOfChange == ControlThinkRepoller.changeType.CurrentStateChanged)
                             {
                                 notification = device.Name + " changed state from " + device.prevCurrentState + " to " + device.CurrentState + ".";
 
@@ -346,17 +358,26 @@ namespace zVirtualScenesApplication
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
                         }
-                        LogThis(1, notification);
+                        AddLogEntry(UrgencyLevel.INFO, notification,ControlThinkRepoller.LOG_INTERFACE);
                         labelLastEvent.Text = notification;
 
-                       LightSwitchInt.BroadcastMessage(device.ToLightSwitchSocketString(true) + Environment.NewLine);                        
-                       LightSwitchInt.BroadcastMessage("ENDLIST" + Environment.NewLine);
+                        LightSwitchInt.BroadcastMessage(LightSwitchInt.TranslateDeviceToLightSwitchString(device, true) + Environment.NewLine);                        
+                        LightSwitchInt.BroadcastMessage("ENDLIST" + Environment.NewLine);
+
+                        //Send XML event notification
+                        SocketInt.BroadcastMessage("<event type=\"DeviceStateChange\" alertlevel=\"Success\" description=\"" + notification + "\" />");
+
+                        //Send full XML device to Socket Clients so they can easily replace device to get new levels
+                        StringWriter devicetoXML = new StringWriter();
+                        XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(device.GetType());
+                        DevicetoXML.Serialize(devicetoXML, device);
+                        SocketInt.BroadcastMessage(devicetoXML.ToString());
                     }
                 }
                 dataListViewDevices.DataSource = null;
                 dataListViewDevices.DataSource = MasterDevices;
             }
-        }
+        }       
 
         #region Saving and Resorting MAIN FORM Sizing
 
@@ -454,8 +475,8 @@ namespace zVirtualScenesApplication
                 {
                     if (Enum.GetName(typeof(CustomHotKeys), thiscene.GlobalHotKey) == KeysPresseed)
                     {
-                        SceneResult result = thiscene.Run(ControlThinkController);
-                        LogThis((int)result.ResultType, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
+                        SceneResult result = thiscene.Run(ControlThinkInt.ControlThinkController);
+                        AddLogEntry((UrgencyLevel)result.ResultType, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
                     }
                 }
             }
@@ -506,154 +527,7 @@ namespace zVirtualScenesApplication
 
         #endregion
 
-        #region ControlThink ZWave Controller Code
-
-        public void ControlThinkConnect()
-        {
-            if (this.InvokeRequired)
-                this.Invoke(new ControlThinkConnectDelegate(ControlThinkConnect));
-            else
-            {
-                if (ControlThinkController.IsConnected)
-                    return;
-                try
-                {
-                    ControlThinkController.SynchronizingObject = this;
-                    ControlThinkController.Connected += new System.EventHandler(ControlThinkUSBConnectedEvent);
-                    ControlThinkController.Disconnected += new System.EventHandler(ControlThinkUSBDisconnectEvent);
-                    ControlThinkController.ControllerNotResponding += new System.EventHandler(ControlThinkUSBNotRespondingEvent);
-                    ControlThinkController.LevelChanged += new ZWaveController.LevelChangedEventHandler(ControlThinkController_LevelChanged);
-                    ControlThinkController.Connect();
-                }
-                catch (Exception e)
-                {
-                    LogThis(2, "ControlThink USB Cennection Error: " + e);
-                }
-            }
-        }
-
-        private void ControlThinkController_LevelChanged(object sender, ControlThink.ZWave.ZWaveController.LevelChangedEventArgs e)
-        {
-            LogThis(1, "ZWave device sent level change notification. Node: " + e.OriginDevice.NodeID + ".");
-            refresher.RePollDevices(e.OriginDevice.NodeID);
-        }
-
-        public void ControlThinkGetDevices()
-        {
-            int saveSelected = dataListViewDevices.SelectedIndex;
-            MasterDevices.Clear();
-
-            if (ControlThinkController.IsConnected)
-            {
-                foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
-                {
-                    //Store device info for speed 
-                    ControlThink.ZWave.Devices.ZWaveDevice DeviceFoundOnNetowrk = device;
-
-                    try
-                    {
-                        LogThis(1, "Found " + DeviceFoundOnNetowrk.ToString() + ".");
-
-                        if (!DeviceFoundOnNetowrk.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
-                        {
-                            //Convert Device to Action
-                            ZWaveDevice newDevice = new ZWaveDevice();
-                            newDevice.zVirtualScenesMain = this;
-                            newDevice.HomeID = ControlThinkController.HomeID;
-                            newDevice.NodeID = DeviceFoundOnNetowrk.NodeID;
-                            newDevice.Level = DeviceFoundOnNetowrk.Level;
-
-                            //BINARY SWITCHES
-                            if (DeviceFoundOnNetowrk is ControlThink.ZWave.Devices.BinarySwitch)
-                            {
-                                newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.BinarySwitch;
-                                newDevice.Name = "Binary Switch";
-                            }
-                            //MULTILEVEL
-                            else if (DeviceFoundOnNetowrk is ControlThink.ZWave.Devices.MultilevelSwitch)
-                            {
-                                newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch;
-                                newDevice.Name = "Multi-level Switch";
-                            }
-                            //Therostats
-                            else if (DeviceFoundOnNetowrk is ControlThink.ZWave.Devices.Thermostat)
-                            {
-                                newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.Thermostat;
-                                newDevice.Name = "Thermostat";
-
-                                ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)DeviceFoundOnNetowrk;
-                                newDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
-                                newDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
-                                newDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
-                                newDevice.FanMode = (int)thermostat.ThermostatFanMode;
-                                newDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
-                                newDevice.Level = thermostat.Level;
-                                newDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
-                            }
-                            else
-                            {
-                                LogThis(2, "Device type  " + DeviceFoundOnNetowrk.ToString() + " UNKNOWN.");
-                            }
-
-
-
-                            //Overwirte Name from the Custom Device Saved Data if present.
-                            foreach (ZWaveDeviceUserSettings PreviouslySavedDevice in SavedZWaveDeviceUserSettings)
-                            {
-                                if (newDevice.GlbUniqueID() == PreviouslySavedDevice.GlbUniqueID())
-                                {
-                                    newDevice.Name = PreviouslySavedDevice.Name;
-                                    newDevice.NotificationDetailLevel = PreviouslySavedDevice.NotificationDetailLevel;
-                                    newDevice.SendJabberNotifications = PreviouslySavedDevice.SendJabberNotifications;
-                                    newDevice.MaxAlertTemp = PreviouslySavedDevice.MaxAlertTemp;
-                                    newDevice.MinAlertTemp = PreviouslySavedDevice.MinAlertTemp;
-                                    newDevice.GroupName = PreviouslySavedDevice.GroupName;
-                                    newDevice.ShowInLightSwitchGUI = PreviouslySavedDevice.ShowInLightSwitchGUI;
-                                    newDevice.MomentaryOnMode = PreviouslySavedDevice.MomentaryOnMode;
-                                    newDevice.MomentaryTimespan = PreviouslySavedDevice.MomentaryTimespan;
-                                }
-                            }
-                            MasterDevices.Add(newDevice);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        LogThis(2, "ControlThink USB Trouble Loading Devices: " + e);
-                    }
-                }
-                LogThis(1, "ControlThink USB Loaded " + MasterDevices.Count() + " Devices.");
-
-                //reset GUI items
-                try { dataListViewDevices.SelectedIndex = saveSelected; }
-                catch { }
-            }
-            else
-                ControlThinkConnect();
-        }
-
-        private void ControlThinkUSBConnectedEvent(object sender, EventArgs e)
-        {
-            LogThis(1, "ControlThink USB Connected to HomeId - " + Convert.ToString(ControlThinkController.HomeID));
-        }
-
-        private void ControlThinkUSBDisconnectEvent(object sender, EventArgs e)
-        {
-            LogThis(1, "ControlThink USB Disconnected.");
-        }
-
-        private void ControlThinkUSBNotRespondingEvent(object sender, EventArgs e)
-        {
-            LogThis(2, "ControlThink USB Not Responding.");
-            try
-            {
-                ControlThinkController.Disconnect();
-            }
-            catch
-            {
-            }
-        }
-
-        #endregion
+        
 
         #region HTTP INTERFACE
 
@@ -668,12 +542,12 @@ namespace zVirtualScenesApplication
                         httpServer = new HttpServer(zVScenesSettings.ZHTTPPort, this);
                         HTTPInterfaceTread = new Thread(new ThreadStart(httpServer.listen));
                         HTTPInterfaceTread.Start();
-                        LogThis(1, "HTTP Interface: Started listening for HTTP commands on all adapters.");
+                        AddLogEntry(UrgencyLevel.INFO, "Started listening for HTTP commands on all adapters.", HttpServer.LOG_INTERFACE);
                     }
                 }
                 catch (Exception e)
                 {
-                    LogThis(2, "HTTP Interface: FAILED to Start HTTP Listening: " + e);
+                    AddLogEntry(UrgencyLevel.ERROR, "FAILED to Start HTTP Listening: " + e.Message, HttpServer.LOG_INTERFACE);
                 }
             }
         }
@@ -682,7 +556,7 @@ namespace zVirtualScenesApplication
 
         #region Settings TAB
 
-        private void AssignSavedSettingstoGUI()
+        private void PopulateSettingsTabWithUsersSettings()
         {
             //General Settings 
             textBoxRepolling.Text = zVScenesSettings.PollingInterval.ToString();
@@ -698,8 +572,6 @@ namespace zVirtualScenesApplication
             textBoxLSport.Text = Convert.ToString(zVScenesSettings.LightSwitchPort);
             checkBoxLSEnabled.Checked = zVScenesSettings.LightSwitchEnabled;
             checkBoxLSDebugVerbose.Checked = zVScenesSettings.LightSwitchVerbose;
-            checkBoxLSDAuth.Checked = zVScenesSettings.LightSwitchDisableAuth;
-            checkBoxAllowiViewer.Checked = zVScenesSettings.LightSwitchAllowiViewerClients;
 
             //JAbber
             textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
@@ -713,6 +585,16 @@ namespace zVirtualScenesApplication
             checkBoxEnableNOAA.Checked = zVScenesSettings.EnableNOAA;
             textBox_Latitude.Text = zVScenesSettings.Latitude;
             textBox_Longitude.Text = zVScenesSettings.Longitude;
+
+            //XML Socket
+            checkBoxEnableSocketInt.Checked = zVScenesSettings.XMLSocketEnabled;
+            checkBoxSocketVerbose.Checked = zVScenesSettings.XMLSocketVerbose;
+            textBoxSocketListenPort.Text = zVScenesSettings.XMLSocketPort.ToString();
+            textBoxSocketConnectionLimit.Text = zVScenesSettings.XMLSocketMaxConnections.ToString();
+            checkBoxAllowiViewer.Checked = zVScenesSettings.XMLSocketAllowiViewer;
+            checkBoxAllowAndroid.Checked = zVScenesSettings.XMLSocketAllowAndroid;
+            textBoxAndroidPassword.Text = zVScenesSettings.XMLSocketAndroidPassword;
+            
         }
 
         #endregion
@@ -746,26 +628,26 @@ namespace zVirtualScenesApplication
             }
             catch (Exception e)
             {
-                LogThis(2, "Error saving XML: (" + e + ")");
+                AddLogEntry(UrgencyLevel.ERROR, "Error saving XML: (" + e.Message + ")");
             }
 
             //SAVE LOG
             try
             {
                 StreamWriter SW = new System.IO.StreamWriter(APP_PATH + "zVirtualScenes.log", false, Encoding.ASCII);
-                foreach (string item in MasterLog)
-                    SW.Write(item);
+                foreach (LogItem item in Masterlog)
+                    SW.Write(item.ToString());
                 SW.Close();
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error saving LOG: (" + e + ")");
+                MessageBox.Show("Error saving LOG: (" + e.Message + ")");
             }
 
 
         }
 
-        private void LoadSettings()
+        private void LoadSettingsFromXML()
         {
             if (File.Exists(APP_PATH + "zVirtualScenes-Scenes.xml"))
             {
@@ -779,7 +661,7 @@ namespace zVirtualScenesApplication
                 }
                 catch (Exception e)
                 {
-                    LogThis(2, "Error loading Scene XML: (" + e + ")");
+                    AddLogEntry(UrgencyLevel.ERROR, "Error loading Scene XML: (" + e.Message + ")");
                 }
             }
             else
@@ -802,11 +684,10 @@ namespace zVirtualScenesApplication
                     FileStream SettingsileStream = new FileStream(APP_PATH + "zVirtualScenes-Settings.xml", FileMode.Open);
                     zVScenesSettings = (Settings)SettingsSerializer.Deserialize(SettingsileStream);
                     SettingsileStream.Close();
-                    AssignSavedSettingstoGUI();
                 }
                 catch (Exception e)
                 {
-                    LogThis(2, "Error loading Settings XML: (" + e + ")");
+                    AddLogEntry(UrgencyLevel.ERROR, "Error loading Settings XML: (" + e.Message + ")");
                 }
             }
 
@@ -821,7 +702,7 @@ namespace zVirtualScenesApplication
                 }
                 catch (Exception e)
                 {
-                    LogThis(2, "Error loading Settings XML: (" + e + ")");
+                    AddLogEntry(UrgencyLevel.ERROR, "Error loading Settings XML: (" + e.Message + ")");
                 }
             }
 
@@ -836,15 +717,15 @@ namespace zVirtualScenesApplication
                 }
                 catch (Exception e)
                 {
-                    LogThis(2, "Error loading Settings XML: (" + e + ")");
+                    AddLogEntry(UrgencyLevel.ERROR, "Error loading Settings XML: (" + e.Message + ")");
                 }
             }
-            LogThis(1, "Loaded Program Settings.");
+            AddLogEntry(UrgencyLevel.INFO, "Loaded Program Settings.");
         }
 
         #endregion
 
-        #region GUI Events
+        #region GUI Events     
 
         #region Scene List Box Handeling
 
@@ -858,8 +739,8 @@ namespace zVirtualScenesApplication
             if (dataListViewScenes.SelectedIndex != -1)
             {
                 Scene selectedscene = (Scene)dataListViewScenes.SelectedObject;
-                SceneResult result = selectedscene.Run(ControlThinkController);
-                LogThis((int)result.ResultType, "GUI: [USER] " + result.Description);
+                SceneResult result = selectedscene.Run(ControlThinkInt.ControlThinkController);
+                AddLogEntry((UrgencyLevel)result.ResultType, "GUI: [USER] " + result.Description);
                 labelSceneRunStatus.Text = result.ResultType + " " + result.Description;
             }
             else
@@ -1339,19 +1220,9 @@ namespace zVirtualScenesApplication
                 OpenDevicePropertyWindow();
         }
 
-        private void reconnectToControlThinkUSBToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            ControlThinkConnect();
-        }
-
         private void findNewDevicesToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            ControlThinkGetDevices();
-        }
-
-        private void reconnectToControlThinkUSBToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ControlThinkConnect();
+            ControlThinkInt.ConnectAndLoadDevices();
         }
 
         private void dataListViewDevices_CellRightClick(object sender, CellRightClickEventArgs e)
@@ -1385,7 +1256,7 @@ namespace zVirtualScenesApplication
 
         private void findNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ControlThinkGetDevices();
+            ControlThinkInt.ConnectAndLoadDevices();
         }
 
         /// <summary>
@@ -1487,13 +1358,8 @@ namespace zVirtualScenesApplication
             zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
             zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
             zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
-            zVScenesSettings.LightSwitchDisableAuth = checkBoxLSDAuth.Checked;
-            zVScenesSettings.LightSwitchAllowiViewerClients = checkBoxAllowiViewer.Checked;
 
-            if (checkBoxLSEnabled.Checked)
-                LightSwitchInt.OpenLightSwitchSocket();
-            else
-                LightSwitchInt.CloseLightSwitchSocket();
+            
 
             try
             {
@@ -1514,6 +1380,11 @@ namespace zVirtualScenesApplication
                 saveOK = false;
                 MessageBox.Show("Invalid LightSwitch Max Connections.", ProgramName);
             }
+
+            if (checkBoxLSEnabled.Checked)
+                LightSwitchInt.OpenLightSwitchSocket();
+            else
+                LightSwitchInt.CloseLightSwitchSocket();
 
             //JABBER
             zVScenesSettings.JabberPassword = textBoxJabberPassword.Text;
@@ -1555,6 +1426,42 @@ namespace zVirtualScenesApplication
                 DisplaySunset();
             }
 
+            //XML Socket
+            zVScenesSettings.XMLSocketEnabled = checkBoxEnableSocketInt.Checked;
+            zVScenesSettings.XMLSocketVerbose = checkBoxSocketVerbose.Checked;
+
+            
+
+            try
+            {
+                zVScenesSettings.XMLSocketPort = Convert.ToInt32(textBoxSocketListenPort.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid XML Socket Port.", ProgramName);
+            }
+
+            try
+            {
+                zVScenesSettings.XMLSocketMaxConnections = Convert.ToInt32(textBoxSocketConnectionLimit.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid XML Socket Max Connections.", ProgramName);
+            }
+
+            zVScenesSettings.XMLSocketAllowiViewer = checkBoxAllowiViewer.Checked;
+            zVScenesSettings.XMLSocketAllowAndroid = checkBoxAllowAndroid.Checked;
+            zVScenesSettings.XMLSocketAndroidPassword = textBoxAndroidPassword.Text;
+
+            //Must be last incase server port or properties change.
+            if (checkBoxEnableSocketInt.Checked)
+                SocketInt.StartListening();
+            else
+                SocketInt.StopListening();
+
             if (saveOK)
                 labelSaveStatus.Text = "Settings Saved.";
             else
@@ -1567,7 +1474,7 @@ namespace zVirtualScenesApplication
 
         private void SceneExecutionFinsihed_Handler(object sender, SceneResult _SceneResult)
         {
-            LogThis((int)_SceneResult.ResultType, _SceneResult.Description);
+            AddLogEntry((UrgencyLevel)_SceneResult.ResultType, _SceneResult.Description);
 
             //Send to LightSwitchClients
             if (zVScenesSettings.LightSwitchEnabled)
@@ -1575,33 +1482,32 @@ namespace zVirtualScenesApplication
                 LightSwitchInt.BroadcastMessage("MSG~" + _SceneResult.Description);
             }
 
+            //Notifiy Socket Clients
+            SocketInt.BroadcastMessage("<event type=\"SceneExecutionFinished\" alertlevel=\"" + (int)_SceneResult.ResultType + "\" description=\"" + _SceneResult.Description + "\" />");
+
             //Invoke because called from another thread. 
             SetlabelSceneRunStatus(_SceneResult.Description);
         }
 
         #endregion
 
-        #region Invokeable Functions
+        #region Invokeable Functions      
         /// <summary>
         /// Logs an event that can be called from any thread.  Self Invokes.
         /// </summary>
-        /// <param name="type">1 = INFO, 2 = ERROR, DEFAULT INFO</param>
+        /// <param name="level">Level</param>
         /// <param name="message">Log Event Message</param>
-        public void LogThis(int type, string message)
+        public void AddLogEntry(UrgencyLevel urgency, string message, string theInterface = "MAIN")
         {
-            string datetime = DateTime.Now.ToString("s");
-            string typename;
-            if (type == 2)
-                typename = "[ERROR]";
-            else
-                typename = "[INFO ]";
-
             if (this.InvokeRequired)
-                this.Invoke(new LogThisDelegate(LogThis), new object[] { type, message });
+                this.Invoke(new LogThisDelegate(AddLogEntry), new object[] { urgency, message, theInterface });
             else
             {
-                MasterLog.Add(datetime + " " + typename + " - " + message + "\n");
-                listBoxLog.SelectedIndex = listBoxLog.Items.Count - 1;
+                LogItem item = new LogItem();
+                item.urgency = urgency;
+                item.InterfaceName = theInterface;
+                item.description = message;
+                Masterlog.Add(item);
             }
         }
 
@@ -1713,12 +1619,12 @@ namespace zVirtualScenesApplication
             {
                 if (SceneID == scene.ID)
                 {
-                    LogThis(1, "Scheduled task '" + taskname + "' exectued scene '" + scene.Name + "'.");
-                    scene.Run(ControlThinkController);
+                    AddLogEntry(UrgencyLevel.INFO, "Scheduled task '" + taskname + "' exectued scene '" + scene.Name + "'.");
+                    scene.Run(ControlThinkInt.ControlThinkController);
                     return;
                 }
             }
-            LogThis(2, "Scheduled task '" + taskname + "' failed to find scene ID '" + SceneID.ToString() + "'.");
+            AddLogEntry(UrgencyLevel.WARNING, "Scheduled task '" + taskname + "' failed to find scene ID '" + SceneID.ToString() + "'.");
         }
 
         public static int NumberOfWeeks(DateTime dateFrom, DateTime dateTo)
@@ -1772,30 +1678,30 @@ namespace zVirtualScenesApplication
                     Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
-                        LogThis(1, "It is now sunrise. Activating sunrise scenes.");
+                        AddLogEntry(UrgencyLevel.INFO, "It is now sunrise. Activating sunrise scenes.");
 
                         foreach (Scene scene in MasterScenes)
                         {
                             if (scene.ActivateAtSunrise)
-                                scene.Run(ControlThinkController);
+                                scene.Run(ControlThinkInt.ControlThinkController);
                         }
                     }
 
                     Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                     {
-                        LogThis(1, "It is now sunset. Activating sunset scenes.");
+                        AddLogEntry(UrgencyLevel.INFO, "It is now sunset. Activating sunset scenes.");
 
                         foreach (Scene scene in MasterScenes)
                         {
                             if (scene.ActivateAtSunset)
-                                scene.Run(ControlThinkController);
+                                scene.Run(ControlThinkInt.ControlThinkController);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogThis(2, "Error calulating Sunrise/Sunset. - " + ex.Message);
+                    AddLogEntry(UrgencyLevel.WARNING, "Error calulating Sunrise/Sunset. - " + ex.Message);
                 }
             }
         }
@@ -2112,12 +2018,22 @@ namespace zVirtualScenesApplication
             AddNewTask();
         }
 
+
+
         #endregion
+
+        private void textBoxJabberUserTo_TextChanged(object sender, EventArgs e)
+        {
+
+        }
 
       
 
         #endregion
 
-       
+        private void checkBoxHideAndroidPassword_CheckedChanged(object sender, EventArgs e)
+        {
+            textBoxAndroidPassword.UseSystemPasswordChar = checkBoxHideAndroidPassword.Checked;
+        }       
     }
 }

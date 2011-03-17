@@ -1,0 +1,81 @@
+== PROTOCOL ==
+
+ === Authentication ===
+ On connect, a user must authenticate by sending one of the following commands.
+
+ {{{ <auth type="Android" password="[hashedpassword]" /> }}}
+
+ {{{ <auth type="iViewer" /> }}}
+
+ Validation of authentication will be sent back to client.
+
+ {{{ <auth result="Invalid Password" /> }}}
+
+ {{{ <auth result="OK" /> }}}
+
+
+ === Events ===
+ Authenticated clients will receive events.
+
+ ==== Device State Change Event ====  
+   1.	A user friendly string describing the event change. 
+ {{{ <event type="DeviceStateChange" alertlevel="Success" description="Lamp changed level from 90 to 0" /> }}}
+
+   2.	A complete XML output of the device node for the device that was changed. 
+
+  ==== Scene Execution Finished Event ====  
+   {{{ <event type="SceneExecutionFinished" alertlevel="ERROR|SUCCESS" description="Scene 3 finished execution." /> }}}
+
+ === Commands ===
+  All command attributes must be present.
+
+  {{{ <listdevices />  }}} - XML device listing
+
+  {{{ <listscenes />  }}} - XML scene listing
+
+  {{{ <runscene id="3" /> }}}
+
+  {{{ <repoll node="1" /> }}} - 0 for all
+
+  {{{ <setswitch node="3" level="20" /> }}}
+
+  {{{ <setthermo node="7" HeatCoolMode="-1" FanMode="-1" EngeryMode="-1" HeatPoint="68" CoolPoint="-1" /> }}}
+
+      
+        * node = any valid node ID
+
+        * HeatCoolMode 
+          * DoNotChange = -1 
+          * Off = 0
+          * Heat = 1
+          * Cool = 2
+          * Auto = 3
+          * AuxiliaryOrEmergencyHeat = 4
+          * Resume = 5
+          * FanOnly = 6
+          * Furnace = 7
+          * DryAir = 8
+          * MoistAir = 9
+          * AutoChangeover = 10
+          * HeatEcon = 11
+          * CoolEcon = 12
+
+        * FanMode
+          * DoNotChange = -1
+          * AutoLow = 0
+          * OnLow = 1
+          * AutoHigh = 2
+          * OnHigh = 3
+
+        * EnergyMode
+          * DoNotChange = -1
+          * EnergySavingMode = 0
+          * ComfortMode = 255
+	
+        * HeatPoint
+          * DoNotChange = -1
+          * Valid Temperature in F
+
+        * CoolPoint
+          * DoNotChange = -1 
+          * Temperature in F

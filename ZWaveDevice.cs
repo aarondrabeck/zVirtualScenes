@@ -12,8 +12,8 @@ namespace zVirtualScenesApplication
 
     public class ZWaveDevice : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
     {
-        [XmlIgnore]
-        public formzVirtualScenes zVirtualScenesMain;
+        //[XmlIgnore]
+        //public formzVirtualScenes zVirtualScenesMain;
         public event PropertyChangedEventHandler PropertyChanged;
 
         #region Properties and Variables
@@ -139,43 +139,18 @@ namespace zVirtualScenesApplication
         public override string ToString()
         {
             return "(" + NodeID + ") " + _Name + " - " + GetStatus();
-        }
-
-        //Light Switch Socket Format 
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Bedroom Lights~0~60~MultiLevelSceneSwitch" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Garage Light~1~0~BinarySwitch" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Thermostat~3~75~Thermostat" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Electric Blinds~4~100~WindowCovering" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Motion Detector~5~0~Sensor" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~House (AWAY MODE)~6~0~Status" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        public string ToLightSwitchSocketString(bool Update=false)
-        {
-            string prefix = "DEVICE~";
-
-            if (Update)
-                prefix = "UPDATE~"; 
-
-            if (Type == ZWaveDeviceTypes.BinarySwitch)
-                return prefix + _Name + "~" + this.NodeID + "~" + this.Level + "~" + "BinarySwitch";
-            else if (Type == ZWaveDeviceTypes.Thermostat)
-                return prefix + _Name + "~" + this.NodeID + "~" + Temp + "~" + this.Type;
-            else
-                return prefix + _Name + "~" + this.NodeID + "~" + this.Level + "~" + this.Type;
-        }
+        }        
 
         public string DeviceIcon()
         {            
             if (this.Type == ZWaveDeviceTypes.Thermostat)
                 return "20zwave-thermostat.png";
+            else if (this.Type == ZWaveDeviceTypes.MultiLevelSwitch)
+                return "20dimmer.png";
+            else if (this.Type == ZWaveDeviceTypes.BinarySwitch)
+                return "20switch.png";
             else
-                return "20zwave-default.jpg";     
-            
+                return "20radio2.png";                 
         }
 
         public int GetLevelMeter()
@@ -190,6 +165,8 @@ namespace zVirtualScenesApplication
         {
             if (Type == ZWaveDeviceTypes.Thermostat)
                 return this.Temp + " F";
+            else if (Type == ZWaveDeviceTypes.BinarySwitch)            
+                return (Level > 0 ? "ON" : "OFF");
             else
                 return this.Level + "%";
         }

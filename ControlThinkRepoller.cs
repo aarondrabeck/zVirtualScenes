@@ -7,16 +7,12 @@ using ControlThink.ZWave.Devices;
 
 namespace zVirtualScenesApplication
 {
-    public class ControlThinkRePoll
+    public class ControlThinkRepoller
     {
-        formzVirtualScenes zVirtualScenesMain;
+        public static string LOG_INTERFACE = "REPOLLER"; 
+        public formzVirtualScenes zVirtualScenesMain;
         public delegate void DeviceInfoChangeEventHandler(string GlbUniqueID, changeType TypeOfChange);
         public event DeviceInfoChangeEventHandler DeviceInfoChange;
-
-        public ControlThinkRePoll(formzVirtualScenes _zVirtualScenesMain)
-        {
-            this.zVirtualScenesMain = _zVirtualScenesMain;
-        }
 
         /// <summary>
         /// This continually looks for changes in device modes.  When one is detected, it will change MasterDeviceList and call the DeviceInfoChangeEventHandler. 
@@ -33,10 +29,10 @@ namespace zVirtualScenesApplication
 
         public void RePollDevices(byte node = 0)
         {
-            if (zVirtualScenesMain.ControlThinkController.IsConnected)
+            if (zVirtualScenesMain.ControlThinkInt.ControlThinkController.IsConnected)
             {
                 //For each device on Control Stick 
-                foreach (ControlThink.ZWave.Devices.ZWaveDevice device in zVirtualScenesMain.ControlThinkController.Devices)
+                foreach (ControlThink.ZWave.Devices.ZWaveDevice device in zVirtualScenesMain.ControlThinkInt.ControlThinkController.Devices)
                 {
                     if (node != 0)  //JUST REPOLL ONE DEVICE REPOLL ALL DEVICES
                     {
@@ -56,7 +52,7 @@ namespace zVirtualScenesApplication
                             foreach (ZWaveDevice thisDevice in zVirtualScenesMain.MasterDevices)
                             {
                                 //if Control Stick device == device in memory
-                                if (zVirtualScenesMain.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
+                                if (zVirtualScenesMain.ControlThinkInt.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
                                 {
                                     #region DETECT LEVEL CHANGES IN ALL DEVICES
                                     //Check to see if any device state/level has changed.
@@ -146,7 +142,7 @@ namespace zVirtualScenesApplication
                     }
                     catch (Exception ex)
                     {
-                        zVirtualScenesMain.LogThis(2, "ControlThink USB Trouble Getting Device Status: " + ex.Message);
+                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, ex.Message, LOG_INTERFACE);
                     }
                 }
             }
