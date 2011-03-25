@@ -117,6 +117,10 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="ZeroconfService">
+      <HintPath>lib\ZeroconfService.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="zlib.net, Version=1.0.3.0, Culture=neutral, PublicKeyToken=924c5b18328d6f09, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\zlib.net.dll</HintPath>
@@ -126,6 +130,12 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ControlThink.cs" />
+    <Compile Include="formActivateGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formActivateGroup.Designer.cs">
+      <DependentUpon>formActivateGroup.cs</DependentUpon>
+    </Compile>
     <Compile Include="LogItem.cs" />
     <Compile Include="XMLSocketInterface.cs" />
     <Compile Include="SunTimes.cs" />
@@ -192,7 +202,7 @@
     <Compile Include="ZWaveDeviceUserSettings.cs" />
     <Compile Include="HttpServer.cs" />
     <Compile Include="HttpProcessor.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="UserSettings.cs" />
     <Compile Include="Scenes.cs" />
     <Compile Include="ZWaveDevice.cs" />
     <Compile Include="GlobalFunctions.cs">
@@ -206,6 +216,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="formActivateGroup.resx">
+      <DependentUpon>formActivateGroup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="formAddEditEXEC.resx">
       <DependentUpon>formAddEditEXEC.cs</DependentUpon>
     </EmbeddedResource>
@@ -315,6 +328,7 @@
     <EmbeddedResource Include="lib\netlib.Dns.dll" />
     <EmbeddedResource Include="lib\ObjectListView.dll" />
     <EmbeddedResource Include="lib\zlib.net.dll" />
+    <EmbeddedResource Include="lib\ZeroconfService.dll" />
     <Content Include="RAW SOCKET READ ME.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

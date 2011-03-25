@@ -302,7 +302,7 @@ namespace zVirtualScenesApplication
                                                 foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                                                     if (scene.ID == SceneID)
                                                     {
-                                                        SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                                        SceneResult result = scene.Run(zVirtualScenesMain);
                                                         zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + client.ClientsSocket.RemoteEndPoint.ToString() + "] " + result.Description,LOG_INTERFACE);
                                                         client.SendMessage("<runscene result=\"" + result.Description +"\" />", zVirtualScenesMain);
                                                         WaitForClientData(client.ClientsSocket.RemoteEndPoint);
@@ -322,6 +322,53 @@ namespace zVirtualScenesApplication
                                             WaitForClientData(client.ClientsSocket.RemoteEndPoint);
                                             return; 
 
+                                        case "activategroup":
+                                            string group = XMLElement.GetAttribute("group");
+                                            level = Convert.ToByte(XMLElement.GetAttribute("level"));
+                                            SceneResult groupsetresult = zVirtualScenesMain.ActivateGroup(group, level);
+                                            zVirtualScenesMain.AddLogEntry((UrgencyLevel)groupsetresult.ResultType, "[" + client.ClientsSocket.RemoteEndPoint.ToString() + "] " + groupsetresult.Description, LOG_INTERFACE);
+                                            client.SendMessage("<activategroup result=\"" + groupsetresult.Description + "\" alertlevel=\"" + groupsetresult.ResultType + "\" />", zVirtualScenesMain);
+                                            WaitForClientData(client.ClientsSocket.RemoteEndPoint);
+                                            return;
+
+                                        case "alterlevel":
+                                            nodeID = Convert.ToByte(XMLElement.GetAttribute("node"));
+                                            int change = Convert.ToInt32(XMLElement.GetAttribute("changelevel"));
+
+                                            //Find device and create action 
+                                            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
+                                            {
+                                                if (device.NodeID == nodeID)
+                                                {
+                                                    int newLevel = device.Level;
+                                                    if (change > 0)
+                                                        newLevel = device.Level + change;  
+                                                    else if (change < 0)
+                                                        newLevel = device.Level - Math.Abs(change);
+
+                                                    if (newLevel < 0)
+                                                        newLevel = 0;
+                                                    else if (newLevel > 99)
+                                                        newLevel = 99;
+
+                                                    level = Convert.ToByte(newLevel);
+                                                    Action action = (Action)device;
+
+                                                    if (action.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                                                    {
+                                                        action.Level = level;
+                                                        ActionResult result = action.Run(zVirtualScenesMain);
+                                                        client.SendMessage("<alterlevel result=\"" + result.Description + "\" alertlevel=\"" + result.ResultType + "\" />", zVirtualScenesMain);
+                                                        WaitForClientData(client.ClientsSocket.RemoteEndPoint);
+                                                        return;
+                                                    }
+                                                }
+                                            }
+
+                                            client.SendMessage("<alterlevel result=\"Device not found.\" alertlevel=\"Error\" />", zVirtualScenesMain);
+                                            WaitForClientData(client.ClientsSocket.RemoteEndPoint);
+                                            return;
+
                                         case "setswitch":
                                             nodeID = Convert.ToByte(XMLElement.GetAttribute("node"));
                                             level = Convert.ToByte(XMLElement.GetAttribute("level"));                                            
@@ -336,7 +383,7 @@ namespace zVirtualScenesApplication
                                                     if (action.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch || action.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
                                                     {
                                                         action.Level = level;
-                                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                                        ActionResult result = action.Run(zVirtualScenesMain);
                                                         client.SendMessage("<setswitch result=\"" + result.Description + "\" alertlevel=\"" + result.ResultType + "\" />", zVirtualScenesMain);                                                        
                                                         WaitForClientData(client.ClientsSocket.RemoteEndPoint);
                                                         return; 
@@ -376,7 +423,7 @@ namespace zVirtualScenesApplication
                                                         action.HeatPoint = HeatPoint;
                                                         action.CoolPoint = CoolPoint;
 
-                                                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                                                        ActionResult result = action.Run(zVirtualScenesMain);
                                                         client.SendMessage("<setthermo result=\"" + result.Description + "\" alertlevel=\"" + result.ResultType + "\" />", zVirtualScenesMain);
                                                         WaitForClientData(client.ClientsSocket.RemoteEndPoint);
                                                         return;

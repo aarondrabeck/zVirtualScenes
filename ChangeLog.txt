@@ -1,3 +1,19 @@
+*zVirtualScenes ver 1.5.4100.35835 - 3-24-11*
+  * LightSwitch - sort devices a-z option added
+  * Allow multiple item selection on Actions (mass edit, delete, rearrange)
+  * Allow multiple device selections and bulk action creation (drag and drop)
+  * Added per Action checkbox to allow Action to be skipped based on time of day (light out or dark out). 
+  * Optimazations for larger ZWave networks.
+  * Zeroconf Support. You will need http://support.apple.com/downloads/DL999/en_US/BonjourPSSetup.exe to utilize this. 
+
+*zVirtualScenes ver 1.5.4095.40726 - 3-19-11*
+  * Repoller Tweaks
+  * Bug fixed that prevented devices from loading if a sensor was present.  THANKS TO PAUL C.
+  * Added Group / Zone support.  Now you can run actions on groups / zones.
+  * Added Group / Zone support to LightSwitch.
+  * Added Group / Zone support to XMLSocket. {{{ <activategroup group="Living Room" level="40" /> }}} - Activate a Group / Zone.  Zones can only control, Binary and Multilevel Switches.
+  * Added XML Socket Command {{{ <alterlevel node="3" changelevel="-5" /> }}} -  MULTILEVEL SWITCH ONLY. Alters the level of a multilevel switch from its current state.  + and - accepted. 
+
 *ver 1.5.4093.20328 - 3-17-11*
   * Changed HTTP ListScenes to output XML
   * Device updates sent to LightSwitch socket clients.

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using ControlThink.ZWave.Devices;
+using System.Threading;
 
 namespace zVirtualScenesApplication
 {
@@ -13,28 +13,61 @@ namespace zVirtualScenesApplication
         public formzVirtualScenes zVirtualScenesMain;
         public delegate void DeviceInfoChangeEventHandler(string GlbUniqueID, changeType TypeOfChange);
         public event DeviceInfoChangeEventHandler DeviceInfoChange;
+        public System.Timers.Timer RepollTimer = new System.Timers.Timer();
+        public bool isRefreshing = false;         
+
+        public ControlThinkRepoller()
+        {
+            RepollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
+            
+        }
 
         /// <summary>
         /// This continually looks for changes in device modes.  When one is detected, it will change MasterDeviceList and call the DeviceInfoChangeEventHandler. 
         /// </summary>
-        public void RefreshThread()
-        {
-            while (true)
-            {
-                RePollDevices();
-                Thread.Sleep(zVirtualScenesMain.zVScenesSettings.PollingInterval * 1000);
-            }          
+        public void Start()
+        {             
+            RepollTimer.Start();
+            RepollTimer.Interval = zVirtualScenesMain.zVScenesSettings.PollingInterval * 1000;
+        }
 
+        public void UpdateInterval()
+        {
+            RepollTimer.Interval = zVirtualScenesMain.zVScenesSettings.PollingInterval * 1000;
+        }
+
+        private void tmr_Elapsed(object sender, EventArgs e)
+        {
+            RePollDevices();
         }
 
         public void RePollDevices(byte node = 0)
         {
+            int NoResponseErrors = 0;
+            int TimeoutErrors = 0;
+            int OtherErrors = 0;
+            DateTime Start = DateTime.Now; 
+
+            //Check if we are in the middle of loading devices from stick.
+            if(zVirtualScenesMain.ControlThinkInt.ReloadDevicesWorker.IsBusy)
+                return;
+
+            //Check if we are already repolling.
+            if (isRefreshing)
+            {
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "A request to repoll was called while a previous request still working.  Consider lowering the repoll interval.", LOG_INTERFACE);
+                return;
+            }
+            else
+                isRefreshing = true; 
+
+            //Make sure the stick is connected.
             if (zVirtualScenesMain.ControlThinkInt.ControlThinkController.IsConnected)
             {
                 //For each device on Control Stick 
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in zVirtualScenesMain.ControlThinkInt.ControlThinkController.Devices)
                 {
-                    if (node != 0)  //JUST REPOLL ONE DEVICE REPOLL ALL DEVICES
+                    if (node != 0)  //If a node is sent, only repoll that node.
                     {
                         if (device.NodeID != node)
                             continue;
@@ -43,7 +76,8 @@ namespace zVirtualScenesApplication
                     try
                     {
                         //If device type on Control Stick is allowed
-                        if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
+                        //Do not include ZWave controllers for now...
+                        if (!device.ToString().Contains("Controller")) 
                         {
                             //get type
                             string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
@@ -55,11 +89,12 @@ namespace zVirtualScenesApplication
                                 if (zVirtualScenesMain.ControlThinkInt.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
                                 {
                                     #region DETECT LEVEL CHANGES IN ALL DEVICES
+                                    byte level = device.Level;
                                     //Check to see if any device state/level has changed.
-                                    if (device.Level != thisDevice.Level)
+                                    if (level != thisDevice.Level)
                                     {
                                         thisDevice.prevLevel = thisDevice.Level;
-                                        thisDevice.Level = device.Level; //set MasterDeviceList
+                                        thisDevice.Level = level; //set MasterDeviceList
                                         this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged); //call event                                                
                                     }
                                     #endregion
@@ -89,7 +124,7 @@ namespace zVirtualScenesApplication
                                         int currenttemp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
                                         int fanmode = (int)thermostat.ThermostatFanMode;
                                         int mode = (int)thermostat.ThermostatMode;
-                                        byte level = thermostat.Level;
+                                        level = thermostat.Level;
                                         string currentstate = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
 
 
@@ -142,10 +177,23 @@ namespace zVirtualScenesApplication
                     }
                     catch (Exception ex)
                     {
-                        zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, ex.Message, LOG_INTERFACE);
+                        if (ex.Message.Contains("timed out"))
+                            TimeoutErrors++;
+                        else if (ex.Message.Contains("did not respond"))
+                            NoResponseErrors++;
+                        else
+                            OtherErrors++;
                     }
                 }
             }
+            //if we get this far, repolling is finished.  Log it and release thread.
+            isRefreshing = false;
+
+            //Log this repoll
+            TimeSpan RepollTime = DateTime.Now.Subtract(Start);
+            string formattedTimeSpan = string.Format("{0:D2} m, {1:D2} s, {2:D2} ms", RepollTime.Minutes, RepollTime.Seconds, RepollTime.Milliseconds);            
+            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Repoll finished in " + formattedTimeSpan + ". (" + TimeoutErrors + " timeout, " + NoResponseErrors + " non-response, " + OtherErrors + " crital error.)" , LOG_INTERFACE);
+                
         }
 
         public enum changeType

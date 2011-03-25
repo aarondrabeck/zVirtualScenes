@@ -20,6 +20,7 @@ using System.Drawing.Drawing2D;
 using BrightIdeasSoftware;
 using System.Globalization;
 using System.Reflection;
+using ZeroconfService;
 
 namespace zVirtualScenesApplication
 {
@@ -38,6 +39,7 @@ namespace zVirtualScenesApplication
         private ControlThinkRepoller refresher = new ControlThinkRepoller();
         private KeyboardHook hook = new KeyboardHook();
         private GrowlInterface growl = new GrowlInterface();
+        private NetService netservice = null;
 
         //Threads 
         Thread HTTPInterfaceTread;
@@ -56,11 +58,12 @@ namespace zVirtualScenesApplication
         public BindingList<Scene> MasterScenes = new BindingList<Scene>();
         public BindingList<Task> MasterTimerEvents = new BindingList<Task>();
         public BindingList<ZWaveDeviceUserSettings> SavedZWaveDeviceUserSettings = new BindingList<ZWaveDeviceUserSettings>();
-        public Settings zVScenesSettings = new Settings();
+        public UserSettings zVScenesSettings = new UserSettings();
+        public HashSet<string> groups = new HashSet<string>();
 
         public formzVirtualScenes()
         {
-            InitializeComponent();  
+            InitializeComponent();
 
             //Load form size
             GeometryFromString(Properties.Settings.Default.WindowGeometry, this);
@@ -78,13 +81,11 @@ namespace zVirtualScenesApplication
             this.dataListViewScenes.CellRightClick += new EventHandler<CellRightClickEventArgs>(dataListViewScenes_CellRightClick);
 
             this.dataListViewDevices.CellRightClick += new EventHandler<CellRightClickEventArgs>(dataListViewDevices_CellRightClick);
-            
+
             this.dataListTasks.CellRightClick += new EventHandler<CellRightClickEventArgs>(dataListTasks_CellRightClick);
 
         }
 
-       
-        
         private void zVirtualScenes_Load(object sender, EventArgs e)
         {
             this.Text = ProgramName;
@@ -99,6 +100,11 @@ namespace zVirtualScenesApplication
             //Load XML Saved Settings
             LoadSettingsFromXML();
             PopulateSettingsTabWithUsersSettings();
+
+            //Start Listening for device changes
+            refresher.zVirtualScenesMain = this;
+            refresher.DeviceInfoChange += new ControlThinkRepoller.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);
+            refresher.Start();
 
             //Query USB for Devices
             ControlThinkInt.formzVirtualScenesMain = this;
@@ -127,14 +133,9 @@ namespace zVirtualScenesApplication
             if (zVScenesSettings.LightSwitchEnabled)
                 LightSwitchInt.OpenLightSwitchSocket();
 
-            //Start Listening for device changes
-            refresher.zVirtualScenesMain = this; 
-            new Thread(new ThreadStart(refresher.RefreshThread)).Start();
-            refresher.DeviceInfoChange += new ControlThinkRepoller.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);
-           
             //XML Socket Clients
             SocketInt.zVirtualScenesMain = this;
-            if(zVScenesSettings.XMLSocketEnabled)
+            if (zVScenesSettings.XMLSocketEnabled)
                 SocketInt.StartListening();
 
             //JABBER
@@ -155,6 +156,17 @@ namespace zVirtualScenesApplication
                 AddNewTask();
             else
                 dataListTasks.SelectedIndex = 0;
+
+            try
+            {
+                if (netservice == null)
+                    PublishZeroconf();
+
+            }
+            catch (Exception ex)
+            {
+                AddLogEntry(UrgencyLevel.ERROR, ex.Message, ZEROCONF_LOG_ENTRY);
+            }
 
             #region Register Global Hot Keys
             try
@@ -214,7 +226,7 @@ namespace zVirtualScenesApplication
         }
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
-        {            
+        {
             if (ControlThinkInt.ControlThinkController.IsConnected)
                 ControlThinkInt.ControlThinkController.Disconnect();
 
@@ -231,7 +243,7 @@ namespace zVirtualScenesApplication
 
             Properties.Settings.Default.WindowGeometry = GeometryToString(this);
             Properties.Settings.Default.Save();
-            
+
             Environment.Exit(1);
         }
 
@@ -358,10 +370,10 @@ namespace zVirtualScenesApplication
                                     growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
                             }
                         }
-                        AddLogEntry(UrgencyLevel.INFO, notification,ControlThinkRepoller.LOG_INTERFACE);
+                        AddLogEntry(UrgencyLevel.INFO, notification, ControlThinkRepoller.LOG_INTERFACE);
                         labelLastEvent.Text = notification;
 
-                        LightSwitchInt.BroadcastMessage(LightSwitchInt.TranslateDeviceToLightSwitchString(device, true) + Environment.NewLine);                        
+                        LightSwitchInt.BroadcastMessage("UPDATE~" + LightSwitchInt.TranslateDeviceToLightSwitchString(device) + Environment.NewLine);
                         LightSwitchInt.BroadcastMessage("ENDLIST" + Environment.NewLine);
 
                         //Send XML event notification
@@ -377,7 +389,7 @@ namespace zVirtualScenesApplication
                 dataListViewDevices.DataSource = null;
                 dataListViewDevices.DataSource = MasterDevices;
             }
-        }       
+        }
 
         #region Saving and Resorting MAIN FORM Sizing
 
@@ -475,7 +487,7 @@ namespace zVirtualScenesApplication
                 {
                     if (Enum.GetName(typeof(CustomHotKeys), thiscene.GlobalHotKey) == KeysPresseed)
                     {
-                        SceneResult result = thiscene.Run(ControlThinkInt.ControlThinkController);
+                        SceneResult result = thiscene.Run(this);
                         AddLogEntry((UrgencyLevel)result.ResultType, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
                     }
                 }
@@ -527,7 +539,52 @@ namespace zVirtualScenesApplication
 
         #endregion
 
-        
+        public SceneResult ActivateGroup(string GroupName, byte Level)
+        {
+            SceneResult result = new SceneResult();
+            int DevicesRun = 0;
+
+            foreach (ZWaveDevice device in MasterDevices)
+            {
+                if (device.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch || device.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                    if (device.GroupName == GroupName)
+                    {
+                        Action action = (Action)device;
+                        action.Level = Level;
+                        action.Run(this);
+                        DevicesRun++;
+                    }
+            }
+            if (DevicesRun == 0)
+            {
+                result.ResultType = SceneResult.ResultTypes.Warning;
+                result.Description = "No acceptable devices in found '" + GroupName + "'.";
+            }
+            else
+            {
+                result.ResultType = SceneResult.ResultTypes.Success;
+                result.Description = "Group '" + GroupName + "' set to " + Level + ". " + DevicesRun + " devices affected.";
+            }
+
+            return result;
+        }
+
+        public void refreshGroups()
+        {
+            groups.Clear();
+            foreach (ZWaveDevice device in MasterDevices)
+                groups.Add(device.GroupName);
+        }
+
+        public AutoCompleteStringCollection GetGroupsAutoCompleteCollection()
+        {
+            AutoCompleteStringCollection GroupCollection = new AutoCompleteStringCollection();
+
+            foreach (string group in groups)
+                GroupCollection.Add(group);
+
+            return GroupCollection;
+        }
 
         #region HTTP INTERFACE
 
@@ -560,6 +617,7 @@ namespace zVirtualScenesApplication
         {
             //General Settings 
             textBoxRepolling.Text = zVScenesSettings.PollingInterval.ToString();
+            txt_loglineslimit.Text = zVScenesSettings.LongLinesLimit.ToString();
 
             //Http Listen
             txtb_httpPort.Text = Convert.ToString(zVScenesSettings.ZHTTPPort);
@@ -572,6 +630,7 @@ namespace zVirtualScenesApplication
             textBoxLSport.Text = Convert.ToString(zVScenesSettings.LightSwitchPort);
             checkBoxLSEnabled.Checked = zVScenesSettings.LightSwitchEnabled;
             checkBoxLSDebugVerbose.Checked = zVScenesSettings.LightSwitchVerbose;
+            checkBoxLSSortDevices.Checked = zVScenesSettings.LightSwitchSortDeviceList;
 
             //JAbber
             textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
@@ -594,7 +653,7 @@ namespace zVirtualScenesApplication
             checkBoxAllowiViewer.Checked = zVScenesSettings.XMLSocketAllowiViewer;
             checkBoxAllowAndroid.Checked = zVScenesSettings.XMLSocketAllowAndroid;
             textBoxAndroidPassword.Text = zVScenesSettings.XMLSocketAndroidPassword;
-            
+
         }
 
         #endregion
@@ -680,9 +739,9 @@ namespace zVirtualScenesApplication
             {
                 try
                 {
-                    XmlSerializer SettingsSerializer = new XmlSerializer(typeof(Settings));
+                    XmlSerializer SettingsSerializer = new XmlSerializer(typeof(UserSettings));
                     FileStream SettingsileStream = new FileStream(APP_PATH + "zVirtualScenes-Settings.xml", FileMode.Open);
-                    zVScenesSettings = (Settings)SettingsSerializer.Deserialize(SettingsileStream);
+                    zVScenesSettings = (UserSettings)SettingsSerializer.Deserialize(SettingsileStream);
                     SettingsileStream.Close();
                 }
                 catch (Exception e)
@@ -725,7 +784,7 @@ namespace zVirtualScenesApplication
 
         #endregion
 
-        #region GUI Events     
+        #region GUI Events
 
         #region Scene List Box Handeling
 
@@ -739,7 +798,7 @@ namespace zVirtualScenesApplication
             if (dataListViewScenes.SelectedIndex != -1)
             {
                 Scene selectedscene = (Scene)dataListViewScenes.SelectedObject;
-                SceneResult result = selectedscene.Run(ControlThinkInt.ControlThinkController);
+                SceneResult result = selectedscene.Run(this);
                 AddLogEntry((UrgencyLevel)result.ResultType, "GUI: [USER] " + result.Description);
                 labelSceneRunStatus.Text = result.ResultType + " " + result.Description;
             }
@@ -857,9 +916,15 @@ namespace zVirtualScenesApplication
         {
             if (dataListViewScenes.SelectedIndex != -1)
             {
+                dataListViewActions.Enabled = true;
                 Scene selectedscene = (Scene)dataListViewScenes.SelectedObject;
                 dataListViewActions.DataSource = selectedscene.Actions;
                 lbl_sceneActions.Text = "Scene " + selectedscene.ID.ToString() + " '" + selectedscene.Name + "' Actions";
+            }
+            else
+            {
+                dataListViewActions.Enabled = false;
+                lbl_sceneActions.Text = "No Scene Selected";
             }
         }
 
@@ -956,36 +1021,44 @@ namespace zVirtualScenesApplication
         /// </summary>
         private void editAction()
         {
-            if (dataListViewActions.SelectedIndex != -1)
+            if (dataListViewActions.SelectedObjects.Count > 0)
             {
-                Action selectedaction = (Action)dataListViewActions.SelectedObject;
+                Scene selectedScene = (Scene)dataListViewScenes.SelectedObject;
+                if (selectedScene.isRunning)
+                {
+                    MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                    return;
+                }
 
-                if (selectedaction.Type == Action.ActionTypes.LauchAPP)
+                foreach (Action selectedaction in dataListViewActions.SelectedObjects)
                 {
-                    formAddEditEXEC formAddEditEXEC = new formAddEditEXEC(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex);
-                    formAddEditEXEC.ShowDialog();
-                }
-                else if (selectedaction.Type == Action.ActionTypes.DelayTimer)
-                {
-                    formAddEditTimeDelay formAddEditTimeDelay = new formAddEditTimeDelay(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex);
-                    formAddEditTimeDelay.ShowDialog();
-                }
-                else if (selectedaction.Type == Action.ActionTypes.ZWaveDevice)
-                {
-                    if (selectedaction.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
+                    if (selectedaction.Type == Action.ActionTypes.LauchAPP)
                     {
-                        formAddEditActionBinSwitch formAddEditActionBinSwitch = new formAddEditActionBinSwitch(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex);
-                        formAddEditActionBinSwitch.ShowDialog();
+                        formAddEditEXEC formAddEditEXEC = new formAddEditEXEC(this, selectedScene, selectedaction);
+                        formAddEditEXEC.ShowDialog();
                     }
-                    else if (selectedaction.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                    else if (selectedaction.Type == Action.ActionTypes.DelayTimer)
                     {
-                        formAddEditActionMultiLevelSwitch formAddEditActionMultiLevelSwitch = new formAddEditActionMultiLevelSwitch(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex);
-                        formAddEditActionMultiLevelSwitch.ShowDialog();
+                        formAddEditTimeDelay formAddEditTimeDelay = new formAddEditTimeDelay(this, selectedScene, selectedaction);
+                        formAddEditTimeDelay.ShowDialog();
                     }
-                    else if (selectedaction.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                    else if (selectedaction.Type == Action.ActionTypes.ZWaveDevice)
                     {
-                        formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex);
-                        formAddEditActionThermostat.ShowDialog();
+                        if (selectedaction.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
+                        {
+                            formAddEditActionBinSwitch formAddEditActionBinSwitch = new formAddEditActionBinSwitch(this, selectedScene, selectedaction);
+                            formAddEditActionBinSwitch.ShowDialog();
+                        }
+                        else if (selectedaction.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                        {
+                            formAddEditActionMultiLevelSwitch formAddEditActionMultiLevelSwitch = new formAddEditActionMultiLevelSwitch(this, selectedScene, selectedaction);
+                            formAddEditActionMultiLevelSwitch.ShowDialog();
+                        }
+                        else if (selectedaction.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                        {
+                            formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, selectedScene, selectedaction);
+                            formAddEditActionThermostat.ShowDialog();
+                        }
                     }
                 }
             }
@@ -1002,27 +1075,34 @@ namespace zVirtualScenesApplication
         {
             if (dataListViewScenes.SelectedIndex != -1)
             {
+                Scene selectedScene = (Scene)dataListViewScenes.SelectedObject;
+                if (selectedScene.isRunning)
+                {
+                    MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                    return;
+                }
+
                 if (comboBoxNonZWAction.SelectedIndex == 0)  //Create Timer
                 {
-                    formAddEditTimeDelay formAddEditTimeDelay = new formAddEditTimeDelay(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex, true);
+                    formAddEditTimeDelay formAddEditTimeDelay = new formAddEditTimeDelay(this, selectedScene, dataListViewActions.SelectedIndex + 1);
                     formAddEditTimeDelay.ShowDialog();
                 }
                 else if (comboBoxNonZWAction.SelectedIndex == 1) //Add EXE Action
                 {
-                    formAddEditEXEC formAddEditEXEC = new formAddEditEXEC(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex, true);
+                    formAddEditEXEC formAddEditEXEC = new formAddEditEXEC(this, selectedScene, dataListViewActions.SelectedIndex + 1);
                     formAddEditEXEC.ShowDialog();
                 }
                 else
                     MessageBox.Show("Please select an action type from the drop down. ", ProgramName);
             }
             else
-                MessageBox.Show("Please select one device and one scene.", ProgramName);
-
+                MessageBox.Show("Please select a scene.", ProgramName);
         }
 
-        public void SelectListBoxActionItem(int ID)
+        public void SelectListBoxActionItem(Action action)
         {
-            dataListViewActions.SelectedIndex = ID;
+            dataListViewActions.SelectedObject = action;
+            dataListViewActions.EnsureVisible(dataListViewActions.IndexOf(action));
             dataListViewActions.Focus();
         }
 
@@ -1039,20 +1119,20 @@ namespace zVirtualScenesApplication
 
         private void deleteActionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            int savedIndex = dataListViewActions.SelectedIndex;
-
-            if (savedIndex == MasterScenes[dataListViewScenes.SelectedIndex].Actions.Count() - 1)
-                savedIndex--;
-
-            if (dataListViewActions.SelectedIndex != -1)
+            if (dataListViewActions.SelectedObjects.Count > 0)
             {
-                MasterScenes[dataListViewScenes.SelectedIndex].Actions.Remove((Action)dataListViewActions.SelectedObject);
-                dataListViewActions.SelectedIndex = savedIndex;
+                Scene selectedScene = (Scene)dataListViewScenes.SelectedObject;
+                if (selectedScene.isRunning)
+                {
+                    MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                    return;
+                }
+
+                foreach (Action selectedaction in dataListViewActions.SelectedObjects)
+                    MasterScenes[dataListViewScenes.SelectedIndex].Actions.Remove(selectedaction);
             }
             else
-                MessageBox.Show("Please select an action to delete.", ProgramName);
-
-            dataListViewActions.Focus();
+                MessageBox.Show("Please select an action.", ProgramName);
         }
 
         public class ActionsDropSink : SimpleDropSink
@@ -1125,52 +1205,65 @@ namespace zVirtualScenesApplication
             //Handle Device Drop
             if (e.SourceModels[0].GetType().ToString() == "zVirtualScenesApplication.ZWaveDevice")
             {
-                ZWaveDevice SourceDevice = (ZWaveDevice)e.SourceModels[0];
-
-                if (SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch || SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                Scene selectedScene = (Scene)dataListViewScenes.SelectedObject;
+                if (selectedScene.isRunning)
                 {
-                    //Create Simple Action from Source
-                    Action TheAction = new Action();
-                    TheAction = (Action)SourceDevice;
-                    Scene selectedscene = (Scene)dataListViewScenes.SelectedObject;
-                    //If the last item in the list and dropped at the bottome, Add it to the bottom of list.
-                    if (TargetIndex == selectedscene.Actions.Count() - 1 && e.DropTargetLocation == DropTargetLocation.BelowItem)
-                        TargetIndex++;
-
-                    //Add it to the scene action list
-                    selectedscene.Actions.Insert(TargetIndex, TheAction);
+                    MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                    return;
                 }
-                else if (SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+
+                foreach (ZWaveDevice SourceDevice in e.SourceModels)
                 {
-                    formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex, SourceDevice);
-                    formAddEditActionThermostat.ShowDialog();
+                    if (SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch || SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch || SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                    {
+                        //Create Simple Action from Source
+                        Action TheAction = new Action();
+                        TheAction = (Action)SourceDevice;
+
+                        if (SourceDevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                            TheAction.HeatCoolMode = (int)ZWaveDevice.ThermostatMode.Off;
+
+                        Scene selectedscene = (Scene)dataListViewScenes.SelectedObject;
+                        //If the last item in the list and dropped at the bottome, Add it to the bottom of list.
+                        if (TargetIndex == selectedscene.Actions.Count() - 1 && e.DropTargetLocation == DropTargetLocation.BelowItem)
+                            TargetIndex++;
+
+                        //Add it to the scene action list
+                        selectedscene.Actions.Insert(TargetIndex, TheAction);
+                    }
                 }
                 return;
-
             }
-            else if (e.SourceModels[0].GetType().ToString() == "zVirtualScenesApplication.Action")
+            if (e.SourceModels[0].GetType().ToString() == "zVirtualScenesApplication.Action")
             {
-                //Rearrage                
-                Action SourceAction = (Action)e.SourceModels[0];
+                //Rearrage Actions
                 Scene selectedscene = (Scene)dataListViewScenes.SelectedObject;
 
-                if (selectedscene.Actions.Count() > 1)
+                //DIE if running.
+                if (selectedscene.isRunning)
                 {
-                    int SourceIndex = selectedscene.Actions.IndexOf(SourceAction);
-                    switch (e.DropTargetLocation)
-                    {
-                        case DropTargetLocation.BelowItem:
-                            TargetIndex = TargetIndex + 1;
-                            break;
-                    }
+                    MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                    return;
+                }
 
-                    //selectedscene.Actions.RemoveAt(SourceIndex);
-                    selectedscene.Actions.Insert(TargetIndex, SourceAction);
+                int SourceIndex = selectedscene.Actions.IndexOf((Action)e.SourceModels[0]);
+                int MovingTarget = TargetIndex;
 
-                    if (TargetIndex > SourceIndex)
-                        selectedscene.Actions.RemoveAt(SourceIndex);
-                    else
-                        selectedscene.Actions.RemoveAt(SourceIndex + 1);
+                //IF WE ARE REARRANGING DOWNWARD, and drop and item above subtract one from the target because that is the ACTUAL ID of insert. 
+                if (SourceIndex < TargetIndex && e.DropTargetLocation == DropTargetLocation.AboveItem)
+                    MovingTarget--;
+
+                //labelSceneRunStatus.Text = "sourceIndex:" + selectedscene.Actions.IndexOf((Action)e.SourceModels[0]) + ", targetindex:" + TargetIndex + ", loc:" + e.DropTargetLocation.ToString();
+                foreach (Action action in e.SourceModels)
+                {
+                    Action tempAction = action;
+                    selectedscene.Actions.Remove(action);
+                    selectedscene.Actions.Insert(MovingTarget, tempAction);
+
+                    //If the first item in the selection is being moved ABOVE, Increase target so the order of the selected actions are not reversed. 
+                    if (TargetIndex <= SourceIndex)
+                        MovingTarget++;
+
                 }
             }
         }
@@ -1181,28 +1274,29 @@ namespace zVirtualScenesApplication
 
         private void OpenDevicePropertyWindow()
         {
-            if (dataListViewDevices.SelectedIndex != -1)
+            if (dataListViewDevices.SelectedObjects.Count > 0)
             {
-                ZWaveDevice selecteddevice = (ZWaveDevice)dataListViewDevices.SelectedObject;
-
-                if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
+                foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
                 {
-                    formPropertiesBinSwitch formPropertiesBinSwitch = new formPropertiesBinSwitch(this, selecteddevice);
-                    formPropertiesBinSwitch.ShowDialog();
+                    if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
+                    {
+                        formPropertiesBinSwitch formPropertiesBinSwitch = new formPropertiesBinSwitch(this, selecteddevice);
+                        formPropertiesBinSwitch.ShowDialog();
+                    }
+                    else if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                    {
+                        formPropertiesMultiLevelSwitch formPropertiesMultiLevelSwitch = new formPropertiesMultiLevelSwitch(this, selecteddevice);
+                        formPropertiesMultiLevelSwitch.ShowDialog();
+                    }
+                    else if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                    {
+                        formPropertiesThermostat formPropertiesThermostat = new formPropertiesThermostat(this, selecteddevice);
+                        formPropertiesThermostat.ShowDialog();
+                    }
                 }
-                else if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
-                {
-                    formPropertiesMultiLevelSwitch formPropertiesMultiLevelSwitch = new formPropertiesMultiLevelSwitch(this, selecteddevice);
-                    formPropertiesMultiLevelSwitch.ShowDialog();
-                }
-                else if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
-                {
-                    formPropertiesThermostat formPropertiesThermostat = new formPropertiesThermostat(this, selecteddevice);
-                    formPropertiesThermostat.ShowDialog();
-                }
-                else
-                    MessageBox.Show("You must select a ZWave device. ", ProgramName);
             }
+            else
+                MessageBox.Show("Please select at least one device.", ProgramName);
         }
 
         private void dataListViewDevices_DoubleClick(object sender, EventArgs e)
@@ -1245,8 +1339,11 @@ namespace zVirtualScenesApplication
 
         private void manuallyRepollToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ZWaveDevice device = (ZWaveDevice)dataListViewDevices.SelectedObject;
-            refresher.RePollDevices(device.NodeID);
+            if (dataListViewDevices.SelectedObjects.Count > 0)
+                foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
+                    refresher.RePollDevices(selecteddevice.NodeID);
+            else
+                MessageBox.Show("Please select at least one device.", ProgramName);
         }
 
         private void repollAllDevicesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1266,28 +1363,27 @@ namespace zVirtualScenesApplication
         /// <param name="e"></param>
         private void CreateNewActionFromZWaveDevice()
         {
-            if (dataListViewDevices.SelectedIndex != -1 && dataListViewScenes.SelectedIndex != -1)
-            {
-                ZWaveDevice selectedZWaveDevice = (ZWaveDevice)dataListViewDevices.SelectedObject;
-
-                if (selectedZWaveDevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
+            if (dataListViewDevices.SelectedObjects.Count > 0 && dataListViewScenes.SelectedObjects.Count > 0)
+                foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
                 {
-                    formAddEditActionBinSwitch formAddEditActionBinSwitch = new formAddEditActionBinSwitch(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex, selectedZWaveDevice);
-                    formAddEditActionBinSwitch.ShowDialog();
+                    if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
+                    {
+                        formAddEditActionBinSwitch formAddEditActionBinSwitch = new formAddEditActionBinSwitch(this, (Scene)dataListViewScenes.SelectedObject, selecteddevice, dataListViewActions.SelectedIndex + 1);
+                        formAddEditActionBinSwitch.ShowDialog();
+                    }
+                    else if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                    {
+                        formAddEditActionMultiLevelSwitch formAddEditActionMultiLevelSwitch = new formAddEditActionMultiLevelSwitch(this, (Scene)dataListViewScenes.SelectedObject, selecteddevice, dataListViewActions.SelectedIndex + 1);
+                        formAddEditActionMultiLevelSwitch.ShowDialog();
+                    }
+                    else if (selecteddevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                    {
+                        formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, (Scene)dataListViewScenes.SelectedObject, selecteddevice, dataListViewActions.SelectedIndex + 1);
+                        formAddEditActionThermostat.ShowDialog();
+                    }
                 }
-                else if (selectedZWaveDevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
-                {
-                    formAddEditActionMultiLevelSwitch formAddEditActionMultiLevelSwitch = new formAddEditActionMultiLevelSwitch(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex, selectedZWaveDevice);
-                    formAddEditActionMultiLevelSwitch.ShowDialog();
-                }
-                else if (selectedZWaveDevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
-                {
-                    formAddEditActionThermostat formAddEditActionThermostat = new formAddEditActionThermostat(this, dataListViewScenes.SelectedIndex, dataListViewActions.SelectedIndex, selectedZWaveDevice);
-                    formAddEditActionThermostat.ShowDialog();
-                }
-            }
             else
-                MessageBox.Show("Please select a ZWave device and one scene. ", ProgramName);
+                MessageBox.Show("Please select a ZWave device and one scene.", ProgramName);
         }
 
         private void btn_AddAction_Click(object sender, EventArgs e)
@@ -1303,6 +1399,12 @@ namespace zVirtualScenesApplication
         #endregion
 
         #region ToolBar Events
+
+        private void activateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formActivateGroup formActivateGroup = new formActivateGroup(this);
+            formActivateGroup.ShowDialog();
+        }
 
         private void forceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1326,11 +1428,26 @@ namespace zVirtualScenesApplication
             try
             {
                 zVScenesSettings.PollingInterval = Convert.ToInt32(textBoxRepolling.Text);
+
+                if (zVScenesSettings.PollingInterval < 0)
+                    throw new Exception("");
+
+                refresher.UpdateInterval();
             }
             catch
             {
                 saveOK = false;
                 MessageBox.Show("Invalid Polling Interval.", ProgramName);
+            }
+
+            try
+            {
+                zVScenesSettings.LongLinesLimit = Convert.ToInt32(txt_loglineslimit.Text);
+            }
+            catch
+            {
+                saveOK = false;
+                MessageBox.Show("Invalid Log Line Limit.", ProgramName);
             }
 
             //HTTP Listen
@@ -1354,12 +1471,10 @@ namespace zVirtualScenesApplication
 
 
             //LightSwitch
-
             zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
             zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
             zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
-
-            
+            zVScenesSettings.LightSwitchSortDeviceList = checkBoxLSSortDevices.Checked;
 
             try
             {
@@ -1407,7 +1522,7 @@ namespace zVirtualScenesApplication
             zVScenesSettings.EnableNOAA = checkBoxEnableNOAA.Checked;
             if (checkBoxEnableNOAA.Checked)
             {
-                if (ValidateLong() != null)
+                if (ValidateLong(textBox_Longitude.Text) != null)
                     zVScenesSettings.Longitude = textBox_Longitude.Text;
                 else
                 {
@@ -1415,7 +1530,7 @@ namespace zVirtualScenesApplication
                     saveOK = false;
                 }
 
-                if (ValidateLat() != null)
+                if (ValidateLat(textBox_Latitude.Text) != null)
                     zVScenesSettings.Latitude = textBox_Latitude.Text;
                 else
                 {
@@ -1429,8 +1544,6 @@ namespace zVirtualScenesApplication
             //XML Socket
             zVScenesSettings.XMLSocketEnabled = checkBoxEnableSocketInt.Checked;
             zVScenesSettings.XMLSocketVerbose = checkBoxSocketVerbose.Checked;
-
-            
 
             try
             {
@@ -1470,6 +1583,11 @@ namespace zVirtualScenesApplication
             SaveSettingsToFile();
         }
 
+        private void checkBoxHideAndroidPassword_CheckedChanged(object sender, EventArgs e)
+        {
+            textBoxAndroidPassword.UseSystemPasswordChar = checkBoxHideAndroidPassword.Checked;
+        }
+
         #endregion
 
         private void SceneExecutionFinsihed_Handler(object sender, SceneResult _SceneResult)
@@ -1491,7 +1609,7 @@ namespace zVirtualScenesApplication
 
         #endregion
 
-        #region Invokeable Functions      
+        #region Invokeable Functions
         /// <summary>
         /// Logs an event that can be called from any thread.  Self Invokes.
         /// </summary>
@@ -1507,6 +1625,10 @@ namespace zVirtualScenesApplication
                 item.urgency = urgency;
                 item.InterfaceName = theInterface;
                 item.description = message;
+
+                if (Masterlog.Count > zVScenesSettings.LongLinesLimit)
+                    Masterlog.RemoveAt(0);
+
                 Masterlog.Add(item);
             }
         }
@@ -1620,7 +1742,7 @@ namespace zVirtualScenesApplication
                 if (SceneID == scene.ID)
                 {
                     AddLogEntry(UrgencyLevel.INFO, "Scheduled task '" + taskname + "' exectued scene '" + scene.Name + "'.");
-                    scene.Run(ControlThinkInt.ControlThinkController);
+                    scene.Run(this);
                     return;
                 }
             }
@@ -1657,6 +1779,25 @@ namespace zVirtualScenesApplication
 
         #region NOAA
 
+        public bool isDark()
+        {
+            DateTime date = DateTime.Today;
+            bool isSunrise = false;
+            bool isSunset = false;
+            DateTime sunrise = DateTime.Now;
+            DateTime sunset = DateTime.Now;
+            SunTimes.LongitudeCoords longitude = ValidateLong(zVScenesSettings.Longitude);
+            SunTimes.LatitudeCoords latitude = ValidateLat(zVScenesSettings.Latitude);
+
+            if (longitude != null && latitude != null)
+                SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+
+            if (DateTime.Now.TimeOfDay < sunrise.TimeOfDay || DateTime.Now.TimeOfDay > sunset.TimeOfDay)
+                return true;
+
+            return false;
+        }
+
         private void timerNOAA_Tick(object sender, EventArgs e)
         {
             if (zVScenesSettings.EnableNOAA)
@@ -1668,8 +1809,8 @@ namespace zVirtualScenesApplication
                     bool isSunset = false;
                     DateTime sunrise = DateTime.Now;
                     DateTime sunset = DateTime.Now;
-                    SunTimes.LongitudeCoords longitude = ValidateLong();
-                    SunTimes.LatitudeCoords latitude = ValidateLat();
+                    SunTimes.LongitudeCoords longitude = ValidateLong(zVScenesSettings.Longitude);
+                    SunTimes.LatitudeCoords latitude = ValidateLat(zVScenesSettings.Latitude);
 
                     if (longitude != null && latitude != null)
                         SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
@@ -1683,7 +1824,7 @@ namespace zVirtualScenesApplication
                         foreach (Scene scene in MasterScenes)
                         {
                             if (scene.ActivateAtSunrise)
-                                scene.Run(ControlThinkInt.ControlThinkController);
+                                scene.Run(this);
                         }
                     }
 
@@ -1695,7 +1836,7 @@ namespace zVirtualScenesApplication
                         foreach (Scene scene in MasterScenes)
                         {
                             if (scene.ActivateAtSunset)
-                                scene.Run(ControlThinkInt.ControlThinkController);
+                                scene.Run(this);
                         }
                     }
                 }
@@ -1706,11 +1847,11 @@ namespace zVirtualScenesApplication
             }
         }
 
-        private SunTimes.LatitudeCoords ValidateLat()
+        private SunTimes.LatitudeCoords ValidateLat(string lat)
         {
             try
             {
-                string[] userLat = textBox_Latitude.Text.Split(',');
+                string[] userLat = lat.Split(',');
                 int degrees = Convert.ToInt32(userLat[0]);
                 int mins = Convert.ToInt32(userLat[1]);
                 int seconds = Convert.ToInt32(userLat[2]);
@@ -1727,11 +1868,11 @@ namespace zVirtualScenesApplication
             }
         }
 
-        private SunTimes.LongitudeCoords ValidateLong()
+        private SunTimes.LongitudeCoords ValidateLong(string log)
         {
             try
             {
-                string[] userLong = textBox_Longitude.Text.Split(',');
+                string[] userLong = log.Split(',');
                 int degrees = Convert.ToInt32(userLong[0]);
                 int mins = Convert.ToInt32(userLong[1]);
                 int seconds = Convert.ToInt32(userLong[2]);
@@ -1755,12 +1896,11 @@ namespace zVirtualScenesApplication
             bool isSunset = false;
             DateTime sunrise = DateTime.Now;
             DateTime sunset = DateTime.Now;
-            SunTimes.LongitudeCoords longitude = ValidateLong();
-            SunTimes.LatitudeCoords latitude = ValidateLat();
+            SunTimes.LongitudeCoords longitude = ValidateLong(zVScenesSettings.Longitude);
+            SunTimes.LatitudeCoords latitude = ValidateLat(zVScenesSettings.Latitude);
 
             if (longitude != null && latitude != null)
             {
-
                 //113, 3, 42, SunTimes.LongitudeCoords.Direction.West
                 //37, 40, 38, SunTimes.LatitudeCoords.Direction.North
                 SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
@@ -1789,7 +1929,7 @@ namespace zVirtualScenesApplication
             checkBox_RecurFriday.Enabled = true;
             checkBox_RecurSaturday.Enabled = true;
             checkBox_RecurSunday.Enabled = true;
-            comboBox_ActionsTask.Enabled = true; 
+            comboBox_ActionsTask.Enabled = true;
 
             textBox_TaskName.Text = Task.Name;
             comboBox_FrequencyTask.SelectedIndex = (int)Task.Frequency;
@@ -1970,7 +2110,7 @@ namespace zVirtualScenesApplication
                 checkBox_RecurFriday.Enabled = false;
                 checkBox_RecurSaturday.Enabled = false;
                 checkBox_RecurSunday.Enabled = false;
-                comboBox_ActionsTask.Enabled = false; 
+                comboBox_ActionsTask.Enabled = false;
             }
 
         }
@@ -2027,13 +2167,66 @@ namespace zVirtualScenesApplication
 
         }
 
-      
+
 
         #endregion
 
-        private void checkBoxHideAndroidPassword_CheckedChanged(object sender, EventArgs e)
+        #region ZeroConf/Bonjour
+        public static string ZEROCONF_LOG_ENTRY = "ZERO CONFIG";
+
+        private void PublishZeroconf()
         {
-            textBoxAndroidPassword.UseSystemPasswordChar = checkBoxHideAndroidPassword.Checked;
-        }       
+
+            Version bonjourVersion = NetService.DaemonVersion;
+            String domain = "";
+            String type = "_zvsxmlsocket._tcp.";
+            String name = "zVirtualScenesXMLSocket " + Environment.MachineName;
+            netservice = new NetService(domain, type, name, zVScenesSettings.XMLSocketPort);
+            netservice.AllowMultithreadedCallbacks = true;
+            netservice.DidPublishService += new NetService.ServicePublished(publishService_DidPublishService);
+            netservice.DidNotPublishService += new NetService.ServiceNotPublished(publishService_DidNotPublishService);
+
+            /* HARDCODE TXT RECORD */
+            System.Collections.Hashtable dict = new System.Collections.Hashtable();
+            dict.Add("txtvers", "1");
+            dict.Add("ServiceName", name);
+            dict.Add("MachineName", Environment.MachineName);
+            dict.Add("OS", Environment.OSVersion.ToString());
+            dict.Add("IPAddress", "127.0.0.1");
+            dict.Add("Version", Application.ProductVersion);
+            netservice.TXTRecordData = NetService.DataFromTXTRecordDictionary(dict);
+            netservice.Publish();
+
+            type = "_lightswitch._tcp.";
+            name = "Lightswitch " + Environment.MachineName;
+            netservice = new NetService(domain, type, name, zVScenesSettings.LightSwitchPort);
+            netservice.AllowMultithreadedCallbacks = true;
+            netservice.DidPublishService += new NetService.ServicePublished(publishService_DidPublishService);
+            netservice.DidNotPublishService += new NetService.ServiceNotPublished(publishService_DidNotPublishService);
+
+            /* HARDCODE TXT RECORD */
+            dict = new System.Collections.Hashtable();
+            dict.Add("txtvers", "1");
+            dict.Add("ServiceName", name);
+            dict.Add("MachineName", Environment.MachineName);
+            dict.Add("OS", Environment.OSVersion.ToString());
+            dict.Add("IPAddress", "127.0.0.1");
+            dict.Add("Version", Application.ProductVersion);
+            netservice.TXTRecordData = NetService.DataFromTXTRecordDictionary(dict);
+            netservice.Publish();
+        }
+
+        void publishService_DidPublishService(NetService service)
+        {
+            string result = String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name);
+            AddLogEntry(UrgencyLevel.INFO, result, ZEROCONF_LOG_ENTRY);
+        }
+
+        void publishService_DidNotPublishService(NetService service, DNSServiceException ex)
+        {
+            AddLogEntry(UrgencyLevel.ERROR, ex.Message, ZEROCONF_LOG_ENTRY);
+        }
+
+        #endregion
     }
 }

@@ -29,6 +29,7 @@ namespace zVirtualScenesApplication
             checkBoxPerDEviceJabberEnable.Checked = _DeviceToEdit.SendJabberNotifications;
             checkBoxDisplayinLightSwitch.Checked = _DeviceToEdit.ShowInLightSwitchGUI;
             checkBoxGrowlEnabled.Checked = _DeviceToEdit.SendGrowlNotifications;
+            txtb_GroupName.AutoCompleteCustomSource = _zVirtualScenesMain.GetGroupsAutoCompleteCollection();
 
             #endregion
 
@@ -66,13 +67,14 @@ namespace zVirtualScenesApplication
             }
 
             //HANDLE DEVICE GROUP NAME CHNAGE
-            if (txtb_GroupName.Text != "")
+            if (txtb_GroupName.Text != "")            
                 _DeviceToEdit.GroupName = txtb_GroupName.Text;
             else
             {
                 MessageBox.Show("Invalid group name.", _zVirtualScenesMain.ProgramName);
                 return;
             }
+            _zVirtualScenesMain.refreshGroups();
 
             //Jabber Notifications
             _DeviceToEdit.SendJabberNotifications = checkBoxPerDEviceJabberEnable.Checked;

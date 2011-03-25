@@ -35,14 +35,14 @@
             this.checkBoxPerDEviceJabberEnable = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBoxDeviceOptions = new System.Windows.Forms.GroupBox();
+            this.textBoxMomentaryOnTimeSpan = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.checkBoxGrowlEnabled = new System.Windows.Forms.CheckBox();
             this.checkBoxMomentaryOn = new System.Windows.Forms.CheckBox();
             this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
             this.txtb_GroupName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btn_SaveOptions = new System.Windows.Forms.Button();
-            this.textBoxMomentaryOnTimeSpan = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.groupBoxDeviceOptions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -97,6 +97,22 @@
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Binary Switch Options";
             // 
+            // textBoxMomentaryOnTimeSpan
+            // 
+            this.textBoxMomentaryOnTimeSpan.Location = new System.Drawing.Point(180, 170);
+            this.textBoxMomentaryOnTimeSpan.Name = "textBoxMomentaryOnTimeSpan";
+            this.textBoxMomentaryOnTimeSpan.Size = new System.Drawing.Size(46, 20);
+            this.textBoxMomentaryOnTimeSpan.TabIndex = 54;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(26, 173);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(148, 13);
+            this.label2.TabIndex = 55;
+            this.label2.Text = "Momentary On Time On (sec):";
+            // 
             // checkBoxGrowlEnabled
             // 
             this.checkBoxGrowlEnabled.AutoSize = true;
@@ -129,6 +145,8 @@
             // 
             // txtb_GroupName
             // 
+            this.txtb_GroupName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtb_GroupName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.txtb_GroupName.Location = new System.Drawing.Point(84, 46);
             this.txtb_GroupName.Name = "txtb_GroupName";
             this.txtb_GroupName.Size = new System.Drawing.Size(250, 20);
@@ -152,22 +170,6 @@
             this.btn_SaveOptions.Text = "Save and Close";
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
-            // 
-            // textBoxMomentaryOnTimeSpan
-            // 
-            this.textBoxMomentaryOnTimeSpan.Location = new System.Drawing.Point(180, 170);
-            this.textBoxMomentaryOnTimeSpan.Name = "textBoxMomentaryOnTimeSpan";
-            this.textBoxMomentaryOnTimeSpan.Size = new System.Drawing.Size(46, 20);
-            this.textBoxMomentaryOnTimeSpan.TabIndex = 54;
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(26, 173);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(148, 13);
-            this.label2.TabIndex = 55;
-            this.label2.Text = "Momentary On Time On (sec):";
             // 
             // formPropertiesBinSwitch
             // 

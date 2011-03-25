@@ -36,6 +36,8 @@
             this.groupBoxAction = new System.Windows.Forms.GroupBox();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.checkBoxSkipLight = new System.Windows.Forms.CheckBox();
+            this.checkBoxSkipDark = new System.Windows.Forms.CheckBox();
             this.groupBoxAction.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
@@ -58,7 +60,7 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(337, 73);
+            this.btn_Save.Location = new System.Drawing.Point(337, 77);
             this.btn_Save.Name = "btn_Save";
             this.btn_Save.Size = new System.Drawing.Size(83, 20);
             this.btn_Save.TabIndex = 34;
@@ -91,11 +93,33 @@
             this.pictureBox3.TabIndex = 37;
             this.pictureBox3.TabStop = false;
             // 
+            // checkBoxSkipLight
+            // 
+            this.checkBoxSkipLight.AutoSize = true;
+            this.checkBoxSkipLight.Location = new System.Drawing.Point(165, 80);
+            this.checkBoxSkipLight.Name = "checkBoxSkipLight";
+            this.checkBoxSkipLight.Size = new System.Drawing.Size(138, 17);
+            this.checkBoxSkipLight.TabIndex = 47;
+            this.checkBoxSkipLight.Text = "Skip when light outside.";
+            this.checkBoxSkipLight.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSkipDark
+            // 
+            this.checkBoxSkipDark.AutoSize = true;
+            this.checkBoxSkipDark.Location = new System.Drawing.Point(12, 80);
+            this.checkBoxSkipDark.Name = "checkBoxSkipDark";
+            this.checkBoxSkipDark.Size = new System.Drawing.Size(140, 17);
+            this.checkBoxSkipDark.TabIndex = 46;
+            this.checkBoxSkipDark.Text = "Skip when dark outside.";
+            this.checkBoxSkipDark.UseVisualStyleBackColor = true;
+            // 
             // formAddEditTimeDelay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(428, 101);
+            this.Controls.Add(this.checkBoxSkipLight);
+            this.Controls.Add(this.checkBoxSkipDark);
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.groupBoxAction);
             this.Controls.Add(this.btn_Save);
@@ -110,6 +134,7 @@
             this.groupBoxAction.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -121,5 +146,7 @@
         private System.Windows.Forms.GroupBox groupBoxAction;
         private System.Windows.Forms.ToolTip toolTipNotificationLevel;
         private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.CheckBox checkBoxSkipLight;
+        private System.Windows.Forms.CheckBox checkBoxSkipDark;
     }
 }

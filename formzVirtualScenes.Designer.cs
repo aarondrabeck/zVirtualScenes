@@ -130,6 +130,7 @@ namespace zVirtualScenesApplication
             this.textBoxJabberPassword = new System.Windows.Forms.TextBox();
             this.label11 = new System.Windows.Forms.Label();
             this.tabPage8 = new System.Windows.Forms.TabPage();
+            this.checkBoxLSSortDevices = new System.Windows.Forms.CheckBox();
             this.label24 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.checkBox_HideLSPassword = new System.Windows.Forms.CheckBox();
@@ -197,9 +198,13 @@ namespace zVirtualScenesApplication
             this.forceSaveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupsZonesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.activateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripDevicesNull = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.findNewDevicesToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.repollAllDevicesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.txt_loglineslimit = new System.Windows.Forms.TextBox();
+            this.label33 = new System.Windows.Forms.Label();
             this.MainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -261,7 +266,7 @@ namespace zVirtualScenesApplication
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(776, 463);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Scenes";
+            this.tabPage1.Text = "ZWave Device & Scenes";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // splitContainer1
@@ -330,7 +335,6 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.HideSelection = false;
             this.dataListViewDevices.IsSimpleDragSource = true;
             this.dataListViewDevices.Location = new System.Drawing.Point(0, 0);
-            this.dataListViewDevices.MultiSelect = false;
             this.dataListViewDevices.Name = "dataListViewDevices";
             this.dataListViewDevices.OwnerDraw = true;
             this.dataListViewDevices.ShowCommandMenuOnRightClick = true;
@@ -402,7 +406,7 @@ namespace zVirtualScenesApplication
             // 
             this.GroupCol.AspectName = "GroupName";
             this.GroupCol.IsEditable = false;
-            this.GroupCol.Text = "Group";
+            this.GroupCol.Text = "Groups / Zones";
             this.GroupCol.Width = 110;
             // 
             // imageListActionTypesSmall
@@ -489,7 +493,6 @@ namespace zVirtualScenesApplication
             this.dataListViewActions.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.dataListViewActions.HideSelection = false;
             this.dataListViewActions.Location = new System.Drawing.Point(209, 36);
-            this.dataListViewActions.MultiSelect = false;
             this.dataListViewActions.Name = "dataListViewActions";
             this.dataListViewActions.OwnerDraw = true;
             this.dataListViewActions.ShowGroups = false;
@@ -960,6 +963,8 @@ namespace zVirtualScenesApplication
             // 
             // tabPage6
             // 
+            this.tabPage6.Controls.Add(this.txt_loglineslimit);
+            this.tabPage6.Controls.Add(this.label33);
             this.tabPage6.Controls.Add(this.textBoxRepolling);
             this.tabPage6.Controls.Add(this.label1);
             this.tabPage6.Controls.Add(this.groupBox4);
@@ -999,7 +1004,7 @@ namespace zVirtualScenesApplication
             this.groupBox4.Controls.Add(this.label4);
             this.groupBox4.Controls.Add(this.textBox_Longitude);
             this.groupBox4.Controls.Add(this.label2);
-            this.groupBox4.Location = new System.Drawing.Point(9, 53);
+            this.groupBox4.Location = new System.Drawing.Point(9, 83);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Size = new System.Drawing.Size(750, 110);
             this.groupBox4.TabIndex = 21;
@@ -1280,6 +1285,7 @@ namespace zVirtualScenesApplication
             // 
             // tabPage8
             // 
+            this.tabPage8.Controls.Add(this.checkBoxLSSortDevices);
             this.tabPage8.Controls.Add(this.label24);
             this.tabPage8.Controls.Add(this.label23);
             this.tabPage8.Controls.Add(this.checkBox_HideLSPassword);
@@ -1297,6 +1303,16 @@ namespace zVirtualScenesApplication
             this.tabPage8.TabIndex = 3;
             this.tabPage8.Text = "LightSwitch Interface";
             this.tabPage8.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxLSSortDevices
+            // 
+            this.checkBoxLSSortDevices.AutoSize = true;
+            this.checkBoxLSSortDevices.Location = new System.Drawing.Point(7, 168);
+            this.checkBoxLSSortDevices.Name = "checkBoxLSSortDevices";
+            this.checkBoxLSSortDevices.Size = new System.Drawing.Size(121, 17);
+            this.checkBoxLSSortDevices.TabIndex = 25;
+            this.checkBoxLSSortDevices.Text = "Sort Device List A-Z";
+            this.checkBoxLSSortDevices.UseVisualStyleBackColor = true;
             // 
             // label24
             // 
@@ -1844,7 +1860,8 @@ namespace zVirtualScenesApplication
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.groupsZonesToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(784, 24);
@@ -1880,6 +1897,21 @@ namespace zVirtualScenesApplication
             this.exitToolStripMenuItem1.Text = "Exit";
             this.exitToolStripMenuItem1.Click += new System.EventHandler(this.exitToolStripMenuItem1_Click);
             // 
+            // groupsZonesToolStripMenuItem
+            // 
+            this.groupsZonesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.activateToolStripMenuItem});
+            this.groupsZonesToolStripMenuItem.Name = "groupsZonesToolStripMenuItem";
+            this.groupsZonesToolStripMenuItem.Size = new System.Drawing.Size(100, 20);
+            this.groupsZonesToolStripMenuItem.Text = "Groups / Zones";
+            // 
+            // activateToolStripMenuItem
+            // 
+            this.activateToolStripMenuItem.Name = "activateToolStripMenuItem";
+            this.activateToolStripMenuItem.Size = new System.Drawing.Size(117, 22);
+            this.activateToolStripMenuItem.Text = "Activate";
+            this.activateToolStripMenuItem.Click += new System.EventHandler(this.activateToolStripMenuItem_Click);
+            // 
             // contextMenuStripDevicesNull
             // 
             this.contextMenuStripDevicesNull.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1900,6 +1932,22 @@ namespace zVirtualScenesApplication
             this.repollAllDevicesToolStripMenuItem.Name = "repollAllDevicesToolStripMenuItem";
             this.repollAllDevicesToolStripMenuItem.Size = new System.Drawing.Size(317, 22);
             this.repollAllDevicesToolStripMenuItem.Text = "Repoll All Devices";
+            // 
+            // txt_loglineslimit
+            // 
+            this.txt_loglineslimit.Location = new System.Drawing.Point(229, 43);
+            this.txt_loglineslimit.Name = "txt_loglineslimit";
+            this.txt_loglineslimit.Size = new System.Drawing.Size(107, 20);
+            this.txt_loglineslimit.TabIndex = 25;
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(115, 46);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(108, 13);
+            this.label33.TabIndex = 24;
+            this.label33.Text = "Log Size Limit (lines): ";
             // 
             // formzVirtualScenes
             // 
@@ -2141,6 +2189,11 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn urgencyColu;
         private BrightIdeasSoftware.OLVColumn descCol;
         private BrightIdeasSoftware.OLVColumn InterfaceCol;
+        private ToolStripMenuItem groupsZonesToolStripMenuItem;
+        private ToolStripMenuItem activateToolStripMenuItem;
+        private CheckBox checkBoxLSSortDevices;
+        private TextBox txt_loglineslimit;
+        private Label label33;
     }
 }
 

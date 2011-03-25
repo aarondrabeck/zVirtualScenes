@@ -11,65 +11,84 @@ namespace zVirtualScenesApplication
 {
     public partial class formAddEditActionMultiLevelSwitch : Form
     {
-        private formzVirtualScenes _zVirtualScenesMain;
-        private ZWaveDevice _SelectedDevice;
-        private int _SelectedSceneIndex;
-        private int _SelectedSceneActionIndex;
-        Action TheAction = new Action();
-        private bool CreateAction = false;
+         private formzVirtualScenes _zVirtualScenesMain;
+        private Scene theScene;
+        private Action theAction;
+        private int InsertPosition;
+        private bool EditMode;
+        private int sceneIndex;
 
         /// <summary>
-        /// Creates OR Edits Action
+        /// Edit Multilevel Switch Action
         /// </summary>
-        /// <param name="zVirtualScenesMain">Main Form</param>
-        /// <param name="SelectedSceneIndex">Index of Selected Scene</param>
-        /// <param name="SelectedSceneActionIndex">Selected Scene Action Index</param>
-        /// <param name="selectedDevice">OPTIONAL: ONLY USED IN CREATE NEW ACTION</param>
-        public formAddEditActionMultiLevelSwitch(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, ZWaveDevice selectedDevice = null)
+        /// <param name="zVirtualScenesMain"></param>
+        /// <param name="scene"></param>
+        /// <param name="action"></param>
+        public formAddEditActionMultiLevelSwitch(formzVirtualScenes zVirtualScenesMain, Scene scene, Action action)
         {
+            //Edit Items
             InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = true;
 
-            _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedDevice = selectedDevice;
-            _SelectedSceneIndex = SelectedSceneIndex;
-            _SelectedSceneActionIndex = SelectedSceneActionIndex;
+            this.groupBoxAction.Text = "Edit Action";
+            this.btn_Save.Text = "Save Action";
+            this.theAction = action;
+            this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
-            if (selectedDevice != null)
-                CreateAction = true;
+            LoadGui();
+        }
+        
+        /// <summary>
+        /// Create New Multilevel Switch Action
+        /// </summary>
+        /// <param name="zVirtualScenesMain"></param>
+        /// <param name="scene"></param>
+        /// <param name="device"></param>
+        /// <param name="PositionOfNewItem"></param>
+        public formAddEditActionMultiLevelSwitch(formzVirtualScenes zVirtualScenesMain, Scene scene, ZWaveDevice device, int PositionOfNewItem)
+        {
+            //Add Items
+            InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = false;
+            
+            this.groupBoxAction.Text = "Create New Action";
+            this.btn_Save.Text = "Add Action to '" + scene.Name + "'";
+            this.theAction = (Action)device;
+            this.InsertPosition = PositionOfNewItem;
 
-            if (!CreateAction)
-            {
-                groupBoxAction.Text = "Edit Action";
-                btn_Save.Text = "Save Action"; 
-                TheAction = _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Actions[SelectedSceneActionIndex];
-            }
-            else 
-            {
-                groupBoxAction.Text = "Create New Action";
-                btn_Save.Text = "Add Action to '" + _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Name + "'"; 
-                //Convert Device to Action id this is a new action and not an edit
-                TheAction = (Action)_SelectedDevice;
-            }
+            LoadGui();
+        }
 
+        private void LoadGui()
+        {
             #region Load Common Feilds into form fields
             lbl_Status.Text = "";
-            label_DeviceName.Text = "Node " + TheAction.NodeID + ",  '" + TheAction.Name + "'";
+            label_DeviceName.Text = "Node " + theAction.NodeID + ",  '" + theAction.Name + "'";
+            checkBoxSkipDark.Checked = theAction.SkipWhenDark;
+            checkBoxSkipLight.Checked = theAction.SkipWhenLight;
             #endregion
 
             #region MultiLevel Switch Specific Fields
-            txtbox_level.Text = TheAction.Level.ToString();
+            txtbox_level.Text = theAction.Level.ToString();
             #endregion
-           
-        }
+        } 
          
         private bool UpdateMultiLevelSwitchAction()
         {            
             //ERROR CHECK INPUTS
+            theAction.SkipWhenDark = checkBoxSkipDark.Checked;
+            theAction.SkipWhenLight = checkBoxSkipLight.Checked;
             try
             {
                 byte level = Convert.ToByte(txtbox_level.Text);
                 if (level < 100 || level == 255)
-                    TheAction.Level = level;
+                    theAction.Level = level;
                 else
                     throw new ArgumentException("Invalid Level.");
             }
@@ -85,33 +104,33 @@ namespace zVirtualScenesApplication
         {
             if (UpdateMultiLevelSwitchAction())
             {
-                ActionResult result = TheAction.Run(_zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                ActionResult result = theAction.Run(_zVirtualScenesMain);
                 _zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "GUI: [USER] " + result.Description);
                 lbl_Status.Text = result.ResultType + " " + result.Description;
             }
         }
 
         private void btn_Save_Click(object sender, EventArgs e)
-        {   
+        {
+            if (_zVirtualScenesMain.MasterScenes[this.sceneIndex].isRunning)
+            {
+                MessageBox.Show("Cannot modify scene when it is running.", _zVirtualScenesMain.ProgramName);
+                return;
+            }
+
             if (UpdateMultiLevelSwitchAction())
             {
-                if (!CreateAction) //replace action
-                {
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-                }
+                //SAVE            
+                if (EditMode) //replace action so delete before add.       
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Remove(theAction);
+
+                if (this.InsertPosition == -1)  //First Action in Scene
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Add(theAction);
                 else
-                {
-                    if (_SelectedSceneActionIndex == -1)  //First Action in Scene
-                        _SelectedSceneActionIndex = 0;
-                    else
-                        _SelectedSceneActionIndex++;  //Add item below cuurent selection
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Insert(InsertPosition, theAction);
 
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-                }
-
+                _zVirtualScenesMain.SelectListBoxActionItem(theAction);
+                this.Close();
                 this.Close();
             }  
         }

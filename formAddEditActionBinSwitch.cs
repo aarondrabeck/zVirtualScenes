@@ -12,61 +12,80 @@ namespace zVirtualScenesApplication
     public partial class formAddEditActionBinSwitch : Form
     {
         private formzVirtualScenes _zVirtualScenesMain;
-        private ZWaveDevice _SelectedDevice;
-        private int _SelectedSceneIndex;
-        private int _SelectedSceneActionIndex;
-        Action TheAction = new Action();
-        private bool CreateAction = false; 
+        private Scene theScene;
+        private Action theAction;
+        private int InsertPosition;
+        private bool EditMode;
+        private int sceneIndex;
 
         /// <summary>
-        /// Creates OR Edits Action
+        /// Edit Binary Switch Action
         /// </summary>
-        /// <param name="zVirtualScenesMain">Main Form</param>
-        /// <param name="SelectedSceneIndex">Index of Selected Scene</param>
-        /// <param name="SelectedSceneActionIndex">Selected Scene Action Index</param>
-        /// <param name="selectedDevice">OPTIONAL: ONLY USED IN CREATE NEW ACTION</param>
-        public formAddEditActionBinSwitch(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, ZWaveDevice selectedDevice = null )
+        /// <param name="zVirtualScenesMain"></param>
+        /// <param name="scene"></param>
+        /// <param name="action"></param>
+        public formAddEditActionBinSwitch(formzVirtualScenes zVirtualScenesMain, Scene scene, Action action)
         {
+            //Edit Items
             InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = true;
 
-            _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedDevice = selectedDevice;
-            _SelectedSceneIndex = SelectedSceneIndex;
-            _SelectedSceneActionIndex = SelectedSceneActionIndex;
+            this.groupBoxAction.Text = "Edit Action";
+            this.btn_Save.Text = "Save Action";
+            this.theAction = action;
+            this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
-            if (selectedDevice != null)
-                CreateAction = true;
+            LoadGui();
+        }
 
-            if (!CreateAction)
-            {
-                groupBoxAction.Text = "Edit Action";
-                btn_Save.Text = "Save Action"; 
-                TheAction = _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Actions[SelectedSceneActionIndex];
-            }
-            else
-            {
-                groupBoxAction.Text = "Create New Action";
-                btn_Save.Text = "Add Action to '" + _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Name + "'";
-                //Convert Device to Action id this is a new action and not an edit
-                TheAction = (Action)_SelectedDevice;
-            }
+        /// <summary>
+        /// Create New Binary Switch Action
+        /// </summary>
+        /// <param name="zVirtualScenesMain"></param>
+        /// <param name="scene"></param>
+        /// <param name="device"></param>
+        /// <param name="PositionOfNewItem"></param>
+        public formAddEditActionBinSwitch(formzVirtualScenes zVirtualScenesMain, Scene scene, ZWaveDevice device, int PositionOfNewItem)
+        {
+            //Add Items
+            InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = false;
+            
+            this.groupBoxAction.Text = "Create New Action";
+            this.btn_Save.Text = "Add Action to '" + scene.Name + "'";
+            this.theAction = (Action)device;
+            this.InsertPosition = PositionOfNewItem;
 
+            LoadGui();
+        }
+
+        private void LoadGui()
+        {
             #region Load Common Feilds into form fields
             lbl_Status.Text = "";
-            label_DeviceName.Text = "Node " + TheAction.NodeID + ",  '" + TheAction.Name + "'";
+            label_DeviceName.Text = "Node " + theAction.NodeID + ",  '" + theAction.Name + "'";
+            checkBoxSkipDark.Checked = theAction.SkipWhenDark;
+            checkBoxSkipLight.Checked = theAction.SkipWhenLight;
             #endregion
 
             #region Binary Switch Specific Fields
-            comboBoxBinaryONOFF.SelectedIndex = (TheAction.Level > 0 ? 1 : 0);
-            labelMomentaryMode.Text = "Momentary Mode: " + (TheAction.MomentaryOnMode ? "ON" : "OFF");
+            comboBoxBinaryONOFF.SelectedIndex = (theAction.Level > 0 ? 1 : 0);
+            labelMomentaryMode.Text = "Momentary Mode: " + (theAction.MomentaryOnMode ? "ON" : "OFF");
             #endregion
-                      
-        }
-
+        } 
+       
         private bool UpdateBinarySwitchAction()
         {
             //ERROR CHECK INPUTS
-            TheAction.Level = (byte)comboBoxBinaryONOFF.SelectedIndex;
+            theAction.Level = (byte)comboBoxBinaryONOFF.SelectedIndex;
+            theAction.SkipWhenDark = checkBoxSkipDark.Checked;
+            theAction.SkipWhenLight = checkBoxSkipLight.Checked;
             return true;
         }
 
@@ -74,7 +93,7 @@ namespace zVirtualScenesApplication
         {
             if (UpdateBinarySwitchAction())
             {
-                ActionResult result = TheAction.Run(_zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                ActionResult result = theAction.Run(_zVirtualScenesMain);
                 _zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "GUI: [USER] " + result.Description);
                 lbl_Status.Text = result.ResultType + " " + result.Description;
             }
@@ -82,25 +101,24 @@ namespace zVirtualScenesApplication
 
         private void btn_Save_Click(object sender, EventArgs e)
         {
+            if (_zVirtualScenesMain.MasterScenes[this.sceneIndex].isRunning)
+            {
+                MessageBox.Show("Cannot modify scene when it is running.", _zVirtualScenesMain.ProgramName);
+                return;
+            }
+
             if (UpdateBinarySwitchAction())
             {
-                if (!CreateAction) //replace action
-                {
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-                }
+                //SAVE            
+                if (EditMode) //replace action so delete before add.       
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Remove(theAction);
+
+                if (this.InsertPosition == -1)  //First Action in Scene
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Add(theAction);
                 else
-                {
-                    if (_SelectedSceneActionIndex == -1)  //First Action in Scene
-                        _SelectedSceneActionIndex = 0;
-                    else
-                        _SelectedSceneActionIndex++;  //Add item below cuurent selection
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Insert(InsertPosition, theAction);
 
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-                }
-
+                _zVirtualScenesMain.SelectListBoxActionItem(theAction);
                 this.Close();
             }
         }        

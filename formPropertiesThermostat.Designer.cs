@@ -36,6 +36,7 @@
             this.checkBoxPerDEviceJabberEnable = new System.Windows.Forms.CheckBox();
             this.label12 = new System.Windows.Forms.Label();
             this.groupBoxDeviceOptions = new System.Windows.Forms.GroupBox();
+            this.checkBoxGrowlEnabled = new System.Windows.Forms.CheckBox();
             this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
             this.txtb_GroupName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -46,7 +47,6 @@
             this.textBoxMaxAlert = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.btn_SaveOptions = new System.Windows.Forms.Button();
-            this.checkBoxGrowlEnabled = new System.Windows.Forms.CheckBox();
             this.groupBoxDeviceOptions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -115,6 +115,16 @@
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Options";
             // 
+            // checkBoxGrowlEnabled
+            // 
+            this.checkBoxGrowlEnabled.AutoSize = true;
+            this.checkBoxGrowlEnabled.Location = new System.Drawing.Point(181, 101);
+            this.checkBoxGrowlEnabled.Name = "checkBoxGrowlEnabled";
+            this.checkBoxGrowlEnabled.Size = new System.Drawing.Size(219, 17);
+            this.checkBoxGrowlEnabled.TabIndex = 50;
+            this.checkBoxGrowlEnabled.Text = "Enable Growl Notifcations for this Device";
+            this.checkBoxGrowlEnabled.UseVisualStyleBackColor = true;
+            // 
             // checkBoxDisplayinLightSwitch
             // 
             this.checkBoxDisplayinLightSwitch.AutoSize = true;
@@ -127,6 +137,8 @@
             // 
             // txtb_GroupName
             // 
+            this.txtb_GroupName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.txtb_GroupName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this.txtb_GroupName.Location = new System.Drawing.Point(87, 45);
             this.txtb_GroupName.Name = "txtb_GroupName";
             this.txtb_GroupName.Size = new System.Drawing.Size(250, 20);
@@ -205,16 +217,6 @@
             this.btn_SaveOptions.Text = "Save and Close";
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
-            // 
-            // checkBoxGrowlEnabled
-            // 
-            this.checkBoxGrowlEnabled.AutoSize = true;
-            this.checkBoxGrowlEnabled.Location = new System.Drawing.Point(181, 101);
-            this.checkBoxGrowlEnabled.Name = "checkBoxGrowlEnabled";
-            this.checkBoxGrowlEnabled.Size = new System.Drawing.Size(219, 17);
-            this.checkBoxGrowlEnabled.TabIndex = 50;
-            this.checkBoxGrowlEnabled.Text = "Enable Growl Notifcations for this Device";
-            this.checkBoxGrowlEnabled.UseVisualStyleBackColor = true;
             // 
             // formPropertiesThermostat
             // 

@@ -219,24 +219,26 @@ namespace zVirtualScenesApplication
                                 {
                                     zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.", LOG_INTERFACE);
 
-                                    foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
-                                        if(device.ShowInLightSwitchGUI)
-                                            SendMessagetoClientsSocket(LightSwitchClientSocket, TranslateDeviceToLightSwitchString(device) + Environment.NewLine);
-                                    
+                                    sendDeviceList(LightSwitchClientSocket);                                    
 
                                     foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                                         if (scene.ShowInLightSwitchGUI)
                                             SendMessagetoClientsSocket(LightSwitchClientSocket, scene.ToLightSwitchSocketString() + Environment.NewLine);
+
+                                    int ID = 0;
+                                    foreach (string group in zVirtualScenesMain.groups)
+                                    {
+                                        ID++;
+                                        SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + group + "~" + ID + Environment.NewLine);
+                                    }
 
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
                                 }
                                 else if (cmd.StartsWith("LIST"))
                                 {
                                     zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User refreshed device list.", LOG_INTERFACE);
-                                    
-                                    foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
-                                        if (device.ShowInLightSwitchGUI)
-                                            SendMessagetoClientsSocket(LightSwitchClientSocket, TranslateDeviceToLightSwitchString(device) + Environment.NewLine);
+
+                                    sendDeviceList(LightSwitchClientSocket);
 
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
                                 }
@@ -249,8 +251,15 @@ namespace zVirtualScenesApplication
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
                                 }
                                 else if (cmd.StartsWith("ZLIST"))
+                                {
+                                    int ID = 0; 
+                                    foreach (string group in zVirtualScenesMain.groups)
+                                    {
+                                        ID++;
+                                        SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + group + "~" + ID + Environment.NewLine);
+                                    }
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
-
+                                }
                                 else if (cmd.StartsWith("DEVICE"))
                                 {
                                     string[] values = cmd.Split('~');
@@ -265,7 +274,25 @@ namespace zVirtualScenesApplication
                                 }
                                 else if (cmd.StartsWith("ZONE"))
                                 {
-                                    //NOT USED
+                                    string[] values = cmd.Split('~');
+
+                                    int ID = 0;
+                                    foreach (string group in zVirtualScenesMain.groups)
+                                    {
+                                        ID++;
+                                        if(ID == Convert.ToByte(values[1]))
+                                        {                                            
+                                            byte level = Convert.ToByte(values[2]);
+
+                                            if (level == 255)
+                                                level = 99;
+
+                                            SceneResult result = zVirtualScenesMain.ActivateGroup(group, level);
+                                            zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + result.Description, LOG_INTERFACE);
+                                            BroadcastMessage("MSG~" + result.Description + Environment.NewLine);
+                                        }
+                                    }
+                                    
                                 }
                                 else if (cmd.StartsWith("THERMMODE"))
                                 {
@@ -317,6 +344,21 @@ namespace zVirtualScenesApplication
             }
         }
 
+        private void sendDeviceList(Socket LightSwitchClientSocket)
+        {
+            List<String> devices = new List<string>();
+
+            foreach (ZWaveDevice device in zVirtualScenesMain.MasterDevices)
+                if (device.ShowInLightSwitchGUI)
+                    devices.Add(TranslateDeviceToLightSwitchString(device));
+
+            if(zVirtualScenesMain.zVScenesSettings.LightSwitchSortDeviceList)
+                devices.Sort(); 
+
+            foreach (string device in devices)
+                SendMessagetoClientsSocket(LightSwitchClientSocket, "DEVICE~" + device + Environment.NewLine);
+        }
+
         /// <summary>
         /// Send a Device Node and Device Level and translates to action.
         /// </summary>
@@ -340,7 +382,7 @@ namespace zVirtualScenesApplication
                         action.Level = Level;
 
                         //Run and log
-                        ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                        ActionResult result = action.Run(zVirtualScenesMain);
                         zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + Client.RemoteEndPoint.ToString() + "] " + result.Description, LOG_INTERFACE);
 
                         //return result to app
@@ -362,7 +404,7 @@ namespace zVirtualScenesApplication
             foreach (Scene scene in zVirtualScenesMain.MasterScenes)
                 if (scene.ID == SceneID)
                 {
-                    SceneResult result = scene.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                    SceneResult result = scene.Run(zVirtualScenesMain);
                     zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + Client.RemoteEndPoint.ToString() + "] " + result.Description, LOG_INTERFACE);
 
                     return result.ResultType.ToString() + " " + result.Description;
@@ -388,7 +430,7 @@ namespace zVirtualScenesApplication
                             action.CoolPoint = Temp;
                             break;                        
                     }
-                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                    ActionResult result = action.Run(zVirtualScenesMain);
                     zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + Client.RemoteEndPoint.ToString() + "] " + result.Description, LOG_INTERFACE);                         
                     return result.ResultType + " " + result.Description; ;                    
                 }
@@ -432,7 +474,7 @@ namespace zVirtualScenesApplication
                             action.EngeryMode = (int)ZWaveDevice.EnergyMode.ComfortMode;
                             break;
                     }
-                    ActionResult result = action.Run(zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                    ActionResult result = action.Run(zVirtualScenesMain);
                     zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "[" + Client.RemoteEndPoint.ToString() + "] " + result.Description, LOG_INTERFACE);                        
                     return result.ResultType + " " + result.Description;                                           
                 }
@@ -536,19 +578,14 @@ namespace zVirtualScenesApplication
         //workerSocket.Send(byData);
         //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~House (AWAY MODE)~6~0~Status" + Environment.NewLine);
         //workerSocket.Send(byData);
-        public string TranslateDeviceToLightSwitchString(ZWaveDevice device, bool Update = false)
+        public string TranslateDeviceToLightSwitchString(ZWaveDevice device)
         {
-            string prefix = "DEVICE~";
-
-            if (Update)
-                prefix = "UPDATE~";
-
             if (device.Type == zVirtualScenesApplication.ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
-                return prefix + device.Name + "~" + device.NodeID + "~" + device.Level + "~" + "BinarySwitch";
+                return device.Name + "~" + device.NodeID + "~" + device.Level + "~" + "BinarySwitch";
             else if (device.Type == zVirtualScenesApplication.ZWaveDevice.ZWaveDeviceTypes.Thermostat)
-                return prefix + device.Name + "~" + device.NodeID + "~" + device.Temp + "~" + device.Type;
+                return device.Name + "~" + device.NodeID + "~" + device.Temp + "~" + device.Type;
             else
-                return prefix + device.Name + "~" + device.NodeID + "~" + device.Level + "~" + device.Type;
+                return device.Name + "~" + device.NodeID + "~" + device.Level + "~" + device.Type;
         }
     }
 

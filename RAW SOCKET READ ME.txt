@@ -35,6 +35,10 @@
 
   {{{ <runscene id="3" /> }}}
 
+  {{{ <activategroup group="Living Room" level="40" /> }}} - Activate a Group / Zone.  Zones can only control, Binary and Multilevel Switches.
+
+  {{{ <alterlevel node="3" changelevel="-5" /> }}} -  MULTILEVEL SWITCH ONLY. Alters the level of a multilevel switch from its current state.  + and - accepted. 
+
   {{{ <repoll node="1" /> }}} - 0 for all
 
   {{{ <setswitch node="3" level="20" /> }}}

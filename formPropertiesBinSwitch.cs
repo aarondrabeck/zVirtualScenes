@@ -30,7 +30,8 @@ namespace zVirtualScenesApplication
             checkBoxDisplayinLightSwitch.Checked = _DeviceToEdit.ShowInLightSwitchGUI;
             checkBoxMomentaryOn.Checked = _DeviceToEdit.MomentaryOnMode;
             checkBoxGrowlEnabled.Checked = _DeviceToEdit.SendGrowlNotifications;
-            textBoxMomentaryOnTimeSpan.Text = DeviceToEdit.MomentaryTimespan.ToString(); 
+            textBoxMomentaryOnTimeSpan.Text = DeviceToEdit.MomentaryTimespan.ToString();
+            txtb_GroupName.AutoCompleteCustomSource = _zVirtualScenesMain.GetGroupsAutoCompleteCollection();
 
             #endregion
 
@@ -59,6 +60,7 @@ namespace zVirtualScenesApplication
                 MessageBox.Show("Invalid group name.", _zVirtualScenesMain.ProgramName);
                 return;
             }
+            _zVirtualScenesMain.refreshGroups();
 
             //Jabber Notifications
             _DeviceToEdit.SendJabberNotifications = checkBoxPerDEviceJabberEnable.Checked;

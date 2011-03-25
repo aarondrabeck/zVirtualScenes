@@ -12,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace zVirtualScenesApplication 
 {
-    public delegate SceneResult RunWorkerDelegate(ZWaveController ControlThinkController);
+    public delegate SceneResult RunWorkerDelegate(formzVirtualScenes form);
     public delegate void SceneExecutionFinished(object sender, SceneResult SceneResultArgs);
 
     public class Scene : INotifyPropertyChanged //use INotifyPropertyChanged to update binded listviews in the GUI on data changes
@@ -54,13 +54,13 @@ namespace zVirtualScenesApplication
         /// </summary>
         /// <param name="ControlThinkController"></param>
         /// <returns></returns>
-        public SceneResult RunWorker(ZWaveController ControlThinkController)
+        public SceneResult RunWorker(formzVirtualScenes form)
         {
             string errors = "";
             
             foreach (Action sceneAction in this.Actions)
             {
-                ActionResult actionresult = sceneAction.Run(ControlThinkController);
+                ActionResult actionresult = sceneAction.Run(form);
 
                 if (actionresult.ResultType == ActionResult.ResultTypes.Error)
                     errors += actionresult.Description + ", ";
@@ -77,7 +77,7 @@ namespace zVirtualScenesApplication
         /// </summary>
         /// <param name="ControlThinkController"></param>
         /// <returns></returns>
-        public SceneResult Run(ZWaveController ControlThinkController)
+        public SceneResult Run(formzVirtualScenes form)
         {
             if(this.isRunning)
                 return new SceneResult { ResultType = SceneResult.ResultTypes.Error, Description = "Scene '" + this.Name + "' is already running." }; 
@@ -88,7 +88,7 @@ namespace zVirtualScenesApplication
             RunWorkerDelegate RunWorkerDel = new RunWorkerDelegate(RunWorker);
             this.isRunning = true; 
             //Start worker in thread
-            RunWorkerDel.BeginInvoke(ControlThinkController, new AsyncCallback(RunSceneCallback), null);
+            RunWorkerDel.BeginInvoke(form, new AsyncCallback(RunSceneCallback), null);
             return new SceneResult { ResultType = SceneResult.ResultTypes.Success, Description = "Scene '" + this.Name + "' began."};                
         }
 
@@ -144,7 +144,9 @@ namespace zVirtualScenesApplication
         public enum ResultTypes
         {
             Success = 1,
-            Error = 2
+            Error = 2,
+            Warning = 3
+
         }
 
         public ResultTypes ResultType { get; set; }

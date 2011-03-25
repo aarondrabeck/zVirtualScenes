@@ -11,48 +11,67 @@ namespace zVirtualScenesApplication
 {
     public partial class formAddEditActionThermostat : Form
     {
-        private formzVirtualScenes _zVirtualScenesMain;
-        private ZWaveDevice _SelectedDevice;
-        private int _SelectedSceneIndex;
-        private int _SelectedSceneActionIndex;
-        Action TheAction = new Action();
-        private bool CreateAction = false;
-        
+         private formzVirtualScenes _zVirtualScenesMain;
+        private Scene theScene;
+        private Action theAction;
+        private int InsertPosition;
+        private bool EditMode;
+        private int sceneIndex;
+
         /// <summary>
-        /// Creates OR Edits Action
+        /// Edit Thermostat Action
         /// </summary>
-        /// <param name="zVirtualScenesMain">Main Form</param>
-        /// <param name="SelectedSceneIndex">Index of Selected Scene</param>
-        /// <param name="SelectedSceneActionIndex">Selected Scene Action Index</param>
-        /// <param name="selectedDevice">OPTIONAL: ONLY USED IN CREATE NEW ACTION</param>
-        public formAddEditActionThermostat(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, ZWaveDevice selectedDevice = null)
+        /// <param name="zVirtualScenesMain"></param>
+        /// <param name="scene"></param>
+        /// <param name="action"></param>
+        public formAddEditActionThermostat(formzVirtualScenes zVirtualScenesMain, Scene scene, Action action)
         {
+            //Edit Items
             InitializeComponent();
-            _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedDevice = selectedDevice;
-            _SelectedSceneIndex = SelectedSceneIndex;
-            _SelectedSceneActionIndex = SelectedSceneActionIndex;
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = true;
 
-            if (selectedDevice != null)
-                CreateAction = true;
+            this.groupBoxAction.Text = "Edit Action";
+            this.btn_Save.Text = "Save Action";
+            this.theAction = action;
+            this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
-            if (!CreateAction)
-            {
-                groupBoxAction.Text = "Edit Action";
+            LoadGui();
+        }
 
-                btn_Save.Text = "Save Action"; 
-                TheAction = _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Actions[SelectedSceneActionIndex];
-            }
-            else
-            {
-                groupBoxAction.Text = "Create New Action";
-                btn_Save.Text = "Add Action to '" + _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Name + "'"; 
-                //Convert Device to Action id this is a new action and not an edit
-                TheAction = (Action)_SelectedDevice;
-            }
+        /// <summary>
+        /// Create New Thermostat Action
+        /// </summary>
+        /// <param name="zVirtualScenesMain"></param>
+        /// <param name="scene"></param>
+        /// <param name="device"></param>
+        /// <param name="PositionOfNewItem"></param>
+        public formAddEditActionThermostat(formzVirtualScenes zVirtualScenesMain, Scene scene, ZWaveDevice device, int PositionOfNewItem)
+        {
+            //Add Items
+            InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = false;
+            
+            this.groupBoxAction.Text = "Create New Action";
+            this.btn_Save.Text = "Add Action to '" + scene.Name + "'";
+            this.theAction = (Action)device;
+            this.InsertPosition = PositionOfNewItem;
+
+            LoadGui();
+        }
+
+        private void LoadGui()
+        {
             #region Load Common Feilds into form fields
             lbl_Status.Text = "";
-            label_DeviceName.Text = "Node " + TheAction.NodeID + ",  '" + TheAction.Name + "'";
+            label_DeviceName.Text = "Node " + theAction.NodeID + ",  '" + theAction.Name + "'";
+            checkBoxSkipDark.Checked = theAction.SkipWhenDark;
+            checkBoxSkipLight.Checked = theAction.SkipWhenLight;
             #endregion
 
             #region Thermostat Specific Fields            
@@ -63,35 +82,34 @@ namespace zVirtualScenesApplication
             comboBoxEnergyMode.DataSource = Enum.GetNames(typeof(ZWaveDevice.EnergyMode));
 
             //Set Action Options 
-            if (TheAction.HeatPoint != -1)
+            if (theAction.HeatPoint != -1)
             {
                 checkBoxeditHP.Checked = true;
-                txtbx_HeatPoint.Text = TheAction.HeatPoint.ToString();
+                txtbx_HeatPoint.Text = theAction.HeatPoint.ToString();
             }
 
-            if (TheAction.CoolPoint != -1)
+            if (theAction.CoolPoint != -1)
             {
                 checkBoxeditCP.Checked = true;
-                textBoxCoolPoint.Text = TheAction.CoolPoint.ToString();
+                textBoxCoolPoint.Text = theAction.CoolPoint.ToString();
             }
 
-            comboBoxHeatCoolMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.ThermostatMode), TheAction.HeatCoolMode);
-            comboBoxEnergyMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), TheAction.EngeryMode);
-            comboBoxFanMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.EnergyMode), TheAction.FanMode);
+            comboBoxHeatCoolMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.ThermostatMode), theAction.HeatCoolMode);
+            comboBoxEnergyMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), theAction.EngeryMode);
+            comboBoxFanMode.SelectedItem = Enum.GetName(typeof(ZWaveDevice.EnergyMode), theAction.FanMode);
             
             #endregion
-
         }
  
         private bool UpdateThermostatAction(Action myBinSwitchAction)
         {
             //ERROR CHECK INPUTS
-            TheAction.HeatCoolMode = (int)Enum.Parse(typeof(ZWaveDevice.ThermostatMode), comboBoxHeatCoolMode.SelectedValue.ToString());
-            TheAction.FanMode = (int)Enum.Parse(typeof(ZWaveDevice.ThermostatFanMode), comboBoxFanMode.SelectedValue.ToString());
-            TheAction.EngeryMode = (int)Enum.Parse(typeof(ZWaveDevice.EnergyMode), comboBoxEnergyMode.SelectedValue.ToString());
+            theAction.HeatCoolMode = (int)Enum.Parse(typeof(ZWaveDevice.ThermostatMode), comboBoxHeatCoolMode.SelectedValue.ToString());
+            theAction.FanMode = (int)Enum.Parse(typeof(ZWaveDevice.ThermostatFanMode), comboBoxFanMode.SelectedValue.ToString());
+            theAction.EngeryMode = (int)Enum.Parse(typeof(ZWaveDevice.EnergyMode), comboBoxEnergyMode.SelectedValue.ToString());
 
             //Make sure atleast one thermo action was chosen
-            if (TheAction.HeatCoolMode == -1 && TheAction.FanMode == -1 && TheAction.EngeryMode == -1 && checkBoxeditHP.Checked == false && checkBoxeditCP.Checked == false)
+            if (theAction.HeatCoolMode == -1 && theAction.FanMode == -1 && theAction.EngeryMode == -1 && checkBoxeditHP.Checked == false && checkBoxeditCP.Checked == false)
             {
                 MessageBox.Show("Please select at least one Temperature Mode.", _zVirtualScenesMain.ProgramName);
                 return false;
@@ -99,7 +117,7 @@ namespace zVirtualScenesApplication
 
             if (checkBoxeditHP.Checked == true)
             {
-                try { TheAction.HeatPoint = Convert.ToInt32(txtbx_HeatPoint.Text); }
+                try { theAction.HeatPoint = Convert.ToInt32(txtbx_HeatPoint.Text); }
                 catch
                 {
                     MessageBox.Show("Invalid Heat Point.", _zVirtualScenesMain.ProgramName);
@@ -109,7 +127,7 @@ namespace zVirtualScenesApplication
 
             if (checkBoxeditCP.Checked == true)
             {
-                try { TheAction.CoolPoint = Convert.ToInt32(textBoxCoolPoint.Text); }
+                try { theAction.CoolPoint = Convert.ToInt32(textBoxCoolPoint.Text); }
                 catch
                 {
                     MessageBox.Show("Invalid Cool Point..", _zVirtualScenesMain.ProgramName);
@@ -117,14 +135,17 @@ namespace zVirtualScenesApplication
                 }
             }
 
+            theAction.SkipWhenDark = checkBoxSkipDark.Checked;
+            theAction.SkipWhenLight = checkBoxSkipLight.Checked;
+
             return true;
         }       
 
         private void btn_RunCommand_Click(object sender, EventArgs e)
         {
-            if (UpdateThermostatAction(TheAction))
+            if (UpdateThermostatAction(theAction))
             {
-                ActionResult result = TheAction.Run(_zVirtualScenesMain.ControlThinkInt.ControlThinkController);
+                ActionResult result = theAction.Run(_zVirtualScenesMain);
                 _zVirtualScenesMain.AddLogEntry((UrgencyLevel)result.ResultType, "GUI: [USER] " + result.Description);
                 lbl_Status.Text = result.ResultType + " " + result.Description;
             }
@@ -132,25 +153,25 @@ namespace zVirtualScenesApplication
 
         private void btn_Save_Click(object sender, EventArgs e)
         {
-            if (UpdateThermostatAction(TheAction))
+
+            if (_zVirtualScenesMain.MasterScenes[this.sceneIndex].isRunning)
             {
-                if (!CreateAction) //replace action
-                {
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-                }
+                MessageBox.Show("Cannot modify scene when it is running.", _zVirtualScenesMain.ProgramName);
+                return;
+            }
+
+            if (UpdateThermostatAction(theAction))
+            {
+                //SAVE            
+                if (EditMode) //replace action so delete before add.       
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Remove(theAction);
+
+                if (this.InsertPosition == -1)  //First Action in Scene
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Add(theAction);
                 else
-                {
-                    if (_SelectedSceneActionIndex == -1)  //First Action in Scene
-                        _SelectedSceneActionIndex = 0;
-                    else
-                        _SelectedSceneActionIndex++;  //Add item below cuurent selection
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Insert(InsertPosition, theAction);
 
-                    _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                    _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-                }
-
+                _zVirtualScenesMain.SelectListBoxActionItem(theAction);
                 this.Close();
             }
         }

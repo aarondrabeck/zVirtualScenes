@@ -5,10 +5,11 @@ using System.Text;
 
 namespace zVirtualScenesApplication
 {
-    public class Settings
+    public class UserSettings
     {
         //GENERAL SETTINGS
         public int PollingInterval { get; set; }
+        public int LongLinesLimit { get; set; }
 
         //HTPP INTERFACE
         public bool zHTTPListenEnabled { get; set; }
@@ -20,6 +21,7 @@ namespace zVirtualScenesApplication
         public int LightSwitchPort { get; set; }
         public int LightSwitchMaxConnections { get; set; }
         public string LightSwitchPassword { get; set; }
+        public bool LightSwitchSortDeviceList { get; set; }
 
         //Jabber INTERFACE
         public bool JabberEnanbled { get; set; }
@@ -43,9 +45,10 @@ namespace zVirtualScenesApplication
         public bool   XMLSocketAllowAndroid    { get; set; }
         public string XMLSocketAndroidPassword { get; set; }
         
-        public Settings()
+        public UserSettings()
         {
-            this.PollingInterval = 10;
+            this.PollingInterval = 60;
+            this.LongLinesLimit = 1000;
 
             //Defaults
             //HTTP
@@ -58,6 +61,7 @@ namespace zVirtualScenesApplication
             this.LightSwitchPort = 1337;
             this.LightSwitchMaxConnections = 50;
             this.LightSwitchPassword = "1234";
+            this.LightSwitchSortDeviceList = true;
 
             //Jabber
             this.JabberEnanbled = false; 
@@ -80,6 +84,7 @@ namespace zVirtualScenesApplication
             this.XMLSocketAllowiViewer = false;
             this.XMLSocketAllowAndroid = false;
             this.XMLSocketAndroidPassword = "changeme";
+                        
         }
 
     }

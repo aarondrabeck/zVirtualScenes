@@ -12,38 +12,56 @@ namespace zVirtualScenesApplication
     public partial class formAddEditEXEC : Form
     {
         private formzVirtualScenes _zVirtualScenesMain;
-        private int _SelectedSceneIndex;
-        private int _SelectedSceneActionIndex;
-        Action TheAction = new Action();
-        private bool _CreateAction;
+        private Scene theScene;
+        private Action theAction;
+        private int InsertPosition;
+        private bool EditMode;
+        private int sceneIndex;
 
-        public formAddEditEXEC(formzVirtualScenes zVirtualScenesMain, int SelectedSceneIndex, int SelectedSceneActionIndex, bool CreateAction = false)
+        public formAddEditEXEC(formzVirtualScenes zVirtualScenesMain, Scene scene, Action action)
         {
+            //Edit Items
             InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = true;
 
-            _zVirtualScenesMain = zVirtualScenesMain;
-            _SelectedSceneIndex = SelectedSceneIndex;
-            _SelectedSceneActionIndex = SelectedSceneActionIndex;
-            _CreateAction = CreateAction;
+            this.groupBoxAction.Text = "Edit Action";
+            this.btn_Save.Text = "Save Action";
+            this.theAction = action;
+            this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
-            if (!_CreateAction)
-            {
-                groupBoxAction.Text = "Edit Action";
-                btn_Save.Text = "Save Action";
-                TheAction = _zVirtualScenesMain.MasterScenes[SelectedSceneIndex].Actions[SelectedSceneActionIndex];
-            }
-            else
-            {
-                groupBoxAction.Text = "Create New Action";
-                btn_Save.Text = "Add Action";
-            }
-            
-            txtb_path.Text = TheAction.EXEPath;
+            LoadGui();
+        }
+
+        public formAddEditEXEC(formzVirtualScenes zVirtualScenesMain, Scene scene, int PositionOfNewItem)
+        {
+            //Add Items
+            InitializeComponent();
+            this._zVirtualScenesMain = zVirtualScenesMain;
+            this.theScene = scene;
+            this.sceneIndex = _zVirtualScenesMain.MasterScenes.IndexOf(this.theScene);
+            this.EditMode = false;
+
+            this.groupBoxAction.Text = "Create New Action";
+            this.btn_Save.Text = "Add Action";
+            this.theAction = new Action();
+            this.InsertPosition = PositionOfNewItem;
+
+            LoadGui();
+        }
+
+        private void LoadGui()
+        {
+            txtb_path.Text = theAction.EXEPath;
+            checkBoxSkipDark.Checked = theAction.SkipWhenDark;
+            checkBoxSkipLight.Checked = theAction.SkipWhenLight;
         }
 
         private void btn_Save_Click(object sender, EventArgs e)
         {
-            //VALIDATE ENTRY
+            //VALIDATE ENTRY            
             if (txtb_path.Text == "")
             {
                 MessageBox.Show("Please select a executable.", _zVirtualScenesMain.ProgramName);
@@ -51,28 +69,22 @@ namespace zVirtualScenesApplication
             }            
 
             //CREATE ACTION
-            TheAction.Name = "Launch App";
-            TheAction.Type = Action.ActionTypes.LauchAPP;
-            TheAction.EXEPath = txtb_path.Text;                   
+            theAction.Name = "Launch App";
+            theAction.Type = Action.ActionTypes.LauchAPP;
+            theAction.EXEPath = txtb_path.Text;
+            theAction.SkipWhenDark = checkBoxSkipDark.Checked;
+            theAction.SkipWhenLight = checkBoxSkipLight.Checked;
+            
+            //SAVE            
+            if (EditMode) //replace action so delete before add.       
+                _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Remove(theAction);
 
-            //SAVE
-            if (!_CreateAction) //replace action
-            {
-                _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.RemoveAt(_SelectedSceneActionIndex);
-                _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-            }
-            else
-            {
-                if (_SelectedSceneActionIndex == -1)  //First Action in Scene
-                    _SelectedSceneActionIndex = 0;
-                else
-                    _SelectedSceneActionIndex++;  //Add item below cuurent selection
+            if (this.InsertPosition == -1)  //First Action in Scene
+                    _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Add(theAction);
+             else
+                _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.Insert(InsertPosition, theAction);          
 
-                _zVirtualScenesMain.MasterScenes[_SelectedSceneIndex].Actions.Insert(_SelectedSceneActionIndex, TheAction);
-                _zVirtualScenesMain.SelectListBoxActionItem(_SelectedSceneActionIndex);
-            }
-
+            _zVirtualScenesMain.SelectListBoxActionItem(theAction);
             this.Close();
         }
 

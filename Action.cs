@@ -75,8 +75,7 @@ namespace zVirtualScenesApplication
             set { GlobalFunctions.Set(this, "EXEPath", ref _EXEPath, value, PropertyChanged); }
         }
 
-        //Standard Properties
-        
+        //Standard Properties        
         public uint HomeID { get; set; }
         public byte NodeID { get; set; }
         public ZWaveDevice.ZWaveDeviceTypes ZWaveType { get; set; }
@@ -84,6 +83,8 @@ namespace zVirtualScenesApplication
         public int Mode { get; set; }
         public bool MomentaryOnMode { get; set; }
         public int MomentaryTimespan { get; set; }
+        public bool SkipWhenLight;
+        public bool SkipWhenDark;
 
         /// <summary>
         /// In Milliseconds
@@ -110,7 +111,9 @@ namespace zVirtualScenesApplication
             this.HomeID = 0;
             this.TimerDuration = 5000;
             this.MomentaryOnMode = false;
-            this.MomentaryTimespan = 1; 
+            this.MomentaryTimespan = 1;
+            this.SkipWhenDark = false;
+            this.SkipWhenLight = false;
         }
 
         public enum ActionTypes
@@ -170,18 +173,23 @@ namespace zVirtualScenesApplication
             return "Unknown";
         }
 
-
-        public ActionResult Run(ZWaveController ControlThinkController)
+        public ActionResult Run(formzVirtualScenes formzVirtualScenesMAIN)
         {
+            if (this.SkipWhenLight && !formzVirtualScenesMAIN.isDark())
+                return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Action skipped because it is light out." };
+
+            if (this.SkipWhenDark && formzVirtualScenesMAIN.isDark())
+                return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Action skipped because it is dark out." };
+
             if (Type == ActionTypes.ZWaveDevice)
-            {
-                if (ControlThinkController.IsConnected)
+            {                
+                if (formzVirtualScenesMAIN.ControlThinkInt.ControlThinkController.IsConnected)
                 {
                     #region BinarySwitchs
 
                     if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
                     {
-                        foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
+                        foreach (ControlThink.ZWave.Devices.ZWaveDevice device in formzVirtualScenesMAIN.ControlThinkInt.ControlThinkController.Devices)
                         {
                             if (device.NodeID == this.NodeID)
                             {
@@ -216,7 +224,7 @@ namespace zVirtualScenesApplication
 
                     else if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
                     {
-                        foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
+                        foreach (ControlThink.ZWave.Devices.ZWaveDevice device in formzVirtualScenesMAIN.ControlThinkInt.ControlThinkController.Devices)
                         {
                             if (device.NodeID == this.NodeID)
                             {
@@ -246,7 +254,7 @@ namespace zVirtualScenesApplication
                             return new ActionResult { ResultType = ActionResult.ResultTypes.Error, Description = "Failed to set Thermostat. Nothing to set!" };
                         }
 
-                        foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
+                        foreach (ControlThink.ZWave.Devices.ZWaveDevice device in formzVirtualScenesMAIN.ControlThinkInt.ControlThinkController.Devices)
                         {
                             if (device.NodeID == this.NodeID)
                             {
@@ -254,8 +262,6 @@ namespace zVirtualScenesApplication
                                 try
                                 {
                                     ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
-
-
 
                                     //Set Heat Cool Mode
                                     if (_HeatCoolMode != -1)
@@ -370,7 +376,8 @@ namespace zVirtualScenesApplication
         public string GlbUniqueID()
         {
             return this.HomeID.ToString() + this.NodeID.ToString();
-        }        
+        }
+
     }
 
     public class ActionResult

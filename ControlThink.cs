@@ -101,24 +101,7 @@ namespace zVirtualScenesApplication
                             else
                             {
                                 formzVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "Device type  " + DeviceFoundOnNetowrk.ToString() + " UNKNOWN.", LOG_INTERFACE);
-                            }
-
-                            //Overwirte Name from the Custom Device Saved Data if present.
-                            foreach (ZWaveDeviceUserSettings PreviouslySavedDevice in formzVirtualScenesMain.SavedZWaveDeviceUserSettings)
-                            {
-                                if (newDevice.GlbUniqueID() == PreviouslySavedDevice.GlbUniqueID())
-                                {
-                                    newDevice.Name = PreviouslySavedDevice.Name;
-                                    newDevice.NotificationDetailLevel = PreviouslySavedDevice.NotificationDetailLevel;
-                                    newDevice.SendJabberNotifications = PreviouslySavedDevice.SendJabberNotifications;
-                                    newDevice.MaxAlertTemp = PreviouslySavedDevice.MaxAlertTemp;
-                                    newDevice.MinAlertTemp = PreviouslySavedDevice.MinAlertTemp;
-                                    newDevice.GroupName = PreviouslySavedDevice.GroupName;
-                                    newDevice.ShowInLightSwitchGUI = PreviouslySavedDevice.ShowInLightSwitchGUI;
-                                    newDevice.MomentaryOnMode = PreviouslySavedDevice.MomentaryOnMode;
-                                    newDevice.MomentaryTimespan = PreviouslySavedDevice.MomentaryTimespan;
-                                }
-                            }
+                            }                            
                             result.NewDeviceList.Add(newDevice);                            
                         }
                     }
@@ -127,9 +110,9 @@ namespace zVirtualScenesApplication
                         result.NoErrors = false;
                         result.ErrorDescription = ex.Message;
                     }
-                }
-                e.Result = result; 
+                }                 
             }
+            e.Result = result;
         }
 
         private void ReloadDevicesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -137,20 +120,36 @@ namespace zVirtualScenesApplication
             ControlThinkGetDevicesResult result = (ControlThinkGetDevicesResult)e.Result;
             if (result != null)
             {
-                if (result.NoErrors)
+                formzVirtualScenesMain.MasterDevices.Clear();
+
+                foreach (ZWaveDevice newDevice in result.NewDeviceList)
                 {
-                    formzVirtualScenesMain.MasterDevices.Clear();
+                    //Overwirte Name from the Custom Device Saved Data if present.
+                    foreach (ZWaveDeviceUserSettings PreviouslySavedDevice in formzVirtualScenesMain.SavedZWaveDeviceUserSettings)
+                    {
+                        if (newDevice.GlbUniqueID() == PreviouslySavedDevice.GlbUniqueID())
+                        {
+                            newDevice.Name = PreviouslySavedDevice.Name;
+                            newDevice.NotificationDetailLevel = PreviouslySavedDevice.NotificationDetailLevel;
+                            newDevice.SendJabberNotifications = PreviouslySavedDevice.SendJabberNotifications;
+                            newDevice.MaxAlertTemp = PreviouslySavedDevice.MaxAlertTemp;
+                            newDevice.MinAlertTemp = PreviouslySavedDevice.MinAlertTemp;
+                            newDevice.GroupName = PreviouslySavedDevice.GroupName;
+                            newDevice.ShowInLightSwitchGUI = PreviouslySavedDevice.ShowInLightSwitchGUI;
+                            newDevice.MomentaryOnMode = PreviouslySavedDevice.MomentaryOnMode;
+                            newDevice.MomentaryTimespan = PreviouslySavedDevice.MomentaryTimespan;
+                            if(newDevice.GroupName != "")
+                                formzVirtualScenesMain.groups.Add(newDevice.GroupName);
+                        }
+                    }
 
-                    foreach (ZWaveDevice newDevice in result.NewDeviceList)
-                        formzVirtualScenesMain.MasterDevices.Add(newDevice);
-
-                    formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB Loaded " + formzVirtualScenesMain.MasterDevices.Count() + " Devices.", LOG_INTERFACE);
+                    formzVirtualScenesMain.MasterDevices.Add(newDevice);
                 }
-                else
-                    formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, result.ErrorDescription, LOG_INTERFACE);
+
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB Loaded " + formzVirtualScenesMain.MasterDevices.Count() + " Devices.", LOG_INTERFACE);
             }
             else
-                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "USB Communication Error" , LOG_INTERFACE);
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, result.ErrorDescription, LOG_INTERFACE);            
         }
 
         public void ConnectAndLoadDevices()
