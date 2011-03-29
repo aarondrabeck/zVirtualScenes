@@ -4,7 +4,7 @@ using jabber.client;
 
 namespace zVirtualScenesApplication
 {
-    class JabberInterface
+    public class JabberInterface
     {
         private static string LOG_INTERFACE = "JABBER"; 
         public formzVirtualScenes zVirtualScenesMain;

@@ -21,6 +21,7 @@ using BrightIdeasSoftware;
 using System.Globalization;
 using System.Reflection;
 using ZeroconfService;
+using System.Xml;
 
 namespace zVirtualScenesApplication
 {
@@ -33,17 +34,18 @@ namespace zVirtualScenesApplication
         //Forms and Controllers
         public ControlThinkInterface ControlThinkInt = new ControlThinkInterface();
         private formPropertiesScene formSceneProperties = new formPropertiesScene();
-        private XMLSocketInterface SocketInt = new XMLSocketInterface();
-        private LightSwitchInterface LightSwitchInt = new LightSwitchInterface();
-        private JabberInterface jabber = new JabberInterface();
-        private ControlThinkRepoller refresher = new ControlThinkRepoller();
+        public XMLSocketInterface SocketInt = new XMLSocketInterface();
+        public LightSwitchInterface LightSwitchInt = new LightSwitchInterface();
+        public JabberInterface jabber = new JabberInterface();
+        public ControlThinkRepoller refresher = new ControlThinkRepoller();
         private KeyboardHook hook = new KeyboardHook();
         private GrowlInterface growl = new GrowlInterface();
         private NetService netservice = null;
+        public HttpServer httpServer;
 
         //Threads 
-        Thread HTTPInterfaceTread;
-        HttpServer httpServer;
+        public Thread HTTPInterfaceTread;
+        
 
         //Delegates
         public delegate void LogThisDelegate(UrgencyLevel urgency, string message, string theInterface);
@@ -99,7 +101,6 @@ namespace zVirtualScenesApplication
 
             //Load XML Saved Settings
             LoadSettingsFromXML();
-            PopulateSettingsTabWithUsersSettings();
 
             //Start Listening for device changes
             refresher.zVirtualScenesMain = this;
@@ -239,7 +240,7 @@ namespace zVirtualScenesApplication
 
             dataListViewLog.DataSource = null;
 
-            SaveSettingsToFile();
+            SaveSettingsToFile(APP_PATH);
 
             Properties.Settings.Default.WindowGeometry = GeometryToString(this);
             Properties.Settings.Default.Save();
@@ -380,9 +381,13 @@ namespace zVirtualScenesApplication
                         SocketInt.BroadcastMessage("<event type=\"DeviceStateChange\" alertlevel=\"Success\" description=\"" + notification + "\" />");
 
                         //Send full XML device to Socket Clients so they can easily replace device to get new levels
+                        XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
+                        xmlwritersettings.NewLineHandling = NewLineHandling.None;
+                        xmlwritersettings.Indent = false;
+
                         StringWriter devicetoXML = new StringWriter();
                         XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(device.GetType());
-                        DevicetoXML.Serialize(devicetoXML, device);
+                        DevicetoXML.Serialize(XmlWriter.Create(devicetoXML, xmlwritersettings), device);                        
                         SocketInt.BroadcastMessage(devicetoXML.ToString());
                     }
                 }
@@ -613,73 +618,32 @@ namespace zVirtualScenesApplication
 
         #region Settings TAB
 
-        private void PopulateSettingsTabWithUsersSettings()
-        {
-            //General Settings 
-            textBoxRepolling.Text = zVScenesSettings.PollingInterval.ToString();
-            txt_loglineslimit.Text = zVScenesSettings.LongLinesLimit.ToString();
-
-            //Http Listen
-            txtb_httpPort.Text = Convert.ToString(zVScenesSettings.ZHTTPPort);
-            txtb_exampleURL.Text = "http://localhost:" + zVScenesSettings.ZHTTPPort + "/zVirtualScene?cmd=RunScene&Scene=1";
-            checkBoxHTTPEnable.Checked = zVScenesSettings.zHTTPListenEnabled;
-
-            //LightSwitch
-            textBoxLSLimit.Text = Convert.ToString(zVScenesSettings.LightSwitchMaxConnections);
-            textBoxLSPassword.Text = Convert.ToString(zVScenesSettings.LightSwitchPassword);
-            textBoxLSport.Text = Convert.ToString(zVScenesSettings.LightSwitchPort);
-            checkBoxLSEnabled.Checked = zVScenesSettings.LightSwitchEnabled;
-            checkBoxLSDebugVerbose.Checked = zVScenesSettings.LightSwitchVerbose;
-            checkBoxLSSortDevices.Checked = zVScenesSettings.LightSwitchSortDeviceList;
-
-            //JAbber
-            textBoxJabberPassword.Text = zVScenesSettings.JabberPassword;
-            textBoxJabberUser.Text = zVScenesSettings.JabberUser;
-            textBoxJabberServer.Text = zVScenesSettings.JabberServer;
-            textBoxJabberUserTo.Text = zVScenesSettings.JabberSendToUser;
-            checkBoxJabberEnabled.Checked = zVScenesSettings.JabberEnanbled;
-            checkBoxJabberVerbose.Checked = zVScenesSettings.JabberVerbose;
-
-            //NOAA
-            checkBoxEnableNOAA.Checked = zVScenesSettings.EnableNOAA;
-            textBox_Latitude.Text = zVScenesSettings.Latitude;
-            textBox_Longitude.Text = zVScenesSettings.Longitude;
-
-            //XML Socket
-            checkBoxEnableSocketInt.Checked = zVScenesSettings.XMLSocketEnabled;
-            checkBoxSocketVerbose.Checked = zVScenesSettings.XMLSocketVerbose;
-            textBoxSocketListenPort.Text = zVScenesSettings.XMLSocketPort.ToString();
-            textBoxSocketConnectionLimit.Text = zVScenesSettings.XMLSocketMaxConnections.ToString();
-            checkBoxAllowiViewer.Checked = zVScenesSettings.XMLSocketAllowiViewer;
-            checkBoxAllowAndroid.Checked = zVScenesSettings.XMLSocketAllowAndroid;
-            textBoxAndroidPassword.Text = zVScenesSettings.XMLSocketAndroidPassword;
-
-        }
+        
 
         #endregion
 
         #region File I/O
 
-        private void SaveSettingsToFile()
+        private void SaveSettingsToFile(string path)
         {
             try
             {
-                Stream stream = File.Open(APP_PATH + "zVirtualScenes-Scenes.xml", FileMode.Create);
+                Stream stream = File.Open(path + "zVirtualScenes-Scenes.xml", FileMode.Create);
                 XmlSerializer SScenes = new XmlSerializer(MasterScenes.GetType());
                 SScenes.Serialize(stream, MasterScenes);
                 stream.Close();
 
-                Stream SettingsStream = File.Open(APP_PATH + "zVirtualScenes-Settings.xml", FileMode.Create);
+                Stream SettingsStream = File.Open(path + "zVirtualScenes-Settings.xml", FileMode.Create);
                 XmlSerializer SSettings = new XmlSerializer(zVScenesSettings.GetType());
                 SSettings.Serialize(SettingsStream, zVScenesSettings);
                 SettingsStream.Close();
 
-                Stream CustomDevicePropertiesStream = File.Open(APP_PATH + "zVirtualScenes-ZWaveDeviceUserSettings.xml", FileMode.Create);
+                Stream CustomDevicePropertiesStream = File.Open(path + "zVirtualScenes-ZWaveDeviceUserSettings.xml", FileMode.Create);
                 XmlSerializer SCustomDeviceProperties = new XmlSerializer(SavedZWaveDeviceUserSettings.GetType());
                 SCustomDeviceProperties.Serialize(CustomDevicePropertiesStream, SavedZWaveDeviceUserSettings);
                 CustomDevicePropertiesStream.Close();
 
-                Stream TimerEventsStream = File.Open(APP_PATH + "zVirtualScenes-ScheduledTasks.xml", FileMode.Create);
+                Stream TimerEventsStream = File.Open(path + "zVirtualScenes-ScheduledTasks.xml", FileMode.Create);
                 XmlSerializer STimerEvents = new XmlSerializer(MasterTimerEvents.GetType());
                 STimerEvents.Serialize(TimerEventsStream, MasterTimerEvents);
                 TimerEventsStream.Close();
@@ -863,15 +827,7 @@ namespace zVirtualScenesApplication
                 e.MenuStrip = contextMenuStripScenes;
         }
 
-        private void checkBox_HideJabberPassword_CheckedChanged(object sender, EventArgs e)
-        {
-            textBoxJabberPassword.UseSystemPasswordChar = checkBox_HideJabberPassword.Checked;
-        }
-
-        private void checkBox_HideLSPassword_CheckedChanged(object sender, EventArgs e)
-        {
-            textBoxLSPassword.UseSystemPasswordChar = checkBox_HideLSPassword.Checked;
-        }
+        
 
         public class SceneDropSink : SimpleDropSink
         {
@@ -1408,184 +1364,12 @@ namespace zVirtualScenesApplication
 
         private void forceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveSettingsToFile();
+            SaveSettingsToFile(APP_PATH);
         }
 
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             this.Close();
-        }
-
-        #endregion
-
-        #region Settings Tab Events
-
-        private void buttonSaveSettings_Click(object sender, EventArgs e)
-        {
-            bool saveOK = true;
-
-            //General Settings
-            try
-            {
-                zVScenesSettings.PollingInterval = Convert.ToInt32(textBoxRepolling.Text);
-
-                if (zVScenesSettings.PollingInterval < 0)
-                    throw new Exception("");
-
-                refresher.UpdateInterval();
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid Polling Interval.", ProgramName);
-            }
-
-            try
-            {
-                zVScenesSettings.LongLinesLimit = Convert.ToInt32(txt_loglineslimit.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid Log Line Limit.", ProgramName);
-            }
-
-            //HTTP Listen
-            try
-            {
-                zVScenesSettings.ZHTTPPort = Convert.ToInt32(txtb_httpPort.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid HTTP Port.", ProgramName);
-            }
-
-            zVScenesSettings.zHTTPListenEnabled = checkBoxHTTPEnable.Checked;
-            if (checkBoxHTTPEnable.Checked)
-                StartHTPP();
-            else
-                if (HTTPInterfaceTread != null && HTTPInterfaceTread.IsAlive)
-                    httpServer.RequestStop();
-
-
-
-            //LightSwitch
-            zVScenesSettings.LightSwitchPassword = textBoxLSPassword.Text;
-            zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
-            zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
-            zVScenesSettings.LightSwitchSortDeviceList = checkBoxLSSortDevices.Checked;
-
-            try
-            {
-                zVScenesSettings.LightSwitchPort = Convert.ToInt32(textBoxLSport.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid LightSwitch Port.", ProgramName);
-            }
-
-            try
-            {
-                zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid LightSwitch Max Connections.", ProgramName);
-            }
-
-            if (checkBoxLSEnabled.Checked)
-                LightSwitchInt.OpenLightSwitchSocket();
-            else
-                LightSwitchInt.CloseLightSwitchSocket();
-
-            //JABBER
-            zVScenesSettings.JabberPassword = textBoxJabberPassword.Text;
-            zVScenesSettings.JabberUser = textBoxJabberUser.Text;
-            zVScenesSettings.JabberServer = textBoxJabberServer.Text;
-            zVScenesSettings.JabberSendToUser = textBoxJabberUserTo.Text;
-            zVScenesSettings.JabberEnanbled = checkBoxJabberEnabled.Checked;
-            zVScenesSettings.JabberVerbose = checkBoxJabberVerbose.Checked;
-
-            if (checkBoxJabberEnabled.Checked)
-            {
-                jabber.Connect();
-            }
-            else
-            {
-                jabber.Disconnect();
-            }
-
-            //NOAA
-            zVScenesSettings.EnableNOAA = checkBoxEnableNOAA.Checked;
-            if (checkBoxEnableNOAA.Checked)
-            {
-                if (ValidateLong(textBox_Longitude.Text) != null)
-                    zVScenesSettings.Longitude = textBox_Longitude.Text;
-                else
-                {
-                    MessageBox.Show("Invalid Longitude.", ProgramName);
-                    saveOK = false;
-                }
-
-                if (ValidateLat(textBox_Latitude.Text) != null)
-                    zVScenesSettings.Latitude = textBox_Latitude.Text;
-                else
-                {
-                    MessageBox.Show("Invalid Latitude.", ProgramName);
-                    saveOK = false;
-                }
-
-                DisplaySunset();
-            }
-
-            //XML Socket
-            zVScenesSettings.XMLSocketEnabled = checkBoxEnableSocketInt.Checked;
-            zVScenesSettings.XMLSocketVerbose = checkBoxSocketVerbose.Checked;
-
-            try
-            {
-                zVScenesSettings.XMLSocketPort = Convert.ToInt32(textBoxSocketListenPort.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid XML Socket Port.", ProgramName);
-            }
-
-            try
-            {
-                zVScenesSettings.XMLSocketMaxConnections = Convert.ToInt32(textBoxSocketConnectionLimit.Text);
-            }
-            catch
-            {
-                saveOK = false;
-                MessageBox.Show("Invalid XML Socket Max Connections.", ProgramName);
-            }
-
-            zVScenesSettings.XMLSocketAllowiViewer = checkBoxAllowiViewer.Checked;
-            zVScenesSettings.XMLSocketAllowAndroid = checkBoxAllowAndroid.Checked;
-            zVScenesSettings.XMLSocketAndroidPassword = textBoxAndroidPassword.Text;
-
-            //Must be last incase server port or properties change.
-            if (checkBoxEnableSocketInt.Checked)
-                SocketInt.StartListening();
-            else
-                SocketInt.StopListening();
-
-            if (saveOK)
-                labelSaveStatus.Text = "Settings Saved.";
-            else
-                labelSaveStatus.Text = "Settings Not Saved.";
-
-            SaveSettingsToFile();
-        }
-
-        private void checkBoxHideAndroidPassword_CheckedChanged(object sender, EventArgs e)
-        {
-            textBoxAndroidPassword.UseSystemPasswordChar = checkBoxHideAndroidPassword.Checked;
         }
 
         #endregion
@@ -1786,11 +1570,8 @@ namespace zVirtualScenesApplication
             bool isSunset = false;
             DateTime sunrise = DateTime.Now;
             DateTime sunset = DateTime.Now;
-            SunTimes.LongitudeCoords longitude = ValidateLong(zVScenesSettings.Longitude);
-            SunTimes.LatitudeCoords latitude = ValidateLat(zVScenesSettings.Latitude);
-
-            if (longitude != null && latitude != null)
-                SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+            
+            SunTimes.Instance.CalculateSunRiseSetTimes(zVScenesSettings.Latitude, zVScenesSettings.Longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
 
             if (DateTime.Now.TimeOfDay < sunrise.TimeOfDay || DateTime.Now.TimeOfDay > sunset.TimeOfDay)
                 return true;
@@ -1809,13 +1590,9 @@ namespace zVirtualScenesApplication
                     bool isSunset = false;
                     DateTime sunrise = DateTime.Now;
                     DateTime sunset = DateTime.Now;
-                    SunTimes.LongitudeCoords longitude = ValidateLong(zVScenesSettings.Longitude);
-                    SunTimes.LatitudeCoords latitude = ValidateLat(zVScenesSettings.Latitude);
 
-                    if (longitude != null && latitude != null)
-                        SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-
-
+                    SunTimes.Instance.CalculateSunRiseSetTimes(zVScenesSettings.Latitude, zVScenesSettings.Longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+                    
                     Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
@@ -1846,68 +1623,7 @@ namespace zVirtualScenesApplication
                 }
             }
         }
-
-        private SunTimes.LatitudeCoords ValidateLat(string lat)
-        {
-            try
-            {
-                string[] userLat = lat.Split(',');
-                int degrees = Convert.ToInt32(userLat[0]);
-                int mins = Convert.ToInt32(userLat[1]);
-                int seconds = Convert.ToInt32(userLat[2]);
-                string direction = userLat[3];
-
-                if (direction.ToUpper() == "N")
-                    return new SunTimes.LatitudeCoords(degrees, mins, seconds, SunTimes.LatitudeCoords.Direction.North);
-                else
-                    return new SunTimes.LatitudeCoords(degrees, mins, seconds, SunTimes.LatitudeCoords.Direction.South);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private SunTimes.LongitudeCoords ValidateLong(string log)
-        {
-            try
-            {
-                string[] userLong = log.Split(',');
-                int degrees = Convert.ToInt32(userLong[0]);
-                int mins = Convert.ToInt32(userLong[1]);
-                int seconds = Convert.ToInt32(userLong[2]);
-                string direction = userLong[3];
-
-                if (direction.ToUpper() == "W")
-                    return new SunTimes.LongitudeCoords(degrees, mins, seconds, SunTimes.LongitudeCoords.Direction.West);
-                else
-                    return new SunTimes.LongitudeCoords(degrees, mins, seconds, SunTimes.LongitudeCoords.Direction.East);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private void DisplaySunset()
-        {
-            DateTime date = DateTime.Today;
-            bool isSunrise = false;
-            bool isSunset = false;
-            DateTime sunrise = DateTime.Now;
-            DateTime sunset = DateTime.Now;
-            SunTimes.LongitudeCoords longitude = ValidateLong(zVScenesSettings.Longitude);
-            SunTimes.LatitudeCoords latitude = ValidateLat(zVScenesSettings.Latitude);
-
-            if (longitude != null && latitude != null)
-            {
-                //113, 3, 42, SunTimes.LongitudeCoords.Direction.West
-                //37, 40, 38, SunTimes.LatitudeCoords.Direction.North
-                SunTimes.Instance.CalculateSunRiseSetTimes(latitude, longitude, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-                Label_SunriseSet.Text = "Today's Sunrise: " + sunrise.ToString("T") + ", Sunset: " + sunset.ToString("T");
-            }
-        }
-
+        
         #endregion
 
         #region Task Scheduler
@@ -2228,5 +1944,11 @@ namespace zVirtualScenesApplication
         }
 
         #endregion
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formEditUserSettings formEditUserSettings = new formEditUserSettings(this);
+            formEditUserSettings.ShowDialog();
+        }
     }
 }

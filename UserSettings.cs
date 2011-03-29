@@ -33,8 +33,8 @@ namespace zVirtualScenesApplication
 
         //NOAA
         public bool EnableNOAA { get; set; }
-        public string Longitude { get; set; }
-        public string Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double Latitude { get; set; }
 
         //XML Socket INTERFACE
         public bool   XMLSocketEnabled         { get; set; }
@@ -73,8 +73,8 @@ namespace zVirtualScenesApplication
 
             //NOAA
             this.EnableNOAA = false;
-            this.Longitude = "113,3,42,W";
-            this.Latitude = "37,40,38,N";
+            this.Longitude = -113.06166666666667;
+            this.Latitude = 37.67722222222222;
 
             //XML socket
             this.XMLSocketEnabled = false;

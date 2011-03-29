@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace zVirtualScenesApplication
 {
-    class LightSwitchInterface
+    public class LightSwitchInterface
     {
         private static string LOG_INTERFACE = "LIGHTSWITCH";
         public formzVirtualScenes zVirtualScenesMain;

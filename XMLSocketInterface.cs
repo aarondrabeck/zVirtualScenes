@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 
 namespace zVirtualScenesApplication
 {
-    class SocketClient
+    public class SocketClient
     {
         public Socket ClientsSocket { get; set; }
         public type ClientType { get; set; }
@@ -52,7 +52,7 @@ namespace zVirtualScenesApplication
         }
     }
 
-    class XMLSocketInterface
+    public class XMLSocketInterface
     {
         public const string LOG_INTERFACE = "XML SOCKET";
 
@@ -119,7 +119,7 @@ namespace zVirtualScenesApplication
                     SocketClients.Add(newClient);
 
                 zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Client [" + newClient.ClientsSocket.RemoteEndPoint.ToString() + "] connected. Connection count now " + SocketClients.Count() + ".", LOG_INTERFACE);
-                newClient.SendMessage("zVirtualScenesSocketServer/1.0", zVirtualScenesMain);
+                newClient.SendMessage("<zVirtualScenesSocketServer ver=\"1.1\" />", zVirtualScenesMain);
                 WaitForClientData(newClient.ClientsSocket.RemoteEndPoint);
                 
                 //Listen for new clients
@@ -273,6 +273,10 @@ namespace zVirtualScenesApplication
                                     throw new Exception("Invalid XML syntax or XML parameters.");                                   
                                 }
                                 //Handle Commands
+                                XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
+                                xmlwritersettings.NewLineHandling = NewLineHandling.None;
+                                xmlwritersettings.Indent = false;
+
                                 if (client.isAuthenticated) 
                                 {
                                     byte nodeID;
@@ -282,14 +286,14 @@ namespace zVirtualScenesApplication
                                         case "listdevices":
                                             StringWriter devices = new StringWriter();
                                             XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zVirtualScenesMain.MasterDevices.GetType());
-                                            DevicetoXML.Serialize(devices, zVirtualScenesMain.MasterDevices);
+                                            DevicetoXML.Serialize(XmlWriter.Create(devices,xmlwritersettings),zVirtualScenesMain.MasterDevices);
                                             client.SendMessage(devices.ToString(), zVirtualScenesMain);
                                             WaitForClientData(client.ClientsSocket.RemoteEndPoint);
                                             return;
                                         case "listscenes":
                                             StringWriter scenes = new StringWriter();
                                             XmlSerializer ScenetoXML = new System.Xml.Serialization.XmlSerializer(zVirtualScenesMain.MasterScenes.GetType());
-                                            ScenetoXML.Serialize(scenes, zVirtualScenesMain.MasterScenes);
+                                            ScenetoXML.Serialize(XmlWriter.Create(scenes, xmlwritersettings), zVirtualScenesMain.MasterScenes);
                                             client.SendMessage(scenes.ToString(), zVirtualScenesMain);
                                             WaitForClientData(client.ClientsSocket.RemoteEndPoint);
                                             return;

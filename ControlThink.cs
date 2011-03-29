@@ -113,6 +113,7 @@ namespace zVirtualScenesApplication
                 }                 
             }
             e.Result = result;
+            return;
         }
 
         private void ReloadDevicesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
