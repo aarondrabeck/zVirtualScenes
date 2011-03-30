@@ -16,7 +16,7 @@ namespace zVirtualScenesApplication
         private static string LOG_INTERFACE = "CONTROL THINK";
         public formzVirtualScenes formzVirtualScenesMain;
         public readonly ZWaveController ControlThinkController = new ZWaveController();
-        public BackgroundWorker ReloadDevicesWorker;        
+        public BackgroundWorker ReloadDevicesWorker;
 
         public ControlThinkInterface()
         {

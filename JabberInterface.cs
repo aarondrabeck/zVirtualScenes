@@ -9,6 +9,7 @@ namespace zVirtualScenesApplication
         private static string LOG_INTERFACE = "JABBER"; 
         public formzVirtualScenes zVirtualScenesMain;
         JabberClient j;
+        public volatile bool isActive; 
 
         public JabberInterface()
         {
@@ -65,6 +66,7 @@ namespace zVirtualScenesApplication
         {
             zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Connected using " + zVirtualScenesMain.zVScenesSettings.JabberUser +".", LOG_INTERFACE);
             j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zVirtualScenesMain.ProgramName + " server.", ":chat", 0);
+            isActive = true;
         }
 
         void jabberClient1_OnError(object sender, Exception ex)
@@ -75,6 +77,7 @@ namespace zVirtualScenesApplication
         void jabberClient1_OnDisconnect(object sender)
         {
             zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Disconnected.", LOG_INTERFACE);
+            isActive = false; 
         }
 
         private void jabberClient1_OnMessage(object sender, jabber.protocol.client.Message msg)

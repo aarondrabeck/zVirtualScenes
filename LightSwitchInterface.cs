@@ -17,32 +17,7 @@ namespace zVirtualScenesApplication
         private readonly List<Socket> LightSwitchClients = new List<Socket>();
         public AsyncCallback pfnWorkerCallBack;
         private int m_cookie = new Random().Next(65536);
-        private bool isActive = false; 
-
-        //Contructor
-        public LightSwitchInterface()
-        {            
-        }
-
-        //Methods
-        public void CloseLightSwitchSocket()
-        {
-            if (LightSwitchSocket != null && isActive)
-            {
-                foreach (Socket client in LightSwitchClients)
-                {
-                    if (client.Connected)
-                    {
-                        client.Shutdown(SocketShutdown.Both);
-                        client.Close();
-                    }                    
-                }
-
-                LightSwitchSocket.Close();
-                isActive = false;
-                zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Stopped listening for new clients.", LOG_INTERFACE);
-            }
-        }
+        public volatile bool isActive = false; 
 
         /// <summary>
         /// Starts listening for LightSwitch clients. 
@@ -65,7 +40,25 @@ namespace zVirtualScenesApplication
                     zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, "Socket Failed to Open - " + e, LOG_INTERFACE);
                 }
             }
+        }
 
+        public void CloseLightSwitchSocket()
+        {
+            if (LightSwitchSocket != null && isActive)
+            {
+                LightSwitchSocket.Close();
+
+                foreach (Socket client in LightSwitchClients)
+                {
+                    if (client.Connected)
+                    {
+                        client.Close();
+                    }
+                }
+
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Stopped listening for new clients.", LOG_INTERFACE);
+                isActive = false;
+            }
         }
 
         /// <summary>
@@ -96,7 +89,7 @@ namespace zVirtualScenesApplication
             }
             catch (ObjectDisposedException e)
             {
-                zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, "Socket Connection Closed: " + e, LOG_INTERFACE);
+                //zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, "Socket Connection Closed: " + e, LOG_INTERFACE);
             }
             catch (SocketException e)
             {

@@ -51,11 +51,10 @@ namespace zVirtualScenesApplication
 
         private void restartserver()
         {
+            formzVirtualScenesMain.httpInt.Stop();
+
             if (checkBoxHTTPEnable.Checked)
-                formzVirtualScenesMain.StartHTPP();
-            else
-                if (formzVirtualScenesMain.HTTPInterfaceTread != null && formzVirtualScenesMain.HTTPInterfaceTread.IsAlive)
-                    formzVirtualScenesMain.httpServer.RequestStop();
+                formzVirtualScenesMain.httpInt.Start();
         } 
     }
 }

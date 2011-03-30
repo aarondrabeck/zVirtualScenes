@@ -236,7 +236,6 @@
     <Compile Include="ControlThinkRepoller.cs" />
     <Compile Include="LightSwitchInterface.cs" />
     <Compile Include="ZWaveDeviceUserSettings.cs" />
-    <Compile Include="HttpServer.cs" />
     <Compile Include="HttpProcessor.cs" />
     <Compile Include="UserSettings.cs" />
     <Compile Include="Scenes.cs" />

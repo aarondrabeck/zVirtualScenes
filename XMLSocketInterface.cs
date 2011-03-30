@@ -60,7 +60,7 @@ namespace zVirtualScenesApplication
         public List<SocketClient> SocketClients = new List<SocketClient>();
         public AsyncCallback ProcessDataCallBack;
         private Socket MainListeningSocket;
-        private bool isLisenting;        
+        public volatile bool isLisenting;        
 
         public XMLSocketInterface()
         {
@@ -91,20 +91,21 @@ namespace zVirtualScenesApplication
         {
             if (MainListeningSocket != null && isLisenting)
             {
+                MainListeningSocket.Close();   
+
                 //Boot each connected client.
                 foreach (SocketClient client in SocketClients)
                 {
                     if (client.ClientsSocket.Connected)
                     {
-                        client.ClientsSocket.Shutdown(SocketShutdown.Both);
                         client.ClientsSocket.Close();
                     }
                 }
 
                 //Stop listening for new conenctions
-                MainListeningSocket.Close();
-                isLisenting = false;
+                             
                 zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Stopped Listening for new connections.", LOG_INTERFACE);
+                isLisenting = false;
             }
         }
 
@@ -455,7 +456,7 @@ namespace zVirtualScenesApplication
             }            
             catch (ObjectDisposedException)
             {
-                zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR,  "Socket has been closed.", LOG_INTERFACE);
+                //zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR,  "Socket has been closed.", LOG_INTERFACE);
             }
             catch (SocketException sEX)
             {

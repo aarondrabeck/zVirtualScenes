@@ -80,7 +80,6 @@ namespace zVirtualScenesApplication
             this.urgencyColu = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.InterfaceCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.descCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.tabPage5 = new System.Windows.Forms.TabPage();
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.dataListTasks = new BrightIdeasSoftware.DataListView();
             this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -526,16 +525,6 @@ namespace zVirtualScenesApplication
             this.descCol.Text = "Description";
             this.descCol.Width = 505;
             // 
-            // tabPage5
-            // 
-            this.tabPage5.Location = new System.Drawing.Point(4, 22);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(776, 463);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "Settings";
-            this.tabPage5.UseVisualStyleBackColor = true;
-            // 
             // tabPage4
             // 
             this.tabPage4.Controls.Add(this.dataListTasks);
@@ -553,9 +542,9 @@ namespace zVirtualScenesApplication
             this.dataListTasks.AllColumns.Add(this.olvColumn1);
             this.dataListTasks.AllColumns.Add(this.EnabledCol);
             this.dataListTasks.AllColumns.Add(this.FreqCol);
-            this.dataListTasks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListTasks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListTasks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn1,
             this.EnabledCol,
@@ -928,9 +917,9 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.AllColumns.Add(this.SetPointCol);
             this.dataListViewDevices.AllColumns.Add(this.currStateCol);
             this.dataListViewDevices.AllColumns.Add(this.GroupCol);
-            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDevices.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.NodeCol,
             this.NameCol,
@@ -1044,8 +1033,8 @@ namespace zVirtualScenesApplication
             // dataListViewScenes
             // 
             this.dataListViewScenes.AllColumns.Add(this.SceneNamecol);
-            this.dataListViewScenes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.dataListViewScenes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)));
             this.dataListViewScenes.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.SceneNamecol});
             this.dataListViewScenes.DataSource = null;
@@ -1081,9 +1070,9 @@ namespace zVirtualScenesApplication
             this.dataListViewActions.AllColumns.Add(this.ColType);
             this.dataListViewActions.AllColumns.Add(this.ColName);
             this.dataListViewActions.AllColumns.Add(this.ColAction);
-            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewActions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColType,
             this.ColName,
@@ -1191,7 +1180,6 @@ namespace zVirtualScenesApplication
             // 
             this.MainTabControl.Controls.Add(this.tabPage1);
             this.MainTabControl.Controls.Add(this.tabPage4);
-            this.MainTabControl.Controls.Add(this.tabPage5);
             this.MainTabControl.Controls.Add(this.tabPage2);
             this.MainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MainTabControl.Location = new System.Drawing.Point(0, 24);
@@ -1300,7 +1288,6 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn urgencyColu;
         private BrightIdeasSoftware.OLVColumn InterfaceCol;
         private BrightIdeasSoftware.OLVColumn descCol;
-        private TabPage tabPage5;
         private TabPage tabPage4;
         private BrightIdeasSoftware.DataListView dataListTasks;
         private BrightIdeasSoftware.OLVColumn olvColumn1;

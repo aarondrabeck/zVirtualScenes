@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formEditUserSettings));
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
             this.labelSaveStatus = new System.Windows.Forms.Label();
             this.listBoxCategory = new System.Windows.Forms.ListBox();
@@ -58,16 +57,18 @@
             // 
             // listBoxCategory
             // 
+            this.listBoxCategory.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxCategory.FormattingEnabled = true;
+            this.listBoxCategory.ItemHeight = 15;
             this.listBoxCategory.Items.AddRange(new object[] {
-            "General",
-            "Jabber",
-            "HTTP",
-            "LightSwitch",
-            "XML Socket"});
+            " General",
+            " Jabber",
+            " HTTP",
+            " Light Switch",
+            " XML Socket"});
             this.listBoxCategory.Location = new System.Drawing.Point(5, 7);
             this.listBoxCategory.Name = "listBoxCategory";
-            this.listBoxCategory.Size = new System.Drawing.Size(154, 264);
+            this.listBoxCategory.Size = new System.Drawing.Size(155, 394);
             this.listBoxCategory.TabIndex = 43;
             this.listBoxCategory.SelectedIndexChanged += new System.EventHandler(this.listBoxCategory_SelectedIndexChanged);
             // 
@@ -134,8 +135,7 @@
             this.Controls.Add(this.uc_setting_general);
             this.Controls.Add(this.listBoxCategory);
             this.Controls.Add(this.labelSaveStatus);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "formEditUserSettings";

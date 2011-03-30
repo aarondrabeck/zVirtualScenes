@@ -41,11 +41,7 @@ namespace zVirtualScenesApplication
         private KeyboardHook hook = new KeyboardHook();
         private GrowlInterface growl = new GrowlInterface();
         private NetService netservice = null;
-        public HttpServer httpServer;
-
-        //Threads 
-        public Thread HTTPInterfaceTread;
-        
+        public HttpProcessor httpInt = new HttpProcessor();
 
         //Delegates
         public delegate void LogThisDelegate(UrgencyLevel urgency, string message, string theInterface);
@@ -127,7 +123,9 @@ namespace zVirtualScenesApplication
             RegisterSceneHandlers();
 
             //Start HTTP INTERFACE
-            StartHTPP();
+            httpInt.zVirtualScenesMain = this;
+            if(zVScenesSettings.zHTTPListenEnabled)
+                httpInt.Start();
 
             //LightSwitch Clients
             LightSwitchInt.zVirtualScenesMain = this;
@@ -228,24 +226,38 @@ namespace zVirtualScenesApplication
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (ControlThinkInt.ControlThinkController.IsConnected)
-                ControlThinkInt.ControlThinkController.Disconnect();
-
-            if (HTTPInterfaceTread != null && HTTPInterfaceTread.IsAlive)
-                httpServer.RequestStop();
-
-            jabber.Disconnect();
-            LightSwitchInt.CloseLightSwitchSocket();
-            SocketInt.StopListening();
-
-            dataListViewLog.DataSource = null;
-
-            SaveSettingsToFile(APP_PATH);
+            SaveUserSettingsToFile(APP_PATH);
 
             Properties.Settings.Default.WindowGeometry = GeometryToString(this);
             Properties.Settings.Default.Save();
 
-            Environment.Exit(1);
+            dataListViewLog.DataSource = null;
+
+            if (ControlThinkInt.ControlThinkController.IsConnected)
+                ControlThinkInt.ControlThinkController.Disconnect();
+
+            while (ControlThinkInt.ControlThinkController.IsConnected)
+                System.Threading.Thread.Sleep(20);
+            
+            httpInt.Stop();
+            while (httpInt.isActive())
+                System.Threading.Thread.Sleep(20);
+            
+
+            jabber.Disconnect();
+            while (jabber.isActive)
+                System.Threading.Thread.Sleep(20);
+
+            LightSwitchInt.CloseLightSwitchSocket();
+            while (LightSwitchInt.isActive)
+                System.Threading.Thread.Sleep(20);
+
+            SocketInt.StopListening();
+            while(SocketInt.isLisenting)
+                System.Threading.Thread.Sleep(20);
+
+            SaveLogToFile();
+
         }
 
         private void DeviceInfoChange_Handler(string GlbUniqueID, ControlThinkRepoller.changeType TypeOfChange)
@@ -591,31 +603,6 @@ namespace zVirtualScenesApplication
             return GroupCollection;
         }
 
-        #region HTTP INTERFACE
-
-        public void StartHTPP()
-        {
-            if (zVScenesSettings.zHTTPListenEnabled)
-            {
-                try
-                {
-                    if (HTTPInterfaceTread == null || !HTTPInterfaceTread.IsAlive)
-                    {
-                        httpServer = new HttpServer(zVScenesSettings.ZHTTPPort, this);
-                        HTTPInterfaceTread = new Thread(new ThreadStart(httpServer.listen));
-                        HTTPInterfaceTread.Start();
-                        AddLogEntry(UrgencyLevel.INFO, "Started listening for HTTP commands on all adapters.", HttpServer.LOG_INTERFACE);
-                    }
-                }
-                catch (Exception e)
-                {
-                    AddLogEntry(UrgencyLevel.ERROR, "FAILED to Start HTTP Listening: " + e.Message, HttpServer.LOG_INTERFACE);
-                }
-            }
-        }
-
-        #endregion
-
         #region Settings TAB
 
         
@@ -624,7 +611,7 @@ namespace zVirtualScenesApplication
 
         #region File I/O
 
-        private void SaveSettingsToFile(string path)
+        private void SaveUserSettingsToFile(string path)
         {
             try
             {
@@ -653,7 +640,10 @@ namespace zVirtualScenesApplication
             {
                 AddLogEntry(UrgencyLevel.ERROR, "Error saving XML: (" + e.Message + ")");
             }
+        }
 
+        private void SaveLogToFile()
+        {
             //SAVE LOG
             try
             {
@@ -666,8 +656,6 @@ namespace zVirtualScenesApplication
             {
                 MessageBox.Show("Error saving LOG: (" + e.Message + ")");
             }
-
-
         }
 
         private void LoadSettingsFromXML()
@@ -1364,12 +1352,19 @@ namespace zVirtualScenesApplication
 
         private void forceSaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SaveSettingsToFile(APP_PATH);
+            FolderBrowserDialog folderDlg = new FolderBrowserDialog();
+            folderDlg.SelectedPath = APP_PATH;
+            folderDlg.ShowNewFolderButton = true;
+
+            if (folderDlg.ShowDialog() == DialogResult.OK)
+                SaveUserSettingsToFile(folderDlg.SelectedPath + "\\");
+            
         }
 
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             this.Close();
+            Environment.Exit(0);
         }
 
         #endregion

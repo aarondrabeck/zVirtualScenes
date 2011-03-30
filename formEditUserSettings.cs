@@ -37,23 +37,23 @@ namespace zVirtualScenesApplication
         {
             HideSettingUserControl();
 
-            if (listBoxCategory.SelectedItem.Equals("General"))
+            if (listBoxCategory.SelectedItem.Equals(" General"))
             {
                 uc_setting_general.Visible = true;
             }
-            else if (listBoxCategory.SelectedItem.Equals("Jabber"))
+            else if (listBoxCategory.SelectedItem.Equals(" Jabber"))
             {
                 uc_setting_jabber1.Visible = true;
             }
-            else if (listBoxCategory.SelectedItem.Equals("LightSwitch"))
+            else if (listBoxCategory.SelectedItem.Equals(" Light Switch"))
             {
                 uc_setting_lightswitch1.Visible = true;
             }
-            else if (listBoxCategory.SelectedItem.Equals("HTTP"))
+            else if (listBoxCategory.SelectedItem.Equals(" HTTP"))
             {
                 uc_setting_http1.Visible = true;
             }
-            else if (listBoxCategory.SelectedItem.Equals("XML Socket"))
+            else if (listBoxCategory.SelectedItem.Equals(" XML Socket"))
             {
                 uc_setting_xmlsocket1.Visible = true;
             }
