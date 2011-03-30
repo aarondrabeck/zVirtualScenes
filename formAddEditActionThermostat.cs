@@ -34,7 +34,7 @@ namespace zVirtualScenesApplication
             this.EditMode = true;
 
             this.groupBoxAction.Text = "Edit Action";
-            this.btn_Save.Text = "Save Action";
+            this.btn_Save.Text = "&Save";
             this.theAction = action;
             this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
@@ -58,7 +58,7 @@ namespace zVirtualScenesApplication
             this.EditMode = false;
             
             this.groupBoxAction.Text = "Create New Action";
-            this.btn_Save.Text = "Add Action to '" + scene.Name + "'";
+            this.btn_Save.Text = "&Add Action to '" + scene.Name + "'";
             this.theAction = (Action)device;
             this.InsertPosition = PositionOfNewItem;
 
@@ -190,6 +190,11 @@ namespace zVirtualScenesApplication
                 textBoxCoolPoint.Enabled = true;
             else
                 textBoxCoolPoint.Enabled = false;
+        }
+
+        private void formAddEditActionThermostat_Load(object sender, EventArgs e)
+        {
+            ActiveControl = comboBoxHeatCoolMode;
         }
     }       
 }

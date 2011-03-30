@@ -16,7 +16,6 @@ namespace zVirtualScenesApplication
         public uc_setting_http()
         {
             InitializeComponent();
-            txtb_httpPort.LostFocus += new EventHandler(txtb_httpPort_LostFocus);
         }
 
         public void LoadSettings(formzVirtualScenes form)
@@ -29,11 +28,30 @@ namespace zVirtualScenesApplication
             txtb_exampleURL.Text = "http://localhost:" + formzVirtualScenesMain.zVScenesSettings.ZHTTPPort + "/zVirtualScene?cmd=RunScene&Scene=1";
         }
 
-        private void txtb_httpPort_LostFocus(object sender, EventArgs e)
+        private void restartserver()
+        {                    
+            formzVirtualScenesMain.httpInt.Stop();  //Only stops if active.
+            
+            if (checkBoxHTTPEnable.Checked)
+                formzVirtualScenesMain.httpInt.Start();
+        }
+
+        private void checkBoxHTTPEnable_Leave(object sender, EventArgs e)
+        {
+            formzVirtualScenesMain.zVScenesSettings.zHTTPListenEnabled = checkBoxHTTPEnable.Checked;
+
+            if (checkBoxHTTPEnable.Checked)
+                formzVirtualScenesMain.httpInt.Start();
+            else
+                formzVirtualScenesMain.httpInt.Stop();
+        }
+
+        private void txtb_httpPort_Leave(object sender, EventArgs e)
         {
             try
             {
                 formzVirtualScenesMain.zVScenesSettings.ZHTTPPort = Convert.ToInt32(txtb_httpPort.Text);
+                formzVirtualScenesMain.httpInt.Stop();
                 restartserver();
             }
             catch
@@ -41,20 +59,6 @@ namespace zVirtualScenesApplication
                 txtb_httpPort.Text = formzVirtualScenesMain.zVScenesSettings.ZHTTPPort.ToString();
                 MessageBox.Show("Invalid HTTP Port.", formzVirtualScenesMain.ProgramName);
             }
-        }
-
-        private void checkBoxHTTPEnable_CheckedChanged(object sender, EventArgs e)
-        {
-            formzVirtualScenesMain.zVScenesSettings.zHTTPListenEnabled = checkBoxHTTPEnable.Checked;
-            restartserver();           
-        }
-
-        private void restartserver()
-        {
-            formzVirtualScenesMain.httpInt.Stop();
-
-            if (checkBoxHTTPEnable.Checked)
-                formzVirtualScenesMain.httpInt.Start();
         } 
     }
 }

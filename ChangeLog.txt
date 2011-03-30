@@ -1,5 +1,14 @@
   * Changed Lat/Long to Decimal notation
-  * Settings are in a form
+  * Settings are in a seperate form
+  * Prompted to save all settings on exit
+  * Export Settings option
+  * GUI tweaks
+  * device count added to zwave devices / scene tab
+  * HTTP interface code rebuild
+  * proper shutdown of threads on exit
+  * control think stick repolling and reloading collision detection  
+  * delete key detection for scenes and actions
+  * tabindex and focus optimized on all popup forms prompts 
 
 *zVirtualScenes ver 1.5.4100.35835 - 3-24-11*
   * LightSwitch - sort devices a-z option added

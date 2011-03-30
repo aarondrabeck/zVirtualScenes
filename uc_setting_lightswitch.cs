@@ -16,9 +16,6 @@ namespace zVirtualScenesApplication
         public uc_setting_lightswitch()
         {
             InitializeComponent();
-            textBoxLSLimit.LostFocus += new EventHandler(textBoxLSLimit_LostFocus);
-            textBoxLSpwd.LostFocus += new EventHandler(textBoxLSpwd_LostFocus);
-            textBoxPort.LostFocus += new EventHandler(textBoxPort_LostFocus);
         }
 
         public void LoadSettings(formzVirtualScenes form)
@@ -34,27 +31,38 @@ namespace zVirtualScenesApplication
             checkBoxLSSortDevices.Checked = formzVirtualScenesMain.zVScenesSettings.LightSwitchSortDeviceList;
            
         }
-
-        private void textBoxLSLimit_LostFocus(object sender, EventArgs e)
+  
+        private void checkBox_HideLSPassword_CheckedChanged(object sender, EventArgs e)
         {
-            try
-            {
-                formzVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
-                restartserver();  
-            }
-            catch
-            {
-                textBoxLSLimit.Text = formzVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections.ToString(); 
-                MessageBox.Show("Invalid LightSwitch Max Connections.", formzVirtualScenesMain.ProgramName);
-            }
+            textBoxLSpwd.UseSystemPasswordChar = checkBox_HideLSPassword.Checked;
         }
 
-        private void textBoxLSpwd_LostFocus(object sender, EventArgs e)
+        private void restartserver()
         {
-            formzVirtualScenesMain.zVScenesSettings.LightSwitchPassword = textBoxLSpwd.Text;
+            formzVirtualScenesMain.LightSwitchInt.CloseLightSwitchSocket();
+
+            if (checkBoxLSEnabled.Checked)
+                formzVirtualScenesMain.LightSwitchInt.OpenLightSwitchSocket();
+            else
+                formzVirtualScenesMain.LightSwitchInt.CloseLightSwitchSocket();
         }
 
-        private void textBoxPort_LostFocus(object sender, EventArgs e)
+        private void checkBoxLSEnabled_Leave(object sender, EventArgs e)
+        {
+            formzVirtualScenesMain.zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
+
+            if (checkBoxLSEnabled.Checked)
+                formzVirtualScenesMain.LightSwitchInt.OpenLightSwitchSocket();
+            else
+                formzVirtualScenesMain.LightSwitchInt.CloseLightSwitchSocket();
+        }
+
+        private void checkBoxLSDebugVerbose_Leave(object sender, EventArgs e)
+        {
+            formzVirtualScenesMain.zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
+        }
+
+        private void textBoxPort_Leave(object sender, EventArgs e)
         {
             try
             {
@@ -62,39 +70,34 @@ namespace zVirtualScenesApplication
                 restartserver();
             }
             catch
-            {                
+            {
                 MessageBox.Show("Invalid LightSwitch Port.", formzVirtualScenesMain.ProgramName);
                 textBoxPort.Text = formzVirtualScenesMain.zVScenesSettings.LightSwitchPort.ToString();
             }
         }
 
-        private void checkBox_HideLSPassword_CheckedChanged(object sender, EventArgs e)
+        private void textBoxLSLimit_Leave(object sender, EventArgs e)
         {
-            textBoxLSpwd.UseSystemPasswordChar = checkBox_HideLSPassword.Checked;
+            try
+            {
+                formzVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections = Convert.ToInt32(textBoxLSLimit.Text);
+                restartserver();
+            }
+            catch
+            {
+                textBoxLSLimit.Text = formzVirtualScenesMain.zVScenesSettings.LightSwitchMaxConnections.ToString();
+                MessageBox.Show("Invalid LightSwitch Max Connections.", formzVirtualScenesMain.ProgramName);
+            }
         }
 
-        private void checkBoxLSSortDevices_CheckedChanged(object sender, EventArgs e)
+        private void textBoxLSpwd_Leave(object sender, EventArgs e)
+        {
+            formzVirtualScenesMain.zVScenesSettings.LightSwitchPassword = textBoxLSpwd.Text;
+        }
+
+        private void checkBoxLSSortDevices_Leave(object sender, EventArgs e)
         {
             formzVirtualScenesMain.zVScenesSettings.LightSwitchSortDeviceList = checkBoxLSSortDevices.Checked;
-        }
-
-        private void checkBoxLSDebugVerbose_CheckedChanged(object sender, EventArgs e)
-        {
-            formzVirtualScenesMain.zVScenesSettings.LightSwitchVerbose = checkBoxLSDebugVerbose.Checked;
-        }
-
-        private void checkBoxLSEnabled_CheckedChanged(object sender, EventArgs e)
-        {
-            formzVirtualScenesMain.zVScenesSettings.LightSwitchEnabled = checkBoxLSEnabled.Checked;
-            restartserver();           
-        }
-
-        private void restartserver()
-        {
-            if (checkBoxLSEnabled.Checked)
-                formzVirtualScenesMain.LightSwitchInt.OpenLightSwitchSocket();
-            else
-                formzVirtualScenesMain.LightSwitchInt.CloseLightSwitchSocket();
         } 
     }
 }

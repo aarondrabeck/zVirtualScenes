@@ -62,7 +62,7 @@
             this.checkBoxJabberEnabled.TabIndex = 24;
             this.checkBoxJabberEnabled.Text = "Enable Jabber/GTalk";
             this.checkBoxJabberEnabled.UseVisualStyleBackColor = true;
-            this.checkBoxJabberEnabled.CheckedChanged += new System.EventHandler(this.checkBoxJabberEnabled_CheckedChanged);
+            this.checkBoxJabberEnabled.Leave += new System.EventHandler(this.checkBoxJabberEnabled_Leave);
             // 
             // label21
             // 
@@ -103,6 +103,7 @@
             this.textBoxJabberPassword.Size = new System.Drawing.Size(236, 20);
             this.textBoxJabberPassword.TabIndex = 29;
             this.textBoxJabberPassword.UseSystemPasswordChar = true;
+            this.textBoxJabberPassword.Leave += new System.EventHandler(this.textBoxJabberPassword_Leave);
             // 
             // textBoxJabberUserTo
             // 
@@ -110,6 +111,7 @@
             this.textBoxJabberUserTo.Name = "textBoxJabberUserTo";
             this.textBoxJabberUserTo.Size = new System.Drawing.Size(409, 20);
             this.textBoxJabberUserTo.TabIndex = 33;
+            this.textBoxJabberUserTo.Leave += new System.EventHandler(this.textBoxJabberUserTo_Leave);
             // 
             // textBoxJabberUser
             // 
@@ -117,6 +119,7 @@
             this.textBoxJabberUser.Name = "textBoxJabberUser";
             this.textBoxJabberUser.Size = new System.Drawing.Size(236, 20);
             this.textBoxJabberUser.TabIndex = 26;
+            this.textBoxJabberUser.Leave += new System.EventHandler(this.textBoxJabberUser_Leave);
             // 
             // label15
             // 
@@ -154,7 +157,7 @@
             this.checkBoxJabberVerbose.TabIndex = 23;
             this.checkBoxJabberVerbose.Text = "Enable Verbose Logging";
             this.checkBoxJabberVerbose.UseVisualStyleBackColor = true;
-            this.checkBoxJabberVerbose.CheckedChanged += new System.EventHandler(this.checkBoxJabberVerbose_CheckedChanged);
+            this.checkBoxJabberVerbose.Leave += new System.EventHandler(this.checkBoxJabberVerbose_Leave);
             // 
             // textBoxJabberServer
             // 
@@ -162,6 +165,7 @@
             this.textBoxJabberServer.Name = "textBoxJabberServer";
             this.textBoxJabberServer.Size = new System.Drawing.Size(236, 20);
             this.textBoxJabberServer.TabIndex = 31;
+            this.textBoxJabberServer.Leave += new System.EventHandler(this.textBoxJabberServer_Leave);
             // 
             // uc_setting_jabber
             // 

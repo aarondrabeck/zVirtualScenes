@@ -56,7 +56,8 @@
             this.txtb_deviceName.Location = new System.Drawing.Point(84, 19);
             this.txtb_deviceName.Name = "txtb_deviceName";
             this.txtb_deviceName.Size = new System.Drawing.Size(250, 20);
-            this.txtb_deviceName.TabIndex = 39;
+            this.txtb_deviceName.TabIndex = 1;
+            this.txtb_deviceName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtb_deviceName_KeyDown);
             // 
             // checkBoxPerDEviceJabberEnable
             // 
@@ -64,7 +65,7 @@
             this.checkBoxPerDEviceJabberEnable.Location = new System.Drawing.Point(7, 78);
             this.checkBoxPerDEviceJabberEnable.Name = "checkBoxPerDEviceJabberEnable";
             this.checkBoxPerDEviceJabberEnable.Size = new System.Drawing.Size(254, 17);
-            this.checkBoxPerDEviceJabberEnable.TabIndex = 26;
+            this.checkBoxPerDEviceJabberEnable.TabIndex = 3;
             this.checkBoxPerDEviceJabberEnable.Text = "Enable Jabber/Gtalk Notifcations for this Device";
             this.checkBoxPerDEviceJabberEnable.UseVisualStyleBackColor = true;
             // 
@@ -90,9 +91,10 @@
             this.groupBoxDeviceOptions.Controls.Add(this.checkBoxPerDEviceJabberEnable);
             this.groupBoxDeviceOptions.Controls.Add(this.txtb_deviceName);
             this.groupBoxDeviceOptions.Controls.Add(this.label12);
-            this.groupBoxDeviceOptions.Location = new System.Drawing.Point(5, 5);
+            this.groupBoxDeviceOptions.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBoxDeviceOptions.Location = new System.Drawing.Point(0, 0);
             this.groupBoxDeviceOptions.Name = "groupBoxDeviceOptions";
-            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(515, 280);
+            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(423, 197);
             this.groupBoxDeviceOptions.TabIndex = 37;
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Binary Switch Options";
@@ -102,7 +104,7 @@
             this.textBoxMomentaryOnTimeSpan.Location = new System.Drawing.Point(180, 170);
             this.textBoxMomentaryOnTimeSpan.Name = "textBoxMomentaryOnTimeSpan";
             this.textBoxMomentaryOnTimeSpan.Size = new System.Drawing.Size(46, 20);
-            this.textBoxMomentaryOnTimeSpan.TabIndex = 54;
+            this.textBoxMomentaryOnTimeSpan.TabIndex = 7;
             // 
             // label2
             // 
@@ -119,7 +121,7 @@
             this.checkBoxGrowlEnabled.Location = new System.Drawing.Point(7, 101);
             this.checkBoxGrowlEnabled.Name = "checkBoxGrowlEnabled";
             this.checkBoxGrowlEnabled.Size = new System.Drawing.Size(219, 17);
-            this.checkBoxGrowlEnabled.TabIndex = 51;
+            this.checkBoxGrowlEnabled.TabIndex = 4;
             this.checkBoxGrowlEnabled.Text = "Enable Growl Notifcations for this Device";
             this.checkBoxGrowlEnabled.UseVisualStyleBackColor = true;
             // 
@@ -129,7 +131,7 @@
             this.checkBoxMomentaryOn.Location = new System.Drawing.Point(8, 147);
             this.checkBoxMomentaryOn.Name = "checkBoxMomentaryOn";
             this.checkBoxMomentaryOn.Size = new System.Drawing.Size(217, 17);
-            this.checkBoxMomentaryOn.TabIndex = 53;
+            this.checkBoxMomentaryOn.TabIndex = 6;
             this.checkBoxMomentaryOn.Text = "Force momentary on mode for this action";
             this.checkBoxMomentaryOn.UseVisualStyleBackColor = true;
             // 
@@ -139,7 +141,7 @@
             this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(8, 124);
             this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
             this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
-            this.checkBoxDisplayinLightSwitch.TabIndex = 50;
+            this.checkBoxDisplayinLightSwitch.TabIndex = 5;
             this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
             this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
             // 
@@ -150,7 +152,7 @@
             this.txtb_GroupName.Location = new System.Drawing.Point(84, 46);
             this.txtb_GroupName.Name = "txtb_GroupName";
             this.txtb_GroupName.Size = new System.Drawing.Size(250, 20);
-            this.txtb_GroupName.TabIndex = 48;
+            this.txtb_GroupName.TabIndex = 2;
             // 
             // label1
             // 
@@ -163,11 +165,11 @@
             // 
             // btn_SaveOptions
             // 
-            this.btn_SaveOptions.Location = new System.Drawing.Point(408, 254);
+            this.btn_SaveOptions.Location = new System.Drawing.Point(353, 162);
             this.btn_SaveOptions.Name = "btn_SaveOptions";
-            this.btn_SaveOptions.Size = new System.Drawing.Size(101, 20);
-            this.btn_SaveOptions.TabIndex = 39;
-            this.btn_SaveOptions.Text = "Save and Close";
+            this.btn_SaveOptions.Size = new System.Drawing.Size(60, 27);
+            this.btn_SaveOptions.TabIndex = 8;
+            this.btn_SaveOptions.Text = "&Save";
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
             // 
@@ -175,7 +177,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(528, 297);
+            this.ClientSize = new System.Drawing.Size(423, 197);
             this.Controls.Add(this.groupBoxDeviceOptions);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -184,6 +186,7 @@
             this.Name = "formPropertiesBinSwitch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Edit this ZWave Binary Switch Device";
+            this.Load += new System.EventHandler(this.formPropertiesBinSwitch_Load);
             this.groupBoxDeviceOptions.ResumeLayout(false);
             this.groupBoxDeviceOptions.PerformLayout();
             this.ResumeLayout(false);

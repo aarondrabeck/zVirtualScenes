@@ -47,7 +47,8 @@
             this.txtb_duration.Location = new System.Drawing.Point(144, 20);
             this.txtb_duration.Name = "txtb_duration";
             this.txtb_duration.Size = new System.Drawing.Size(87, 20);
-            this.txtb_duration.TabIndex = 24;
+            this.txtb_duration.TabIndex = 1;
+            this.txtb_duration.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtb_duration_KeyDown);
             // 
             // label12
             // 
@@ -60,11 +61,11 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(337, 77);
+            this.btn_Save.Location = new System.Drawing.Point(361, 73);
             this.btn_Save.Name = "btn_Save";
-            this.btn_Save.Size = new System.Drawing.Size(83, 20);
-            this.btn_Save.TabIndex = 34;
-            this.btn_Save.Text = "Save Action";
+            this.btn_Save.Size = new System.Drawing.Size(59, 24);
+            this.btn_Save.TabIndex = 2;
+            this.btn_Save.Text = "&Save";
             this.btn_Save.UseVisualStyleBackColor = true;
             this.btn_Save.Click += new System.EventHandler(this.btn_Save_Click);
             // 
@@ -130,6 +131,7 @@
             this.Name = "formAddEditTimeDelay";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Timed Delay Action Properties";
+            this.Load += new System.EventHandler(this.formAddEditTimeDelay_Load);
             this.groupBoxAction.ResumeLayout(false);
             this.groupBoxAction.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();

@@ -50,6 +50,7 @@
             this.txt_loglineslimit.Name = "txt_loglineslimit";
             this.txt_loglineslimit.Size = new System.Drawing.Size(71, 20);
             this.txt_loglineslimit.TabIndex = 30;
+            this.txt_loglineslimit.Leave += new System.EventHandler(this.txt_loglineslimit_Leave);
             // 
             // label1
             // 
@@ -124,6 +125,7 @@
             this.checkBoxEnableNOAA.TabIndex = 7;
             this.checkBoxEnableNOAA.Text = "Enable Sunrise/Sunset";
             this.checkBoxEnableNOAA.UseVisualStyleBackColor = true;
+            this.checkBoxEnableNOAA.Leave += new System.EventHandler(this.checkBoxEnableNOAA_Leave);
             // 
             // textBox_Latitude
             // 
@@ -131,6 +133,7 @@
             this.textBox_Latitude.Name = "textBox_Latitude";
             this.textBox_Latitude.Size = new System.Drawing.Size(176, 20);
             this.textBox_Latitude.TabIndex = 16;
+            this.textBox_Latitude.Leave += new System.EventHandler(this.textBox_Latitude_Leave);
             // 
             // label4
             // 
@@ -147,6 +150,7 @@
             this.textBox_Longitude.Name = "textBox_Longitude";
             this.textBox_Longitude.Size = new System.Drawing.Size(176, 20);
             this.textBox_Longitude.TabIndex = 14;
+            this.textBox_Longitude.Leave += new System.EventHandler(this.textBox_Longitude_Leave);
             // 
             // label2
             // 
@@ -163,6 +167,7 @@
             this.textBoxRepolling.Name = "textBoxRepolling";
             this.textBoxRepolling.Size = new System.Drawing.Size(71, 20);
             this.textBoxRepolling.TabIndex = 28;
+            this.textBoxRepolling.Leave += new System.EventHandler(this.textBoxRepolling_Leave);
             // 
             // uc_setting_general
             // 
@@ -175,6 +180,7 @@
             this.Controls.Add(this.textBoxRepolling);
             this.Name = "uc_setting_general";
             this.Size = new System.Drawing.Size(532, 198);
+            this.Load += new System.EventHandler(this.uc_setting_general_Load);
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.ResumeLayout(false);

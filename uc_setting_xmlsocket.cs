@@ -16,9 +16,6 @@ namespace zVirtualScenesApplication
         public uc_setting_xmlsocket()
         {
             InitializeComponent();
-            textBoxSocketListenPort.LostFocus += new EventHandler(textBoxSocketListenPort_LostFocus);
-            textBoxSocketConnectionLimit.LostFocus += new EventHandler(textBoxSocketConnectionLimit_LostFocus);
-            textBoxAndroidPassword.LostFocus +=new EventHandler(textBoxAndroidPassword_LostFocus);
         }
 
         public void LoadSettings(formzVirtualScenes form)
@@ -35,7 +32,37 @@ namespace zVirtualScenesApplication
             textBoxAndroidPassword.Text = formzVirtualScenesMain.zVScenesSettings.XMLSocketAndroidPassword;     
         }
 
-        private void textBoxSocketListenPort_LostFocus(object sender, EventArgs e)
+        private void checkBoxHideAndroidPassword_CheckedChanged(object sender, EventArgs e)
+        {
+            textBoxAndroidPassword.UseSystemPasswordChar = checkBoxHideAndroidPassword.Checked;
+        }
+
+        private void restartServer()
+        {
+            formzVirtualScenesMain.SocketInt.StopListening();
+
+            if (checkBoxEnableSocketInt.Checked)
+                formzVirtualScenesMain.SocketInt.StartListening();
+            else
+                formzVirtualScenesMain.SocketInt.StopListening();
+        }
+
+        private void checkBoxEnableSocketInt_Leave(object sender, EventArgs e)
+        {
+            formzVirtualScenesMain.zVScenesSettings.XMLSocketEnabled = checkBoxEnableSocketInt.Checked;
+
+            if (checkBoxEnableSocketInt.Checked)
+                formzVirtualScenesMain.SocketInt.StartListening();
+            else
+                formzVirtualScenesMain.SocketInt.StopListening();
+        }
+
+        private void checkBoxSocketVerbose_Leave(object sender, EventArgs e)
+        {
+            formzVirtualScenesMain.zVScenesSettings.XMLSocketVerbose = checkBoxSocketVerbose.Checked;
+        }
+
+        private void textBoxSocketListenPort_Leave(object sender, EventArgs e)
         {
             try
             {
@@ -49,7 +76,7 @@ namespace zVirtualScenesApplication
             }
         }
 
-        private void textBoxSocketConnectionLimit_LostFocus(object sender, EventArgs e)
+        private void textBoxSocketConnectionLimit_Leave(object sender, EventArgs e)
         {
             try
             {
@@ -61,46 +88,21 @@ namespace zVirtualScenesApplication
                 textBoxSocketConnectionLimit.Text = formzVirtualScenesMain.zVScenesSettings.XMLSocketMaxConnections.ToString();
                 MessageBox.Show("Invalid XML Socket Max Connections.", formzVirtualScenesMain.ProgramName);
             }
-
         }
 
-        private void textBoxAndroidPassword_LostFocus(object sender, EventArgs e)
-        {
-            formzVirtualScenesMain.zVScenesSettings.XMLSocketAndroidPassword = textBoxAndroidPassword.Text;
-        }
-
-        private void checkBoxHideAndroidPassword_CheckedChanged(object sender, EventArgs e)
-        {
-            textBoxAndroidPassword.UseSystemPasswordChar = checkBoxHideAndroidPassword.Checked;
-        }
-
-        private void checkBoxEnableSocketInt_CheckedChanged(object sender, EventArgs e)
-        {
-            formzVirtualScenesMain.zVScenesSettings.XMLSocketEnabled = checkBoxEnableSocketInt.Checked;
-            restartServer();
-        }
-
-        private void checkBoxSocketVerbose_CheckedChanged(object sender, EventArgs e)
-        {
-            formzVirtualScenesMain.zVScenesSettings.XMLSocketVerbose = checkBoxSocketVerbose.Checked;
-        }
-
-        private void checkBoxAllowiViewer_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxAllowiViewer_Leave(object sender, EventArgs e)
         {
             formzVirtualScenesMain.zVScenesSettings.XMLSocketAllowiViewer = checkBoxAllowiViewer.Checked;
         }
 
-        private void checkBoxAllowAndroid_CheckedChanged(object sender, EventArgs e)
+        private void checkBoxAllowAndroid_Leave(object sender, EventArgs e)
         {
             formzVirtualScenesMain.zVScenesSettings.XMLSocketAllowAndroid = checkBoxAllowAndroid.Checked;
         }
 
-        private void restartServer()
+        private void textBoxAndroidPassword_Leave(object sender, EventArgs e)
         {
-            if (checkBoxEnableSocketInt.Checked)
-                formzVirtualScenesMain.SocketInt.StartListening();
-            else
-                formzVirtualScenesMain.SocketInt.StopListening();
+            formzVirtualScenesMain.zVScenesSettings.XMLSocketAndroidPassword = textBoxAndroidPassword.Text;
         }
     }
 }

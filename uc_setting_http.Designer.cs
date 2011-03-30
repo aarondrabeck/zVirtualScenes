@@ -54,7 +54,7 @@
             this.checkBoxHTTPEnable.TabIndex = 10;
             this.checkBoxHTTPEnable.Text = "Enable HTTP Listen";
             this.checkBoxHTTPEnable.UseVisualStyleBackColor = true;
-            this.checkBoxHTTPEnable.CheckedChanged += new System.EventHandler(this.checkBoxHTTPEnable_CheckedChanged);
+            this.checkBoxHTTPEnable.Leave += new System.EventHandler(this.checkBoxHTTPEnable_Leave);
             // 
             // txtb_exampleURL
             // 
@@ -70,6 +70,7 @@
             this.txtb_httpPort.Name = "txtb_httpPort";
             this.txtb_httpPort.Size = new System.Drawing.Size(62, 20);
             this.txtb_httpPort.TabIndex = 8;
+            this.txtb_httpPort.Leave += new System.EventHandler(this.txtb_httpPort_Leave);
             // 
             // label9
             // 

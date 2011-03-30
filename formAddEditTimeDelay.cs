@@ -28,11 +28,11 @@ namespace zVirtualScenesApplication
             this.EditMode = true;
 
             this.groupBoxAction.Text = "Edit Action";
-            this.btn_Save.Text = "Save Action";
+            this.btn_Save.Text = "&Save";
             this.theAction = action;
             this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
-            LoadGui();
+            LoadGui();            
         }
 
         public formAddEditTimeDelay(formzVirtualScenes zVirtualScenesMain, Scene scene, int PositionOfNewItem)
@@ -45,7 +45,7 @@ namespace zVirtualScenesApplication
             this.EditMode = false;
 
             this.groupBoxAction.Text = "Create New Action";
-            this.btn_Save.Text = "Add Action";
+            this.btn_Save.Text = "&Add";
             this.theAction = new Action();
             this.InsertPosition = PositionOfNewItem;
 
@@ -94,6 +94,19 @@ namespace zVirtualScenesApplication
 
             _zVirtualScenesMain.SelectListBoxActionItem(theAction);
             this.Close();
+        }
+
+        private void formAddEditTimeDelay_Load(object sender, EventArgs e)
+        {
+            ActiveControl = txtb_duration;
+        }
+
+        private void txtb_duration_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btn_Save_Click((object)sender, (EventArgs)e);
+            }
         }
     }       
 }

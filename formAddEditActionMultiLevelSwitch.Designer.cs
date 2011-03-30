@@ -32,6 +32,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(formAddEditActionMultiLevelSwitch));
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
             this.groupBoxAction = new System.Windows.Forms.GroupBox();
+            this.checkBoxSkipLight = new System.Windows.Forms.CheckBox();
+            this.checkBoxSkipDark = new System.Windows.Forms.CheckBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label_DeviceName = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -40,8 +42,6 @@
             this.btn_RunCommand = new System.Windows.Forms.Button();
             this.btn_Save = new System.Windows.Forms.Button();
             this.lbl_Status = new System.Windows.Forms.Label();
-            this.checkBoxSkipLight = new System.Windows.Forms.CheckBox();
-            this.checkBoxSkipDark = new System.Windows.Forms.CheckBox();
             this.groupBoxAction.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -67,6 +67,28 @@
             this.groupBoxAction.TabIndex = 36;
             this.groupBoxAction.TabStop = false;
             this.groupBoxAction.Text = "Create or Edit Action";
+            // 
+            // checkBoxSkipLight
+            // 
+            this.checkBoxSkipLight.AutoSize = true;
+            this.checkBoxSkipLight.Location = new System.Drawing.Point(276, 38);
+            this.checkBoxSkipLight.Name = "checkBoxSkipLight";
+            this.checkBoxSkipLight.Size = new System.Drawing.Size(138, 17);
+            this.checkBoxSkipLight.TabIndex = 50;
+            this.checkBoxSkipLight.TabStop = false;
+            this.checkBoxSkipLight.Text = "Skip when light outside.";
+            this.checkBoxSkipLight.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSkipDark
+            // 
+            this.checkBoxSkipDark.AutoSize = true;
+            this.checkBoxSkipDark.Location = new System.Drawing.Point(276, 15);
+            this.checkBoxSkipDark.Name = "checkBoxSkipDark";
+            this.checkBoxSkipDark.Size = new System.Drawing.Size(140, 17);
+            this.checkBoxSkipDark.TabIndex = 49;
+            this.checkBoxSkipDark.TabStop = false;
+            this.checkBoxSkipDark.Text = "Skip when dark outside.";
+            this.checkBoxSkipDark.UseVisualStyleBackColor = true;
             // 
             // pictureBox1
             // 
@@ -110,15 +132,16 @@
             this.txtbox_level.Location = new System.Drawing.Point(92, 44);
             this.txtbox_level.Name = "txtbox_level";
             this.txtbox_level.Size = new System.Drawing.Size(51, 20);
-            this.txtbox_level.TabIndex = 44;
+            this.txtbox_level.TabIndex = 1;
             this.txtbox_level.Text = "0";
+            this.txtbox_level.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtbox_level_KeyDown);
             // 
             // btn_RunCommand
             // 
             this.btn_RunCommand.Location = new System.Drawing.Point(313, 90);
             this.btn_RunCommand.Name = "btn_RunCommand";
             this.btn_RunCommand.Size = new System.Drawing.Size(103, 20);
-            this.btn_RunCommand.TabIndex = 38;
+            this.btn_RunCommand.TabIndex = 2;
             this.btn_RunCommand.Text = "Run Action Now";
             this.btn_RunCommand.UseVisualStyleBackColor = true;
             this.btn_RunCommand.Click += new System.EventHandler(this.btn_RunCommand_Click);
@@ -128,7 +151,7 @@
             this.btn_Save.Location = new System.Drawing.Point(4, 146);
             this.btn_Save.Name = "btn_Save";
             this.btn_Save.Size = new System.Drawing.Size(423, 20);
-            this.btn_Save.TabIndex = 37;
+            this.btn_Save.TabIndex = 3;
             this.btn_Save.Text = "Save Action";
             this.btn_Save.UseVisualStyleBackColor = true;
             this.btn_Save.Click += new System.EventHandler(this.btn_Save_Click);
@@ -141,26 +164,6 @@
             this.lbl_Status.Size = new System.Drawing.Size(35, 13);
             this.lbl_Status.TabIndex = 39;
             this.lbl_Status.Text = "status";
-            // 
-            // checkBoxSkipLight
-            // 
-            this.checkBoxSkipLight.AutoSize = true;
-            this.checkBoxSkipLight.Location = new System.Drawing.Point(276, 38);
-            this.checkBoxSkipLight.Name = "checkBoxSkipLight";
-            this.checkBoxSkipLight.Size = new System.Drawing.Size(138, 17);
-            this.checkBoxSkipLight.TabIndex = 50;
-            this.checkBoxSkipLight.Text = "Skip when light outside.";
-            this.checkBoxSkipLight.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxSkipDark
-            // 
-            this.checkBoxSkipDark.AutoSize = true;
-            this.checkBoxSkipDark.Location = new System.Drawing.Point(276, 15);
-            this.checkBoxSkipDark.Name = "checkBoxSkipDark";
-            this.checkBoxSkipDark.Size = new System.Drawing.Size(140, 17);
-            this.checkBoxSkipDark.TabIndex = 49;
-            this.checkBoxSkipDark.Text = "Skip when dark outside.";
-            this.checkBoxSkipDark.UseVisualStyleBackColor = true;
             // 
             // formAddEditActionMultiLevelSwitch
             // 
@@ -177,6 +180,7 @@
             this.Name = "formAddEditActionMultiLevelSwitch";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Multilevel Switch Action";
+            this.Load += new System.EventHandler(this.formAddEditActionMultiLevelSwitch_Load);
             this.groupBoxAction.ResumeLayout(false);
             this.groupBoxAction.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

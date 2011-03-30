@@ -67,6 +67,16 @@ namespace zVirtualScenesApplication
             //NOAA
             checkBoxSunrise.Checked =  _SceneToEdit.ActivateAtSunrise;
             checkBoxSunset.Checked = _SceneToEdit.ActivateAtSunset;
+
+            ActiveControl = txtb_sceneName;
+        }
+
+        private void txtb_sceneName_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btn_Save_Click((object)sender, (EventArgs)e);
+            }
         }
     }       
 }

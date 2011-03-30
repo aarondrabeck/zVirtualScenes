@@ -70,7 +70,7 @@
             this.checkBoxAllowAndroid.TabIndex = 37;
             this.checkBoxAllowAndroid.Text = "Allow Android Clients";
             this.checkBoxAllowAndroid.UseVisualStyleBackColor = true;
-            this.checkBoxAllowAndroid.CheckedChanged += new System.EventHandler(this.checkBoxAllowAndroid_CheckedChanged);
+            this.checkBoxAllowAndroid.Leave += new System.EventHandler(this.checkBoxAllowAndroid_Leave);
             // 
             // textBoxAndroidPassword
             // 
@@ -79,6 +79,7 @@
             this.textBoxAndroidPassword.Size = new System.Drawing.Size(176, 20);
             this.textBoxAndroidPassword.TabIndex = 27;
             this.textBoxAndroidPassword.UseSystemPasswordChar = true;
+            this.textBoxAndroidPassword.Leave += new System.EventHandler(this.textBoxAndroidPassword_Leave);
             // 
             // label28
             // 
@@ -111,7 +112,7 @@
             this.checkBoxEnableSocketInt.TabIndex = 39;
             this.checkBoxEnableSocketInt.Text = "Enable XML Socket Interface";
             this.checkBoxEnableSocketInt.UseVisualStyleBackColor = true;
-            this.checkBoxEnableSocketInt.CheckedChanged += new System.EventHandler(this.checkBoxEnableSocketInt_CheckedChanged);
+            this.checkBoxEnableSocketInt.Leave += new System.EventHandler(this.checkBoxEnableSocketInt_Leave);
             // 
             // groupBox3
             // 
@@ -145,7 +146,7 @@
             this.checkBoxAllowiViewer.TabIndex = 37;
             this.checkBoxAllowiViewer.Text = "Allow iViewer Clients";
             this.checkBoxAllowiViewer.UseVisualStyleBackColor = true;
-            this.checkBoxAllowiViewer.CheckedChanged += new System.EventHandler(this.checkBoxAllowiViewer_CheckedChanged);
+            this.checkBoxAllowiViewer.Leave += new System.EventHandler(this.checkBoxAllowiViewer_Leave);
             // 
             // label29
             // 
@@ -175,7 +176,7 @@
             this.checkBoxSocketVerbose.TabIndex = 40;
             this.checkBoxSocketVerbose.Text = "Enable Verbose Logging";
             this.checkBoxSocketVerbose.UseVisualStyleBackColor = true;
-            this.checkBoxSocketVerbose.CheckedChanged += new System.EventHandler(this.checkBoxSocketVerbose_CheckedChanged);
+            this.checkBoxSocketVerbose.Leave += new System.EventHandler(this.checkBoxSocketVerbose_Leave);
             // 
             // label26
             // 
@@ -194,6 +195,7 @@
             this.textBoxSocketListenPort.Name = "textBoxSocketListenPort";
             this.textBoxSocketListenPort.Size = new System.Drawing.Size(66, 20);
             this.textBoxSocketListenPort.TabIndex = 42;
+            this.textBoxSocketListenPort.Leave += new System.EventHandler(this.textBoxSocketListenPort_Leave);
             // 
             // textBoxSocketConnectionLimit
             // 
@@ -201,6 +203,7 @@
             this.textBoxSocketConnectionLimit.Name = "textBoxSocketConnectionLimit";
             this.textBoxSocketConnectionLimit.Size = new System.Drawing.Size(65, 20);
             this.textBoxSocketConnectionLimit.TabIndex = 44;
+            this.textBoxSocketConnectionLimit.Leave += new System.EventHandler(this.textBoxSocketConnectionLimit_Leave);
             // 
             // label27
             // 

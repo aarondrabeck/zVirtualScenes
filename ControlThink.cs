@@ -32,10 +32,17 @@ namespace zVirtualScenesApplication
 
         private void ReloadDevicesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            ControlThinkGetDevicesResult result = new ControlThinkGetDevicesResult();
+             ControlThinkGetDevicesResult result = new ControlThinkGetDevicesResult();
+
+             if (formzVirtualScenesMain.refresher.isRefreshing)
+             {
+                 result.NoErrors = false;
+                 result.fatalError = true;
+                 result.ErrorDescription = "Cannot refresh when repolling. Try agian later."; 
+             }  
 
             //Connect to ThinkStick
-            if (!ControlThinkController.IsConnected)
+            if (!ControlThinkController.IsConnected & !result.fatalError)
             {
                 try
                 {
@@ -46,6 +53,7 @@ namespace zVirtualScenesApplication
                 catch (Exception ex)
                 {
                     result.NoErrors = false;
+                    result.fatalError = true;
                     result.ErrorDescription = ex.Message;
                 }
             }
@@ -119,8 +127,11 @@ namespace zVirtualScenesApplication
         private void ReloadDevicesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             ControlThinkGetDevicesResult result = (ControlThinkGetDevicesResult)e.Result;
-            if (result != null)
+            if (result != null && !result.fatalError)
             {
+                if(!result.NoErrors)
+                    formzVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, result.ErrorDescription, LOG_INTERFACE); 
+
                 formzVirtualScenesMain.MasterDevices.Clear();
 
                 foreach (ZWaveDevice newDevice in result.NewDeviceList)
@@ -146,11 +157,11 @@ namespace zVirtualScenesApplication
 
                     formzVirtualScenesMain.MasterDevices.Add(newDevice);
                 }
-
                 formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB Loaded " + formzVirtualScenesMain.MasterDevices.Count() + " Devices.", LOG_INTERFACE);
             }
             else
-                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, result.ErrorDescription, LOG_INTERFACE);            
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, result.ErrorDescription, LOG_INTERFACE); 
+                          
         }
 
         public void ConnectAndLoadDevices()
@@ -200,11 +211,13 @@ namespace zVirtualScenesApplication
     public class ControlThinkGetDevicesResult
     {
         public bool NoErrors;
+        public bool fatalError;
         public BindingList<ZWaveDevice> NewDeviceList = new BindingList<ZWaveDevice>();
         public string ErrorDescription; 
 
         public ControlThinkGetDevicesResult()
         {
+            fatalError = false; 
             NoErrors = true; 
         }
     }

@@ -34,7 +34,7 @@ namespace zVirtualScenesApplication
             this.EditMode = true;
 
             this.groupBoxAction.Text = "Edit Action";
-            this.btn_Save.Text = "Save Action";
+            this.btn_Save.Text = "&Save";
             this.theAction = action;
             this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
@@ -58,7 +58,7 @@ namespace zVirtualScenesApplication
             this.EditMode = false;
             
             this.groupBoxAction.Text = "Create New Action";
-            this.btn_Save.Text = "Add Action to '" + scene.Name + "'";
+            this.btn_Save.Text = "&Add Action to '" + scene.Name + "'";
             this.theAction = (Action)device;
             this.InsertPosition = PositionOfNewItem;
 
@@ -133,6 +133,19 @@ namespace zVirtualScenesApplication
                 this.Close();
                 this.Close();
             }  
+        }
+
+        private void formAddEditActionMultiLevelSwitch_Load(object sender, EventArgs e)
+        {
+            ActiveControl = txtbox_level;
+        }
+
+        private void txtbox_level_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btn_Save_Click((object)sender, (EventArgs)e);
+            }
         }
 
     }       

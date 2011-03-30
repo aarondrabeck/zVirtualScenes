@@ -54,7 +54,7 @@
             this.btn_On.Location = new System.Drawing.Point(68, 45);
             this.btn_On.Name = "btn_On";
             this.btn_On.Size = new System.Drawing.Size(48, 20);
-            this.btn_On.TabIndex = 34;
+            this.btn_On.TabIndex = 2;
             this.btn_On.Text = "ON";
             this.btn_On.UseVisualStyleBackColor = true;
             this.btn_On.Click += new System.EventHandler(this.btn_On_Click);
@@ -66,14 +66,14 @@
             this.comboBoxGroups.Location = new System.Drawing.Point(68, 19);
             this.comboBoxGroups.Name = "comboBoxGroups";
             this.comboBoxGroups.Size = new System.Drawing.Size(266, 21);
-            this.comboBoxGroups.TabIndex = 35;
+            this.comboBoxGroups.TabIndex = 1;
             // 
             // btn_OFF
             // 
             this.btn_OFF.Location = new System.Drawing.Point(122, 45);
             this.btn_OFF.Name = "btn_OFF";
             this.btn_OFF.Size = new System.Drawing.Size(45, 20);
-            this.btn_OFF.TabIndex = 36;
+            this.btn_OFF.TabIndex = 3;
             this.btn_OFF.Text = "OFF";
             this.btn_OFF.UseVisualStyleBackColor = true;
             this.btn_OFF.Click += new System.EventHandler(this.btn_OFF_Click);
@@ -83,7 +83,7 @@
             this.button_Set.Location = new System.Drawing.Point(173, 45);
             this.button_Set.Name = "button_Set";
             this.button_Set.Size = new System.Drawing.Size(43, 20);
-            this.button_Set.TabIndex = 37;
+            this.button_Set.TabIndex = 4;
             this.button_Set.Text = "SET";
             this.button_Set.UseVisualStyleBackColor = true;
             this.button_Set.Click += new System.EventHandler(this.button_Set_Click);
@@ -102,16 +102,17 @@
             this.textBoxLevel.Location = new System.Drawing.Point(299, 46);
             this.textBoxLevel.Name = "textBoxLevel";
             this.textBoxLevel.Size = new System.Drawing.Size(35, 20);
-            this.textBoxLevel.TabIndex = 39;
+            this.textBoxLevel.TabIndex = 5;
             // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(272, 94);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(83, 20);
-            this.button1.TabIndex = 40;
+            this.button1.TabIndex = 6;
             this.button1.Text = "Close";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // groupBox1
             // 
@@ -151,6 +152,7 @@
             this.Name = "formActivateGroup";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Activate Groups / Zones";
+            this.Load += new System.EventHandler(this.formActivateGroup_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();

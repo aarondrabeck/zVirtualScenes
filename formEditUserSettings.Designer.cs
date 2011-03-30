@@ -38,6 +38,7 @@
             this.uc_setting_lightswitch1 = new zVirtualScenesApplication.uc_setting_lightswitch();
             this.uc_setting_jabber1 = new zVirtualScenesApplication.uc_setting_jabber();
             this.uc_setting_general = new zVirtualScenesApplication.uc_setting_general();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.SuspendLayout();
             // 
             // toolTipNotificationLevel
@@ -68,8 +69,8 @@
             " XML Socket"});
             this.listBoxCategory.Location = new System.Drawing.Point(5, 7);
             this.listBoxCategory.Name = "listBoxCategory";
-            this.listBoxCategory.Size = new System.Drawing.Size(155, 394);
-            this.listBoxCategory.TabIndex = 43;
+            this.listBoxCategory.Size = new System.Drawing.Size(155, 364);
+            this.listBoxCategory.TabIndex = 1;
             this.listBoxCategory.SelectedIndexChanged += new System.EventHandler(this.listBoxCategory_SelectedIndexChanged);
             // 
             // buttonOK
@@ -77,7 +78,7 @@
             this.buttonOK.Location = new System.Drawing.Point(756, 375);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
-            this.buttonOK.TabIndex = 49;
+            this.buttonOK.TabIndex = 20;
             this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
@@ -87,7 +88,7 @@
             this.uc_setting_xmlsocket1.Location = new System.Drawing.Point(166, 7);
             this.uc_setting_xmlsocket1.Name = "uc_setting_xmlsocket1";
             this.uc_setting_xmlsocket1.Size = new System.Drawing.Size(649, 377);
-            this.uc_setting_xmlsocket1.TabIndex = 48;
+            this.uc_setting_xmlsocket1.TabIndex = 2;
             this.uc_setting_xmlsocket1.Visible = false;
             // 
             // uc_setting_http1
@@ -95,7 +96,7 @@
             this.uc_setting_http1.Location = new System.Drawing.Point(166, 7);
             this.uc_setting_http1.Name = "uc_setting_http1";
             this.uc_setting_http1.Size = new System.Drawing.Size(766, 116);
-            this.uc_setting_http1.TabIndex = 47;
+            this.uc_setting_http1.TabIndex = 5;
             this.uc_setting_http1.Visible = false;
             // 
             // uc_setting_lightswitch1
@@ -103,7 +104,7 @@
             this.uc_setting_lightswitch1.Location = new System.Drawing.Point(166, 7);
             this.uc_setting_lightswitch1.Name = "uc_setting_lightswitch1";
             this.uc_setting_lightswitch1.Size = new System.Drawing.Size(665, 187);
-            this.uc_setting_lightswitch1.TabIndex = 46;
+            this.uc_setting_lightswitch1.TabIndex = 3;
             this.uc_setting_lightswitch1.Visible = false;
             // 
             // uc_setting_jabber1
@@ -111,7 +112,7 @@
             this.uc_setting_jabber1.Location = new System.Drawing.Point(166, 12);
             this.uc_setting_jabber1.Name = "uc_setting_jabber1";
             this.uc_setting_jabber1.Size = new System.Drawing.Size(592, 195);
-            this.uc_setting_jabber1.TabIndex = 45;
+            this.uc_setting_jabber1.TabIndex = 4;
             this.uc_setting_jabber1.Visible = false;
             // 
             // uc_setting_general
@@ -119,14 +120,25 @@
             this.uc_setting_general.Location = new System.Drawing.Point(166, 7);
             this.uc_setting_general.Name = "uc_setting_general";
             this.uc_setting_general.Size = new System.Drawing.Size(548, 377);
-            this.uc_setting_general.TabIndex = 44;
+            this.uc_setting_general.TabIndex = 6;
             this.uc_setting_general.Visible = false;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.BackColor = System.Drawing.Color.Transparent;
+            this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.groupBox1.Location = new System.Drawing.Point(166, 361);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(665, 10);
+            this.groupBox1.TabIndex = 24;
+            this.groupBox1.TabStop = false;
             // 
             // formEditUserSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(839, 406);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.uc_setting_xmlsocket1);
             this.Controls.Add(this.uc_setting_http1);
@@ -157,5 +169,6 @@
         private uc_setting_http uc_setting_http1;
         private uc_setting_xmlsocket uc_setting_xmlsocket1;
         private System.Windows.Forms.Button buttonOK;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }

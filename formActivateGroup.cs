@@ -24,6 +24,8 @@ namespace zVirtualScenesApplication
 
             try { comboBoxGroups.SelectedIndex = 0; }
             catch { }
+
+            
         }
 
         private void btn_On_Click(object sender, EventArgs e)
@@ -72,6 +74,15 @@ namespace zVirtualScenesApplication
 
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void formActivateGroup_Load(object sender, EventArgs e)
+        {
+            ActiveControl = comboBoxGroups;
+        }
         
     }       
 }

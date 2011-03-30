@@ -63,11 +63,11 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(360, 106);
+            this.btn_Save.Location = new System.Drawing.Point(379, 103);
             this.btn_Save.Name = "btn_Save";
-            this.btn_Save.Size = new System.Drawing.Size(83, 20);
-            this.btn_Save.TabIndex = 34;
-            this.btn_Save.Text = "Save Action";
+            this.btn_Save.Size = new System.Drawing.Size(64, 23);
+            this.btn_Save.TabIndex = 2;
+            this.btn_Save.Text = "&Save";
             this.btn_Save.UseVisualStyleBackColor = true;
             this.btn_Save.Click += new System.EventHandler(this.btn_Save_Click);
             // 
@@ -88,8 +88,8 @@
             this.buttonBrowse.Location = new System.Drawing.Point(297, 45);
             this.buttonBrowse.Name = "buttonBrowse";
             this.buttonBrowse.Size = new System.Drawing.Size(77, 20);
-            this.buttonBrowse.TabIndex = 36;
-            this.buttonBrowse.Text = "Browse";
+            this.buttonBrowse.TabIndex = 1;
+            this.buttonBrowse.Text = "&Browse";
             this.buttonBrowse.UseVisualStyleBackColor = true;
             this.buttonBrowse.Click += new System.EventHandler(this.buttonBrowse_Click);
             // 
@@ -144,6 +144,7 @@
             this.Name = "formAddEditEXEC";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Executable Action Properties";
+            this.Load += new System.EventHandler(this.formAddEditEXEC_Load);
             this.groupBoxAction.ResumeLayout(false);
             this.groupBoxAction.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();

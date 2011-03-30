@@ -115,5 +115,18 @@ namespace zVirtualScenesApplication
             this.Close();
         }
 
+        private void formPropertiesBinSwitch_Load(object sender, EventArgs e)
+        {
+            ActiveControl = txtb_deviceName;
+        }
+
+        private void txtb_deviceName_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                btn_SaveOptions_Click((object)sender, (EventArgs)e);
+            }
+        }
+
     }
 }

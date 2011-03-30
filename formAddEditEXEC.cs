@@ -28,7 +28,7 @@ namespace zVirtualScenesApplication
             this.EditMode = true;
 
             this.groupBoxAction.Text = "Edit Action";
-            this.btn_Save.Text = "Save Action";
+            this.btn_Save.Text = "&Save";
             this.theAction = action;
             this.InsertPosition = _zVirtualScenesMain.MasterScenes[sceneIndex].Actions.IndexOf(theAction);
 
@@ -45,7 +45,7 @@ namespace zVirtualScenesApplication
             this.EditMode = false;
 
             this.groupBoxAction.Text = "Create New Action";
-            this.btn_Save.Text = "Add Action";
+            this.btn_Save.Text = "&Add";
             this.theAction = new Action();
             this.InsertPosition = PositionOfNewItem;
 
@@ -100,6 +100,11 @@ namespace zVirtualScenesApplication
                 Action EXEAction = new Action();
                 txtb_path.Text = fdlg.FileName;
             }
+        }
+
+        private void formAddEditEXEC_Load(object sender, EventArgs e)
+        {
+            ActiveControl = buttonBrowse;
         }
     }       
 }

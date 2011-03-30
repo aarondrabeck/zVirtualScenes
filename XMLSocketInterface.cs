@@ -96,7 +96,7 @@ namespace zVirtualScenesApplication
                 //Boot each connected client.
                 foreach (SocketClient client in SocketClients)
                 {
-                    if (client.ClientsSocket.Connected)
+                    if (client.ClientsSocket != null && client.ClientsSocket.Connected)
                     {
                         client.ClientsSocket.Close();
                     }
@@ -126,9 +126,8 @@ namespace zVirtualScenesApplication
                 //Listen for new clients
                 MainListeningSocket.BeginAccept(new AsyncCallback(OnConnect), null);
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException)
             {
-                zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, "ODE:" + e.Message, LOG_INTERFACE);
             }
             catch (SocketException se)
             {
@@ -456,7 +455,7 @@ namespace zVirtualScenesApplication
             }            
             catch (ObjectDisposedException)
             {
-                //zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR,  "Socket has been closed.", LOG_INTERFACE);
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR,  "Socket has been closed.", LOG_INTERFACE);
             }
             catch (SocketException sEX)
             {

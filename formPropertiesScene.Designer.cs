@@ -34,13 +34,13 @@
             this.label12 = new System.Windows.Forms.Label();
             this.btn_Save = new System.Windows.Forms.Button();
             this.groupBoxDevice = new System.Windows.Forms.GroupBox();
+            this.checkBoxSunset = new System.Windows.Forms.CheckBox();
+            this.checkBoxSunrise = new System.Windows.Forms.CheckBox();
             this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.comboBoxHotKeys = new System.Windows.Forms.ComboBox();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
-            this.checkBoxSunrise = new System.Windows.Forms.CheckBox();
-            this.checkBoxSunset = new System.Windows.Forms.CheckBox();
             this.groupBoxDevice.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -51,7 +51,8 @@
             this.txtb_sceneName.Location = new System.Drawing.Point(129, 17);
             this.txtb_sceneName.Name = "txtb_sceneName";
             this.txtb_sceneName.Size = new System.Drawing.Size(205, 20);
-            this.txtb_sceneName.TabIndex = 24;
+            this.txtb_sceneName.TabIndex = 0;
+            this.txtb_sceneName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtb_sceneName_KeyDown);
             // 
             // label12
             // 
@@ -64,11 +65,11 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(247, 225);
+            this.btn_Save.Location = new System.Drawing.Point(283, 160);
             this.btn_Save.Name = "btn_Save";
-            this.btn_Save.Size = new System.Drawing.Size(93, 25);
-            this.btn_Save.TabIndex = 34;
-            this.btn_Save.Text = "Save Changes";
+            this.btn_Save.Size = new System.Drawing.Size(57, 25);
+            this.btn_Save.TabIndex = 5;
+            this.btn_Save.Text = "&Save";
             this.btn_Save.UseVisualStyleBackColor = true;
             this.btn_Save.Click += new System.EventHandler(this.btn_Save_Click);
             // 
@@ -82,12 +83,33 @@
             this.groupBoxDevice.Controls.Add(this.txtb_sceneName);
             this.groupBoxDevice.Controls.Add(this.btn_Save);
             this.groupBoxDevice.Controls.Add(this.label12);
-            this.groupBoxDevice.Location = new System.Drawing.Point(4, 5);
+            this.groupBoxDevice.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBoxDevice.Location = new System.Drawing.Point(0, 0);
             this.groupBoxDevice.Name = "groupBoxDevice";
-            this.groupBoxDevice.Size = new System.Drawing.Size(346, 256);
+            this.groupBoxDevice.Size = new System.Drawing.Size(346, 191);
             this.groupBoxDevice.TabIndex = 35;
             this.groupBoxDevice.TabStop = false;
             this.groupBoxDevice.Text = "Scene";
+            // 
+            // checkBoxSunset
+            // 
+            this.checkBoxSunset.AutoSize = true;
+            this.checkBoxSunset.Location = new System.Drawing.Point(8, 159);
+            this.checkBoxSunset.Name = "checkBoxSunset";
+            this.checkBoxSunset.Size = new System.Drawing.Size(113, 17);
+            this.checkBoxSunset.TabIndex = 4;
+            this.checkBoxSunset.Text = "Activate at Sunset";
+            this.checkBoxSunset.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxSunrise
+            // 
+            this.checkBoxSunrise.AutoSize = true;
+            this.checkBoxSunrise.Location = new System.Drawing.Point(8, 136);
+            this.checkBoxSunrise.Name = "checkBoxSunrise";
+            this.checkBoxSunrise.Size = new System.Drawing.Size(115, 17);
+            this.checkBoxSunrise.TabIndex = 3;
+            this.checkBoxSunrise.Text = "Activate at Sunrise";
+            this.checkBoxSunrise.UseVisualStyleBackColor = true;
             // 
             // checkBoxDisplayinLightSwitch
             // 
@@ -95,7 +117,7 @@
             this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(8, 113);
             this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
             this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
-            this.checkBoxDisplayinLightSwitch.TabIndex = 40;
+            this.checkBoxDisplayinLightSwitch.TabIndex = 2;
             this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
             this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
             // 
@@ -125,38 +147,18 @@
             this.comboBoxHotKeys.Location = new System.Drawing.Point(6, 19);
             this.comboBoxHotKeys.Name = "comboBoxHotKeys";
             this.comboBoxHotKeys.Size = new System.Drawing.Size(318, 21);
-            this.comboBoxHotKeys.TabIndex = 39;
+            this.comboBoxHotKeys.TabIndex = 1;
             // 
             // toolTipNotificationLevel
             // 
             this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
             // 
-            // checkBoxSunrise
-            // 
-            this.checkBoxSunrise.AutoSize = true;
-            this.checkBoxSunrise.Location = new System.Drawing.Point(8, 136);
-            this.checkBoxSunrise.Name = "checkBoxSunrise";
-            this.checkBoxSunrise.Size = new System.Drawing.Size(115, 17);
-            this.checkBoxSunrise.TabIndex = 41;
-            this.checkBoxSunrise.Text = "Activate at Sunrise";
-            this.checkBoxSunrise.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxSunset
-            // 
-            this.checkBoxSunset.AutoSize = true;
-            this.checkBoxSunset.Location = new System.Drawing.Point(8, 159);
-            this.checkBoxSunset.Name = "checkBoxSunset";
-            this.checkBoxSunset.Size = new System.Drawing.Size(113, 17);
-            this.checkBoxSunset.TabIndex = 42;
-            this.checkBoxSunset.Text = "Activate at Sunset";
-            this.checkBoxSunset.UseVisualStyleBackColor = true;
-            // 
             // formPropertiesScene
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(353, 264);
+            this.ClientSize = new System.Drawing.Size(346, 191);
             this.Controls.Add(this.groupBoxDevice);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

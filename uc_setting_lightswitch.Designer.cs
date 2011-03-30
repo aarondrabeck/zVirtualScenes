@@ -51,7 +51,7 @@
             this.checkBoxLSSortDevices.TabIndex = 37;
             this.checkBoxLSSortDevices.Text = "Sort Device List A-Z";
             this.checkBoxLSSortDevices.UseVisualStyleBackColor = true;
-            this.checkBoxLSSortDevices.CheckedChanged += new System.EventHandler(this.checkBoxLSSortDevices_CheckedChanged);
+            this.checkBoxLSSortDevices.Leave += new System.EventHandler(this.checkBoxLSSortDevices_Leave);
             // 
             // checkBoxLSEnabled
             // 
@@ -62,7 +62,7 @@
             this.checkBoxLSEnabled.TabIndex = 26;
             this.checkBoxLSEnabled.Text = "Enable LightSwitch Server";
             this.checkBoxLSEnabled.UseVisualStyleBackColor = true;
-            this.checkBoxLSEnabled.CheckedChanged += new System.EventHandler(this.checkBoxLSEnabled_CheckedChanged);
+            this.checkBoxLSEnabled.Leave += new System.EventHandler(this.checkBoxLSEnabled_Leave);
             // 
             // label24
             // 
@@ -125,7 +125,7 @@
             this.checkBoxLSDebugVerbose.TabIndex = 28;
             this.checkBoxLSDebugVerbose.Text = "Enable Verbose Logging";
             this.checkBoxLSDebugVerbose.UseVisualStyleBackColor = true;
-            this.checkBoxLSDebugVerbose.CheckedChanged += new System.EventHandler(this.checkBoxLSDebugVerbose_CheckedChanged);
+            this.checkBoxLSDebugVerbose.Leave += new System.EventHandler(this.checkBoxLSDebugVerbose_Leave);
             // 
             // textBoxLSLimit
             // 
@@ -133,6 +133,7 @@
             this.textBoxLSLimit.Name = "textBoxLSLimit";
             this.textBoxLSLimit.Size = new System.Drawing.Size(65, 20);
             this.textBoxLSLimit.TabIndex = 33;
+            this.textBoxLSLimit.Leave += new System.EventHandler(this.textBoxLSLimit_Leave);
             // 
             // label14
             // 
@@ -149,6 +150,7 @@
             this.textBoxPort.Name = "textBoxPort";
             this.textBoxPort.Size = new System.Drawing.Size(65, 20);
             this.textBoxPort.TabIndex = 38;
+            this.textBoxPort.Leave += new System.EventHandler(this.textBoxPort_Leave);
             // 
             // textBoxLSpwd
             // 
@@ -157,6 +159,7 @@
             this.textBoxLSpwd.Size = new System.Drawing.Size(176, 20);
             this.textBoxLSpwd.TabIndex = 39;
             this.textBoxLSpwd.UseSystemPasswordChar = true;
+            this.textBoxLSpwd.Leave += new System.EventHandler(this.textBoxLSpwd_Leave);
             // 
             // uc_setting_lightswitch
             // 

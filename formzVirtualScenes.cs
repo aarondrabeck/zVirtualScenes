@@ -226,7 +226,15 @@ namespace zVirtualScenesApplication
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
         {
-            SaveUserSettingsToFile(APP_PATH);
+            switch (MessageBox.Show("Would you like to save your settings?", ProgramName, MessageBoxButtons.YesNoCancel,MessageBoxIcon.Exclamation))
+            {
+                case System.Windows.Forms.DialogResult.Cancel:
+                    e.Cancel = true;
+                    return;
+                case System.Windows.Forms.DialogResult.Yes:
+                    SaveUserSettingsToFile(APP_PATH);
+                    break;
+            }
 
             Properties.Settings.Default.WindowGeometry = GeometryToString(this);
             Properties.Settings.Default.Save();
@@ -241,10 +249,9 @@ namespace zVirtualScenesApplication
             
             httpInt.Stop();
             while (httpInt.isActive())
-                System.Threading.Thread.Sleep(20);
-            
+                System.Threading.Thread.Sleep(20);            
 
-            jabber.Disconnect();
+            jabber.Shutdown();
             while (jabber.isActive)
                 System.Threading.Thread.Sleep(20);
 
@@ -256,7 +263,7 @@ namespace zVirtualScenesApplication
             while(SocketInt.isLisenting)
                 System.Threading.Thread.Sleep(20);
 
-            SaveLogToFile();
+            SaveLogToFile();                       
 
         }
 
@@ -603,12 +610,6 @@ namespace zVirtualScenesApplication
             return GroupCollection;
         }
 
-        #region Settings TAB
-
-        
-
-        #endregion
-
         #region File I/O
 
         private void SaveUserSettingsToFile(string path)
@@ -740,6 +741,8 @@ namespace zVirtualScenesApplication
 
         #region Scene List Box Handeling
 
+        
+
         private void editSceneToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenScenePropertiesWindow();
@@ -760,6 +763,19 @@ namespace zVirtualScenesApplication
 
         private void deleteSceneToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            deleteScene();
+        }
+
+        private void dataListViewScenes_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                deleteScene();
+            }            
+        }
+
+        private void deleteScene()
+        {
             int savedIndex = dataListViewScenes.SelectedIndex;
 
             if (savedIndex == MasterScenes.Count() - 1)
@@ -778,7 +794,13 @@ namespace zVirtualScenesApplication
                 MessageBox.Show("You must have at least one scene.", ProgramName);
         }
 
+
         private void addSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddScene();
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
         {
             AddScene();
         }
@@ -806,7 +828,6 @@ namespace zVirtualScenesApplication
             dataListViewScenes.Focus();
         }
 
-
         private void dataListViewScenes_CellRightClick(object sender, CellRightClickEventArgs e)
         {
             if (e.Item == null)
@@ -814,8 +835,6 @@ namespace zVirtualScenesApplication
             else
                 e.MenuStrip = contextMenuStripScenes;
         }
-
-        
 
         public class SceneDropSink : SimpleDropSink
         {
@@ -1063,6 +1082,19 @@ namespace zVirtualScenesApplication
 
         private void deleteActionToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            deleteAction();
+        }
+
+        private void dataListViewActions_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                deleteAction();
+            }
+        }
+
+        private void deleteAction()
+        {
             if (dataListViewActions.SelectedObjects.Count > 0)
             {
                 Scene selectedScene = (Scene)dataListViewScenes.SelectedObject;
@@ -1216,6 +1248,11 @@ namespace zVirtualScenesApplication
 
         #region Device List Boc Handling
 
+        private void dataListViewDevices_ItemsChanging(object sender, ItemsChangingEventArgs e)
+        {
+            label_devicecount.Text = MasterDevices.Count.ToString() + " devices";
+        }
+
         private void OpenDevicePropertyWindow()
         {
             if (dataListViewDevices.SelectedObjects.Count > 0)
@@ -1344,6 +1381,17 @@ namespace zVirtualScenesApplication
 
         #region ToolBar Events
 
+        private void saveSettingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveUserSettingsToFile(APP_PATH);
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            formEditUserSettings formEditUserSettings = new formEditUserSettings(this);
+            formEditUserSettings.ShowDialog();
+        }
+
         private void activateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             formActivateGroup formActivateGroup = new formActivateGroup(this);
@@ -1364,7 +1412,6 @@ namespace zVirtualScenesApplication
         private void exitToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             this.Close();
-            Environment.Exit(0);
         }
 
         #endregion
@@ -1396,8 +1443,18 @@ namespace zVirtualScenesApplication
         /// <param name="message">Log Event Message</param>
         public void AddLogEntry(UrgencyLevel urgency, string message, string theInterface = "MAIN")
         {
-            if (this.InvokeRequired)
-                this.Invoke(new LogThisDelegate(AddLogEntry), new object[] { urgency, message, theInterface });
+            if (this.InvokeRequired && !this.IsDisposed)
+            {
+                try
+                {
+                    this.Invoke(new LogThisDelegate(AddLogEntry), new object[] { urgency, message, theInterface });
+                }
+                catch (ObjectDisposedException)
+                { 
+                    //Sometimes called when jabber sends messages after program has been disposed. 
+                    //Jabber implementation has thread sync issues.
+                }
+            }
             else
             {
                 LogItem item = new LogItem();
@@ -1621,7 +1678,7 @@ namespace zVirtualScenesApplication
         
         #endregion
 
-        #region Task Scheduler
+        #region Task Scheduler GUI
 
         #region Methods
 
@@ -1684,6 +1741,14 @@ namespace zVirtualScenesApplication
         #endregion
 
         #region GUI Event Handling
+
+        private void dataListTasks_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                deleteTask();
+            }
+        }
 
         private void comboBox_FrequencyTask_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1938,12 +2003,9 @@ namespace zVirtualScenesApplication
             AddLogEntry(UrgencyLevel.ERROR, ex.Message, ZEROCONF_LOG_ENTRY);
         }
 
-        #endregion
+        #endregion 
 
-        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            formEditUserSettings formEditUserSettings = new formEditUserSettings(this);
-            formEditUserSettings.ShowDialog();
-        }
+       
+        
     }
 }

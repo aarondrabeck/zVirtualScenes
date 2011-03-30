@@ -9,7 +9,8 @@ namespace zVirtualScenesApplication
         private static string LOG_INTERFACE = "JABBER"; 
         public formzVirtualScenes zVirtualScenesMain;
         JabberClient j;
-        public volatile bool isActive; 
+        public volatile bool isActive;
+        private bool shuttingdown = false; 
 
         public JabberInterface()
         {
@@ -20,7 +21,17 @@ namespace zVirtualScenesApplication
             j.OnAuthError += new jabber.protocol.ProtocolHandler(jabberClient1_OnAuthError);
             j.OnAuthenticate += new bedrock.ObjectHandler(jabberClient1_OnAuthenticate);
             j.OnReadText += new bedrock.TextHandler(j_OnReadText);
-            j.OnWriteText += new bedrock.TextHandler(j_OnWriteText);            
+            j.OnWriteText += new bedrock.TextHandler(j_OnWriteText); 
+        }
+
+        public void Shutdown()
+        {
+            Disconnect();
+            shuttingdown = true;
+
+            //Wait to shutdown
+            System.Threading.Thread.Sleep(500);
+            isActive = false;
         }
 
         public void Connect()
@@ -54,49 +65,51 @@ namespace zVirtualScenesApplication
             }
          }
 
-        void jabberClient1_OnAuthError(object sender, System.Xml.XmlElement rp)
+        private void jabberClient1_OnAuthError(object sender, System.Xml.XmlElement rp)
         {
             if (rp.Name == "failure")
             {
-                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "Invalid Username or Password.", LOG_INTERFACE);
+                if(!shuttingdown)
+                    zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "Invalid Username or Password.", LOG_INTERFACE);
             }
         }
 
         private void jabberClient1_OnAuthenticate(object sender)
         {
-            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Connected using " + zVirtualScenesMain.zVScenesSettings.JabberUser +".", LOG_INTERFACE);
+            if (!shuttingdown)
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Connected using " + zVirtualScenesMain.zVScenesSettings.JabberUser +".", LOG_INTERFACE);
             j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zVirtualScenesMain.ProgramName + " server.", ":chat", 0);
             isActive = true;
         }
 
-        void jabberClient1_OnError(object sender, Exception ex)
+        private void jabberClient1_OnError(object sender, Exception ex)
         {
-            zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, ex.Message, LOG_INTERFACE);
+            if (!shuttingdown)
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, ex.Message, LOG_INTERFACE);
         }
 
-        void jabberClient1_OnDisconnect(object sender)
+        private void jabberClient1_OnDisconnect(object sender)
         {
-            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Disconnected.", LOG_INTERFACE);
-            isActive = false; 
+            zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Disconnected.", LOG_INTERFACE);             
         }
 
         private void jabberClient1_OnMessage(object sender, jabber.protocol.client.Message msg)
         {
-            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)
+            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose && !shuttingdown)
                 zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "[" + msg.From.User +  "] says : " + msg.Body + "\n", LOG_INTERFACE);
         }
 
         private void j_OnWriteText(object sender, string txt)
         {
             if (txt == " ") return;
-            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)
+            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose && !shuttingdown)
                 zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "SENT: " + txt, LOG_INTERFACE);
         }
 
         private void j_OnReadText(object sender, string txt)
         {
             if (txt == " ") return;  // ignore keep-alive spaces
-            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose)
+            if (zVirtualScenesMain.zVScenesSettings.JabberVerbose && !shuttingdown)
                 zVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "RECV: " + txt, LOG_INTERFACE);
         }
     }

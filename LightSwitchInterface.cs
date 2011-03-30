@@ -87,9 +87,8 @@ namespace zVirtualScenesApplication
                 // Since the main Socket is now free, it can go back and wait for other clients who are attempting to connect
                 LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException)
             {
-                //zVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, "Socket Connection Closed: " + e, LOG_INTERFACE);
             }
             catch (SocketException e)
             {

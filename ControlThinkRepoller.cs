@@ -14,12 +14,11 @@ namespace zVirtualScenesApplication
         public delegate void DeviceInfoChangeEventHandler(string GlbUniqueID, changeType TypeOfChange);
         public event DeviceInfoChangeEventHandler DeviceInfoChange;
         public System.Timers.Timer RepollTimer = new System.Timers.Timer();
-        public bool isRefreshing = false;         
+        public volatile bool isRefreshing = false;         
 
         public ControlThinkRepoller()
         {
             RepollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
-            
         }
 
         /// <summary>
@@ -43,11 +42,6 @@ namespace zVirtualScenesApplication
 
         public void RePollDevices(byte node = 0)
         {
-            int NoResponseErrors = 0;
-            int TimeoutErrors = 0;
-            int OtherErrors = 0;
-            DateTime Start = DateTime.Now; 
-
             //Check if we are in the middle of loading devices from stick.
             if(zVirtualScenesMain.ControlThinkInt.ReloadDevicesWorker.IsBusy)
                 return;
@@ -55,11 +49,16 @@ namespace zVirtualScenesApplication
             //Check if we are already repolling.
             if (isRefreshing)
             {
-                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "A request to repoll was called while a previous request still working.  Consider lowering the repoll interval.", LOG_INTERFACE);
+                zVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "A request to repoll was called while a previous request was still working.  Consider lowering the repolling interval.", LOG_INTERFACE);
                 return;
             }
             else
-                isRefreshing = true; 
+                isRefreshing = true;
+
+            int NoResponseErrors = 0;
+            int TimeoutErrors = 0;
+            int OtherErrors = 0;
+            DateTime Start = DateTime.Now;
 
             //Make sure the stick is connected.
             if (zVirtualScenesMain.ControlThinkInt.ControlThinkController.IsConnected)
