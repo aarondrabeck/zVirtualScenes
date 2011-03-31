@@ -5,10 +5,11 @@
   * GUI tweaks
   * device count added to zwave devices / scene tab
   * HTTP interface code rebuild
-  * proper shutdown of threads on exit
-  * control think stick repolling and reloading collision detection  
-  * delete key detection for scenes and actions
-  * tabindex and focus optimized on all popup forms prompts 
+  * Proper shutdown of threads on exit
+  * Control think stick repolling and reloading collision detection  
+  * Delete key detection for scenes and actions
+  * Tabindex and focus optimized on all popup forms prompts 
+  * ctrl-s Save
 
 *zVirtualScenes ver 1.5.4100.35835 - 3-24-11*
   * LightSwitch - sort devices a-z option added
