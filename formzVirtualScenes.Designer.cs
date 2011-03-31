@@ -401,27 +401,28 @@ namespace zVirtualScenesApplication
             // saveSettingsToolStripMenuItem
             // 
             this.saveSettingsToolStripMenuItem.Name = "saveSettingsToolStripMenuItem";
-            this.saveSettingsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.saveSettingsToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.saveSettingsToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.saveSettingsToolStripMenuItem.Text = "&Save Settings";
             this.saveSettingsToolStripMenuItem.Click += new System.EventHandler(this.saveSettingsToolStripMenuItem_Click);
             // 
             // forceSaveToolStripMenuItem
             // 
             this.forceSaveToolStripMenuItem.Name = "forceSaveToolStripMenuItem";
-            this.forceSaveToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.forceSaveToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
             this.forceSaveToolStripMenuItem.Text = "&Export Settings...";
             this.forceSaveToolStripMenuItem.Click += new System.EventHandler(this.forceSaveToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(158, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(180, 6);
             // 
             // exitToolStripMenuItem1
             // 
             this.exitToolStripMenuItem1.Name = "exitToolStripMenuItem1";
             this.exitToolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(161, 22);
+            this.exitToolStripMenuItem1.Size = new System.Drawing.Size(183, 22);
             this.exitToolStripMenuItem1.Text = "E&xit";
             this.exitToolStripMenuItem1.Click += new System.EventHandler(this.exitToolStripMenuItem1_Click);
             // 
@@ -436,7 +437,7 @@ namespace zVirtualScenesApplication
             // activateToolStripMenuItem
             // 
             this.activateToolStripMenuItem.Name = "activateToolStripMenuItem";
-            this.activateToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
+            this.activateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.activateToolStripMenuItem.Text = "Activate...";
             this.activateToolStripMenuItem.Click += new System.EventHandler(this.activateToolStripMenuItem_Click);
             // 
@@ -451,7 +452,7 @@ namespace zVirtualScenesApplication
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.settingsToolStripMenuItem.Text = "Settings...";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -703,8 +704,8 @@ namespace zVirtualScenesApplication
             // 
             // textBox_TaskName
             // 
-            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_TaskName.Location = new System.Drawing.Point(132, 16);
             this.textBox_TaskName.Name = "textBox_TaskName";
             this.textBox_TaskName.Size = new System.Drawing.Size(247, 20);
@@ -742,8 +743,8 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_ActionsTask
             // 
-            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_ActionsTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_ActionsTask.FormattingEnabled = true;
             this.comboBox_ActionsTask.Location = new System.Drawing.Point(102, 72);
@@ -753,8 +754,8 @@ namespace zVirtualScenesApplication
             // 
             // dateTimePickerStartTask
             // 
-            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dateTimePickerStartTask.CustomFormat = "dddd,MMMM d, yyyy \'at\' h:mm:ss tt";
             this.dateTimePickerStartTask.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateTimePickerStartTask.Location = new System.Drawing.Point(62, 105);
@@ -764,8 +765,8 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_FrequencyTask
             // 
-            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_FrequencyTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_FrequencyTask.FormattingEnabled = true;
             this.comboBox_FrequencyTask.Location = new System.Drawing.Point(152, 42);
@@ -968,9 +969,9 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.AllColumns.Add(this.SetPointCol);
             this.dataListViewDevices.AllColumns.Add(this.currStateCol);
             this.dataListViewDevices.AllColumns.Add(this.GroupCol);
-            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDevices.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataListViewDevices.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.NodeCol,
@@ -1141,9 +1142,9 @@ namespace zVirtualScenesApplication
             this.dataListViewActions.AllColumns.Add(this.ColType);
             this.dataListViewActions.AllColumns.Add(this.ColName);
             this.dataListViewActions.AllColumns.Add(this.ColAction);
-            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewActions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewActions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColType,

@@ -145,6 +145,7 @@
             this.txtb_GroupName.Name = "txtb_GroupName";
             this.txtb_GroupName.Size = new System.Drawing.Size(250, 20);
             this.txtb_GroupName.TabIndex = 2;
+            this.txtb_GroupName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtb_GroupName_KeyDown);
             // 
             // label1
             // 

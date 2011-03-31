@@ -143,9 +143,14 @@ namespace zVirtualScenesApplication
         private void txtb_deviceName_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-            {
                 btn_SaveOptions_Click((object)sender, (EventArgs)e);
-            }
+        }
+
+        private void txtb_GroupName_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)            
+                btn_SaveOptions_Click((object)sender, (EventArgs)e);
+            
         }
 
 
