@@ -1,3 +1,4 @@
+*zVirtualScenes ver 1.5.4108.26182 - 4-01-11*
   * Changed Lat/Long to Decimal notation
   * Settings are in a seperate form
   * Prompted to save all settings on exit
