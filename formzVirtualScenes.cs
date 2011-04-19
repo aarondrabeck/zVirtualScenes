@@ -404,10 +404,16 @@ namespace zVirtualScenesApplication
                         xmlwritersettings.NewLineHandling = NewLineHandling.None;
                         xmlwritersettings.Indent = false;
 
-                        StringWriter devicetoXML = new StringWriter();
-                        XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(device.GetType());
-                        DevicetoXML.Serialize(XmlWriter.Create(devicetoXML, xmlwritersettings), device);                        
-                        SocketInt.BroadcastMessage(devicetoXML.ToString());
+                        //send as device list
+                        //later we can group updates
+                        List<ZWaveDevice> updatedDevices = new List<ZWaveDevice>();
+                        updatedDevices.Add(device);
+
+                        StringWriter devices = new StringWriter();
+                        XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(updatedDevices.GetType());
+                        DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), updatedDevices);
+                        SocketInt.BroadcastMessage(devices.ToString());                      
+                        
                     }
                 }
                 dataListViewDevices.DataSource = null;

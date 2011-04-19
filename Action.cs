@@ -202,7 +202,7 @@ namespace zVirtualScenesApplication
                                     }
                                     else
                                     {
-                                        device.Level = 1;
+                                        device.Level = 255;
                                         System.Threading.Thread.Sleep(this.MomentaryTimespan * 1000);
                                         device.Level = 0;
                                         return new ActionResult { ResultType = ActionResult.ResultTypes.Success, Description = "Ran Action. '" + this.Name + "' toggled on momentarily." };

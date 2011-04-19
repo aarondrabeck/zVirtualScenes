@@ -83,7 +83,7 @@ namespace zVirtualScenesApplication
         private bool UpdateBinarySwitchAction()
         {
             //ERROR CHECK INPUTS
-            theAction.Level = (byte)comboBoxBinaryONOFF.SelectedIndex;
+            theAction.Level = (byte)(comboBoxBinaryONOFF.SelectedIndex == 0 ? 0 : 255);
             theAction.SkipWhenDark = checkBoxSkipDark.Checked;
             theAction.SkipWhenLight = checkBoxSkipLight.Checked;
             return true;
