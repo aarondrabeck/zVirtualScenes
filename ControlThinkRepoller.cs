@@ -63,6 +63,8 @@ namespace zVirtualScenesApplication
             //Make sure the stick is connected.
             if (zVirtualScenesMain.ControlThinkInt.ControlThinkController.IsConnected)
             {
+
+                zVirtualScenesMain.ControlThinkInt.ControlThinkController.SynchronizingObject = this;
                 //For each device on Control Stick 
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in zVirtualScenesMain.ControlThinkInt.ControlThinkController.Devices)
                 {

@@ -185,6 +185,8 @@ namespace zVirtualScenesApplication
             {                
                 if (formzVirtualScenesMAIN.ControlThinkInt.ControlThinkController.IsConnected)
                 {
+
+                    formzVirtualScenesMAIN.ControlThinkInt.ControlThinkController.SynchronizingObject = this;
                     #region BinarySwitchs
 
                     if (this.ZWaveType == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch)
