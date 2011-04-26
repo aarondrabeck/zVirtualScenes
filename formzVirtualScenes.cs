@@ -105,7 +105,7 @@ namespace zVirtualScenesApplication
 
             //Query USB for Devices
             ControlThinkInt.formzVirtualScenesMain = this;
-            ControlThinkInt.ConnectAndLoadDevices();
+            ControlThinkInt.ConnectAndFindDevices();
 
             //Bind data to GUI elements
             // Devices
@@ -1303,7 +1303,7 @@ namespace zVirtualScenesApplication
 
         private void findNewDevicesToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            ControlThinkInt.ConnectAndLoadDevices();
+            ControlThinkInt.ConnectAndFindDevices();
         }
 
         private void dataListViewDevices_CellRightClick(object sender, CellRightClickEventArgs e)
@@ -1340,7 +1340,7 @@ namespace zVirtualScenesApplication
 
         private void findNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ControlThinkInt.ConnectAndLoadDevices();
+            ControlThinkInt.ConnectAndFindDevices();
         }
 
         /// <summary>
@@ -2010,6 +2010,11 @@ namespace zVirtualScenesApplication
         }
 
         #endregion 
+
+        private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            refresher.RePollDevices();
+        }
 
        
         

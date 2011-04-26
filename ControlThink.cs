@@ -32,109 +32,79 @@ namespace zVirtualScenesApplication
 
         private void ReloadDevicesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-             ControlThinkGetDevicesResult result = new ControlThinkGetDevicesResult();
+            BindingList<ZWaveDevice> DevicesFound = new BindingList<ZWaveDevice>();
 
-             if (formzVirtualScenesMain.refresher.isRefreshing)
-             {
-                 result.NoErrors = false;
-                 result.fatalError = true;
-                 result.ErrorDescription = "Cannot refresh when repolling. Try agian later."; 
-             }  
+             if (formzVirtualScenesMain.refresher.isRefreshing)             
+                 throw new Exception("Cannot refresh when repolling. Try agian later.");             
 
             //Connect to ThinkStick
-            if (!ControlThinkController.IsConnected & !result.fatalError)
+            if (!ControlThinkController.IsConnected)
             {
-                try
-                {
-                    //throw new System.Exception("error connectings");
                     ControlThinkController.SynchronizingObject = this;                    
                     ControlThinkController.Connect();                    
-                }
-                catch (Exception ex)
-                {
-                    result.NoErrors = false;
-                    result.fatalError = true;
-                    result.ErrorDescription = ex.Message;
-                }
             }
 
             //Get ZWave Devices
-            if (ControlThinkController.IsConnected && result.NoErrors)
+            if (ControlThinkController.IsConnected)
             {
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
                 {
-                    //Store device info for speed 
-                    ControlThink.ZWave.Devices.ZWaveDevice DeviceFoundOnNetowrk = device;
-
                     try
                     {
-                        //throw new System.Exception("error test");
-                        formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Found " + DeviceFoundOnNetowrk.ToString() + ".", LOG_INTERFACE);
+                        formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Found " + device.ToString() + ".", LOG_INTERFACE);
 
-                        if (!DeviceFoundOnNetowrk.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
+                        if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers for now...
                         {
                             //Save ControlThink Device to zVirtualScenesDevice
                             ZWaveDevice newDevice = new ZWaveDevice();
                             newDevice.HomeID = ControlThinkController.HomeID;
-                            newDevice.NodeID = DeviceFoundOnNetowrk.NodeID;
-                            newDevice.Level = DeviceFoundOnNetowrk.Level;
+                            newDevice.NodeID = device.NodeID;
 
                             //BINARY SWITCHES
-                            if (DeviceFoundOnNetowrk is ControlThink.ZWave.Devices.BinarySwitch)
+                            if (device is ControlThink.ZWave.Devices.BinarySwitch)
                             {
                                 newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.BinarySwitch;
                                 newDevice.Name = "Binary Switch";
                             }
                             //MULTILEVEL
-                            else if (DeviceFoundOnNetowrk is ControlThink.ZWave.Devices.MultilevelSwitch)
+                            else if (device is ControlThink.ZWave.Devices.MultilevelSwitch)
                             {
                                 newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch;
                                 newDevice.Name = "Multi-level Switch";
                             }
                             //Therostats
-                            else if (DeviceFoundOnNetowrk is ControlThink.ZWave.Devices.Thermostat)
+                            else if (device is ControlThink.ZWave.Devices.Thermostat)
                             {
                                 newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.Thermostat;
                                 newDevice.Name = "Thermostat";
-
-                                ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)DeviceFoundOnNetowrk;
-                                newDevice.Temp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
-                                newDevice.CoolPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
-                                newDevice.HeatPoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
-                                newDevice.FanMode = (int)thermostat.ThermostatFanMode;
-                                newDevice.HeatCoolMode = (int)thermostat.ThermostatMode;
-                                newDevice.Level = thermostat.Level;
-                                newDevice.CurrentState = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
                             }
                             else
                             {
-                                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "Device type  " + DeviceFoundOnNetowrk.ToString() + " UNKNOWN.", LOG_INTERFACE);
-                            }                            
-                            result.NewDeviceList.Add(newDevice);                            
+                                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, "Device type  " + device.ToString() + " UNKNOWN.", LOG_INTERFACE);
+                            }
+                            DevicesFound.Add(newDevice);                            
                         }
                     }
                     catch (Exception ex)
                     {
-                        result.NoErrors = false;
-                        result.ErrorDescription = ex.Message;
+                        formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, ex.Message, LOG_INTERFACE);
                     }
                 }                 
             }
-            e.Result = result;
-            return;
+            e.Result = DevicesFound;
         }
 
         private void ReloadDevicesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            ControlThinkGetDevicesResult result = (ControlThinkGetDevicesResult)e.Result;
-            if (result != null && !result.fatalError)
+            if (e.Error != null)
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, e.Error.Message, LOG_INTERFACE);
+            else
             {
-                if(!result.NoErrors)
-                    formzVirtualScenesMain.AddLogEntry(UrgencyLevel.WARNING, result.ErrorDescription, LOG_INTERFACE); 
+                BindingList<ZWaveDevice> DevicesFound = (BindingList<ZWaveDevice>)e.Result;
 
                 formzVirtualScenesMain.MasterDevices.Clear();
 
-                foreach (ZWaveDevice newDevice in result.NewDeviceList)
+                foreach (ZWaveDevice newDevice in DevicesFound)
                 {
                     //Overwirte Name from the Custom Device Saved Data if present.
                     foreach (ZWaveDeviceUserSettings PreviouslySavedDevice in formzVirtualScenesMain.SavedZWaveDeviceUserSettings)
@@ -150,28 +120,32 @@ namespace zVirtualScenesApplication
                             newDevice.ShowInLightSwitchGUI = PreviouslySavedDevice.ShowInLightSwitchGUI;
                             newDevice.MomentaryOnMode = PreviouslySavedDevice.MomentaryOnMode;
                             newDevice.MomentaryTimespan = PreviouslySavedDevice.MomentaryTimespan;
-                            if(newDevice.GroupName != "")
+                            if (newDevice.GroupName != "")
                                 formzVirtualScenesMain.groups.Add(newDevice.GroupName);
                         }
                     }
-
                     formzVirtualScenesMain.MasterDevices.Add(newDevice);
                 }
                 formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB Loaded " + formzVirtualScenesMain.MasterDevices.Count() + " Devices.", LOG_INTERFACE);
-            }
-            else
-                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, result.ErrorDescription, LOG_INTERFACE); 
-                          
+                formzVirtualScenesMain.refresher.RePollDevices();
+            }                          
         }
-
-        public void ConnectAndLoadDevices()
+        
+        public void ConnectAndFindDevices()
         {
             if (ReloadDevicesWorker.IsBusy)
-                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink Reload Already Running.", LOG_INTERFACE);
-            else
             {
-                ReloadDevicesWorker.RunWorkerAsync();
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink Reload Already Running.", LOG_INTERFACE);
+                return;
             }
+            if(formzVirtualScenesMain.refresher.isRefreshing)
+            {
+                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB is busy refreshing, cannot look for new devices at this time.", LOG_INTERFACE);
+                return;
+            }
+             
+                ReloadDevicesWorker.RunWorkerAsync();
+            
         }
 
         /// <summary>
@@ -205,20 +179,6 @@ namespace zVirtualScenesApplication
             catch
             {
             }
-        }
-    }
-
-    public class ControlThinkGetDevicesResult
-    {
-        public bool NoErrors;
-        public bool fatalError;
-        public BindingList<ZWaveDevice> NewDeviceList = new BindingList<ZWaveDevice>();
-        public string ErrorDescription; 
-
-        public ControlThinkGetDevicesResult()
-        {
-            fatalError = false; 
-            NoErrors = true; 
         }
     }
 }

@@ -437,7 +437,7 @@ namespace zVirtualScenesApplication
             // activateToolStripMenuItem
             // 
             this.activateToolStripMenuItem.Name = "activateToolStripMenuItem";
-            this.activateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.activateToolStripMenuItem.Size = new System.Drawing.Size(126, 22);
             this.activateToolStripMenuItem.Text = "Activate...";
             this.activateToolStripMenuItem.Click += new System.EventHandler(this.activateToolStripMenuItem_Click);
             // 
@@ -452,7 +452,7 @@ namespace zVirtualScenesApplication
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(125, 22);
             this.settingsToolStripMenuItem.Text = "Settings...";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
@@ -462,7 +462,7 @@ namespace zVirtualScenesApplication
             this.findNewDevicesToolStripMenuItem1,
             this.repollAllDevicesToolStripMenuItem});
             this.contextMenuStripDevicesNull.Name = "contextMenuStripDevicesNull";
-            this.contextMenuStripDevicesNull.Size = new System.Drawing.Size(318, 48);
+            this.contextMenuStripDevicesNull.Size = new System.Drawing.Size(318, 70);
             // 
             // findNewDevicesToolStripMenuItem1
             // 
@@ -476,6 +476,7 @@ namespace zVirtualScenesApplication
             this.repollAllDevicesToolStripMenuItem.Name = "repollAllDevicesToolStripMenuItem";
             this.repollAllDevicesToolStripMenuItem.Size = new System.Drawing.Size(317, 22);
             this.repollAllDevicesToolStripMenuItem.Text = "Repoll All Devices";
+            this.repollAllDevicesToolStripMenuItem.Click += new System.EventHandler(this.repollAllDevicesToolStripMenuItem_Click_1);
             // 
             // tabPage2
             // 
