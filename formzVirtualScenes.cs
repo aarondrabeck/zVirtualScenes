@@ -37,7 +37,6 @@ namespace zVirtualScenesApplication
         public XMLSocketInterface SocketInt = new XMLSocketInterface();
         public LightSwitchInterface LightSwitchInt = new LightSwitchInterface();
         public JabberInterface jabber = new JabberInterface();
-        public ControlThinkRepoller refresher = new ControlThinkRepoller();
         private KeyboardHook hook = new KeyboardHook();
         private GrowlInterface growl = new GrowlInterface();
         private NetService netservice = null;
@@ -46,7 +45,7 @@ namespace zVirtualScenesApplication
         //Delegates
         public delegate void LogThisDelegate(UrgencyLevel urgency, string message, string theInterface);
         public delegate void SetlabelSceneRunStatusDelegate(string text);
-        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkRepoller.changeType TypeOfChange);
+        public delegate void DeviceInfoChange_HandlerDelegate(string GlbUniqueID, zVirtualScenesApplication.ControlThinkInterface.changeType TypeOfChange, bool verbose);
         public delegate void onRemoteButtonPressDelegate(string msg, string param1, string param);
         public delegate void RepollDevicesDelegate(byte node = 0);
 
@@ -98,14 +97,11 @@ namespace zVirtualScenesApplication
             //Load XML Saved Settings
             LoadSettingsFromXML();
 
-            //Start Listening for device changes
-            refresher.zVirtualScenesMain = this;
-            refresher.DeviceInfoChange += new ControlThinkRepoller.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);
-            refresher.Start();
-
-            //Query USB for Devices
+            //Query USB for Devices            
             ControlThinkInt.formzVirtualScenesMain = this;
             ControlThinkInt.ConnectAndFindDevices();
+            ControlThinkInt.DeviceInfoChange += new ControlThinkInterface.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);            
+            ControlThinkInt.Start();
 
             //Bind data to GUI elements
             // Devices
@@ -267,155 +263,163 @@ namespace zVirtualScenesApplication
 
         }
 
-        private void DeviceInfoChange_Handler(string GlbUniqueID, ControlThinkRepoller.changeType TypeOfChange)
+        private void DeviceInfoChange_Handler(string GlbUniqueID, ControlThinkInterface.changeType TypeOfChange, bool verbose)
         {
             if (this.InvokeRequired)
-                this.Invoke(new DeviceInfoChange_HandlerDelegate(DeviceInfoChange_Handler), new object[] { GlbUniqueID, TypeOfChange });
+                this.Invoke(new DeviceInfoChange_HandlerDelegate(DeviceInfoChange_Handler), new object[] { GlbUniqueID, TypeOfChange, verbose});
             else
             {
-                foreach (ZWaveDevice device in MasterDevices)
+                //We do not always want the notifications sent 
+                //For example on the first load of devices from the USB stick
+                //all levels will be 0 and change when / if we can poll each device.  In this case
+                //we do not want level changes sent out. 
+                if (verbose)
                 {
-                    if (GlbUniqueID == device.GlbUniqueID())
+                    foreach (ZWaveDevice device in MasterDevices)
                     {
-                        string notification = "Event Notification Error";
-                        string notificationprefix = DateTime.Now.ToString("T") + ": ";
-
-                        if (device.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch && TypeOfChange == ControlThinkRepoller.changeType.LevelChanged)
+                        if (GlbUniqueID == device.GlbUniqueID())
                         {
-                            notification = device.Name + " state changed from " + (device.prevLevel > 0 ? "ON" : "OFF") + " to " + (device.Level > 0 ? "ON" : "OFF") + ".";
+                            string notification = "Event Notification Error";
+                            string notificationprefix = DateTime.Now.ToString("T") + ": ";
 
-                            if (jabber != null && device.SendJabberNotifications)
-                                jabber.SendMessage(notificationprefix + notification);
-
-                            if (growl != null && device.SendGrowlNotifications)
-                                growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Level Changed", notification);
-                        }
-                        if (device.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch && TypeOfChange == ControlThinkRepoller.changeType.LevelChanged)
-                        {
-                            notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";
-
-                            if (jabber != null && device.SendJabberNotifications)
-                                jabber.SendMessage(notificationprefix + notification);
-
-                            if (growl != null && device.SendGrowlNotifications)
-                                growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Level Changed", notification);
-                        }
-                        else if (device.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
-                        {
-                            if (TypeOfChange == ControlThinkRepoller.changeType.TempChanged)
+                            if (device.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch && TypeOfChange == ControlThinkInterface.changeType.LevelChanged)
                             {
-                                notification = device.Name + " temperature changed from " + device.prevTemp + " degrees to " + device.Temp + " degrees.";
-                                string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees.";
+                                notification = device.Name + " state changed from " + (device.prevLevel > 0 ? "ON" : "OFF") + " to " + (device.Level > 0 ? "ON" : "OFF") + ".";
 
-                                if (device.NotificationDetailLevel > 0)
+                                if (jabber != null && device.SendJabberNotifications)
+                                    jabber.SendMessage(notificationprefix + notification);
+
+                                if (growl != null && device.SendGrowlNotifications)
+                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Level Changed", notification);
+                            }
+                            if (device.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch && TypeOfChange == ControlThinkInterface.changeType.LevelChanged)
+                            {
+                                notification = device.Name + " level changed from " + device.prevLevel + " to " + device.Level + ".";
+
+                                if (jabber != null && device.SendJabberNotifications)
+                                    jabber.SendMessage(notificationprefix + notification);
+
+                                if (growl != null && device.SendGrowlNotifications)
+                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Level Changed", notification);
+                            }
+                            else if (device.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                            {
+                                if (TypeOfChange == ControlThinkInterface.changeType.TempChanged)
                                 {
-                                    if (device.Temp >= device.MaxAlertTemp || device.Temp <= device.MinAlertTemp)
+                                    notification = device.Name + " temperature changed from " + device.prevTemp + " degrees to " + device.Temp + " degrees.";
+                                    string urgetnotification = "URGENT! " + device.Name + " temperature is above/below alert temp. Temperature is " + device.Temp + " degrees.";
+
+                                    if (device.NotificationDetailLevel > 0)
                                     {
+                                        if (device.Temp >= device.MaxAlertTemp || device.Temp <= device.MinAlertTemp)
+                                        {
 
-                                        if (growl != null && device.SendGrowlNotifications)
-                                            growl.Notify(GrowlInterface.NOTIFY_TEMP_ALERT, "", "Urgent Temperature Alert!", urgetnotification);
+                                            if (growl != null && device.SendGrowlNotifications)
+                                                growl.Notify(GrowlInterface.NOTIFY_TEMP_ALERT, "", "Urgent Temperature Alert!", urgetnotification);
 
-                                        if (jabber != null && device.SendJabberNotifications)
-                                            jabber.SendMessage(notificationprefix + urgetnotification);
+                                            if (jabber != null && device.SendJabberNotifications)
+                                                jabber.SendMessage(notificationprefix + urgetnotification);
 
-                                        AddLogEntry(UrgencyLevel.INFO, urgetnotification);
+                                            AddLogEntry(UrgencyLevel.INFO, urgetnotification);
+                                        }
                                     }
+
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 1)
+                                        jabber.SendMessage(notificationprefix + notification);
+
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 1)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+
                                 }
+                                if (TypeOfChange == ControlThinkInterface.changeType.CoolPointChanged)
+                                {
+                                    notification = device.Name + " cool point changed from " + device.prevCoolPoint + " to " + device.CoolPoint + ".";
 
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 1)
-                                    jabber.SendMessage(notificationprefix + notification);
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                        jabber.SendMessage(notificationprefix + notification);
 
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 1)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                }
+                                if (TypeOfChange == ControlThinkInterface.changeType.HeatPointChanged)
+                                {
+                                    notification = device.Name + " heat point changed from " + device.prevHeatPoint + " to " + device.HeatPoint + ".";
 
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                        jabber.SendMessage(notificationprefix + notification);
+
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                }
+                                if (TypeOfChange == ControlThinkInterface.changeType.FanModeChanged)
+                                {
+                                    notification = device.Name + " fan mode changed from " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), device.prevFanMode) + " to " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), device.FanMode) + ".";
+
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                        jabber.SendMessage(notificationprefix + notification);
+
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                }
+                                if (TypeOfChange == ControlThinkInterface.changeType.HeatCoolModeChanged)
+                                {
+                                    notification = device.Name + " mode changed from " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), device.prevHeatCoolMode) + " to " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), device.HeatCoolMode) + ".";
+
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                        jabber.SendMessage(notificationprefix + notification);
+
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                }
+                                if (TypeOfChange == ControlThinkInterface.changeType.LevelChanged)
+                                {
+                                    notification = device.Name + " energy state changed from " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), device.prevLevel) + " to " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), device.Level) + ".";
+
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
+                                        jabber.SendMessage(notificationprefix + notification);
+
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                }
+                                if (TypeOfChange == ControlThinkInterface.changeType.CurrentStateChanged)
+                                {
+                                    notification = device.Name + " changed state from " + device.prevCurrentState + " to " + device.CurrentState + ".";
+
+                                    if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 3)
+                                        jabber.SendMessage(notificationprefix + notification);
+
+                                    if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 3)
+                                        growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
+                                }
                             }
-                            if (TypeOfChange == ControlThinkRepoller.changeType.CoolPointChanged)
-                            {
-                                notification = device.Name + " cool point changed from " + device.prevCoolPoint + " to " + device.CoolPoint + ".";
+                            AddLogEntry(UrgencyLevel.INFO, notification, ControlThinkInterface.LOG_INTERFACE);
+                            labelLastEvent.Text = notification;
 
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
-                                    jabber.SendMessage(notificationprefix + notification);
+                            LightSwitchInt.BroadcastMessage("UPDATE~" + LightSwitchInt.TranslateDeviceToLightSwitchString(device) + Environment.NewLine);
+                            LightSwitchInt.BroadcastMessage("ENDLIST" + Environment.NewLine);
 
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
-                            }
-                            if (TypeOfChange == ControlThinkRepoller.changeType.HeatPointChanged)
-                            {
-                                notification = device.Name + " heat point changed from " + device.prevHeatPoint + " to " + device.HeatPoint + ".";
+                            //Send XML event notification
+                            SocketInt.BroadcastMessage("<event type=\"DeviceStateChange\" alertlevel=\"Success\" description=\"" + notification + "\" />");
 
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
-                                    jabber.SendMessage(notificationprefix + notification);
+                            //Send full XML device to Socket Clients so they can easily replace device to get new levels
+                            XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
+                            xmlwritersettings.NewLineHandling = NewLineHandling.None;
+                            xmlwritersettings.Indent = false;
 
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
-                            }
-                            if (TypeOfChange == ControlThinkRepoller.changeType.FanModeChanged)
-                            {
-                                notification = device.Name + " fan mode changed from " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), device.prevFanMode) + " to " + Enum.GetName(typeof(ZWaveDevice.ThermostatFanMode), device.FanMode) + ".";
+                            //send as device list
+                            //later we can group updates
+                            List<ZWaveDevice> updatedDevices = new List<ZWaveDevice>();
+                            updatedDevices.Add(device);
 
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
-                                    jabber.SendMessage(notificationprefix + notification);
+                            StringWriter devices = new StringWriter();
+                            XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(updatedDevices.GetType());
+                            DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), updatedDevices);
+                            SocketInt.BroadcastMessage(devices.ToString());
 
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
-                            }
-                            if (TypeOfChange == ControlThinkRepoller.changeType.HeatCoolModeChanged)
-                            {
-                                notification = device.Name + " mode changed from " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), device.prevHeatCoolMode) + " to " + Enum.GetName(typeof(ZWaveDevice.ThermostatMode), device.HeatCoolMode) + ".";
-
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
-                                    jabber.SendMessage(notificationprefix + notification);
-
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
-                            }
-                            if (TypeOfChange == ControlThinkRepoller.changeType.LevelChanged)
-                            {
-                                notification = device.Name + " energy state changed from " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), device.prevLevel) + " to " + Enum.GetName(typeof(ZWaveDevice.EnergyMode), device.Level) + ".";
-
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 2)
-                                    jabber.SendMessage(notificationprefix + notification);
-
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 2)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
-                            }
-                            if (TypeOfChange == ControlThinkRepoller.changeType.CurrentStateChanged)
-                            {
-                                notification = device.Name + " changed state from " + device.prevCurrentState + " to " + device.CurrentState + ".";
-
-                                if (jabber != null && device.SendJabberNotifications && device.NotificationDetailLevel > 3)
-                                    jabber.SendMessage(notificationprefix + notification);
-
-                                if (growl != null && device.SendGrowlNotifications && device.NotificationDetailLevel > 3)
-                                    growl.Notify(GrowlInterface.NOTIFY_DEVICE_LEVEL_CHANGE, "", "Device Level Changed", notification);
-                            }
                         }
-                        AddLogEntry(UrgencyLevel.INFO, notification, ControlThinkRepoller.LOG_INTERFACE);
-                        labelLastEvent.Text = notification;
-
-                        LightSwitchInt.BroadcastMessage("UPDATE~" + LightSwitchInt.TranslateDeviceToLightSwitchString(device) + Environment.NewLine);
-                        LightSwitchInt.BroadcastMessage("ENDLIST" + Environment.NewLine);
-
-                        //Send XML event notification
-                        SocketInt.BroadcastMessage("<event type=\"DeviceStateChange\" alertlevel=\"Success\" description=\"" + notification + "\" />");
-
-                        //Send full XML device to Socket Clients so they can easily replace device to get new levels
-                        XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
-                        xmlwritersettings.NewLineHandling = NewLineHandling.None;
-                        xmlwritersettings.Indent = false;
-
-                        //send as device list
-                        //later we can group updates
-                        List<ZWaveDevice> updatedDevices = new List<ZWaveDevice>();
-                        updatedDevices.Add(device);
-
-                        StringWriter devices = new StringWriter();
-                        XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(updatedDevices.GetType());
-                        DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), updatedDevices);
-                        SocketInt.BroadcastMessage(devices.ToString());                      
-                        
                     }
                 }
+                
                 dataListViewDevices.DataSource = null;
                 dataListViewDevices.DataSource = MasterDevices;
             }
@@ -1328,14 +1332,14 @@ namespace zVirtualScenesApplication
         {
             if (dataListViewDevices.SelectedObjects.Count > 0)
                 foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
-                    refresher.RePollDevices(selecteddevice.NodeID);
+                    ControlThinkInt.RepollDevices(selecteddevice.NodeID);
             else
                 MessageBox.Show("Please select at least one device.", ProgramName);
         }
 
-        private void repollAllDevicesToolStripMenuItem_Click(object sender, EventArgs e)
+        private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            refresher.RePollDevices();
+            ControlThinkInt.RepollDevices();
         }
 
         private void findNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1488,7 +1492,7 @@ namespace zVirtualScenesApplication
             if (this.InvokeRequired)
                 this.Invoke(new RepollDevicesDelegate(RepollDevices), new object[] { node });
             else
-                refresher.RePollDevices(node);
+                ControlThinkInt.RepollDevices(node);
         }
 
         #endregion
@@ -2010,13 +2014,6 @@ namespace zVirtualScenesApplication
         }
 
         #endregion 
-
-        private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
-        {
-            refresher.RePollDevices();
-        }
-
-       
         
     }
 }

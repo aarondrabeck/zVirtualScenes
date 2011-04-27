@@ -5,5 +5,17 @@
     <Setting Name="WindowGeometry" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="SpiltContainer1Distance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">200</Value>
+    </Setting>
+    <Setting Name="SpiltContainer2Distance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">375</Value>
+    </Setting>
+    <Setting Name="SpiltContainer3Distance" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">187</Value>
+    </Setting>
+    <Setting Name="MainFormLocation" Type="System.Drawing.Point" Scope="User">
+      <Value Profile="(Default)">0, 0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

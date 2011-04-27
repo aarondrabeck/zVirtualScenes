@@ -462,7 +462,7 @@ namespace zVirtualScenesApplication
             this.findNewDevicesToolStripMenuItem1,
             this.repollAllDevicesToolStripMenuItem});
             this.contextMenuStripDevicesNull.Name = "contextMenuStripDevicesNull";
-            this.contextMenuStripDevicesNull.Size = new System.Drawing.Size(318, 70);
+            this.contextMenuStripDevicesNull.Size = new System.Drawing.Size(318, 48);
             // 
             // findNewDevicesToolStripMenuItem1
             // 
@@ -559,6 +559,7 @@ namespace zVirtualScenesApplication
             // splitContainer2
             // 
             this.splitContainer2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.splitContainer2.DataBindings.Add(new System.Windows.Forms.Binding("SplitterDistance", global::zVirtualScenesApplication.Properties.Settings.Default, "SpiltContainer2Distance", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.splitContainer2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer2.Location = new System.Drawing.Point(3, 3);
             this.splitContainer2.Name = "splitContainer2";
@@ -585,7 +586,7 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.Controls.Add(this.groupBox_Weekly);
             this.splitContainer2.Panel2MinSize = 325;
             this.splitContainer2.Size = new System.Drawing.Size(770, 457);
-            this.splitContainer2.SplitterDistance = 375;
+            this.splitContainer2.SplitterDistance = global::zVirtualScenesApplication.Properties.Settings.Default.SpiltContainer2Distance;
             this.splitContainer2.TabIndex = 47;
             // 
             // dataListTasks
@@ -705,8 +706,8 @@ namespace zVirtualScenesApplication
             // 
             // textBox_TaskName
             // 
-            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_TaskName.Location = new System.Drawing.Point(132, 16);
             this.textBox_TaskName.Name = "textBox_TaskName";
             this.textBox_TaskName.Size = new System.Drawing.Size(247, 20);
@@ -744,8 +745,8 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_ActionsTask
             // 
-            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_ActionsTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_ActionsTask.FormattingEnabled = true;
             this.comboBox_ActionsTask.Location = new System.Drawing.Point(102, 72);
@@ -755,8 +756,8 @@ namespace zVirtualScenesApplication
             // 
             // dateTimePickerStartTask
             // 
-            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dateTimePickerStartTask.CustomFormat = "dddd,MMMM d, yyyy \'at\' h:mm:ss tt";
             this.dateTimePickerStartTask.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateTimePickerStartTask.Location = new System.Drawing.Point(62, 105);
@@ -766,8 +767,8 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_FrequencyTask
             // 
-            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_FrequencyTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_FrequencyTask.FormattingEnabled = true;
             this.comboBox_FrequencyTask.Location = new System.Drawing.Point(152, 42);
@@ -914,6 +915,7 @@ namespace zVirtualScenesApplication
             // splitContainer1
             // 
             this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer1.DataBindings.Add(new System.Windows.Forms.Binding("SplitterDistance", global::zVirtualScenesApplication.Properties.Settings.Default, "SpiltContainer1Distance", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(3, 3);
             this.splitContainer1.Name = "splitContainer1";
@@ -934,7 +936,7 @@ namespace zVirtualScenesApplication
             this.splitContainer1.Panel2MinSize = 100;
             this.splitContainer1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.splitContainer1.Size = new System.Drawing.Size(770, 457);
-            this.splitContainer1.SplitterDistance = 200;
+            this.splitContainer1.SplitterDistance = global::zVirtualScenesApplication.Properties.Settings.Default.SpiltContainer1Distance;
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 33;
             // 
@@ -970,9 +972,9 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.AllColumns.Add(this.SetPointCol);
             this.dataListViewDevices.AllColumns.Add(this.currStateCol);
             this.dataListViewDevices.AllColumns.Add(this.GroupCol);
-            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDevices.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataListViewDevices.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.NodeCol,
@@ -1071,6 +1073,7 @@ namespace zVirtualScenesApplication
             // splitContainer3
             // 
             this.splitContainer3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.splitContainer3.DataBindings.Add(new System.Windows.Forms.Binding("SplitterDistance", global::zVirtualScenesApplication.Properties.Settings.Default, "SpiltContainer3Distance", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.splitContainer3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer3.Location = new System.Drawing.Point(0, 0);
             this.splitContainer3.Name = "splitContainer3";
@@ -1090,7 +1093,7 @@ namespace zVirtualScenesApplication
             this.splitContainer3.Panel2.Controls.Add(this.labelSceneRunStatus);
             this.splitContainer3.Panel2MinSize = 500;
             this.splitContainer3.Size = new System.Drawing.Size(770, 256);
-            this.splitContainer3.SplitterDistance = 187;
+            this.splitContainer3.SplitterDistance = global::zVirtualScenesApplication.Properties.Settings.Default.SpiltContainer3Distance;
             this.splitContainer3.TabIndex = 33;
             // 
             // dataListViewScenes
@@ -1143,9 +1146,9 @@ namespace zVirtualScenesApplication
             this.dataListViewActions.AllColumns.Add(this.ColType);
             this.dataListViewActions.AllColumns.Add(this.ColName);
             this.dataListViewActions.AllColumns.Add(this.ColAction);
-            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewActions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewActions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColType,
@@ -1261,7 +1264,9 @@ namespace zVirtualScenesApplication
             this.ClientSize = new System.Drawing.Size(784, 513);
             this.Controls.Add(this.MainTabControl);
             this.Controls.Add(this.menuStrip1);
+            this.DataBindings.Add(new System.Windows.Forms.Binding("Location", global::zVirtualScenesApplication.Properties.Settings.Default, "MainFormLocation", true, System.Windows.Forms.DataSourceUpdateMode.OnPropertyChanged));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Location = global::zVirtualScenesApplication.Properties.Settings.Default.MainFormLocation;
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(800, 551);
             this.Name = "formzVirtualScenes";

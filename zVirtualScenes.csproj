@@ -129,7 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Action.cs" />
-    <Compile Include="ControlThink.cs" />
+    <Compile Include="ControlThinkInterface.cs" />
     <Compile Include="uc_setting_lightswitch.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -233,7 +233,6 @@
       <DependentUpon>formPropertiesScene.cs</DependentUpon>
     </Compile>
     <Compile Include="JabberInterface.cs" />
-    <Compile Include="ControlThinkRepoller.cs" />
     <Compile Include="LightSwitchInterface.cs" />
     <Compile Include="ZWaveDeviceUserSettings.cs" />
     <Compile Include="HttpProcessor.cs" />

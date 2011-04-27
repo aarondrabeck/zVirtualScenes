@@ -58,7 +58,7 @@ namespace zVirtualScenesApplication
                 if (formzVirtualScenesMain.zVScenesSettings.PollingInterval < 0)
                     throw new Exception("");
 
-                formzVirtualScenesMain.refresher.UpdateInterval();
+                formzVirtualScenesMain.ControlThinkInt.UpdateInterval();
             }
             catch
             {
