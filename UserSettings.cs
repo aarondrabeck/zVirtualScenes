@@ -8,6 +8,12 @@ namespace zVirtualScenesApplication
     public class UserSettings
     {
         //GENERAL SETTINGS
+        public enum interfaces
+        {
+            controlthinkUSB,
+            OpenZwave
+        }
+        public interfaces zvs_interface { get; set; }
         public int PollingInterval { get; set; }
         public int LongLinesLimit { get; set; }
 
