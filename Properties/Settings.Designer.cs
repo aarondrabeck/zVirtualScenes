@@ -82,5 +82,221 @@ namespace zVirtualScenesApplication.Properties {
                 this["MainFormLocation"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("45")]
+        public int NodeWidth {
+            get {
+                return ((int)(this["NodeWidth"]));
+            }
+            set {
+                this["NodeWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int nameWidth {
+            get {
+                return ((int)(this["nameWidth"]));
+            }
+            set {
+                this["nameWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        public int levelWidth {
+            get {
+                return ((int)(this["levelWidth"]));
+            }
+            set {
+                this["levelWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("40")]
+        public int levelmeterWidth {
+            get {
+                return ((int)(this["levelmeterWidth"]));
+            }
+            set {
+                this["levelmeterWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public int modeWidth {
+            get {
+                return ((int)(this["modeWidth"]));
+            }
+            set {
+                this["modeWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public int fanmodeWidth {
+            get {
+                return ((int)(this["fanmodeWidth"]));
+            }
+            set {
+                this["fanmodeWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("140")]
+        public int SetPointColWidth {
+            get {
+                return ((int)(this["SetPointColWidth"]));
+            }
+            set {
+                this["SetPointColWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public int currStateWidth {
+            get {
+                return ((int)(this["currStateWidth"]));
+            }
+            set {
+                this["currStateWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("110")]
+        public int GroupColWidth {
+            get {
+                return ((int)(this["GroupColWidth"]));
+            }
+            set {
+                this["GroupColWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("110")]
+        public int ColNameWidth {
+            get {
+                return ((int)(this["ColNameWidth"]));
+            }
+            set {
+                this["ColNameWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("380")]
+        public int ColActionwidth {
+            get {
+                return ((int)(this["ColActionwidth"]));
+            }
+            set {
+                this["ColActionwidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("185")]
+        public int taskWidth {
+            get {
+                return ((int)(this["taskWidth"]));
+            }
+            set {
+                this["taskWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("52")]
+        public int enabledWidth {
+            get {
+                return ((int)(this["enabledWidth"]));
+            }
+            set {
+                this["enabledWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("120")]
+        public int freqWidth {
+            get {
+                return ((int)(this["freqWidth"]));
+            }
+            set {
+                this["freqWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
+        public int datetimeWidth {
+            get {
+                return ((int)(this["datetimeWidth"]));
+            }
+            set {
+                this["datetimeWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
+        public int UrgencyWidth {
+            get {
+                return ((int)(this["UrgencyWidth"]));
+            }
+            set {
+                this["UrgencyWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int interfaceWidth {
+            get {
+                return ((int)(this["interfaceWidth"]));
+            }
+            set {
+                this["interfaceWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("505")]
+        public int descWidth {
+            get {
+                return ((int)(this["descWidth"]));
+            }
+            set {
+                this["descWidth"] = value;
+            }
+        }
     }
 }

@@ -1,7 +1,8 @@
 *zVirtualScenes ver 1.5.x- 4-18-11*
   * Expanded BinarySwitch Device Compatability. 
-
-
+  * Reworked ControlThink Interface and Repoller
+  * Save splitpanel distances and form position on exit. 
+  
 *zVirtualScenes ver 1.5.4108.26182 - 4-01-11*
   * Changed Lat/Long to Decimal notation
   * Settings are in a seperate form

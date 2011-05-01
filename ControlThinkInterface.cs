@@ -41,7 +41,9 @@ namespace zVirtualScenesApplication
             RepollDevicesWorker = new BackgroundWorker();
             RepollDevicesWorker.DoWork += new DoWorkEventHandler(RepollDevicesWorker_DoWork);
             RepollDevicesWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RepollDevicesWorker_RunWorkerCompleted);
-            RepollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);            
+            
+            RepollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
+            RepollTimer.SynchronizingObject = formzVirtualScenesMain; 
         }       
 
         #region Initial Connection and Discover Zwave Devices on the USB Stick

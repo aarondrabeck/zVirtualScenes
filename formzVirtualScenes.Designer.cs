@@ -115,8 +115,7 @@ namespace zVirtualScenesApplication
             this.textBox_RecurWeeks = new System.Windows.Forms.TextBox();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.label_devicecount = new System.Windows.Forms.Label();
-            this.labelLastEvent = new System.Windows.Forms.Label();
+            this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataListViewDevices = new BrightIdeasSoftware.DataListView();
             this.NodeCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.NameCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -127,6 +126,8 @@ namespace zVirtualScenesApplication
             this.SetPointCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.currStateCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.GroupCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.label_devicecount = new System.Windows.Forms.Label();
+            this.labelLastEvent = new System.Windows.Forms.Label();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.dataListViewScenes = new BrightIdeasSoftware.DataListView();
             this.SceneNamecol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -165,6 +166,10 @@ namespace zVirtualScenesApplication
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).BeginInit();
+            this.splitContainer4.Panel1.SuspendLayout();
+            this.splitContainer4.Panel2.SuspendLayout();
+            this.splitContainer4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewDevices)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
@@ -524,26 +529,26 @@ namespace zVirtualScenesApplication
             // 
             this.dateTimeCol.AspectName = "datetime";
             this.dateTimeCol.Text = "Date & Time";
-            this.dateTimeCol.Width = 150;
+            this.dateTimeCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.datetimeWidth;
             // 
             // urgencyColu
             // 
             this.urgencyColu.AspectName = "urgency";
             this.urgencyColu.Text = "Urgency";
-            this.urgencyColu.Width = 80;
+            this.urgencyColu.Width = global::zVirtualScenesApplication.Properties.Settings.Default.UrgencyWidth;
             // 
             // InterfaceCol
             // 
             this.InterfaceCol.AspectName = "InterfaceName";
             this.InterfaceCol.Text = "Interface";
-            this.InterfaceCol.Width = 100;
+            this.InterfaceCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.interfaceWidth;
             // 
             // descCol
             // 
             this.descCol.AspectName = "description";
             this.descCol.FillsFreeSpace = true;
             this.descCol.Text = "Description";
-            this.descCol.Width = 505;
+            this.descCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.descWidth;
             // 
             // tabPage4
             // 
@@ -624,21 +629,21 @@ namespace zVirtualScenesApplication
             this.olvColumn1.ImageAspectName = "GetIcon";
             this.olvColumn1.IsEditable = false;
             this.olvColumn1.Text = "Task Name";
-            this.olvColumn1.Width = 185;
+            this.olvColumn1.Width = global::zVirtualScenesApplication.Properties.Settings.Default.taskWidth;
             // 
             // EnabledCol
             // 
             this.EnabledCol.AspectName = "isEnabled";
             this.EnabledCol.IsEditable = false;
             this.EnabledCol.Text = "Enabled";
-            this.EnabledCol.Width = 52;
+            this.EnabledCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.enabledWidth;
             // 
             // FreqCol
             // 
             this.FreqCol.AspectName = "FrequencyString";
             this.FreqCol.ImageAspectName = "";
             this.FreqCol.Text = "Frequency";
-            this.FreqCol.Width = 120;
+            this.FreqCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.freqWidth;
             // 
             // pictureBox1
             // 
@@ -706,8 +711,8 @@ namespace zVirtualScenesApplication
             // 
             // textBox_TaskName
             // 
-            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_TaskName.Location = new System.Drawing.Point(132, 16);
             this.textBox_TaskName.Name = "textBox_TaskName";
             this.textBox_TaskName.Size = new System.Drawing.Size(247, 20);
@@ -745,8 +750,8 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_ActionsTask
             // 
-            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_ActionsTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_ActionsTask.FormattingEnabled = true;
             this.comboBox_ActionsTask.Location = new System.Drawing.Point(102, 72);
@@ -756,8 +761,8 @@ namespace zVirtualScenesApplication
             // 
             // dateTimePickerStartTask
             // 
-            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dateTimePickerStartTask.CustomFormat = "dddd,MMMM d, yyyy \'at\' h:mm:ss tt";
             this.dateTimePickerStartTask.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.dateTimePickerStartTask.Location = new System.Drawing.Point(62, 105);
@@ -767,8 +772,8 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_FrequencyTask
             // 
-            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_FrequencyTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_FrequencyTask.FormattingEnabled = true;
             this.comboBox_FrequencyTask.Location = new System.Drawing.Point(152, 42);
@@ -923,9 +928,7 @@ namespace zVirtualScenesApplication
             // 
             // splitContainer1.Panel1
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.label_devicecount);
-            this.splitContainer1.Panel1.Controls.Add(this.labelLastEvent);
-            this.splitContainer1.Panel1.Controls.Add(this.dataListViewDevices);
+            this.splitContainer1.Panel1.Controls.Add(this.splitContainer4);
             this.splitContainer1.Panel1.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.splitContainer1.Panel1MinSize = 75;
             // 
@@ -940,29 +943,29 @@ namespace zVirtualScenesApplication
             this.splitContainer1.SplitterWidth = 1;
             this.splitContainer1.TabIndex = 33;
             // 
-            // label_devicecount
+            // splitContainer4
             // 
-            this.label_devicecount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label_devicecount.AutoSize = true;
-            this.label_devicecount.Location = new System.Drawing.Point(700, 183);
-            this.label_devicecount.Name = "label_devicecount";
-            this.label_devicecount.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.label_devicecount.Size = new System.Drawing.Size(55, 13);
-            this.label_devicecount.TabIndex = 31;
-            this.label_devicecount.Text = "0 Devices";
+            this.splitContainer4.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer4.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.splitContainer4.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer4.Name = "splitContainer4";
+            this.splitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
-            // labelLastEvent
+            // splitContainer4.Panel1
             // 
-            this.labelLastEvent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.labelLastEvent.AutoSize = true;
-            this.labelLastEvent.Location = new System.Drawing.Point(1, 183);
-            this.labelLastEvent.Name = "labelLastEvent";
-            this.labelLastEvent.Size = new System.Drawing.Size(64, 13);
-            this.labelLastEvent.TabIndex = 22;
-            this.labelLastEvent.Text = "Last Event: ";
+            this.splitContainer4.Panel1.Controls.Add(this.dataListViewDevices);
+            // 
+            // splitContainer4.Panel2
+            // 
+            this.splitContainer4.Panel2.Controls.Add(this.label_devicecount);
+            this.splitContainer4.Panel2.Controls.Add(this.labelLastEvent);
+            this.splitContainer4.Size = new System.Drawing.Size(768, 198);
+            this.splitContainer4.SplitterDistance = 168;
+            this.splitContainer4.TabIndex = 32;
             // 
             // dataListViewDevices
             // 
+            this.dataListViewDevices.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
             this.dataListViewDevices.AllColumns.Add(this.NodeCol);
             this.dataListViewDevices.AllColumns.Add(this.NameCol);
             this.dataListViewDevices.AllColumns.Add(this.LevelCol);
@@ -972,9 +975,6 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.AllColumns.Add(this.SetPointCol);
             this.dataListViewDevices.AllColumns.Add(this.currStateCol);
             this.dataListViewDevices.AllColumns.Add(this.GroupCol);
-            this.dataListViewDevices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDevices.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataListViewDevices.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.NodeCol,
@@ -987,6 +987,7 @@ namespace zVirtualScenesApplication
             this.currStateCol,
             this.GroupCol});
             this.dataListViewDevices.DataSource = null;
+            this.dataListViewDevices.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataListViewDevices.EmptyListMsg = "Devices Loading...";
             this.dataListViewDevices.EmptyListMsgFont = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dataListViewDevices.FullRowSelect = true;
@@ -994,12 +995,12 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.HeaderMaximumHeight = 15;
             this.dataListViewDevices.HideSelection = false;
             this.dataListViewDevices.IsSimpleDragSource = true;
-            this.dataListViewDevices.Location = new System.Drawing.Point(2, 2);
+            this.dataListViewDevices.Location = new System.Drawing.Point(0, 0);
             this.dataListViewDevices.Name = "dataListViewDevices";
             this.dataListViewDevices.OwnerDraw = true;
             this.dataListViewDevices.ShowCommandMenuOnRightClick = true;
             this.dataListViewDevices.ShowGroups = false;
-            this.dataListViewDevices.Size = new System.Drawing.Size(767, 176);
+            this.dataListViewDevices.Size = new System.Drawing.Size(768, 168);
             this.dataListViewDevices.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewDevices.TabIndex = 30;
             this.dataListViewDevices.UseCompatibleStateImageBehavior = false;
@@ -1013,62 +1014,84 @@ namespace zVirtualScenesApplication
             this.NodeCol.ImageAspectName = "DeviceIcon";
             this.NodeCol.IsEditable = false;
             this.NodeCol.Text = "ID";
-            this.NodeCol.Width = 45;
+            this.NodeCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.NodeWidth;
             // 
             // NameCol
             // 
             this.NameCol.AspectName = "Name";
             this.NameCol.IsEditable = false;
             this.NameCol.Text = "Name";
-            this.NameCol.Width = 100;
+            this.NameCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.nameWidth;
             // 
             // LevelCol
             // 
             this.LevelCol.AspectName = "GetLevelMeter";
             this.LevelCol.IsEditable = false;
             this.LevelCol.Text = "Level";
+            this.LevelCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.levelWidth;
             // 
             // LevelTextCol
             // 
             this.LevelTextCol.AspectName = "GetLevelText";
             this.LevelTextCol.IsEditable = false;
             this.LevelTextCol.Text = "";
-            this.LevelTextCol.Width = 40;
+            this.LevelTextCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.levelmeterWidth;
             // 
             // ModeCol
             // 
             this.ModeCol.AspectName = "GetMode";
             this.ModeCol.IsEditable = false;
             this.ModeCol.Text = "Mode";
-            this.ModeCol.Width = 80;
+            this.ModeCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.modeWidth;
             // 
             // FanModeCol
             // 
             this.FanModeCol.AspectName = "GetFanMode";
             this.FanModeCol.IsEditable = false;
             this.FanModeCol.Text = "Fan Mode";
-            this.FanModeCol.Width = 80;
+            this.FanModeCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.fanmodeWidth;
             // 
             // SetPointCol
             // 
             this.SetPointCol.AspectName = "GetSetPoint";
             this.SetPointCol.IsEditable = false;
             this.SetPointCol.Text = "Set Point";
-            this.SetPointCol.Width = 140;
+            this.SetPointCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.SetPointColWidth;
             // 
             // currStateCol
             // 
             this.currStateCol.AspectName = "GetCurrentState";
             this.currStateCol.IsEditable = false;
             this.currStateCol.Text = "Currently";
-            this.currStateCol.Width = 80;
+            this.currStateCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.currStateWidth;
             // 
             // GroupCol
             // 
             this.GroupCol.AspectName = "GroupName";
             this.GroupCol.IsEditable = false;
             this.GroupCol.Text = "Groups / Zones";
-            this.GroupCol.Width = 110;
+            this.GroupCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.GroupColWidth;
+            // 
+            // label_devicecount
+            // 
+            this.label_devicecount.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label_devicecount.AutoSize = true;
+            this.label_devicecount.Location = new System.Drawing.Point(709, 7);
+            this.label_devicecount.Name = "label_devicecount";
+            this.label_devicecount.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.label_devicecount.Size = new System.Drawing.Size(55, 13);
+            this.label_devicecount.TabIndex = 31;
+            this.label_devicecount.Text = "0 Devices";
+            // 
+            // labelLastEvent
+            // 
+            this.labelLastEvent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelLastEvent.AutoSize = true;
+            this.labelLastEvent.Location = new System.Drawing.Point(6, 6);
+            this.labelLastEvent.Name = "labelLastEvent";
+            this.labelLastEvent.Size = new System.Drawing.Size(64, 13);
+            this.labelLastEvent.TabIndex = 22;
+            this.labelLastEvent.Text = "Last Event: ";
             // 
             // splitContainer3
             // 
@@ -1146,9 +1169,9 @@ namespace zVirtualScenesApplication
             this.dataListViewActions.AllColumns.Add(this.ColType);
             this.dataListViewActions.AllColumns.Add(this.ColName);
             this.dataListViewActions.AllColumns.Add(this.ColAction);
-            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewActions.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewActions.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColType,
@@ -1183,13 +1206,13 @@ namespace zVirtualScenesApplication
             this.ColName.AspectName = "Name";
             this.ColName.IsEditable = false;
             this.ColName.Text = "Device";
-            this.ColName.Width = 110;
+            this.ColName.Width = global::zVirtualScenesApplication.Properties.Settings.Default.ColNameWidth;
             // 
             // ColAction
             // 
             this.ColAction.AspectName = "ActionToString";
             this.ColAction.Text = "Action(s)";
-            this.ColAction.Width = 380;
+            this.ColAction.Width = global::zVirtualScenesApplication.Properties.Settings.Default.ColActionwidth;
             // 
             // btn_createnonzwaction
             // 
@@ -1298,10 +1321,14 @@ namespace zVirtualScenesApplication
             this.groupBox_Weekly.PerformLayout();
             this.tabPage1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.splitContainer4.Panel1.ResumeLayout(false);
+            this.splitContainer4.Panel2.ResumeLayout(false);
+            this.splitContainer4.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
+            this.splitContainer4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewDevices)).EndInit();
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
@@ -1426,6 +1453,7 @@ namespace zVirtualScenesApplication
         private SplitContainer splitContainer3;
         private Label label_devicecount;
         private ToolStripMenuItem saveSettingsToolStripMenuItem;
+        private SplitContainer splitContainer4;
     }
 }
 

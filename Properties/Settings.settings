@@ -17,5 +17,59 @@
     <Setting Name="MainFormLocation" Type="System.Drawing.Point" Scope="User">
       <Value Profile="(Default)">0, 0</Value>
     </Setting>
+    <Setting Name="NodeWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">45</Value>
+    </Setting>
+    <Setting Name="nameWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="levelWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
+    <Setting Name="levelmeterWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">40</Value>
+    </Setting>
+    <Setting Name="modeWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="fanmodeWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="SetPointColWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">140</Value>
+    </Setting>
+    <Setting Name="currStateWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="GroupColWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">110</Value>
+    </Setting>
+    <Setting Name="ColNameWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">110</Value>
+    </Setting>
+    <Setting Name="ColActionwidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">380</Value>
+    </Setting>
+    <Setting Name="taskWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">185</Value>
+    </Setting>
+    <Setting Name="enabledWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">52</Value>
+    </Setting>
+    <Setting Name="freqWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">120</Value>
+    </Setting>
+    <Setting Name="datetimeWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">150</Value>
+    </Setting>
+    <Setting Name="UrgencyWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="interfaceWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="descWidth" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">505</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
