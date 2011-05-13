@@ -138,6 +138,7 @@ namespace zVirtualScenesApplication
                             newDevice.MomentaryTimespan = PreviouslySavedDevice.MomentaryTimespan;
                             if (newDevice.GroupName != "")
                                 formzVirtualScenesMain.groups.Add(newDevice.GroupName);
+                            newDevice.RepollInterval = PreviouslySavedDevice.RepollInterval;
                         }
                     }
                     formzVirtualScenesMain.MasterDevices.Add(newDevice);
@@ -186,8 +187,8 @@ namespace zVirtualScenesApplication
                                 {
                                     if (!thisDevice.SubscribedToPollTimer)
                                     {
-                                        thisDevice.PollTimer.Elapsed += new System.Timers.ElapsedEventHandler(PollTimer_Elapsed);
-                                        thisDevice.PollTimer._node = device.NodeID;
+                                        thisDevice.PollTimer.RepollingTimerElapsed += new RepollingTimer.RepollingTimerElapsedEventHandler(PollTimer_RepollingTimerElapsed);
+                                        thisDevice.PollTimer.NodeID = thisDevice.NodeID;
                                         thisDevice.SubscribedToPollTimer = true; 
                                     }
 
@@ -198,22 +199,17 @@ namespace zVirtualScenesApplication
                                 {
                                     thisDevice.PollTimer.Stop();
                                 }
-                            }
+                           }
                         }
                     }                    
                 }
             }
         }
 
-        void PollTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        void PollTimer_RepollingTimerElapsed(byte node)
         {
-            RepollingTimer timer = (RepollingTimer)sender;
-            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "TIMER ELASPED. NODE: " + timer._node + ".", LOG_INTERFACE);        
-        }
-
-        private void tmr_Elapsed(object sender, RepollingTimerArgs e)
-        {
-            
+            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "TIMER ELASPED. NODE: " + node + ".", LOG_INTERFACE);
+            repolldevice(node);
         }
 
         private void SubscribetoDeviceEvents()
@@ -225,26 +221,120 @@ namespace zVirtualScenesApplication
                     if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
                     { 
                         device.PollFailed += new ControlThink.ZWave.Devices.ZWaveDevice.PollFailedEventHandler(device_PollFailed);
-                        device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged);
-
-                        //string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
-                        //if (devicetype.Contains("GeneralThermostat"))
-                        //{
-                        //    foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
-                        //    {
-                        //        if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
-                        //        {
-                                    
-                        //        }                              
-                        //    }
-                        //}
+                        device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged);                        
                     }                    
                 }
             }
         }
 
-        #endregion
+        public void repolldevice(byte node)
+        {
+            if (ControlThinkController.IsConnected)
+            {
+                foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
+                {
+                    if (node == 0 || device.NodeID == node)
+                    {
+                        try
+                        {
+                            foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
+                            {
+                                if (thisDevice.NodeID == device.NodeID)
+                                {
+                                    if (thisDevice.Type == ZWaveDevice.ZWaveDeviceTypes.BinarySwitch || thisDevice.Type == ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch)
+                                    {
+                                        //THIS SHOULD TRIGGER A CALL OF THE LEVEL CHANGE EVENT ???
+                                        byte level = device.Level;
+                                    }                                    
+                                    if (thisDevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
+                                    {
+                                        #region DETECT THERMOSTAT SPECIFIC CHANGES
+                                        ControlThink.ZWave.Devices.Specific.GeneralThermostatV2 thermostat = (ControlThink.ZWave.Devices.Specific.GeneralThermostatV2)device;
 
+                                        int coolpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
+                                        //If ThermostatSetpoints[x] returns 0 C and gets converted to 32 F recheck to make sure it is the intended figure. 
+                                        //Either the ControlThink Stick or certian thermostats falsely return Heat and Cool points of 32 F, upon a 
+                                        //second query they return the proper value therefor we will requery if we initially get 32
+                                        if (coolpoint == 32)
+                                        {
+                                            Thread.Sleep(200);
+                                            coolpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Cooling1].Temperature.ToFahrenheit();
+                                        }
+
+                                        int heatpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                        if (heatpoint == 32)
+                                        {
+                                            Thread.Sleep(200);
+                                            heatpoint = (int)thermostat.ThermostatSetpoints[ThermostatSetpointType.Heating1].Temperature.ToFahrenheit();
+                                        }
+
+                                        int currenttemp = (int)thermostat.ThermostatTemperature.ToFahrenheit();
+                                        int fanmode = (int)thermostat.ThermostatFanMode;
+                                        int mode = (int)thermostat.ThermostatMode;
+                                        //level = thermostat.Level;
+                                        string currentstate = thermostat.ThermostatOperatingState.ToString() + "-" + thermostat.ThermostatFanMode.ToString();
+
+
+                                        if (thisDevice.Temp != currenttemp)
+                                        {
+                                            thisDevice.prevTemp = thisDevice.Temp; //Save old temp
+                                            thisDevice.Temp = currenttemp; //Save new Temp
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.TempChanged, true); //call event 
+                                        }
+
+                                        if (thisDevice.CoolPoint != coolpoint)
+                                        {
+                                            thisDevice.prevCoolPoint = thisDevice.CoolPoint;
+                                            thisDevice.CoolPoint = coolpoint;
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.CoolPointChanged, true); //call event
+                                        }
+
+                                        if (thisDevice.HeatPoint != heatpoint)
+                                        {
+                                            thisDevice.prevHeatPoint = thisDevice.HeatPoint;
+                                            thisDevice.HeatPoint = heatpoint;
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.HeatPointChanged, true); //call event
+                                        }
+
+                                        if (thisDevice.FanMode != fanmode)
+                                        {
+                                            thisDevice.prevFanMode = thisDevice.FanMode;
+                                            thisDevice.FanMode = fanmode;
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.FanModeChanged, true); //call event
+                                        }
+
+                                        if (thisDevice.HeatCoolMode != mode)
+                                        {
+                                            thisDevice.prevHeatCoolMode = thisDevice.HeatCoolMode;
+                                            thisDevice.HeatCoolMode = mode;
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.HeatCoolModeChanged, true); //call event
+                                        }
+
+                                        if (thisDevice.CurrentState != currentstate)
+                                        {
+                                            thisDevice.prevCurrentState = thisDevice.CurrentState;
+                                            thisDevice.CurrentState = currentstate;
+                                            this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.CurrentStateChanged, true); //call event
+                                        }
+                                        #endregion
+                                    }                                    
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Custom Poll Failed. Node: " + device.NodeID + ".", LOG_INTERFACE);                              
+                        }
+                }
+            }
+        }
+
+    
+
+
+        #endregion
+        }
+                
         #region USB Events
 
         //void device_LevelChanged_therm(object sender, LevelChangedEventArgs e)

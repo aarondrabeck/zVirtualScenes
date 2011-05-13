@@ -7,9 +7,9 @@ namespace zVirtualScenesApplication
 {
     public class RepollingTimer : System.Timers.Timer
     {
-        public delegate void RepollingTimerElapsedEventHandler(byte node);
         public event RepollingTimerElapsedEventHandler RepollingTimerElapsed;
-        public byte _node {get;set;}  
+        public delegate void RepollingTimerElapsedEventHandler(byte node);        
+        public byte NodeID {get;set;}  
 
         public RepollingTimer()
         {
@@ -18,7 +18,7 @@ namespace zVirtualScenesApplication
 
         void MyTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            OnRepollingTimerElapsed(_node);           
+            OnRepollingTimerElapsed(NodeID);           
         }
 
         protected virtual void OnRepollingTimerElapsed(byte node)
@@ -26,13 +26,6 @@ namespace zVirtualScenesApplication
             if (RepollingTimerElapsed != null)
                 RepollingTimerElapsed(node);                    
         }
-    }
-
-    public class RepollingTimerArgs
-    {
-       
-
-        public byte node { get; set; }
     }
 }
 

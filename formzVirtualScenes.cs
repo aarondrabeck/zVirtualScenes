@@ -1329,16 +1329,16 @@ namespace zVirtualScenesApplication
 
         private void manuallyRepollToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //if (dataListViewDevices.SelectedObjects.Count > 0)
-               // foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
-                    //TODO: ControlThinkInt.RepollDevices(selecteddevice.NodeID);
-           // else
-              //  MessageBox.Show("Please select at least one device.", ProgramName);
+            if (dataListViewDevices.SelectedObjects.Count > 0)
+                foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
+                    ControlThinkInt.repolldevice(selecteddevice.NodeID);
+            else
+                MessageBox.Show("Please select at least one device.", ProgramName);
         }
 
         private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            //TODO: ControlThinkInt.RepollDevices();
+            ControlThinkInt.repolldevice(0);
         }
 
         private void findNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1490,8 +1490,8 @@ namespace zVirtualScenesApplication
         {
             if (this.InvokeRequired)
                 this.Invoke(new RepollDevicesDelegate(RepollDevices), new object[] { node });
-            //else
-               //TODO: ControlThinkInt.RepollDevices(node);
+            else
+               ControlThinkInt.repolldevice(node);
         }
 
         #endregion
