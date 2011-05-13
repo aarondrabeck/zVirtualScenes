@@ -130,6 +130,9 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="ControlThinkInterface.cs" />
+    <Compile Include="RepollingTimer.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="uc_setting_lightswitch.cs">
       <SubType>UserControl</SubType>
     </Compile>

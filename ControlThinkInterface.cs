@@ -186,7 +186,8 @@ namespace zVirtualScenesApplication
                                 {
                                     if (!thisDevice.SubscribedToPollTimer)
                                     {
-                                        thisDevice.PollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
+                                        thisDevice.PollTimer.Elapsed += new System.Timers.ElapsedEventHandler(PollTimer_Elapsed);
+                                        thisDevice.PollTimer._node = device.NodeID;
                                         thisDevice.SubscribedToPollTimer = true; 
                                     }
 
@@ -204,9 +205,15 @@ namespace zVirtualScenesApplication
             }
         }
 
-        private void tmr_Elapsed(object sender, EventArgs e)
-        {            
-            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO,"TIMER ELASPED. sender: "  + sender.ToString() +  " args" + e.ToString() + ".", LOG_INTERFACE);        
+        void PollTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            RepollingTimer timer = (RepollingTimer)sender;
+            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "TIMER ELASPED. NODE: " + timer._node + ".", LOG_INTERFACE);        
+        }
+
+        private void tmr_Elapsed(object sender, RepollingTimerArgs e)
+        {
+            
         }
 
         private void SubscribetoDeviceEvents()

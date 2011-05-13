@@ -71,7 +71,7 @@ namespace zVirtualScenesApplication
         public bool SubscribedToPollTimer { get; set; }
 
         [XmlIgnore]
-        public System.Timers.Timer PollTimer = new System.Timers.Timer();
+        public RepollingTimer PollTimer = new RepollingTimer();
 
         #endregion
 
