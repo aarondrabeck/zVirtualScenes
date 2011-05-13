@@ -160,8 +160,7 @@ namespace zVirtualScenesApplication
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
                 {
                     if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
-                    {
-                        string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
+                    {                      
 
                         //Look for user set polling levels for this device
                         foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
@@ -179,9 +178,9 @@ namespace zVirtualScenesApplication
                                     device.PollEnabled = false;
                                 }
                             }
-
+                           
                             //Some devices like general thermos need to be polled for more than just level.
-                            if (devicetype.Contains("GeneralThermostat"))
+                            if (thisDevice.Type == ZWaveDevice.ZWaveDeviceTypes.Thermostat)
                             {
                                 if (thisDevice.RepollInterval > 0)
                                 {
@@ -191,7 +190,7 @@ namespace zVirtualScenesApplication
                                         thisDevice.SubscribedToPollTimer = true; 
                                     }
 
-                                    thisDevice.PollTimer.Interval = thisDevice.RepollInterval * 1000;
+                                    thisDevice.PollTimer.Interval = thisDevice.RepollInterval *1000;
                                     thisDevice.PollTimer.Start();
                                 }
                                 else
