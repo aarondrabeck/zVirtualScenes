@@ -66,18 +66,7 @@ namespace zVirtualScenesApplication
         public bool MomentaryOnMode { get; set; }
         public bool SendGrowlNotifications { get; set; }
         public int MomentaryTimespan { get; set; }
-
-
-        public int RepollInterval {
-            get {
-                return this.RepollInterval;
-            }
-
-
-            set { 
-                this.RepollInterval = value;       
-            }
-        }
+        public int RepollInterval { get; set; }
 
         #endregion
 
