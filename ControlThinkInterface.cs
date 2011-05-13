@@ -68,7 +68,7 @@ namespace zVirtualScenesApplication
             //Connect to ThinkStick
             if (!ControlThinkController.IsConnected)
             {
-                    ControlThinkController.SynchronizingObject = this;                    
+                    //ControlThinkController.SynchronizingObject = this;                    
                     ControlThinkController.Connect();                    
             }
 
@@ -93,12 +93,20 @@ namespace zVirtualScenesApplication
                             {
                                 newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.BinarySwitch;
                                 newDevice.Name = "Binary Switch";
+                                device.PollInterval = new TimeSpan(0, 1, 0);
+                                device.PollEnabled = true;
+                                device.PollFailed += new ControlThink.ZWave.Devices.ZWaveDevice.PollFailedEventHandler(device_PollFailed_switch);
+                                device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged_switch);
                             }
                             //MULTILEVEL
                             else if (device is ControlThink.ZWave.Devices.MultilevelSwitch)
                             {
                                 newDevice.Type = ZWaveDevice.ZWaveDeviceTypes.MultiLevelSwitch;
                                 newDevice.Name = "Multi-level Switch";
+                                device.PollInterval = new TimeSpan(0, 1, 0);
+                                device.PollEnabled = true;
+                                device.PollFailed += new ControlThink.ZWave.Devices.ZWaveDevice.PollFailedEventHandler(device_PollFailed_switch);
+                                device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged_switch);
                             }
                             //Therostats
                             else if (device is ControlThink.ZWave.Devices.Thermostat)
@@ -120,6 +128,37 @@ namespace zVirtualScenesApplication
                 }                 
             }
             e.Result = DevicesFound;
+        }
+
+        void device_LevelChanged_switch(object sender, LevelChangedEventArgs e)
+        {
+            ControlThink.ZWave.Devices.ZWaveDevice device = (ControlThink.ZWave.Devices.ZWaveDevice)sender;
+            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ZWave device sent level change notification. Node: " + device.NodeID + " level: " + e.Level + ".", LOG_INTERFACE);
+                        
+            //for each device previously discovered
+            foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
+            {
+                //if Control Stick device == device in memory
+                if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
+                {
+                    #region DETECT LEVEL CHANGES IN ALL DEVICES
+                    byte level = device.Level;
+                    //Check to see if any device state/level has changed.
+                    if (level != thisDevice.Level)
+                    {
+                        thisDevice.prevLevel = thisDevice.Level;
+                        thisDevice.Level = level; //set MasterDeviceList
+                        this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, VerboseRepoll); //call event                                                
+                    }
+                    #endregion
+                }
+            }
+        }
+
+        void device_PollFailed_switch(object sender, PollFailedEventArgs e)
+        {
+            ControlThink.ZWave.Devices.ZWaveDevice device = (ControlThink.ZWave.Devices.ZWaveDevice)sender;
+            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Poll Failed. Node: " + device.NodeID + " property: " + e.PropertyName.ToString() + ".", LOG_INTERFACE);
         }
 
         private void ReloadDevicesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
