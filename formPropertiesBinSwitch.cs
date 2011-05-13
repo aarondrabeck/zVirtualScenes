@@ -55,7 +55,7 @@ namespace zVirtualScenesApplication
             }
 
             //repoll interval
-            if (textBoxRepolling.Text != "" || Convert.ToInt32(textBoxRepolling.Text) >= 0)
+            if (textBoxRepolling.Text != "" && Convert.ToInt32(textBoxRepolling.Text) >= 0)
             {
                 _DeviceToEdit.RepollInterval = Convert.ToInt32(textBoxRepolling.Text);
                 _zVirtualScenesMain.ControlThinkInt.UpdatePollingIntervalsAllDevices();
