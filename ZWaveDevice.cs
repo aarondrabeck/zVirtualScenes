@@ -67,6 +67,7 @@ namespace zVirtualScenesApplication
         public bool SendGrowlNotifications { get; set; }
         public int MomentaryTimespan { get; set; }
         public int RepollInterval { get; set; }
+        public System.Timers.Timer PollTimer = new System.Timers.Timer();
 
         #endregion
 

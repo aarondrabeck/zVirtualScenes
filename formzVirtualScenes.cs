@@ -100,8 +100,7 @@ namespace zVirtualScenesApplication
             //Query USB for Devices            
             ControlThinkInt.formzVirtualScenesMain = this;
             ControlThinkInt.ConnectAndFindDevices();
-            ControlThinkInt.DeviceInfoChange += new ControlThinkInterface.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);            
-            ControlThinkInt.Start();
+            ControlThinkInt.DeviceInfoChange += new ControlThinkInterface.DeviceInfoChangeEventHandler(DeviceInfoChange_Handler);                        
 
             //Bind data to GUI elements
             // Devices
@@ -1330,16 +1329,16 @@ namespace zVirtualScenesApplication
 
         private void manuallyRepollToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dataListViewDevices.SelectedObjects.Count > 0)
-                foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
-                    ControlThinkInt.RepollDevices(selecteddevice.NodeID);
-            else
-                MessageBox.Show("Please select at least one device.", ProgramName);
+            //if (dataListViewDevices.SelectedObjects.Count > 0)
+               // foreach (ZWaveDevice selecteddevice in dataListViewDevices.SelectedObjects)
+                    //TODO: ControlThinkInt.RepollDevices(selecteddevice.NodeID);
+           // else
+              //  MessageBox.Show("Please select at least one device.", ProgramName);
         }
 
         private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            ControlThinkInt.RepollDevices();
+            //TODO: ControlThinkInt.RepollDevices();
         }
 
         private void findNewDevicesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1491,8 +1490,8 @@ namespace zVirtualScenesApplication
         {
             if (this.InvokeRequired)
                 this.Invoke(new RepollDevicesDelegate(RepollDevices), new object[] { node });
-            else
-                ControlThinkInt.RepollDevices(node);
+            //else
+               //TODO: ControlThinkInt.RepollDevices(node);
         }
 
         #endregion

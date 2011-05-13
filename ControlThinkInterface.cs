@@ -21,10 +21,6 @@ namespace zVirtualScenesApplication
         //Repoller
         public delegate void DeviceInfoChangeEventHandler(string GlbUniqueID, changeType TypeOfChange, bool verbose);
         public event DeviceInfoChangeEventHandler DeviceInfoChange;
-        private BackgroundWorker RepollDevicesWorker;
-        private System.Timers.Timer RepollTimer = new System.Timers.Timer();
-        byte RepollNode = 0;
-        private bool VerboseRepoll = false;
 
         public ControlThinkInterface()
         {
@@ -36,14 +32,6 @@ namespace zVirtualScenesApplication
             ControlThinkController.Disconnected += new System.EventHandler(ControlThinkUSBDisconnectEvent);
             ControlThinkController.ControllerNotResponding += new System.EventHandler(ControlThinkUSBNotRespondingEvent);
             ControlThinkController.LevelChanged += new ZWaveController.LevelChangedEventHandler(ControlThinkController_LevelChanged);
-
-            //repoll
-            RepollDevicesWorker = new BackgroundWorker();
-            RepollDevicesWorker.DoWork += new DoWorkEventHandler(RepollDevicesWorker_DoWork);
-            RepollDevicesWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(RepollDevicesWorker_RunWorkerCompleted);
-            
-            RepollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
-            RepollTimer.SynchronizingObject = formzVirtualScenesMain; 
         }       
 
         #region Initial Connection and Discover Zwave Devices on the USB Stick
@@ -60,8 +48,8 @@ namespace zVirtualScenesApplication
 
         private void ReloadDevicesWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (this.RepollDevicesWorker.IsBusy)            
-                throw new Exception("ControlThink USB is busy repolling, cannot look for new devices at this time.");
+            //if (this.RepollDevicesWorker.IsBusy)            
+            //    throw new Exception("ControlThink USB is busy repolling, cannot look for new devices at this time.");
                 
             BindingList<ZWaveDevice> DevicesFound = new BindingList<ZWaveDevice>();            
 
@@ -165,103 +153,6 @@ namespace zVirtualScenesApplication
 
         #region Repoll devices
 
-        public void Start()
-        {
-            //RepollTimer.Interval = formzVirtualScenesMain.zVScenesSettings.PollingInterval * 1000;
-            //RepollTimer.Start();            
-        }
-
-        public void RepollDevices(byte node = 0, bool verbose = true)
-        {
-            //Check if we are already repolling.
-            if (this.RepollDevicesWorker.IsBusy)
-            {
-                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "A request to repoll was called while a previous request was still working.  Consider lowering the repolling interval.", LOG_INTERFACE);
-                return;
-            }
-
-            this.VerboseRepoll = verbose;
-            this.RepollNode = node;
-            RepollDevicesWorker.RunWorkerAsync();
-        }
-
-        private void tmr_Elapsed(object sender, EventArgs e)
-        {
-            RepollDevices();
-        }
-
-        private void RepollDevicesWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            //Check if we are in the middle of loading devices from stick.
-            if (this.ReloadDevicesWorker.IsBusy)
-                throw new Exception("A request to repoll was called while control think stil was reloading devices.");
-
-            //Make sure the stick is connected.
-            if (!this.ControlThinkController.IsConnected)
-                throw new Exception("Cannot repoll, USB stick not connected.");
-
-            int NoResponseErrors = 0;
-            int TimeoutErrors = 0;
-            int OtherErrors = 0;
-            DateTime Start = DateTime.Now;
-
-            //this.ControlThinkController.SynchronizingObject = this;
-            //For each device on Control Stick 
-            foreach (ControlThink.ZWave.Devices.ZWaveDevice device in this.ControlThinkController.Devices)
-            {
-                if (this.RepollNode != 0)  //If a node is sent, only repoll that node.
-                {
-                    if (device.NodeID != this.RepollNode)
-                        continue;
-                }
-
-                try
-                {
-                    //If device type on Control Stick is allowed
-                    //Do not include ZWave controllers for now...
-                    if (!device.ToString().Contains("Controller"))
-                    {
-                        //get type
-                        string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
-
-                        //for each device previously saved in memory
-                        foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
-                        {
-                            //if Control Stick device == device in memory
-                            if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
-                            {
-                               
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message.Contains("timed out"))
-                        TimeoutErrors++;
-                    else if (ex.Message.Contains("did not respond"))
-                        NoResponseErrors++;
-                    else
-                        OtherErrors++;
-                }
-            }
-                
-            //Log this repoll
-            TimeSpan RepollTime = DateTime.Now.Subtract(Start);
-            string formattedTimeSpan = string.Format("{0:D2} m, {1:D2} s, {2:D2} ms", RepollTime.Minutes, RepollTime.Seconds, RepollTime.Milliseconds);
-            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "Repoll finished in " + formattedTimeSpan + ". (" + TimeoutErrors + " timeout, " + NoResponseErrors + " non-response, " + OtherErrors + " crital error, verbose " + (this.VerboseRepoll ? "Yes" : "No") +" )", LOG_INTERFACE);
-        }
-
-        private void RepollDevicesWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Error != null)
-                formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, e.Error.Message, LOG_INTERFACE);
-            else
-            { }            
-        }
-
-        #endregion
-
         public void UpdatePollingIntervalsAllDevices()
         {
             if (ControlThinkController.IsConnected)
@@ -270,18 +161,49 @@ namespace zVirtualScenesApplication
                 {
                     if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
                     {
+                        string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
+
                         //Look for user set polling levels for this device
                         foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
                         {
+                            //All devices check for level
                             if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
                             {
-                                device.PollInterval = new TimeSpan(0, 0, thisDevice.RepollInterval);
-                                device.PollEnabled = true;
+                                if (thisDevice.RepollInterval > 0)
+                                {
+                                    device.PollInterval = new TimeSpan(0, 0, thisDevice.RepollInterval);
+                                    device.PollEnabled = true;
+                                }
+                                else
+                                {
+                                    device.PollEnabled = false;
+                                }
+                            }
+
+                            //Some devices like general thermos need to be polled for more than just level.
+                            if (devicetype.Contains("GeneralThermostat"))
+                            {
+                                if (thisDevice.RepollInterval > 0)
+                                {
+                                    thisDevice.PollTimer.Interval = thisDevice.RepollInterval * 1000;
+                                    thisDevice.PollTimer.Start();
+                                }
+                                else
+                                {
+                                    thisDevice.PollTimer.Stop();
+                                }
                             }
                         }
                     }                    
                 }
             }
+        }
+
+        private void tmr_Elapsed(object sender, EventArgs e)
+        {
+            
+            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO,"TIMER ELASPED. sender: "  + sender.ToString() +  " args" + e.ToString() + ".", LOG_INTERFACE);
+        
         }
 
         private void SubscribetoDeviceEvents()
@@ -292,12 +214,27 @@ namespace zVirtualScenesApplication
                 {                    
                     if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
                     {
+                        string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
+
                         device.PollFailed += new ControlThink.ZWave.Devices.ZWaveDevice.PollFailedEventHandler(device_PollFailed);
-                        device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged);                            
+                        device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged);
+
+                        if (devicetype.Contains("GeneralThermostat"))
+                        {
+                            foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
+                            {
+                                if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
+                                {
+                                    thisDevice.PollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
+                                }                              
+                            }
+                        }
                     }                    
                 }
             }
-        }        
+        }
+
+        #endregion
 
         #region USB Events
 
@@ -391,7 +328,7 @@ namespace zVirtualScenesApplication
         private void device_LevelChanged(object sender, LevelChangedEventArgs e)
         {
             ControlThink.ZWave.Devices.ZWaveDevice device = (ControlThink.ZWave.Devices.ZWaveDevice)sender;
-            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ZWave device sent level change notification. Node: " + device.NodeID + " level: " + e.Level + ".", LOG_INTERFACE);
+            //formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ZWave device sent level change notification. Node: " + device.NodeID + " level: " + e.Level + ".", LOG_INTERFACE);
 
             //for each device previously discovered
             foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
