@@ -24,12 +24,14 @@ namespace zVirtualScenesApplication
 
             groupBoxDeviceOptions.Text = "Node " + _DeviceToEdit.NodeID + ",  '" + _DeviceToEdit.Name + "' Options";
             txtb_deviceName.Text = _DeviceToEdit.Name;
+            textBoxRepolling.Text = _DeviceToEdit.RepollInterval.ToString();
             txtb_GroupName.Text = _DeviceToEdit.GroupName;
 
             checkBoxPerDEviceJabberEnable.Checked = _DeviceToEdit.SendJabberNotifications;
             checkBoxDisplayinLightSwitch.Checked = _DeviceToEdit.ShowInLightSwitchGUI;
             checkBoxGrowlEnabled.Checked = _DeviceToEdit.SendGrowlNotifications;
             txtb_GroupName.AutoCompleteCustomSource = _zVirtualScenesMain.GetGroupsAutoCompleteCollection();
+            textBoxRepolling.Text = _DeviceToEdit.RepollInterval.ToString();
 
             #endregion
 
@@ -63,6 +65,18 @@ namespace zVirtualScenesApplication
             else
             {
                 MessageBox.Show("Invalid device name.", _zVirtualScenesMain.ProgramName);
+                return;
+            }
+
+            //repoll interval
+            if (textBoxRepolling.Text != "" || Convert.ToInt32(textBoxRepolling.Text) >= 0)
+            {
+                _DeviceToEdit.RepollInterval = Convert.ToInt32(textBoxRepolling.Text);
+                _zVirtualScenesMain.ControlThinkInt.UpdatePollingIntervalsAllDevices();
+            }
+            else
+            {
+                MessageBox.Show("Invalid interval.", _zVirtualScenesMain.ProgramName);
                 return;
             }
 
@@ -153,6 +167,14 @@ namespace zVirtualScenesApplication
             
         }
 
+        private void textBoxRepolling_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if ((Keys)e.KeyChar != Keys.Back)
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "\\d+"))
+                    e.Handled = true;
+            }
+        }
 
     }
 }

@@ -156,8 +156,8 @@ namespace zVirtualScenesApplication
                 }
                 formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB Loaded " + formzVirtualScenesMain.MasterDevices.Count() + " Devices.", LOG_INTERFACE);
 
-                //repoll the device to get their initial level without throwing device change events
-                this.RepollDevices(0,false);
+                //setup per device polling now that we have a list of devices.
+                UpdatePollingIntervalsAllDevices();
             }                          
         }
 
@@ -169,11 +169,6 @@ namespace zVirtualScenesApplication
         {
             //RepollTimer.Interval = formzVirtualScenesMain.zVScenesSettings.PollingInterval * 1000;
             //RepollTimer.Start();            
-        }
-
-        public void UpdateInterval()
-        {
-            RepollTimer.Interval = formzVirtualScenesMain.zVScenesSettings.PollingInterval * 1000;
         }
 
         public void RepollDevices(byte node = 0, bool verbose = true)
@@ -273,18 +268,18 @@ namespace zVirtualScenesApplication
             {
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
                 {
-                    try
+                    if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
                     {
-                        if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
+                        //Look for user set polling levels for this device
+                        foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
                         {
-                            device.PollInterval = new TimeSpan(0, 0, formzVirtualScenesMain.zVScenesSettings.PollingInterval);
-                            device.PollEnabled = true;
+                            if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
+                            {
+                                device.PollInterval = new TimeSpan(0, 0, thisDevice.RepollInterval);
+                                device.PollEnabled = true;
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        formzVirtualScenesMain.AddLogEntry(UrgencyLevel.ERROR, ex.Message, LOG_INTERFACE);
-                    }
+                    }                    
                 }
             }
         }
@@ -433,8 +428,7 @@ namespace zVirtualScenesApplication
         private void ControlThinkUSBConnectedEvent(object sender, EventArgs e)
         {
             formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO, "ControlThink USB Connected to HomeId - " + Convert.ToString(ControlThinkController.HomeID),LOG_INTERFACE);
-            SubscribetoDeviceEvents();
-            UpdatePollingIntervalsAllDevices();
+            SubscribetoDeviceEvents();           
         }
 
         private void ControlThinkUSBDisconnectEvent(object sender, EventArgs e)

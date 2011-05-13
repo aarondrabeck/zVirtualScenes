@@ -43,6 +43,8 @@
             this.txtb_GroupName = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.btn_SaveOptions = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxRepolling = new System.Windows.Forms.TextBox();
             this.groupBoxDeviceOptions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -80,6 +82,8 @@
             // 
             // groupBoxDeviceOptions
             // 
+            this.groupBoxDeviceOptions.Controls.Add(this.label3);
+            this.groupBoxDeviceOptions.Controls.Add(this.textBoxRepolling);
             this.groupBoxDeviceOptions.Controls.Add(this.textBoxMomentaryOnTimeSpan);
             this.groupBoxDeviceOptions.Controls.Add(this.label2);
             this.groupBoxDeviceOptions.Controls.Add(this.checkBoxGrowlEnabled);
@@ -94,7 +98,7 @@
             this.groupBoxDeviceOptions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBoxDeviceOptions.Location = new System.Drawing.Point(0, 0);
             this.groupBoxDeviceOptions.Name = "groupBoxDeviceOptions";
-            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(423, 197);
+            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(414, 225);
             this.groupBoxDeviceOptions.TabIndex = 37;
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Binary Switch Options";
@@ -166,7 +170,7 @@
             // 
             // btn_SaveOptions
             // 
-            this.btn_SaveOptions.Location = new System.Drawing.Point(353, 162);
+            this.btn_SaveOptions.Location = new System.Drawing.Point(349, 189);
             this.btn_SaveOptions.Name = "btn_SaveOptions";
             this.btn_SaveOptions.Size = new System.Drawing.Size(60, 27);
             this.btn_SaveOptions.TabIndex = 8;
@@ -174,11 +178,28 @@
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(33, 204);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(141, 13);
+            this.label3.TabIndex = 102;
+            this.label3.Text = "Repolling Interval (seconds):";
+            // 
+            // textBoxRepolling
+            // 
+            this.textBoxRepolling.Location = new System.Drawing.Point(180, 197);
+            this.textBoxRepolling.Name = "textBoxRepolling";
+            this.textBoxRepolling.Size = new System.Drawing.Size(71, 20);
+            this.textBoxRepolling.TabIndex = 103;
+            this.textBoxRepolling.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxRepolling_KeyPress);
+            // 
             // formPropertiesBinSwitch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(423, 197);
+            this.ClientSize = new System.Drawing.Size(414, 225);
             this.Controls.Add(this.groupBoxDeviceOptions);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -209,5 +230,7 @@
         private System.Windows.Forms.CheckBox checkBoxGrowlEnabled;
         private System.Windows.Forms.TextBox textBoxMomentaryOnTimeSpan;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxRepolling;
     }
 }

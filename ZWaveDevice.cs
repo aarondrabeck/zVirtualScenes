@@ -67,6 +67,18 @@ namespace zVirtualScenesApplication
         public bool SendGrowlNotifications { get; set; }
         public int MomentaryTimespan { get; set; }
 
+
+        public int RepollInterval {
+            get {
+                return this.RepollInterval;
+            }
+
+
+            set { 
+                this.RepollInterval = value;       
+            }
+        }
+
         #endregion
 
         //Constructor
@@ -89,6 +101,7 @@ namespace zVirtualScenesApplication
             this.MomentaryOnMode = false;
             this.SendGrowlNotifications = true;
             this.MomentaryTimespan = 0;
+            this.RepollInterval = 300; 
         }
 
         public enum ZWaveDeviceTypes

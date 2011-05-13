@@ -14,7 +14,7 @@ namespace zVirtualScenesApplication
             OpenZwave
         }
         public interfaces zvs_interface { get; set; }
-        public int PollingInterval { get; set; }
+        //public int PollingInterval { get; set; }
         public int LongLinesLimit { get; set; }
 
         //HTPP INTERFACE
@@ -53,7 +53,7 @@ namespace zVirtualScenesApplication
         
         public UserSettings()
         {
-            this.PollingInterval = 60;
+            //this.PollingInterval = 60;
             this.LongLinesLimit = 1000;
 
             //Defaults

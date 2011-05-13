@@ -23,7 +23,6 @@ namespace zVirtualScenesApplication
             this.formzVirtualScenesMain = form;
 
             //General Settings 
-            textBoxRepolling.Text = formzVirtualScenesMain.zVScenesSettings.PollingInterval.ToString();
             txt_loglineslimit.Text = formzVirtualScenesMain.zVScenesSettings.LongLinesLimit.ToString();
             //NOAA
             checkBoxEnableNOAA.Checked = formzVirtualScenesMain.zVScenesSettings.EnableNOAA;
@@ -47,25 +46,6 @@ namespace zVirtualScenesApplication
         {
             formzVirtualScenesMain.zVScenesSettings.EnableNOAA = checkBoxEnableNOAA.Checked;
             DisplaySunset();
-        }
-
-        private void textBoxRepolling_Leave(object sender, EventArgs e)
-        {
-            try
-            {
-                formzVirtualScenesMain.zVScenesSettings.PollingInterval = Convert.ToInt32(textBoxRepolling.Text);
-
-                if (formzVirtualScenesMain.zVScenesSettings.PollingInterval < 0)
-                    throw new Exception("");
-
-                //formzVirtualScenesMain.ControlThinkInt.UpdateInterval();
-                formzVirtualScenesMain.ControlThinkInt.UpdatePollingIntervalsAllDevices();
-            }
-            catch
-            {
-                MessageBox.Show("Invalid Polling Interval.", formzVirtualScenesMain.ProgramName);
-                textBoxRepolling.Text = formzVirtualScenesMain.zVScenesSettings.PollingInterval.ToString();
-            }
         }
 
         private void txt_loglineslimit_Leave(object sender, EventArgs e)

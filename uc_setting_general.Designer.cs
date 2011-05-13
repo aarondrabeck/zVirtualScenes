@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.txt_loglineslimit = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.label33 = new System.Windows.Forms.Label();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.label32 = new System.Windows.Forms.Label();
@@ -40,31 +39,21 @@
             this.label4 = new System.Windows.Forms.Label();
             this.textBox_Longitude = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBoxRepolling = new System.Windows.Forms.TextBox();
             this.groupBox4.SuspendLayout();
             this.SuspendLayout();
             // 
             // txt_loglineslimit
             // 
-            this.txt_loglineslimit.Location = new System.Drawing.Point(226, 32);
+            this.txt_loglineslimit.Location = new System.Drawing.Point(133, 46);
             this.txt_loglineslimit.Name = "txt_loglineslimit";
             this.txt_loglineslimit.Size = new System.Drawing.Size(71, 20);
             this.txt_loglineslimit.TabIndex = 30;
             this.txt_loglineslimit.Leave += new System.EventHandler(this.txt_loglineslimit_Leave);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(217, 13);
-            this.label1.TabIndex = 27;
-            this.label1.Text = "ZWave Device Repolling Interval (seconds):";
-            // 
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(112, 35);
+            this.label33.Location = new System.Drawing.Point(19, 49);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(108, 13);
             this.label33.TabIndex = 29;
@@ -161,23 +150,13 @@
             this.label2.TabIndex = 13;
             this.label2.Text = "Longitude:";
             // 
-            // textBoxRepolling
-            // 
-            this.textBoxRepolling.Location = new System.Drawing.Point(226, 6);
-            this.textBoxRepolling.Name = "textBoxRepolling";
-            this.textBoxRepolling.Size = new System.Drawing.Size(71, 20);
-            this.textBoxRepolling.TabIndex = 28;
-            this.textBoxRepolling.Leave += new System.EventHandler(this.textBoxRepolling_Leave);
-            // 
             // uc_setting_general
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.txt_loglineslimit);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.label33);
             this.Controls.Add(this.groupBox4);
-            this.Controls.Add(this.textBoxRepolling);
             this.Name = "uc_setting_general";
             this.Size = new System.Drawing.Size(532, 198);
             this.Load += new System.EventHandler(this.uc_setting_general_Load);
@@ -191,7 +170,6 @@
         #endregion
 
         private System.Windows.Forms.TextBox txt_loglineslimit;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label33;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.Label label32;
@@ -202,6 +180,5 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBox_Longitude;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBoxRepolling;
     }
 }

@@ -47,6 +47,8 @@
             this.textBoxMaxAlert = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
             this.btn_SaveOptions = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textBoxRepolling = new System.Windows.Forms.TextBox();
             this.groupBoxDeviceOptions.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -94,7 +96,9 @@
             // 
             // groupBoxDeviceOptions
             // 
+            this.groupBoxDeviceOptions.Controls.Add(this.label3);
             this.groupBoxDeviceOptions.Controls.Add(this.checkBoxGrowlEnabled);
+            this.groupBoxDeviceOptions.Controls.Add(this.textBoxRepolling);
             this.groupBoxDeviceOptions.Controls.Add(this.checkBoxDisplayinLightSwitch);
             this.groupBoxDeviceOptions.Controls.Add(this.txtb_GroupName);
             this.groupBoxDeviceOptions.Controls.Add(this.label1);
@@ -112,7 +116,7 @@
             this.groupBoxDeviceOptions.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBoxDeviceOptions.Location = new System.Drawing.Point(0, 0);
             this.groupBoxDeviceOptions.Name = "groupBoxDeviceOptions";
-            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(513, 171);
+            this.groupBoxDeviceOptions.Size = new System.Drawing.Size(513, 201);
             this.groupBoxDeviceOptions.TabIndex = 37;
             this.groupBoxDeviceOptions.TabStop = false;
             this.groupBoxDeviceOptions.Text = "Options";
@@ -213,7 +217,7 @@
             // 
             // btn_SaveOptions
             // 
-            this.btn_SaveOptions.Location = new System.Drawing.Point(450, 141);
+            this.btn_SaveOptions.Location = new System.Drawing.Point(450, 167);
             this.btn_SaveOptions.Name = "btn_SaveOptions";
             this.btn_SaveOptions.Size = new System.Drawing.Size(57, 24);
             this.btn_SaveOptions.TabIndex = 9;
@@ -221,11 +225,28 @@
             this.btn_SaveOptions.UseVisualStyleBackColor = true;
             this.btn_SaveOptions.Click += new System.EventHandler(this.btn_SaveOptions_Click);
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(7, 178);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(141, 13);
+            this.label3.TabIndex = 104;
+            this.label3.Text = "Repolling Interval (seconds):";
+            // 
+            // textBoxRepolling
+            // 
+            this.textBoxRepolling.Location = new System.Drawing.Point(154, 171);
+            this.textBoxRepolling.Name = "textBoxRepolling";
+            this.textBoxRepolling.Size = new System.Drawing.Size(71, 20);
+            this.textBoxRepolling.TabIndex = 105;
+            this.textBoxRepolling.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxRepolling_KeyPress);
+            // 
             // formPropertiesThermostat
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(513, 171);
+            this.ClientSize = new System.Drawing.Size(513, 201);
             this.Controls.Add(this.groupBoxDeviceOptions);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -260,5 +281,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox checkBoxDisplayinLightSwitch;
         private System.Windows.Forms.CheckBox checkBoxGrowlEnabled;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBoxRepolling;
     }
 }

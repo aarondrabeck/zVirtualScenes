@@ -18,6 +18,7 @@ namespace zVirtualScenesApplication
         public bool ShowInLightSwitchGUI { get; set; }
         public bool MomentaryOnMode { get; set; }
         public int MomentaryTimespan { get; set; }
+        public int RepollInterval { get; set; }
 
         public ZWaveDeviceUserSettings()
         {
@@ -32,6 +33,7 @@ namespace zVirtualScenesApplication
             this.ShowInLightSwitchGUI = true;
             this.MomentaryOnMode = false;
             this.MomentaryTimespan = 1;
+            this.RepollInterval = 300; 
         }
 
         public string GlbUniqueID()
@@ -42,7 +44,7 @@ namespace zVirtualScenesApplication
         public static implicit operator ZWaveDeviceUserSettings(ZWaveDevice thisDevice)
         {
            ZWaveDeviceUserSettings newcDevice = new ZWaveDeviceUserSettings();
-            //ONLY INCLUDE NOT ACTION PROPERTIES HERE
+            //ONLY INCLUDE NON ACTION PROPERTIES HERE
            newcDevice.HomeID = thisDevice.HomeID;
            newcDevice.NodeID = thisDevice.NodeID;
            newcDevice.Name = thisDevice.Name;
@@ -54,6 +56,7 @@ namespace zVirtualScenesApplication
            newcDevice.ShowInLightSwitchGUI = thisDevice.ShowInLightSwitchGUI;
            newcDevice.MomentaryOnMode = thisDevice.MomentaryOnMode;
            newcDevice.MomentaryTimespan = thisDevice.MomentaryTimespan;
+           newcDevice.RepollInterval = thisDevice.RepollInterval;
            return newcDevice;
         }
     }
