@@ -185,6 +185,12 @@ namespace zVirtualScenesApplication
                             {
                                 if (thisDevice.RepollInterval > 0)
                                 {
+                                    if (!thisDevice.SubscribedToPollTimer)
+                                    {
+                                        thisDevice.PollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
+                                        thisDevice.SubscribedToPollTimer = true; 
+                                    }
+
                                     thisDevice.PollTimer.Interval = thisDevice.RepollInterval * 1000;
                                     thisDevice.PollTimer.Start();
                                 }
@@ -200,10 +206,8 @@ namespace zVirtualScenesApplication
         }
 
         private void tmr_Elapsed(object sender, EventArgs e)
-        {
-            
-            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO,"TIMER ELASPED. sender: "  + sender.ToString() +  " args" + e.ToString() + ".", LOG_INTERFACE);
-        
+        {            
+            formzVirtualScenesMain.AddLogEntry(UrgencyLevel.INFO,"TIMER ELASPED. sender: "  + sender.ToString() +  " args" + e.ToString() + ".", LOG_INTERFACE);        
         }
 
         private void SubscribetoDeviceEvents()
@@ -213,22 +217,21 @@ namespace zVirtualScenesApplication
                 foreach (ControlThink.ZWave.Devices.ZWaveDevice device in ControlThinkController.Devices)
                 {                    
                     if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
-                    {
-                        string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
-
+                    { 
                         device.PollFailed += new ControlThink.ZWave.Devices.ZWaveDevice.PollFailedEventHandler(device_PollFailed);
                         device.LevelChanged += new ControlThink.ZWave.Devices.ZWaveDevice.LevelChangedEventHandler(device_LevelChanged);
 
-                        if (devicetype.Contains("GeneralThermostat"))
-                        {
-                            foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
-                            {
-                                if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
-                                {
-                                    thisDevice.PollTimer.Elapsed += new System.Timers.ElapsedEventHandler(tmr_Elapsed);
-                                }                              
-                            }
-                        }
+                        //string devicetype = device.ToString().Replace("ControlThink.ZWave.Devices.Specific.", "");
+                        //if (devicetype.Contains("GeneralThermostat"))
+                        //{
+                        //    foreach (ZWaveDevice thisDevice in formzVirtualScenesMain.MasterDevices)
+                        //    {
+                        //        if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
+                        //        {
+                                    
+                        //        }                              
+                        //    }
+                        //}
                     }                    
                 }
             }

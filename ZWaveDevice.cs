@@ -66,7 +66,9 @@ namespace zVirtualScenesApplication
         public bool MomentaryOnMode { get; set; }
         public bool SendGrowlNotifications { get; set; }
         public int MomentaryTimespan { get; set; }
+
         public int RepollInterval { get; set; }
+        public bool SubscribedToPollTimer { get; set; }
 
         [XmlIgnore]
         public System.Timers.Timer PollTimer = new System.Timers.Timer();
@@ -93,7 +95,8 @@ namespace zVirtualScenesApplication
             this.MomentaryOnMode = false;
             this.SendGrowlNotifications = true;
             this.MomentaryTimespan = 0;
-            this.RepollInterval = 300; 
+            this.RepollInterval = 300;
+            this.SubscribedToPollTimer = false; 
         }
 
         public enum ZWaveDeviceTypes
