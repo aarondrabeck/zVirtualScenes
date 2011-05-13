@@ -406,7 +406,7 @@ namespace zVirtualScenesApplication
                 {
                     thisDevice.prevLevel = thisDevice.Level;  //Save last level
                     thisDevice.Level = e.Level; //set MasterDeviceList
-                    this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, false); //call event   
+                    this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, true); //call event   
                 }
             }
         }
