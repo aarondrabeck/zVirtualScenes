@@ -141,15 +141,12 @@ namespace zVirtualScenesApplication
                 //if Control Stick device == device in memory
                 if (this.ControlThinkController.HomeID.ToString() + device.NodeID.ToString() == thisDevice.GlbUniqueID())
                 {
-                    #region DETECT LEVEL CHANGES IN ALL DEVICES
-                    byte level = device.Level;
-                    //Check to see if any device state/level has changed.
-                    if (level != thisDevice.Level)
-                    {
-                        thisDevice.prevLevel = thisDevice.Level;
-                        thisDevice.Level = level; //set MasterDeviceList
-                        this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, VerboseRepoll); //call event                                                
-                    }
+                    #region DETECT LEVEL CHANGES SWITCHES      
+                    //Check to see if any device state/level has changed.                    
+                    thisDevice.prevLevel = thisDevice.Level;
+                    thisDevice.Level = e.Level; //set MasterDeviceList
+                    this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, VerboseRepoll); //call event                                              
+                    
                     #endregion
                 }
             }
