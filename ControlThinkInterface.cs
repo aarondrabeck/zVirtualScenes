@@ -267,7 +267,7 @@ namespace zVirtualScenesApplication
 
         #endregion
 
-        private void UpdatePollingIntervalsAllDevices()
+        public void UpdatePollingIntervalsAllDevices()
         {
             if (ControlThinkController.IsConnected)
             {
@@ -277,7 +277,7 @@ namespace zVirtualScenesApplication
                     {
                         if (!device.ToString().Contains("Controller")) //Do not include ZWave controllers
                         {
-                            device.PollInterval = new TimeSpan(0, 1, 0);
+                            device.PollInterval = new TimeSpan(0, 0, formzVirtualScenesMain.zVScenesSettings.PollingInterval);
                             device.PollEnabled = true;
                         }
                     }
@@ -406,7 +406,9 @@ namespace zVirtualScenesApplication
                 {
                     thisDevice.prevLevel = thisDevice.Level;  //Save last level
                     thisDevice.Level = e.Level; //set MasterDeviceList
-                    this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, true); //call event   
+
+                    if(thisDevice.prevLevel != thisDevice.Level)
+                        this.DeviceInfoChange(thisDevice.GlbUniqueID(), changeType.LevelChanged, true); //call event   
                 }
             }
         }
