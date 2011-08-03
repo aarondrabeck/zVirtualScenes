@@ -1,0 +1,400 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7F7A1176-AAB8-4376-8915-57A4341E68E2}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>zVirtualScenesApplication</RootNamespace>
+    <AssemblyName>zVirtualScenes</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>false</MapFileExtensions>
+    <SupportUrl>https://code.google.com/p/zvirtualscenes</SupportUrl>
+    <ProductName>zVirtualScenes</ProductName>
+    <PublisherName>Drabeck Solutions</PublisherName>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>2.5.0.0</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\output\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\output_release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestCertificateThumbprint>0FFE95B20B0268CF38E7C4C8FC9A09369DB83FB9</ManifestCertificateThumbprint>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ManifestKeyFile>zVirtualScenes_TemporaryKey.pfx</ManifestKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>true</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationIcon>Resources\audio-mixing-desk.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ObjectListView">
+      <HintPath>..\output_release\lib\ObjectListView.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="EventCommon\EventControl.cs" />
+    <Compile Include="Forms\AddEditGroupName.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddEditGroupName.Designer.cs">
+      <DependentUpon>AddEditGroupName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ActivateGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ActivateGroup.Designer.cs">
+      <DependentUpon>ActivateGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AddEditSceneObjectCMD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddEditSceneObjectCMD.Designer.cs">
+      <DependentUpon>AddEditSceneObjectCMD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AddEditSceneBuiltinCMD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddEditSceneBuiltinCMD.Designer.cs">
+      <DependentUpon>AddEditSceneBuiltinCMD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DatabaseConnection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DatabaseConnection.Designer.cs">
+      <DependentUpon>DatabaseConnection.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\formPropertiesScene.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\formPropertiesScene.Designer.cs">
+      <DependentUpon>formPropertiesScene.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\GroupEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GroupEditor.Designer.cs">
+      <DependentUpon>GroupEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ObjectProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ObjectProperties.Designer.cs">
+      <DependentUpon>ObjectProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ScriptEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ScriptEditor.Designer.cs">
+      <DependentUpon>ScriptEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Globals\GlobalMethods.cs" />
+    <Compile Include="KeyboardHook.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PluginSystem\PluginManager.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Structs\zwObjectState.cs" />
+    <Compile Include="Task.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestForm.Designer.cs">
+      <DependentUpon>TestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\BtnInfo.cs" />
+    <Compile Include="UserControls\uc_object_basic.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_object_basic.Designer.cs">
+      <DependentUpon>uc_object_basic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_object_commands.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_object_commands.Designer.cs">
+      <DependentUpon>uc_object_commands.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_object_values_grid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_object_values_grid.Designer.cs">
+      <DependentUpon>uc_object_values_grid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_plugin_properties_form.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_plugin_properties_form.Designer.cs">
+      <DependentUpon>uc_plugin_properties_form.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_script_editor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_script_editor.Designer.cs">
+      <DependentUpon>uc_script_editor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_object_values.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_object_values.Designer.cs">
+      <DependentUpon>uc_object_values.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ProgramSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ProgramSettings.Designer.cs">
+      <DependentUpon>ProgramSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_object_properties.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_object_properties.Designer.cs">
+      <DependentUpon>uc_object_properties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_object_groups.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_object_groups.Designer.cs">
+      <DependentUpon>uc_object_groups.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\AddEditGroupName.resx">
+      <DependentUpon>AddEditGroupName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ActivateGroup.resx">
+      <DependentUpon>ActivateGroup.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddEditSceneObjectCMD.resx">
+      <DependentUpon>AddEditSceneObjectCMD.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddEditSceneBuiltinCMD.resx">
+      <DependentUpon>AddEditSceneBuiltinCMD.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DatabaseConnection.resx">
+      <DependentUpon>DatabaseConnection.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\formPropertiesScene.resx">
+      <DependentUpon>formPropertiesScene.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GroupEditor.resx">
+      <DependentUpon>GroupEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ObjectProperties.resx">
+      <DependentUpon>ObjectProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ScriptEditor.resx">
+      <DependentUpon>ScriptEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\TestForm.resx">
+      <DependentUpon>TestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_object_basic.resx">
+      <DependentUpon>uc_object_basic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_object_commands.resx">
+      <DependentUpon>uc_object_commands.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_object_values_grid.resx">
+      <DependentUpon>uc_object_values_grid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_plugin_properties_form.resx">
+      <DependentUpon>uc_plugin_properties_form.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_script_editor.resx">
+      <DependentUpon>uc_script_editor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_object_values.resx">
+      <DependentUpon>uc_object_values.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ProgramSettings.resx">
+      <DependentUpon>ProgramSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="UserControls\uc_object_properties.resx">
+      <DependentUpon>uc_object_properties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_object_groups.resx">
+      <DependentUpon>uc_object_groups.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\app.manifest">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Visual.C++.10.0.x86">
+      <Visible>False</Visible>
+      <ProductName>Visual C++ 2010 Runtime Libraries %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Switch1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\thermometer.png" />
+    <None Include="Resources\controler3.png" />
+    <None Include="Resources\lb_on.png" />
+    <None Include="Resources\lb_off.png" />
+    <None Include="Resources\audio-mixing-desk.ico" />
+    <None Include="Resources\20scene_icon.jpg" />
+    <None Include="Resources\48schedule_icon.jpg" />
+    <None Include="Resources\20schedule_icon.jpg" />
+    <None Include="Resources\20zwave-default.jpg" />
+    <None Include="Resources\zwave48.jpg" />
+    <None Include="Resources\scheduled_tasks48.png" />
+    <None Include="Resources\programs-icon48.png" />
+    <None Include="Resources\Broadcast20.png" />
+    <EmbeddedResource Include="Resources\User48.png" />
+    <EmbeddedResource Include="Resources\temperature48.png" />
+    <EmbeddedResource Include="Resources\Broadcast48.png" />
+    <EmbeddedResource Include="Resources\zvirtualscenes57.png" />
+    <None Include="Resources\switch48.png" />
+    <None Include="Resources\scene-32.jpg" />
+    <None Include="Resources\dial-32.jpg" />
+    <None Include="Resources\switch-32.jpg" />
+    <EmbeddedResource Include="lib\ObjectListView.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
+      <Project>{90E854D0-AB37-4928-BF33-93B3553F33A9}</Project>
+      <Name>zVirtualScenesAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
+      <Project>{FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00}</Project>
+      <Name>zVirtualScenesCommon</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\doorlock.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

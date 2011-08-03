@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0A43D202-F903-44C8-83E3-03A3928E9480}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenZWavePlugin</RootNamespace>
+    <AssemblyName>OpenZWavePlugin</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\output\plugins\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\output_release\plugins\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenZWaveDotNet">
+      <HintPath>..\..\OpenZWaveDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Node.cs" />
+    <Compile Include="OpenZWavePlugin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Value.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
+      <Project>{90E854D0-AB37-4928-BF33-93B3553F33A9}</Project>
+      <Name>zVirtualScenesAPI</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="config\act\zdm230.xml" />
+    <Content Include="config\act\zir010.xml" />
+    <Content Include="config\act\zrp110.xml" />
+    <Content Include="config\aeon_labs\doorwindow.xml" />
+    <Content Include="config\aeon_labs\hem.xml" />
+    <Content Include="config\aeon_labs\minimote.xml" />
+    <Content Include="config\aeon_labs\ses.xml" />
+    <Content Include="config\danfoss\living.xml" />
+    <Content Include="config\device_classes.xml" />
+    <Content Include="config\everspring\sm103.xml" />
+    <Content Include="config\everspring\sp103.xml" />
+    <Content Include="config\everspring\st814.xml" />
+    <Content Include="config\express_controls\ezmotion.xml" />
+    <Content Include="config\homeseer\hsm100.xml" />
+    <Content Include="config\homeseer\ztroller.xml" />
+    <Content Include="config\manufacturer_specific.xml" />
+    <Content Include="config\options.xml" />
+    <Content Include="config\trane\TZEMT400AB32MAA.xml" />
+    <Content Include="OpenZWaveDotNet.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(ProjectDir)build\postbuild.bat" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
