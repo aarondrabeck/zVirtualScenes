@@ -78,7 +78,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ObjectListView">
-      <HintPath>..\output_release\lib\ObjectListView.dll</HintPath>
+      <HintPath>lib\ObjectListView.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
