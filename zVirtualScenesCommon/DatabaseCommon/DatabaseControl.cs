@@ -40,7 +40,9 @@ namespace zVirtualScenesCommon.DatabaseCommon
                             "TRUNCATE TABLE plugin_settings_options;" +
                             "TRUNCATE TABLE plugins;" +
                             "TRUNCATE TABLE scenes_cmds;" +
-                            "TRUNCATE TABLE scenes;");
+                            "TRUNCATE TABLE scenes;" +
+                            "TRUNCATE TABLE scheduled_tasks;"                           
+                            );
         }  
 
         public delegate void ObjectModifiedEventHandler(object sender, EventArgs e);
@@ -195,9 +197,9 @@ namespace zVirtualScenesCommon.DatabaseCommon
             int pluginId = GetPluginId(APIName);
             if (pluginId != -1)
             {
-                if (!HasRows("SELECT id FROM plugin_settings WHERE plugin_id = " + pluginId + " AND txt_setting_name = '" + settingName + "';"))
+                if (!HasRows("SELECT id FROM plugin_settings WHERE plugin_id = " + pluginId + " AND txt_setting_name = '" +  GetSafeText(settingName) + "';"))
                 {
-                    NonQuery("INSERT INTO plugin_settings (plugin_id, txt_setting_name, txt_setting_value, plugin_settings_type_id, txt_setting_description) VALUES (" + pluginId + ", '" + settingName + "', '" + defaultValue + "', '" + type + "', '" + description + "');");
+                    NonQuery("INSERT INTO plugin_settings (plugin_id, txt_setting_name, txt_setting_value, plugin_settings_type_id, txt_setting_description) VALUES (" + pluginId + ", '" + GetSafeText(settingName)  + "', '" + defaultValue + "', '" + type + "', '" + GetSafeText(description) + "');");
                 }
             }
         }
@@ -1413,7 +1415,7 @@ namespace zVirtualScenesCommon.DatabaseCommon
             reader.Close();
 
             if (dt.Rows.Count == 1)            
-                if (!dt.Rows[0]["version"].ToString().Equals(CurrentVersion.Database))                    
+                if (!dt.Rows[0]["version"].ToString().Equals(CurrentVersion.RequiredDatabaseVersion))                    
                     return dt.Rows[0]["version"].ToString();
             
             conn.Close();            
@@ -1507,6 +1509,118 @@ namespace zVirtualScenesCommon.DatabaseCommon
             {
                 NonQuery(string.Format("UPDATE scenes SET `is_running`='{0}' WHERE `id`='{1}';", isRunning.ToString(), SceneID));
             }            
+        }
+        #endregion
+
+        
+        #region scheduled_tasks
+        public static class ScheduledTasks
+        {
+            public static int Add(string Name,
+                                    int Frequency,
+                                    string Enabled,
+                                    int SceneID,
+                                    string RecurMonday,
+                                    string RecurTuesday,
+                                    string RecurWednesday,
+                                    string RecurThursday,
+                                    string RecurFriday,
+                                    string RecurSaturday,
+                                    string RecurSunday,
+                                    int RecurDays,
+                                    int RecurWeeks,
+                                    int RecurMonth,
+                                    int RecurDayofMonth,
+                                    int RecurSeconds,
+                                    string StartTime,
+                                    int sort_order    )
+            {
+                int id = 0;
+                string sql = string.Format("INSERT INTO scheduled_tasks (`Name`,`Frequency`, `Enabled`, `Scene_id`, `RecurMonday`, `RecurTuesday`, `RecurWednesday`, `RecurThursday`, `RecurFriday`, `RecurSaturday`, `RecurSunday`, `RecurDays`, `RecurWeeks`, `RecurMonth`, `RecurDayofMonth`, `RecurSeconds`, `StartTime`, `sort_order`) "+
+                                            "VALUES ('{0}', '{1}', {2}, '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', '{15}', '{16}', '{17}');SELECT LAST_INSERT_ID() as id;",
+                                            Name,
+                                            Frequency,
+                                            Enabled,
+                                            SceneID,
+                                            RecurMonday,
+                                            RecurTuesday,
+                                            RecurWednesday,
+                                            RecurThursday,
+                                            RecurFriday,
+                                            RecurSaturday,
+                                            RecurSunday,
+                                            RecurDays,
+                                            RecurWeeks,
+                                            RecurMonth,
+                                            RecurDayofMonth,
+                                            RecurSeconds,
+                                            StartTime,
+                                            sort_order);
+
+                DataTable dt = GetDataTable(sql);
+
+                if (dt.Rows.Count > 0)
+                    int.TryParse(dt.Rows[0]["id"].ToString(), out id);
+                return id;
+            }
+
+            public static DataTable GetTask(int TaskID)
+            {
+                return GetDataTable(string.Format("SELECT * FROM scheduled_tasks WHERE id = {0} ORDER BY sort_order ASC;", TaskID));
+            }
+
+            public static DataTable GetTasks()
+            {
+                return GetDataTable("SELECT * FROM scheduled_tasks ORDER BY sort_order ASC;");
+            }
+
+            public static void Remove(int TaskID)
+            {
+                NonQuery(string.Format("DELETE FROM scheduled_tasks WHERE `id`='{0}';",TaskID));
+            }
+
+            public static void Update(int id,
+                                    string Name,
+                                    int Frequency,
+                                    string Enabled,
+                                    int SceneID,
+                                    string RecurMonday,
+                                    string RecurTuesday,
+                                    string RecurWednesday,
+                                    string RecurThursday,
+                                    string RecurFriday,
+                                    string RecurSaturday,
+                                    string RecurSunday,
+                                    int RecurDays,
+                                    int RecurWeeks,
+                                    int RecurMonth,
+                                    int RecurDayofMonth,
+                                    int RecurSeconds,
+                                    string StartTime,
+                                    int sort_order)
+            {
+                string sql = string.Format("UPDATE scheduled_tasks SET `Name`='{0}', `Enabled`='{1}', `Scene_id`={2}, `Frequency`={3}, `RecurMonday`='{4}', `RecurTuesday`='{5}', `RecurWednesday`='{6}', `RecurThursday`='{7}', `RecurFriday`='{8}', `RecurSaturday`='{9}', `RecurSunday`='{10}', `RecurDays`={11}, `RecurWeeks`={12}, `RecurMonth`={13}, `RecurDayofMonth`={14}, `RecurSeconds`={15}, `StartTime`='{16}', `sort_order`={17} WHERE `id`='{18}';",
+                                            Name,                                            
+                                            Enabled,
+                                            SceneID,
+                                            Frequency,
+                                            RecurMonday,
+                                            RecurTuesday,
+                                            RecurWednesday,
+                                            RecurThursday,
+                                            RecurFriday,
+                                            RecurSaturday,
+                                            RecurSunday,
+                                            RecurDays,
+                                            RecurWeeks,
+                                            RecurMonth,
+                                            RecurDayofMonth,
+                                            RecurSeconds,
+                                            StartTime,
+                                            sort_order,
+                                            id);
+                NonQuery(sql);
+            }
         }
         #endregion
 

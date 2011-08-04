@@ -16,28 +16,31 @@ namespace zVirtualScenesApplication.Structs
         public int id { get; set; }
         public string txt_name { get; set; }        
         public BindingList<SceneCommands> scene_commands = new BindingList<SceneCommands>();
-        bool isRunning = false; 
+        public bool isRunning = false; 
         BackgroundWorker ExecuteScene = new BackgroundWorker();
-            
+
+        public override string ToString()
+        {
+            return txt_name;
+        }
 
         public Scene()
         {
             ExecuteScene.DoWork += new DoWorkEventHandler(ExecuteScene_DoWork);
-            ExecuteScene.RunWorkerCompleted += new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
-            
+            ExecuteScene.RunWorkerCompleted += new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);            
         }
 
         public string DeviceIcon()
         {
             if (!isRunning)
-                return "20scene_icon.jpg";
-            //else
-            return "20event.png";
+                return "Scene";
+            else
+                return "SceneRun";
         }
 
         public void Remove()
         {
-            API.Scenes.DeleteScene(id);
+            API.Scenes.Delete(id);
         }
 
         public void Add()
@@ -52,19 +55,20 @@ namespace zVirtualScenesApplication.Structs
             else
             {
                 if(scene_commands.Count < 1)
-                    return "Cannot start scene '" + txt_name + "' because it has no commands!!";
+                    return "Cannot start scene '" + txt_name + "' because it has no commands!";
 
                 API.Scenes.SetIsRunning(id, true);
-                isRunning = true;
+                zVirtualSceneEvents.SceneChanged(this.id);
                 ExecuteScene.RunWorkerAsync(); 
-                return "Scene '" + txt_name + "' started.";  
+                return "Started scene '" + txt_name + "'.";  
             }
         }
 
         void ExecuteScene_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            API.Scenes.SetIsRunning(id, false);
-            isRunning = false;
+            API.Scenes.SetIsRunning(id, false); 
+            zVirtualSceneEvents.SceneChanged(this.id);
+
             zVirtualSceneEvents.SceneRunComplete(id, errorCount);
         }
 

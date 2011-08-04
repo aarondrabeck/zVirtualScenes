@@ -18,7 +18,7 @@ namespace zVirtualScenesAPI.Events
         {
             if (CommandAddedEvent != null)
                 CommandAddedEvent(QueCmdID);
-        }
+        }       
 
         /// <summary>
         /// Called after a command is executed
@@ -57,7 +57,7 @@ namespace zVirtualScenesAPI.Events
         }
 
         /// <summary>
-        /// Called after the value is changed in the database
+        /// Called when a scene is changed.
         /// </summary>
         public static event SceneChangedEventHandler SceneChangedEvent;
         public delegate void SceneChangedEventHandler(int SceneID);
@@ -69,7 +69,7 @@ namespace zVirtualScenesAPI.Events
         }
 
         /// <summary>
-        /// Called after the value is changed in the database
+        /// Called when a scene command is modified.
         /// </summary>
         public static event SceneCMDChangedEventHandler SceneCMDChangedEvent;
         public delegate void SceneCMDChangedEventHandler(int SceneID);
@@ -81,7 +81,7 @@ namespace zVirtualScenesAPI.Events
         }
 
         /// <summary>
-        /// Called after the value is changed in the database
+        /// Called when a scene is finished.
         /// </summary>
         public static event SceneRunCompleteEventHandler SceneRunCompleteEvent;
         public delegate void SceneRunCompleteEventHandler(int SceneID, int ErrorCount);
@@ -90,6 +90,18 @@ namespace zVirtualScenesAPI.Events
         {
             if (SceneRunCompleteEvent != null)
                 SceneRunCompleteEvent(SceneID, ErrorCount);
+        }
+
+        /// <summary>
+        /// Called when a scheduled task is changed.
+        /// </summary>
+        public static event ScheduledTaskChangedEventHandler ScheduledTaskChangedEvent;
+        public delegate void ScheduledTaskChangedEventHandler(int TaskID);
+
+        public static void ScheduledTaskChanged(int TaskID)
+        {
+            if (ScheduledTaskChangedEvent != null)
+                ScheduledTaskChangedEvent(TaskID);
         }
 
         

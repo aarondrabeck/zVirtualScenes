@@ -324,7 +324,7 @@ namespace LightSwitchPlugin
 
                                     sendDeviceList(LightSwitchClientSocket);
 
-                                    BindingList<Scene> scenes = API.Scenes.GetSceneList();
+                                    BindingList<Scene> scenes = API.Scenes.GetScenes();
                                     foreach (Scene scene in scenes)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.txt_name + "~" + scene.id + Environment.NewLine);
                               
@@ -343,7 +343,7 @@ namespace LightSwitchPlugin
                                 else if (cmd.StartsWith("SLIST"))  //SCENES
                                 {
                                     //TODO: OPTION FOR EACH SCENE... if (scene.ShowInLightSwitchGUI)
-                                    BindingList<Scene> scenes = API.Scenes.GetSceneList();                                    
+                                    BindingList<Scene> scenes = API.Scenes.GetScenes();                                    
                                     foreach(Scene scene in scenes)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.txt_name + "~" + scene.id + Environment.NewLine);
                               

@@ -22,7 +22,7 @@ namespace zVirtualScenesAPI
 
         public static string DatabaseVersion
         {
-            get { return CurrentVersion.Database; }
+            get { return CurrentVersion.RequiredDatabaseVersion; }
         }
 
         public static void Initialize()
@@ -684,11 +684,7 @@ namespace zVirtualScenesAPI
 
         
         public static class Scenes
-        {
-            public static DataTable GetScenes()
-            {
-                return DatabaseControl.Scenes.GetScenes();
-            }
+        {           
            
             public static Scene GetScene(int sceneID)
             {
@@ -701,6 +697,10 @@ namespace zVirtualScenesAPI
                     int.TryParse(dt.Rows[0]["id"].ToString(), out id);
                     scene.id = id;
                     scene.txt_name = dt.Rows[0]["txt_name"].ToString();
+
+                    bool is_running = false;
+                    bool.TryParse(dt.Rows[0]["is_running"].ToString(), out is_running);
+                    scene.isRunning = is_running;
 
                     //Get Commands
                     scene.scene_commands.Clear();
@@ -741,7 +741,7 @@ namespace zVirtualScenesAPI
                 
             }
 
-            public static BindingList<Scene> GetSceneList()
+            public static BindingList<Scene> GetScenes()
             {
                 BindingList<Scene> scenes = new BindingList<Scene>();
                 DataTable dt = DatabaseControl.Scenes.GetScenes();
@@ -771,7 +771,7 @@ namespace zVirtualScenesAPI
                     DatabaseControl.Scenes.SetOrder(scene.id, scenes.IndexOf(scene));
             }
 
-            public static void DeleteScene(int sceneID)
+            public static void Delete(int sceneID)
             {
                 DatabaseControl.Scenes.DeleteScene(sceneID);
                 zVirtualSceneEvents.SceneChanged(sceneID);
@@ -782,7 +782,7 @@ namespace zVirtualScenesAPI
                 zVirtualSceneEvents.SceneChanged(DatabaseControl.Scenes.AddScene("New Scene"));
             }
 
-            public static int AddScene(string name)
+            public static int Add(string name)
             {                
                 int id =  DatabaseControl.Scenes.AddScene(name);
                 zVirtualSceneEvents.SceneChanged(id);
@@ -837,9 +837,182 @@ namespace zVirtualScenesAPI
             }
         }
 
-        //event triggering
+        #region scheduled_tasks
+        public static class ScheduledTasks
+        {
+            public static int Add(Task task)
+            {
+               int TaskID =  DatabaseControl.ScheduledTasks.Add(task.Name,
+                                                    (int)task.Frequency,
+                                                    task.Enabled.ToString(),
+                                                    task.SceneID,
+                                                    task.RecurMonday.ToString(),
+                                                    task.RecurTuesday.ToString(),
+                                                    task.RecurWednesday.ToString(),
+                                                    task.RecurThursday.ToString(),
+                                                    task.RecurFriday.ToString(),
+                                                    task.RecurSaturday.ToString(),
+                                                    task.RecurSunday.ToString(),
+                                                    task.RecurDays,
+                                                    task.RecurWeeks,
+                                                    task.RecurMonth,
+                                                    task.RecurDayofMonth,
+                                                    task.RecurSeconds,
+                                                    task.StartTime.ToString(),
+                                                    99);
 
-     
+               zVirtualSceneEvents.ScheduledTaskChanged(TaskID);
+               return TaskID;
+            }            
+
+            private static Task TaskDRtoObject(DataRow dr)
+            {
+                Task task = new Task();
+                
+                int id = 0;
+                int.TryParse(dr["id"].ToString(), out id);
+                task.ID = id;
+
+                task.Name = dr["Name"].ToString();
+
+                int fid = 0;
+                int.TryParse(dr["Frequency"].ToString(), out fid);
+                task.Frequency = (zVirtualScenesAPI.Structs.Task.frequencys)fid;
+
+                bool enabled = false;
+                bool.TryParse(dr["Enabled"].ToString(), out enabled);
+                task.Enabled = enabled;
+
+                int sid = 0;
+                int.TryParse(dr["Scene_id"].ToString(), out sid);
+                task.SceneID = sid;
+
+                bool RecurMonday = false;
+                bool.TryParse(dr["RecurMonday"].ToString(), out RecurMonday);
+                task.RecurMonday = RecurMonday;
+
+                bool RecurTuesday = false;
+                bool.TryParse(dr["RecurTuesday"].ToString(), out RecurTuesday);
+                task.RecurTuesday = RecurTuesday;
+
+                bool RecurWednesday = false;
+                bool.TryParse(dr["RecurWednesday"].ToString(), out RecurWednesday);
+                task.RecurWednesday = RecurWednesday;
+
+                bool RecurThursday = false;
+                bool.TryParse(dr["RecurThursday"].ToString(), out RecurThursday);
+                task.RecurThursday = RecurThursday;
+
+                bool RecurFriday = false;
+                bool.TryParse(dr["RecurFriday"].ToString(), out RecurFriday);
+                task.RecurFriday = RecurFriday;
+
+                bool RecurSaturday = false;
+                bool.TryParse(dr["RecurSaturday"].ToString(), out RecurSaturday);
+                task.RecurSaturday = RecurSaturday;
+
+                bool RecurSunday = false;
+                bool.TryParse(dr["RecurSunday"].ToString(), out RecurSunday);
+                task.RecurSunday = RecurSunday;
+
+                int RecurDays = 0;
+                int.TryParse(dr["RecurDays"].ToString(), out RecurDays);
+                task.RecurDays = RecurDays;
+
+                int RecurWeeks = 0;
+                int.TryParse(dr["RecurWeeks"].ToString(), out RecurWeeks);
+                task.RecurWeeks = RecurWeeks;
+
+                int RecurMonth = 0;
+                int.TryParse(dr["RecurMonth"].ToString(), out RecurMonth);
+                task.RecurMonth = RecurMonth;
+
+                int RecurDayofMonth = 0;
+                int.TryParse(dr["RecurDayofMonth"].ToString(), out RecurDayofMonth);
+                task.RecurDayofMonth = RecurDayofMonth;
+
+                int RecurSeconds = 0;
+                int.TryParse(dr["RecurSeconds"].ToString(), out RecurSeconds);
+                task.RecurSeconds = RecurSeconds;
+
+                DateTime StartTime = DateTime.Now;
+                DateTime.TryParse(dr["StartTime"].ToString(), out StartTime);
+                task.StartTime = StartTime;
+
+                return task;
+            }
+
+            /// <summary>
+            /// Return null if not found.
+            /// </summary>
+            /// <param name="TaskID"></param>
+            /// <returns></returns>
+            public static Task GetTask(int TaskID)
+            {
+                DataTable dt = DatabaseControl.ScheduledTasks.GetTask(TaskID);
+
+                if (dt != null && dt.Rows.Count == 1)
+                {
+                    return TaskDRtoObject(dt.Rows[0]);
+                }
+                return null;
+            }
+
+            public static BindingList<Task> GetTasks()
+            {
+                BindingList<Task> tasks = new BindingList<Task>();
+                DataTable dt = DatabaseControl.ScheduledTasks.GetTasks();
+
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        Task task = TaskDRtoObject(dr);
+                        tasks.Add(task);
+                    }
+                }
+                return tasks;
+            }
+
+            public static void Remove(Task task)
+            {
+                DatabaseControl.ScheduledTasks.Remove(task.ID);
+                zVirtualSceneEvents.ScheduledTaskChanged(task.ID);
+            }
+
+            public static void Remove(int TaskID)
+            {
+                DatabaseControl.ScheduledTasks.Remove(TaskID);
+                zVirtualSceneEvents.ScheduledTaskChanged(TaskID);
+            }
+
+            public static void Update(Task task)
+            {
+                DatabaseControl.ScheduledTasks.Update(task.ID,
+                    task.Name,
+                    (int)task.Frequency,
+                    task.Enabled.ToString(),
+                    task.SceneID,
+                    task.RecurMonday.ToString(),
+                    task.RecurTuesday.ToString(),
+                    task.RecurWednesday.ToString(),
+                    task.RecurThursday.ToString(),
+                    task.RecurFriday.ToString(),
+                    task.RecurSaturday.ToString(),
+                    task.RecurSunday.ToString(),
+                    task.RecurDays,
+                    task.RecurWeeks,
+                    task.RecurMonth,
+                    task.RecurDayofMonth,
+                    task.RecurSeconds,
+                    task.StartTime.ToString(),
+                    task.Order);
+
+                zVirtualSceneEvents.ScheduledTaskChanged(task.ID);
+            }
+        }
+        #endregion
+        //event triggering
 
         /// <summary>
         /// Call this to update database values have been updated. It will automatically call the proper valuechange events.

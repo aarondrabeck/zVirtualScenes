@@ -161,9 +161,6 @@
     <Compile Include="PluginSystem\PluginManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Structs\zwObjectState.cs" />
-    <Compile Include="Task.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="TestForms\TestForm.cs">
       <SubType>Form</SubType>
     </Compile>

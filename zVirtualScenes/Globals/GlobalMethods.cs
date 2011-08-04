@@ -39,9 +39,10 @@ namespace zVirtualScenesApplication.Globals
                     case ParamType.DECIMAL:
                         Numeric.Name = UniqueName;
                         Numeric.Top = top;
-                        Numeric.Width = 75;
+                        Numeric.Width = 175;
                         Numeric.Left = left;
                         Numeric.Tag = tag;
+                        Numeric.DecimalPlaces = 11; 
                         Numeric.Maximum = Decimal.MaxValue;
                         Numeric.Minimum = Decimal.MinValue;
                         p.Controls.Add(Numeric);

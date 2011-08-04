@@ -409,7 +409,7 @@ namespace HTTPControl
             #region Scene Listing
             if (rawURL.Contains(acceptedCMDs[4]))
             {
-                BindingList<Scene> APIScenes = API.Scenes.GetSceneList();
+                BindingList<Scene> APIScenes = API.Scenes.GetScenes();
 
                 List<zvsScene> Scenes = new List<zvsScene>();
 

@@ -72,6 +72,9 @@
     <Content Include="21to22.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="22to23.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="base_db.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

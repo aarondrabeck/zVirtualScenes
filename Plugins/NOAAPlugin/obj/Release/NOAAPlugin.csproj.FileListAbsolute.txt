@@ -1,0 +1,5 @@
+P:\2 - Hobby\zvs\trunk\Plugins\NOAAPlugin\obj\Release\ResolveAssemblyReference.cache
+P:\2 - Hobby\zvs\trunk\output_release\plugins\NOAAPlugin.dll
+P:\2 - Hobby\zvs\trunk\output_release\plugins\NOAAPlugin.pdb
+P:\2 - Hobby\zvs\trunk\Plugins\NOAAPlugin\obj\Release\NOAAPlugin.dll
+P:\2 - Hobby\zvs\trunk\Plugins\NOAAPlugin\obj\Release\NOAAPlugin.pdb

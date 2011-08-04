@@ -49,7 +49,7 @@ namespace zVirtualScenesApplication.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("441")]
+        [global::System.Configuration.DefaultSettingValueAttribute("437")]
         public int SpiltContainer2Distance {
             get {
                 return ((int)(this["SpiltContainer2Distance"]));

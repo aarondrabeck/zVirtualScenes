@@ -37,7 +37,6 @@ namespace zVirtualScenesApplication
             this.imageListActionTypesSmall = new System.Windows.Forms.ImageList(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.timer_TaskRunner = new System.Windows.Forms.Timer(this.components);
-            this.timerNOAA = new System.Windows.Forms.Timer(this.components);
             this.contextMenuStripScenes = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.runSceneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addSceneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -78,15 +77,20 @@ namespace zVirtualScenesApplication
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.dataListTasks = new BrightIdeasSoftware.DataListView();
             this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.EnabledCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.FreqCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.EnabledCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.imageList25Icons = new System.Windows.Forms.ImageList(this.components);
+            this.groupBox_Seconds = new System.Windows.Forms.GroupBox();
+            this.numericUpDownOccurSeconds = new System.Windows.Forms.NumericUpDown();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.groupBoxDaily = new System.Windows.Forms.GroupBox();
+            this.groupBox_Daily = new System.Windows.Forms.GroupBox();
+            this.numericUpDownOccurDays = new System.Windows.Forms.NumericUpDown();
             this.label19 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
-            this.textBox_DaysRecur = new System.Windows.Forms.TextBox();
             this.textBox_TaskName = new System.Windows.Forms.TextBox();
             this.checkBox_EnabledTask = new System.Windows.Forms.CheckBox();
             this.button_SaveTask = new System.Windows.Forms.Button();
@@ -96,6 +100,7 @@ namespace zVirtualScenesApplication
             this.comboBox_FrequencyTask = new System.Windows.Forms.ComboBox();
             this.label17 = new System.Windows.Forms.Label();
             this.groupBox_Weekly = new System.Windows.Forms.GroupBox();
+            this.numericUpDownOccurWeeks = new System.Windows.Forms.NumericUpDown();
             this.checkBox_RecurSunday = new System.Windows.Forms.CheckBox();
             this.checkBox_RecurSaturday = new System.Windows.Forms.CheckBox();
             this.checkBox_RecurFriday = new System.Windows.Forms.CheckBox();
@@ -105,7 +110,6 @@ namespace zVirtualScenesApplication
             this.checkBox_RecurMonday = new System.Windows.Forms.CheckBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
-            this.textBox_RecurWeeks = new System.Windows.Forms.TextBox();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.dataListViewDevices = new BrightIdeasSoftware.DataListView();
@@ -117,6 +121,7 @@ namespace zVirtualScenesApplication
             this.LevelCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.GroupsCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colLastHeardFrom = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_object_values();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -160,7 +165,6 @@ namespace zVirtualScenesApplication
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_object_values();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -181,9 +185,13 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).BeginInit();
+            this.groupBox_Seconds.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurSeconds)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.groupBoxDaily.SuspendLayout();
+            this.groupBox_Daily.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurDays)).BeginInit();
             this.groupBox_Weekly.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurWeeks)).BeginInit();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
@@ -220,18 +228,13 @@ namespace zVirtualScenesApplication
             this.imageListActionTypesSmall.Images.SetKeyName(9, "controler320.png");
             this.imageListActionTypesSmall.Images.SetKeyName(10, "20bulb.png");
             this.imageListActionTypesSmall.Images.SetKeyName(11, "doorlock20");
+            this.imageListActionTypesSmall.Images.SetKeyName(12, "Task");
             // 
             // timer_TaskRunner
             // 
             this.timer_TaskRunner.Enabled = true;
             this.timer_TaskRunner.Interval = 1000;
             this.timer_TaskRunner.Tick += new System.EventHandler(this.timer_TaskRunner_Tick);
-            // 
-            // timerNOAA
-            // 
-            this.timerNOAA.Enabled = true;
-            this.timerNOAA.Interval = 60000;
-            this.timerNOAA.Tick += new System.EventHandler(this.timerNOAA_Tick);
             // 
             // contextMenuStripScenes
             // 
@@ -562,7 +565,7 @@ namespace zVirtualScenesApplication
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage4.Size = new System.Drawing.Size(1000, 673);
             this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Scheduling";
+            this.tabPage4.Text = "Scene Scheduling";
             this.tabPage4.UseVisualStyleBackColor = true;
             // 
             // splitContainer2
@@ -580,10 +583,11 @@ namespace zVirtualScenesApplication
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Seconds);
             this.splitContainer2.Panel2.Controls.Add(this.pictureBox1);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
             this.splitContainer2.Panel2.Controls.Add(this.label6);
-            this.splitContainer2.Panel2.Controls.Add(this.groupBoxDaily);
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Daily);
             this.splitContainer2.Panel2.Controls.Add(this.textBox_TaskName);
             this.splitContainer2.Panel2.Controls.Add(this.checkBox_EnabledTask);
             this.splitContainer2.Panel2.Controls.Add(this.button_SaveTask);
@@ -593,7 +597,7 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.Controls.Add(this.comboBox_FrequencyTask);
             this.splitContainer2.Panel2.Controls.Add(this.label17);
             this.splitContainer2.Panel2.Controls.Add(this.groupBox_Weekly);
-            this.splitContainer2.Panel2MinSize = 325;
+            this.splitContainer2.Panel2MinSize = 553;
             this.splitContainer2.Size = new System.Drawing.Size(994, 667);
             this.splitContainer2.SplitterDistance = global::zVirtualScenesApplication.Properties.Settings.Default.SpiltContainer2Distance;
             this.splitContainer2.TabIndex = 47;
@@ -601,27 +605,28 @@ namespace zVirtualScenesApplication
             // dataListTasks
             // 
             this.dataListTasks.AllColumns.Add(this.olvColumn1);
-            this.dataListTasks.AllColumns.Add(this.EnabledCol);
             this.dataListTasks.AllColumns.Add(this.FreqCol);
+            this.dataListTasks.AllColumns.Add(this.EnabledCol);
             this.dataListTasks.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataListTasks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn1,
-            this.EnabledCol,
-            this.FreqCol});
+            this.FreqCol,
+            this.EnabledCol});
             this.dataListTasks.DataSource = null;
             this.dataListTasks.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataListTasks.FullRowSelect = true;
             this.dataListTasks.HasCollapsibleGroups = false;
-            this.dataListTasks.HeaderMaximumHeight = 15;
             this.dataListTasks.HideSelection = false;
             this.dataListTasks.Location = new System.Drawing.Point(0, 0);
             this.dataListTasks.Name = "dataListTasks";
             this.dataListTasks.OwnerDraw = true;
             this.dataListTasks.ShowCommandMenuOnRightClick = true;
             this.dataListTasks.ShowGroups = false;
-            this.dataListTasks.Size = new System.Drawing.Size(437, 663);
+            this.dataListTasks.Size = new System.Drawing.Size(433, 663);
+            this.dataListTasks.SmallImageList = this.imageList25Icons;
             this.dataListTasks.TabIndex = 46;
-            this.dataListTasks.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.InactiveCaption;
+            this.dataListTasks.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientActiveCaption;
+            this.dataListTasks.UnfocusedHighlightForegroundColor = System.Drawing.Color.Black;
             this.dataListTasks.UseCompatibleStateImageBehavior = false;
             this.dataListTasks.View = System.Windows.Forms.View.Details;
             this.dataListTasks.SelectedIndexChanged += new System.EventHandler(this.dataListTasks_SelectedIndexChanged_1);
@@ -629,18 +634,12 @@ namespace zVirtualScenesApplication
             // 
             // olvColumn1
             // 
-            this.olvColumn1.AspectName = "GetName";
-            this.olvColumn1.ImageAspectName = "GetIcon";
+            this.olvColumn1.AspectName = "ToString";
+            this.olvColumn1.FillsFreeSpace = true;
+            this.olvColumn1.ImageAspectName = "IconName";
             this.olvColumn1.IsEditable = false;
             this.olvColumn1.Text = "Task Name";
             this.olvColumn1.Width = global::zVirtualScenesApplication.Properties.Settings.Default.taskWidth;
-            // 
-            // EnabledCol
-            // 
-            this.EnabledCol.AspectName = "isEnabled";
-            this.EnabledCol.IsEditable = false;
-            this.EnabledCol.Text = "Enabled";
-            this.EnabledCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.enabledWidth;
             // 
             // FreqCol
             // 
@@ -649,19 +648,77 @@ namespace zVirtualScenesApplication
             this.FreqCol.Text = "Frequency";
             this.FreqCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.freqWidth;
             // 
+            // EnabledCol
+            // 
+            this.EnabledCol.AspectName = "isEnabled";
+            this.EnabledCol.IsEditable = false;
+            this.EnabledCol.Text = "Enabled";
+            this.EnabledCol.Width = global::zVirtualScenesApplication.Properties.Settings.Default.enabledWidth;
+            // 
+            // imageList25Icons
+            // 
+            this.imageList25Icons.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList25Icons.ImageStream")));
+            this.imageList25Icons.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageList25Icons.Images.SetKeyName(0, "Task");
+            this.imageList25Icons.Images.SetKeyName(1, "Scene");
+            this.imageList25Icons.Images.SetKeyName(2, "SceneRun");
+            // 
+            // groupBox_Seconds
+            // 
+            this.groupBox_Seconds.Controls.Add(this.numericUpDownOccurSeconds);
+            this.groupBox_Seconds.Controls.Add(this.label1);
+            this.groupBox_Seconds.Controls.Add(this.label2);
+            this.groupBox_Seconds.Location = new System.Drawing.Point(17, 142);
+            this.groupBox_Seconds.Name = "groupBox_Seconds";
+            this.groupBox_Seconds.Size = new System.Drawing.Size(234, 54);
+            this.groupBox_Seconds.TabIndex = 41;
+            this.groupBox_Seconds.TabStop = false;
+            this.groupBox_Seconds.Text = "Per Second";
+            // 
+            // numericUpDownOccurSeconds
+            // 
+            this.numericUpDownOccurSeconds.Location = new System.Drawing.Point(95, 19);
+            this.numericUpDownOccurSeconds.Maximum = new decimal(new int[] {
+            86400,
+            0,
+            0,
+            0});
+            this.numericUpDownOccurSeconds.Name = "numericUpDownOccurSeconds";
+            this.numericUpDownOccurSeconds.Size = new System.Drawing.Size(76, 20);
+            this.numericUpDownOccurSeconds.TabIndex = 45;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(178, 22);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(50, 13);
+            this.label1.TabIndex = 40;
+            this.label1.Text = "seconds.";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(19, 22);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(65, 13);
+            this.label2.TabIndex = 39;
+            this.label2.Text = "Recur every";
+            // 
             // pictureBox1
             // 
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(4, 7);
+            this.pictureBox1.Location = new System.Drawing.Point(404, 161);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(51, 49);
+            this.pictureBox1.Size = new System.Drawing.Size(137, 130);
             this.pictureBox1.TabIndex = 44;
             this.pictureBox1.TabStop = false;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(61, 19);
+            this.label5.Location = new System.Drawing.Point(14, 16);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(65, 13);
             this.label5.TabIndex = 32;
@@ -670,28 +727,40 @@ namespace zVirtualScenesApplication
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(13, 75);
+            this.label6.Location = new System.Drawing.Point(14, 78);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(83, 13);
             this.label6.TabIndex = 43;
             this.label6.Text = "Activate Scene:";
             // 
-            // groupBoxDaily
+            // groupBox_Daily
             // 
-            this.groupBoxDaily.Controls.Add(this.label19);
-            this.groupBoxDaily.Controls.Add(this.label20);
-            this.groupBoxDaily.Controls.Add(this.textBox_DaysRecur);
-            this.groupBoxDaily.Location = new System.Drawing.Point(59, 154);
-            this.groupBoxDaily.Name = "groupBoxDaily";
-            this.groupBoxDaily.Size = new System.Drawing.Size(206, 54);
-            this.groupBoxDaily.TabIndex = 37;
-            this.groupBoxDaily.TabStop = false;
-            this.groupBoxDaily.Text = "Daily";
+            this.groupBox_Daily.Controls.Add(this.numericUpDownOccurDays);
+            this.groupBox_Daily.Controls.Add(this.label19);
+            this.groupBox_Daily.Controls.Add(this.label20);
+            this.groupBox_Daily.Location = new System.Drawing.Point(17, 142);
+            this.groupBox_Daily.Name = "groupBox_Daily";
+            this.groupBox_Daily.Size = new System.Drawing.Size(206, 54);
+            this.groupBox_Daily.TabIndex = 37;
+            this.groupBox_Daily.TabStop = false;
+            this.groupBox_Daily.Text = "Daily";
+            // 
+            // numericUpDownOccurDays
+            // 
+            this.numericUpDownOccurDays.Location = new System.Drawing.Point(90, 19);
+            this.numericUpDownOccurDays.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numericUpDownOccurDays.Name = "numericUpDownOccurDays";
+            this.numericUpDownOccurDays.Size = new System.Drawing.Size(76, 20);
+            this.numericUpDownOccurDays.TabIndex = 46;
             // 
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(146, 22);
+            this.label19.Location = new System.Drawing.Point(168, 22);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(32, 13);
             this.label19.TabIndex = 40;
@@ -702,51 +771,43 @@ namespace zVirtualScenesApplication
             this.label20.AutoSize = true;
             this.label20.Location = new System.Drawing.Point(19, 22);
             this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(71, 13);
+            this.label20.Size = new System.Drawing.Size(65, 13);
             this.label20.TabIndex = 39;
-            this.label20.Text = "Recur every: ";
-            // 
-            // textBox_DaysRecur
-            // 
-            this.textBox_DaysRecur.Location = new System.Drawing.Point(90, 19);
-            this.textBox_DaysRecur.Name = "textBox_DaysRecur";
-            this.textBox_DaysRecur.Size = new System.Drawing.Size(50, 20);
-            this.textBox_DaysRecur.TabIndex = 38;
+            this.label20.Text = "Recur every";
             // 
             // textBox_TaskName
             // 
-            this.textBox_TaskName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_TaskName.Location = new System.Drawing.Point(132, 16);
+            this.textBox_TaskName.Location = new System.Drawing.Point(111, 13);
             this.textBox_TaskName.Name = "textBox_TaskName";
-            this.textBox_TaskName.Size = new System.Drawing.Size(363, 20);
+            this.textBox_TaskName.Size = new System.Drawing.Size(297, 20);
             this.textBox_TaskName.TabIndex = 0;
             // 
             // checkBox_EnabledTask
             // 
+            this.checkBox_EnabledTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox_EnabledTask.AutoSize = true;
-            this.checkBox_EnabledTask.Location = new System.Drawing.Point(62, 131);
+            this.checkBox_EnabledTask.Location = new System.Drawing.Point(446, 14);
             this.checkBox_EnabledTask.Name = "checkBox_EnabledTask";
-            this.checkBox_EnabledTask.Size = new System.Drawing.Size(65, 17);
+            this.checkBox_EnabledTask.Size = new System.Drawing.Size(92, 17);
             this.checkBox_EnabledTask.TabIndex = 39;
-            this.checkBox_EnabledTask.Text = "Enabled";
+            this.checkBox_EnabledTask.Text = "Task Enabled";
             this.checkBox_EnabledTask.UseVisualStyleBackColor = true;
             // 
             // button_SaveTask
             // 
             this.button_SaveTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_SaveTask.Location = new System.Drawing.Point(433, 622);
+            this.button_SaveTask.Location = new System.Drawing.Point(444, 631);
             this.button_SaveTask.Name = "button_SaveTask";
             this.button_SaveTask.Size = new System.Drawing.Size(97, 25);
             this.button_SaveTask.TabIndex = 38;
-            this.button_SaveTask.Text = "Save";
+            this.button_SaveTask.Text = "Save Task";
             this.button_SaveTask.UseVisualStyleBackColor = true;
             this.button_SaveTask.Click += new System.EventHandler(this.button_SaveTask_Click);
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(24, 108);
+            this.label18.Location = new System.Drawing.Point(14, 112);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(32, 13);
             this.label18.TabIndex = 36;
@@ -754,42 +815,36 @@ namespace zVirtualScenesApplication
             // 
             // comboBox_ActionsTask
             // 
-            this.comboBox_ActionsTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_ActionsTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_ActionsTask.FormattingEnabled = true;
-            this.comboBox_ActionsTask.Location = new System.Drawing.Point(102, 72);
+            this.comboBox_ActionsTask.Location = new System.Drawing.Point(111, 75);
             this.comboBox_ActionsTask.Name = "comboBox_ActionsTask";
-            this.comboBox_ActionsTask.Size = new System.Drawing.Size(393, 21);
+            this.comboBox_ActionsTask.Size = new System.Drawing.Size(297, 21);
             this.comboBox_ActionsTask.TabIndex = 42;
             // 
             // dateTimePickerStartTask
             // 
-            this.dateTimePickerStartTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.dateTimePickerStartTask.CustomFormat = "dddd,MMMM d, yyyy \'at\' h:mm:ss tt";
             this.dateTimePickerStartTask.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePickerStartTask.Location = new System.Drawing.Point(62, 105);
+            this.dateTimePickerStartTask.Location = new System.Drawing.Point(111, 108);
             this.dateTimePickerStartTask.Name = "dateTimePickerStartTask";
-            this.dateTimePickerStartTask.Size = new System.Drawing.Size(433, 20);
+            this.dateTimePickerStartTask.Size = new System.Drawing.Size(297, 20);
             this.dateTimePickerStartTask.TabIndex = 35;
             // 
             // comboBox_FrequencyTask
             // 
-            this.comboBox_FrequencyTask.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBox_FrequencyTask.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox_FrequencyTask.FormattingEnabled = true;
-            this.comboBox_FrequencyTask.Location = new System.Drawing.Point(152, 42);
+            this.comboBox_FrequencyTask.Location = new System.Drawing.Point(111, 44);
             this.comboBox_FrequencyTask.Name = "comboBox_FrequencyTask";
-            this.comboBox_FrequencyTask.Size = new System.Drawing.Size(343, 21);
+            this.comboBox_FrequencyTask.Size = new System.Drawing.Size(297, 21);
             this.comboBox_FrequencyTask.TabIndex = 33;
             this.comboBox_FrequencyTask.SelectedIndexChanged += new System.EventHandler(this.comboBox_FrequencyTask_SelectedIndexChanged);
             // 
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(59, 45);
+            this.label17.Location = new System.Drawing.Point(14, 47);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(87, 13);
             this.label17.TabIndex = 34;
@@ -797,6 +852,7 @@ namespace zVirtualScenesApplication
             // 
             // groupBox_Weekly
             // 
+            this.groupBox_Weekly.Controls.Add(this.numericUpDownOccurWeeks);
             this.groupBox_Weekly.Controls.Add(this.checkBox_RecurSunday);
             this.groupBox_Weekly.Controls.Add(this.checkBox_RecurSaturday);
             this.groupBox_Weekly.Controls.Add(this.checkBox_RecurFriday);
@@ -806,13 +862,24 @@ namespace zVirtualScenesApplication
             this.groupBox_Weekly.Controls.Add(this.checkBox_RecurMonday);
             this.groupBox_Weekly.Controls.Add(this.label7);
             this.groupBox_Weekly.Controls.Add(this.label12);
-            this.groupBox_Weekly.Controls.Add(this.textBox_RecurWeeks);
-            this.groupBox_Weekly.Location = new System.Drawing.Point(59, 154);
+            this.groupBox_Weekly.Location = new System.Drawing.Point(17, 142);
             this.groupBox_Weekly.Name = "groupBox_Weekly";
             this.groupBox_Weekly.Size = new System.Drawing.Size(206, 165);
             this.groupBox_Weekly.TabIndex = 41;
             this.groupBox_Weekly.TabStop = false;
             this.groupBox_Weekly.Text = "Weekly";
+            // 
+            // numericUpDownOccurWeeks
+            // 
+            this.numericUpDownOccurWeeks.Location = new System.Drawing.Point(91, 16);
+            this.numericUpDownOccurWeeks.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numericUpDownOccurWeeks.Name = "numericUpDownOccurWeeks";
+            this.numericUpDownOccurWeeks.Size = new System.Drawing.Size(58, 20);
+            this.numericUpDownOccurWeeks.TabIndex = 47;
             // 
             // checkBox_RecurSunday
             // 
@@ -887,7 +954,7 @@ namespace zVirtualScenesApplication
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(146, 22);
+            this.label7.Location = new System.Drawing.Point(156, 22);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(41, 13);
             this.label7.TabIndex = 40;
@@ -898,16 +965,9 @@ namespace zVirtualScenesApplication
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(19, 22);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(71, 13);
+            this.label12.Size = new System.Drawing.Size(65, 13);
             this.label12.TabIndex = 39;
-            this.label12.Text = "Recur every: ";
-            // 
-            // textBox_RecurWeeks
-            // 
-            this.textBox_RecurWeeks.Location = new System.Drawing.Point(90, 19);
-            this.textBox_RecurWeeks.Name = "textBox_RecurWeeks";
-            this.textBox_RecurWeeks.Size = new System.Drawing.Size(50, 20);
-            this.textBox_RecurWeeks.TabIndex = 38;
+            this.label12.Text = "Recur every";
             // 
             // tabPage5
             // 
@@ -1047,6 +1107,14 @@ namespace zVirtualScenesApplication
             this.colLastHeardFrom.Text = "Last Heard From";
             this.colLastHeardFrom.Width = 200;
             // 
+            // uc_object_values1
+            // 
+            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
+            this.uc_object_values1.Name = "uc_object_values1";
+            this.uc_object_values1.Size = new System.Drawing.Size(992, 232);
+            this.uc_object_values1.TabIndex = 0;
+            // 
             // MainTabControl
             // 
             this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1054,8 +1122,8 @@ namespace zVirtualScenesApplication
             | System.Windows.Forms.AnchorStyles.Right)));
             this.MainTabControl.Controls.Add(this.tabPage5);
             this.MainTabControl.Controls.Add(this.tabPage3);
-            this.MainTabControl.Controls.Add(this.tabPage1);
             this.MainTabControl.Controls.Add(this.tabPage4);
+            this.MainTabControl.Controls.Add(this.tabPage1);
             this.MainTabControl.Controls.Add(this.tabPage2);
             this.MainTabControl.Location = new System.Drawing.Point(0, 24);
             this.MainTabControl.Name = "MainTabControl";
@@ -1114,7 +1182,7 @@ namespace zVirtualScenesApplication
             this.dataListViewScenes.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
             this.dataListViewScenes.ShowGroups = false;
             this.dataListViewScenes.Size = new System.Drawing.Size(331, 667);
-            this.dataListViewScenes.SmallImageList = this.imageListActionTypesSmall;
+            this.dataListViewScenes.SmallImageList = this.imageList25Icons;
             this.dataListViewScenes.TabIndex = 0;
             this.dataListViewScenes.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.dataListViewScenes.UnfocusedHighlightForegroundColor = System.Drawing.Color.Black;
@@ -1193,7 +1261,7 @@ namespace zVirtualScenesApplication
             this.dataListViewSceneCMDs.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewSceneCMDs.TabIndex = 0;
             this.dataListViewSceneCMDs.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.dataListViewSceneCMDs.UnfocusedHighlightForegroundColor = System.Drawing.Color.White;
+            this.dataListViewSceneCMDs.UnfocusedHighlightForegroundColor = System.Drawing.Color.Black;
             this.dataListViewSceneCMDs.UseCompatibleStateImageBehavior = false;
             this.dataListViewSceneCMDs.UseExplorerTheme = true;
             this.dataListViewSceneCMDs.View = System.Windows.Forms.View.Details;
@@ -1460,14 +1528,6 @@ namespace zVirtualScenesApplication
             this.pluginsToolStripMenuItem.Text = "&Options";
             this.pluginsToolStripMenuItem.Click += new System.EventHandler(this.pluginsToolStripMenuItem_Click);
             // 
-            // uc_object_values1
-            // 
-            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
-            this.uc_object_values1.Name = "uc_object_values1";
-            this.uc_object_values1.Size = new System.Drawing.Size(992, 232);
-            this.uc_object_values1.TabIndex = 0;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1508,11 +1568,16 @@ namespace zVirtualScenesApplication
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).EndInit();
+            this.groupBox_Seconds.ResumeLayout(false);
+            this.groupBox_Seconds.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurSeconds)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.groupBoxDaily.ResumeLayout(false);
-            this.groupBoxDaily.PerformLayout();
+            this.groupBox_Daily.ResumeLayout(false);
+            this.groupBox_Daily.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurDays)).EndInit();
             this.groupBox_Weekly.ResumeLayout(false);
             this.groupBox_Weekly.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurWeeks)).EndInit();
             this.tabPage5.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
@@ -1542,7 +1607,6 @@ namespace zVirtualScenesApplication
 
         private System.Windows.Forms.ToolTip toolTip1;
         private Timer timer_TaskRunner;
-        private Timer timerNOAA;
         private ImageList imageListActionTypesSmall;
         private ContextMenuStrip contextMenuStripScenes;
         private ToolStripMenuItem editSceneToolStripMenuItem;
@@ -1586,10 +1650,9 @@ namespace zVirtualScenesApplication
         private PictureBox pictureBox1;
         private Label label5;
         private Label label6;
-        private GroupBox groupBoxDaily;
+        private GroupBox groupBox_Daily;
         private Label label19;
         private Label label20;
-        private TextBox textBox_DaysRecur;
         private TextBox textBox_TaskName;
         private CheckBox checkBox_EnabledTask;
         private Button button_SaveTask;
@@ -1608,7 +1671,6 @@ namespace zVirtualScenesApplication
         private CheckBox checkBox_RecurMonday;
         private Label label7;
         private Label label12;
-        private TextBox textBox_RecurWeeks;
         private TabPage tabPage1;
         private SplitContainer splitContainer1;
         private BrightIdeasSoftware.DataListView dataListEvents;
@@ -1667,6 +1729,13 @@ namespace zVirtualScenesApplication
         private ToolStripMenuItem aaronRestoreNamesToolStripMenuItem;
         private Button btnAddBltInCMD;
         private ToolStripMenuItem duplicateSceneToolStripMenuItem;
+        private GroupBox groupBox_Seconds;
+        private NumericUpDown numericUpDownOccurSeconds;
+        private Label label1;
+        private Label label2;
+        private NumericUpDown numericUpDownOccurDays;
+        private NumericUpDown numericUpDownOccurWeeks;
+        private ImageList imageList25Icons;
     }
 }
 

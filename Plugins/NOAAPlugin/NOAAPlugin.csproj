@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{90E854D0-AB37-4928-BF33-93B3553F33A9}</ProjectGuid>
+    <ProjectGuid>{87DAEF88-428E-4BCA-8DFC-56889C7C30A7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>zVirtualScenesAPI</RootNamespace>
-    <AssemblyName>zVirtualScenesAPI</AssemblyName>
+    <RootNamespace>NOAAPlugin</RootNamespace>
+    <AssemblyName>NOAAPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\output\</OutputPath>
+    <OutputPath>..\..\output\plugins\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,17 +25,15 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\output_release\</OutputPath>
+    <OutputPath>..\..\output_release\plugins\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,30 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="API\zVirtualSceneEvents.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="NOAAPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="API\API.cs" />
-    <Compile Include="ParamType.cs" />
-    <Compile Include="Structs\Command.cs" />
-    <Compile Include="Structs\CommandType.cs" />
-    <Compile Include="Structs\Scene.cs" />
-    <Compile Include="Structs\SceneCommands.cs" />
-    <Compile Include="Structs\Task.cs" />
-    <Compile Include="Structs\zwObject.cs" />
-    <Compile Include="Structs\zwObjectState.cs" />
-    <Compile Include="ValueControl.cs" />
-    <Compile Include="Structs\QuedCommand.cs" />
+    <Compile Include="SunTimes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
-      <Project>{FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00}</Project>
-      <Name>zVirtualScenesCommon</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
+      <Project>{90E854D0-AB37-4928-BF33-93B3553F33A9}</Project>
+      <Name>zVirtualScenesAPI</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.Config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
