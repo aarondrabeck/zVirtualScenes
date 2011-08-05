@@ -88,7 +88,7 @@ namespace HTTPControl
 
         protected override void SettingChanged(string settingName, string settingValue)
         {
-            throw new NotImplementedException();
+           
         }
 
         public override void ProcessCommand(QuedCommand cmd)

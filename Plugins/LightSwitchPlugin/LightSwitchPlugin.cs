@@ -12,6 +12,7 @@ using System.Data;
 using zVirtualScenesAPI.Events;
 using zVirtualScenesApplication.Structs;
 using System.ComponentModel;
+using ZeroconfService;
 
 namespace LightSwitchPlugin
 {
@@ -23,6 +24,7 @@ namespace LightSwitchPlugin
         public AsyncCallback pfnWorkerCallBack;
         private int m_cookie = new Random().Next(65536);
         public volatile bool isActive = false;
+        private NetService netservice = null;
 
         public LightSwitchPlugin()
             : base("LIGHTSWITCH")
@@ -37,6 +39,26 @@ namespace LightSwitchPlugin
             zVirtualSceneEvents.SceneRunCompleteEvent += new zVirtualSceneEvents.SceneRunCompleteEventHandler(zVirtualSceneEvents_SceneRunCompleteEvent);
             API.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
             OpenLightSwitchSocket();
+
+            bool useBonjour = false;
+            bool.TryParse(API.GetSetting("Publish ZeroConf/Bonjour"), out useBonjour);
+
+            try
+            {
+                if (netservice == null)
+                    PublishZeroconf();
+                else
+                {
+                    netservice.Dispose();
+                    PublishZeroconf();
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                API.WriteToLog(Urgency.ERROR, ex.Message); 
+            }
+
             IsReady = true;
             return true;
         }   
@@ -55,14 +77,12 @@ namespace LightSwitchPlugin
 
         protected override void SettingChanged(string settingName, string settingValue)
         {
-            //throw new NotImplementedException();
         }
 
         public override void Initialize()
         {
 
             API.InstallObjectType("LIGHTSWITCH", false);
-            //API.InstallObjectTypeCommand("SPEECH", "Say", "SAY", ParamType.STRING);
 
             API.NewObject(1, "LIGHTSWITCH", "LIGHTSWITCH");
             API.DefineSetting("Port", "1337", ParamType.INTEGER, "LightSwitch will listen for connections on this port.");
@@ -70,17 +90,10 @@ namespace LightSwitchPlugin
             API.DefineSetting("Verbose Logging", "true", ParamType.BOOL, "(Writes all server client communication to the log for debugging.)");
             API.DefineSetting("Password", "ChaNgeMe444", ParamType.STRING, "The password clients must use to connect to the LightSwitch server. ");
             API.DefineSetting("Sort Device List", "true", ParamType.BOOL, "(Alphabetically sorts the device list.)");
+            API.DefineSetting("Publish ZeroConf/Bonjour", "false", ParamType.BOOL, "Zero configuration networking allows clients on your network to detect and connect to your LightSwitch server automatically.");
 
             API.Object.Properties.NewObjectProperty("SHOWINLSLIST", "Show in Lightswitch List", "true", ParamType.BOOL);
-
-            //API.NewObjectProperty("TESTLIST", "Test List", "NO", ParamType.LIST);
-            //API.NewObjectPropertyOption("TESTLIST", "YES");
-            //API.NewObjectPropertyOption("TESTLIST", "NO");
-            //API.NewObjectPropertyOption("TESTLIST", "MAYBE"); 
-
         }
-
-
 
         public override void ProcessCommand(QuedCommand cmd)
         {            
@@ -760,7 +773,49 @@ namespace LightSwitchPlugin
                 result.Append(encodedBytes[i].ToString("x2"));
 
             return result.ToString().ToUpper();
-        }               
+        }
+
+
+        #region ZeroConf/Bonjour
+
+        private void PublishZeroconf()
+        {
+            int port = 9909;
+            int.TryParse(API.GetSetting("Port"), out port);
+
+            string domain = "";
+            String type = "_lightswitch._tcp.";
+            String name = "Lightswitch " + Environment.MachineName;
+            netservice = new NetService(domain, type, name, port);
+            netservice.AllowMultithreadedCallbacks = true;
+            netservice.DidPublishService += new NetService.ServicePublished(publishService_DidPublishService);
+            netservice.DidNotPublishService += new NetService.ServiceNotPublished(publishService_DidNotPublishService);
+
+            /* HARDCODE TXT RECORD */
+            System.Collections.Hashtable dict = new System.Collections.Hashtable();
+            dict = new System.Collections.Hashtable();
+            dict.Add("txtvers", "1");
+            dict.Add("ServiceName", name);
+            dict.Add("MachineName", Environment.MachineName);
+            dict.Add("OS", Environment.OSVersion.ToString());
+            dict.Add("IPAddress", "127.0.0.1");
+            dict.Add("Version", API.GetProgramNameAndVersion);
+            netservice.TXTRecordData = NetService.DataFromTXTRecordDictionary(dict);
+            netservice.Publish();
+            
+        }
+
+        void publishService_DidPublishService(NetService service)
+        {
+            API.WriteToLog(Urgency.INFO, String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name));
+        }
+
+        void publishService_DidNotPublishService(NetService service, DNSServiceException ex)
+        {
+            API.WriteToLog(Urgency.ERROR, ex.Message);
+        }
+
+        #endregion 
     }
 
     public class SocketPacket

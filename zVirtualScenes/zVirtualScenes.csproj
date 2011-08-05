@@ -359,15 +359,10 @@
     <None Include="Resources\Broadcast20.png" />
     <EmbeddedResource Include="Resources\User48.png" />
     <EmbeddedResource Include="Resources\temperature48.png" />
-    <EmbeddedResource Include="Resources\Broadcast48.png" />
-    <EmbeddedResource Include="Resources\zvirtualscenes57.png" />
     <None Include="Resources\switch48.png" />
     <None Include="Resources\scene-32.jpg" />
     <None Include="Resources\dial-32.jpg" />
     <None Include="Resources\switch-32.jpg" />
-    <EmbeddedResource Include="lib\ObjectListView.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
