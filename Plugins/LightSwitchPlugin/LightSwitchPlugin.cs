@@ -43,20 +43,23 @@ namespace LightSwitchPlugin
             bool useBonjour = false;
             bool.TryParse(API.GetSetting("Publish ZeroConf/Bonjour"), out useBonjour);
 
-            try
+            if (useBonjour)
             {
-                if (netservice == null)
-                    PublishZeroconf();
-                else
+                try
                 {
-                    netservice.Dispose();
-                    PublishZeroconf();
+                    if (netservice == null)
+                        PublishZeroconf();
+                    else
+                    {
+                        netservice.Dispose();
+                        PublishZeroconf();
+                    }
+
                 }
-                
-            }
-            catch (Exception ex)
-            {
-                API.WriteToLog(Urgency.ERROR, ex.Message); 
+                catch (Exception ex)
+                {
+                    API.WriteToLog(Urgency.ERROR, ex.Message);
+                }
             }
 
             IsReady = true;

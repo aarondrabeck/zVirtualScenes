@@ -114,10 +114,10 @@ namespace NOAAPlugin
 
         private void LoadLatLong()
         {
-            Double Lat = 30.6772222222222;
+            Lat = 30.6772222222222;
             Double.TryParse(API.GetSetting("Latitude"), out Lat);
 
-            Double Long = -100.061666666667;
+            Long = -100.061666666667;
             Double.TryParse(API.GetSetting("Longitude"), out Long);
         }
 

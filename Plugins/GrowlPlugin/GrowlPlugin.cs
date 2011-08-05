@@ -93,11 +93,11 @@ namespace GrowlPlugin
         {
             try
             {
-                string[] resourcenames = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
-                foreach (string rname in resourcenames)
-                {
-                    API.WriteToLog(Urgency.INFO, rname);
-                }
+                //string[] resourcenames = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
+                //foreach (string rname in resourcenames)
+                //{
+                //    API.WriteToLog(Urgency.INFO, rname);
+                //}
 
                 Growl.Connector.Application application = new Growl.Connector.Application("zVirtualScenes");
                 string exePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
