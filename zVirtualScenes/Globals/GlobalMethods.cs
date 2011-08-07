@@ -94,6 +94,25 @@ namespace zVirtualScenesApplication.Globals
                         }
 
                         break;
+                    case ParamType.SHORT:
+                        Numeric.Name = UniqueName;
+                        Numeric.Top = top;
+                        Numeric.Left = left;
+                        Numeric.Tag = tag;
+                        Numeric.Width = 75;
+                        Numeric.Maximum = short.MaxValue;
+                        Numeric.Minimum = short.MinValue;
+                        p.Controls.Add(Numeric);
+                        left += Numeric.Width + 5;
+
+                        if (!String.IsNullOrEmpty(value))
+                        {
+                            short i = 0;
+                            short.TryParse(value, out i);
+                            Numeric.Value = i;
+                        }
+
+                        break;
                     case ParamType.STRING:                        
                         TextBox tbx = new TextBox();
                         tbx.Name = UniqueName;

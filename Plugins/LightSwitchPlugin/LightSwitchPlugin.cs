@@ -29,7 +29,7 @@ namespace LightSwitchPlugin
         public LightSwitchPlugin()
             : base("LIGHTSWITCH")
         {
-            PluginName = "LightSwitch";
+            PluginName = "LightSwitch Server";
         }
 
         protected override bool StartPlugin()

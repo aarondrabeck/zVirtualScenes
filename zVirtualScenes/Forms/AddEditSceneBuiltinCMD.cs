@@ -279,6 +279,7 @@ namespace zVirtualScenesApplication.Forms
                         case ParamType.BYTE:
                         case ParamType.DECIMAL:
                         case ParamType.INTEGER:
+                        case ParamType.SHORT:
                             argument = Numeric.Value.ToString();
                             break;
                     }

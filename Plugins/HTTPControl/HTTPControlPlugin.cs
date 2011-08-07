@@ -28,7 +28,7 @@ namespace HTTPControl
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
 
         public HTTPControlPlugin()
-            : base("HTTPControl")
+            : base("HTTPCONTROL")
         {
             PluginName = "HTTP Control";
         }

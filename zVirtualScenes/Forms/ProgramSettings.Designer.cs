@@ -134,7 +134,7 @@
             this.MinimumSize = new System.Drawing.Size(720, 428);
             this.Name = "ProgramSettings";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "zVirtualScenes - Settings";
+            this.Text = "Options";
             this.Load += new System.EventHandler(this.ProgramSettings_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewMenu)).EndInit();
             this.ResumeLayout(false);

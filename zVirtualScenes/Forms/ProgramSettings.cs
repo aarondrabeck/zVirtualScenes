@@ -48,7 +48,8 @@ namespace zVirtualScenesApplication
             foreach (Plugin p in allplugins)
             {
                 MenuItem plugin_mi = new MenuItem();
-                plugin_mi.Name = p.GetAPIName();
+                plugin_mi.Name = p.ToString();
+                plugin_mi.API = p.GetAPIName();
                 plugin_mi.Group = "Plugins";
                 menu.Add(plugin_mi);               
             }
@@ -62,6 +63,7 @@ namespace zVirtualScenesApplication
 
         public class MenuItem
         {
+            public string API;
             public string Name;
             public string Group;
         }
@@ -75,7 +77,7 @@ namespace zVirtualScenesApplication
 
                 if (mi.Group.Equals("Plugins"))
                 {
-                    uc_plugin_properties_form1.PopulatePluginSettings(mi.Name, _mainForm);
+                    uc_plugin_properties_form1.PopulatePluginSettings(mi.API, _mainForm);
                     uc_plugin_properties_form1.Visible = true;
                 }
                 else

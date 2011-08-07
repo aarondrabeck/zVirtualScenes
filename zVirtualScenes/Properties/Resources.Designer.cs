@@ -186,9 +186,23 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap zvirtualscenes {
+            get {
+                object obj = ResourceManager.GetObject("zvirtualscenes", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap zvirtualscenes57 {
             get {
                 object obj = ResourceManager.GetObject("zvirtualscenes57", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap zvirtualscenes72 {
+            get {
+                object obj = ResourceManager.GetObject("zvirtualscenes72", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

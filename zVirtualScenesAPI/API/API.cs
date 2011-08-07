@@ -58,6 +58,11 @@ namespace zVirtualScenesAPI
             DatabaseControl.DefinePluginSetting(_plugin, settingName, defaultSetting, (int)type, description);
         }
 
+        public void RemovePluginSetting(string PropertyName)
+        {
+            DatabaseControl.RemovePluginSetting(_plugin, PropertyName);
+        }
+
         public void NewPluginSettingOption(string settingName, string Option)
         {
             DatabaseControl.NewPluginSettingOption(_plugin, settingName,  Option); 
@@ -186,6 +191,11 @@ namespace zVirtualScenesAPI
                 public static void NewObjectProperty(string PropertyName, string PropertyFriendlyName, string DefaultValue, ParamType PropertyType)
                 {
                     DatabaseControl.NewObjectProperty(PropertyName, PropertyFriendlyName, DefaultValue, (int)PropertyType);
+                }
+
+                public static void RemoveObjectProperty(string PropertyName)
+                {
+                    DatabaseControl.RemoveObjectProperty(PropertyName);
                 }
 
                 /// <summary>
@@ -834,6 +844,44 @@ namespace zVirtualScenesAPI
                     bool.TryParse(dt.Rows[0]["is_running"].ToString(), out isrunning);
                 }
                 return isrunning;
+            }
+
+            public static class Properties
+            {
+                public static DataTable GetSceneProperties()
+                {
+                    return DatabaseControl.Scenes.Properties.GetSceneProperties();
+                }
+
+                public static List<string> GetScenePropertyOptions(string PropertyName)
+                {
+                    return DatabaseControl.Scenes.Properties.GetScenePropertyOptions(PropertyName);
+                }
+
+                public static string SetScenePropertyValue(string PropertyName, int sceneID, string value)
+                {
+                    return DatabaseControl.Scenes.Properties.SetScenePropertyValue(PropertyName, sceneID, value);
+                }
+                
+                public static void New(string PropertyName, string PropertyDescription, string DefaultValue, ParamType PropertyVauleTypeID)
+                {
+                    DatabaseControl.Scenes.Properties.New(PropertyName, PropertyDescription, DefaultValue, (int)PropertyVauleTypeID);
+                }
+
+                public static void Remove(string PropertyName)
+                {
+                    DatabaseControl.Scenes.Properties.Remove(PropertyName);
+                }
+
+                public static void NewPropertyOption(string PropertyName, string OptionValue)
+                {
+                    DatabaseControl.Scenes.Properties.NewPropertyOption(PropertyName, OptionValue);
+                }
+
+                public static string GetScenePropertyValue(int sceneID, string PropertyName)
+                {
+                    return DatabaseControl.Scenes.Properties.GetScenePropertyValue(sceneID, PropertyName);
+                } 
             }
         }
 

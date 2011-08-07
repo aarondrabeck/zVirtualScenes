@@ -41,7 +41,9 @@ namespace zVirtualScenesCommon.DatabaseCommon
                             "TRUNCATE TABLE plugins;" +
                             "TRUNCATE TABLE scenes_cmds;" +
                             "TRUNCATE TABLE scenes;" +
-                            "TRUNCATE TABLE scheduled_tasks;"                           
+                            "TRUNCATE TABLE scheduled_tasks;" +
+                            "TRUNCATE TABLE scene_properties;" +
+                            "TRUNCATE TABLE scene_property_options;" 
                             );
         }  
 
@@ -129,9 +131,9 @@ namespace zVirtualScenesCommon.DatabaseCommon
 
         public static void NewPlugin(string pluginName, string APIName)
         {
-            if (!HasRows("SELECT * FROM plugins WHERE txt_api_name = '" + APIName + "';"))
-                NonQuery("INSERT INTO plugins (txt_plugin_name, txt_api_name) VALUES ('" + pluginName + "', '" +
-                       APIName + "');");
+            if (!HasRows("SELECT * FROM plugins WHERE txt_api_name = '" + GetSafeText(APIName) + "';"))
+                NonQuery("INSERT INTO plugins (txt_plugin_name, txt_api_name) VALUES ('" + GetSafeText(pluginName) + "', '" +
+                       GetSafeText(APIName) + "');");
         }
 
         public static string GetPluginSetting(string APIName, string settingName)
@@ -200,6 +202,27 @@ namespace zVirtualScenesCommon.DatabaseCommon
                 if (!HasRows("SELECT id FROM plugin_settings WHERE plugin_id = " + pluginId + " AND txt_setting_name = '" +  GetSafeText(settingName) + "';"))
                 {
                     NonQuery("INSERT INTO plugin_settings (plugin_id, txt_setting_name, txt_setting_value, plugin_settings_type_id, txt_setting_description) VALUES (" + pluginId + ", '" + GetSafeText(settingName)  + "', '" + defaultValue + "', '" + type + "', '" + GetSafeText(description) + "');");
+                }
+            }
+        }
+
+        public static void RemovePluginSetting(string APIName, string PropertyName)
+        {
+             int pluginId = GetPluginId(APIName);
+            if (pluginId != -1)
+            {
+                int id = 0;
+                string existssql = string.Format("SELECT id FROM plugin_settings WHERE txt_setting_name = '{0}' and plugin_id = '{1}';", GetSafeText(PropertyName), pluginId);
+                DataTable dt = GetDataTable(existssql);
+
+                if (dt.Rows.Count > 0)
+                    int.TryParse(dt.Rows[0]["id"].ToString(), out id);
+
+                if (id > 0)
+                {
+                    string sql = string.Format("DELETE FROM `plugin_settings` WHERE `id`='{0}';",
+                        id);
+                    NonQuery(sql);
                 }
             }
         }
@@ -406,6 +429,23 @@ namespace zVirtualScenesCommon.DatabaseCommon
                     GetSafeText(DefaultValue),
                     PropertyType);
 
+                NonQuery(sql);
+            }
+        }
+
+        public static void RemoveObjectProperty(string PropertyName)
+        {
+            int id = 0;
+            string existssql = string.Format("SELECT id FROM object_properties WHERE txt_property_name = '{0}';", GetSafeText(PropertyName));
+            DataTable dt = GetDataTable(existssql);
+
+            if (dt.Rows.Count > 0)
+                int.TryParse(dt.Rows[0]["id"].ToString(), out id);
+
+            if (id > 0)
+            {
+                string sql = string.Format("DELETE FROM `object_properties` WHERE `id`='{0}';",
+                    id);
                 NonQuery(sql);
             }
         }
@@ -1509,9 +1549,178 @@ namespace zVirtualScenesCommon.DatabaseCommon
             {
                 NonQuery(string.Format("UPDATE scenes SET `is_running`='{0}' WHERE `id`='{1}';", isRunning.ToString(), SceneID));
             }            
+
+            public static class Properties
+            {
+                public static DataTable GetSceneProperties()
+                {
+                    return GetDataTable("SELECT * FROM `scene_properties`;");
+                }
+
+                public static List<string> GetScenePropertyOptions(string PropertyName)
+                {
+                    List<string> options = new List<string>();
+                    int scenePropertyID = GetPropertyID(GetSafeText(PropertyName));
+
+                    if (scenePropertyID > 0)
+                    {
+                        string sql = string.Format("SELECT txt_option FROM `scene_property_options` WHERE scene_property_id = '{0}';",
+                            scenePropertyID);
+
+                        foreach (DataRow dr in GetDataTable(sql).Rows)
+                        {
+                            options.Add(dr["txt_option"].ToString());
+                        }
+                    }
+                    else
+                        Logger.WriteToLog(UrgencyLevel.ERROR, "Could get scene property options. Scene Property Not Found!", "DatabaseControl");
+
+                    return options;
+                }
+
+                public static string SetScenePropertyValue(string PropertyName, int sceneID, string value)
+                {
+                    int scenePropertyID = GetPropertyID(PropertyName);
+
+                    if (scenePropertyID > 0)
+                    {
+                        string istheresql = string.Format("SELECT id FROM `scene_property_values` WHERE scene_id = {0} AND scene_property_id = {1};",
+                                                            sceneID,
+                                                            scenePropertyID);
+
+                        DataTable dt = GetDataTable(istheresql);
+                        if (dt.Rows.Count > 0)
+                        {
+                            string updatesql = string.Format("UPDATE `scene_property_values` SET `txt_property_value`='{0}' WHERE `id`={1};",
+                                GetSafeText(value),
+                                dt.Rows[0]["id"].ToString());
+
+                            return NonQuery(updatesql);
+                        }
+                        else
+                        {
+                            string insertsql = string.Format("INSERT INTO `scene_property_values` (`scene_id`, `scene_property_id`, `txt_property_value`) VALUES ({0}, {1}, '{2}');",
+                            sceneID,
+                            scenePropertyID,
+                            GetSafeText(value));
+
+                            return NonQuery(insertsql);
+                        }
+
+                    }
+                    else
+                        Logger.WriteToLog(UrgencyLevel.ERROR, "Could not set scene property. Scene Property Not Found!", "DatabaseControl");
+
+                    return string.Empty;
+                }
+
+                public static void New(string PropertyName, string PropertyDescription, string DefaultValue, int PropertyVauleTypeID)
+                {
+                    if (!HasRows(string.Format("SELECT * FROM scene_properties WHERE txt_property_name = '{0}';", GetSafeText(PropertyName))))
+                    {
+                        string sql = string.Format("INSERT INTO `scene_properties` (`txt_property_name`, `txt_property_defualt_value`, `property_type_id`, `txt_property_description`) VALUES ('{0}', '{1}', {2}, '{3}');",
+                            GetSafeText(PropertyName),
+                            GetSafeText(DefaultValue),
+                            PropertyVauleTypeID,
+                            GetSafeText(PropertyDescription));
+
+                        NonQuery(sql);
+                    }
+                }
+
+                public static void Remove(string PropertyName)
+                {
+                    int id = 0;
+                    string existssql = string.Format("SELECT id FROM scene_properties WHERE txt_property_name = '{0}';", GetSafeText(PropertyName));
+                    DataTable dt = GetDataTable(existssql);
+
+                    if (dt.Rows.Count > 0)
+                        int.TryParse(dt.Rows[0]["id"].ToString(), out id);
+
+                    if (id > 0)
+                    {
+                        string sql = string.Format("DELETE FROM `scene_properties` WHERE `id`='{0}';",
+                            id);
+                        NonQuery(sql);
+                    }
+                }
+
+                public static int GetPropertyID(string PropertyName)
+                {
+                    int id = 0;
+
+                    string sql = String.Format("SELECT id FROM `scene_properties` WHERE txt_property_name = '{0}';",
+                                        GetSafeText(PropertyName));
+
+                    DataTable dt = GetDataTable(sql);
+
+                    if (dt.Rows.Count > 0)
+                        int.TryParse(dt.Rows[0]["id"].ToString(), out id);
+
+                    if (id == 0)
+                        Logger.WriteToLog(UrgencyLevel.ERROR, "Scene Property Not Found!", "DatabaseControl");
+
+                    return id;
+                }
+
+                public static string GetScenePropertyValue(int sceneID, string PropertyName)
+                {
+                    int scenePropertyID = GetPropertyID(PropertyName);
+                    //TRY TO FIND SETTING FOR THIS SPECIFIC DEIVCE
+                    string sql = String.Format("SELECT txt_property_value FROM `scene_property_values` WHERE scene_id = {0} AND scene_property_id = {1};",
+                                        sceneID,
+                                        scenePropertyID);
+
+                    DataTable dt = GetDataTable(sql);
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        return dt.Rows[0]["txt_property_value"].ToString();
+                    }
+                    else  //GET DEFAULT VALUE
+                    {
+                        return GetScenePropertyDefaultValue(PropertyName);
+                    }
+                }
+
+                public static string GetScenePropertyDefaultValue(string PropertyName)
+                {
+                    string sql = String.Format("SELECT txt_property_defualt_value FROM `scene_properties` WHERE txt_property_name = '{0}';",
+                                        GetSafeText(PropertyName));
+
+                    DataTable dt = GetDataTable(sql);
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        return dt.Rows[0]["txt_property_defualt_value"].ToString();
+                    }
+                    return String.Empty;
+                }
+
+                public static void NewPropertyOption(string PropertyName, string OptionValue)
+                {
+                    int PropertyID = GetPropertyID(PropertyName);
+
+                    if (PropertyID > 0)
+                    {
+                        string isalreadyinstalledsql = string.Format("SELECT id FROM `scene_property_options` WHERE scene_property_id = {0} AND txt_option = '{1}';",
+                                                                    PropertyID,
+                                                                    GetSafeText(OptionValue));
+                        if (!HasRows(isalreadyinstalledsql))
+                        {
+                            string insertOption = string.Format("INSERT INTO `scene_property_options` (`scene_property_id`, `txt_option`) VALUES ({0}, '{1}');",
+                                                                PropertyID,
+                                                                GetSafeText(OptionValue));
+                            NonQuery(insertOption);
+                        }
+                    }
+                    else
+                        Logger.WriteToLog(UrgencyLevel.ERROR, "Could install new scene property option '"+PropertyName+"'. Object Property Not Found!", "DatabaseControl");
+                }                
+
+            }
         }
         #endregion
-
         
         #region scheduled_tasks
         public static class ScheduledTasks
@@ -1623,7 +1832,6 @@ namespace zVirtualScenesCommon.DatabaseCommon
             }
         }
         #endregion
-
 
         public static string installBaseDB()
         {

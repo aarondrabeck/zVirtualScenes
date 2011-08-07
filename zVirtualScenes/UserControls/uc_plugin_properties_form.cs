@@ -169,6 +169,7 @@ namespace zVirtualScenesApplication.UserControls
                                     break;                               
                                 case ParamType.DECIMAL:
                                 case ParamType.INTEGER:
+                                case ParamType.SHORT:
                                 case ParamType.BYTE:
                                     errors += API.PluginSettings.SetPluginSetting(_PluginAPIName, dr["txt_setting_name"].ToString(), ((NumericUpDown)c).Value.ToString());                                      
                                     break;

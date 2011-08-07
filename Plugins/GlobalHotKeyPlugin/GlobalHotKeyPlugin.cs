@@ -7,6 +7,7 @@ using zVirtualScenesAPI;
 using zVirtualScenesAPI.Structs;
 using zVirtualScenesApplication;
 using System.Windows.Forms;
+using zVirtualScenesApplication.Structs;
 
 namespace GlobalHotKeyPlugin
 {
@@ -15,70 +16,67 @@ namespace GlobalHotKeyPlugin
     {
         public volatile bool isActive;
         private KeyboardHook hook = new KeyboardHook();
-        //Form backgroundForm = new Form();
 
         public GlobalHotKeyPlugin()
-            : base("GlobalHotKeyPlugin")
+            : base("GLOBALHOTKEYS")
         {
-            PluginName = "Global HotKey Plugin";
+            PluginName = "Global HotKeys";
         }
 
         public override void Initialize()
         {
-            //TODO: Make this a scene property
-
-            //API.Object.Properties.NewObjectProperty("GlbHotKey", "Hot Key to activate scene.", "", ParamType.LIST);
+            API.Scenes.Properties.New("Global Hotkey", "Hotkey that will activate this scene.", "None", ParamType.LIST);
             
-            //foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
-            //{
-            //    API.Object.Properties.NewObjectPropertyOption("GlbHotKey", option.Replace('_','+'));
-            //}            
+            foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
+            {
+                API.Scenes.Properties.NewPropertyOption("Global Hotkey", option.Replace('_', '+'));
+            }            
         }
 
         protected override bool StartPlugin()
-        {          
-
+        {
+            int success = 0; 
+            int errors = 0; 
             #region Register Global Hot Keys
             try
             {
                 hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D0);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D1);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D2);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D3);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D4);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D5);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D6);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D7);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D8);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D9);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.A);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.B);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.C);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.E);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.F);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.G);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.H);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.I);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.J);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.K);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.L);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.M);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.N);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.O);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.P);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Q);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.R);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.S);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.T);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.U);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.V);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.W);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.X);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Y);
-                hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Z);
-                API.WriteToLog(Urgency.INFO, "Registered global hotkeys.");
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D0)) { success++; } else { errors++; }; 
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D1)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D2)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D3)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D4)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D5)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D6)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D7)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D8)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D9)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.A)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.B)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.C)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.E)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.F)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.G)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.H)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.I)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.J)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.K)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.L)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.M)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.N)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.O)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.P)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Q)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.R)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.S)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.T)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.U)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.V)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.W)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.X)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Y)) { success++; } else { errors++; };
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Z)) { success++; } else { errors++; };
             }
             catch (Exception ex)
             {
@@ -86,8 +84,7 @@ namespace GlobalHotKeyPlugin
             }
             #endregion
 
-            //TODO:
-            API.WriteToLog(Urgency.INFO, string.Format("{0} plugin started. With {1} {2}", PluginName, 99 , "Errors."));
+            API.WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", PluginName, success , errors));
 
             IsReady = true;
             return true;
@@ -124,21 +121,20 @@ namespace GlobalHotKeyPlugin
             {
 
             }
-            ////Learn Mode
-            //if (formSceneProperties.isOpen)
-            //    formSceneProperties.SetGlobalHotKey(KeysPresseed);
-            ////Run Mode
-            //else
-            //{
-            //    foreach (Scene thiscene in MasterScenes)
-            //    {
-            //        if (Enum.GetName(typeof(CustomHotKeys), thiscene.GlobalHotKey) == KeysPresseed)
-            //        {
-            //            SceneResult result = thiscene.Run(this);
-            //            AddLogEntry((UrgencyLevel)result.ResultType, "Global HotKey Interface:  (" + KeysPresseed + ") " + result.Description);
-            //        }
-            //    }
-            //}
+
+            foreach (Scene scene in API.Scenes.GetScenes())
+            {
+                string sceneHotKey = API.Scenes.Properties.GetScenePropertyValue(scene.id, "Global Hotkey");
+
+                if (!string.IsNullOrEmpty(sceneHotKey))
+                {
+                    if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                    {
+                        string result = scene.RunScene();
+                        API.WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                    }
+                }  
+            }            
         }
 
         public enum CustomHotKeys

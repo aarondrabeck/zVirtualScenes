@@ -30,6 +30,21 @@ namespace NOAAPlugin
             PluginName = "NOAA";
         }
 
+        public override void Initialize()
+        {
+            API.InstallObjectType("NOAA", false);
+            API.DefineSetting("Latitude", "37.6772222222222", ParamType.DECIMAL, "Your Latitude in Decimal Notation. ex. 37.6772222222222");
+            API.DefineSetting("Longitude", "-113.061666666667", ParamType.DECIMAL, "Your Longitude in Decimal Notation. ex. -113.061666666667");
+
+            API.Scenes.Properties.New("Activate at Sunrise", "Activate this scene at sunrise.", "false", ParamType.BOOL);
+            API.Scenes.Properties.New("Activate at Sunset", "Activate this scene at sunset.", "false", ParamType.BOOL);
+
+            //Remove plugin properties from old version
+            API.RemovePluginSetting("Sunrise Scenes");
+            API.RemovePluginSetting("Sunset Scenes");
+
+        } 
+
         protected override bool StartPlugin()
         {
             LoadLatLong();
@@ -61,16 +76,7 @@ namespace NOAAPlugin
                         
             IsReady = false;
             return true;
-        }
-
-        public override void Initialize()
-        {
-            API.InstallObjectType("NOAA", false);
-            API.DefineSetting("Latitude", "37.6772222222222", ParamType.DECIMAL, "Your Latitude in Decimal Notation. ex. 37.6772222222222");
-            API.DefineSetting("Longitude", "-113.061666666667", ParamType.DECIMAL, "Your Longitude in Decimal Notation. ex. -113.061666666667");
-            API.DefineSetting("Sunrise Scenes", "3,4", ParamType.STRING, "Enter the Scene ID's of the Scenes you would like launched at sunrise. Comma Seperated.");
-            API.DefineSetting("Sunset Scenes", "2,3", ParamType.STRING, "Enter the Scene ID's of the Scenes you would like launched at sunset. Comma Seperated.");
-        } 
+        }       
 
         protected override void SettingChanged(string settingName, string settingValue)
         {            
@@ -140,36 +146,18 @@ namespace NOAAPlugin
                 {
                     API.WriteToLog(Urgency.INFO, "It is now sunrise. Activating sunrise scenes.");
 
-                    BindingList<Scene> SceneList = new BindingList<Scene>();
-                    SceneList = API.Scenes.GetScenes(); 
-
-                    string sunriseIDs = API.GetSetting("Sunrise Scenes"); 
-                    if(!string.IsNullOrEmpty(sunriseIDs))
+                    foreach (Scene scene in API.Scenes.GetScenes())
                     {
-                        string[] sunriseSceneIDs = sunriseIDs.Split(',');
-                        if (sunriseSceneIDs.Length > 0)
-                        {
-                            foreach (string str_SceneID in sunriseSceneIDs)
-                            {
-                                int SceneID = 0;
-                                int.TryParse(str_SceneID, out SceneID);
+                        string propertyvalue = API.Scenes.Properties.GetScenePropertyValue(scene.id, "Activate at Sunrise");
+                        bool activate = false;
+                        bool.TryParse(propertyvalue, out activate);
 
-                                if (SceneID > 0)
-                                {
-                                    Scene scene = SceneList.FirstOrDefault(s => s.id == SceneID);
-                                    if (scene != null)
-                                    {
-                                        string result = scene.RunScene();
-                                        API.WriteToLog(Urgency.INFO, "Sunrise: " + result);
-                                    }
-                                    else
-                                    {
-                                        API.WriteToLog(Urgency.WARNING, "Sunrise: Cannot find a scene with an ID of " + SceneID + ".");
-                                    }
-                                }
-                            }
+                        if (activate)
+                        {
+                            string result = scene.RunScene();
+                            API.WriteToLog(Urgency.INFO, "Sunrise: " + result);
                         }
-                    }
+                    }       
                 }
 
                 Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
@@ -177,34 +165,16 @@ namespace NOAAPlugin
                 {
                     API.WriteToLog(Urgency.INFO, "It is now sunset. Activating sunrise scenes.");
 
-                    BindingList<Scene> SceneList = new BindingList<Scene>();
-                    SceneList = API.Scenes.GetScenes();
-
-                    string sunriseIDs = API.GetSetting("Sunset Scenes");
-                    if (!string.IsNullOrEmpty(sunriseIDs))
+                    foreach (Scene scene in API.Scenes.GetScenes())
                     {
-                        string[] sunriseSceneIDs = sunriseIDs.Split(',');
-                        if (sunriseSceneIDs.Length > 0)
-                        {
-                            foreach (string str_SceneID in sunriseSceneIDs)
-                            {
-                                int SceneID = 0;
-                                int.TryParse(str_SceneID, out SceneID);
+                        string propertyvalue = API.Scenes.Properties.GetScenePropertyValue(scene.id, "Activate at Sunset");
+                        bool activate = false;
+                        bool.TryParse(propertyvalue, out activate);
 
-                                if (SceneID > 0)
-                                {
-                                    Scene scene = SceneList.FirstOrDefault(s => s.id == SceneID);
-                                    if (scene != null)
-                                    {
-                                        string result = scene.RunScene();
-                                        API.WriteToLog(Urgency.INFO, "Sunset: " + result);
-                                    }
-                                    else
-                                    {
-                                        API.WriteToLog(Urgency.WARNING, "Sunset: Cannot find a scene with an ID of " + SceneID + ".");
-                                    }
-                                }
-                            }
+                        if (activate)
+                        {
+                            string result = scene.RunScene();
+                            API.WriteToLog(Urgency.INFO, "Sunset: " + result);
                         }
                     }
                 }

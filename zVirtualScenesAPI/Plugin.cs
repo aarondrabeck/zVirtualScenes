@@ -50,7 +50,7 @@ namespace zVirtualScenesAPI
         {
             return API.GetPluginName();
         }
-
+        
         public void SetSetting(string settingName, string settingValue)
         {
             if (API != null)

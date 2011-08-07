@@ -98,6 +98,7 @@ namespace zVirtualScenesApplication.UserControls
                     break;
                 case ParamType.DECIMAL:
                 case ParamType.INTEGER:
+                case ParamType.SHORT:
                 case ParamType.BYTE:
                     //NumericUpDown have built in self validation
                     if (pnlSettings.Controls.ContainsKey(btn.Name + "-proparg"))

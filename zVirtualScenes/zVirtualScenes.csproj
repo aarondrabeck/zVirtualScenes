@@ -377,6 +377,12 @@
   <ItemGroup>
     <None Include="Resources\doorlock.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zvirtualscenes.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zvirtualscenes72.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -33,22 +33,16 @@
             this.txtb_sceneName = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
             this.btn_Save = new System.Windows.Forms.Button();
-            this.groupBoxDevice = new System.Windows.Forms.GroupBox();
-            this.checkBoxSunset = new System.Windows.Forms.CheckBox();
-            this.checkBoxSunrise = new System.Windows.Forms.CheckBox();
-            this.checkBoxDisplayinLightSwitch = new System.Windows.Forms.CheckBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.comboBoxHotKeys = new System.Windows.Forms.ComboBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.pnlSceneProperties = new System.Windows.Forms.Panel();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
-            this.groupBoxDevice.SuspendLayout();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
-            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // txtb_sceneName
             // 
-            this.txtb_sceneName.Location = new System.Drawing.Point(129, 17);
+            this.txtb_sceneName.Location = new System.Drawing.Point(175, 15);
             this.txtb_sceneName.Name = "txtb_sceneName";
             this.txtb_sceneName.Size = new System.Drawing.Size(205, 20);
             this.txtb_sceneName.TabIndex = 0;
@@ -57,7 +51,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(53, 22);
+            this.label12.Location = new System.Drawing.Point(94, 18);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(75, 13);
             this.label12.TabIndex = 25;
@@ -65,118 +59,73 @@
             // 
             // btn_Save
             // 
-            this.btn_Save.Location = new System.Drawing.Point(283, 160);
+            this.btn_Save.Location = new System.Drawing.Point(386, 13);
             this.btn_Save.Name = "btn_Save";
-            this.btn_Save.Size = new System.Drawing.Size(57, 25);
+            this.btn_Save.Size = new System.Drawing.Size(122, 22);
             this.btn_Save.TabIndex = 5;
-            this.btn_Save.Text = "&Save";
+            this.btn_Save.Text = "&Save Scene Name";
             this.btn_Save.UseVisualStyleBackColor = true;
             this.btn_Save.Click += new System.EventHandler(this.btn_Save_Click);
             // 
-            // groupBoxDevice
+            // button1
             // 
-            this.groupBoxDevice.Controls.Add(this.checkBoxSunset);
-            this.groupBoxDevice.Controls.Add(this.checkBoxSunrise);
-            this.groupBoxDevice.Controls.Add(this.checkBoxDisplayinLightSwitch);
-            this.groupBoxDevice.Controls.Add(this.pictureBox2);
-            this.groupBoxDevice.Controls.Add(this.groupBox1);
-            this.groupBoxDevice.Controls.Add(this.txtb_sceneName);
-            this.groupBoxDevice.Controls.Add(this.btn_Save);
-            this.groupBoxDevice.Controls.Add(this.label12);
-            this.groupBoxDevice.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBoxDevice.Location = new System.Drawing.Point(0, 0);
-            this.groupBoxDevice.Name = "groupBoxDevice";
-            this.groupBoxDevice.Size = new System.Drawing.Size(346, 191);
-            this.groupBoxDevice.TabIndex = 35;
-            this.groupBoxDevice.TabStop = false;
-            this.groupBoxDevice.Text = "Scene";
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(752, 261);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(63, 22);
+            this.button1.TabIndex = 41;
+            this.button1.Text = "&Done";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // checkBoxSunset
+            // pnlSceneProperties
             // 
-            this.checkBoxSunset.AutoSize = true;
-            this.checkBoxSunset.Location = new System.Drawing.Point(8, 159);
-            this.checkBoxSunset.Name = "checkBoxSunset";
-            this.checkBoxSunset.Size = new System.Drawing.Size(113, 17);
-            this.checkBoxSunset.TabIndex = 4;
-            this.checkBoxSunset.Text = "Activate at Sunset";
-            this.checkBoxSunset.UseVisualStyleBackColor = true;
-            this.checkBoxSunset.Visible = false;
-            // 
-            // checkBoxSunrise
-            // 
-            this.checkBoxSunrise.AutoSize = true;
-            this.checkBoxSunrise.Location = new System.Drawing.Point(8, 136);
-            this.checkBoxSunrise.Name = "checkBoxSunrise";
-            this.checkBoxSunrise.Size = new System.Drawing.Size(115, 17);
-            this.checkBoxSunrise.TabIndex = 3;
-            this.checkBoxSunrise.Text = "Activate at Sunrise";
-            this.checkBoxSunrise.UseVisualStyleBackColor = true;
-            this.checkBoxSunrise.Visible = false;
-            // 
-            // checkBoxDisplayinLightSwitch
-            // 
-            this.checkBoxDisplayinLightSwitch.AutoSize = true;
-            this.checkBoxDisplayinLightSwitch.Location = new System.Drawing.Point(8, 113);
-            this.checkBoxDisplayinLightSwitch.Name = "checkBoxDisplayinLightSwitch";
-            this.checkBoxDisplayinLightSwitch.Size = new System.Drawing.Size(129, 17);
-            this.checkBoxDisplayinLightSwitch.TabIndex = 2;
-            this.checkBoxDisplayinLightSwitch.Text = "Display in LightSwitch";
-            this.checkBoxDisplayinLightSwitch.UseVisualStyleBackColor = true;
-            this.checkBoxDisplayinLightSwitch.Visible = false;
-            // 
-            // pictureBox2
-            // 
-            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.scene_32;
-            this.pictureBox2.Location = new System.Drawing.Point(12, 15);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(35, 34);
-            this.pictureBox2.TabIndex = 39;
-            this.pictureBox2.TabStop = false;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.comboBoxHotKeys);
-            this.groupBox1.Location = new System.Drawing.Point(6, 59);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(330, 48);
-            this.groupBox1.TabIndex = 38;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Global Hotkey Assignment";
-            this.groupBox1.Visible = false;
-            // 
-            // comboBoxHotKeys
-            // 
-            this.comboBoxHotKeys.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxHotKeys.FormattingEnabled = true;
-            this.comboBoxHotKeys.Location = new System.Drawing.Point(6, 19);
-            this.comboBoxHotKeys.Name = "comboBoxHotKeys";
-            this.comboBoxHotKeys.Size = new System.Drawing.Size(318, 21);
-            this.comboBoxHotKeys.TabIndex = 1;
+            this.pnlSceneProperties.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.pnlSceneProperties.AutoScroll = true;
+            this.pnlSceneProperties.Location = new System.Drawing.Point(91, 40);
+            this.pnlSceneProperties.Name = "pnlSceneProperties";
+            this.pnlSceneProperties.Size = new System.Drawing.Size(721, 215);
+            this.pnlSceneProperties.TabIndex = 40;
             // 
             // toolTipNotificationLevel
             // 
             this.toolTipNotificationLevel.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipNotificationLevel.ToolTipTitle = "Notification Levels";
             // 
+            // pictureBox2
+            // 
+            this.pictureBox2.Image = global::zVirtualScenesApplication.Properties.Resources.zvirtualscenes72;
+            this.pictureBox2.Location = new System.Drawing.Point(8, 7);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(77, 62);
+            this.pictureBox2.TabIndex = 39;
+            this.pictureBox2.TabStop = false;
+            // 
             // formPropertiesScene
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(346, 191);
-            this.Controls.Add(this.groupBoxDevice);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.ClientSize = new System.Drawing.Size(824, 291);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.pnlSceneProperties);
+            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.txtb_sceneName);
+            this.Controls.Add(this.btn_Save);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(534, 325);
             this.Name = "formPropertiesScene";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Edit Scene Properties";
             this.Load += new System.EventHandler(this.formSceneProperties_Load);
-            this.groupBoxDevice.ResumeLayout(false);
-            this.groupBoxDevice.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
-            this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -185,13 +134,9 @@
         private System.Windows.Forms.TextBox txtb_sceneName;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Button btn_Save;
-        private System.Windows.Forms.GroupBox groupBoxDevice;
         private System.Windows.Forms.ToolTip toolTipNotificationLevel;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.ComboBox comboBoxHotKeys;
         private System.Windows.Forms.PictureBox pictureBox2;
-        private System.Windows.Forms.CheckBox checkBoxDisplayinLightSwitch;
-        private System.Windows.Forms.CheckBox checkBoxSunrise;
-        private System.Windows.Forms.CheckBox checkBoxSunset;
+        private System.Windows.Forms.Panel pnlSceneProperties;
+        private System.Windows.Forms.Button button1;
     }
 }

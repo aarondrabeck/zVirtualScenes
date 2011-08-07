@@ -44,4 +44,46 @@ CREATE  TABLE `scheduled_tasks` (
 
   UNIQUE INDEX `id_UNIQUE` (`id` ASC) );
 
+
+
+  CREATE  TABLE `scene_properties` (
+
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+
+  `txt_property_name` VARCHAR(255) NOT NULL ,
+
+  `txt_property_defualt_value` VARCHAR(1024) NOT NULL ,
+
+  `property_type_id` INT(11) NOT NULL ,
+
+  `txt_property_description` VARCHAR(1024) NULL DEFAULT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) );
+
+
+
+  CREATE  TABLE `scene_property_options` (
+
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+
+  `scene_property_id` INT(11) NOT NULL ,
+
+  `txt_option` VARCHAR(255) NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) );
+
+
+  CREATE  TABLE `scene_property_values` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT ,
+  `scene_id` INT(11) NOT NULL ,
+  `scene_property_id` INT(11) NOT NULL ,
+  `txt_property_value` VARCHAR(1024) NULL ,
+  PRIMARY KEY (`id`) ,
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) );
+
+
 UPDATE `version` SET `version`='2.3' WHERE `id`='1';

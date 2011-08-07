@@ -9,7 +9,7 @@ namespace zVirtualScenesCommon
     {
         public static string Program
         {
-            get { return "2.0 Beta 4"; }
+            get { return "2.0 Beta 5"; }
         }
 
         public static string RequiredDatabaseVersion

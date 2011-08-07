@@ -20,7 +20,7 @@ namespace GrowlPlugin
         public GrowlPlugin()
             : base("GROWL")
         {
-            PluginName = "GROWL";
+            PluginName = "Growl";
         }
 
         public const string NOTIFY_DEVICE_VALUE_CHANGE = "DEVICE_VALUE_CHANGE";
@@ -58,19 +58,22 @@ namespace GrowlPlugin
 
         void zVirtualSceneEvents_ValueDataChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)
         {
-            string objType = API.Object.GetObjectType(ObjectId);
-            string objName = API.Object.GetObjectName(ObjectId);
-
-            string[] objTypeValuespairs = API.GetSetting("Notifications to send").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string objTypeValuespair in objTypeValuespairs)
+            if (IsReady)
             {
-                string thisEvent = objType + ":" + label;
+                string objType = API.Object.GetObjectType(ObjectId);
+                string objName = API.Object.GetObjectName(ObjectId);
 
-                if (thisEvent.Equals(objTypeValuespair.Trim()) && IsReady)
+                string[] objTypeValuespairs = API.GetSetting("Notifications to send").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string objTypeValuespair in objTypeValuespairs)
                 {
-                    Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", objName + " " + label, "Changed to " + Value + " from " + PreviousValue +".");
-                    GrowlConnector.Notify(notification);
+                    string thisEvent = objType + ":" + label;
+
+                    if (thisEvent.Equals(objTypeValuespair.Trim()))
+                    {
+                        Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", objName + " " + label, "Changed to " + Value + " from " + PreviousValue + ".");
+                        GrowlConnector.Notify(notification);
+                    }
                 }
             }
         }
