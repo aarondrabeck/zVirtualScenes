@@ -1418,17 +1418,22 @@ namespace zVirtualScenesCommon.DatabaseCommon
         /// Tests the database connection
         /// </summary>
         /// <returns>Empty if success otherwise return the error.</returns>
-        public static string GetConnectionErrors()
+        public static string ExamineDatabase()
         {
             try
             {                
                 MySqlDataReader reader = null;                
                 var conn = new MySqlConnection(_connectionString);
-                var cmd = new MySqlCommand("SELECT version FROM version;", conn);
+                var cmd = new MySqlCommand("SHOW TABLES;", conn);
                 conn.Open();
                 reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
                 DataTable dt = new DataTable();
                 dt.Load(reader);
+
+                if (dt.Rows.Count < 10)
+                {
+                    return "The selected database does not appear to be a vaild zvirtualscenes database.";
+                }
                 reader.Close();                
                 conn.Close();
             }
@@ -1445,20 +1450,27 @@ namespace zVirtualScenesCommon.DatabaseCommon
         /// <returns></returns>
         public static string GetOutdatedDbVersion()
         {
-            MySqlDataReader reader = null;
-            var conn = new MySqlConnection(_connectionString);
-            var cmd = new MySqlCommand("SELECT version FROM version;", conn);
-            conn.Open();
-            reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
-            DataTable dt = new DataTable();
-            dt.Load(reader);
-            reader.Close();
+            try
+            {
+                MySqlDataReader reader = null;
+                var conn = new MySqlConnection(_connectionString);
+                var cmd = new MySqlCommand("SELECT version FROM version;", conn);
+                conn.Open();
+                reader = cmd.ExecuteReader(CommandBehavior.CloseConnection);
+                DataTable dt = new DataTable();
+                dt.Load(reader);
+                reader.Close();
 
-            if (dt.Rows.Count == 1)            
-                if (!dt.Rows[0]["version"].ToString().Equals(CurrentVersion.RequiredDatabaseVersion))                    
-                    return dt.Rows[0]["version"].ToString();
+                if (dt.Rows.Count == 1)            
+                    if (!dt.Rows[0]["version"].ToString().Equals(CurrentVersion.RequiredDatabaseVersion))                    
+                        return dt.Rows[0]["version"].ToString();
             
-            conn.Close();            
+                conn.Close();
+            }
+            catch (Exception e)
+            {
+                return e.Message;
+            }
             return null;
         }
 

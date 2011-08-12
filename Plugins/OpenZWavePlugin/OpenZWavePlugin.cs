@@ -7,6 +7,8 @@ using zVirtualScenesAPI;
 using System.Threading;
 using System.ComponentModel;
 using zVirtualScenesAPI.Structs;
+using System.Windows.Forms;
+using OZWForm;
 
 namespace OpenZWavePlugin
 {
@@ -19,7 +21,6 @@ namespace OpenZWavePlugin
         UInt32 m_homeId = 0;
         List<Node> m_nodeList = new List<Node>();
         private bool FinishedInitialPoll = false;
-        static private ZWControllerCommand m_op;
 
         public OpenZWavePlugin() : base("OPENZWAVE")
         {
@@ -150,12 +151,21 @@ namespace OpenZWavePlugin
         {
             API.DefineSetting("Com Port", "7", ParamType.INTEGER, "The COM port that your z-wave controller is assigned to.");
             API.DefineSetting("Use HID", "false", ParamType.BOOL, "Use HID rather than COM port. (use this for ControlThink Sticks)");
-            API.DefineSetting("Polling Interval", "360", ParamType.INTEGER, "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network  traffic. ");
+            API.DefineSetting("Polling Interval", "360", ParamType.INTEGER, "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. ");
 
             //Controller
             API.InstallObjectType("CONTROLLER", true);
-            API.NewObjectTypeCommand("CONTROLLER", "RESET", "Reset Controller", ParamType.NONE, "Earses all Z-Wave netowrks from your controller.");
-            API.NewObjectTypeCommand("CONTROLLER", "ADDDEVICE",  "Add Device to Network",ParamType.NONE, "Puts your controller in a mode to wait for new devices.");
+            API.NewObjectTypeCommand("CONTROLLER", "RESET",                 "Reset Controller", ParamType.NONE, "Earses all Z-Wave netowrks from your controller.");
+            API.NewObjectTypeCommand("CONTROLLER", "ADDDEVICE",             "Add Device to Network", ParamType.NONE, "Adds a ZWave Device to your network.");
+            API.NewObjectTypeCommand("CONTROLLER", "AddController",         "Add Controller to Network", ParamType.NONE, "Adds a ZWave Controller to your network.");
+            API.NewObjectTypeCommand("CONTROLLER", "CreateNewPrimary",      "Create New Primary", ParamType.NONE, "Puts the target controller into receive configuration mode.");
+            API.NewObjectTypeCommand("CONTROLLER", "ReceiveConfiguration",  "Receive Configuration", ParamType.NONE, "Receives the network configuration from another controller.");
+            API.NewObjectTypeCommand("CONTROLLER", "RemoveController",      "Remove Controller", ParamType.NONE, "Removes a Controller from your netowrk.");
+            API.NewObjectTypeCommand("CONTROLLER", "RemoveDevice",          "Remove Device", ParamType.NONE, "Removes a Device from your netowrk.");
+            API.NewObjectTypeCommand("CONTROLLER", "TransferPrimaryRole",   "Transfer Primary Role", ParamType.NONE, "Transfers the primary role\nto another controller.");
+            API.NewObjectTypeCommand("CONTROLLER", "HasNodeFailed",         "Has Node Failed", ParamType.NONE, "Tests whether a node has failed.");
+            API.NewObjectTypeCommand("CONTROLLER", "RemoveFailedNode",      "Remove Failed Node", ParamType.NONE, "Removes the failed node from the controller's list.");
+            API.NewObjectTypeCommand("CONTROLLER", "ReplaceFailedNode",     "Replace Failed Node", ParamType.NONE, "Tests the failed node.");
             
             // Switch
             API.InstallObjectType("SWITCH", true);
@@ -190,7 +200,7 @@ namespace OpenZWavePlugin
             //TODO: Make a new ObjectAPIProperty that is API specific for types of settings that applies OpenZWave Devices
 
             
-        }
+        }     
 
         public override void ProcessCommand(QuedCommand cmd)
         {
@@ -205,14 +215,75 @@ namespace OpenZWavePlugin
                     m_manager.ResetController(m_homeId);
                     break;
                 case "ADDDEVICE":
-                    m_op = ZWControllerCommand.AddDevice;
-                    m_manager.OnControllerStateChanged += ControllerStateChangedHandler;
-                    if (!m_manager.BeginControllerCommand(m_homeId, m_op, false, NodeID))
-                    {
-                        m_manager.OnControllerStateChanged -= ControllerStateChangedHandler;
-                    }
-                    m_manager.ResetController(m_homeId);
-                    break;                    
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddDevice, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "AddController":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddController, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }                
+                case "CreateNewPrimary":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.CreateNewPrimary, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "ReceiveConfiguration":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReceiveConfiguration, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "RemoveController":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveController, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "RemoveDevice":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveDevice, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "TransferPrimaryRole":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.TransferPrimaryRole, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "HasNodeFailed":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.HasNodeFailed, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "RemoveFailedNode":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveFailedNode, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
+                case "ReplaceFailedNode":
+                {
+                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReplaceFailedNode, NodeID);
+                    dlg.ShowDialog();
+                    dlg.Dispose();
+                    break;
+                }
                 case "TURNON":
                     switch (API.Object.GetObjectType(cmd.ObjectId))
                     {
@@ -308,74 +379,6 @@ namespace OpenZWavePlugin
                                 m_manager.SetValue(v.ValueID, i);
                         break;
                 }
-            }
-        }
-
-        public void ControllerStateChangedHandler(ZWControllerState state)
-        {
-            bool complete = false;
-            string dlgText = string.Empty;
-            switch (state)
-            {
-                case ZWControllerState.Waiting:
-                    {
-                        // Display a message to tell the user to press the include button on the controller
-                        if (m_op == ZWControllerCommand.ReplaceFailedNode)
-                        {
-                            dlgText = "Press the program button on the replacement Z-Wave device to add it to the network.\nFor security reasons, the PC Z-Wave Controller must be close to the device being added.\nThis command cannot be cancelled.";
-                        }
-                        break;
-                    }
-                case ZWControllerState.InProgress:
-                    {
-                        // Tell the user that the controller has been found and the adding process is in progress.
-                        dlgText = "Please wait...";
-                       // buttonEnabled = false;
-                        break;
-                    }
-                case ZWControllerState.Completed:
-                    {
-                        // Tell the user that the controller has been successfully added.
-                        // The command is now complete
-                        dlgText = "Command Completed OK.";
-                       // complete = true;
-                        break;
-                    }
-                case ZWControllerState.Failed:
-                    {
-                        // Tell the user that the controller addition process has failed.
-                        // The command is now complete
-                        dlgText = "Command Failed.";
-                        complete = true;
-                        break;
-                    }
-                case ZWControllerState.NodeOK:
-                    {
-                        dlgText = "Node has not failed.";
-                        complete = true;
-                        break;
-                    }
-                case ZWControllerState.NodeFailed:
-                    {
-                        dlgText = "Node has failed.";
-                        complete = true;
-                        break;
-                    }
-            }
-
-            if (!String.IsNullOrEmpty(dlgText))
-            {
-                API.WriteToLog(Urgency.INFO, dlgText);
-            }
-
-           // m_dlg.SetButtonEnabled(buttonEnabled);
-
-            if (complete)
-            {
-                //m_dlg.SetButtonText("OK");
-                //
-                // Remove the event handler
-                m_manager.OnControllerStateChanged -= ControllerStateChangedHandler;
             }
         }
 

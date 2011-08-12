@@ -43,9 +43,8 @@
             this.buttonRefreshList = new System.Windows.Forms.Button();
             this.cmbDatabases = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.btnTest = new System.Windows.Forms.Button();
+            this.label5 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +54,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxIP.Location = new System.Drawing.Point(140, 12);
             this.textBoxIP.Name = "textBoxIP";
-            this.textBoxIP.Size = new System.Drawing.Size(363, 20);
+            this.textBoxIP.Size = new System.Drawing.Size(331, 20);
             this.textBoxIP.TabIndex = 0;
             this.textBoxIP.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxIP_KeyPress);
             // 
@@ -83,7 +82,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxUsername.Location = new System.Drawing.Point(140, 67);
             this.textBoxUsername.Name = "textBoxUsername";
-            this.textBoxUsername.Size = new System.Drawing.Size(363, 20);
+            this.textBoxUsername.Size = new System.Drawing.Size(331, 20);
             this.textBoxUsername.TabIndex = 2;
             this.textBoxUsername.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxUsername_KeyPress);
             // 
@@ -102,7 +101,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPass.Location = new System.Drawing.Point(140, 93);
             this.textBoxPass.Name = "textBoxPass";
-            this.textBoxPass.Size = new System.Drawing.Size(363, 20);
+            this.textBoxPass.Size = new System.Drawing.Size(331, 20);
             this.textBoxPass.TabIndex = 4;
             this.textBoxPass.UseSystemPasswordChar = true;
             this.textBoxPass.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxPass_KeyPress);
@@ -122,14 +121,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxPort.Location = new System.Drawing.Point(140, 38);
             this.textBoxPort.Name = "textBoxPort";
-            this.textBoxPort.Size = new System.Drawing.Size(363, 20);
+            this.textBoxPort.Size = new System.Drawing.Size(331, 20);
             this.textBoxPort.TabIndex = 6;
             this.textBoxPort.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxPort_KeyPress);
             // 
             // buttonOK
             // 
             this.buttonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOK.Location = new System.Drawing.Point(347, 328);
+            this.buttonOK.Location = new System.Drawing.Point(315, 284);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 10;
@@ -140,7 +139,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonCancel.Location = new System.Drawing.Point(428, 328);
+            this.buttonCancel.Location = new System.Drawing.Point(396, 284);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 11;
@@ -161,11 +160,11 @@
             // buttonRefreshList
             // 
             this.buttonRefreshList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonRefreshList.Location = new System.Drawing.Point(290, 26);
+            this.buttonRefreshList.Location = new System.Drawing.Point(294, 26);
             this.buttonRefreshList.Name = "buttonRefreshList";
-            this.buttonRefreshList.Size = new System.Drawing.Size(150, 23);
+            this.buttonRefreshList.Size = new System.Drawing.Size(114, 23);
             this.buttonRefreshList.TabIndex = 13;
-            this.buttonRefreshList.Text = "Refresh List";
+            this.buttonRefreshList.Text = "Refresh Databases";
             this.buttonRefreshList.UseVisualStyleBackColor = true;
             this.buttonRefreshList.Click += new System.EventHandler(this.buttonRefreshList_Click);
             // 
@@ -176,7 +175,7 @@
             this.cmbDatabases.FormattingEnabled = true;
             this.cmbDatabases.Location = new System.Drawing.Point(94, 28);
             this.cmbDatabases.Name = "cmbDatabases";
-            this.cmbDatabases.Size = new System.Drawing.Size(190, 21);
+            this.cmbDatabases.Size = new System.Drawing.Size(194, 21);
             this.cmbDatabases.TabIndex = 14;
             // 
             // groupBox1
@@ -190,10 +189,19 @@
             this.groupBox1.Controls.Add(this.buttonRefreshList);
             this.groupBox1.Location = new System.Drawing.Point(46, 129);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(457, 143);
+            this.groupBox1.Size = new System.Drawing.Size(425, 143);
             this.groupBox1.TabIndex = 15;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "MySQL Database";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(35, 31);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(53, 13);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "Database";
             // 
             // label5
             // 
@@ -205,32 +213,11 @@
             this.label5.Text = "Do not see \'zvirtualscenes\' on the list?  \r\nYou might need to install the databas" +
     "e.";
             // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(35, 31);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(53, 13);
-            this.label6.TabIndex = 16;
-            this.label6.Text = "Database";
-            // 
-            // btnTest
-            // 
-            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnTest.Location = new System.Drawing.Point(323, 283);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(180, 23);
-            this.btnTest.TabIndex = 16;
-            this.btnTest.Text = "Test Connection to Database";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
-            // 
             // DatabaseConnection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(515, 363);
-            this.Controls.Add(this.btnTest);
+            this.ClientSize = new System.Drawing.Size(483, 319);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -242,9 +229,8 @@
             this.Controls.Add(this.textBoxUsername);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxIP);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(424, 397);
             this.Name = "DatabaseConnection";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "zVirtualScenes - Database Connection Setup";
@@ -274,6 +260,5 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Button btnTest;
     }
 }

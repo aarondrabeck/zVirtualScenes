@@ -49,7 +49,7 @@ namespace zVirtualScenesApplication
 
 
             //ONLY LAUCH IF WE CAN CONNECT TO THE DATABASE
-            if (!String.IsNullOrEmpty(DatabaseControl.GetConnectionErrors()) || DatabaseControl.GetOutdatedDbVersion() != null)
+            if (!String.IsNullOrEmpty(DatabaseControl.ExamineDatabase()) || DatabaseControl.GetOutdatedDbVersion() != null)
             {
                 DatabaseConnection FormDatabaseConnection = new DatabaseConnection();
                 FormDatabaseConnection.ShowDialog();

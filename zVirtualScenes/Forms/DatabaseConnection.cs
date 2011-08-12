@@ -41,6 +41,10 @@ namespace zVirtualScenesApplication.Forms
             
             if(databases == null)    
                 MessageBox.Show("Connection Error!\n\n" + DatabaseControl.LastDBError, API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            else if (databases.Count < 1)
+            {
+                MessageBox.Show("No databases found!", API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
             else
             {
                 if (cmbDatabases.Items.Contains("zvirtualscenes"))
@@ -141,7 +145,7 @@ namespace zVirtualScenesApplication.Forms
 
         private bool DBReady()
         {
-            string errors = DatabaseControl.GetConnectionErrors();
+            string errors = DatabaseControl.ExamineDatabase();
             if (string.IsNullOrEmpty(errors))
             {
                 string VerionOfDatabase = DatabaseControl.GetOutdatedDbVersion();
@@ -223,7 +227,7 @@ namespace zVirtualScenesApplication.Forms
             }
             else
             {
-                MessageBox.Show("Error!\n\n" + errors, API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Database Connection Error!\n\n" + errors, API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return false;
             }      
         }
@@ -239,6 +243,12 @@ namespace zVirtualScenesApplication.Forms
         private void buttonOK_Click(object sender, EventArgs e)
         {
             SaveUserInput();
+
+            if(string.IsNullOrEmpty(DatabaseControl.db_database))
+            {
+                MessageBox.Show("No database selected!", API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                return;
+            }
 
             if(DBReady())
             {

@@ -37,6 +37,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\ControllerCommandDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ControllerCommandDlg.Designer.cs">
+      <DependentUpon>ControllerCommandDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Node.cs" />
     <Compile Include="OpenZWavePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,6 +86,11 @@
     <Content Include="OpenZWaveDotNet.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\ControllerCommandDlg.resx">
+      <DependentUpon>ControllerCommandDlg.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

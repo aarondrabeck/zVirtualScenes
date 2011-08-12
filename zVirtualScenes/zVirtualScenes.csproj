@@ -383,6 +383,9 @@
   <ItemGroup>
     <None Include="Resources\zvirtualscenes72.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="ChangeLog.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
