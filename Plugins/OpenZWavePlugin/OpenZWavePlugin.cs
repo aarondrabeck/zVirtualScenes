@@ -171,6 +171,7 @@ namespace OpenZWavePlugin
             API.InstallObjectType("SWITCH", true);
             API.NewObjectTypeCommand("SWITCH", "TURNON", "Turn On", ParamType.NONE, "Sets a switch to 100%");
             API.NewObjectTypeCommand("SWITCH", "TURNOFF", "Turn Off", ParamType.NONE, "Sets a switch to 0%");
+            API.NewObjectTypeCommand("SWITCH", "MOMENTARY", "Turn On for X milliseconds", ParamType.INTEGER, "Turns a device on for the specified number of milliseconds and then turns the device back off.");
             
             // Dimmer
             API.InstallObjectType("DIMMER", true);
@@ -282,6 +283,29 @@ namespace OpenZWavePlugin
                     ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReplaceFailedNode, NodeID);
                     dlg.ShowDialog();
                     dlg.Dispose();
+                    break;
+                }
+
+                case "MOMENTARY":
+                {
+                    switch (API.Object.GetObjectType(cmd.ObjectId))
+                    {                        
+                        case "SWITCH":
+                            int delay = 1000; 
+                            int.TryParse(cmd.Argument, out delay);
+
+                            m_manager.SetNodeOn(m_homeId, NodeID);
+                            System.Timers.Timer t = new System.Timers.Timer();
+                            t.Interval = delay;
+                            t.Elapsed += (sender, e) =>
+                            {
+                                m_manager.SetNodeOff(m_homeId, NodeID);
+                                t.Enabled = false;
+                                t.Dispose();
+                            };
+                            t.Enabled = true;
+                            break;
+                    }
                     break;
                 }
                 case "TURNON":
