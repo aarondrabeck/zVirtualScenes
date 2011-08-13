@@ -35,8 +35,6 @@ namespace HTTPControl
 
         public override void Initialize()
         {
-            API.InstallObjectType("HTTPCONTROL", false);
-            API.NewObject(1, "HTTPCONTROL", "HTTP Control");
             API.DefineSetting("Port", "8085", ParamType.INTEGER, "The port that HTTP will listen for commands on.");
         }
 

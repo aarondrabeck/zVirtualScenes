@@ -83,16 +83,13 @@ namespace JabberPlugin
         }
 
         public override void Initialize()
-        {
-            API.InstallObjectType("JABBER", false);
-            API.NewObject(1, "JABBER", "JABBER");                       
+        {                                 
             API.DefineSetting("Jabber Server", "gmail.com", ParamType.STRING, "The Jabber server to connect to.");
             API.DefineSetting("Jabber Username", "user", ParamType.STRING, "The username of the jabber user.");
             API.DefineSetting("Jabber Password", "passw0rd", ParamType.STRING, "The password of the jabber user."); 
             API.DefineSetting("Send to", "user@gmail.com", ParamType.STRING, "Jabber users that will receive notifications. (comma seperated)");
             API.DefineSetting("Verbose Logging", "true", ParamType.BOOL, "(Writes all server client communication to the log for debugging.)");
             API.DefineSetting("Notifications to send", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", ParamType.STRING, "Include all values you would like announced. Comma Seperated.");
-
         }
 
         void zVirtualSceneEvents_ValueDataChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)

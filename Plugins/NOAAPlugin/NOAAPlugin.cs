@@ -32,7 +32,6 @@ namespace NOAAPlugin
 
         public override void Initialize()
         {
-            API.InstallObjectType("NOAA", false);
             API.DefineSetting("Latitude", "37.6772222222222", ParamType.DECIMAL, "Your Latitude in Decimal Notation. ex. 37.6772222222222");
             API.DefineSetting("Longitude", "-113.061666666667", ParamType.DECIMAL, "Your Longitude in Decimal Notation. ex. -113.061666666667");
 

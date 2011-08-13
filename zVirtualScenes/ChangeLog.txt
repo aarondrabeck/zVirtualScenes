@@ -1,4 +1,7 @@
-﻿
+﻿Beta 7:
+- Database Update Bug Fixed
+- Removed data from base sql file
+
 Beta 6: 
 Made the database dialog "smarter"
 

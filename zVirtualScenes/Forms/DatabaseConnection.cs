@@ -148,12 +148,12 @@ namespace zVirtualScenesApplication.Forms
             string errors = DatabaseControl.ExamineDatabase();
             if (string.IsNullOrEmpty(errors))
             {
-                string VerionOfDatabase = DatabaseControl.GetOutdatedDbVersion();
-                if (VerionOfDatabase != null)
+                string DBOldVersionFound = DatabaseControl.GetOutdatedDbVersion();
+                if (DBOldVersionFound != null)
                 {                    
                     //PROMT FOR UPGRADEs
                     #region Upgrade to DB 2.1
-                    if (VerionOfDatabase.Equals("2.0 Base") && CurrentVersion.RequiredDatabaseVersion.Equals("2.1"))
+                    if (DBOldVersionFound.Equals("2.0 Base"))
                     {
                         if (MessageBox.Show("Would you like to upgrade your database to 2.1?", API.GetProgramNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                         {
@@ -161,7 +161,7 @@ namespace zVirtualScenesApplication.Forms
                             if (string.IsNullOrEmpty(error))
                             {
                                 MessageBox.Show("Upgrade to 2.1 Complete.", API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                return true;
+                                DBReady();
                             }
                             else
                             {
@@ -173,7 +173,7 @@ namespace zVirtualScenesApplication.Forms
                     }
                     #endregion
                     #region Upgrade to DB 2.2
-                    else if (VerionOfDatabase.Equals("2.1") && CurrentVersion.RequiredDatabaseVersion.Equals("2.2"))
+                    else if (DBOldVersionFound.Equals("2.1"))
                     {
                         if (MessageBox.Show("Would you like to upgrade your database to 2.2?", API.GetProgramNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                         {
@@ -181,7 +181,7 @@ namespace zVirtualScenesApplication.Forms
                             if (string.IsNullOrEmpty(error))
                             {
                                 MessageBox.Show("Upgrade to 2.2 Complete.", API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                return true;
+                                DBReady();
                             }
                             else
                             {
@@ -193,7 +193,7 @@ namespace zVirtualScenesApplication.Forms
                     }
                     #endregion
                     #region Upgrade to DB 2.3
-                    else if (VerionOfDatabase.Equals("2.2") && CurrentVersion.RequiredDatabaseVersion.Equals("2.3"))
+                    else if (DBOldVersionFound.Equals("2.2"))
                     {
                         if (MessageBox.Show("Would you like to upgrade your database to 2.3?", API.GetProgramNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                         {
@@ -201,7 +201,7 @@ namespace zVirtualScenesApplication.Forms
                             if (string.IsNullOrEmpty(error))
                             {
                                 MessageBox.Show("Upgrade to 2.3 Complete.", API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                return true;
+                                DBReady();
                             }
                             else
                             {

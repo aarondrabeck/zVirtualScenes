@@ -84,10 +84,6 @@ namespace LightSwitchPlugin
 
         public override void Initialize()
         {
-
-            API.InstallObjectType("LIGHTSWITCH", false);
-
-            API.NewObject(1, "LIGHTSWITCH", "LIGHTSWITCH");
             API.DefineSetting("Port", "1337", ParamType.INTEGER, "LightSwitch will listen for connections on this port.");
             API.DefineSetting("Max Conn.", "200", ParamType.INTEGER, "The maximum number of connections allowed.");
             API.DefineSetting("Verbose Logging", "true", ParamType.BOOL, "(Writes all server client communication to the log for debugging.)");
