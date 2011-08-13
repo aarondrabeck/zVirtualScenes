@@ -1,19 +1,16 @@
-﻿Beta 7:
-- Database Update Bug Fixed
-- Removed data from base sql file
-
-Beta 6: 
-Made the database dialog "smarter"
-
-Added the following Controller Commands in the OpenZWave plugin:
-"RESET",                
-"ADDDEVICE",            
-"AddController",        
-"CreateNewPrimary",     
-"ReceiveConfiguration", 
-"RemoveController",     
-"RemoveDevice",         
-"TransferPrimaryRole",  
-"HasNodeFailed",        
-"RemoveFailedNode",     
-"ReplaceFailedNode",    
+﻿*Beta 7 (08-12-11)  
+  * Database Update Bug Fixed
+  * Removed data from base sql file
+  * Made the database dialog "smarter"
+  * Added the following Controller Commands in the OpenZWave plugin:
+  * "RESET",                
+  * "ADDDEVICE",            
+  * "AddController",        
+  * "CreateNewPrimary",     
+  * "ReceiveConfiguration", 
+  * "RemoveController",     
+  * "RemoveDevice",         
+  * "TransferPrimaryRole",  
+  * "HasNodeFailed",        
+  * "RemoveFailedNode",     
+  * "ReplaceFailedNode",    
