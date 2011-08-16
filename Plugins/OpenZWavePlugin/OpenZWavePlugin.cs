@@ -740,11 +740,13 @@ namespace OpenZWavePlugin
                             {
                                 case "Binary Switch":
                                 case "Binary Power Switch":
+                                case "Binary Scene Switch":                                    
                                     objectName = "OpenZWave Switch " + node.ID;
                                     objectType = "SWITCH";
                                     break;
                                 case "Multilevel Switch":
                                 case "Multilevel Power Switch":
+                                case "Multilevel Scene Switch":
                                     objectName = "OpenZWave Dimmer " + node.ID;
                                     objectType = "DIMMER";
                                     break;
@@ -766,7 +768,10 @@ namespace OpenZWavePlugin
                             if (objectType != "UNKNOWN")
                                 API.NewObject(node.ID, objectType, objectName);
                             else
-                                API.WriteToLog(Urgency.WARNING, "Found unknown device '"+node.Label+"'!");
+                            {
+                                API.NewObject(node.ID, objectType, objectName);
+                                API.WriteToLog(Urgency.WARNING, "Found unknown device '" + node.Label + "'!");
+                            }
                         }
                     }
 
