@@ -14,8 +14,8 @@ using System.Drawing;
 
 namespace GrowlPlugin
 {
-    [Export(typeof(Plugin))]
-    public class GrowlPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class GrowlPlugin : zvsPlugin
     {
         public GrowlPlugin()
             : base("GROWL")
@@ -29,8 +29,8 @@ namespace GrowlPlugin
         protected override bool StartPlugin()
         {
 
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
-            zVirtualSceneEvents.ValueDataChangedEvent += new zVirtualSceneEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
+            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
+            zvsEvents.ValueDataChangedEvent += new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
             
             RegisterGrowl(); 
 
@@ -40,8 +40,8 @@ namespace GrowlPlugin
 
         protected override bool StopPlugin()
         {
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
-            zVirtualSceneEvents.ValueDataChangedEvent -= new zVirtualSceneEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
+            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            zvsEvents.ValueDataChangedEvent -= new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
 
             IsReady = false;
             return true;
@@ -53,17 +53,17 @@ namespace GrowlPlugin
 
         public override void Initialize()
         {
-            API.DefineSetting("Notifications to send", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", ParamType.STRING, "Include all values you would like announced. Comma Seperated.");
+            zvsAPI.DefineSetting("Notifications to send", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", Data_Types.STRING, "Include all values you would like announced. Comma Seperated.");
         }
 
         void zVirtualSceneEvents_ValueDataChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)
         {
             if (IsReady)
             {
-                string objType = API.Object.GetObjectType(ObjectId);
-                string objName = API.Object.GetObjectName(ObjectId);
+                string objType = zvsAPI.Object.GetObjectType(ObjectId);
+                string objName = zvsAPI.Object.GetObjectName(ObjectId);
 
-                string[] objTypeValuespairs = API.GetSetting("Notifications to send").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] objTypeValuespairs = zvsAPI.GetSetting("Notifications to send").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string objTypeValuespair in objTypeValuespairs)
                 {
@@ -111,11 +111,11 @@ namespace GrowlPlugin
 
                
                 GrowlConnector.Register(application, new NotificationType[] { DeviceValueChange });
-                API.WriteToLog(Urgency.INFO, "Registered Growl Interface.");
+                zvsAPI.WriteToLog(Urgency.INFO, "Registered Growl Interface.");
             }
             catch (Exception ex)
             {
-                API.WriteToLog(Urgency.ERROR, "Error registering Growl. " + ex.Message);
+                zvsAPI.WriteToLog(Urgency.ERROR, "Error registering Growl. " + ex.Message);
             }
         }
     }

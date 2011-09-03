@@ -3,33 +3,20 @@ using System.Windows.Forms;
 using zVirtualScenesApplication.PluginSystem;
 using zVirtualScenesAPI;
 using System.ComponentModel;
-using zVirtualScenesCommon.DatabaseCommon;
 using zVirtualScenesCommon.Util;
+using zVirtualScenesCommon.Entity;
 
 namespace zVirtualScenesApplication.Forms
 {
     public partial class ObjectProperties : Form
     {
-        BindingList<MenuItem> menu = new BindingList<MenuItem>();
-        int _objId;
-        string _objName;
-        string _pluginName;
+        private BindingList<MenuItem> menu = new BindingList<MenuItem>();
+        private device _d;
 
-        public ObjectProperties(int objectId)
+        public ObjectProperties(device d)
         {
             InitializeComponent();
-            _objId = objectId;
-
-            //Object Name
-            _objName = API.Object.GetObjectName(objectId);
-
-            // Get info about the plugin
-            _pluginName = DatabaseControl.GetObjectPluginAPIName(objectId);
-            if (string.IsNullOrEmpty(_pluginName))
-            {
-                Logger.WriteToLog(UrgencyLevel.ERROR, "Error getting plugin name", "OBJECTPROPFORM");
-                return;
-            }
+            _d = d;
 
             this.colSettings.GroupKeyGetter = delegate(object rowObject)
             {
@@ -46,7 +33,7 @@ namespace zVirtualScenesApplication.Forms
 
         private void ObjectProperties_Load(object sender, EventArgs e)
         {
-            if (_pluginName.Equals("OPENZWAVE"))
+            if (_d.device_types.plugin.name.Equals("OPENZWAVE"))
             {
                 string group = "Open ZWave Device";
                 MenuItem mi = new MenuItem();
@@ -60,7 +47,17 @@ namespace zVirtualScenesApplication.Forms
                 menu.Add(mi);
 
                 mi = new MenuItem();
-                mi.Name = "Commands";
+                mi.Name = "Device Specific Commands";
+                mi.Group = group;
+                menu.Add(mi);
+
+                mi = new MenuItem();
+                mi.Name = "Generic Commands";
+                mi.Group = group;
+                menu.Add(mi);                
+
+                mi = new MenuItem();
+                mi.Name = "Groups";
                 mi.Group = group;
                 menu.Add(mi);
 
@@ -69,31 +66,25 @@ namespace zVirtualScenesApplication.Forms
                 mi.Group = group;
                 menu.Add(mi);
 
-                mi = new MenuItem();
-                mi.Name = "Groups";
-                mi.Group = group;
-                menu.Add(mi);                
-
                 dataListViewMenu.DataSource = menu;
 
                 if (dataListViewMenu.Items.Count > 0)
                     dataListViewMenu.SelectedIndex = 0;
 
-                if (!String.IsNullOrEmpty(_objName))
-                {
-                    this.Text = "'" + _objName + "' Properties";
-                    textBoxObjName.Text = _objName;
-                }
+                this.Text = "'" + _d.friendly_name + "' Properties";
+                textBoxObjName.Text = _d.friendly_name;
+                
             }
         }
         
         private void HideAllUserControls()
         {
-            uc_object_values_grid2.Visible = false;
-            uc_object_commands1.Visible = false;
-            uc_object_properties1.Visible = false;
-            uc_object_groups1.Visible = false;
-            uc_object_basic1.Visible = false; 
+            uc_device_values_grid2.Visible = false;
+            uc_device_commands1.Visible = false;
+            uc_device_properties1.Visible = false;
+            uc_device_groups1.Visible = false;
+            uc_device_basic1.Visible = false;
+            uc_device_type_commands1.Visible = false;
         }        
 
         public class MenuItem
@@ -101,7 +92,6 @@ namespace zVirtualScenesApplication.Forms
             public string Name;
             public string Group;
         }
-
        
         private void dataListViewMenu_SelectedIndexChanged_1(object sender, EventArgs e)
         {
@@ -112,28 +102,33 @@ namespace zVirtualScenesApplication.Forms
 
                 if (mi.Name.Equals("Values"))
                 {
-                    uc_object_values_grid2.UpdateControl(_objId);
-                    uc_object_values_grid2.Visible = true;
+                    uc_device_values_grid2.UpdateControl(_d);
+                    uc_device_values_grid2.Visible = true;
                 }
-                else if (mi.Name.Equals("Commands"))
+                else if (mi.Name.Equals("Device Specific Commands"))
                 {
-                    uc_object_commands1.UpdateObject(_objId);
-                    uc_object_commands1.Visible = true;
+                    uc_device_commands1.UpdateObject(_d);
+                    uc_device_commands1.Visible = true;
+                }
+                else if (mi.Name.Equals("Generic Commands"))
+                {
+                    uc_device_type_commands1.UpdateObject(_d);
+                    uc_device_type_commands1.Visible = true;
                 }
                 else if (mi.Name.Equals("Properties"))
                 {
-                    uc_object_properties1.UpdateObject(_objId);
-                    uc_object_properties1.Visible = true;
+                    uc_device_properties1.UpdateObject(_d);
+                    uc_device_properties1.Visible = true;
                 }
                 else if (mi.Name.Equals("Groups"))
                 {
-                    uc_object_groups1.UpdateControl(_objId);
-                    uc_object_groups1.Visible = true;
+                    uc_device_groups1.UpdateControl(_d);
+                    uc_device_groups1.Visible = true;
                 }
                 else if (mi.Name.Equals("Basic"))
                 {
-                    uc_object_basic1.UpdateControl(_objId);
-                    uc_object_basic1.Visible = true;
+                    uc_device_basic1.UpdateControl(_d);
+                    uc_device_basic1.Visible = true;
                 }                
             }
         }

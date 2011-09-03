@@ -7,17 +7,16 @@ using System.Threading;
 using System.Text;
 using System.Security.Cryptography;
 using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
 using System.Data;
 using zVirtualScenesAPI.Events;
-using zVirtualScenesApplication.Structs;
 using System.ComponentModel;
 using ZeroconfService;
+using zVirtualScenesAPI.Entity;
 
 namespace LightSwitchPlugin
 {
-    [Export(typeof(Plugin))]
-    public class LightSwitchPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class LightSwitchPlugin : zvsPlugin
     {
         private Socket LightSwitchSocket;
         private readonly List<Socket> LightSwitchClients = new List<Socket>();
@@ -26,22 +25,21 @@ namespace LightSwitchPlugin
         public volatile bool isActive = false;
         private NetService netservice = null;
 
-        public LightSwitchPlugin()
-            : base("LIGHTSWITCH")
+        public LightSwitchPlugin() : base("LIGHTSWITCH")
         {
-            PluginName = "LightSwitch Server";
+            friendly_name = "LightSwitch Server";
         }
 
         protected override bool StartPlugin()
         {
-            zVirtualSceneEvents.ValueDataChangedEvent += new zVirtualSceneEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
-            zVirtualSceneEvents.CommandRunCompleteEvent +=new zVirtualSceneEvents.CommandRunCompleteEventHandler(zVirtualSceneEvents_CommandRunCompleteEvent);
-            zVirtualSceneEvents.SceneRunCompleteEvent += new zVirtualSceneEvents.SceneRunCompleteEventHandler(zVirtualSceneEvents_SceneRunCompleteEvent);
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
+            zvsEvents.ValueDataChangedEvent += new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
+            zvsEvents.CommandRunCompleteEvent +=new zvsEvents.CommandRunCompleteEventHandler(zVirtualSceneEvents_CommandRunCompleteEvent);
+            zvsEvents.SceneRunCompleteEvent += new zvsEvents.SceneRunCompleteEventHandler(zVirtualSceneEvents_SceneRunCompleteEvent);
+            WriteToLog(Urgency.INFO, this.friendly_name + " plugin started.");
             OpenLightSwitchSocket();
 
             bool useBonjour = false;
-            bool.TryParse(API.GetSetting("Publish ZeroConf/Bonjour"), out useBonjour);
+            bool.TryParse(GetSettingValue("PUBLISHZEROCFG"), out useBonjour);
 
             if (useBonjour)
             {
@@ -58,7 +56,7 @@ namespace LightSwitchPlugin
                 }
                 catch (Exception ex)
                 {
-                    API.WriteToLog(Urgency.ERROR, ex.Message);
+                    WriteToLog(Urgency.ERROR, ex.Message);
                 }
             }
 
@@ -68,11 +66,11 @@ namespace LightSwitchPlugin
 
         protected override bool StopPlugin()
         {
-            zVirtualSceneEvents.ValueDataChangedEvent -= new zVirtualSceneEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
-            zVirtualSceneEvents.CommandRunCompleteEvent -= new zVirtualSceneEvents.CommandRunCompleteEventHandler(zVirtualSceneEvents_CommandRunCompleteEvent);
-            zVirtualSceneEvents.SceneRunCompleteEvent -= new zVirtualSceneEvents.SceneRunCompleteEventHandler(zVirtualSceneEvents_SceneRunCompleteEvent);
+            zvsEvents.ValueDataChangedEvent -= new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
+            zvsEvents.CommandRunCompleteEvent -= new zvsEvents.CommandRunCompleteEventHandler(zVirtualSceneEvents_CommandRunCompleteEvent);
+            zvsEvents.SceneRunCompleteEvent -= new zvsEvents.SceneRunCompleteEventHandler(zVirtualSceneEvents_SceneRunCompleteEvent);
             
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.friendly_name + " plugin ended.");
             CloseLightSwitchSocket();
             IsReady = false;
             return true;
@@ -84,33 +82,78 @@ namespace LightSwitchPlugin
 
         public override void Initialize()
         {
-            API.DefineSetting("Port", "1337", ParamType.INTEGER, "LightSwitch will listen for connections on this port.");
-            API.DefineSetting("Max Conn.", "200", ParamType.INTEGER, "The maximum number of connections allowed.");
-            API.DefineSetting("Verbose Logging", "true", ParamType.BOOL, "(Writes all server client communication to the log for debugging.)");
-            API.DefineSetting("Password", "ChaNgeMe444", ParamType.STRING, "The password clients must use to connect to the LightSwitch server. ");
-            API.DefineSetting("Sort Device List", "true", ParamType.BOOL, "(Alphabetically sorts the device list.)");
-            API.DefineSetting("Publish ZeroConf/Bonjour", "false", ParamType.BOOL, "Zero configuration networking allows clients on your network to detect and connect to your LightSwitch server automatically.");
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "PORT",
+                friendly_name = "Port",
+                value = (1337).ToString(),
+                value_data_type = (int)Data_Types.INTEGER,
+                description = "LightSwitch will listen for connections on this port."
+            });
 
-            API.Object.Properties.NewObjectProperty("SHOWINLSLIST", "Show in Lightswitch List", "true", ParamType.BOOL);
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "MAXCONN",
+                friendly_name = "Max Conn.",
+                value = (200).ToString(),
+                value_data_type = (int)Data_Types.INTEGER,
+                description = "The maximum number of connections allowed."
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "VERBOSE",
+                friendly_name = "Verbose Logging",
+                value = true.ToString(),
+                value_data_type = (int)Data_Types.BOOL,
+                description = "(Writes all server client communication to the log for debugging.)"
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "PASSWORD",
+                friendly_name = "Password",
+                value = "ChaNgeMe444",
+                value_data_type = (int)Data_Types.STRING,
+                description = "The password clients must use to connect to the LightSwitch server. "
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "SORTLIST",
+                friendly_name = "Sort Device List",
+                value = true.ToString(),
+                value_data_type = (int)Data_Types.BOOL,
+                description = "(Alphabetically sorts the device list.)"
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "PUBLISHZEROCFG",
+                friendly_name = "Publish ZeroConf/Bonjour",
+                value = false.ToString(),
+                value_data_type = (int)Data_Types.BOOL,
+                description = "Zero configuration networking allows clients on your network to detect and connect to your LightSwitch server automatically."
+            });
+
+            zvsAPI.DEVICES.PROPERTY.DefineOrUpdateDeviceProperty(new device_propertys
+            {
+                name = "SHOWINLSLIST",
+                friendly_name = "Show in Lightswitch List",
+                value_data_type = (int)Data_Types.BOOL,
+                default_value = "true"
+            });
         }
 
-        public override void ProcessCommand(QuedCommand cmd)
-        {            
-        }
-
-        public override void Repoll(string id)
-        {
-        }
-
-        public override void ActivateGroup(string GroupName)
-        { }
-
-        public override void DeactivateGroup(string GroupName)
-        { }
+        public override void ProcessDeviceCommand(device_command_que cmd);
+        public override void ProcessDeviceTypeCommand(device_type_command_que cmd);
+        public override void Repoll(string id);
+        public override void ActivateGroup(string GroupName);
+        public override void DeactivateGroup(string GroupName);
 
         void zVirtualSceneEvents_ValueDataChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)
         {
-            zwObject obj = (zwObject)API.Object.GetObject(ObjectId);
+            zwObject obj = (zwObject)zvsAPI.Object.GetObject(ObjectId);
             BroadcastMessage("UPDATE~" + TranslateObjectToLightSwitchString(obj) + Environment.NewLine);
             BroadcastMessage("ENDLIST" + Environment.NewLine);
 
@@ -119,7 +162,7 @@ namespace LightSwitchPlugin
 
         void zVirtualSceneEvents_SceneRunCompleteEvent(int SceneID, int ErrorCount)
         {
-            Scene scene = API.Scenes.GetScene(SceneID);
+            Scene scene = zvsAPI.Scenes.GetScene(SceneID);
             if (scene != null)
             {
                 BroadcastMessage("MSG~" + "Scene '" + scene.txt_name + "' has completed with " + ErrorCount + " errors." + Environment.NewLine);
@@ -142,21 +185,21 @@ namespace LightSwitchPlugin
                 try
                 {
                     int port = 9909;
-                    int.TryParse(API.GetSetting("Port"), out port);
+                    int.TryParse(GetSettingValue("PORT"), out port);
 
                     int max_conn = 50;
-                    int.TryParse(API.GetSetting("Max Conn."), out max_conn);
+                    int.TryParse(GetSettingValue("MAXCONN"), out max_conn);
 
                     isActive = true;
                     LightSwitchSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, port));
                     LightSwitchSocket.Listen(max_conn);
                     LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                    API.WriteToLog(Urgency.INFO, "Started listening for LightSwitch clients on port " + port + ".");
+                    WriteToLog(Urgency.INFO, "Started listening for LightSwitch clients on port " + port + ".");
                 }
                 catch (SocketException e)
                 {
-                    API.WriteToLog(Urgency.ERROR, "Socket Failed to Open - " + e);
+                    WriteToLog(Urgency.ERROR, "Socket Failed to Open - " + e);
                 }
             }
         }
@@ -174,7 +217,7 @@ namespace LightSwitchPlugin
                         client.Close();
                     }
                 }
-                API.WriteToLog(Urgency.INFO, "Stopped listening for new clients.");
+                WriteToLog(Urgency.INFO, "Stopped listening for new clients.");
                 isActive = false;
             }
         }
@@ -193,7 +236,7 @@ namespace LightSwitchPlugin
                 lock (LightSwitchClients)
                     LightSwitchClients.Add(LightSwitchClientsSocket);
 
-                API.WriteToLog(Urgency.INFO, "Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
+                WriteToLog(Urgency.INFO, "Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
 
                 // Send a welcome message to client                
                 string msg = "LightSwitch zVirtualScenes Plugin (Active Connections " + LightSwitchClients.Count + ")" + Environment.NewLine;
@@ -210,7 +253,7 @@ namespace LightSwitchPlugin
             }
             catch (SocketException e)
             {
-                API.WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
+                WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
             }
         }
 
@@ -234,7 +277,7 @@ namespace LightSwitchPlugin
             }
             catch (SocketException e)
             {
-                API.WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
+                WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
             }
         }
 
@@ -272,14 +315,14 @@ namespace LightSwitchPlugin
 
 
                     bool verbose = true;
-                    bool.TryParse(API.GetSetting("Verbose Logging"), out verbose);
+                    bool.TryParse(GetSettingValue("VERBOSE"), out verbose);
 
                     if (verbose)
-                        API.WriteToLog(Urgency.INFO, "Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
+                        WriteToLog(Urgency.INFO, "Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
 
                     string[] commands = data.Split('\n');
 
-                    string version = "VER~" + API.GetProgramNameAndVersion;
+                    string version = "VER~" + zvsAPI.GetProgramNameAndVersion;
 
                     foreach (string command in commands)
                     {
@@ -303,14 +346,14 @@ namespace LightSwitchPlugin
                                 {
                                     string[] values = cmd.Split('~');
                                     string inputPassword = values[1];
-                                    string hashedPassword = EncodePassword(Convert.ToString(m_cookie) + ":" + API.GetSetting("Password"));
+                                    string hashedPassword = EncodePassword(Convert.ToString(m_cookie) + ":" + GetSettingValue("PASSWORD"));
                                     //hashedPassword = "638831F3AF6F32B25D6F1C961CBBA393"
 
                                     if (inputPassword.StartsWith(hashedPassword))
                                     {
                                         socketData.m_verified = true;
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
-                                        API.WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
+                                        WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
                                     }
                                     else
                                     {
@@ -332,11 +375,11 @@ namespace LightSwitchPlugin
 
                                 else if (cmd.StartsWith("ALIST"))  //DEVICES, SCENES AND ZONES.
                                 {
-                                    API.WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
+                                    WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
 
                                     sendDeviceList(LightSwitchClientSocket);
 
-                                    BindingList<Scene> scenes = API.Scenes.GetScenes();
+                                    BindingList<Scene> scenes = zvsAPI.Scenes.GetScenes();
                                     foreach (Scene scene in scenes)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.txt_name + "~" + scene.id + Environment.NewLine);
                               
@@ -346,7 +389,7 @@ namespace LightSwitchPlugin
                                 }
                                 else if (cmd.StartsWith("LIST")) //DEVICES
                                 {
-                                    API.WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
+                                    WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
 
                                     sendDeviceList(LightSwitchClientSocket);
 
@@ -355,7 +398,7 @@ namespace LightSwitchPlugin
                                 else if (cmd.StartsWith("SLIST"))  //SCENES
                                 {
                                     //TODO: OPTION FOR EACH SCENE... if (scene.ShowInLightSwitchGUI)
-                                    BindingList<Scene> scenes = API.Scenes.GetScenes();                                    
+                                    BindingList<Scene> scenes = zvsAPI.Scenes.GetScenes();                                    
                                     foreach(Scene scene in scenes)
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.txt_name + "~" + scene.id + Environment.NewLine);
                               
@@ -363,7 +406,7 @@ namespace LightSwitchPlugin
                                 }
                                 else if (cmd.StartsWith("ZLIST")) //ZONES
                                 {
-                                    API.WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested zone/group list.");
+                                    WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested zone/group list.");
 
                                     sendZoneList(LightSwitchClientSocket);
                                     SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
@@ -388,7 +431,7 @@ namespace LightSwitchPlugin
 
                                     int groupId = 0;
                                     int.TryParse(values[1], out groupId);
-                                    string groupName = API.Groups.GetGroupName(groupId);
+                                    string groupName = zvsAPI.Groups.GetGroupName(groupId);
 
                                     string action = ""; 
                                     switch(values[2])
@@ -396,20 +439,20 @@ namespace LightSwitchPlugin
                                         case "255":
                                         {
                                             action = "activated";
-                                            cmdId = API.Commands.GetBuiltinCommandId("GROUP_ON"); 
+                                            cmdId = zvsAPI.Commands.GetBuiltinCommandId("GROUP_ON"); 
                                             break;
                                         }
                                         case "0":
                                         {
                                             action = "deactivated";
-                                            cmdId = API.Commands.GetBuiltinCommandId("GROUP_OFF"); 
+                                            cmdId = zvsAPI.Commands.GetBuiltinCommandId("GROUP_OFF"); 
                                             break;
                                         }
                                     }
 
-                                    API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Builtin, Argument = groupName, CommandId = cmdId });
+                                    zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Builtin, Argument = groupName, CommandId = cmdId });
 
-                                    API.WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + "All devices in group '" + groupName + "' " + action + ".");
+                                    WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + "All devices in group '" + groupName + "' " + action + ".");
                                     BroadcastMessage("MSG~" + "All devices in group '" + groupName + "' " + action + "." + Environment.NewLine);
                                 }
                                 else if (cmd.StartsWith("THERMMODE"))
@@ -439,20 +482,20 @@ namespace LightSwitchPlugin
             }
             catch (ObjectDisposedException)
             {
-                API.WriteToLog(Urgency.ERROR, "OnDataReceived - Socket has been closed");
+                WriteToLog(Urgency.ERROR, "OnDataReceived - Socket has been closed");
             }
             catch (SocketException se)
             {
                 if (se.ErrorCode == 10054) // Error code for Connection reset by peer
-                    API.WriteToLog(Urgency.ERROR, "Client " + socketData.m_clientNumber + " Disconnected.");
+                    WriteToLog(Urgency.ERROR, "Client " + socketData.m_clientNumber + " Disconnected.");
                 else
-                    API.WriteToLog(Urgency.ERROR, "SocketException - " + se.Message);
+                    WriteToLog(Urgency.ERROR, "SocketException - " + se.Message);
 
                 DisconnectClientSocket(socketData);
             }
             catch (Exception e)
             {
-                API.WriteToLog(Urgency.ERROR, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
+                WriteToLog(Urgency.ERROR, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
 
                 //SEND ERROR TO CLIENT
                 SendMessagetoClientsSocket(LightSwitchClientSocket, "ERR~" + e.Message + Environment.NewLine);
@@ -464,7 +507,7 @@ namespace LightSwitchPlugin
 
         private void sendZoneList(Socket LightSwitchClientSocket)
         {
-            DataTable groups = zVirtualScenesAPI.API.Groups.GetGroups();
+            DataTable groups = zVirtualScenesAPI.zvsAPI.Groups.GetGroups();
 
             foreach (DataRow dr in groups.Rows)
                 SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + dr["txt_group_name"].ToString() + "~" + dr["id"].ToString() + Environment.NewLine);
@@ -472,15 +515,15 @@ namespace LightSwitchPlugin
 
         private void sendDeviceList(Socket LightSwitchClientSocket)
         {
-             List<zwObject> ojbects = new List<zwObject>(); 
-             List<String> strObjects = new List<string>();
+           List<device> ojbects = new List<device>(); 
+           List<String> strObjects = new List<string>();
 
-             ojbects = zwObject.ConvertObjDataTabletoObjList(API.Object.GetObjects(true));
+           ojbects = zvsAPI.Object.GetDevices(true);
 
            foreach (zwObject ojb in ojbects)
            {
                bool show = true;
-               bool.TryParse(API.Object.Properties.GetObjectPropertyValue(ojb.ID, "SHOWINLSLIST"), out show);
+               bool.TryParse(zvsAPI.Object.Properties.GetObjectPropertyValue(ojb.ID, "SHOWINLSLIST"), out show);
 
                if (show)
                {
@@ -491,7 +534,7 @@ namespace LightSwitchPlugin
            }
 
            bool sort_list = true;
-           bool.TryParse(API.GetSetting("Sort Device List"), out sort_list);
+           bool.TryParse(GetSettingValue("SORTLIST"), out sort_list);
 
             if (sort_list)
                 strObjects.Sort();
@@ -540,7 +583,7 @@ namespace LightSwitchPlugin
         private string TranslateToObjectAction(byte Node, byte Level, Socket Client)
         {
             string result = "ERR~Error setting node " + Node.ToString() + ". Try Agian";
-            DataTable dt = API.Object.GetObjectByNodeID(Node.ToString());
+            DataTable dt = zvsAPI.Object.GetObjectByNodeID(Node.ToString());
 
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -551,23 +594,23 @@ namespace LightSwitchPlugin
                 {
                     case "SWITCH":
                         string state = (Level == 0 ? "OFF" : "ON");
-                        commandId = (Level == 0 ? API.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "TURNOFF") : API.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "TURNON"));
-                        API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.ObjectType, CommandId = commandId, ObjectId = zwObj.ID });                   
+                        commandId = (Level == 0 ? zvsAPI.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "TURNOFF") : zvsAPI.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "TURNON"));
+                        zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.ObjectType, CommandId = commandId, ObjectId = zwObj.ID });                   
                         
                         result = "MSG~Turned " + zwObj.Name + (Level == 0 ?  "Off" : "On") + "."; 
                         break; 
                     case "DIMMER":
                         if (Level == 255)
                             Level = 99;
-                        commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_BASIC");
-                        API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = Level.ToString() });
+                        commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_BASIC");
+                        zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = Level.ToString() });
 
                         result = "MSG~Set " + zwObj.Name + " to " + Level.ToString() + "."; 
                         break;
                 }
             }
 
-           API.WriteToLog(Urgency.INFO,"[" + Client.RemoteEndPoint.ToString() + "] " + result);            
+           WriteToLog(Urgency.INFO,"[" + Client.RemoteEndPoint.ToString() + "] " + result);            
            return result;
         }
 
@@ -578,12 +621,12 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void TranslateToSceneActions(int SceneID, Socket Client)
         {
-            Scene scene = API.Scenes.GetScene(SceneID);
+            Scene scene = zvsAPI.Scenes.GetScene(SceneID);
 
             if (scene != null)
             {
                 string result = scene.RunScene();
-                API.WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
+                WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
                 BroadcastMessage("MSG~" + result + Environment.NewLine);
             }
         }
@@ -591,7 +634,7 @@ namespace LightSwitchPlugin
         private string TranslateToThermoTEMPATUREAction(byte Node, byte Mode, int Temp, Socket Client)
         {
             string result = "ERR~Error setting node " + Node.ToString() + ". Try Agian";
-            DataTable dt = API.Object.GetObjectByNodeID(Node.ToString());
+            DataTable dt = zvsAPI.Object.GetObjectByNodeID(Node.ToString());
 
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -603,27 +646,27 @@ namespace LightSwitchPlugin
                     switch (Mode)
                     {
                         case 2:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_HEATING 1");
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_HEATING 1");
 
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = Temp.ToString() });
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = Temp.ToString() });
                             result = "MSG~Set " + zwObj.Name + " Heat Point to " +Temp.ToString()+".";
                             break;
                         case 3:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_COOLING 1");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = Temp.ToString() });
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_COOLING 1");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = Temp.ToString() });
                             result = "MSG~Set " + zwObj.Name + " Cool Point to " +Temp.ToString()+".";
                             break;
                     }
                 }
             }
-            API.WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
+            WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
             return result;
         }
 
         private string TranslateToThermoAction(byte Node, byte Mode, Socket Client)
         {
             string result = "ERR~Error setting node " + Node.ToString() + ". Try Agian";
-            DataTable dt = API.Object.GetObjectByNodeID(Node.ToString());
+            DataTable dt = zvsAPI.Object.GetObjectByNodeID(Node.ToString());
 
             if (dt != null && dt.Rows.Count > 0)
             {
@@ -635,49 +678,49 @@ namespace LightSwitchPlugin
                     switch (Mode)
                     {
                         case 0:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Off" });                           
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Off" });                           
                             result = "MSG~Set " + zwObj.Name + " to Mode to Off.";
                             break;
                         case 1:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Auto" });
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Auto" });
                             result = "MSG~Set " + zwObj.Name + " to Mode to Auto.";
                             break;
                         case 2:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Heat" });
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Heat" });
                             result = "MSG~Set " + zwObj.Name + " to Mode to Heat.";
                             break;
                         case 3:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Cool" });
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_MODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Cool" });
                             result = "MSG~Set " + zwObj.Name + " to Mode to Cool.";
                             break;
                         case 4:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_FAN MODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "On Low" });
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_FAN MODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "On Low" });
                             result = "MSG~Set " + zwObj.Name + " to Fan Mode to On-Low.";                           
                             break;
                         case 5:
-                            commandId = API.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_FAN MODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Auto Low" });
+                            commandId = zvsAPI.Commands.GetObjectCommandId(zwObj.ID, "DYNAMIC_CMD_FAN MODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.Object, CommandId = commandId, ObjectId = zwObj.ID, Argument = "Auto Low" });
                             result = "MSG~Set " + zwObj.Name + " to Fan Mode to Auto-Low."; 
                             break;
                         case 6:
-                            commandId = API.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "SETENERGYMODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.ObjectType, CommandId = commandId, ObjectId = zwObj.ID });
+                            commandId = zvsAPI.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "SETENERGYMODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.ObjectType, CommandId = commandId, ObjectId = zwObj.ID });
                             result = "MSG~Set " + zwObj.Name + " to Energy Mode.";                             
                             break;
                         case 7:
-                            commandId = API.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "SETCONFORTMODE");
-                            API.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = cmdType.ObjectType, CommandId = commandId, ObjectId = zwObj.ID });
+                            commandId = zvsAPI.Commands.GetObjectTypeCommandId(zwObj.Type_ID, "SETCONFORTMODE");
+                            zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { cmdtype = commandScopeType.ObjectType, CommandId = commandId, ObjectId = zwObj.ID });
                             result = "MSG~Set " + zwObj.Name + " to Confort Mode.";                             
                             break;
                     }                    
                 }
             }
-            API.WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
+            WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
             return result;
         }
 
@@ -697,10 +740,10 @@ namespace LightSwitchPlugin
                         workerSocket.Send(byData);
 
                 bool verbose = true;
-                bool.TryParse(API.GetSetting("Verbose Logging"), out verbose);
+                bool.TryParse(GetSettingValue("VERBOSE"), out verbose);
 
                 if (verbose)
-                    API.WriteToLog(Urgency.INFO, "SENT TO ALL - " + msg);
+                    WriteToLog(Urgency.INFO, "SENT TO ALL - " + msg);
             }
         }
 
@@ -718,10 +761,10 @@ namespace LightSwitchPlugin
 
 
                 bool verbose = true;
-                bool.TryParse(API.GetSetting("Verbose Logging"), out verbose);
+                bool.TryParse(GetSettingValue("VERBOSE"), out verbose);
 
                 if (verbose)
-                    API.WriteToLog(Urgency.INFO, "SENT - " + msg);
+                    WriteToLog(Urgency.INFO, "SENT - " + msg);
             }
         }
 
@@ -737,10 +780,10 @@ namespace LightSwitchPlugin
             LightSwitchClientsSocket.Send(byData);
 
             bool verbose = true;
-            bool.TryParse(API.GetSetting("LS_VERBOSE"), out verbose);
+            bool.TryParse(GetSettingValue("VERBOSE"), out verbose);
 
             if (verbose)
-                API.WriteToLog(Urgency.INFO, "SENT " + msg);
+                WriteToLog(Urgency.INFO, "SENT " + msg);
         }
 
         private void DisconnectClientSocket(SocketPacket socketData)
@@ -757,7 +800,7 @@ namespace LightSwitchPlugin
             }
             catch (Exception e)
             {
-                API.WriteToLog(Urgency.INFO, "Socket Disconnect: " + e);
+                WriteToLog(Urgency.INFO, "Socket Disconnect: " + e);
             }
         }
 
@@ -780,7 +823,7 @@ namespace LightSwitchPlugin
         private void PublishZeroconf()
         {
             int port = 9909;
-            int.TryParse(API.GetSetting("Port"), out port);
+            int.TryParse(GetSettingValue("PORT"), out port);
 
             string domain = "";
             String type = "_lightswitch._tcp.";
@@ -798,7 +841,7 @@ namespace LightSwitchPlugin
             dict.Add("MachineName", Environment.MachineName);
             dict.Add("OS", Environment.OSVersion.ToString());
             dict.Add("IPAddress", "127.0.0.1");
-            dict.Add("Version", API.GetProgramNameAndVersion);
+            dict.Add("Version", zvsAPI.GetProgramNameAndVersion);
             netservice.TXTRecordData = NetService.DataFromTXTRecordDictionary(dict);
             netservice.Publish();
             
@@ -806,12 +849,12 @@ namespace LightSwitchPlugin
 
         void publishService_DidPublishService(NetService service)
         {
-            API.WriteToLog(Urgency.INFO, String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name));
+            WriteToLog(Urgency.INFO, String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name));
         }
 
         void publishService_DidNotPublishService(NetService service, DNSServiceException ex)
         {
-            API.WriteToLog(Urgency.ERROR, ex.Message);
+            WriteToLog(Urgency.ERROR, ex.Message);
         }
 
         #endregion 

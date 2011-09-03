@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using zVirtualScenesAPI;
 
-namespace zVirtualScenesApplication.UserControls
-{
-    public class btnInfo
-    {
-        public ParamType Param;
-        public cmdType zCommandType;
+//namespace zVirtualScenesApplication.UserControls
+//{
+//    public class btnInfo
+//    {
+//        public Data_Types Param;
+//        public commandScopeType zCommandType;
 
-        public btnInfo(ParamType param, cmdType zcommandType)
-        {
-            Param = param;
-            zCommandType = zcommandType;
-        }
-    }
-}
+//        public btnInfo(Data_Types param, commandScopeType zcommandType)
+//        {
+//            Param = param;
+//            zCommandType = zcommandType;
+//        }
+//    }
+//}

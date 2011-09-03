@@ -5,19 +5,20 @@ using System.Text;
 using zVirtualScenesAPI;
 using System.Windows.Forms;
 using System.Drawing;
+using zVirtualScenesCommon;
 
 namespace zVirtualScenesApplication.Globals
 {
     public static class GlobalMethods
     {
-        public static int DrawDynamicUserInputBoxes(Panel p, ParamType paramType, int top, int left, string UniqueName, string CommandText, List<string> options, string value, object tag )
+        public static int DrawDynamicUserInputBoxes(Panel p, Data_Types paramType, int top, int left, string UniqueName, string CommandText, List<string> options, string value, object tag )
         {
             NumericUpDown Numeric = new NumericUpDown();
-            switch ((ParamType)paramType)
+            switch ((Data_Types)paramType)
                 {
-                    case ParamType.NONE:
+                    case Data_Types.NONE:
                         return left;
-                    case ParamType.BOOL:
+                    case Data_Types.BOOL:
                         CheckBox cb = new CheckBox();
                         cb.Name = UniqueName;
                         cb.Text = CommandText;
@@ -36,7 +37,7 @@ namespace zVirtualScenesApplication.Globals
 
                         left += cb.Width + 5;
                         break;
-                    case ParamType.DECIMAL:
+                    case Data_Types.DECIMAL:
                         Numeric.Name = UniqueName;
                         Numeric.Top = top;
                         Numeric.Width = 175;
@@ -56,7 +57,7 @@ namespace zVirtualScenesApplication.Globals
                         }
 
                         break;
-                    case ParamType.BYTE:
+                    case Data_Types.BYTE:
                         Numeric.Name = UniqueName;
                         Numeric.Top = top;
                         Numeric.Left = left;
@@ -75,7 +76,7 @@ namespace zVirtualScenesApplication.Globals
                         }
 
                         break;
-                    case ParamType.INTEGER:
+                    case Data_Types.INTEGER:
                         Numeric.Name = UniqueName;
                         Numeric.Top = top;
                         Numeric.Left = left;
@@ -94,7 +95,7 @@ namespace zVirtualScenesApplication.Globals
                         }
 
                         break;
-                    case ParamType.SHORT:
+                    case Data_Types.SHORT:
                         Numeric.Name = UniqueName;
                         Numeric.Top = top;
                         Numeric.Left = left;
@@ -113,7 +114,7 @@ namespace zVirtualScenesApplication.Globals
                         }
 
                         break;
-                    case ParamType.STRING:                        
+                    case Data_Types.STRING:                        
                         TextBox tbx = new TextBox();
                         tbx.Name = UniqueName;
                         tbx.Top = top;
@@ -128,7 +129,7 @@ namespace zVirtualScenesApplication.Globals
 
                         break;
 
-                    case ParamType.LIST:
+                    case Data_Types.LIST:
                         ComboBox cmbo = new ComboBox();
 
                         foreach(string option in options)

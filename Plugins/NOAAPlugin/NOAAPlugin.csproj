@@ -34,6 +34,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -49,6 +50,10 @@
     <ProjectReference Include="..\..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
       <Project>{90E854D0-AB37-4928-BF33-93B3553F33A9}</Project>
       <Name>zVirtualScenesAPI</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
+      <Project>{FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00}</Project>
+      <Name>zVirtualScenesCommon</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

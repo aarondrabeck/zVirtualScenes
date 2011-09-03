@@ -9,32 +9,40 @@ using System.Windows.Forms;
 using zVirtualScenesApplication.Structs;
 using zVirtualScenesAPI;
 using zVirtualScenesApplication.Globals;
+using zVirtualScenesCommon.Entity;
+using zVirtualScenesCommon;
 
 namespace zVirtualScenesApplication
 {
     public partial class formPropertiesScene : Form
     {
-        public Scene _scene;
+        private scene _scene = null;
 
-        public formPropertiesScene()
+        public formPropertiesScene(scene s)
         {
-            InitializeComponent();          
+            InitializeComponent();
+            _scene = s;
+
+            if (s == null)
+                this.Close();
         }
 
         private void btn_Save_Click(object sender, EventArgs e)
-        {           
-            if (!string.IsNullOrEmpty(txtb_sceneName.Text))
-                API.Scenes.UpdateName(_scene.id, txtb_sceneName.Text);
+        {
+            if (string.IsNullOrEmpty(txtb_sceneName.Text))
+            {
+                MessageBox.Show("Invalid scene name.", zvsEntityControl.GetProgramNameAndVersion);
+            }
             else
             {
-                MessageBox.Show("Invalid scene name.", API.GetProgramNameAndVersion);
-                return;
+                _scene.friendly_name = txtb_sceneName.Text;
+                zvsEntityControl.zvsContext.SaveChanges();
             }   
         }
 
         private void formSceneProperties_Load(object sender, EventArgs e)
         {
-            txtb_sceneName.Text = _scene.txt_name;
+            txtb_sceneName.Text = _scene.friendly_name;
             ActiveControl = txtb_sceneName;
             CreateDynamicProperties(); 
         }
@@ -46,33 +54,42 @@ namespace zVirtualScenesApplication
                 pnlSceneProperties.Controls.Clear();
                 int top = 0;
 
-                #region Properties
-
-                DataTable _loadedProperties = API.Scenes.Properties.GetSceneProperties();
-                                
+                #region Properties                                
                 top += 10;
-                foreach (DataRow dr in _loadedProperties.Rows)
+                foreach (scene_property property in zvsEntityControl.zvsContext.scene_property)
                 {
                     int left = 0;
-                    //Get Value
-                    string value = API.Scenes.Properties.GetScenePropertyValue(_scene.id, dr["txt_property_name"].ToString());
-                                       
-                    int pType;
-                    int.TryParse(dr["property_type_id"].ToString(), out pType);
-                    ParamType propertyType = (ParamType)pType;
                     
-                    #region Input Boxes                   
-                    List<string> options = API.Scenes.Properties.GetScenePropertyOptions(dr["txt_property_name"].ToString());
-                    left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSceneProperties, propertyType, top, left, dr["txt_property_name"].ToString() + "-proparg", dr["txt_property_name"].ToString(), options, value, "");
+                    //Get Value
+                    string value = string.Empty;
+                    if (_scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
+                    {
+                        value = _scene.scene_property_value.SingleOrDefault(sp => sp.scene_property_id == property.id).value;
+                    }
+                    else
+                    {
+                        value = property.defualt_value;                            
+                    }                    
+                    
+                    #region Input Boxes                                      
+                    left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSceneProperties, 
+                                                                    (Data_Types)property.value_data_type, 
+                                                                    top, 
+                                                                    left,
+                                                                    property.id + "-proparg",
+                                                                    property.friendly_name,
+                                                                    property.scene_property_option.Select(o=> o.option).ToList(),
+                                                                    value,
+                                                                    "");
 
                     #endregion
 
                     #region Add Button
                     Button btn = new Button();
-                    btn.Name = dr["txt_property_name"].ToString();
-                    btn.Text = (propertyType == ParamType.NONE ? "" : "Save ") + dr["txt_property_name"].ToString();
+                    btn.Name = property.friendly_name;
+                    btn.Text = ((Data_Types)property.value_data_type == Data_Types.NONE ? "" : "Save ") + property.friendly_name;
                     btn.Click += new EventHandler(btn_Click_Property_Set);
-                    btn.Tag = propertyType;
+                    btn.Tag = property;
                     btn.Top = top;
                     btn.Left = left;
                     pnlSceneProperties.Controls.Add(btn);
@@ -88,7 +105,7 @@ namespace zVirtualScenesApplication
 
                     #region Add Description
                     Label lbl = new Label();
-                    lbl.Text = dr["txt_property_description"].ToString();
+                    lbl.Text = property.description;
                     lbl.Top = top +4;
                     lbl.Left = left;
                     lbl.AutoSize = false;
@@ -112,34 +129,46 @@ namespace zVirtualScenesApplication
         void btn_Click_Property_Set(object sender, EventArgs e)
         {
             Button btn = (Button)sender;
+            scene_property property = (scene_property)btn.Tag;
+
             string arg = String.Empty;
 
-            switch ((ParamType)btn.Tag)
+            switch ((Data_Types)property.value_data_type)
             {
-                case ParamType.NONE:
+                case Data_Types.NONE:
                     break;
-                case ParamType.DECIMAL:
-                case ParamType.INTEGER:
-                case ParamType.SHORT:
-                case ParamType.BYTE:
+                case Data_Types.DECIMAL:
+                case Data_Types.INTEGER:
+                case Data_Types.SHORT:
+                case Data_Types.BYTE:
                     //NumericUpDown have built in self validation
-                    if (pnlSceneProperties.Controls.ContainsKey(btn.Name + "-proparg"))
-                        arg = ((NumericUpDown)pnlSceneProperties.Controls[btn.Name + "-proparg"]).Value.ToString();
+                    if (pnlSceneProperties.Controls.ContainsKey(property.id + "-proparg"))
+                        arg = ((NumericUpDown)pnlSceneProperties.Controls[property.id + "-proparg"]).Value.ToString();
                     break;
-                case ParamType.BOOL:
-                    if (pnlSceneProperties.Controls.ContainsKey(btn.Name + "-proparg"))
-                        arg = ((CheckBox)pnlSceneProperties.Controls[btn.Name + "-proparg"]).Checked.ToString();
+                case Data_Types.BOOL:
+                    if (pnlSceneProperties.Controls.ContainsKey(property.id + "-proparg"))
+                        arg = ((CheckBox)pnlSceneProperties.Controls[property.id + "-proparg"]).Checked.ToString();
                     break;
-                case ParamType.STRING:
-                    if (pnlSceneProperties.Controls.ContainsKey(btn.Name + "-proparg"))
-                        arg = ((TextBox)pnlSceneProperties.Controls[btn.Name + "-proparg"]).Text;
+                case Data_Types.STRING:
+                    if (pnlSceneProperties.Controls.ContainsKey(property.id + "-proparg"))
+                        arg = ((TextBox)pnlSceneProperties.Controls[property.id + "-proparg"]).Text;
                     break;
-                case ParamType.LIST:
-                    if (pnlSceneProperties.Controls.ContainsKey(btn.Name + "-proparg"))
-                        arg = ((ComboBox)pnlSceneProperties.Controls[btn.Name + "-proparg"]).Text;
+                case Data_Types.LIST:
+                    if (pnlSceneProperties.Controls.ContainsKey(property.id + "-proparg"))
+                        arg = ((ComboBox)pnlSceneProperties.Controls[property.id + "-proparg"]).Text;
                     break;
             }
-            API.Scenes.Properties.SetScenePropertyValue(btn.Name, _scene.id, arg);
+
+
+            if (_scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
+            {
+                _scene.scene_property_value.SingleOrDefault(sp => sp.scene_property_id == property.id).value = arg;
+            }
+            else
+            {
+                _scene.scene_property_value.Add(new scene_property_value { value = arg, scene_property_id = property.id });
+            }
+            zvsEntityControl.zvsContext.SaveChanges();
         }
 
         private void txtb_sceneName_KeyDown(object sender, KeyEventArgs e)

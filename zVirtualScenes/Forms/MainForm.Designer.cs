@@ -121,27 +121,28 @@ namespace zVirtualScenesApplication
             this.LevelCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.GroupsCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colLastHeardFrom = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_object_values();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataListViewScenes = new BrightIdeasSoftware.DataListView();
             this.colScene = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SceneSortCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.dataListViewDeviceSmallList = new BrightIdeasSoftware.DataListView();
+            this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumn6 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.btnAddBltInCMD = new System.Windows.Forms.Button();
-            this.btnAddObjCMD = new System.Windows.Forms.Button();
             this.lbl_sceneActions = new System.Windows.Forms.Label();
             this.dataListViewSceneCMDs = new BrightIdeasSoftware.DataListView();
             this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn3 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.SceneCMDOrderCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.tabPage6 = new System.Windows.Forms.TabPage();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.cmsSceneCMD = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.addCommandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editCommandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteCommandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cmsSceneCMDnull = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.addCommandToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -165,6 +166,9 @@ namespace zVirtualScenesApplication
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.label3 = new System.Windows.Forms.Label();
+            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_device_values();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -205,10 +209,10 @@ namespace zVirtualScenesApplication
             this.splitContainer4.Panel2.SuspendLayout();
             this.splitContainer4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewScenes)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataListViewDeviceSmallList)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewSceneCMDs)).BeginInit();
             this.statusStrip1.SuspendLayout();
             this.cmsSceneCMD.SuspendLayout();
-            this.cmsSceneCMDnull.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -1046,36 +1050,34 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.TabIndex = 0;
             this.dataListViewDevices.UseCompatibleStateImageBehavior = false;
             this.dataListViewDevices.View = System.Windows.Forms.View.Details;
-            this.dataListViewDevices.ItemsChanging += new System.EventHandler<BrightIdeasSoftware.ItemsChangingEventArgs>(this.dataListViewDevices_ItemsChanging);
             this.dataListViewDevices.SelectedIndexChanged += new System.EventHandler(this.dataListViewDevices_SelectedIndexChanged);
             this.dataListViewDevices.DoubleClick += new System.EventHandler(this.dataListViewDevices_DoubleClick);
             // 
             // nodeID
             // 
-            this.nodeID.AspectName = "Node_ID";
+            this.nodeID.AspectName = "node_id";
             this.nodeID.DisplayIndex = 6;
             this.nodeID.Text = "Node";
-            this.nodeID.Width = 40;
             // 
             // IDCol
             // 
-            this.IDCol.AspectName = "ID";
+            this.IDCol.AspectName = "id";
             this.IDCol.DisplayIndex = 0;
             this.IDCol.ImageAspectName = "DeviceIcon";
             this.IDCol.IsEditable = false;
             this.IDCol.Text = "ID";
-            this.IDCol.Width = 40;
             // 
             // NCol
             // 
-            this.NCol.AspectName = "Name";
+            this.NCol.AspectName = "friendly_name";
             this.NCol.DisplayIndex = 1;
+            this.NCol.FillsFreeSpace = true;
             this.NCol.Text = "Name";
             this.NCol.Width = 150;
             // 
             // TCol
             // 
-            this.TCol.AspectName = "Type";
+            this.TCol.AspectName = "device_types.friendly_name";
             this.TCol.DisplayIndex = 2;
             this.TCol.IsEditable = false;
             this.TCol.Text = "Type";
@@ -1096,24 +1098,16 @@ namespace zVirtualScenesApplication
             // 
             // GroupsCol
             // 
-            this.GroupsCol.AspectName = "Groups";
+            this.GroupsCol.AspectName = "GetGroups";
             this.GroupsCol.DisplayIndex = 5;
             this.GroupsCol.Text = "Groups / Zones";
             this.GroupsCol.Width = 200;
             // 
             // colLastHeardFrom
             // 
-            this.colLastHeardFrom.AspectName = "LastHeardFrom";
+            this.colLastHeardFrom.AspectName = "last_heard_from";
             this.colLastHeardFrom.Text = "Last Heard From";
             this.colLastHeardFrom.Width = 200;
-            // 
-            // uc_object_values1
-            // 
-            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
-            this.uc_object_values1.Name = "uc_object_values1";
-            this.uc_object_values1.Size = new System.Drawing.Size(992, 232);
-            this.uc_object_values1.TabIndex = 0;
             // 
             // MainTabControl
             // 
@@ -1125,6 +1119,7 @@ namespace zVirtualScenesApplication
             this.MainTabControl.Controls.Add(this.tabPage4);
             this.MainTabControl.Controls.Add(this.tabPage1);
             this.MainTabControl.Controls.Add(this.tabPage2);
+            this.MainTabControl.Controls.Add(this.tabPage6);
             this.MainTabControl.Location = new System.Drawing.Point(0, 24);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
@@ -1154,8 +1149,9 @@ namespace zVirtualScenesApplication
             // 
             // splitContainer4.Panel2
             // 
+            this.splitContainer4.Panel2.Controls.Add(this.label3);
+            this.splitContainer4.Panel2.Controls.Add(this.dataListViewDeviceSmallList);
             this.splitContainer4.Panel2.Controls.Add(this.btnAddBltInCMD);
-            this.splitContainer4.Panel2.Controls.Add(this.btnAddObjCMD);
             this.splitContainer4.Panel2.Controls.Add(this.lbl_sceneActions);
             this.splitContainer4.Panel2.Controls.Add(this.dataListViewSceneCMDs);
             this.splitContainer4.Size = new System.Drawing.Size(994, 667);
@@ -1165,6 +1161,7 @@ namespace zVirtualScenesApplication
             // dataListViewScenes
             // 
             this.dataListViewScenes.AllColumns.Add(this.colScene);
+            this.dataListViewScenes.AllColumns.Add(this.SceneSortCol);
             this.dataListViewScenes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewScenes.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colScene});
@@ -1178,11 +1175,11 @@ namespace zVirtualScenesApplication
             this.dataListViewScenes.MultiSelect = false;
             this.dataListViewScenes.Name = "dataListViewScenes";
             this.dataListViewScenes.OwnerDraw = true;
-            this.dataListViewScenes.SelectColumnsOnRightClick = false;
-            this.dataListViewScenes.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
             this.dataListViewScenes.ShowGroups = false;
             this.dataListViewScenes.Size = new System.Drawing.Size(331, 667);
             this.dataListViewScenes.SmallImageList = this.imageList25Icons;
+            this.dataListViewScenes.SortGroupItemsByPrimaryColumn = false;
+            this.dataListViewScenes.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.dataListViewScenes.TabIndex = 0;
             this.dataListViewScenes.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.dataListViewScenes.UnfocusedHighlightForegroundColor = System.Drawing.Color.Black;
@@ -1198,32 +1195,79 @@ namespace zVirtualScenesApplication
             // 
             // colScene
             // 
-            this.colScene.AspectName = "txt_name";
+            this.colScene.AspectName = "friendly_name";
             this.colScene.FillsFreeSpace = true;
             this.colScene.ImageAspectName = "DeviceIcon";
             this.colScene.Text = "Scenes";
             // 
+            // SceneSortCol
+            // 
+            this.SceneSortCol.AspectName = "sort_order";
+            this.SceneSortCol.DisplayIndex = 1;
+            this.SceneSortCol.IsVisible = false;
+            this.SceneSortCol.Text = "Order";
+            this.SceneSortCol.Width = 10;
+            // 
+            // dataListViewDeviceSmallList
+            // 
+            this.dataListViewDeviceSmallList.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
+            this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn5);
+            this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn6);
+            this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn4);
+            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.dataListViewDeviceSmallList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.dataListViewDeviceSmallList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.olvColumn5,
+            this.olvColumn6,
+            this.olvColumn4});
+            this.dataListViewDeviceSmallList.DataSource = null;
+            this.dataListViewDeviceSmallList.EmptyListMsg = "Objects Loading...";
+            this.dataListViewDeviceSmallList.FullRowSelect = true;
+            this.dataListViewDeviceSmallList.HasCollapsibleGroups = false;
+            this.dataListViewDeviceSmallList.HideSelection = false;
+            this.dataListViewDeviceSmallList.IsSimpleDragSource = true;
+            this.dataListViewDeviceSmallList.Location = new System.Drawing.Point(3, 488);
+            this.dataListViewDeviceSmallList.Name = "dataListViewDeviceSmallList";
+            this.dataListViewDeviceSmallList.OwnerDraw = true;
+            this.dataListViewDeviceSmallList.RenderNonEditableCheckboxesAsDisabled = true;
+            this.dataListViewDeviceSmallList.SelectAllOnControlA = false;
+            this.dataListViewDeviceSmallList.SelectColumnsMenuStaysOpen = false;
+            this.dataListViewDeviceSmallList.SelectColumnsOnRightClick = false;
+            this.dataListViewDeviceSmallList.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
+            this.dataListViewDeviceSmallList.ShowCommandMenuOnRightClick = true;
+            this.dataListViewDeviceSmallList.ShowGroups = false;
+            this.dataListViewDeviceSmallList.Size = new System.Drawing.Size(514, 174);
+            this.dataListViewDeviceSmallList.SmallImageList = this.imageListActionTypesSmall;
+            this.dataListViewDeviceSmallList.SortGroupItemsByPrimaryColumn = false;
+            this.dataListViewDeviceSmallList.TabIndex = 5;
+            this.dataListViewDeviceSmallList.UseCompatibleStateImageBehavior = false;
+            this.dataListViewDeviceSmallList.View = System.Windows.Forms.View.Details;
+            // 
+            // olvColumn5
+            // 
+            this.olvColumn5.AspectName = "id";
+            this.olvColumn5.ImageAspectName = "DeviceIcon";
+            this.olvColumn5.IsEditable = false;
+            this.olvColumn5.Text = "ID";
+            this.olvColumn5.Width = 50;
+            // 
+            // olvColumn6
+            // 
+            this.olvColumn6.AspectName = "friendly_name";
+            this.olvColumn6.FillsFreeSpace = true;
+            this.olvColumn6.Text = "Name";
+            this.olvColumn6.Width = 150;
+            // 
             // btnAddBltInCMD
             // 
             this.btnAddBltInCMD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAddBltInCMD.Location = new System.Drawing.Point(393, 639);
+            this.btnAddBltInCMD.Location = new System.Drawing.Point(523, 639);
             this.btnAddBltInCMD.Name = "btnAddBltInCMD";
             this.btnAddBltInCMD.Size = new System.Drawing.Size(131, 23);
             this.btnAddBltInCMD.TabIndex = 3;
             this.btnAddBltInCMD.Text = "Add Builtin Command";
             this.btnAddBltInCMD.UseVisualStyleBackColor = true;
             this.btnAddBltInCMD.Click += new System.EventHandler(this.btnAddBltInCMD_Click);
-            // 
-            // btnAddObjCMD
-            // 
-            this.btnAddObjCMD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAddObjCMD.Location = new System.Drawing.Point(530, 639);
-            this.btnAddObjCMD.Name = "btnAddObjCMD";
-            this.btnAddObjCMD.Size = new System.Drawing.Size(124, 23);
-            this.btnAddObjCMD.TabIndex = 2;
-            this.btnAddObjCMD.Text = "Add Object Command";
-            this.btnAddObjCMD.UseVisualStyleBackColor = true;
-            this.btnAddObjCMD.Click += new System.EventHandler(this.btnAddCMD_Click);
             // 
             // lbl_sceneActions
             // 
@@ -1239,13 +1283,15 @@ namespace zVirtualScenesApplication
             // 
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn2);
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn3);
+            this.dataListViewSceneCMDs.AllColumns.Add(this.SceneCMDOrderCol);
             this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewSceneCMDs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewSceneCMDs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn2,
-            this.olvColumn3});
+            this.olvColumn3,
+            this.SceneCMDOrderCol});
             this.dataListViewSceneCMDs.DataSource = null;
             this.dataListViewSceneCMDs.FullRowSelect = true;
             this.dataListViewSceneCMDs.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -1257,7 +1303,7 @@ namespace zVirtualScenesApplication
             this.dataListViewSceneCMDs.SelectColumnsOnRightClick = false;
             this.dataListViewSceneCMDs.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
             this.dataListViewSceneCMDs.ShowGroups = false;
-            this.dataListViewSceneCMDs.Size = new System.Drawing.Size(651, 611);
+            this.dataListViewSceneCMDs.Size = new System.Drawing.Size(651, 458);
             this.dataListViewSceneCMDs.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewSceneCMDs.TabIndex = 0;
             this.dataListViewSceneCMDs.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientInactiveCaption;
@@ -1273,17 +1319,35 @@ namespace zVirtualScenesApplication
             // 
             // olvColumn2
             // 
-            this.olvColumn2.AspectName = "ObjectName";
+            this.olvColumn2.AspectName = "Actionable_Object";
             this.olvColumn2.ImageAspectName = "DeviceIcon";
-            this.olvColumn2.Text = "Command / Object";
+            this.olvColumn2.Text = "Command / Action";
             this.olvColumn2.Width = 200;
             // 
             // olvColumn3
             // 
-            this.olvColumn3.AspectName = "CMDName";
+            this.olvColumn3.AspectName = "Action_Description";
             this.olvColumn3.FillsFreeSpace = true;
             this.olvColumn3.Text = "";
             this.olvColumn3.Width = 200;
+            // 
+            // SceneCMDOrderCol
+            // 
+            this.SceneCMDOrderCol.AspectName = "sort_order";
+            this.SceneCMDOrderCol.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.SceneCMDOrderCol.Text = "Execution Order";
+            this.SceneCMDOrderCol.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.SceneCMDOrderCol.Width = 90;
+            // 
+            // tabPage6
+            // 
+            this.tabPage6.Location = new System.Drawing.Point(4, 22);
+            this.tabPage6.Name = "tabPage6";
+            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage6.Size = new System.Drawing.Size(1000, 673);
+            this.tabPage6.TabIndex = 8;
+            this.tabPage6.Text = "tabPage6";
+            this.tabPage6.UseVisualStyleBackColor = true;
             // 
             // statusStrip1
             // 
@@ -1304,19 +1368,11 @@ namespace zVirtualScenesApplication
             // cmsSceneCMD
             // 
             this.cmsSceneCMD.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addCommandToolStripMenuItem,
             this.editCommandToolStripMenuItem,
             this.toolStripSeparator1,
             this.deleteCommandToolStripMenuItem});
             this.cmsSceneCMD.Name = "cmsSceneCMD";
-            this.cmsSceneCMD.Size = new System.Drawing.Size(168, 76);
-            // 
-            // addCommandToolStripMenuItem
-            // 
-            this.addCommandToolStripMenuItem.Name = "addCommandToolStripMenuItem";
-            this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-            this.addCommandToolStripMenuItem.Text = "&Add Command";
-            this.addCommandToolStripMenuItem.Click += new System.EventHandler(this.addCommandToolStripMenuItem_Click);
+            this.cmsSceneCMD.Size = new System.Drawing.Size(168, 54);
             // 
             // editCommandToolStripMenuItem
             // 
@@ -1336,20 +1392,6 @@ namespace zVirtualScenesApplication
             this.deleteCommandToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.deleteCommandToolStripMenuItem.Text = "&Delete Command";
             this.deleteCommandToolStripMenuItem.Click += new System.EventHandler(this.deleteCommandToolStripMenuItem_Click);
-            // 
-            // cmsSceneCMDnull
-            // 
-            this.cmsSceneCMDnull.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addCommandToolStripMenuItem1});
-            this.cmsSceneCMDnull.Name = "cmsSceneCMDnull";
-            this.cmsSceneCMDnull.Size = new System.Drawing.Size(157, 26);
-            // 
-            // addCommandToolStripMenuItem1
-            // 
-            this.addCommandToolStripMenuItem1.Name = "addCommandToolStripMenuItem1";
-            this.addCommandToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
-            this.addCommandToolStripMenuItem1.Text = "&Add Command";
-            this.addCommandToolStripMenuItem1.Click += new System.EventHandler(this.addCommandToolStripMenuItem1_Click);
             // 
             // menuStrip1
             // 
@@ -1528,6 +1570,31 @@ namespace zVirtualScenesApplication
             this.pluginsToolStripMenuItem.Text = "&Options";
             this.pluginsToolStripMenuItem.Click += new System.EventHandler(this.pluginsToolStripMenuItem_Click);
             // 
+            // olvColumn4
+            // 
+            this.olvColumn4.AspectName = "device_types.friendly_name";
+            this.olvColumn4.Text = "Type";
+            this.olvColumn4.Width = 200;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label3.Location = new System.Drawing.Point(528, 516);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(117, 100);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "Drag and drop device to add them to scenes or add a builtin command with the butt" +
+    "on below.";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // uc_object_values1
+            // 
+            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
+            this.uc_object_values1.Name = "uc_object_values1";
+            this.uc_object_values1.Size = new System.Drawing.Size(992, 232);
+            this.uc_object_values1.TabIndex = 0;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1591,11 +1658,11 @@ namespace zVirtualScenesApplication
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer4)).EndInit();
             this.splitContainer4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewScenes)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataListViewDeviceSmallList)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewSceneCMDs)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.cmsSceneCMD.ResumeLayout(false);
-            this.cmsSceneCMDnull.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -1640,7 +1707,7 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn nodeID;
         private BrightIdeasSoftware.OLVColumn GroupsCol;
         private BrightIdeasSoftware.OLVColumn colLastHeardFrom;
-        private UserControls.uc_object_values uc_object_values1;
+        private UserControls.uc_device_values uc_object_values1;
         private TabPage tabPage4;
         private SplitContainer splitContainer2;
         private BrightIdeasSoftware.DataListView dataListTasks;
@@ -1696,13 +1763,9 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn olvColumn2;
         private BrightIdeasSoftware.OLVColumn olvColumn3;
         private Label lbl_sceneActions;
-        private Button btnAddObjCMD;
         private ContextMenuStrip cmsSceneCMD;
-        private ToolStripMenuItem addCommandToolStripMenuItem;
         private ToolStripMenuItem deleteCommandToolStripMenuItem;
         private ToolStripMenuItem editCommandToolStripMenuItem;
-        private ContextMenuStrip cmsSceneCMDnull;
-        private ToolStripMenuItem addCommandToolStripMenuItem1;
         private ToolStripSeparator toolStripSeparator1;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem optionsToolStripMenuItem;
@@ -1727,7 +1790,6 @@ namespace zVirtualScenesApplication
         private ToolStripMenuItem repollAllToolStripMenuItem;
         private ToolStripMenuItem otherToolStripMenuItem;
         private ToolStripMenuItem aaronRestoreNamesToolStripMenuItem;
-        private Button btnAddBltInCMD;
         private ToolStripMenuItem duplicateSceneToolStripMenuItem;
         private GroupBox groupBox_Seconds;
         private NumericUpDown numericUpDownOccurSeconds;
@@ -1736,6 +1798,15 @@ namespace zVirtualScenesApplication
         private NumericUpDown numericUpDownOccurDays;
         private NumericUpDown numericUpDownOccurWeeks;
         private ImageList imageList25Icons;
+        private TabPage tabPage6;
+        private BrightIdeasSoftware.DataListView dataListViewDeviceSmallList;
+        private BrightIdeasSoftware.OLVColumn olvColumn5;
+        private BrightIdeasSoftware.OLVColumn olvColumn6;
+        private Button btnAddBltInCMD;
+        private BrightIdeasSoftware.OLVColumn SceneSortCol;
+        private BrightIdeasSoftware.OLVColumn SceneCMDOrderCol;
+        private BrightIdeasSoftware.OLVColumn olvColumn4;
+        private Label label3;
     }
 }
 

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using zVirtualScenesAPI;
+using zVirtualScenesCommon.Entity;
 
 namespace zVirtualScenesApplication
 {
@@ -49,7 +50,7 @@ namespace zVirtualScenesApplication
             {
                 MenuItem plugin_mi = new MenuItem();
                 plugin_mi.Name = p.ToString();
-                plugin_mi.API = p.GetAPIName();
+                plugin_mi.API = p.Name;
                 plugin_mi.Group = "Plugins";
                 menu.Add(plugin_mi);               
             }
@@ -77,12 +78,17 @@ namespace zVirtualScenesApplication
 
                 if (mi.Group.Equals("Plugins"))
                 {
-                    uc_plugin_properties_form1.PopulatePluginSettings(mi.API, _mainForm);
-                    uc_plugin_properties_form1.Visible = true;
+                    plugin plgin = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == mi.API);
+                    if (plgin != null)
+                    {
+                        uc_plugin_properties_form1.PopulatePluginSettings(plgin, _mainForm);
+                        uc_plugin_properties_form1.Visible = true;
+                    }
                 }
                 else
                 {
-                    //TODO: Load a General Settings Control
+                    //TODO: Load a General Settings Control 
+                    //Add Entitys Connection Setting UC
                 }
             }
         }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using zVirtualScenesAPI;
+using zVirtualScenesCommon.Entity;
 
 namespace zVirtualScenesApplication.Forms
 {
@@ -24,7 +25,7 @@ namespace zVirtualScenesApplication.Forms
         {
             if (String.IsNullOrEmpty(txtbName.Text))
             {
-                MessageBox.Show("You must enter a name for the group!", API.GetProgramNameAndVersion, MessageBoxButtons.OK,
+                MessageBox.Show("You must enter a name for the group!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
             else

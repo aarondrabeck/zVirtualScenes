@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Data.Objects.DataClasses;
+using zVirtualScenesCommon;
+using System.Runtime.Serialization;
+using System.Data.Objects;
+
+namespace zVirtualScenesCommon.Entity
+{
+    public partial class device_command_que : EntityObject
+    {
+
+        #region Events
+        /// <summary>
+        /// Called when a Builtin command is added to the que
+        /// </summary>
+        public static event DeviceCommandAddedEventHandler DeviceCommandAddedToQueEvent;
+        public delegate void DeviceCommandAddedEventHandler(device_command_que bcq);
+
+        public static void DeviceCommandAddedToQue(device_command_que bcq)
+        {
+            if (DeviceCommandAddedToQueEvent != null)
+                DeviceCommandAddedToQueEvent(bcq);
+        }
+
+        /// <summary>
+        /// Called after a command is executed
+        /// </summary>
+        public static event DeviceCommandRunCompleteEventHandler DeviceCommandRunCompleteEvent;
+        public delegate void DeviceCommandRunCompleteEventHandler(device_command_que cmd, bool withErrors, string txtError);
+
+        public static void DeviceCommandRunComplete(device_command_que cmd, bool withErrors, string txtError)
+        {
+            if (DeviceCommandRunCompleteEvent != null)
+                DeviceCommandRunCompleteEvent(cmd, withErrors, txtError);
+        }
+        #endregion
+
+        public static void Run(device_command_que cmd)
+        {
+            zvsEntityControl.zvsContext.device_command_que.AddObject(cmd);
+            zvsEntityControl.zvsContext.SaveChanges();
+            DeviceCommandAddedToQue(cmd);
+        }
+    }
+}

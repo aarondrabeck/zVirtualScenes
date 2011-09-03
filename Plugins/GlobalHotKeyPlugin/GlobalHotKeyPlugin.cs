@@ -11,8 +11,8 @@ using zVirtualScenesApplication.Structs;
 
 namespace GlobalHotKeyPlugin
 {
-    [Export(typeof(Plugin))]
-    public class GlobalHotKeyPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class GlobalHotKeyPlugin : zvsPlugin
     {
         public volatile bool isActive;
         private KeyboardHook hook = new KeyboardHook();
@@ -25,11 +25,11 @@ namespace GlobalHotKeyPlugin
 
         public override void Initialize()
         {
-            API.Scenes.Properties.New("Global Hotkey", "Hotkey that will activate this scene.", "None", ParamType.LIST);
+            zvsAPI.Scenes.Properties.New("Global Hotkey", "Hotkey that will activate this scene.", "None", Data_Types.LIST);
             
             foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
             {
-                API.Scenes.Properties.NewPropertyOption("Global Hotkey", option.Replace('_', '+'));
+                zvsAPI.Scenes.Properties.NewPropertyOption("Global Hotkey", option.Replace('_', '+'));
             }            
         }
 
@@ -80,11 +80,11 @@ namespace GlobalHotKeyPlugin
             }
             catch (Exception ex)
             {
-                API.WriteToLog(Urgency.ERROR, "Failed to register global hotkeys. - " + ex.Message);
+                zvsAPI.WriteToLog(Urgency.ERROR, "Failed to register global hotkeys. - " + ex.Message);
             }
             #endregion
 
-            API.WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", PluginName, success , errors));
+            zvsAPI.WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", PluginName, success , errors));
 
             IsReady = true;
             return true;
@@ -92,7 +92,7 @@ namespace GlobalHotKeyPlugin
 
         protected override bool StopPlugin()
         {
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
             IsReady = false;
             return true;
         }
@@ -122,16 +122,16 @@ namespace GlobalHotKeyPlugin
 
             }
 
-            foreach (Scene scene in API.Scenes.GetScenes())
+            foreach (Scene scene in zvsAPI.Scenes.GetScenes())
             {
-                string sceneHotKey = API.Scenes.Properties.GetScenePropertyValue(scene.id, "Global Hotkey");
+                string sceneHotKey = zvsAPI.Scenes.Properties.GetScenePropertyValue(scene.id, "Global Hotkey");
 
                 if (!string.IsNullOrEmpty(sceneHotKey))
                 {
                     if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
                     {
                         string result = scene.RunScene();
-                        API.WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                        zvsAPI.WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
                     }
                 }  
             }            

@@ -4,8 +4,6 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Diagnostics;
-using zVirtualScenesCommon.DatabaseCommon;
-using zVirtualScenesApplication.Forms;
 
 namespace zVirtualScenesApplication
 {
@@ -49,16 +47,16 @@ namespace zVirtualScenesApplication
 
 
             //ONLY LAUCH IF WE CAN CONNECT TO THE DATABASE
-            if (!String.IsNullOrEmpty(DatabaseControl.ExamineDatabase()) || DatabaseControl.GetOutdatedDbVersion() != null)
-            {
-                DatabaseConnection FormDatabaseConnection = new DatabaseConnection();
-                FormDatabaseConnection.ShowDialog();
+            //if (!String.IsNullOrEmpty(DatabaseControl.ExamineDatabase()) || DatabaseControl.GetOutdatedDbVersion() != null)
+            //{
+            //    DatabaseConnection FormDatabaseConnection = new DatabaseConnection();
+            //    FormDatabaseConnection.ShowDialog();
 
-                if (FormDatabaseConnection.DialogResult == DialogResult.Cancel)
-                {
-                    return;
-                }
-            }
+            //    if (FormDatabaseConnection.DialogResult == DialogResult.Cancel)
+            //    {
+            //        return;
+            //    }
+            //}
 
             Application.Run(new MainForm());
         }

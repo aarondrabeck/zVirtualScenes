@@ -13,7 +13,7 @@ namespace HTTPControlPlugin
         public string FriendlyName;
         public string HelpText;
         public int CommandId;
-        public ParamType paramType;
-        public cmdType cmdtype;
+        public Data_Types paramType;
+        public commandScopeType cmdtype;
     }
 }

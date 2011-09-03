@@ -4,12 +4,11 @@ using System.Speech.Synthesis;
 using zVirtualScenesAPI;
 using zVirtualScenesAPI.Events;
 using System.Collections.Generic;
-using zVirtualScenesAPI.Structs;
 
 namespace SpeechPlugin
 {
-    [Export(typeof(Plugin))]
-    public class SpeechPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class SpeechPlugin : zvsPlugin
     {
         private SpeechSynthesizer _synth;
 
@@ -21,9 +20,9 @@ namespace SpeechPlugin
 
         protected override bool StartPlugin()
         {
-            zVirtualSceneEvents.ValueDataChangedEvent += new zVirtualSceneEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueChangedEvent);
+            zvsEvents.ValueDataChangedEvent += new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueChangedEvent);
 
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
+            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
             _synth.SpeakAsync("Speech Started!");
             IsReady = true;
             return true;
@@ -31,8 +30,8 @@ namespace SpeechPlugin
 
         protected override bool StopPlugin()
         {
-            zVirtualSceneEvents.ValueDataChangedEvent -= new zVirtualSceneEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueChangedEvent);
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            zvsEvents.ValueDataChangedEvent -= new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueChangedEvent);
+            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
             _synth.Dispose();
             IsReady = false;
             return true;
@@ -53,24 +52,24 @@ namespace SpeechPlugin
         {
             _synth = new SpeechSynthesizer();
 
-            API.InstallObjectType("SPEECH", false);
-            API.NewObjectTypeCommand("SPEECH", "SAY", "Say", ParamType.STRING, "Used to make the computer say any command you want");
+            zvsAPI.InstallObjectType("SPEECH", false);
+            zvsAPI.NewObjectTypeCommand("SPEECH", "SAY", "Say", Data_Types.STRING, "Used to make the computer say any command you want");
 
-            API.NewObject(1, "SPEECH", "SPEECH");
+            zvsAPI.NewObject(1, "SPEECH", "SPEECH");
 
-            API.DefineSetting("Enable announce on", "Level", ParamType.LIST, "Select the values to annouce.");
-            API.NewPluginSettingOption("Enable announce on", "Switch Level");
-            API.NewPluginSettingOption("Enable announce on", "Dimmer Level");
-            API.NewPluginSettingOption("Enable announce on", "Thermostat Operating State and Temp");
-            API.NewPluginSettingOption("Enable announce on", "All of the above");
-            API.NewPluginSettingOption("Enable announce on", "Custom");
-            API.DefineSetting("Announce on custom values", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", ParamType.STRING, "Include all values you would like announced. Comma Seperated.");
+            zvsAPI.DefineSetting("Enable announce on", "Level", Data_Types.LIST, "Select the values to annouce.");
+            zvsAPI.NewPluginSettingOption("Enable announce on", "Switch Level");
+            zvsAPI.NewPluginSettingOption("Enable announce on", "Dimmer Level");
+            zvsAPI.NewPluginSettingOption("Enable announce on", "Thermostat Operating State and Temp");
+            zvsAPI.NewPluginSettingOption("Enable announce on", "All of the above");
+            zvsAPI.NewPluginSettingOption("Enable announce on", "Custom");
+            zvsAPI.DefineSetting("Announce on custom values", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", Data_Types.STRING, "Include all values you would like announced. Comma Seperated.");
 
         }
 
         public override void ProcessCommand(QuedCommand cmd)
         {
-            Command cmdInfo = API.Commands.GetCommand(cmd.CommandId, cmd.cmdtype);
+            Command cmdInfo = zvsAPI.Commands.GetCommand(cmd.CommandId, cmd.cmdtype);
             switch (cmdInfo.Name)
             {
                 case "SAY":
@@ -81,10 +80,10 @@ namespace SpeechPlugin
 
         void zVirtualSceneEvents_ValueChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)
         {
-            string objType = API.Object.GetObjectType(ObjectId);
-            string objName = API.Object.GetObjectName(ObjectId);
+            string objType = zvsAPI.Object.GetObjectType(ObjectId);
+            string objName = zvsAPI.Object.GetObjectName(ObjectId);
 
-            string AnnounceSetting = API.GetSetting("Enable Announce On");
+            string AnnounceSetting = zvsAPI.GetSetting("Enable Announce On");
 
             if(AnnounceSetting == "Switch Level" || AnnounceSetting == "All of the above")
             {
@@ -116,7 +115,7 @@ namespace SpeechPlugin
             }
             if (AnnounceSetting == "Custom")
             {
-                string[] objTypeValuespairs = API.GetSetting("Announce on custom values").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] objTypeValuespairs = zvsAPI.GetSetting("Announce on custom values").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string objTypeValuespair in objTypeValuespairs)
                 {

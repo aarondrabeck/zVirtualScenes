@@ -83,6 +83,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -94,29 +95,29 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EventCommon\EventControl.cs" />
-    <Compile Include="Forms\AddEditGroupName.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\AddEditGroupName.Designer.cs">
-      <DependentUpon>AddEditGroupName.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\ActivateGroup.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ActivateGroup.Designer.cs">
       <DependentUpon>ActivateGroup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\AddEditSceneObjectCMD.cs">
+    <Compile Include="Forms\AddEditGroupName.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AddEditSceneObjectCMD.Designer.cs">
-      <DependentUpon>AddEditSceneObjectCMD.cs</DependentUpon>
+    <Compile Include="Forms\AddEditGroupName.Designer.cs">
+      <DependentUpon>AddEditGroupName.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\AddEditSceneBuiltinCMD.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\AddEditSceneBuiltinCMD.Designer.cs">
       <DependentUpon>AddEditSceneBuiltinCMD.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AddEditSceneDeviceCMD.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddEditSceneDeviceCMD.Designer.cs">
+      <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\DatabaseConnection.cs">
       <SubType>Form</SubType>
@@ -148,11 +149,11 @@
     <Compile Include="Forms\ObjectProperties.Designer.cs">
       <DependentUpon>ObjectProperties.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ScriptEditor.cs">
+    <Compile Include="Forms\ProgramSettings.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ScriptEditor.Designer.cs">
-      <DependentUpon>ScriptEditor.cs</DependentUpon>
+    <Compile Include="Forms\ProgramSettings.Designer.cs">
+      <DependentUpon>ProgramSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="Globals\GlobalMethods.cs" />
     <Compile Include="KeyboardHook.cs">
@@ -161,30 +162,30 @@
     <Compile Include="PluginSystem\PluginManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Structs\zwObjectState.cs" />
-    <Compile Include="TestForms\TestForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TestForms\TestForm.Designer.cs">
-      <DependentUpon>TestForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="UserControls\BtnInfo.cs" />
-    <Compile Include="UserControls\uc_object_basic.cs">
+    <Compile Include="UserControls\uc_device_type_commands.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\uc_object_basic.Designer.cs">
-      <DependentUpon>uc_object_basic.cs</DependentUpon>
+    <Compile Include="UserControls\uc_device_type_commands.Designer.cs">
+      <DependentUpon>uc_device_type_commands.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\uc_object_commands.cs">
+    <Compile Include="UserControls\uc_device_basic.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\uc_object_commands.Designer.cs">
-      <DependentUpon>uc_object_commands.cs</DependentUpon>
+    <Compile Include="UserControls\uc_device_basic.Designer.cs">
+      <DependentUpon>uc_device_basic.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\uc_object_values_grid.cs">
+    <Compile Include="UserControls\uc_device_commands.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\uc_object_values_grid.Designer.cs">
-      <DependentUpon>uc_object_values_grid.cs</DependentUpon>
+    <Compile Include="UserControls\uc_device_commands.Designer.cs">
+      <DependentUpon>uc_device_commands.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\uc_device_values_grid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_device_values_grid.Designer.cs">
+      <DependentUpon>uc_device_values_grid.cs</DependentUpon>
     </Compile>
     <Compile Include="UserControls\uc_plugin_properties_form.cs">
       <SubType>UserControl</SubType>
@@ -198,45 +199,36 @@
     <Compile Include="UserControls\uc_script_editor.Designer.cs">
       <DependentUpon>uc_script_editor.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\uc_object_values.cs">
+    <Compile Include="UserControls\uc_device_values.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\uc_object_values.Designer.cs">
-      <DependentUpon>uc_object_values.cs</DependentUpon>
+    <Compile Include="UserControls\uc_device_values.Designer.cs">
+      <DependentUpon>uc_device_values.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ProgramSettings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\ProgramSettings.Designer.cs">
-      <DependentUpon>ProgramSettings.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\uc_object_properties.cs">
+    <Compile Include="UserControls\uc_device_properties.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\uc_object_properties.Designer.cs">
-      <DependentUpon>uc_object_properties.cs</DependentUpon>
+    <Compile Include="UserControls\uc_device_properties.Designer.cs">
+      <DependentUpon>uc_device_properties.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\uc_object_groups.cs">
+    <Compile Include="UserControls\uc_device_groups.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="UserControls\uc_object_groups.Designer.cs">
-      <DependentUpon>uc_object_groups.cs</DependentUpon>
+    <Compile Include="UserControls\uc_device_groups.Designer.cs">
+      <DependentUpon>uc_device_groups.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Forms\ActivateGroup.resx">
+      <DependentUpon>ActivateGroup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddEditGroupName.resx">
       <DependentUpon>AddEditGroupName.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ActivateGroup.resx">
-      <DependentUpon>ActivateGroup.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\AddEditSceneObjectCMD.resx">
-      <DependentUpon>AddEditSceneObjectCMD.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddEditSceneBuiltinCMD.resx">
       <DependentUpon>AddEditSceneBuiltinCMD.cs</DependentUpon>
-      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddEditSceneDeviceCMD.resx">
+      <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\DatabaseConnection.resx">
       <DependentUpon>DatabaseConnection.cs</DependentUpon>
@@ -254,20 +246,20 @@
     <EmbeddedResource Include="Forms\ObjectProperties.resx">
       <DependentUpon>ObjectProperties.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ScriptEditor.resx">
-      <DependentUpon>ScriptEditor.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\ProgramSettings.resx">
+      <DependentUpon>ProgramSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestForms\TestForm.resx">
-      <DependentUpon>TestForm.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_type_commands.resx">
+      <DependentUpon>uc_device_type_commands.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControls\uc_object_basic.resx">
-      <DependentUpon>uc_object_basic.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_basic.resx">
+      <DependentUpon>uc_device_basic.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControls\uc_object_commands.resx">
-      <DependentUpon>uc_object_commands.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_commands.resx">
+      <DependentUpon>uc_device_commands.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControls\uc_object_values_grid.resx">
-      <DependentUpon>uc_object_values_grid.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_values_grid.resx">
+      <DependentUpon>uc_device_values_grid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControls\uc_plugin_properties_form.resx">
       <DependentUpon>uc_plugin_properties_form.cs</DependentUpon>
@@ -275,11 +267,8 @@
     <EmbeddedResource Include="UserControls\uc_script_editor.resx">
       <DependentUpon>uc_script_editor.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControls\uc_object_values.resx">
-      <DependentUpon>uc_object_values.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ProgramSettings.resx">
-      <DependentUpon>ProgramSettings.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_values.resx">
+      <DependentUpon>uc_device_values.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -291,11 +280,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="UserControls\uc_object_properties.resx">
-      <DependentUpon>uc_object_properties.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_properties.resx">
+      <DependentUpon>uc_device_properties.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="UserControls\uc_object_groups.resx">
-      <DependentUpon>uc_object_groups.cs</DependentUpon>
+    <EmbeddedResource Include="UserControls\uc_device_groups.resx">
+      <DependentUpon>uc_device_groups.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config">
       <SubType>Designer</SubType>
@@ -386,6 +375,7 @@
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

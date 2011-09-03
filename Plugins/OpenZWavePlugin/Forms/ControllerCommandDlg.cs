@@ -7,8 +7,11 @@ using System.Text;
 using System.Windows.Forms;
 using OpenZWaveDotNet;
 using zVirtualScenesAPI;
+using zVirtualScenesCommon;
+using zVirtualScenesCommon.Util;
+using zVirtualScenesCommon.Entity;
 
-namespace OZWForm
+namespace OpenZWavePlugin.Forms
 {
 	public partial class ControllerCommandDlg : Form
 	{
@@ -33,64 +36,64 @@ namespace OZWForm
 			{
                 case ZWControllerCommand.AddController:
 				{
-					this.Text = API.GetProgramNameAndVersion + " - Add Controller";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Add Controller";
 					this.label1.Text = "Put the target controller into receive configuration mode.\nThe PC Z-Wave Controller must be within 2m of the controller being added.";
 					break;
 				}
                 case ZWControllerCommand.AddDevice:
 				{
-                    this.Text = API.GetProgramNameAndVersion + " - Add Device";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Add Device";
 					this.label1.Text = "Press the program button on the Z-Wave device to add it to the network.\nFor security reasons, the PC Z-Wave Controller must be close to the device being added.";
 					break;
 				}
                 case ZWControllerCommand.CreateNewPrimary:
 				{
-                    this.Text = API.GetProgramNameAndVersion + " - Create New Primary Controller";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Create New Primary Controller";
 					this.label1.Text = "Put the target controller into receive configuration mode.\nThe PC Z-Wave Controller must be within 2m of the controller that is being made the primary.";
 					break;
 				}
                 case ZWControllerCommand.ReceiveConfiguration:
 				{
-                    this.Text = API.GetProgramNameAndVersion + " - Receive Configuration";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Receive Configuration";
 					this.label1.Text = "Transfering the network configuration\nfrom another controller.\n\nPlease bring the other controller within 2m of the PC controller and set it to send its network configuration.";
 					break;
 				}
                 case ZWControllerCommand.RemoveController:
 				{
-                    this.Text = API.GetProgramNameAndVersion + " - RemoveController";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - RemoveController";
 					this.label1.Text = "Put the target controller into receive configuration mode.\nThe PC Z-Wave Controller must be within 2m of the controller being added.";
 					break;
 				}
                 case ZWControllerCommand.RemoveDevice:
 				{
-                    this.Text = API.GetProgramNameAndVersion + " - Remove Device";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Remove Device";
 					this.label1.Text = "Press the program button on the Z-Wave device to remove it from the network.\nFor security reasons, the PC Z-Wave Controller must be close to the device being removed.";
 					break;
 				}
                 case ZWControllerCommand.TransferPrimaryRole:
 				{
-                    this.Text = API.GetProgramNameAndVersion + " - Transfer Primary Role";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Transfer Primary Role";
 					this.label1.Text = "Transfering the primary role\nto another controller.\n\nPlease bring the new controller within 2m of the PC controller and set it to receive the network configuration.";
 					break;
 				}
                 case ZWControllerCommand.HasNodeFailed:
                 {
                     this.ButtonCancel.Enabled = false;
-                    this.Text = API.GetProgramNameAndVersion + " - Has Node Failed";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Has Node Failed";
                     this.label1.Text = "Testing whether the node has failed.\nThis command cannot be cancelled.";
                     break;
                 }
                 case ZWControllerCommand.RemoveFailedNode:
                 {
                     this.ButtonCancel.Enabled = false;
-                    this.Text = API.GetProgramNameAndVersion + " - Remove Failed Node";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Remove Failed Node";
                     this.label1.Text = "Removing the failed node from the controller's list.\nThis command cannot be cancelled.";
 					break;
                 }
                 case ZWControllerCommand.ReplaceFailedNode:
                 {
                     this.ButtonCancel.Enabled = false;
-                    this.Text = API.GetProgramNameAndVersion + " - Replacing Failed Node";
+                    this.Text = zvsEntityControl.GetProgramNameAndVersion + " - Replacing Failed Node";
                     this.label1.Text = "Testing the failed node.\nThis command cannot be cancelled.";
                     break;
                 }
@@ -124,7 +127,7 @@ namespace OZWForm
 		        case ZWControllerState.InProgress:
 		        {
 		            // Tell the user that the controller has been found and the adding process is in progress.
-                    API.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " in progress...", "OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " in progress...", "OPENZWAVE");
                     dlgText = "Please wait...";
                     buttonEnabled = false;
                     break;
@@ -133,7 +136,7 @@ namespace OZWForm
 		        {
 		            // Tell the user that the controller has been successfully added.
 		            // The command is now complete
-                    API.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " command complete.", "OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " command complete.", "OPENZWAVE");
                     dlgText = "Command Completed OK.";
                     complete = true;
 		            break;
@@ -142,21 +145,21 @@ namespace OZWForm
 		        {
 		            // Tell the user that the controller addition process has failed.
 		            // The command is now complete
-                    API.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " command failed.", "OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " command failed.", "OPENZWAVE");
                     dlgText = "Command Failed.";
                     complete = true;
 		            break;
 		        }
                 case ZWControllerState.NodeOK:
                 {
-                    API.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " node has not failed.", "OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " node has not failed.", "OPENZWAVE");
                     dlgText = "Node has not failed.";
                     complete = true;
                     break;
                 }
                 case ZWControllerState.NodeFailed:
                 {
-                    API.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " node has failed.", "OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " node has failed.", "OPENZWAVE");
                     dlgText = "Node has failed.";
                     complete = true;
                     break;
@@ -225,11 +228,11 @@ namespace OZWForm
                 // Cancel the operation
                 if (m_manager.CancelControllerCommand(_homeid))
                 {
-                    API.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " cancelled by user.","OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " cancelled by user.","OPENZWAVE");
                 }
                 else
                 {
-                    API.WriteToLog(Urgency.INFO, "Failed to cancel "+_zwcontrollercommand.ToString() + ".", "OPENZWAVE");
+                    Logger.WriteToLog(Urgency.INFO, "Failed to cancel "+_zwcontrollercommand.ToString() + ".", "OPENZWAVE");
                 }
             }
 

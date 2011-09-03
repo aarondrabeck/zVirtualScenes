@@ -19,8 +19,8 @@ using HTTPControlPlugin;
 
 namespace HTTPControl
 {
-    [Export(typeof(Plugin))]
-    public class HTTPControlPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class HTTPControlPlugin : zvsPlugin
     {
         public volatile bool isActive;
 
@@ -35,7 +35,7 @@ namespace HTTPControl
 
         public override void Initialize()
         {
-            API.DefineSetting("Port", "8085", ParamType.INTEGER, "The port that HTTP will listen for commands on.");
+            zvsAPI.DefineSetting("Port", "8085", Data_Types.INTEGER, "The port that HTTP will listen for commands on.");
         }
 
         protected override bool StartPlugin()
@@ -45,18 +45,18 @@ namespace HTTPControl
                 if (!httplistener.IsListening)
                 {
                     int port = 1338;
-                    int.TryParse(API.GetSetting("Port"), out port);
+                    int.TryParse(zvsAPI.GetSetting("Port"), out port);
                     httplistener.Prefixes.Add("http://*:" + port + "/");
                     httplistener.Start();
 
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
 
-                    API.WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", PluginName, port));
+                    zvsAPI.WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", PluginName, port));
                 }
             }
             catch (Exception ex)
             {
-                API.WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
+                zvsAPI.WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
             }
 
             IsReady = true;
@@ -65,19 +65,19 @@ namespace HTTPControl
 
         protected override bool StopPlugin()
         {
-            API.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
 
             try
             {
                 if (httplistener != null && httplistener.IsListening)
                 {
                     httplistener.Stop();
-                    API.WriteToLog(Urgency.INFO, string.Format("{0} plugin shutdown.", PluginName));
+                    zvsAPI.WriteToLog(Urgency.INFO, string.Format("{0} plugin shutdown.", PluginName));
                 }
             }
             catch (Exception ex)
             {
-                API.WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
+                zvsAPI.WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
             }
 
             IsReady = false;
@@ -115,7 +115,7 @@ namespace HTTPControl
             }
             catch (Exception ex)
             {
-                API.WriteToLog(Urgency.ERROR, ex.Message);
+                zvsAPI.WriteToLog(Urgency.ERROR, ex.Message);
             }
         }
 
@@ -150,9 +150,9 @@ namespace HTTPControl
                     HTTPCMDResult CMDresult = parseRequest(context.Request.RawUrl);
 
                     if (CMDresult.HadError)
-                        API.WriteToLog(Urgency.ERROR, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
+                        zvsAPI.WriteToLog(Urgency.ERROR, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
                     else
-                        API.WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
+                        zvsAPI.WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
                            
                     string XMLResult;
                     if (!CMDresult.DescriptionIsXML)
@@ -173,7 +173,7 @@ namespace HTTPControl
             }
             catch (Exception ex)
             {
-                API.WriteToLog(Urgency.ERROR, ex.Message + ex.InnerException + "END");
+                zvsAPI.WriteToLog(Urgency.ERROR, ex.Message + ex.InnerException + "END");
             }
         }
 
@@ -208,7 +208,7 @@ namespace HTTPControl
 
                 if (sceneID > 0)
                 {
-                    Scene scene = API.Scenes.GetScene(sceneID);
+                    Scene scene = zvsAPI.Scenes.GetScene(sceneID);
 
                     if (scene != null)
                     {
@@ -257,14 +257,14 @@ namespace HTTPControl
 
                 if (ObjID > 0)
                 {
-                    string ObjName = API.Object.GetObjectName(ObjID);
-                    int commandId = API.Commands.GetObjectCommandId(ObjID, "DYNAMIC_CMD_BASIC");
+                    string ObjName = zvsAPI.Object.GetObjectName(ObjID);
+                    int commandId = zvsAPI.Commands.GetObjectCommandId(ObjID, "DYNAMIC_CMD_BASIC");
 
                     if (commandId > 0)
                     {
-                        API.Commands.InstallQueCommandAndProcess(new QuedCommand
+                        zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand
                         {
-                            cmdtype = cmdType.Object,
+                            cmdtype = commandScopeType.Object,
                             CommandId = commandId,
                             ObjectId = ObjID,
                             Argument = level.ToString()
@@ -295,7 +295,7 @@ namespace HTTPControl
                 string command = string.Empty;
                 string arg = string.Empty;
                 string strtype = string.Empty;
-                cmdType type = cmdType.Object;
+                commandScopeType type = commandScopeType.Object;
 
 
 
@@ -330,17 +330,17 @@ namespace HTTPControl
 
                 if (ObjID > 0)
                 {
-                    string ObjName = API.Object.GetObjectName(ObjID);
+                    string ObjName = zvsAPI.Object.GetObjectName(ObjID);
 
                     int commandId = 0;
-                    if(type == cmdType.Object)
-                        commandId = API.Commands.GetObjectCommandId(ObjID, command);
-                    else if(type == cmdType.ObjectType)
-                        commandId = API.Commands.GetObjectTypeCommandId(ObjID, command);
+                    if(type == commandScopeType.Object)
+                        commandId = zvsAPI.Commands.GetObjectCommandId(ObjID, command);
+                    else if(type == commandScopeType.ObjectType)
+                        commandId = zvsAPI.Commands.GetObjectTypeCommandId(ObjID, command);
 
                     if (commandId > 0)
                     {
-                        API.Commands.InstallQueCommandAndProcess(new QuedCommand
+                        zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand
                         {
                             cmdtype = type,
                             CommandId = commandId,
@@ -372,7 +372,7 @@ namespace HTTPControl
                 try
                 {
                     List<zvsObject> Devices = new List<zvsObject>();
-                    DataTable dt = API.Object.GetObjects(true);
+                    DataTable dt = zvsAPI.Object.GetDevices(true);
 
                     foreach (DataRow dr in dt.Rows)
                     {
@@ -407,7 +407,7 @@ namespace HTTPControl
             #region Scene Listing
             if (rawURL.Contains(acceptedCMDs[4]))
             {
-                BindingList<Scene> APIScenes = API.Scenes.GetScenes();
+                BindingList<Scene> APIScenes = zvsAPI.Scenes.GetScenes();
 
                 List<zvsScene> Scenes = new List<zvsScene>();
 
@@ -441,9 +441,9 @@ namespace HTTPControl
 
                 if (ObjID == 0)  //REPOLL ALL
                 {
-                    int cmdId = API.Commands.GetBuiltinCommandId("REPOLL_ALL");
-                    API.Commands.InstallQueCommandAndProcess(new QuedCommand { 
-                        cmdtype = cmdType.Builtin, 
+                    int cmdId = zvsAPI.Commands.GetBuiltinCommandId("REPOLL_ALL");
+                    zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { 
+                        cmdtype = commandScopeType.Builtin, 
                         CommandId = cmdId });
 
                     result.HadError = false;
@@ -452,9 +452,9 @@ namespace HTTPControl
                 }
                 else
                 {
-                    int cmdId = API.Commands.GetBuiltinCommandId("REPOLL_ME");                    
-                    API.Commands.InstallQueCommandAndProcess(new QuedCommand { 
-                        cmdtype = cmdType.Builtin, 
+                    int cmdId = zvsAPI.Commands.GetBuiltinCommandId("REPOLL_ME");                    
+                    zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { 
+                        cmdtype = commandScopeType.Builtin, 
                         CommandId = cmdId,
                         Argument = ObjID.ToString()
                     });
@@ -475,8 +475,8 @@ namespace HTTPControl
                 if (ObjID > 0)
                 {
                     List<Command> commands = new List<Command>();
-                    commands = API.Commands.GetAllObjectCommandsForObjectasCMD(ObjID);
-                    commands.AddRange(API.Commands.GetAllObjectTypeCommandsForObjectasCMD(ObjID));
+                    commands = zvsAPI.Commands.GetAllObjectCommandsForObjectasCMD(ObjID);
+                    commands.AddRange(zvsAPI.Commands.GetAllObjectTypeCommandsForObjectasCMD(ObjID));
 
                     List<zvsObjectCommand> zvsObjectCommands = new List<zvsObjectCommand>();
                     foreach (Command cmd in commands)

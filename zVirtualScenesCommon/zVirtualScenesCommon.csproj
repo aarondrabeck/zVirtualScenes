@@ -36,6 +36,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,6 +47,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseCommon\DatabaseControl.cs" />
+    <Compile Include="command_types.cs" />
+    <Compile Include="Data_Types.cs" />
+    <Compile Include="Entity\builtin_commands.cs" />
+    <Compile Include="Entity\scene_commands.cs" />
+    <Compile Include="Entity\device_propertys.cs" />
+    <Compile Include="Entity\device_property_values.cs" />
+    <Compile Include="Entity\device_command_que.cs" />
+    <Compile Include="Entity\builtin_command_que.cs" />
+    <Compile Include="Entity\device_type_command_que.cs" />
+    <Compile Include="Entity\scene_property_value.cs" />
+    <Compile Include="Entity\scene_property.cs" />
+    <Compile Include="Entity\device.cs" />
+    <Compile Include="Entity\device_values.cs" />
+    <Compile Include="Entity\zvsEntityControl.cs" />
+    <Compile Include="Entity\scene.cs" />
+    <Compile Include="Urgency.cs" />
+    <Compile Include="Entity\zvsEvents.cs" />
+    <Compile Include="Entity\zvsModel.Designer.cs">
+      <DependentUpon>zvsModel.edmx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -56,7 +81,14 @@
     <Compile Include="Version.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <EntityDeploy Include="Entity\zvsModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>zvsModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\DataSources\zvsEntities.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -64,20 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Forms\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="20to21.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="21to22.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="22to23.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="base_db.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using zVirtualScenesCommon.DatabaseCommon;
+using System.Data.Objects;
+using System.Linq;
 using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
+using zVirtualScenesCommon.Entity;
+
 
 namespace zVirtualScenesApplication.Forms
 {
     public partial class ActivateGroup : Form
     {
-        private DataTable _groups;
-
         public ActivateGroup()
         {
             InitializeComponent();
@@ -18,22 +18,14 @@ namespace zVirtualScenesApplication.Forms
 
         private void GroupEditor_Load(object sender, EventArgs e)
         {
-            UpdateGroupsList();
+            ObjectQuery<group> groupQuery = zvsEntityControl.zvsContext.groups;
+            comboBoxGroups.DataSource = groupQuery.Execute(MergeOption.AppendOnly);
+            comboBoxGroups.DisplayMember = "name";
 
-            //Select the first item if there is one
+            //Select the first group if there is one
             if (comboBoxGroups.Items.Count > 0) { comboBoxGroups.SelectedIndex = 0; }
         }
-
-        private void UpdateGroupsList()
-        {
-            _groups = DatabaseControl.GetGroups();
-
-            comboBoxGroups.Items.Clear();
-
-            foreach (DataRow dr in _groups.Rows)
-                comboBoxGroups.Items.Add(dr["txt_group_name"].ToString());
-        }
-
+  
         private void btnClose_Click(object sender, EventArgs e)
         {
             Close();
@@ -41,24 +33,34 @@ namespace zVirtualScenesApplication.Forms
 
         private void buttonOn_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(comboBoxGroups.Text))
+            if (comboBoxGroups.SelectedIndex > -1)
             {
-                int cmdId = API.Commands.GetBuiltinCommandId("GROUP_ON");
-                API.Commands.InstallQueCommandAndProcess(new QuedCommand { CommandId = cmdId, cmdtype = cmdType.Builtin, Argument = comboBoxGroups.Text});
+                group g = (group)comboBoxGroups.SelectedItem;
+                if (g != null)
+                {
+                    builtin_commands group_on_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "GROUP_ON");
+                    builtin_command_que cmd = builtin_command_que.Createbuiltin_command_que(0, g.id.ToString(), group_on_cmd.id);
+                    builtin_command_que.Run(cmd);    
+                }
             }
             else
-                MessageBox.Show("No Group Selected!", API.GetProgramNameAndVersion,MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                MessageBox.Show("No Group Selected!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
         private void buttonOff_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(comboBoxGroups.Text))
+            if (comboBoxGroups.SelectedIndex > -1)
             {
-                int cmdId = API.Commands.GetBuiltinCommandId("GROUP_OFF");
-                API.Commands.InstallQueCommandAndProcess(new QuedCommand { CommandId = cmdId, cmdtype = cmdType.Builtin, Argument = comboBoxGroups.Text });
+                group g = (group)comboBoxGroups.SelectedItem;
+                if (g != null)
+                {
+                    builtin_commands group_on_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "GROUP_OFF");
+                    builtin_command_que cmd = builtin_command_que.Createbuiltin_command_que(0, g.id.ToString(), group_on_cmd.id);
+                    builtin_command_que.Run(cmd);                        
+                }
             }
             else
-                MessageBox.Show("No Group Selected!", API.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("No Group Selected!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
         private void btnClose_KeyDown(object sender, KeyEventArgs e)
@@ -71,3 +73,4 @@ namespace zVirtualScenesApplication.Forms
 
     }
 }
+

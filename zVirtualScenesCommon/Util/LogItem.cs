@@ -1,14 +1,7 @@
 ﻿using System;
 
 namespace zVirtualScenesCommon.Util
-{
-    public enum UrgencyLevel
-    {
-        INFO = 1,
-        ERROR = 2,
-        WARNING = 3
-    }
-
+{    
     public class LogItem
     {
         public DateTime Datetime { get; set; }
@@ -23,7 +16,7 @@ namespace zVirtualScenesCommon.Util
         
         public string Description { get; set; }
 
-        public UrgencyLevel Urgency { get; set; }
+        public Urgency Urgency { get; set; }
 
         public string Source {get; set;}
 
@@ -32,7 +25,7 @@ namespace zVirtualScenesCommon.Util
             Datetime = DateTime.Now;
         }
 
-        public LogItem(UrgencyLevel urgency, string desc, string source)
+        public LogItem(Urgency urgency, string desc, string source)
         {
             Datetime = DateTime.Now;
             Urgency = urgency;

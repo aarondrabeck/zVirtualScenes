@@ -10,7 +10,7 @@ namespace zVirtualScenesCommon.Util
         public delegate void LogItemAddEventHandler(object sender, EventArgs e);
         public static event LogItemAddEventHandler LogItemPostAdd; 
 
-        public static void WriteToLog(UrgencyLevel urgency, string log, string source)
+        public static void WriteToLog(Urgency urgency, string log, string source)
         {
             // TODO: Make this write to a log file somewhere instead of the console
             Console.WriteLine(log);

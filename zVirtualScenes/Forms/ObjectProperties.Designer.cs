@@ -35,11 +35,12 @@
             this.colSettings = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.btnClose = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.uc_object_basic1 = new zVirtualScenesApplication.UserControls.uc_object_basic();
-            this.uc_object_values_grid2 = new zVirtualScenesApplication.UserControls.uc_object_values_grid();
-            this.uc_object_commands1 = new zVirtualScenesApplication.UserControls.uc_object_commands();
-            this.uc_object_properties1 = new zVirtualScenesApplication.UserControls.uc_object_properties();
-            this.uc_object_groups1 = new zVirtualScenesApplication.UserControls.uc_object_groups();
+            this.uc_device_basic1 = new zVirtualScenesApplication.UserControls.uc_device_basic();
+            this.uc_device_values_grid2 = new zVirtualScenesApplication.UserControls.uc_device_values_grid();
+            this.uc_device_commands1 = new zVirtualScenesApplication.UserControls.uc_device_commands();
+            this.uc_device_properties1 = new zVirtualScenesApplication.UserControls.uc_device_properties();
+            this.uc_device_groups1 = new zVirtualScenesApplication.UserControls.uc_device_groups();
+            this.uc_device_type_commands1 = new zVirtualScenesApplication.UserControls.uc_device_type_commands();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewMenu)).BeginInit();
             this.SuspendLayout();
             // 
@@ -113,56 +114,66 @@
             // 
             // uc_object_basic1
             // 
-            this.uc_object_basic1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.uc_device_basic1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.uc_object_basic1.AutoScroll = true;
-            this.uc_object_basic1.Location = new System.Drawing.Point(238, 13);
-            this.uc_object_basic1.Name = "uc_object_basic1";
-            this.uc_object_basic1.Size = new System.Drawing.Size(716, 562);
-            this.uc_object_basic1.TabIndex = 32;
+            this.uc_device_basic1.AutoScroll = true;
+            this.uc_device_basic1.Location = new System.Drawing.Point(238, 13);
+            this.uc_device_basic1.Name = "uc_object_basic1";
+            this.uc_device_basic1.Size = new System.Drawing.Size(716, 562);
+            this.uc_device_basic1.TabIndex = 32;
             // 
             // uc_object_values_grid2
             // 
-            this.uc_object_values_grid2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.uc_device_values_grid2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.uc_object_values_grid2.Location = new System.Drawing.Point(238, 13);
-            this.uc_object_values_grid2.Name = "uc_object_values_grid2";
-            this.uc_object_values_grid2.Size = new System.Drawing.Size(716, 561);
-            this.uc_object_values_grid2.TabIndex = 0;
+            this.uc_device_values_grid2.Location = new System.Drawing.Point(238, 13);
+            this.uc_device_values_grid2.Name = "uc_object_values_grid2";
+            this.uc_device_values_grid2.Size = new System.Drawing.Size(716, 561);
+            this.uc_device_values_grid2.TabIndex = 0;
             // 
             // uc_object_commands1
             // 
-            this.uc_object_commands1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.uc_device_commands1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.uc_object_commands1.AutoScroll = true;
-            this.uc_object_commands1.Location = new System.Drawing.Point(238, 13);
-            this.uc_object_commands1.Name = "uc_object_commands1";
-            this.uc_object_commands1.Size = new System.Drawing.Size(716, 561);
-            this.uc_object_commands1.TabIndex = 1;
+            this.uc_device_commands1.AutoScroll = true;
+            this.uc_device_commands1.Location = new System.Drawing.Point(238, 13);
+            this.uc_device_commands1.Name = "uc_object_commands1";
+            this.uc_device_commands1.Size = new System.Drawing.Size(716, 561);
+            this.uc_device_commands1.TabIndex = 1;
             // 
             // uc_object_properties1
             // 
-            this.uc_object_properties1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.uc_device_properties1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.uc_object_properties1.AutoScroll = true;
-            this.uc_object_properties1.Location = new System.Drawing.Point(238, 13);
-            this.uc_object_properties1.Name = "uc_object_properties1";
-            this.uc_object_properties1.Size = new System.Drawing.Size(716, 561);
-            this.uc_object_properties1.TabIndex = 29;
+            this.uc_device_properties1.AutoScroll = true;
+            this.uc_device_properties1.Location = new System.Drawing.Point(238, 13);
+            this.uc_device_properties1.Name = "uc_object_properties1";
+            this.uc_device_properties1.Size = new System.Drawing.Size(716, 561);
+            this.uc_device_properties1.TabIndex = 29;
             // 
             // uc_object_groups1
             // 
-            this.uc_object_groups1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.uc_device_groups1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.uc_object_groups1.Location = new System.Drawing.Point(238, 13);
-            this.uc_object_groups1.Name = "uc_object_groups1";
-            this.uc_object_groups1.Size = new System.Drawing.Size(716, 561);
-            this.uc_object_groups1.TabIndex = 30;
+            this.uc_device_groups1.Location = new System.Drawing.Point(238, 13);
+            this.uc_device_groups1.Name = "uc_object_groups1";
+            this.uc_device_groups1.Size = new System.Drawing.Size(716, 561);
+            this.uc_device_groups1.TabIndex = 30;
+            // 
+            // uc_object_type_commands1
+            // 
+            this.uc_device_type_commands1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.uc_device_type_commands1.Location = new System.Drawing.Point(238, 13);
+            this.uc_device_type_commands1.Name = "uc_object_type_commands1";
+            this.uc_device_type_commands1.Size = new System.Drawing.Size(716, 558);
+            this.uc_device_type_commands1.TabIndex = 34;
             // 
             // ObjectProperties
             // 
@@ -170,14 +181,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.ClientSize = new System.Drawing.Size(966, 623);
+            this.Controls.Add(this.uc_device_type_commands1);
             this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.uc_object_basic1);
+            this.Controls.Add(this.uc_device_basic1);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.dataListViewMenu);
-            this.Controls.Add(this.uc_object_values_grid2);
-            this.Controls.Add(this.uc_object_commands1);
-            this.Controls.Add(this.uc_object_properties1);
-            this.Controls.Add(this.uc_object_groups1);
+            this.Controls.Add(this.uc_device_values_grid2);
+            this.Controls.Add(this.uc_device_commands1);
+            this.Controls.Add(this.uc_device_properties1);
+            this.Controls.Add(this.uc_device_groups1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(750, 500);
             this.Name = "ObjectProperties";
@@ -194,15 +206,16 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBoxObjName;
-        private UserControls.uc_object_values_grid uc_object_values_grid2;
-        private UserControls.uc_object_commands uc_object_commands1;
+        private UserControls.uc_device_values_grid uc_device_values_grid2;
+        private UserControls.uc_device_commands uc_device_commands1;
         private BrightIdeasSoftware.DataListView dataListViewMenu;
         private BrightIdeasSoftware.OLVColumn colSettings;
-        private UserControls.uc_object_properties uc_object_properties1;
-        private UserControls.uc_object_groups uc_object_groups1;
+        private UserControls.uc_device_properties uc_device_properties1;
+        private UserControls.uc_device_groups uc_device_groups1;
         private System.Windows.Forms.Button btnClose;
-        private UserControls.uc_object_basic uc_object_basic1;
+        private UserControls.uc_device_basic uc_device_basic1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private UserControls.uc_device_type_commands uc_device_type_commands1;
 
     }
 }

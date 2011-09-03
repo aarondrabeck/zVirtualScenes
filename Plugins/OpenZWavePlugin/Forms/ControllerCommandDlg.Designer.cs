@@ -1,4 +1,4 @@
-namespace OZWForm
+namespace OpenZWavePlugin.Forms
 {
     partial class ControllerCommandDlg
 	{

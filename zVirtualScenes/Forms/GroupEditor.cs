@@ -1,39 +1,33 @@
 ﻿using System;
 using System.Data;
 using System.Windows.Forms;
-using zVirtualScenesCommon.DatabaseCommon;
+using zVirtualScenesCommon.Entity;
 using zVirtualScenesAPI;
+using System.Linq;
+using System.Collections.Generic;
+using System.Data.Objects;
 
 namespace zVirtualScenesApplication.Forms
 {
     public partial class GroupEditor : Form
     {
-        private DataTable _groups;
-        private DataTable _added;
-        private DataTable _notAdded;
-        private int _groupId;
-
+        private ObjectQuery<group> groupQuery; 
         public GroupEditor()
         {
-            InitializeComponent();
+            InitializeComponent();             
         }
 
         private void GroupEditor_Load(object sender, EventArgs e)
         {
-            UpdateGroupsList();
-
-            //Select the first item if there is one
+            RebindGroupList();
             if (cboGroups.Items.Count > 0) { cboGroups.SelectedIndex = 0; }
         }
 
-        private void UpdateGroupsList()
+        private void RebindGroupList()
         {
-            _groups = DatabaseControl.GetGroups();
-
-            cboGroups.Items.Clear();
-
-            foreach (DataRow dr in _groups.Rows)
-                cboGroups.Items.Add(dr["txt_group_name"].ToString());
+            groupQuery = zvsEntityControl.zvsContext.groups;
+            cboGroups.DataSource = groupQuery.Execute(MergeOption.AppendOnly);
+            cboGroups.DisplayMember = "name";
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -41,118 +35,144 @@ namespace zVirtualScenesApplication.Forms
             Close();
         }
 
-        private void btnDelete_Click(object sender, EventArgs e)
-        {
-            if (cboGroups.SelectedIndex > -1)
-            {
-                if (
-                    MessageBox.Show("Are you sure you want to delete the " + cboGroups.SelectedItem + " group?",
-                                    "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
-                    DialogResult.Yes)
-                {
-                    DatabaseControl.DeleteGroup(_groupId);
-                    UpdateGroupsList();
-                    cboGroups.SelectedIndex = cboGroups.Items.Count - 1;
-                }
-            }            
-        }
-
-        private void cboGroups_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            int.TryParse(_groups.Rows[cboGroups.SelectedIndex]["id"].ToString(), out _groupId);
-            UpdateObjectLists();
-        }
-
-        private void UpdateObjectLists()
-        {
-            lstAdded.Items.Clear();
-            lstNotAdded.Items.Clear();
-
-            if (cboGroups.SelectedIndex > -1)
-            {
-                _added = DatabaseControl.GetGroupObjects(_groupId);
-                _notAdded = DatabaseControl.GetGroupLeftOverObjects(_groupId);
-
-                lstAdded.DataSource = _added;
-                lstNotAdded.DataSource = _notAdded;
-            }
-        }
-
-        private void btnAddAll_Click(object sender, EventArgs e)
-        {
-            foreach (DataRow dr in _notAdded.Rows)
-            {
-                int objectId;
-                int.TryParse(dr["id"].ToString(), out objectId);
-                DatabaseControl.AddObjectToGroup(_groupId, objectId);
-            }
-
-            UpdateObjectLists();
-        }
-
-        private void btnRemoveAll_Click(object sender, EventArgs e)
-        {
-            foreach (DataRow dr in _added.Rows)
-            {
-                int objectId;
-                int.TryParse(dr["id"].ToString(), out objectId);
-                DatabaseControl.RemoveObjectFromGroup(_groupId, objectId);
-            }
-
-            UpdateObjectLists();
-        }
-
-        private void btnAddOne_Click(object sender, EventArgs e)
-        {            
-            foreach(DataRowView dr in lstNotAdded.SelectedObjects) 
-            {           
-                int objectId;
-                int.TryParse(dr["id"].ToString(), out objectId);
-                DatabaseControl.AddObjectToGroup(_groupId, objectId);                
-            }
-
-            UpdateObjectLists();
-        }
-
-        private void btnRemoveOne_Click(object sender, EventArgs e)
-        {
-            foreach (DataRowView dr in lstAdded.SelectedObjects) 
-            {
-                int objectId;
-                int.TryParse(dr["id"].ToString(), out objectId);
-                DatabaseControl.RemoveObjectFromGroup(_groupId, objectId);               
-            }
-            UpdateObjectLists();
-        }
-
-        private void btnNew_Click(object sender, EventArgs e)
+        private void btnNewGroup_Click(object sender, EventArgs e)
         {
             AddEditGroupName FormAddEditGroupName = new AddEditGroupName("");
             FormAddEditGroupName.ShowDialog();
 
             if (FormAddEditGroupName.DialogResult == DialogResult.OK)
             {
-                DatabaseControl.AddGroup(FormAddEditGroupName.gName);
-                UpdateGroupsList();
-                cboGroups.SelectedItem = FormAddEditGroupName.gName;
+                group new_g = group.Creategroup(0, FormAddEditGroupName.gName);
+                zvsEntityControl.zvsContext.groups.AddObject(new_g);
+                zvsEntityControl.zvsContext.SaveChanges();
+                RebindGroupList();
+                cboGroups.SelectedIndex = cboGroups.Items.Count - 1;
             }
-            FormAddEditGroupName.Dispose();
         }
+
+        private void btnDeleteGroup_Click(object sender, EventArgs e)
+        {
+            if (cboGroups.SelectedIndex > -1)
+            {
+                group g = (group)cboGroups.SelectedItem;
+                if (g != null)
+                {
+                    if (
+                        MessageBox.Show("Are you sure you want to delete the " + g.name + " group?",
+                                        "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
+                        DialogResult.Yes)
+                    {
+                        zvsEntityControl.zvsContext.groups.DeleteObject(g);
+                        zvsEntityControl.zvsContext.SaveChanges();
+                        cboGroups.SelectedIndex = cboGroups.Items.Count - 1;
+                    }
+                }
+            }    
+        }
+
+        private void cboGroups_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            RebindGroup();
+        }
+
+        private void RebindGroup()
+        {
+            group g = (group)cboGroups.SelectedItem;
+            if (g != null)
+            {
+                if (g != null)
+                {
+                    lstAdded.DataSource = zvsEntityControl.zvsContext.group_devices.Where(dg => dg.group_id == g.id).Select(d => d.device);
+
+                    var device_query = from d in zvsEntityControl.zvsContext.devices
+                                       where !d.group_devices.Any(gd => gd.group_id == g.id)
+                                       select d;
+                    lstNotAdded.DataSource = device_query;
+                }
+            }
+            else
+            {
+                lstNotAdded.DataSource = null;
+                lstNotAdded.ClearObjects(); 
+                lstAdded.DataSource = null;
+                lstAdded.ClearObjects(); 
+            }
+        }
+
+        private void btnAddAll_Click(object sender, EventArgs e)
+        {
+             group selected_group = (group)cboGroups.SelectedItem;
+
+             if (selected_group != null)
+             {
+                 foreach (device d in lstNotAdded.Objects)
+                 {
+                     zvsEntityControl.zvsContext.group_devices.AddObject(new group_devices { device_id = d.id, group_id = selected_group.id });
+                 }
+                 zvsEntityControl.zvsContext.SaveChanges();
+                 RebindGroup();
+             }
+        }
+
+        private void btnRemoveAll_Click(object sender, EventArgs e)
+        {
+            group selected_group = (group)cboGroups.SelectedItem;
+            if (selected_group != null)
+            {
+                foreach (device d in lstAdded.Objects)
+                {
+                    group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == d.id);
+                    zvsEntityControl.zvsContext.group_devices.DeleteObject(device);
+                }
+                zvsEntityControl.zvsContext.SaveChanges();
+                RebindGroup();
+            }
+        }
+
+        private void btnAddOne_Click(object sender, EventArgs e)
+        {
+            group selected_group = (group)cboGroups.SelectedItem;
+     
+            if (selected_group != null)
+            {
+                foreach (device d in lstNotAdded.SelectedObjects)
+                {
+                    zvsEntityControl.zvsContext.group_devices.AddObject(new group_devices { device_id = d.id, group_id = selected_group.id });
+                }
+                zvsEntityControl.zvsContext.SaveChanges();
+                RebindGroup();
+            }
+        }
+
+        private void btnRemoveOne_Click(object sender, EventArgs e)
+        {
+            group selected_group = (group)cboGroups.SelectedItem;
+            if (selected_group != null)
+            {
+                foreach (device d in lstAdded.SelectedObjects)
+                {
+                    group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == d.id);
+                    zvsEntityControl.zvsContext.group_devices.DeleteObject(device);
+                }
+                zvsEntityControl.zvsContext.SaveChanges();
+                RebindGroup();
+            }
+        }       
 
         private void btnEdit_Click_1(object sender, EventArgs e)
         {
-            AddEditGroupName FormAddEditGroupName = new AddEditGroupName(cboGroups.SelectedItem.ToString());
-            FormAddEditGroupName.ShowDialog();
-
-            if (FormAddEditGroupName.DialogResult == DialogResult.OK)
+            group selected_group = (group)cboGroups.SelectedItem;
+            if (selected_group != null)
             {
-                int.TryParse(_groups.Rows[cboGroups.SelectedIndex]["id"].ToString(), out _groupId);
+                AddEditGroupName FormAddEditGroupName = new AddEditGroupName(selected_group.name);
+                FormAddEditGroupName.ShowDialog();
 
-                DatabaseControl.SetGroupName(_groupId, FormAddEditGroupName.gName);
-                UpdateGroupsList();
-                cboGroups.SelectedItem = FormAddEditGroupName.gName;
+                if (FormAddEditGroupName.DialogResult == DialogResult.OK)
+                {
+                    selected_group.name = FormAddEditGroupName.gName;
+                    zvsEntityControl.zvsContext.SaveChanges();
+                }
             }
-            FormAddEditGroupName.Dispose();
         }
 
         private void GroupEditor_KeyDown(object sender, KeyEventArgs e)

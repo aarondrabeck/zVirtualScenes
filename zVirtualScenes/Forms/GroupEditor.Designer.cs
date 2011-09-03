@@ -63,6 +63,7 @@
             // 
             this.cboGroups.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.cboGroups.DisplayMember = "name";
             this.cboGroups.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboGroups.FormattingEnabled = true;
             this.cboGroups.Location = new System.Drawing.Point(63, 13);
@@ -80,7 +81,7 @@
             this.btnDelete.TabIndex = 2;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
+            this.btnDelete.Click += new System.EventHandler(this.btnDeleteGroup_Click);
             // 
             // btnAddAll
             // 
@@ -195,7 +196,7 @@
             // 
             // obj_Name
             // 
-            this.obj_Name.AspectName = "txt_object_name";
+            this.obj_Name.AspectName = "friendly_name";
             this.obj_Name.Text = "Object(s) Not in Group";
             this.obj_Name.Width = 170;
             // 
@@ -240,7 +241,7 @@
             // 
             // ObjName
             // 
-            this.ObjName.AspectName = "txt_object_name";
+            this.ObjName.AspectName = "friendly_name";
             this.ObjName.Text = "Object(s) in group";
             this.ObjName.Width = 170;
             // 
@@ -262,7 +263,7 @@
             this.btnNew.TabIndex = 1;
             this.btnNew.Text = "New";
             this.btnNew.UseVisualStyleBackColor = true;
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
+            this.btnNew.Click += new System.EventHandler(this.btnNewGroup_Click);
             // 
             // btnEdit
             // 
