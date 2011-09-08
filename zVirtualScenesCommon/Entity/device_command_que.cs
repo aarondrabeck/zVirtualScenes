@@ -17,9 +17,9 @@ namespace zVirtualScenesCommon.Entity
         /// Called when a Builtin command is added to the que
         /// </summary>
         public static event DeviceCommandAddedEventHandler DeviceCommandAddedToQueEvent;
-        public delegate void DeviceCommandAddedEventHandler(device_command_que bcq);
+        public delegate void DeviceCommandAddedEventHandler(long device_command_que_id);
 
-        public static void DeviceCommandAddedToQue(device_command_que bcq)
+        public static void DeviceCommandAddedToQue(long bcq)
         {
             if (DeviceCommandAddedToQueEvent != null)
                 DeviceCommandAddedToQueEvent(bcq);
@@ -38,11 +38,16 @@ namespace zVirtualScenesCommon.Entity
         }
         #endregion
 
+        public void Run()
+        {
+            Run(this);
+        }
+
         public static void Run(device_command_que cmd)
         {
             zvsEntityControl.zvsContext.device_command_que.AddObject(cmd);
             zvsEntityControl.zvsContext.SaveChanges();
-            DeviceCommandAddedToQue(cmd);
+            DeviceCommandAddedToQue(cmd.id);
         }
     }
 }

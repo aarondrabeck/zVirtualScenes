@@ -111,6 +111,7 @@ namespace zVirtualScenesAPI
 
                 if (existing_dv == null)
                 {
+                    //TODO: FIX CROSS THREADING 
                     d.device_values.Add(dv);
                 }
                 else
@@ -180,22 +181,22 @@ namespace zVirtualScenesAPI
             return string.Empty;
         }
 
-        public void DefineDevice(device dt)
-        {
-
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
-            if (pl != null)
-            {
-                device existing_device = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.node_id == dt.node_id && d.device_types.plugin.name == pl.name);
-
-                if (existing_device == null)
-                {
-                    zvsEntityControl.zvsContext.devices.AddObject(dt);
-                    zvsEntityControl.zvsContext.SaveChanges();                    
-                }                    
-            }
+        //public void DefineDevice(device dt)
+        //{
+        //    plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
             
-        }               
+        //    if (pl != null)
+        //    {
+        //        device existing_device = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.node_id == dt.node_id && d.device_types.plugin.name == pl.name);
+
+        //        if (existing_device == null)
+        //        {
+        //            zvsEntityControl.zvsContext.devices.AddObject(dt);
+        //            zvsEntityControl.zvsContext.SaveChanges();                    
+        //        }                    
+        //    }
+            
+        //}               
 
         public IQueryable<device> GetDevices()
         {
@@ -258,14 +259,14 @@ namespace zVirtualScenesAPI
             }
         }
 
-        public IQueryable<device> GetDeviceInGroup(string GroupName)
+        public IQueryable<device> GetDeviceInGroup(long GroupID)
         {
 
 
             plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                group g = zvsEntityControl.zvsContext.groups.SingleOrDefault(gr => gr.name == GroupName);
+                group g = zvsEntityControl.zvsContext.groups.SingleOrDefault(gr => gr.id == GroupID);
                 if (g != null)
                 {
                     return g.group_devices.Where(gd => gd.device.device_types.plugin == pl).Select(d => d.device).AsQueryable(); 
@@ -307,7 +308,17 @@ namespace zVirtualScenesAPI
                     existing_dc.custom_data2 = dc.custom_data2;
                     existing_dc.custom_data1 = dc.custom_data1;
                     existing_dc.arg_data_type = dc.arg_data_type;
-                    existing_dc.device_command_options = dc.device_command_options;
+
+                    existing_dc.device_command_options.Clear();
+
+                    foreach (var option in zvsEntityControl.zvsContext.device_command_options.Where(o => o.device_command_id == existing_dc.id).ToArray())
+                    {
+                        zvsEntityControl.zvsContext.DeleteObject(option);
+                    }
+
+                    foreach(device_command_options o in dc.device_command_options)
+                        existing_dc.device_command_options.Add(new device_command_options { name = o.name });
+                    
                     existing_dc.sort_order = dc.sort_order;
                 }
                 zvsEntityControl.zvsContext.SaveChanges();
@@ -328,8 +339,8 @@ namespace zVirtualScenesAPI
         public abstract bool ProcessDeviceCommand(device_command_que cmd);
         public abstract bool ProcessDeviceTypeCommand(device_type_command_que cmd);
         public abstract bool Repoll(device device);
-        public abstract bool ActivateGroup(string group_name);
-        public abstract bool DeactivateGroup(string group_name); 
+        public abstract bool ActivateGroup(long groupID);
+        public abstract bool DeactivateGroup(long groupID); 
 
             }
 }

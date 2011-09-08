@@ -13,29 +13,31 @@ namespace zVirtualScenesCommon.Entity
     {
         public static string GetDevicePropertyValue(long DeviceId, string SettingName)
         {
-
-            device device = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == DeviceId);
-
-            if (device != null)
+            using (zvsEntities2 context = new zvsEntities2())
             {
-                device_property_values dpv = device.device_property_values.SingleOrDefault(o => o.device_propertys.name == SettingName);
+                device device = context.devices.SingleOrDefault(o => o.id == DeviceId);
 
-                if (dpv != null)
+                if (device != null)
                 {
-                    return dpv.value;
-                }
-                else
-                {
-                    device_property_values default_value = device.device_property_values.SingleOrDefault(o => o.device_propertys.name == SettingName);
-                    if (default_value != null)
+                    device_property_values dpv = device.device_property_values.SingleOrDefault(o => o.device_propertys.name == SettingName);
+
+                    if (dpv != null)
                     {
-                        return default_value.device_propertys.default_value;
+                        return dpv.value;
                     }
+                    else
+                    {
+                        device_propertys dp = context.device_propertys.SingleOrDefault(o => o.name == SettingName);
+                        if (dp != null)
+                        {
+                            return dp.default_value;
+                        }
+                    }
+
                 }
 
+                return string.Empty;
             }
-
-            return string.Empty;
         }
     }
 }

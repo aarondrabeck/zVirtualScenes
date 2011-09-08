@@ -39,8 +39,8 @@ namespace zVirtualScenesApplication.Forms
                 if (g != null)
                 {
                     builtin_commands group_on_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "GROUP_ON");
-                    builtin_command_que cmd = builtin_command_que.Createbuiltin_command_que(0, g.id.ToString(), group_on_cmd.id);
-                    builtin_command_que.Run(cmd);    
+                    if (group_on_cmd != null)
+                        group_on_cmd.Run(g.id.ToString());
                 }
             }
             else
@@ -54,9 +54,9 @@ namespace zVirtualScenesApplication.Forms
                 group g = (group)comboBoxGroups.SelectedItem;
                 if (g != null)
                 {
-                    builtin_commands group_on_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "GROUP_OFF");
-                    builtin_command_que cmd = builtin_command_que.Createbuiltin_command_que(0, g.id.ToString(), group_on_cmd.id);
-                    builtin_command_que.Run(cmd);                        
+                    builtin_commands group_off_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "GROUP_OFF");
+                    if(group_off_cmd != null)
+                        group_off_cmd.Run(g.id.ToString());                   
                 }
             }
             else

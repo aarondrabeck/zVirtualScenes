@@ -8,12 +8,12 @@ using zVirtualScenesCommon.Entity;
 
 namespace zVirtualScenesApplication.Forms
 {
-    public partial class ObjectProperties : Form
+    public partial class DeviceProperties : Form
     {
         private BindingList<MenuItem> menu = new BindingList<MenuItem>();
         private device _d;
 
-        public ObjectProperties(device d)
+        public DeviceProperties(device d)
         {
             InitializeComponent();
             _d = d;

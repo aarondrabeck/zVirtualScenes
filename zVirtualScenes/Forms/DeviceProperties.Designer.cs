@@ -1,6 +1,6 @@
 ﻿namespace zVirtualScenesApplication.Forms
 {
-    partial class ObjectProperties
+    partial class DeviceProperties
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ObjectProperties));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DeviceProperties));
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxObjName = new System.Windows.Forms.TextBox();
             this.dataListViewMenu = new BrightIdeasSoftware.DataListView();

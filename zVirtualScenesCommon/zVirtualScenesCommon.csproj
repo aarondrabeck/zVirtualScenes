@@ -46,10 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseCommon\DatabaseControl.cs" />
     <Compile Include="command_types.cs" />
     <Compile Include="Data_Types.cs" />
     <Compile Include="Entity\builtin_commands.cs" />
+    <Compile Include="Entity\device_commands.cs" />
+    <Compile Include="Entity\device_type_commands.cs" />
+    <Compile Include="Entity\scheduled_tasks.cs" />
     <Compile Include="Entity\scene_commands.cs" />
     <Compile Include="Entity\device_propertys.cs" />
     <Compile Include="Entity\device_property_values.cs" />
@@ -94,9 +96,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Forms\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>if exist "$(TargetPath).locked" del "$(TargetPath).locked"

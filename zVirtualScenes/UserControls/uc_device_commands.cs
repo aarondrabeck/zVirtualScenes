@@ -42,6 +42,12 @@ namespace zVirtualScenesApplication.UserControls
             
             foreach (device_commands d_cmd in _d.device_commands)
             {
+                //get the current value from the value table list
+                string current_value = string.Empty;
+                device_values dv = d_cmd.device.device_values.SingleOrDefault(v => v.value_id == d_cmd.custom_data2);
+                if (dv != null)
+                    current_value = dv.value;
+
                 int left = 0;
                 #region Add Input Control Depending on type
                 left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSettings,
@@ -51,7 +57,7 @@ namespace zVirtualScenesApplication.UserControls
                                                                 d_cmd.id.ToString(),
                                                                 d_cmd.friendly_name, 
                                                                 d_cmd.device_command_options.Select(o => o.name).ToList(),
-                                                                d_cmd.custom_data1,
+                                                                current_value,
                                                                 d_cmd);
                 #endregion
 

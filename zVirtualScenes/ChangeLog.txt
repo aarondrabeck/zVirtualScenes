@@ -1,4 +1,10 @@
-﻿*Beta 7 (08-12-11)  
+﻿*2.5 Beta 1 (09-06-11)
+  * Moved to SQLLite
+  * Now using Entites to SQL
+  * API commands moved to Entity objects and Plugin class directly.
+  * Plugin now need a reference to System.Entity and the zVSCommon project or DLL.
+
+*Beta 7 (08-12-11)  
   * Database Update Bug Fixed
   * Removed data from base sql file
   * Made the database dialog "smarter"

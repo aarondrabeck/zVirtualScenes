@@ -119,12 +119,12 @@ namespace NOAAPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(string group_name)
+        public override bool ActivateGroup(long groupID)
         {
             return true;
         }
 
-        public override bool DeactivateGroup(string group_name)
+        public override bool DeactivateGroup(long groupID)
         {
             return true;
         }

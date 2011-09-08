@@ -9,7 +9,7 @@
       <Value Profile="(Default)">200</Value>
     </Setting>
     <Setting Name="SpiltContainer2Distance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">437</Value>
+      <Value Profile="(Default)">326</Value>
     </Setting>
     <Setting Name="SpiltContainer3Distance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">187</Value>

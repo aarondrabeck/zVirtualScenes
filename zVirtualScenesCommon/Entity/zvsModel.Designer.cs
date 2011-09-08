@@ -21,24 +21,25 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_builtin_command_options_0", "builtin_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.builtin_commands), "builtin_command_options", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.builtin_command_options), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_builtin_command_que_0", "builtin_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.builtin_commands), "builtin_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.builtin_command_que), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_command_options_0", "device_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_commands), "device_command_options", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_command_options), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_command_que_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_command_que), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_command_que_1", "device_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_commands), "device_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_command_que), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_command_que_0", "device_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_commands), "device_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_command_que), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_command_que_1", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_command_que), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_commands_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_commands), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_property_options_0", "device_propertys", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_propertys), "device_property_options", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_property_options), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_property_values_0", "device_propertys", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_propertys), "device_property_values", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_property_values), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_property_values_1", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_property_values", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_property_values), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_property_values_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_property_values", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_property_values), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_property_values_1", "device_propertys", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_propertys), "device_property_values", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_property_values), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_type_command_options_0", "device_type_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_type_commands), "device_type_command_options", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_type_command_options), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_type_command_que_0", "device_type_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_type_commands), "device_type_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_type_command_que), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_type_command_que_1", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_type_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_type_command_que), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_type_command_que_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_type_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_type_command_que), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_type_command_que_1", "device_type_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_type_commands), "device_type_command_que", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_type_command_que), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_type_commands_0", "device_types", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_types), "device_type_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_type_commands), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_types_0", "plugin", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.plugin), "device_types", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_types), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_devices_0", "device_types", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_types), "device", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_values_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "device_values", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_values), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_group_devices_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device), "group_devices", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.group_devices), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_commands_0", "device", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(zVirtualScenesCommon.Entity.device), "scene_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_commands), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_group_devices_1", "group", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.group), "group_devices", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.group_devices), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_plugin_setting_options_0", "plugin_settings", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.plugin_settings), "plugin_setting_options", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.plugin_setting_options), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_plugin_settings_0", "plugin", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.plugin), "plugin_settings", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.plugin_settings), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_commands_0", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_commands), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_commands_1", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_commands), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_option_0", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_option", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_option), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_1", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_0", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
@@ -1513,18 +1514,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_0", "device_command_que")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_1", "device_command_que")]
         public EntityCollection<device_command_que> device_command_que
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_0", "device_command_que");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_1", "device_command_que");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_0", "device_command_que", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_1", "device_command_que", value);
                 }
             }
         }
@@ -1557,18 +1558,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_1", "device_property_values")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_0", "device_property_values")]
         public EntityCollection<device_property_values> device_property_values
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_1", "device_property_values");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_0", "device_property_values");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_1", "device_property_values", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_0", "device_property_values", value);
                 }
             }
         }
@@ -1579,18 +1580,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_1", "device_type_command_que")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_0", "device_type_command_que")]
         public EntityCollection<device_type_command_que> device_type_command_que
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_1", "device_type_command_que");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_0", "device_type_command_que");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_1", "device_type_command_que", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_0", "device_type_command_que", value);
                 }
             }
         }
@@ -1673,6 +1674,28 @@ namespace zVirtualScenesCommon.Entity
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<group_devices>("zvsModel.FK_group_devices_0", "group_devices", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_commands_0", "scene_commands")]
+        public EntityCollection<scene_commands> scene_commands
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<scene_commands>("zvsModel.FK_scene_commands_0", "scene_commands");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<scene_commands>("zvsModel.FK_scene_commands_0", "scene_commands", value);
                 }
             }
         }
@@ -1967,54 +1990,16 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_0", "device")]
-        public device device
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_command_que_0", "device").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_command_que_0", "device").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<device> deviceReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_command_que_0", "device");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_command_que_0", "device", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_1", "device_commands")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_0", "device_commands")]
         public device_commands device_commands
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_commands>("zvsModel.FK_device_command_que_1", "device_commands").Value;
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_commands>("zvsModel.FK_device_command_que_0", "device_commands").Value;
             }
             set
             {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_commands>("zvsModel.FK_device_command_que_1", "device_commands").Value = value;
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_commands>("zvsModel.FK_device_command_que_0", "device_commands").Value = value;
             }
         }
         /// <summary>
@@ -2026,13 +2011,51 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_commands>("zvsModel.FK_device_command_que_1", "device_commands");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_commands>("zvsModel.FK_device_command_que_0", "device_commands");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_commands>("zvsModel.FK_device_command_que_1", "device_commands", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_commands>("zvsModel.FK_device_command_que_0", "device_commands", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_1", "device")]
+        public device device
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_command_que_1", "device").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_command_que_1", "device").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<device> deviceReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_command_que_1", "device");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_command_que_1", "device", value);
                 }
             }
         }
@@ -2347,18 +2370,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_1", "device_command_que")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_command_que_0", "device_command_que")]
         public EntityCollection<device_command_que> device_command_que
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_1", "device_command_que");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_0", "device_command_que");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_1", "device_command_que", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_command_que>("zvsModel.FK_device_command_que_0", "device_command_que", value);
                 }
             }
         }
@@ -2691,54 +2714,16 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_0", "device_propertys")]
-        public device_propertys device_propertys
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_propertys>("zvsModel.FK_device_property_values_0", "device_propertys").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_propertys>("zvsModel.FK_device_property_values_0", "device_propertys").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<device_propertys> device_propertysReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_propertys>("zvsModel.FK_device_property_values_0", "device_propertys");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_propertys>("zvsModel.FK_device_property_values_0", "device_propertys", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_1", "device")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_0", "device")]
         public device device
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_property_values_1", "device").Value;
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_property_values_0", "device").Value;
             }
             set
             {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_property_values_1", "device").Value = value;
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_property_values_0", "device").Value = value;
             }
         }
         /// <summary>
@@ -2750,13 +2735,51 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_property_values_1", "device");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_property_values_0", "device");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_property_values_1", "device", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_property_values_0", "device", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_1", "device_propertys")]
+        public device_propertys device_propertys
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_propertys>("zvsModel.FK_device_property_values_1", "device_propertys").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_propertys>("zvsModel.FK_device_property_values_1", "device_propertys").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<device_propertys> device_propertysReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_propertys>("zvsModel.FK_device_property_values_1", "device_propertys");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_propertys>("zvsModel.FK_device_property_values_1", "device_propertys", value);
                 }
             }
         }
@@ -2951,18 +2974,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_0", "device_property_values")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_property_values_1", "device_property_values")]
         public EntityCollection<device_property_values> device_property_values
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_0", "device_property_values");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_1", "device_property_values");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_0", "device_property_values", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_property_values>("zvsModel.FK_device_property_values_1", "device_property_values", value);
                 }
             }
         }
@@ -3257,54 +3280,16 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_0", "device_type_commands")]
-        public device_type_commands device_type_commands
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_0", "device_type_commands").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_0", "device_type_commands").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<device_type_commands> device_type_commandsReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_0", "device_type_commands");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_0", "device_type_commands", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_1", "device")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_0", "device")]
         public device device
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_type_command_que_1", "device").Value;
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_type_command_que_0", "device").Value;
             }
             set
             {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_type_command_que_1", "device").Value = value;
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_type_command_que_0", "device").Value = value;
             }
         }
         /// <summary>
@@ -3316,13 +3301,51 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_type_command_que_1", "device");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_device_type_command_que_0", "device");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_type_command_que_1", "device", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_type_command_que_0", "device", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_1", "device_type_commands")]
+        public device_type_commands device_type_commands
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_1", "device_type_commands").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_1", "device_type_commands").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<device_type_commands> device_type_commandsReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_1", "device_type_commands");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_type_commands>("zvsModel.FK_device_type_command_que_1", "device_type_commands", value);
                 }
             }
         }
@@ -3637,18 +3660,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_0", "device_type_command_que")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_type_command_que_1", "device_type_command_que")]
         public EntityCollection<device_type_command_que> device_type_command_que
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_0", "device_type_command_que");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_1", "device_type_command_que");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_0", "device_type_command_que", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_type_command_que>("zvsModel.FK_device_type_command_que_1", "device_type_command_que", value);
                 }
             }
         }
@@ -5275,18 +5298,18 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_commands_0", "scene_commands")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_commands_1", "scene_commands")]
         public EntityCollection<scene_commands> scene_commands
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<scene_commands>("zvsModel.FK_scene_commands_0", "scene_commands");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<scene_commands>("zvsModel.FK_scene_commands_1", "scene_commands");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<scene_commands>("zvsModel.FK_scene_commands_0", "scene_commands", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<scene_commands>("zvsModel.FK_scene_commands_1", "scene_commands", value);
                 }
             }
         }
@@ -5331,16 +5354,14 @@ namespace zVirtualScenesCommon.Entity
         /// </summary>
         /// <param name="id">Initial value of the id property.</param>
         /// <param name="scene_id">Initial value of the scene_id property.</param>
-        /// <param name="device_id">Initial value of the device_id property.</param>
         /// <param name="command_type_id">Initial value of the command_type_id property.</param>
         /// <param name="command_id">Initial value of the command_id property.</param>
         /// <param name="arg">Initial value of the arg property.</param>
-        public static scene_commands Createscene_commands(global::System.Int64 id, global::System.Int64 scene_id, global::System.Int64 device_id, global::System.Int64 command_type_id, global::System.Int64 command_id, global::System.String arg)
+        public static scene_commands Createscene_commands(global::System.Int64 id, global::System.Int64 scene_id, global::System.Int64 command_type_id, global::System.Int64 command_id, global::System.String arg)
         {
             scene_commands scene_commands = new scene_commands();
             scene_commands.id = id;
             scene_commands.scene_id = scene_id;
-            scene_commands.device_id = device_id;
             scene_commands.command_type_id = command_type_id;
             scene_commands.command_id = command_id;
             scene_commands.arg = arg;
@@ -5404,9 +5425,9 @@ namespace zVirtualScenesCommon.Entity
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.Int64 device_id
+        public Nullable<global::System.Int64> device_id
         {
             get
             {
@@ -5421,8 +5442,8 @@ namespace zVirtualScenesCommon.Entity
                 Ondevice_idChanged();
             }
         }
-        private global::System.Int64 _device_id;
-        partial void Ondevice_idChanging(global::System.Int64 value);
+        private Nullable<global::System.Int64> _device_id;
+        partial void Ondevice_idChanging(Nullable<global::System.Int64> value);
         partial void Ondevice_idChanged();
     
         /// <summary>
@@ -5531,16 +5552,54 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_commands_0", "scene")]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_commands_0", "device")]
+        public device device
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_scene_commands_0", "device").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_scene_commands_0", "device").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<device> deviceReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device>("zvsModel.FK_scene_commands_0", "device");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_scene_commands_0", "device", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_commands_1", "scene")]
         public scene scene
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_scene_commands_0", "scene").Value;
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_scene_commands_1", "scene").Value;
             }
             set
             {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_scene_commands_0", "scene").Value = value;
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_scene_commands_1", "scene").Value = value;
             }
         }
         /// <summary>
@@ -5552,13 +5611,13 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_scene_commands_0", "scene");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_scene_commands_1", "scene");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<scene>("zvsModel.FK_scene_commands_0", "scene", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<scene>("zvsModel.FK_scene_commands_1", "scene", value);
                 }
             }
         }

@@ -26,11 +26,11 @@ namespace zVirtualScenesCommon.Entity
         public string RunScene()
         {
             if (this.is_running || ExecuteScene.IsBusy)
-                return "Cannot start scene '" + this.friendly_name + "' because it is already running!";
+                return "Failed to start scene '" + this.friendly_name + "' because it is already running!";
             else
             {
                 if (scene_commands.Count < 1)
-                    return "Cannot start scene '" + this.friendly_name + "' because it has no commands!";
+                    return "Failed to start scene '" + this.friendly_name + "' because it has no commands!";
 
                 ExecuteScene.DoWork += new DoWorkEventHandler(ExecuteScene_DoWork);
                 ExecuteScene.RunWorkerCompleted +=new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
@@ -38,9 +38,9 @@ namespace zVirtualScenesCommon.Entity
                 this.is_running = true;
                 zvsEntityControl.zvsContext.SaveChanges();
 
-                ExecuteScene.RunWorkerAsync();
+                ExecuteScene.RunWorkerAsync(this.id);
 
-                string result = "Started scene '" + this.friendly_name + "'."; 
+                string result = "Scene '" + this.friendly_name + "' started."; 
                 zvsEntityControl.SceneRunStarted(this, result);
                 return result;
             }
@@ -48,10 +48,16 @@ namespace zVirtualScenesCommon.Entity
 
         void ExecuteScene_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.is_running = false;
-            zvsEntityControl.zvsContext.SaveChanges();
-            zvsEntityControl.SceneRunComplete(this, errorCount);
-
+            using (zvsEntities2 context = new zvsEntities2())
+            {
+                scene _scene = context.scenes.SingleOrDefault(s => s.id == (long)e.Result);
+                if (_scene != null)
+                {
+                    _scene.is_running = false;
+                    context.SaveChanges();
+                }
+            }
+            zvsEntityControl.SceneRunComplete((long)e.Result, errorCount);
             ExecuteScene.DoWork -= new DoWorkEventHandler(ExecuteScene_DoWork);
             ExecuteScene.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
         }
@@ -61,79 +67,90 @@ namespace zVirtualScenesCommon.Entity
         public static int errorCount;
         void ExecuteScene_DoWork(object sender, DoWorkEventArgs e)
         {
-            errorCount = 0;
-            foreach (scene_commands sCMD in this.scene_commands)
+            //Use a new context here to thread safety
+            using (zvsEntities2 context = new zvsEntities2())
             {
-                switch ((command_types)sCMD.command_type_id)
+                //Find Scene
+                scene _scene = context.scenes.SingleOrDefault(s => s.id == (long)e.Argument);
+                if(_scene != null)
                 {
-                    case command_types.builtin:
+                    e.Result = (long)e.Argument;
+                    errorCount = 0;
+                    foreach (scene_commands sCMD in _scene.scene_commands)
+                    {
+                        switch ((command_types)sCMD.command_type_id)
                         {
-                            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.id == sCMD.command_id);
-                            if (cmd != null)
-                            {
-                                if (cmd.name.Equals("TIMEDELAY"))
+                            case command_types.builtin:
                                 {
-                                    int delay = 0;
-                                    int.TryParse(sCMD.arg, out delay);
-                                    if (delay > 0)
-                                        System.Threading.Thread.Sleep(delay * 1000);
+                                    builtin_commands cmd = context.builtin_commands.SingleOrDefault(c => c.id == sCMD.command_id);
+                                    if (cmd != null)
+                                    {
+                                        if (cmd.name.Equals("TIMEDELAY"))
+                                        {
+                                            int delay = 0;
+                                            int.TryParse(sCMD.arg, out delay);
+                                            if (delay > 0)
+                                                System.Threading.Thread.Sleep(delay * 1000);
+                                        }
+                                        else
+                                        {
+                                            Waiting = true;
+                                            builtin_command_que.BuiltinCommandRunCompleteEvent += new builtin_command_que.BuiltinCommandRunCompleteEventHandler(builtin_command_que_BuiltinCommandRunCompleteEvent);
+
+                                            builtin_command_que b_cmd = builtin_command_que.Createbuiltin_command_que(0, sCMD.arg, sCMD.command_id);
+                                            context.builtin_command_que.AddObject(b_cmd);
+                                            context.SaveChanges();
+                                            CmdWaitingForProcessingQueID = b_cmd.id;
+                                            //trigger the event
+                                            builtin_command_que.BuiltinCommandAddedToQue(b_cmd.id);
+
+
+                                            while (Waiting)
+                                                System.Threading.Thread.Sleep(300);
+
+                                            builtin_command_que.BuiltinCommandRunCompleteEvent -= new builtin_command_que.BuiltinCommandRunCompleteEventHandler(builtin_command_que_BuiltinCommandRunCompleteEvent);
+                                        }
+                                    }
+                                    break;
                                 }
-                                else
+                            case command_types.device_command:
                                 {
                                     Waiting = true;
-                                    builtin_command_que.BuiltinCommandRunCompleteEvent += new builtin_command_que.BuiltinCommandRunCompleteEventHandler(builtin_command_que_BuiltinCommandRunCompleteEvent);
+                                    device_command_que.DeviceCommandRunCompleteEvent += new device_command_que.DeviceCommandRunCompleteEventHandler(device_command_que_DeviceCommandRunCompleteEvent);
 
-                                    builtin_command_que b_cmd = builtin_command_que.Createbuiltin_command_que(0, sCMD.arg, sCMD.command_id);
-                                    zvsEntityControl.zvsContext.builtin_command_que.AddObject(b_cmd);
-                                    zvsEntityControl.zvsContext.SaveChanges();
-                                    CmdWaitingForProcessingQueID = b_cmd.id;
-                                    builtin_command_que.BuiltinCommandAddedToQue(b_cmd);
-                                    
+                                    device_command_que d_cmd = device_command_que.Createdevice_command_que(0, sCMD.device_id.Value, sCMD.command_id, sCMD.arg);
+                                    context.device_command_que.AddObject(d_cmd);
+                                    context.SaveChanges();
+                                    CmdWaitingForProcessingQueID = d_cmd.id;
+                                    device_command_que.DeviceCommandAddedToQue(d_cmd.id);
 
                                     while (Waiting)
                                         System.Threading.Thread.Sleep(300);
 
-                                    builtin_command_que.BuiltinCommandRunCompleteEvent -= new builtin_command_que.BuiltinCommandRunCompleteEventHandler(builtin_command_que_BuiltinCommandRunCompleteEvent);
+                                    device_command_que.DeviceCommandRunCompleteEvent -= new device_command_que.DeviceCommandRunCompleteEventHandler(device_command_que_DeviceCommandRunCompleteEvent);
+
+                                    break;
                                 }
-                            }
-                            break;
+                            case command_types.device_type_command:
+                                {
+                                    Waiting = true;
+                                    device_type_command_que.DeviceTypeCommandRunCompleteEvent += new device_type_command_que.DeviceTypeCommandRunCompleteEventHandler(device_type_command_que_DeviceTypeCommandRunCompleteEvent);
+
+                                    device_type_command_que dt_cmd = device_type_command_que.Createdevice_type_command_que(0, sCMD.command_id, sCMD.device_id.Value, sCMD.arg);
+                                    context.device_type_command_que.AddObject(dt_cmd);
+                                    context.SaveChanges();
+                                    CmdWaitingForProcessingQueID = dt_cmd.id;
+                                    device_type_command_que.DeviceTypeCommandAddedToQue(dt_cmd.id);
+
+                                    while (Waiting)
+                                        System.Threading.Thread.Sleep(300);
+
+                                    device_type_command_que.DeviceTypeCommandRunCompleteEvent -= new device_type_command_que.DeviceTypeCommandRunCompleteEventHandler(device_type_command_que_DeviceTypeCommandRunCompleteEvent);
+
+                                    break;
+                                }
                         }
-                    case command_types.device_command:
-                        {
-                            Waiting = true;
-                            device_command_que.DeviceCommandRunCompleteEvent += new device_command_que.DeviceCommandRunCompleteEventHandler(device_command_que_DeviceCommandRunCompleteEvent);
-                            
-                            device_command_que d_cmd = device_command_que.Createdevice_command_que(0, sCMD.device_id, sCMD.command_id, sCMD.arg); 
-                            zvsEntityControl.zvsContext.device_command_que.AddObject(d_cmd);
-                            zvsEntityControl.zvsContext.SaveChanges();
-                            CmdWaitingForProcessingQueID = d_cmd.id;
-                            device_command_que.DeviceCommandAddedToQue(d_cmd);                            
-
-                            while (Waiting)
-                                System.Threading.Thread.Sleep(300);
-
-                            device_command_que.DeviceCommandRunCompleteEvent -= new device_command_que.DeviceCommandRunCompleteEventHandler(device_command_que_DeviceCommandRunCompleteEvent);
-                            
-                            break;
-                        }
-                    case command_types.device_type_command:
-                        {
-                            Waiting = true;
-                            device_type_command_que.DeviceTypeCommandRunCompleteEvent += new device_type_command_que.DeviceTypeCommandRunCompleteEventHandler(device_type_command_que_DeviceTypeCommandRunCompleteEvent);
-
-                            device_type_command_que dt_cmd = device_type_command_que.Createdevice_type_command_que(0, sCMD.command_id, sCMD.device_id, sCMD.arg);
-                            zvsEntityControl.zvsContext.device_type_command_que.AddObject(dt_cmd);
-                            zvsEntityControl.zvsContext.SaveChanges();
-                            CmdWaitingForProcessingQueID = dt_cmd.id;
-                            device_type_command_que.DeviceTypeCommandAddedToQue(dt_cmd);
-
-                            while (Waiting)
-                                System.Threading.Thread.Sleep(300);
-
-                            device_type_command_que.DeviceTypeCommandRunCompleteEvent -= new device_type_command_que.DeviceTypeCommandRunCompleteEventHandler(device_type_command_que_DeviceTypeCommandRunCompleteEvent);
-
-                            break;
-                        }
+                    }
                 }
             }
         }

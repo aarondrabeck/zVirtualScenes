@@ -9,16 +9,9 @@ using System.Data.Objects;
 
 
 namespace zVirtualScenesCommon.Entity
-{
-    
-    
+{   
     public partial class device : EntityObject
-    {
-        partial void Onlast_heard_fromChanging(DateTime? value)
-        {
-            
-        }
-
+    {        
         public static IQueryable<device> GetAllDevices(bool forList)
         {
             var query = from o in zvsEntityControl.zvsContext.devices
@@ -72,24 +65,32 @@ namespace zVirtualScenesCommon.Entity
             if (this.device_types.name.Equals("THERMOSTAT"))
             {
                 int temp = 0;
-                int.TryParse(this.device_values.SingleOrDefault(v => v.label_name == "Temperature").value, out temp);
+                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Temperature");
+
+                if (dv != null)                
+                    int.TryParse(dv.value, out temp);
+
                 return temp;
             }
             else if (this.device_types.name.Equals("SWITCH"))
             {
                 int level = 0;
-                int.TryParse(this.device_values.SingleOrDefault(v => v.label_name == "Basic").value, out level);
+                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
+
+                if (dv != null)  
+                    int.TryParse(dv.value, out level);
+
                 return (level > 0 ? 100 : 0);
             }
             else
             {
-                device_values value = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
-                if (value == null || value.value == null)
-                    return 0;
-
                 int level = 0;
-                    int.TryParse(value.value, out level);
-                    return level;
+                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
+
+                if (dv != null)
+                    int.TryParse(dv.value, out level);
+
+                return level;
             }
         }
 
@@ -99,25 +100,15 @@ namespace zVirtualScenesCommon.Entity
             {
                 if (this.device_types.name.Equals("THERMOSTAT"))
                 {
-                    int temp = 0;
-                    int.TryParse(this.device_values.SingleOrDefault(v => v.label_name == "Temperature").value, out temp);
-                    return temp + " F";
+                    return GetLevelMeter() + " F";
                 }
                 else if (this.device_types.name.Equals("SWITCH"))
                 {
-                    int level = 0;
-                    int.TryParse(this.device_values.SingleOrDefault(v => v.label_name == "Basic").value, out level);
-                    return (level > 0 ? "ON" : "OFF");
+                    return (GetLevelMeter() > 0 ? "ON" : "OFF");
                 }
                 else
                 {
-                    device_values value = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
-                    if (value == null || value.value == null)
-                        return "0";
-
-                    int level = 0;
-                    int.TryParse(value.value, out level);
-                    return level + "%";
+                    return GetLevelMeter() + "%";
                 }
             }
         }

@@ -8,6 +8,12 @@ namespace zVirtualScenesCommon.Entity
 {
     public partial class builtin_commands : EntityObject
     {
+        public void Run(string argument = "")
+        {         
+            builtin_command_que cmd = new builtin_command_que { builtin_command_id = this.id, arg = argument };
+            cmd.Run();
+        }
+
         public static void InstallBuiltInCommand(builtin_commands c)
         {
             builtin_commands existing_c = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(cmd => cmd.name == c.name);
@@ -25,5 +31,7 @@ namespace zVirtualScenesCommon.Entity
             }
             zvsEntityControl.zvsContext.SaveChanges();
         }
+
+        
     }
 }

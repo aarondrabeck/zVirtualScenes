@@ -16,8 +16,6 @@ namespace zVirtualScenesCommon.Entity
         {
             get 
             {
-
-
                 device d = zvsEntityControl.zvsContext.devices.Single(o => o.id == this.device_id);
 
                 if (d.device_types.name != null)
@@ -53,7 +51,7 @@ namespace zVirtualScenesCommon.Entity
                         case command_types.device_command:
                         case command_types.device_type_command:
                             {
-                                device d = zvsEntityControl.zvsContext.devices.Single(o => o.id == this.device_id);
+                                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == this.device_id);
                                 if (d != null)
                                     return d.friendly_name;
                                 break;

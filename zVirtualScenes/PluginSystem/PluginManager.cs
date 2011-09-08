@@ -76,17 +76,16 @@ namespace zVirtualScenesApplication.PluginSystem
             {
                 name = "ENABLEPOLLING",
                 friendly_name = "Enable polling for this device.",
-                default_value = "false",
+                default_value = "true",
                 value_data_type = (int)Data_Types.BOOL
             });
             
             // Iterate the plugins to make sure none of them are new...
             foreach (Plugin p in _plugins)
             {
-                using (var context = new zvsEntities2())
+                using (zvsEntities2 context = new zvsEntities2())
                 {
                     plugin ent_p = context.plugins.SingleOrDefault(pl => pl.name == p.Name);
-
                     if (ent_p == null)
                     {
                         ent_p = new plugin { name = p.Name, friendly_name = p.ToString() };
@@ -104,11 +103,13 @@ namespace zVirtualScenesApplication.PluginSystem
             device_command_que.DeviceCommandAddedToQueEvent += new device_command_que.DeviceCommandAddedEventHandler(device_command_que_DeviceCommandAddedToQueEvent);            
         }
 
-        void device_type_command_que_DeviceTypeCommandAddedToQueEvent(device_type_command_que bcq)
+        void device_type_command_que_DeviceTypeCommandAddedToQueEvent(long device_type_command_que_id)
         {
-            device_type_command_que cmd = zvsEntityControl.zvsContext.device_type_command_que.SingleOrDefault(c => c.id == bcq.id);
+            using (zvsEntities2 context = new zvsEntities2())
+            {
+                device_type_command_que cmd = context.device_type_command_que.SingleOrDefault(c => c.id == device_type_command_que_id);
 
-                if (cmd != null)
+                if (cmd != null && cmd.device != null)
                 {
                     Console.WriteLine("[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
                                                             ", CMD_NAME:" + cmd.device_type_commands.friendly_name +
@@ -129,8 +130,8 @@ namespace zVirtualScenesApplication.PluginSystem
                                     Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                                    zvsEntityControl.zvsContext.device_type_command_que.DeleteObject(cmd);
-                                    zvsEntityControl.zvsContext.SaveChanges();
+                                    context.device_type_command_que.DeleteObject(cmd);
+                                    context.SaveChanges();
                                     return;
                                 }
                                 iterations++;
@@ -141,8 +142,8 @@ namespace zVirtualScenesApplication.PluginSystem
                             {
                                 p.ProcessDeviceTypeCommand(cmd);
                                 device_type_command_que.DeviceTypeCommandRunComplete(cmd, false, string.Empty);
-                                zvsEntityControl.zvsContext.device_type_command_que.DeleteObject(cmd);
-                                zvsEntityControl.zvsContext.SaveChanges();
+                                context.device_type_command_que.DeleteObject(cmd);
+                                context.SaveChanges();
                             }
                         }
                         else
@@ -151,86 +152,91 @@ namespace zVirtualScenesApplication.PluginSystem
                             Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                            zvsEntityControl.zvsContext.device_type_command_que.DeleteObject(cmd);
-                            zvsEntityControl.zvsContext.SaveChanges();
+                            context.device_type_command_que.DeleteObject(cmd);
+                            context.SaveChanges();
                         }
                     }
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued device command.", "PLUGIN MANAGER");
-            
+            }            
         }
 
-        void device_command_que_DeviceCommandAddedToQueEvent(device_command_que bcq)
+        void device_command_que_DeviceCommandAddedToQueEvent(long device_command_que_id)
         {
+            using (zvsEntities2 context = new zvsEntities2())
+            {
+                device_command_que cmd = context.device_command_que.SingleOrDefault(c => c.id == device_command_que_id);
 
-            device_command_que cmd = zvsEntityControl.zvsContext.device_command_que.SingleOrDefault(c => c.id == bcq.id);
-
-                if (cmd != null)
-                { 
+                if (cmd != null && cmd.device != null)
+                {
                     Console.WriteLine("[Processing Device CMD] API:" + cmd.device.device_types.plugin.name +
                                                             ", CMD_NAME:" + cmd.device_commands.friendly_name +
                                                             ", ARG:" + cmd.arg);
 
                     foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
+                    {
+                        if (p.Enabled)
                         {
-                            if (p.Enabled)
+                            bool err = false;
+                            int iterations = 0;
+                            while (!p.IsReady)
                             {
-                                bool err = false;
-                                int iterations = 0;
-                                while (!p.IsReady)
+                                if (iterations == 5)
                                 {
-                                    if (iterations == 5)
-                                    {
-                                        err = true;
-                                        string err_str = "Timed-out while trying to process " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plugin Not Ready.";
-                                        Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
+                                    err = true;
+                                    string err_str = "Timed-out while trying to process " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plugin Not Ready.";
+                                    Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
-                                        device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                                        zvsEntityControl.zvsContext.device_command_que.DeleteObject(cmd);
-                                        zvsEntityControl.zvsContext.SaveChanges();
-                                        return;
-                                    }
-                                    iterations++;
-                                    Thread.Sleep(1000);
+                                    device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
+                                    context.device_command_que.DeleteObject(cmd);
+                                    context.SaveChanges();
+                                    return;
                                 }
-
-                                if (!err)
-                                {
-                                    p.ProcessDeviceCommand(cmd);
-                                    device_command_que.DeviceCommandRunComplete(cmd, false, string.Empty);
-                                    zvsEntityControl.zvsContext.device_command_que.DeleteObject(cmd);
-                                    zvsEntityControl.zvsContext.SaveChanges();
-                                }
+                                iterations++;
+                                Thread.Sleep(1000);
                             }
-                            else
-                            {
-                                string err_str = "Attemped command " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "' on a disabled plugin. Removing command from que...";
-                                Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
-                                device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                                zvsEntityControl.zvsContext.device_command_que.DeleteObject(cmd);
-                                zvsEntityControl.zvsContext.SaveChanges();
+                            if (!err)
+                            {
+                                p.ProcessDeviceCommand(cmd);
+                                device_command_que.DeviceCommandRunComplete(cmd, false, string.Empty);
+                                context.device_command_que.DeleteObject(cmd);
+                                context.SaveChanges();
                             }
                         }
+                        else
+                        {
+                            string err_str = "Attemped command " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "' on a disabled plugin. Removing command from que...";
+                            Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
+
+                            device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
+                            context.device_command_que.DeleteObject(cmd);
+                            context.SaveChanges();
+                        }
+                    }
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued device command.", "PLUGIN MANAGER");
-            
+            }            
         }
 
-        void builtin_command_que_BuiltinCommandAddedToQueEvent(builtin_command_que bcq)
+        void builtin_command_que_BuiltinCommandAddedToQueEvent(long builtin_command_que_id)
         {
-            if (bcq != null)
-                {
-                    Console.WriteLine("[PROCESSING BUILTIN CMD] CMD_NAME:" + bcq.builtin_commands.friendly_name + ", ARG:" + bcq.arg);
+            using (zvsEntities2 context = new zvsEntities2())
+            {
+                builtin_command_que cmd = context.builtin_command_que.SingleOrDefault(c => c.id == builtin_command_que_id);
 
-                    switch (bcq.builtin_commands.name)
+                if (cmd != null)
+                {
+                    Console.WriteLine("[PROCESSING BUILTIN CMD] CMD_NAME:" + cmd.builtin_commands.friendly_name + ", ARG:" + cmd.arg);
+
+                    switch (cmd.builtin_commands.name)
                     {
                         case "REPOLL_ME":
                             {
                                 long d_id = 0;
-                                long.TryParse(bcq.arg, out d_id);
+                                long.TryParse(cmd.arg, out d_id);
                                 device d = device.GetAllDevices(false).SingleOrDefault(o => o.id == d_id);
 
                                 if (d.device_types.plugin.enabled)
@@ -251,31 +257,46 @@ namespace zVirtualScenesApplication.PluginSystem
                                 break;
                             }
                         case "GROUP_ON":
-                            //EXECUTE ON ALL API's
-                            foreach (Plugin p in GetPlugins())
                             {
-                                if (p.Enabled)
-                                    p.ActivateGroup(bcq.arg);
+                                long g_id = 0;
+                                long.TryParse(cmd.arg, out g_id);
+                                //EXECUTE ON ALL API's
+                                if (g_id > 0)
+                                {
+                                    foreach (Plugin p in GetPlugins())
+                                    {
+                                        if (p.Enabled)
+                                            p.ActivateGroup(g_id);
+                                    }
+                                }
+                                break;
                             }
-                            break;
                         case "GROUP_OFF":
-                            //EXECUTE ON ALL API's
-                            foreach (Plugin p in GetPlugins())
                             {
-                                if (p.Enabled)
-                                    p.DeactivateGroup(bcq.arg);
+                                long g_id = 0;
+                                long.TryParse(cmd.arg, out g_id);
+                                //EXECUTE ON ALL API's
+                                if (g_id > 0)
+                                {
+                                    foreach (Plugin p in GetPlugins())
+                                    {
+                                        if (p.Enabled)
+                                            p.DeactivateGroup(g_id);
+                                    }
+                                }
+                                break;
                             }
-                            break;
                     }
                     //TODO: Error Checking for CMD
-                    builtin_command_que.BuiltinCommandRunComplete(bcq, false, "");
+                    builtin_command_que.BuiltinCommandRunComplete(cmd, false, "");
 
                     //Remove processed command from que
-                    zvsEntityControl.zvsContext.builtin_command_que.DeleteObject(bcq);
-                    zvsEntityControl.zvsContext.SaveChanges();
+                    context.builtin_command_que.DeleteObject(cmd);
+                    context.SaveChanges();
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued builit-in command.", "PLUGIN MANAGER");
+            }
         }
 
         public IEnumerable<Plugin> GetPlugins()

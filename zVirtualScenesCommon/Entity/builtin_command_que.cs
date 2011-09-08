@@ -16,12 +16,12 @@ namespace zVirtualScenesCommon.Entity
         /// Called when a Builtin command is added to the que
         /// </summary>
         public static event BuiltinCommandAddedEventHandler BuiltinCommandAddedToQueEvent;
-        public delegate void BuiltinCommandAddedEventHandler(builtin_command_que bcq);
+        public delegate void BuiltinCommandAddedEventHandler(long builtin_command_que_id);
 
-        public static void BuiltinCommandAddedToQue(builtin_command_que bcq)
+        public static void BuiltinCommandAddedToQue(long id)
         {
             if (BuiltinCommandAddedToQueEvent != null)
-                BuiltinCommandAddedToQueEvent(bcq);
+                BuiltinCommandAddedToQueEvent(id);
         } 
 
         /// <summary>
@@ -37,11 +37,16 @@ namespace zVirtualScenesCommon.Entity
         }
         #endregion
 
+        public void Run()
+        {
+            Run(this);
+        }
+
         public static void Run(builtin_command_que cmd)
         {
             zvsEntityControl.zvsContext.builtin_command_que.AddObject(cmd);
             zvsEntityControl.zvsContext.SaveChanges();
-            BuiltinCommandAddedToQue(cmd);
+            BuiltinCommandAddedToQue(cmd.id);
         }
     }
 }

@@ -199,39 +199,38 @@ namespace OpenZWavePlugin
                 value_data_type = (int)Data_Types.BOOL
             });
                         
-            //TODO: Make a new DeviceAPIProperty that is API specific for types of settings that applies OpenZWave Devices 
-           
+            //TODO: Make a new DeviceAPIProperty that is API specific for types of settings that applies OpenZWave Devices           
 
-            //TEMP 
-            DefineDevice(new device { node_id = 1, device_type_id = GetDeviceType("DIMMER").id, friendly_name = "Test Device 1", last_heard_from = DateTime.Now});
-            DefineDevice(new device { node_id = 2, device_type_id = GetDeviceType("DIMMER").id, friendly_name = "Test Device 2", last_heard_from = DateTime.Now });
+            ////TEMP 
+            //DefineDevice(new device { node_id = 1, device_type_id = GetDeviceType("DIMMER").id, friendly_name = "Test Device 1", last_heard_from = DateTime.Now});
+            //DefineDevice(new device { node_id = 2, device_type_id = GetDeviceType("DIMMER").id, friendly_name = "Test Device 2", last_heard_from = DateTime.Now });
 
-            int i = 2; 
-            System.Timers.Timer t = new System.Timers.Timer();
-            t.Interval = 5000;
-            t.Elapsed += (sender, e) =>
-            {
-                i++;
-                //zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.node_id == 1).last_heard_from = DateTime.Now;
-               // zvsEntityControl.zvsContext.SaveChanges();
+            //int i = 2;
+            //System.Timers.Timer t = new System.Timers.Timer();
+            //t.Interval = 5000;
+            //t.Elapsed += (sender, e) =>
+            //{
+            //    i++;
+            //    //zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.node_id == 1).last_heard_from = DateTime.Now;
+            //    //zvsEntityControl.zvsContext.SaveChanges();
 
 
-                //DefineOrUpdateDeviceValue(new device_values
-                //{
-                //    device_id = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.node_id == 1).id,
-                //    value_id = "1!",
-                //    label_name = "Basic",
-                //    genre = "Genre",
-                //    index = "Index",
-                //    type = "Type",
-                //    commandClassId = "Coomand Class",
-                //    value = (i % 2 == 0 ? "99" : "50")
-                //});
+            //    DefineOrUpdateDeviceValue(new device_values
+            //    {
+            //        device_id = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.node_id == 1).id,
+            //        value_id = "1!",
+            //        label_name = "Basic",
+            //        genre = "Genre",
+            //        index = "Index",
+            //        type = "Type",
+            //        commandClassId = "Coomand Class",
+            //        value = (i % 2 == 0 ? "99" : "50")
+            //    });
 
-               //DefineDevice(new device { node_id = i, device_type_id = GetDeviceType("DIMMER").id, friendly_name = "Test Device "+ i, last_heard_from = DateTime.Now });
+            //    //DefineDevice(new device { node_id = i, device_type_id = GetDeviceType("DIMMER").id, friendly_name = "Test Device " + i, last_heard_from = DateTime.Now });
 
-            };
-            t.Enabled = true;
+            //};
+            //t.Enabled = true;
 
 
             
@@ -487,9 +486,9 @@ namespace OpenZWavePlugin
             return true;
         }
 
-        public override bool ActivateGroup(string GroupName)
+        public override bool ActivateGroup(long groupID)
         {
-            IQueryable<device> devices = GetDeviceInGroup(GroupName);
+            IQueryable<device> devices = GetDeviceInGroup(groupID);
 
             if (devices != null)
             {
@@ -512,9 +511,9 @@ namespace OpenZWavePlugin
             return true;
         }
 
-        public override bool DeactivateGroup(string GroupName)
+        public override bool DeactivateGroup(long groupID)
         {
-            IQueryable<device> devices = GetDeviceInGroup(GroupName);
+            IQueryable<device> devices = GetDeviceInGroup(groupID);
 
             if (devices != null)
             {
@@ -569,10 +568,10 @@ namespace OpenZWavePlugin
                             node.AddValue(value);
 
                             string data = "";
-                            m_manager.GetValueAsString(vid, out data);
+                            bool b = m_manager.GetValueAsString(vid, out data);
 
 
-                            Console.WriteLine("OpenZWave Plugin | [ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
+                            Console.WriteLine("OpenZWave Plugin | [ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " +b.ToString());
 
                             DefineOrUpdateDeviceValue(new device_values
                             {
@@ -700,10 +699,9 @@ namespace OpenZWavePlugin
                             string data;
                             m_manager.GetValueAsString(vid, out data);
 
-                            Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);                            
-                            
-                            var context = new zvsEntities2();
-                            device d = context.devices.SingleOrDefault(o => o.node_id == node.ID);
+                            Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
+                     
+                            device d = GetDevices().SingleOrDefault(o => o.node_id == node.ID);
 
                             if (d != null)
                             {
@@ -763,9 +761,14 @@ namespace OpenZWavePlugin
                                                         //If it is truely new
                                                         if (!prevVal.Equals(data))
                                                         {
-                                                            BackgroundWorker DelayedRepoll = new BackgroundWorker();
-                                                            DelayedRepoll.DoWork += new DoWorkEventHandler(DelayedRepoll_DoWork);
-                                                            DelayedRepoll.RunWorkerAsync(d.id);
+                                                            System.Timers.Timer t = new System.Timers.Timer();
+                                                            t.Interval = 3000;
+                                                            t.Elapsed += (sender, e) =>
+                                                            {                                                                
+                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);
+                                                                t.Enabled = false;
+                                                            };
+                                                            t.Enabled = true;                                                       
                                                         }
                                                         break;
                                                 }
@@ -782,13 +785,11 @@ namespace OpenZWavePlugin
                                 dv.type = value.Type;
                                 dv.genre = value.Genre;
                                 dv.label_name = value.Label;
-                                context.SaveChanges();                                
+                                zvsEntityControl.zvsContext.SaveChanges();                                               
 
                                 if (!prev_value.Equals(data))
                                 {
-                                    //TODO: FIX 2.5
-                                    //Call Event
-                                    //device_values..ValueDataChanged((int)d.id, dv.id.ToString(), dv.label_name, data, prev_value);
+                                    dv.DeviceValueDataChanged(prev_value);
                                 }
                             }
                             else
@@ -920,8 +921,16 @@ namespace OpenZWavePlugin
                                     break;
                             }
                             if (device_type != null)
-                            {
-                                DefineDevice(new device { node_id = node.ID, device_types = device_type, friendly_name = deviceName });                               
+                            {               
+                                //If we already have the device
+                                if (!GetDevices().Any(d => d.node_id == node.ID))
+                                {
+                                    zvsEntityControl.zvsContext.devices.AddObject(new device { node_id = node.ID, 
+                                                                                               device_types = device_type, 
+                                                                                               friendly_name = deviceName });
+                                    zvsEntityControl.zvsContext.SaveChanges();
+                                    zvsEntityControl.DeviceAdded(this, new EventArgs());
+                                }                               
                             }
                             else
                                 WriteToLog(Urgency.WARNING, string.Format("Found unknown device '{0}', node #{1}!", node.Label, node.ID));
@@ -994,15 +1003,15 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            var context = new zvsEntities2();
-                            device d = context.devices.SingleOrDefault(o => o.node_id == node.ID);
+                            
+                            device d = GetDevices().SingleOrDefault(o => o.node_id == node.ID);
 
                             if (d != null)
                             {
                                 d.last_heard_from = DateTime.Now;
                             }
-                            context.SaveChanges();
-                            
+                            zvsEntityControl.zvsContext.SaveChanges();
+                                                        
                             WriteToLog(Urgency.INFO, "Initializing: Node " + node.ID + " query complete.");
                             Console.WriteLine("OpenZWave Plugin | [NodeQueriesComplete] Initializing...node " + node.ID + " query complete.");
                         }
@@ -1040,12 +1049,7 @@ namespace OpenZWavePlugin
             }
         }
 
-        void DelayedRepoll_DoWork(object sender, DoWorkEventArgs e)
-        {
-            System.Threading.Thread.Sleep(3000);
-            byte NodeId = (byte)GetDevices().SingleOrDefault(d => d.id.ToString() == e.Argument.ToString()).node_id;
-            m_manager.RefreshNodeInfo(m_homeId, NodeId);  
-        }
+     
 
         private Node GetNode(UInt32 homeId, Byte nodeId)
         {

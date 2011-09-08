@@ -45,13 +45,6 @@
   <ItemGroup>
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OLD\zvsAPI.cs" />
-    <Compile Include="OLD\Scene.cs" />
-    <Compile Include="OLD\SceneCommands.cs" />
-    <Compile Include="OLD\Task.cs" />
-    <Compile Include="OLD\zwObject.cs" />
-    <Compile Include="OLD\zwObjectState.cs" />
-    <Compile Include="OLD\ValueControl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
