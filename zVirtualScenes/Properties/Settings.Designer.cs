@@ -277,7 +277,7 @@ namespace zVirtualScenesApplication.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("150")]
         public int interfaceWidth {
             get {
                 return ((int)(this["interfaceWidth"]));

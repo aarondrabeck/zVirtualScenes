@@ -104,17 +104,14 @@ namespace NOAAPlugin
         protected override void SettingChanged(string settingName, string settingValue)
         {            
         }               
-
         public override bool ProcessDeviceCommand(device_command_que cmd)
         {
             return true;
         }
-
         public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
         {
             return true;
         }
-
         public override bool Repoll(device device)
         {
             return true;
@@ -123,12 +120,10 @@ namespace NOAAPlugin
         {
             return true;
         }
-
         public override bool DeactivateGroup(long groupID)
         {
             return true;
-        }
-     
+        }     
 
         #region NOAA
 
@@ -180,14 +175,13 @@ namespace NOAAPlugin
 
                     foreach (scene scene in zvsEntityControl.zvsContext.scenes)
                     {
-                        string value = scene_property_value.GetPropertyValue(scene, "ACTIVATE_SUNRISE");
+                        string value = scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "ACTIVATE_SUNRISE");
                         bool activate = false;
                         bool.TryParse(value, out activate);
 
                         if (activate)
                         {
-                            //string result = scene.RunScene();
-                           // WriteToLog(Urgency.INFO, "Sunrise: "// + result);
+                            WriteToLog(Urgency.INFO, "Sunrise: " + scene.RunScene());
                         }
                     }       
                 }
@@ -199,14 +193,13 @@ namespace NOAAPlugin
 
                     foreach (scene scene in zvsEntityControl.zvsContext.scenes)
                     {
-                        string value = scene_property_value.GetPropertyValue(scene, "ACTIVATE_SUNSET");
+                        string value = scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "ACTIVATE_SUNSET");
                         bool activate = false;
                         bool.TryParse(value, out activate);
 
                         if (activate)
                         {
-                            //string result = scene.RunScene();
-                            //WriteToLog(Urgency.INFO, "Sunset: " + result);
+                            WriteToLog(Urgency.INFO, "Sunset: " + scene.RunScene());
                         }
                     }
                 }

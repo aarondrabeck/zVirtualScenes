@@ -66,7 +66,7 @@
       <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="interfaceWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">150</Value>
     </Setting>
     <Setting Name="descWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">505</Value>

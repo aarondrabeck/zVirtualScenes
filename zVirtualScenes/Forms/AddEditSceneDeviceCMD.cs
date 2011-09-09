@@ -129,7 +129,7 @@ namespace zVirtualScenesApplication.Forms
                 device_type_commands selected_cmd = (device_type_commands)comboBoxTypeCommands.SelectedItem;
                 if (selected_cmd == null)
                 {
-                    MessageBox.Show("Please select a command!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show("Please select a command!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
                 _scene_cmd.command_id = selected_cmd.id;
@@ -146,7 +146,7 @@ namespace zVirtualScenesApplication.Forms
                 device_commands selected_cmd = (device_commands)comboBoxDeviceCommand.SelectedItem;
                 if (selected_cmd == null)
                 {
-                    MessageBox.Show("Please select a command!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show("Please select a command!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     return;
                 }
 
@@ -264,14 +264,14 @@ namespace zVirtualScenesApplication.Forms
                 case Data_Types.LIST:
                     if (String.IsNullOrEmpty(cmbo.Text))
                     {
-                        MessageBox.Show("Please select a vaule!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show("Please select a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return null;
                     }
                     return cmbo.Text;                    
                 case Data_Types.STRING:
                     if (String.IsNullOrEmpty(tbx.Text))
                     {
-                        MessageBox.Show("Please enter a vaule!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show("Please enter a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         return null;
                     }
                     return tbx.Text;

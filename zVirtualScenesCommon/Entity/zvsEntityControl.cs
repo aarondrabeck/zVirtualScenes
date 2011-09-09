@@ -12,7 +12,7 @@ namespace zVirtualScenesCommon.Entity
 
         
 
-        public static string GetProgramNameAndVersion
+        public static string zvsNameAndVersion
         {
             get { return "zVirtualScenes -  v2.4"; }// +ProgramVersion + " | db" + DatabaseVersion; }
         }

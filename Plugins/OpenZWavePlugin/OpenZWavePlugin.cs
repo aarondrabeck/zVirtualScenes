@@ -360,7 +360,7 @@ namespace OpenZWavePlugin
                     case "TURNON":
                         {
                             byte defaultonlevel = 99;
-                            byte.TryParse(device_property_values.GetDevicePropertyValue(cmd.device_id, "DEFAULONLEVEL"), out defaultonlevel);
+                            byte.TryParse(device_property_values.GetDevicePropertyValue(zvsEntityControl.zvsContext, cmd.device_id, "DEFAULONLEVEL"), out defaultonlevel);
                             m_manager.SetNodeLevel(m_homeId, (byte)cmd.device.node_id, defaultonlevel);
                             return true;
                         }
@@ -501,7 +501,7 @@ namespace OpenZWavePlugin
                             break;
                         case "DIMMER":
                             byte defaultonlevel = 99;
-                            byte.TryParse(device_property_values.GetDevicePropertyValue(d.id, "DEFAULONLEVEL"), out defaultonlevel);
+                            byte.TryParse(device_property_values.GetDevicePropertyValue(zvsEntityControl.zvsContext, d.id, "DEFAULONLEVEL"), out defaultonlevel);
                             m_manager.SetNodeLevel(m_homeId, Convert.ToByte(d.node_id), defaultonlevel);
                             break;
                     }
@@ -742,7 +742,7 @@ namespace OpenZWavePlugin
                                 //level between old level and new level. (if going from 0 to 100 we get 84 here).
                                 //To get the real level repoll the device a second or two after a level change was recieved.     
                                 bool EnableDimmerRepoll = false;
-                                bool.TryParse(device_property_values.GetDevicePropertyValue(d.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+                                bool.TryParse(device_property_values.GetDevicePropertyValue(zvsEntityControl.zvsContext,d.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
 
                                 if (FinishedInitialPoll && EnableDimmerRepoll)
                                 {
@@ -1027,7 +1027,7 @@ namespace OpenZWavePlugin
                             
                             if (d != null)
                             {
-                                if (device_property_values.GetDevicePropertyValue(d.id, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
+                                if (device_property_values.GetDevicePropertyValue(zvsEntityControl.zvsContext,d.id, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
                                     EnablePolling(n.ID);
                             }                           
                         }

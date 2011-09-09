@@ -5,31 +5,88 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Text;
-using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
 using System.Data;
 using jabber.client;
-using zVirtualScenesAPI.Events;
+using zVirtualScenesAPI;
+using zVirtualScenesCommon;
+using zVirtualScenesCommon.Entity;
 
 namespace JabberPlugin
 {
-    [Export(typeof(zvsPlugin))]
-    public class JabberPlugin : zvsPlugin
+    [Export(typeof(Plugin))]
+    public class JabberPlugin : Plugin
     {
         JabberClient j;
         public volatile bool isActive;
-        private bool shuttingdown = false; 
-       
-        public JabberPlugin()
-            : base("JABBER")
-        {
-            PluginName = "Jabber";
-        }
+        private bool shuttingdown = false;
 
+        public JabberPlugin()
+            : base("JABBER",
+               "Jabber/Gtalk Plugin",
+                "This plug-in will send customizable notifications to one or more jabber / gtalk users."
+                ) { }
+
+        public override void Initialize()
+        {
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "JABBERSERVER",
+                friendly_name = "Jabber Server",
+                value = "talk.google.com",
+                value_data_type = (int)Data_Types.STRING,
+                description = "The Jabber server to connect to (ex. talk.google.com)."
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "JABBERUSER",
+                friendly_name = "Jabber Username",
+                value = "user",
+                value_data_type = (int)Data_Types.STRING,
+                description = "The username of the jabber user."
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "JABBERPASSWORD",
+                friendly_name = "Jabber Password",
+                value = "passw0rd",
+                value_data_type = (int)Data_Types.STRING,
+                description = "The password of the jabber user."
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "JABBERSENDTO",
+                friendly_name = "Send notifications to",
+                value = "user@gmail.com",
+                value_data_type = (int)Data_Types.STRING,
+                description = "Jabber users that will receive notifications. (comma seperated)"
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "JABBERVERBOSE",
+                friendly_name = "Verbose Logging",
+                value = "false",
+                value_data_type = (int)Data_Types.BOOL,
+                description = "(Writes all server client communication to the log for debugging.)"
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "JABBERNOTIFICATIONS",
+                friendly_name = "Notifications to send",
+                value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
+                value_data_type = (int)Data_Types.STRING,
+                description = "Include all values you would like announced. Comma Seperated."
+            });
+        }
+               
         protected override bool StartPlugin()
         {
             shuttingdown = false;
-            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
 
             j = new JabberClient();
             j.OnMessage += new MessageHandler(jabberClient1_OnMessage);
@@ -39,28 +96,33 @@ namespace JabberPlugin
             j.OnAuthenticate += new bedrock.ObjectHandler(jabberClient1_OnAuthenticate);
             j.OnReadText += new bedrock.TextHandler(j_OnReadText);
             j.OnWriteText += new bedrock.TextHandler(j_OnWriteText);
+            j.OnInvalidCertificate += new System.Net.Security.RemoteCertificateValidationCallback(j_OnInvalidCertificate);
             
             if (!j.IsAuthenticated)
             {
-                j.User = zvsAPI.GetSetting("Jabber Username");
-                j.Server = zvsAPI.GetSetting("Jabber Server");
-                j.Password = zvsAPI.GetSetting("Jabber Password");
+                j.User = GetSettingValue("JABBERUSER");
+                j.Server = GetSettingValue("JABBERSERVER");
+                j.Password = GetSettingValue("JABBERPASSWORD");
                 j.AutoRoster = false;
                 j.AutoPresence = false;
                 j.AutoReconnect = 50;
                 j.Connect();
             }
 
-            zvsEvents.ValueDataChangedEvent += new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
-            
+            device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+                        
             IsReady = true;
             return true;
-        }       
+        }
+
+        bool j_OnInvalidCertificate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
+        {
+            throw new NotImplementedException();
+        }               
 
         protected override bool StopPlugin()
         {
-            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
-
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
             Disconnect();
 
             //supresses messages sent to log while program is closing
@@ -71,56 +133,52 @@ namespace JabberPlugin
             isActive = false;
             j.Dispose();
 
-            zvsEvents.ValueDataChangedEvent -= new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
+            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
             
             IsReady = false;
             return true;
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
+      
+
+        void device_values_DeviceValueDataChangedEvent(object sender, string PreviousValue)
         {
-            
-        }
-
-        public override void Initialize()
-        {                                 
-            zvsAPI.DefineSetting("Jabber Server", "gmail.com", Data_Types.STRING, "The Jabber server to connect to.");
-            zvsAPI.DefineSetting("Jabber Username", "user", Data_Types.STRING, "The username of the jabber user.");
-            zvsAPI.DefineSetting("Jabber Password", "passw0rd", Data_Types.STRING, "The password of the jabber user."); 
-            zvsAPI.DefineSetting("Send to", "user@gmail.com", Data_Types.STRING, "Jabber users that will receive notifications. (comma seperated)");
-            zvsAPI.DefineSetting("Verbose Logging", "true", Data_Types.BOOL, "(Writes all server client communication to the log for debugging.)");
-            zvsAPI.DefineSetting("Notifications to send", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", Data_Types.STRING, "Include all values you would like announced. Comma Seperated.");
-        }
-
-        void zVirtualSceneEvents_ValueDataChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)
-        {
-            string objType = zvsAPI.Object.GetObjectType(ObjectId);
-            string objName = zvsAPI.Object.GetObjectName(ObjectId);
-
-            string[] objTypeValuespairs = zvsAPI.GetSetting("Notifications to send").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            device_values dv = (device_values)sender;
+                        
+            string[] objTypeValuespairs = GetSettingValue("JABBERNOTIFICATIONS").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string objTypeValuespair in objTypeValuespairs)
             {
-                string thisEvent = objType + ":" + label;
+                string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
 
                 if (thisEvent.Equals(objTypeValuespair.Trim()))
-                   SendMessage(objName + " " + label + " changed to " + Value + ".");
+                    SendMessage(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
             }
         }
 
-        public override void ProcessCommand(QuedCommand cmd)
+        protected override void SettingChanged(string settingName, string settingValue)
         {
         }
-
-        public override void Repoll(string id)
+        public override bool ProcessDeviceCommand(device_command_que cmd)
         {
+            return true;
         }
-
-        public override void ActivateGroup(string GroupName)
-        { }
-
-        public override void DeactivateGroup(string GroupName)
-        { }        
+        public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
+        {
+            return true;
+        }
+        public override bool Repoll(device device)
+        {
+            return true;
+        }
+        public override bool ActivateGroup(long groupID)
+        {
+            return true;
+        }
+        public override bool DeactivateGroup(long groupID)
+        {
+            return true;
+        }           
 
         public void Disconnect()
         {
@@ -130,7 +188,7 @@ namespace JabberPlugin
 
         public void SendMessage(string msg)
         {
-            string[] users = zvsAPI.GetSetting("Send to").Split(',');
+            string[] users = GetSettingValue("JABBERSENDTO").Split(',');
 
             if (msg != null)
             {
@@ -144,56 +202,56 @@ namespace JabberPlugin
             if (rp.Name == "failure")
             {
                 if(!shuttingdown)
-                    zvsAPI.WriteToLog(Urgency.WARNING, "Invalid Username or Password.");
+                    WriteToLog(Urgency.WARNING, "Invalid Username or Password.");
             }
         }
 
         private void jabberClient1_OnAuthenticate(object sender)
         {
             if (!shuttingdown)
-                zvsAPI.WriteToLog(Urgency.INFO, "Connected using " + j.User + ".");
-            j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zvsAPI.GetProgramNameAndVersion + " server.", ":chat", 0);
+                WriteToLog(Urgency.INFO, "Connected using " + j.User + ".");
+            j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + zvsEntityControl.zvsNameAndVersion + " server.", ":chat", 0);
             isActive = true;
         }
 
         private void jabberClient1_OnError(object sender, Exception ex)
         {
             if (!shuttingdown)
-                zvsAPI.WriteToLog(Urgency.ERROR, ex.Message);
+                WriteToLog(Urgency.ERROR, ex.Message);
         }
 
         private void jabberClient1_OnDisconnect(object sender)
         {
-            zvsAPI.WriteToLog(Urgency.INFO, "Disconnected.");             
+            WriteToLog(Urgency.INFO, "Disconnected.");             
         }
 
         private void jabberClient1_OnMessage(object sender, jabber.protocol.client.Message msg)
         {
             bool verbose = false;
-            bool.TryParse(zvsAPI.GetSetting("Verbose Logging"), out verbose);
+            bool.TryParse(GetSettingValue("JABBERVERBOSE"), out verbose);
 
             if (verbose && !shuttingdown)
-                zvsAPI.WriteToLog(Urgency.INFO, "[" + msg.From.User + "] says : " + msg.Body + "\n");
+                WriteToLog(Urgency.INFO, "[" + msg.From.User + "] says : " + msg.Body + "\n");
         }
 
         private void j_OnWriteText(object sender, string txt)
         {
             bool verbose = false;
-            bool.TryParse(zvsAPI.GetSetting("Verbose Logging"), out verbose);
+            bool.TryParse(GetSettingValue("JABBERVERBOSE"), out verbose);
 
             if (txt == " ") return;
             if (verbose && !shuttingdown)
-                zvsAPI.WriteToLog(Urgency.INFO, "SENT: " + txt);
+                WriteToLog(Urgency.INFO, "SENT: " + txt);
         }
 
         private void j_OnReadText(object sender, string txt)
         {
             bool verbose = false;
-            bool.TryParse(zvsAPI.GetSetting("Verbose Logging"), out verbose);
+            bool.TryParse(GetSettingValue("JABBERVERBOSE"), out verbose);
 
             if (txt == " ") return;  // ignore keep-alive spaces
             if (verbose && !shuttingdown)
-                zvsAPI.WriteToLog(Urgency.INFO, "RECV: " + txt);
+                WriteToLog(Urgency.INFO, "RECV: " + txt);
         }
         
     }

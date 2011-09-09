@@ -207,7 +207,7 @@ namespace zVirtualScenesApplication.Forms
 
                         if (d == null)
                         {
-                            MessageBox.Show("Please select a deice!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            MessageBox.Show("Please select a deice!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             return;
                         }
                         else
@@ -221,7 +221,7 @@ namespace zVirtualScenesApplication.Forms
                         group g = (group)cmbo.SelectedItem;
                         if (g == null)
                         {
-                            MessageBox.Show("Please select a group!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                            MessageBox.Show("Please select a group!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                             return;
                         }
                         else
@@ -241,7 +241,7 @@ namespace zVirtualScenesApplication.Forms
                         case Data_Types.LIST:
                             if (String.IsNullOrEmpty(cmbo.Text))
                             {
-                                MessageBox.Show("Please select a vaule!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                MessageBox.Show("Please select a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return;
                             }
                             _scene_command.arg = cmbo.Text;
@@ -249,7 +249,7 @@ namespace zVirtualScenesApplication.Forms
                         case Data_Types.STRING:
                             if (String.IsNullOrEmpty(tbx.Text))
                             {
-                                MessageBox.Show("Please enter a vaule!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                MessageBox.Show("Please enter a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return;
                             }
                             _scene_command.arg = tbx.Text;

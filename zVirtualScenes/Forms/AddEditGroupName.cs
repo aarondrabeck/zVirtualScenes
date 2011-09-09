@@ -25,7 +25,7 @@ namespace zVirtualScenesApplication.Forms
         {
             if (String.IsNullOrEmpty(txtbName.Text))
             {
-                MessageBox.Show("You must enter a name for the group!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK,
+                MessageBox.Show("You must enter a name for the group!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
             }
             else

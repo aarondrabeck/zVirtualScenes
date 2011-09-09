@@ -22,7 +22,7 @@ namespace zVirtualScenesApplication
     public partial class MainForm : Form
     {
        
-        public string ProgramName = zvsEntityControl.GetProgramNameAndVersion;
+        public string ProgramName = zvsEntityControl.zvsNameAndVersion;
         private IBindingList deviceList;
         private ObjectQuery<device> deviceListQuery;
         private IBindingList sceneList;
@@ -429,7 +429,7 @@ namespace zVirtualScenesApplication
 
             if (selected_scene != null)
             {
-                if (MessageBox.Show("Are you sure you want to delete this scene?", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                if (MessageBox.Show("Are you sure you want to delete this scene?", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
                 {
                     zvsEntityControl.zvsContext.scenes.DeleteObject(selected_scene);
                                            
@@ -649,7 +649,7 @@ namespace zVirtualScenesApplication
         private void deleteCommandToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (MessageBox.Show("Are you sure you want to delete the selected scene command(s)?",
-                                zvsEntityControl.GetProgramNameAndVersion,
+                                zvsEntityControl.zvsNameAndVersion,
                                 MessageBoxButtons.YesNo,
                                 MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
             {
@@ -749,7 +749,7 @@ namespace zVirtualScenesApplication
             }
             else
             {
-                MessageBox.Show("Please select a scene!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                MessageBox.Show("Please select a scene!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
 
         }

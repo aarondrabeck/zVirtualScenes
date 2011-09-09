@@ -31,7 +31,7 @@ namespace zVirtualScenesApplication
         {
             if (string.IsNullOrEmpty(txtb_sceneName.Text))
             {
-                MessageBox.Show("Invalid scene name.", zvsEntityControl.GetProgramNameAndVersion);
+                MessageBox.Show("Invalid scene name.", zvsEntityControl.zvsNameAndVersion);
             }
             else
             {

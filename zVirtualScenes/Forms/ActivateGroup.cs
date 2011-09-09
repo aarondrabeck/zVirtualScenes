@@ -44,7 +44,7 @@ namespace zVirtualScenesApplication.Forms
                 }
             }
             else
-                MessageBox.Show("No Group Selected!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("No Group Selected!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
         private void buttonOff_Click(object sender, EventArgs e)
@@ -60,7 +60,7 @@ namespace zVirtualScenesApplication.Forms
                 }
             }
             else
-                MessageBox.Show("No Group Selected!", zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("No Group Selected!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
 
         private void btnClose_KeyDown(object sender, KeyEventArgs e)

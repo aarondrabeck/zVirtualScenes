@@ -190,7 +190,7 @@ namespace zVirtualScenesApplication.UserControls
             catch (Exception ex)
             {
                 labelStatus.Text = "Save Failed.";
-                MessageBox.Show("Error saving " + _p.friendly_name + " settings." + Environment.NewLine + Environment.NewLine + ex.Message, zvsEntityControl.GetProgramNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                MessageBox.Show("Error saving " + _p.friendly_name + " settings." + Environment.NewLine + Environment.NewLine + ex.Message, zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             labelStatus.Text = _p.friendly_name + " Settings Saved!";
             #endregion

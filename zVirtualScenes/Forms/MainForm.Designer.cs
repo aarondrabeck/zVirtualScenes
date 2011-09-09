@@ -121,6 +121,7 @@ namespace zVirtualScenesApplication
             this.LevelCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.GroupsCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colLastHeardFrom = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_device_values();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
@@ -156,7 +157,6 @@ namespace zVirtualScenesApplication
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_device_values();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -1098,6 +1098,14 @@ namespace zVirtualScenesApplication
             this.colLastHeardFrom.Text = "Last Heard From";
             this.colLastHeardFrom.Width = 150;
             // 
+            // uc_object_values1
+            // 
+            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
+            this.uc_object_values1.Name = "uc_object_values1";
+            this.uc_object_values1.Size = new System.Drawing.Size(1179, 202);
+            this.uc_object_values1.TabIndex = 0;
+            // 
             // MainTabControl
             // 
             this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1482,14 +1490,6 @@ namespace zVirtualScenesApplication
             this.pluginsToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
             this.pluginsToolStripMenuItem.Text = "&Options";
             this.pluginsToolStripMenuItem.Click += new System.EventHandler(this.pluginsToolStripMenuItem_Click);
-            // 
-            // uc_object_values1
-            // 
-            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
-            this.uc_object_values1.Name = "uc_object_values1";
-            this.uc_object_values1.Size = new System.Drawing.Size(1179, 202);
-            this.uc_object_values1.TabIndex = 0;
             // 
             // MainForm
             // 

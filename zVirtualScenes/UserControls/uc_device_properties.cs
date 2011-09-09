@@ -42,7 +42,7 @@ namespace zVirtualScenesApplication.UserControls
             {
                 int left = 0;
                 //Get Value
-                string value = device_property_values.GetDevicePropertyValue(d.id, dp.name);
+                string value = device_property_values.GetDevicePropertyValue(zvsEntityControl.zvsContext,d.id, dp.name);
                 
                 Data_Types dataType = (Data_Types)dp.value_data_type;
 

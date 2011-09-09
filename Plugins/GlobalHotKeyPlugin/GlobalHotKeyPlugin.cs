@@ -3,34 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.ComponentModel.Composition;
-using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
-using zVirtualScenesApplication;
 using System.Windows.Forms;
-using zVirtualScenesApplication.Structs;
+using zVirtualScenesAPI;
+using zVirtualScenesCommon.Entity;
+using zVirtualScenesCommon;
+
 
 namespace GlobalHotKeyPlugin
 {
-    [Export(typeof(zvsPlugin))]
-    public class GlobalHotKeyPlugin : zvsPlugin
+    [Export(typeof(Plugin))]
+    public class GlobalHotKeyPlugin : Plugin
     {
         public volatile bool isActive;
         private KeyboardHook hook = new KeyboardHook();
 
         public GlobalHotKeyPlugin()
-            : base("GLOBALHOTKEYS")
-        {
-            PluginName = "Global HotKeys";
-        }
-
+            : base("GLOBALHOTKEYS",
+               "Global Hot-key Plugin",
+                "This plug-in will allow you to map keyboard shortcuts to scenes."
+                ) { }
+       
         public override void Initialize()
         {
-            zvsAPI.Scenes.Properties.New("Global Hotkey", "Hotkey that will activate this scene.", "None", Data_Types.LIST);
+            scene_property hotkeypropert = new scene_property
+            {
+                name = "GLOBALHOTKEY",
+                friendly_name = "Global Hotkey",
+                description = "Hotkey that will activate this scene.",
+                defualt_value = "None",
+                value_data_type = (int)Data_Types.LIST
+            };
             
             foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
             {
-                zvsAPI.Scenes.Properties.NewPropertyOption("Global Hotkey", option.Replace('_', '+'));
-            }            
+                hotkeypropert.scene_property_option.Add(new scene_property_option { option = option.Replace('_', '+') });
+            }
+
+            scene_property.DefineOrUpdateProperty(hotkeypropert);
+
         }
 
         protected override bool StartPlugin()
@@ -80,11 +90,11 @@ namespace GlobalHotKeyPlugin
             }
             catch (Exception ex)
             {
-                zvsAPI.WriteToLog(Urgency.ERROR, "Failed to register global hotkeys. - " + ex.Message);
+                WriteToLog(Urgency.ERROR, "Failed to register global hotkeys. - " + ex.Message);
             }
             #endregion
 
-            zvsAPI.WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", PluginName, success , errors));
+            WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", this.Friendly_Name, success , errors));
 
             IsReady = true;
             return true;
@@ -92,25 +102,35 @@ namespace GlobalHotKeyPlugin
 
         protected override bool StopPlugin()
         {
-            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
             IsReady = false;
             return true;
         }
 
         protected override void SettingChanged(string settingName, string settingValue)
-        { }
+        {
+        }
+        public override bool ProcessDeviceCommand(device_command_que cmd)
+        {
+            return true;
+        }
+        public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
+        {
+            return true;
+        }
+        public override bool Repoll(device device)
+        {
+            return true;
+        }
+        public override bool ActivateGroup(long groupID)
+        {
+            return true;
+        }
 
-        public override void ProcessCommand(QuedCommand cmd)
-        { }
-
-        public override void Repoll(string id)
-        { }
-
-        public override void ActivateGroup(string GroupName)
-        { }
-
-        public override void DeactivateGroup(string GroupName)
-        { }
+        public override bool DeactivateGroup(long groupID)
+        {
+            return true;
+        }     
 
         private void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
@@ -119,22 +139,20 @@ namespace GlobalHotKeyPlugin
 
             if (IsReady)
             {
-
-            }
-
-            foreach (Scene scene in zvsAPI.Scenes.GetScenes())
-            {
-                string sceneHotKey = zvsAPI.Scenes.Properties.GetScenePropertyValue(scene.id, "Global Hotkey");
-
-                if (!string.IsNullOrEmpty(sceneHotKey))
+                foreach (scene scene in zvsEntityControl.zvsContext.scenes)
                 {
-                    if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                    string sceneHotKey = scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "GLOBALHOTKEY");
+
+                    if (!string.IsNullOrEmpty(sceneHotKey))
                     {
-                        string result = scene.RunScene();
-                        zvsAPI.WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                        if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                        {
+                            string result = scene.RunScene();
+                            WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                        }
                     }
-                }  
-            }            
+                }
+            }
         }
 
         public enum CustomHotKeys

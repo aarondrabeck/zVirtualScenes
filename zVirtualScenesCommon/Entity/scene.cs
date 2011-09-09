@@ -76,7 +76,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     e.Result = (long)e.Argument;
                     errorCount = 0;
-                    foreach (scene_commands sCMD in _scene.scene_commands)
+                    foreach (scene_commands sCMD in _scene.scene_commands.OrderBy(o=> o.sort_order))
                     {
                         switch ((command_types)sCMD.command_type_id)
                         {

@@ -33,7 +33,7 @@ namespace zVirtualScenesApplication.UserControls
             {
                 //Object Name
                 if (String.IsNullOrEmpty(textBoxName.Text))
-                    MessageBox.Show("Invalid Object Name", zvsEntityControl.GetProgramNameAndVersion);
+                    MessageBox.Show("Invalid Object Name", zvsEntityControl.zvsNameAndVersion);
                 else
                 {
                     _d.friendly_name = textBoxName.Text;

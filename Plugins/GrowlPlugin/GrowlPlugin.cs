@@ -5,92 +5,105 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Text;
-using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
 using System.Data;
-using zVirtualScenesAPI.Events;
 using Growl.Connector;
 using System.Drawing;
+using zVirtualScenesAPI;
+using zVirtualScenesCommon;
+using zVirtualScenesCommon.Entity;
 
 namespace GrowlPlugin
 {
-    [Export(typeof(zvsPlugin))]
-    public class GrowlPlugin : zvsPlugin
+    [Export(typeof(Plugin))]
+    public class GrowlPlugin : Plugin
     {
         public GrowlPlugin()
-            : base("GROWL")
-        {
-            PluginName = "Growl";
-        }
+            : base("GROWL",
+               "Growl Plugin",
+                "This plug-in will send notifications to Growl."
+                ) { }
 
         public const string NOTIFY_DEVICE_VALUE_CHANGE = "DEVICE_VALUE_CHANGE";
         public GrowlConnector GrowlConnector = new GrowlConnector();
 
+        public override void Initialize()
+        {
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "NOTIFICATIONS",
+                friendly_name = "Notifications to send",
+                value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
+                value_data_type = (int)Data_Types.STRING,
+                description = "Include all values you would like announced. Comma Seperated."
+            });
+        }
+
         protected override bool StartPlugin()
         {
 
-            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin started.");
-            zvsEvents.ValueDataChangedEvent += new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
-            
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
+            device_values.DeviceValueDataChangedEvent+=new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent); 
             RegisterGrowl(); 
 
             IsReady = true;
             return true;
-        }
+        }     
 
         protected override bool StopPlugin()
         {
-            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
-            zvsEvents.ValueDataChangedEvent -= new zvsEvents.ValueDataChangedEventHandler(zVirtualSceneEvents_ValueDataChangedEvent);
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
+            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent); 
 
             IsReady = false;
             return true;
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
-        {
-        }
+       
 
-        public override void Initialize()
-        {
-            zvsAPI.DefineSetting("Notifications to send", "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State", Data_Types.STRING, "Include all values you would like announced. Comma Seperated.");
-        }
-
-        void zVirtualSceneEvents_ValueDataChangedEvent(int ObjectId, string ValueID, string label, string Value, string PreviousValue)
+        void device_values_DeviceValueDataChangedEvent(object sender, string PreviousValue)
         {
             if (IsReady)
             {
-                string objType = zvsAPI.Object.GetObjectType(ObjectId);
-                string objName = zvsAPI.Object.GetObjectName(ObjectId);
+                device_values dv = (device_values)sender;
 
-                string[] objTypeValuespairs = zvsAPI.GetSetting("Notifications to send").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                string[] deviceTypeValuespairs = GetSettingValue("NOTIFICATIONS").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                foreach (string objTypeValuespair in objTypeValuespairs)
+                foreach (string deviceTypeValuespair in deviceTypeValuespairs)
                 {
-                    string thisEvent = objType + ":" + label;
+                    string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
 
-                    if (thisEvent.Equals(objTypeValuespair.Trim()))
+                    if (thisEvent.Equals(deviceTypeValuespair.Trim()))
                     {
-                        Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", objName + " " + label, "Changed to " + Value + " from " + PreviousValue + ".");
+                        Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value + " from " + PreviousValue + ".");
                         GrowlConnector.Notify(notification);
                     }
                 }
             }
         }
 
-        public override void ProcessCommand(QuedCommand cmd)
+        protected override void SettingChanged(string settingName, string settingValue)
         {
         }
-
-        public override void Repoll(string id)
+        public override bool ProcessDeviceCommand(device_command_que cmd)
         {
+            return true;
         }
-
-        public override void ActivateGroup(string GroupName)
-        { }
-
-        public override void DeactivateGroup(string GroupName)
-        { }
+        public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
+        {
+            return true;
+        }
+        public override bool Repoll(device device)
+        {
+            return true;
+        }
+        public override bool ActivateGroup(long groupID)
+        {
+            return true;
+        }
+        public override bool DeactivateGroup(long groupID)
+        {
+            return true;
+        }     
 
         public void RegisterGrowl()
         {
@@ -111,11 +124,11 @@ namespace GrowlPlugin
 
                
                 GrowlConnector.Register(application, new NotificationType[] { DeviceValueChange });
-                zvsAPI.WriteToLog(Urgency.INFO, "Registered Growl Interface.");
+                WriteToLog(Urgency.INFO, "Registered Growl Interface.");
             }
             catch (Exception ex)
             {
-                zvsAPI.WriteToLog(Urgency.ERROR, "Error registering Growl. " + ex.Message);
+                WriteToLog(Urgency.ERROR, "Error registering Growl. " + ex.Message);
             }
         }
     }

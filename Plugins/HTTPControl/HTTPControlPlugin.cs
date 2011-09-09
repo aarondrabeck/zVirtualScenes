@@ -7,20 +7,21 @@ using System.Threading;
 using System.Text;
 using System.Security.Cryptography;
 using zVirtualScenesAPI;
-using zVirtualScenesAPI.Structs;
 using System.Data;
-using zVirtualScenesAPI.Events;
-using zVirtualScenesApplication.Structs;
 using System.ComponentModel;
 using System.Xml;
 using System.IO;
 using System.Xml.Serialization;
+using System.Linq;
 using HTTPControlPlugin;
+using zVirtualScenesCommon.Entity;
+using zVirtualScenesCommon;
+using System.Runtime.Serialization;
 
 namespace HTTPControl
 {
-    [Export(typeof(zvsPlugin))]
-    public class HTTPControlPlugin : zvsPlugin
+    [Export(typeof(Plugin))]
+    public class HTTPControlPlugin : Plugin
     {
         public volatile bool isActive;
 
@@ -28,14 +29,21 @@ namespace HTTPControl
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
 
         public HTTPControlPlugin()
-            : base("HTTPCONTROL")
-        {
-            PluginName = "HTTP Control";
-        }
+            : base("HTTPCONTROL",
+               "HTTP Control Plugin",
+                "This plug-in acts as a HTTP server to accept commands to query and control zVirtualScene devices."
+                ) { }       
 
         public override void Initialize()
         {
-            zvsAPI.DefineSetting("Port", "8085", Data_Types.INTEGER, "The port that HTTP will listen for commands on.");
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "PORT",
+                friendly_name = "HTTP Port",
+                value = "8085",
+                value_data_type = (int)Data_Types.INTEGER,
+                description = "The port that HTTP will listen for commands on."
+            });           
         }
 
         protected override bool StartPlugin()
@@ -45,18 +53,18 @@ namespace HTTPControl
                 if (!httplistener.IsListening)
                 {
                     int port = 1338;
-                    int.TryParse(zvsAPI.GetSetting("Port"), out port);
+                    int.TryParse(GetSettingValue("PORT"), out port);
                     httplistener.Prefixes.Add("http://*:" + port + "/");
                     httplistener.Start();
 
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
 
-                    zvsAPI.WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", PluginName, port));
+                    WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", this.Friendly_Name, port));
                 }
             }
             catch (Exception ex)
             {
-                zvsAPI.WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
+                WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
             }
 
             IsReady = true;
@@ -65,19 +73,19 @@ namespace HTTPControl
 
         protected override bool StopPlugin()
         {
-            zvsAPI.WriteToLog(Urgency.INFO, PluginName + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
 
             try
             {
                 if (httplistener != null && httplistener.IsListening)
                 {
                     httplistener.Stop();
-                    zvsAPI.WriteToLog(Urgency.INFO, string.Format("{0} plugin shutdown.", PluginName));
+                    WriteToLog(Urgency.INFO, string.Format("{0} plugin shutdown."));
                 }
             }
             catch (Exception ex)
             {
-                zvsAPI.WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
+                WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
             }
 
             IsReady = false;
@@ -86,22 +94,27 @@ namespace HTTPControl
 
         protected override void SettingChanged(string settingName, string settingValue)
         {
-           
         }
-
-        public override void ProcessCommand(QuedCommand cmd)
+        public override bool ProcessDeviceCommand(device_command_que cmd)
         {
+            return true;
         }
-
-        public override void Repoll(string id)
+        public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
         {
+            return true;
         }
-
-        public override void ActivateGroup(string GroupName)
-        { }
-
-        public override void DeactivateGroup(string GroupName)
-        { }
+        public override bool Repoll(device device)
+        {
+            return true;
+        }
+        public override bool ActivateGroup(long groupID)
+        {
+            return true;
+        }
+        public override bool DeactivateGroup(long groupID)
+        {
+            return true;
+        }     
 
         private void HttpListen(object state)
         {
@@ -115,7 +128,7 @@ namespace HTTPControl
             }
             catch (Exception ex)
             {
-                zvsAPI.WriteToLog(Urgency.ERROR, ex.Message);
+                WriteToLog(Urgency.ERROR, ex.Message);
             }
         }
 
@@ -150,9 +163,9 @@ namespace HTTPControl
                     HTTPCMDResult CMDresult = parseRequest(context.Request.RawUrl);
 
                     if (CMDresult.HadError)
-                        zvsAPI.WriteToLog(Urgency.ERROR, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
+                        WriteToLog(Urgency.ERROR, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
                     else
-                        zvsAPI.WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
+                        WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
                            
                     string XMLResult;
                     if (!CMDresult.DescriptionIsXML)
@@ -173,7 +186,7 @@ namespace HTTPControl
             }
             catch (Exception ex)
             {
-                zvsAPI.WriteToLog(Urgency.ERROR, ex.Message + ex.InnerException + "END");
+                WriteToLog(Urgency.ERROR, ex.Message + ex.InnerException + "END");
             }
         }
 
@@ -195,10 +208,10 @@ namespace HTTPControl
             string[] acceptedCMDs = new string[] { "/zVirtualScene?cmd=RunScene&Scene=" , 
                                                         "/zVirtualScene?cmd=SetBasic&",
                                                         "/zVirtualScene?cmd=SendCommand&", 
-                                                        "/zVirtualScene?cmd=ListObjects",
+                                                        "/zVirtualScene?cmd=ListDevices",
                                                         "/zVirtualScene?cmd=ListScenes",    
-                                                        "/zVirtualScene?cmd=RepollDevice&ObjID=",
-                                                        "/zVirtualScene?cmd=GetObjectCommands&ObjID="};
+                                                        "/zVirtualScene?cmd=GetDeviceCommands&deviceID=",
+                                                        "/zVirtualScene?cmd=GetBuiltinCommands"};
 
             #region RUN SCENE
             if (rawURL.Contains(acceptedCMDs[0]))
@@ -208,7 +221,7 @@ namespace HTTPControl
 
                 if (sceneID > 0)
                 {
-                    Scene scene = zvsAPI.Scenes.GetScene(sceneID);
+                    scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == sceneID);
 
                     if (scene != null)
                     {
@@ -236,16 +249,16 @@ namespace HTTPControl
             #region Set Basic
             if (rawURL.Contains(acceptedCMDs[1]))
             {
-                int ObjID = 0;
-                byte level = 0;
+                int dID = 0;
+                string arg;
 
                 string prams = rawURL.Remove(0, acceptedCMDs[1].Length); //Strip CMD                    
                 string[] values = prams.Split('&'); //Get values
 
                 try
                 {
-                    ObjID = Convert.ToInt32(values[0].Remove(0, "ObjID=".Length));
-                    level = Convert.ToByte(values[1].Remove(0, "arg=".Length));
+                    dID = Convert.ToInt32(values[0].Remove(0, "deviceID=".Length));
+                    arg = values[1].Remove(0, "arg=".Length);
                 }
                 catch
                 {
@@ -254,24 +267,21 @@ namespace HTTPControl
                     return result;
                 }
 
-
-                if (ObjID > 0)
+                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                if (d != null)
                 {
-                    string ObjName = zvsAPI.Object.GetObjectName(ObjID);
-                    int commandId = zvsAPI.Commands.GetObjectCommandId(ObjID, "DYNAMIC_CMD_BASIC");
-
-                    if (commandId > 0)
-                    {
-                        zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand
+                    device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == "DYNAMIC_CMD_BASIC");
+                    if (cmd != null)
+                    {  
+                        device_command_que.Run(new device_command_que
                         {
-                            cmdtype = commandScopeType.Object,
-                            CommandId = commandId,
-                            ObjectId = ObjID,
-                            Argument = level.ToString()
+                            device_id = d.id,
+                            device_command_id = cmd.id,
+                            arg = arg
                         });
 
+                        result.Description = string.Format("Executed command '{0}{1}' on '{2}'.", cmd.friendly_name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.friendly_name);
                         result.HadError = false;
-                        result.Description = ObjName + " basic set to " + level;
                         return result;
                     }
                     else
@@ -280,7 +290,7 @@ namespace HTTPControl
                         result.Description = "Command not found.";
                         return result;
                     }
-                }
+                }                
 
                 result.HadError = true;
                 result.Description = "Object not found.";
@@ -291,21 +301,17 @@ namespace HTTPControl
             #region Send Command
             if (rawURL.Contains(acceptedCMDs[2]))
             {
-                int ObjID = 0;
+                int dID = 0;
                 string command = string.Empty;
                 string arg = string.Empty;
                 string strtype = string.Empty;
-                commandScopeType type = commandScopeType.Object;
-
-
-
 
                 string prams = rawURL.Remove(0, acceptedCMDs[2].Length); //Strip CMD                    
                 string[] values = prams.Split('&'); //Get values
 
                 try
                 {
-                    ObjID = Convert.ToInt32(values[0].Remove(0, "ObjID=".Length));
+                    dID = Convert.ToInt32(values[0].Remove(0, "deviceID=".Length));
                     strtype = values[1].Remove(0, "commandType=".Length);
                     command = values[2].Remove(0, "command=".Length);
                     arg = values[3].Remove(0, "arg=".Length);                    
@@ -317,48 +323,88 @@ namespace HTTPControl
                     return result;
                 }
 
-                if (!string.IsNullOrEmpty(strtype))
+                switch (strtype)
                 {
-                    Enum.TryParse(strtype, out type);
-                }
-                else
-                {
-                    result.HadError = true;
-                    result.Description = "Error parsing command type.";
-                    return result;
-                }
-
-                if (ObjID > 0)
-                {
-                    string ObjName = zvsAPI.Object.GetObjectName(ObjID);
-
-                    int commandId = 0;
-                    if(type == commandScopeType.Object)
-                        commandId = zvsAPI.Commands.GetObjectCommandId(ObjID, command);
-                    else if(type == commandScopeType.ObjectType)
-                        commandId = zvsAPI.Commands.GetObjectTypeCommandId(ObjID, command);
-
-                    if (commandId > 0)
-                    {
-                        zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand
+                    case "device":
                         {
-                            cmdtype = type,
-                            CommandId = commandId,
-                            ObjectId = ObjID,
-                            Argument = arg
-                        });
+                            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                            if (d != null)
+                            {
+                                device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == command);
+                                if (cmd != null)
+                                {
+                                    device_command_que.Run(new device_command_que
+                                    {
+                                        device_id = d.id,
+                                        device_command_id = cmd.id,
+                                        arg = arg
+                                    });
 
-                        result.HadError = false;
-                        result.Description = ObjName + " " + command + " set to " + arg;
-                        return result;
-                    }
-                    else
-                    {
-                        result.HadError = true;
-                        result.Description = "Command not found.";
-                        return result;
-                    }
-                }
+                                    result.Description = string.Format("Executed command '{0}{1}' on '{2}'.", cmd.friendly_name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.friendly_name);
+                                    result.HadError = false;
+                                    return result;
+                                }
+                                else
+                                {
+                                    result.HadError = true;
+                                    result.Description = "Device command not found.";
+                                    return result;
+                                }
+                            }
+                            break;
+                        }
+                    case "device_type":
+                        {
+                            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                            if (d != null)
+                            {
+                                device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == command);
+                                if (cmd != null)
+                                {
+                                    device_type_command_que.Run(new device_type_command_que
+                                    {
+                                        device_id = d.id,
+                                        device_type_command_id = cmd.id,
+                                        arg = arg
+                                    });
+
+                                    result.Description = string.Format("Executed command '{0}{1}' on '{2}'.", cmd.friendly_name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.friendly_name);
+                                    result.HadError = false;
+                                    return result;
+                                }
+                                else
+                                {
+                                    result.HadError = true;
+                                    result.Description = "Device type command not found.";
+                                    return result;
+                                }
+                            }
+                            break;
+                        }
+                    case "builtin":
+                        {
+                            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == command);
+                            if (cmd != null)
+                            {
+                                builtin_command_que.Run(new builtin_command_que
+                                {                                     
+                                    builtin_command_id = cmd.id,
+                                    arg = arg
+                                });
+
+                                result.Description = string.Format("Executed command '{0}{1}'", cmd.friendly_name, string.IsNullOrEmpty(arg) ? arg : " to " + arg);
+                                result.HadError = false;
+                                return result;
+                            }
+                            else
+                            {
+                                result.HadError = true;
+                                result.Description = "Builtin command not found.";
+                                return result;
+                            }
+                        }
+                        
+                }               
 
                 result.HadError = true;
                 result.Description = "Object not found.";
@@ -371,16 +417,12 @@ namespace HTTPControl
             {
                 try
                 {
-                    List<zvsObject> Devices = new List<zvsObject>();
-                    DataTable dt = zvsAPI.Object.GetDevices(true);
 
-                    foreach (DataRow dr in dt.Rows)
+                    List<zvsDevice> zvsDevices = new List<zvsDevice>();
+
+                    foreach(device d in zvsEntityControl.zvsContext.devices)
                     {
-                        zvsObject device = new zvsObject();
-                        int.TryParse(dr["id"].ToString(), out device.ObjectID);
-                        device.Name = dr["txt_object_name"].ToString();
-                        device.Type = dr["txt_object_type"].ToString();                        
-                        Devices.Add(device);
+                        zvsDevices.Add(new zvsDevice { friendly_name = d.friendly_name, id = d.id, type_name = d.device_types.name } );
                     }
 
                     XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
@@ -388,8 +430,8 @@ namespace HTTPControl
                     xmlwritersettings.Indent = false;
 
                     StringWriter devices = new StringWriter();
-                    XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(Devices.GetType());
-                    DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), Devices);
+                    XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zvsDevices.GetType());
+                    DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), zvsDevices);
                     result.HadError = false;
                     result.Description = devices.ToString();
                     result.DescriptionIsXML = true;
@@ -406,18 +448,12 @@ namespace HTTPControl
 
             #region Scene Listing
             if (rawURL.Contains(acceptedCMDs[4]))
-            {
-                BindingList<Scene> APIScenes = zvsAPI.Scenes.GetScenes();
-
+            { 
                 List<zvsScene> Scenes = new List<zvsScene>();
 
-                foreach (zVirtualScenesApplication.Structs.Scene APIScene in APIScenes)
-                {
-                    zvsScene scene = new zvsScene();
-                    scene.ID = APIScene.id;
-                    scene.Name = APIScene.txt_name;
-                    Scenes.Add(scene);
-                }
+                foreach (scene s in zvsEntityControl.zvsContext.scenes)                                    
+                    Scenes.Add(new zvsScene { ID = s.id, friendly_name = s.friendly_name } );
+                
 
                 XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
                 xmlwritersettings.NewLineHandling = NewLineHandling.None;
@@ -431,64 +467,40 @@ namespace HTTPControl
                 result.DescriptionIsXML = true;
                 return result;
             }
-            #endregion                      
+            #endregion   
 
-            #region Repoll
+            #region Get Device Commands
             if (rawURL.Contains(acceptedCMDs[5]))
             {
-                int ObjID = 0;
-                int.TryParse(rawURL.Remove(0, acceptedCMDs[5].Length), out ObjID);                            
+                int dId = 0;
+                int.TryParse(rawURL.Remove(0, acceptedCMDs[5].Length), out dId);
 
-                if (ObjID == 0)  //REPOLL ALL
+                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dId);
+                if (d != null)
                 {
-                    int cmdId = zvsAPI.Commands.GetBuiltinCommandId("REPOLL_ALL");
-                    zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { 
-                        cmdtype = commandScopeType.Builtin, 
-                        CommandId = cmdId });
-
-                    result.HadError = false;
-                    result.Description = "Repolling All Objects...";
-                    return result;
-                }
-                else
-                {
-                    int cmdId = zvsAPI.Commands.GetBuiltinCommandId("REPOLL_ME");                    
-                    zvsAPI.Commands.InstallQueCommandAndProcess(new QuedCommand { 
-                        cmdtype = commandScopeType.Builtin, 
-                        CommandId = cmdId,
-                        Argument = ObjID.ToString()
-                    });
-
-                    result.HadError = false;
-                    result.Description = "Repolling object #" + ObjID;
-                    return result;
-                }
-            }
-            #endregion
-
-            #region Get Object Commands
-            if (rawURL.Contains(acceptedCMDs[6]))
-            {
-                int ObjID = 0;
-                int.TryParse(rawURL.Remove(0, acceptedCMDs[6].Length), out ObjID);
-
-                if (ObjID > 0)
-                {
-                    List<Command> commands = new List<Command>();
-                    commands = zvsAPI.Commands.GetAllObjectCommandsForObjectasCMD(ObjID);
-                    commands.AddRange(zvsAPI.Commands.GetAllObjectTypeCommandsForObjectasCMD(ObjID));
-
-                    List<zvsObjectCommand> zvsObjectCommands = new List<zvsObjectCommand>();
-                    foreach (Command cmd in commands)
+                    List<zvsCommand> zvscommands = new List<zvsCommand>();
+                    foreach (device_commands cmd in d.device_commands)
                     {
-                        zvsObjectCommand zvsObjCmd = new zvsObjectCommand();
-                        zvsObjCmd.CommandId = cmd.CommandId;
-                        zvsObjCmd.FriendlyName = cmd.FriendlyName;
-                        zvsObjCmd.HelpText = cmd.HelpText;
-                        zvsObjCmd.Name = cmd.Name;
-                        zvsObjCmd.paramType = cmd.paramType;
-                        zvsObjCmd.cmdtype = cmd.cmdtype;
-                        zvsObjectCommands.Add(zvsObjCmd);
+                        zvscommands.Add(new zvsCommand
+                        {
+                            CommandId = cmd.id,
+                            CommandType = "device",
+                            FriendlyName = cmd.friendly_name,
+                            HelpText = cmd.help,
+                            Name = cmd.name
+                        });
+                    }
+
+                    foreach (device_type_commands cmd in d.device_types.device_type_commands)
+                    {
+                        zvscommands.Add(new zvsCommand
+                        {
+                            CommandId = cmd.id,
+                            CommandType = "device_type",
+                            FriendlyName = cmd.friendly_name,
+                            HelpText = cmd.help,
+                            Name = cmd.name
+                        });
                     }
 
                     XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
@@ -496,8 +508,8 @@ namespace HTTPControl
                     xmlwritersettings.Indent = false;
 
                     StringWriter devices = new StringWriter();
-                    XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zvsObjectCommands.GetType());
-                    DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), zvsObjectCommands);
+                    XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zvscommands.GetType());
+                    DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), zvscommands);
                     result.HadError = false;
                     result.Description = devices.ToString();
                     result.DescriptionIsXML = true;
@@ -506,9 +518,41 @@ namespace HTTPControl
                 else
                 {
                     result.HadError = true;
-                    result.Description = "Object ID not vaild.";
+                    result.Description = "Device ID not vaild.";
                     return result;
                 }
+            }
+            #endregion
+
+            #region Get Builtin Commands
+            if (rawURL.Contains(acceptedCMDs[6]))
+            {
+                
+                    List<zvsCommand> zvscommands = new List<zvsCommand>();
+                    foreach (builtin_commands cmd in zvsEntityControl.zvsContext.builtin_commands)
+                    {
+                        zvscommands.Add(new zvsCommand
+                        {
+                            CommandId = cmd.id,
+                            CommandType = "builtin",
+                            FriendlyName = cmd.friendly_name,
+                            HelpText = cmd.help,
+                            Name = cmd.name
+                        });
+                    }                  
+
+                    XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
+                    xmlwritersettings.NewLineHandling = NewLineHandling.None;
+                    xmlwritersettings.Indent = false;
+
+                    StringWriter devices = new StringWriter();
+                    XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zvscommands.GetType());
+                    DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), zvscommands);
+                    result.HadError = false;
+                    result.Description = devices.ToString();
+                    result.DescriptionIsXML = true;
+                    return result;
+                
             }
             #endregion
                      
