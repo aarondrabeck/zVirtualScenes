@@ -38,7 +38,7 @@ namespace zVirtualScenesApplication.UserControls
                 if (zvsPlugin != null)
                 {
                     cbEnablePlugin.Checked = zvsPlugin.Enabled;
-                    labelPluginTitle.Text = p.friendly_name + " (zvsPlugin)";
+                    labelPluginTitle.Text = p.friendly_name + " for zVirtualScenes";
                     lblPluginDescription.Text = p.description;
                     cbEnablePlugin.Tag = zvsPlugin;
                 }
@@ -115,37 +115,7 @@ namespace zVirtualScenesApplication.UserControls
         }
 
         private void btnSave_Click(object sender, EventArgs e)
-        {
-            //Save Builtin Settings
-            #region Enable/Disable
-
-            Plugin zvsPlugin = (Plugin)cbEnablePlugin.Tag;
-            if(zvsPlugin != null)
-            {
-                if (cbEnablePlugin.Checked)
-                {
-                    //Enable
-                    if (!zvsPlugin.Enabled)
-                    {
-                        zvsPlugin.Enabled = true;
-                        zvsPlugin.Initialize();
-                        zvsPlugin.Start();
-                    }
-                }
-                else
-                {
-                    //Disable
-                    if (zvsPlugin.Enabled)
-                    {
-                        zvsPlugin.Enabled = false;
-
-                        if (zvsPlugin.IsRunning)
-                            zvsPlugin.Stop();
-                    }
-                }
-            }
-            #endregion
-
+        {           
             //Save Dynamic Settings
             #region Dynamic Settings
 
@@ -193,6 +163,40 @@ namespace zVirtualScenesApplication.UserControls
                 MessageBox.Show("Error saving " + _p.friendly_name + " settings." + Environment.NewLine + Environment.NewLine + ex.Message, zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             labelStatus.Text = _p.friendly_name + " Settings Saved!";
+            #endregion
+
+            //Save Builtin Settings
+            #region Enable/Disable
+
+            Plugin zvsPlugin = (Plugin)cbEnablePlugin.Tag;
+            if (zvsPlugin != null)
+            {
+                if (cbEnablePlugin.Checked)
+                {
+                    //Enable
+                    if (!zvsPlugin.Enabled)
+                    {
+                        zvsPlugin.Enabled = true;
+                        _p.enabled = true;
+                        zvsEntityControl.zvsContext.SaveChanges();
+                        zvsPlugin.Initialize();
+                        zvsPlugin.Start();
+                    }
+                }
+                else
+                {
+                    //Disable
+                    if (zvsPlugin.Enabled)
+                    {
+                        zvsPlugin.Enabled = false;
+                        _p.enabled = false;
+                        zvsEntityControl.zvsContext.SaveChanges();
+
+                        if (zvsPlugin.IsRunning)
+                            zvsPlugin.Stop();
+                    }
+                }
+            }
             #endregion
         }
     }

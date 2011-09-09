@@ -194,7 +194,7 @@ namespace zVirtualScenesApplication
                 this.Invoke(new zvsEntityControl.SceneRunCompleteEventHandler(zvsEntityControl_SceneRunCompleteEvent), new object[] { scene_id, ErrorCount });
             else
             {
-                using (zvsEntities2 context = new zvsEntities2())
+                using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
                     scene _scene = context.scenes.SingleOrDefault(s => s.id == scene_id);
                     if (_scene != null)
@@ -1183,10 +1183,10 @@ namespace zVirtualScenesApplication
                         d.friendly_name = "Fireplace Light";
                         break;                
                     case 22:
-                        d.friendly_name = "Brother Printer";
+                        d.friendly_name = "Label Printer";
                         break;
                     case 23:
-                        d.friendly_name = "Label Printer";
+                        d.friendly_name = "Brother Printer";
                         break;
                     case 24:
                         d.friendly_name = "South Thermostat";
@@ -1196,6 +1196,9 @@ namespace zVirtualScenesApplication
                         break;
                     case 26:
                         d.friendly_name = "Masterbed Thermostat";
+                       break;
+                    case 27:
+                       d.friendly_name = "Aeon Labs Z-Stick Series 1 (Secondary)";
                        break;
                 }
             }

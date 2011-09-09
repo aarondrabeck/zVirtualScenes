@@ -83,7 +83,7 @@ namespace zVirtualScenesApplication.PluginSystem
             // Iterate the plugins to make sure none of them are new...
             foreach (Plugin p in _plugins)
             {
-                using (zvsEntities2 context = new zvsEntities2())
+                using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
                     plugin ent_p = context.plugins.SingleOrDefault(pl => pl.name == p.Name);
                     if (ent_p == null)
@@ -105,17 +105,16 @@ namespace zVirtualScenesApplication.PluginSystem
 
         void device_type_command_que_DeviceTypeCommandAddedToQueEvent(long device_type_command_que_id)
         {
-            using (zvsEntities2 context = new zvsEntities2())
-            {
-                device_type_command_que cmd = context.device_type_command_que.SingleOrDefault(c => c.id == device_type_command_que_id);
+           
+                device_type_command_que cmd = zvsEntityControl.zvsContext.device_type_command_que.SingleOrDefault(c => c.id == device_type_command_que_id);
 
-                if (cmd != null && cmd.device != null)
+                if (cmd != null)
                 {
                     Console.WriteLine("[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
                                                             ", CMD_NAME:" + cmd.device_type_commands.friendly_name +
                                                             ", ARG:" + cmd.arg);
 
-                    foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device_type_commands.device_types.plugin.name))
+                    foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
                     {
                         if (p.Enabled)
                         {
@@ -130,8 +129,8 @@ namespace zVirtualScenesApplication.PluginSystem
                                     Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                                    context.device_type_command_que.DeleteObject(cmd);
-                                    context.SaveChanges();
+                                    zvsEntityControl.zvsContext.device_type_command_que.DeleteObject(cmd);
+                                    zvsEntityControl.zvsContext.SaveChanges();
                                     return;
                                 }
                                 iterations++;
@@ -142,8 +141,9 @@ namespace zVirtualScenesApplication.PluginSystem
                             {
                                 p.ProcessDeviceTypeCommand(cmd);
                                 device_type_command_que.DeviceTypeCommandRunComplete(cmd, false, string.Empty);
-                                context.device_type_command_que.DeleteObject(cmd);
-                                context.SaveChanges();
+                                zvsEntityControl.zvsContext.device_type_command_que.DeleteObject(cmd);
+                                zvsEntityControl.zvsContext.SaveChanges();
+                                return;
                             }
                         }
                         else
@@ -152,21 +152,21 @@ namespace zVirtualScenesApplication.PluginSystem
                             Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                            context.device_type_command_que.DeleteObject(cmd);
-                            context.SaveChanges();
+                            zvsEntityControl.zvsContext.device_type_command_que.DeleteObject(cmd);
+                            zvsEntityControl.zvsContext.SaveChanges();
+                            return;
                         }
                     }
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued device command.", "PLUGIN MANAGER");
-            }            
+                    
         }
 
         void device_command_que_DeviceCommandAddedToQueEvent(long device_command_que_id)
         {
-            using (zvsEntities2 context = new zvsEntities2())
-            {
-                device_command_que cmd = context.device_command_que.SingleOrDefault(c => c.id == device_command_que_id);
+            
+                device_command_que cmd = zvsEntityControl.zvsContext.device_command_que.SingleOrDefault(c => c.id == device_command_que_id);
 
                 if (cmd != null && cmd.device != null)
                 {
@@ -189,8 +189,8 @@ namespace zVirtualScenesApplication.PluginSystem
                                     Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                                    context.device_command_que.DeleteObject(cmd);
-                                    context.SaveChanges();
+                                    zvsEntityControl.zvsContext.device_command_que.DeleteObject(cmd);
+                                    zvsEntityControl.zvsContext.SaveChanges();
                                     return;
                                 }
                                 iterations++;
@@ -201,8 +201,9 @@ namespace zVirtualScenesApplication.PluginSystem
                             {
                                 p.ProcessDeviceCommand(cmd);
                                 device_command_que.DeviceCommandRunComplete(cmd, false, string.Empty);
-                                context.device_command_que.DeleteObject(cmd);
-                                context.SaveChanges();
+                                zvsEntityControl.zvsContext.device_command_que.DeleteObject(cmd);
+                                zvsEntityControl.zvsContext.SaveChanges();
+                                return;
                             }
                         }
                         else
@@ -211,21 +212,21 @@ namespace zVirtualScenesApplication.PluginSystem
                             Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                            context.device_command_que.DeleteObject(cmd);
-                            context.SaveChanges();
+                            zvsEntityControl.zvsContext.device_command_que.DeleteObject(cmd);
+                            zvsEntityControl.zvsContext.SaveChanges();
+                            return;
                         }
                     }
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued device command.", "PLUGIN MANAGER");
-            }            
+                   
         }
 
         void builtin_command_que_BuiltinCommandAddedToQueEvent(long builtin_command_que_id)
         {
-            using (zvsEntities2 context = new zvsEntities2())
-            {
-                builtin_command_que cmd = context.builtin_command_que.SingleOrDefault(c => c.id == builtin_command_que_id);
+            
+                builtin_command_que cmd = zvsEntityControl.zvsContext.builtin_command_que.SingleOrDefault(c => c.id == builtin_command_que_id);
 
                 if (cmd != null)
                 {
@@ -291,12 +292,12 @@ namespace zVirtualScenesApplication.PluginSystem
                     builtin_command_que.BuiltinCommandRunComplete(cmd, false, "");
 
                     //Remove processed command from que
-                    context.builtin_command_que.DeleteObject(cmd);
-                    context.SaveChanges();
+                    zvsEntityControl.zvsContext.builtin_command_que.DeleteObject(cmd);
+                    zvsEntityControl.zvsContext.SaveChanges();
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued builit-in command.", "PLUGIN MANAGER");
-            }
+            
         }
 
         public IEnumerable<Plugin> GetPlugins()

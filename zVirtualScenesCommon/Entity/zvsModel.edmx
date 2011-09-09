@@ -1820,7 +1820,7 @@
         <EntityTypeShape EntityType="zvsModel.device_property_values" Width="1.5" PointX="10.5" PointY="19.625" Height="2.1725878906250102" />
         <EntityTypeShape EntityType="zvsModel.device_propertys" Width="1.5" PointX="8.25" PointY="27.5" Height="2.3648893229166674" />
         <EntityTypeShape EntityType="zvsModel.device_type_command_options" Width="1.5" PointX="7.5" PointY="9.75" Height="1.7879850260416674" />
-        <EntityTypeShape EntityType="zvsModel.device_type_command_que" Width="1.5" PointX="7.5" PointY="12.625" Height="2.1725878906250102" />
+        <EntityTypeShape EntityType="zvsModel.device_type_command_que" Width="1.875" PointX="7.125" PointY="12.25" Height="2.1725878906250102" />
         <EntityTypeShape EntityType="zvsModel.device_type_commands" Width="1.5" PointX="5.25" PointY="8.875" Height="3.5186979166666674" />
         <EntityTypeShape EntityType="zvsModel.device_types" Width="1.5" PointX="3" PointY="13.375" Height="2.5571907552083246" />
         <EntityTypeShape EntityType="zvsModel.device_values" Width="1.5" PointX="7.5" PointY="23.25" Height="2.9417936197916674" />
@@ -1855,8 +1855,8 @@
           <ConnectorPoint PointX="9.75" PointY="15.42258789062501" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_que_1" >
-          <ConnectorPoint PointX="6.75" PointY="15.180041445312511" />
-          <ConnectorPoint PointX="9.75" PointY="15.180041445312511" />
+          <ConnectorPoint PointX="6.75" PointY="15.180041445312504" />
+          <ConnectorPoint PointX="9.75" PointY="15.180041445312504" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_commands_0" >
           <ConnectorPoint PointX="6.75" PointY="17.259348958333334" />
@@ -1887,14 +1887,13 @@
           <ConnectorPoint PointX="7.5" PointY="10.643992513020834" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_type_command_que_0" >
-          <ConnectorPoint PointX="6" PointY="15" />
-          <ConnectorPoint PointX="6" PointY="13.711293945312505" />
-          <ConnectorPoint PointX="7.5" PointY="13.711293945312505" />
+          <ConnectorPoint PointX="6.75" PointY="15" />
+          <ConnectorPoint PointX="7.125" PointY="14.42258789062501" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_type_command_que_1" >
-          <ConnectorPoint PointX="6.375" PointY="12.393697916666667" />
-          <ConnectorPoint PointX="6.375" PointY="13.136894472656259" />
-          <ConnectorPoint PointX="7.5" PointY="13.136894472656259" />
+          <ConnectorPoint PointX="6" PointY="12.393697916666667" />
+          <ConnectorPoint PointX="6" PointY="13.336293945312505" />
+          <ConnectorPoint PointX="7.125" PointY="13.336293945312505" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_type_commands_0" >
           <ConnectorPoint PointX="3.75" PointY="13.375" />

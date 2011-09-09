@@ -48,7 +48,7 @@ namespace zVirtualScenesCommon.Entity
 
         void ExecuteScene_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            using (zvsEntities2 context = new zvsEntities2())
+            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 scene _scene = context.scenes.SingleOrDefault(s => s.id == (long)e.Result);
                 if (_scene != null)
@@ -68,7 +68,7 @@ namespace zVirtualScenesCommon.Entity
         void ExecuteScene_DoWork(object sender, DoWorkEventArgs e)
         {
             //Use a new context here to thread safety
-            using (zvsEntities2 context = new zvsEntities2())
+            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 //Find Scene
                 scene _scene = context.scenes.SingleOrDefault(s => s.id == (long)e.Argument);

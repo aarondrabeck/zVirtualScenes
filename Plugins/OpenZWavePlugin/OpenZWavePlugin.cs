@@ -1047,9 +1047,7 @@ namespace OpenZWavePlugin
                         break;
                     }                   
             }
-        }
-
-     
+        }     
 
         private Node GetNode(UInt32 homeId, Byte nodeId)
         {

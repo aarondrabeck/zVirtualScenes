@@ -57,7 +57,7 @@ namespace LightSwitchPlugin
             {
                 name = "VERBOSE",
                 friendly_name = "Verbose Logging",
-                value = true.ToString(),
+                value = false.ToString(),
                 value_data_type = (int)Data_Types.BOOL,
                 description = "(Writes all server client communication to the log for debugging.)"
             });
@@ -689,7 +689,7 @@ namespace LightSwitchPlugin
         /// <returns></returns>
         private void ExecuteZVSCommand(long device_id, byte Level, Socket Client)
         {
-            using (zvsEntities2 context = new zvsEntities2())
+            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 device d = context.devices.SingleOrDefault(o => o.id == device_id);
 
@@ -767,7 +767,7 @@ namespace LightSwitchPlugin
 
         private void ExecuteZVSThermostatCommand(long deviceID, byte Mode, int Temp, Socket Client)
         {
-            using (zvsEntities2 context = new zvsEntities2())
+            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 device d = context.devices.SingleOrDefault(o => o.id == deviceID);
 
@@ -796,7 +796,7 @@ namespace LightSwitchPlugin
         private void ExecuteZVSThermostatCommand(long deviceID, byte Mode, Socket Client)
         {
 
-            using (zvsEntities2 context = new zvsEntities2())
+            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 device d = context.devices.SingleOrDefault(o => o.id == deviceID);
 

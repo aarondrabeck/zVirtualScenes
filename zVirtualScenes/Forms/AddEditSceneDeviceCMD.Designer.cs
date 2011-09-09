@@ -31,14 +31,13 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddEditSceneDeviceCMD));
             this.btnSave = new System.Windows.Forms.Button();
-            this.comboBoxTypeCommands = new System.Windows.Forms.ComboBox();
+            this.comboBoxCommands = new System.Windows.Forms.ComboBox();
             this.panelUserInputControls = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.radioBtnDeviceCMD = new System.Windows.Forms.RadioButton();
             this.radioBtnTypeCommand = new System.Windows.Forms.RadioButton();
-            this.comboBoxDeviceCommand = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2.SuspendLayout();
@@ -55,15 +54,15 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
-            // comboBoxTypeCommands
+            // comboBoxCommands
             // 
-            this.comboBoxTypeCommands.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxTypeCommands.FormattingEnabled = true;
-            this.comboBoxTypeCommands.Location = new System.Drawing.Point(84, 48);
-            this.comboBoxTypeCommands.Name = "comboBoxTypeCommands";
-            this.comboBoxTypeCommands.Size = new System.Drawing.Size(241, 21);
-            this.comboBoxTypeCommands.TabIndex = 14;
-            this.comboBoxTypeCommands.SelectedIndexChanged += new System.EventHandler(this.comboBoxTypeCommands_SelectedIndexChanged);
+            this.comboBoxCommands.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxCommands.FormattingEnabled = true;
+            this.comboBoxCommands.Location = new System.Drawing.Point(84, 48);
+            this.comboBoxCommands.Name = "comboBoxCommands";
+            this.comboBoxCommands.Size = new System.Drawing.Size(241, 21);
+            this.comboBoxCommands.TabIndex = 14;
+            this.comboBoxCommands.SelectedIndexChanged += new System.EventHandler(this.comboBoxTypeCommands_SelectedIndexChanged);
             // 
             // panelUserInputControls
             // 
@@ -116,16 +115,6 @@
             this.radioBtnTypeCommand.UseVisualStyleBackColor = true;
             this.radioBtnTypeCommand.CheckedChanged += new System.EventHandler(this.radioBtnTypeCommand_CheckedChanged);
             // 
-            // comboBoxDeviceCommand
-            // 
-            this.comboBoxDeviceCommand.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxDeviceCommand.FormattingEnabled = true;
-            this.comboBoxDeviceCommand.Location = new System.Drawing.Point(84, 48);
-            this.comboBoxDeviceCommand.Name = "comboBoxDeviceCommand";
-            this.comboBoxDeviceCommand.Size = new System.Drawing.Size(241, 21);
-            this.comboBoxDeviceCommand.TabIndex = 17;
-            this.comboBoxDeviceCommand.SelectedIndexChanged += new System.EventHandler(this.comboBoxDeviceCommand_SelectedIndexChanged);
-            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.radioBtnTypeCommand);
@@ -145,7 +134,7 @@
             this.label1.TabIndex = 24;
             this.label1.Text = "Arg";
             // 
-            // AddEditSceneObjectCMD
+            // AddEditSceneDeviceCMD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -153,15 +142,14 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.panelUserInputControls);
-            this.Controls.Add(this.comboBoxDeviceCommand);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.comboBoxTypeCommands);
+            this.Controls.Add(this.comboBoxCommands);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnSave);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(351, 195);
-            this.Name = "AddEditSceneObjectCMD";
+            this.Name = "AddEditSceneDeviceCMD";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Scene Command";
             this.Load += new System.EventHandler(this.AddEditSceneCMD_Load);
@@ -175,14 +163,13 @@
         #endregion
 
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.ComboBox comboBoxTypeCommands;
+        private System.Windows.Forms.ComboBox comboBoxCommands;
         private System.Windows.Forms.Panel panelUserInputControls;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.RadioButton radioBtnDeviceCMD;
         private System.Windows.Forms.RadioButton radioBtnTypeCommand;
-        private System.Windows.Forms.ComboBox comboBoxDeviceCommand;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
     }

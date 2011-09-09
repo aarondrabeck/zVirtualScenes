@@ -3,18 +3,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using zVirtualScenesCommon.Util;
+using System.Data.EntityClient;
+using System.IO;
 
 namespace zVirtualScenesCommon.Entity
 {
     public static class zvsEntityControl
     {
-        public static zvsEntities2 zvsContext = new zvsEntities2();
+        public static zvsEntities2 zvsContext = new zvsEntities2(GetzvsConnectionString);
 
-        
+        public static string GetzvsConnectionString
+        {
+            get
+            {
+                string dbpath = string.Empty;
+
+                #if !DEBUG   
+                dbpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs-debug.db");
+                #else
+                dbpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs.db");
+                #endif
+
+                string sqlLiteConnectionString = string.Format("data source=\"{0}\"", dbpath);
+
+                EntityConnectionStringBuilder ee = new EntityConnectionStringBuilder
+                {
+                    Metadata = @"res://*/Entity.zvsModel.csdl|res://*/Entity.zvsModel.ssdl|res://*/Entity.zvsModel.msl",
+                    Provider = @"System.Data.SQLite",
+                    ProviderConnectionString = sqlLiteConnectionString,
+                };
+                return ee.ToString();
+            }
+        }
 
         public static string zvsNameAndVersion
         {
-            get { return "zVirtualScenes -  v2.4"; }// +ProgramVersion + " | db" + DatabaseVersion; }
+            get { 
+                
+                string version = "zVirtualScenes -  v2.5 Beta 1";
+
+                #if (!DEBUG)
+                return version + " DEBUG MODE";
+                #else
+                return version;
+                #endif
+            }
         }
 
         /// <summary>

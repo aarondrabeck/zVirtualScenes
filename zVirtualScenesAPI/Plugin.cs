@@ -23,7 +23,7 @@ namespace zVirtualScenesAPI
             Friendly_Name = Plugin_Friendly_Name;
             Description = Plugin_Description;
 
-            using (var context = new zvsEntities2())
+            using (var context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 plugin pl = context.plugins.SingleOrDefault(p => p.name == this._name);
 
@@ -56,7 +56,7 @@ namespace zVirtualScenesAPI
         {
             get
             {
-                using (var context = new zvsEntities2())
+                using (var context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
                     plugin pl = context.plugins.SingleOrDefault(p => p.name == this._name);
 
@@ -68,7 +68,7 @@ namespace zVirtualScenesAPI
             }
             set
             {
-                using (var context = new zvsEntities2())
+                using (var context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
                     plugin pl = context.plugins.SingleOrDefault(p => p.name == this._name);
 
