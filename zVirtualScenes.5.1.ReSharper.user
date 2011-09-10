@@ -515,56 +515,25 @@
   <RecentFiles>
     <RecentFiles>
       <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:Plugin.cs" caret="2237" fromTop="33" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:zCommand.cs" caret="619" fromTop="17" />
       <File id="F9F697BB-3589-4FED-8E15-F15D16D56C91/f:LightSwitchPlugin.cs" caret="29247" fromTop="21" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:ScriptEditor.cs" caret="1223" fromTop="20" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:ValueControl.cs" caret="208" fromTop="8" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Globals/f:GlobalMethods.cs" caret="113" fromTop="4" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:ParamType.cs" caret="27" fromTop="0" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:TestForms/f:TestForm.cs" caret="147" fromTop="5" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:ActivateGroup.cs" caret="1223" fromTop="43" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_plugin_properties_form.cs" caret="2255" fromTop="26" />
       <File id="4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66/f:SpeechPlugin.cs" caret="1177" fromTop="18" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:EventCommon/f:EventControl.cs" caret="2065" fromTop="24" />
       <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5973" fromTop="0" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/d:Structs/f:Command.cs" caret="219" fromTop="12" />
-      <File id="FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00/d:DatabaseCommon/f:DatabaseControl.cs" caret="43477" fromTop="26" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13217" fromTop="31" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/d:Structs/f:CommandType.cs" caret="10" fromTop="0" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="394" fromTop="13" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="12657" fromTop="39" />
     </RecentFiles>
     <RecentEdits>
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="3" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="24" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="27" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="32" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="25" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="13" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="19" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="13539" fromTop="11" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:EventCommon/f:EventControl.cs" caret="336" fromTop="11" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="89409" fromTop="46" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:API.cs" caret="12961" fromTop="26" />
       <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5135" fromTop="27" />
       <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5478" fromTop="32" />
       <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5900" fromTop="38" />
       <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="6231" fromTop="43" />
       <File id="4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66/f:SpeechPlugin.cs" caret="1478" fromTop="26" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:EventCommon/f:EventControl.cs" caret="2220" fromTop="28" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="67022" fromTop="26" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/d:Structs/f:CommandType.cs" caret="18" fromTop="0" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/d:Structs/f:Command.cs" caret="194" fromTop="13" />
-      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/d:Structs/f:Command.cs" caret="100" fromTop="5" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="67581" fromTop="25" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="69851" fromTop="42" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="12885" fromTop="29" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="9515" fromTop="7" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="3914" fromTop="12" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="11126" fromTop="27" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="12584" fromTop="36" />
       <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="17697" fromTop="20" />
-      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_object_properties_form.cs" caret="12782" fromTop="46" />
     </RecentEdits>
   </RecentFiles>
   <NAntValidationSettings>
