@@ -49,10 +49,21 @@ namespace zVirtualScenesApplication
         public PluginManager pm;
 
         public static bool UpdateScripts;
-
+        void HandlerMethod(object sender, UnhandledExceptionEventArgs e)
+        {
+            if ((e.ExceptionObject is ThreadAbortException) != true)
+            {
+                var exception = e.ExceptionObject as Exception;
+                MessageBox.Show(exception.ToString());
+            }
+        }
         public MainForm()
         {
             InitializeComponent();
+
+             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(HandlerMethod);
+
+
 
             zvsEntityControl.zvsContext.Connection.Open();
 
@@ -132,8 +143,7 @@ namespace zVirtualScenesApplication
         }        
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
-        {           
-
+        {
             Properties.Settings.Default.WindowGeometry = GeometryToString(this);
             Properties.Settings.Default.Save();
 
@@ -1144,7 +1154,7 @@ namespace zVirtualScenesApplication
                         d.friendly_name = "Masterbed Bed Light";
                         break;
                     case 8:
-                        d.friendly_name = "Family Hallway Light";
+                        d.friendly_name = "Office Light";
                         break;
                     case 9:
                         d.friendly_name = "Family Hallway Light";
@@ -1229,61 +1239,63 @@ namespace zVirtualScenesApplication
 
         private void timer_TaskRunner_Tick(object sender, EventArgs e)
         {
-            foreach (scheduled_tasks task in taskList)
-            {
-                if (task.Enabled)
+            
+                foreach (scheduled_tasks task in taskList)
                 {
-                    if (task.Frequency.HasValue)
+                    if (task.Enabled)
                     {
-                        switch ((scheduled_tasks.frequencys)task.Frequency)
+                        if (task.Frequency.HasValue)
                         {
-                            case scheduled_tasks.frequencys.Seconds:
-                                if (task.StartTime.HasValue)
-                                {
-                                    int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                    if (sec % task.RecurSeconds == 0)
+                            switch ((scheduled_tasks.frequencys)task.Frequency)
+                            {
+                                case scheduled_tasks.frequencys.Seconds:
+                                    if (task.StartTime.HasValue)
                                     {
-                                        task.Run();
-                                    }
-                                }
-                                break;
-                            case scheduled_tasks.frequencys.Daily:
-                                if (task.StartTime.HasValue)
-                                {
-                                    if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
-                                    {
-                                        Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
-                                        if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                        int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                        if (sec % task.RecurSeconds == 0)
+                                        {
                                             task.Run();
+                                        }
                                     }
-                                }
-                                break;
-                            case scheduled_tasks.frequencys.Weekly:
-                                if (task.StartTime.HasValue)
-                                {
-                                    if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
+                                    break;
+                                case scheduled_tasks.frequencys.Daily:
+                                    if (task.StartTime.HasValue)
                                     {
-                                        if (ShouldRunToday(task))  //IF RUN THIS DAY 
+                                        if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
                                         {
                                             Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
                                             if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
                                                 task.Run();
                                         }
                                     }
-                                }
-                                break;
-                            case scheduled_tasks.frequencys.Once:
-                                if (task.StartTime.HasValue)
-                                {
-                                    Double SecondsBetween = (DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                    if (SecondsBetween < 1 && SecondsBetween > 0)
-                                        task.Run();
-                                }
-                                break;
+                                    break;
+                                case scheduled_tasks.frequencys.Weekly:
+                                    if (task.StartTime.HasValue)
+                                    {
+                                        if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
+                                        {
+                                            if (ShouldRunToday(task))  //IF RUN THIS DAY 
+                                            {
+                                                Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                                                if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                                    task.Run();
+                                            }
+                                        }
+                                    }
+                                    break;
+                                case scheduled_tasks.frequencys.Once:
+                                    if (task.StartTime.HasValue)
+                                    {
+                                        Double SecondsBetween = (DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                        if (SecondsBetween < 1 && SecondsBetween > 0)
+                                            task.Run();
+                                    }
+                                    break;
+                            }
                         }
                     }
                 }
-            }
+
         }
 
         private bool ShouldRunToday(scheduled_tasks task)

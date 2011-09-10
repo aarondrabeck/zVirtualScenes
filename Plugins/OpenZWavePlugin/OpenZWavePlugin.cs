@@ -671,7 +671,6 @@ namespace OpenZWavePlugin
                             Console.WriteLine("OpenZWave Plugin | [ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
 
                             node.RemoveValue(val);
-
                             //TODO: Remove from values and command table
                         }
                         catch (Exception ex)
@@ -1036,7 +1035,6 @@ namespace OpenZWavePlugin
                         IsReady = true;
                         
                         FinishedInitialPoll = true;
-                        //TODO: FREEZE GUI UNTIL THIS IS HIT.  YOU CANNOT SUBMIT COMMANDS UNTIL THIS IS COMPLETE. 
                         break;
                     }
 

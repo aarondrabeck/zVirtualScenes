@@ -58,6 +58,9 @@ namespace zVirtualScenesApplication
             //    }
             //}
 
+           
+
+
             Application.Run(new MainForm());
         }
     }
