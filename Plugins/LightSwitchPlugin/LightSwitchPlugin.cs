@@ -599,7 +599,7 @@ namespace LightSwitchPlugin
                 case "SWITCH":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "BASIC");
+                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
                             int.TryParse(dv.value, out level);
 
@@ -608,7 +608,7 @@ namespace LightSwitchPlugin
                 case "DIMMER":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "BASIC");
+                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
                             int.TryParse(dv.value, out level);
 
@@ -617,7 +617,7 @@ namespace LightSwitchPlugin
                 case "THERMOSTAT":
                     {
                         int temp = 0;
-                        device_values dv_temp = d.device_values.SingleOrDefault(v => v.label_name == "TEMPERATURE");
+                        device_values dv_temp = d.device_values.SingleOrDefault(v => v.label_name == "Temperature");
                         if (dv_temp != null)
                             int.TryParse(dv_temp.value, out temp);
 
@@ -626,7 +626,7 @@ namespace LightSwitchPlugin
                 case "SENSOR":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "BASIC");
+                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
                             int.TryParse(dv.value, out level);
 
