@@ -128,6 +128,12 @@
     <Compile Include="Forms\AddEditSceneDeviceCMD.Designer.cs">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\AdvancedScriptEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AdvancedScriptEditor.Designer.cs">
+      <DependentUpon>AdvancedScriptEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\formPropertiesScene.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -187,6 +193,9 @@
     <Compile Include="UserControls\uc_device_values_grid.Designer.cs">
       <DependentUpon>uc_device_values_grid.cs</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\uc_intellisense_listbox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="UserControls\uc_plugin_properties_form.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -229,6 +238,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddEditSceneDeviceCMD.resx">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AdvancedScriptEditor.resx">
+      <DependentUpon>AdvancedScriptEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\formPropertiesScene.resx">
       <DependentUpon>formPropertiesScene.cs</DependentUpon>

@@ -1636,8 +1636,8 @@ namespace zVirtualScenesApplication
         #region Events
         private void btnNewEvent_Click(object sender, EventArgs e)
         {
-            //ScriptEditor scriptEditor = new ScriptEditor(0);
-            //scriptEditor.Show();
+            AdvancedScriptEditor scriptEditor = new AdvancedScriptEditor();
+            scriptEditor.Show();
         }
 
         private void btnEditEvent_Click(object sender, EventArgs e)
