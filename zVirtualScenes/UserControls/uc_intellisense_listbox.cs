@@ -71,15 +71,21 @@ namespace zVirtualScenesApplication.UserControls
                 }
                 catch
                 {
-                    if (e.Index != -1)
+                    try
                     {
-                        e.Graphics.DrawString(Items[e.Index].ToString(), e.Font,
-                                              new SolidBrush(e.ForeColor), bounds.Left, bounds.Top);
+                        if (e.Index != -1)
+                        {
+                            e.Graphics.DrawString(Items[e.Index].ToString(), e.Font,
+                                                  new SolidBrush(e.ForeColor), bounds.Left, bounds.Top);
+                        }
+                        else
+                        {
+                            e.Graphics.DrawString(Text, e.Font, new SolidBrush(e.ForeColor),
+                                                  bounds.Left, bounds.Top);
+                        }
                     }
-                    else
+                    catch
                     {
-                        e.Graphics.DrawString(Text, e.Font, new SolidBrush(e.ForeColor),
-                                              bounds.Left, bounds.Top);
                     }
                 }
                 base.OnDrawItem(e);

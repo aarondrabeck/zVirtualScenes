@@ -29,9 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("LowerNode1");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("test", new System.Windows.Forms.TreeNode[] {
-            treeNode1});
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(uc_script_editor));
             this.txtScript = new System.Windows.Forms.RichTextBox();
             this.textBoxTooltip = new System.Windows.Forms.TextBox();
@@ -67,12 +64,6 @@
             // 
             this.treeViewItems.Location = new System.Drawing.Point(8, 8);
             this.treeViewItems.Name = "treeViewItems";
-            treeNode1.Name = "LowerNode1";
-            treeNode1.Text = "LowerNode1";
-            treeNode2.Name = "test";
-            treeNode2.Text = "test";
-            this.treeViewItems.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode2});
             this.treeViewItems.Size = new System.Drawing.Size(98, 36);
             this.treeViewItems.TabIndex = 4;
             this.treeViewItems.Visible = false;

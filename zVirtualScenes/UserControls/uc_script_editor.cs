@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
+using System.Data.Objects;
 using System.Drawing;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using zVirtualScenesCommon.Entity;
 
 namespace zVirtualScenesApplication.UserControls
 {
@@ -21,9 +24,35 @@ namespace zVirtualScenesApplication.UserControls
         private TreeNode nameSpaceNode;
         private TreeNode findNodeResult;
 
+        private ObjectQuery<device> deviceListQuery;
+
         public uc_script_editor()
         {
             InitializeComponent();
+        }
+
+        private void uc_script_editor_Load(object sender, EventArgs e)
+        {
+            // Load up all the items and their actions/methods
+
+            deviceListQuery = zvsEntityControl.zvsContext.devices;
+            deviceListQuery.MergeOption = MergeOption.AppendOnly;
+
+            foreach (device d in ((IListSource)deviceListQuery).GetList())
+            {
+                TreeNode newNode = new TreeNode(d.friendly_name.Replace(" ", "_"));
+
+                foreach (device_commands dc in d.device_commands)
+                {
+                    TreeNode subNode = new TreeNode(dc.friendly_name.Replace(" ", "_"));
+
+                    subNode.Tag = "method";
+
+                    newNode.Nodes.Add(subNode);
+                }
+
+                treeViewItems.Nodes.Add(newNode);
+            }
         }
 
         public void SetScript(string script)
@@ -38,6 +67,11 @@ namespace zVirtualScenesApplication.UserControls
 
         private void txtScript_TextChanged(object sender, EventArgs e)
         {
+            // Test to remove color from words that no longer match
+            txtScript.SelectAll();
+            txtScript.SelectionColor = Color.Black;
+            txtScript.Select(txtScript.Text.Length, 0);
+
             int selPos = txtScript.SelectionStart;
 
             //For each match from the regex, highlight the word.
@@ -431,11 +465,6 @@ namespace zVirtualScenesApplication.UserControls
                 txtScript.Text = prefix + fill + suffix;
                 txtScript.SelectionStart = prefix.Length + fill.Length;
             }
-        }
-
-        private void uc_script_editor_Load(object sender, EventArgs e)
-        {
-
         }
     }
 
