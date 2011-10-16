@@ -13,11 +13,16 @@ using OpenZWavePlugin.Forms;
 using zVirtualScenesCommon.Entity;
 using zVirtualScenesCommon;
 
+
+using System.Drawing;
+using System.Text;
+using zVirtualScenesCommon.Util;
+
 namespace OpenZWavePlugin
 {
     [Export(typeof(Plugin))]
     public class OpenZWavePlugin : Plugin
-    {
+    {               
         private ZWManager m_manager = null;
         private ZWOptions m_options = null;
         ZWNotification m_notification = null;
