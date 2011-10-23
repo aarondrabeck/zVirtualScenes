@@ -134,8 +134,8 @@ namespace zvsMobile
 
         public void HttpListenerCallback(IAsyncResult result)
         {
-            try
-            {
+            //try
+            //{
                 HttpListener listener = (HttpListener)result.AsyncState;
                 HttpListenerContext context = null;
 
@@ -163,57 +163,152 @@ namespace zvsMobile
                     JavaScriptSerializer js = new JavaScriptSerializer();
                     response.ContentType = "application/javascript;charset=utf-8";
 
-                    string data = string.Empty;
-       
+                    string data = data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "ERROR" }) + ");";
+
                     if (context.Request.RawUrl.Contains("/JSON/GetDeviceList"))
                     {
                         List<object> devices = new List<object>();
                         foreach (device d in zvsEntityControl.zvsContext.devices)
                         {
-                            var device = new {id = d.id,
-                                     name = d.friendly_name,
-                                     on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
-                                     level = d.GetLevelMeter(),
-                                     level_txt = d.GetLevelText(),
-                                     type = d.device_types.name,
+                            var device = new
+                            {
+                                id = d.id,
+                                name = d.friendly_name,
+                                on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
+                                level = d.GetLevelMeter(),
+                                level_txt = d.GetLevelText(),
+                                type = d.device_types.name,
                             };
 
-                            devices.Add(device);                                 
+                            devices.Add(device);
                         }
                         data = context.Request.QueryString["callback"] + "(" + js.Serialize(devices) + ");";
-                    }         
+                    }
 
                     if (context.Request.RawUrl.Contains("/JSON/GetDeviceDetails"))
                     {
                         //if (!string.IsNullOrEmpty(context.Request.QueryString["id"]))
                         //{
-                            long id = 0;
-                            long.TryParse(context.Request.QueryString["id"],out id);
-                            if (id > 0)
-                            {
-                                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == id);
+                        long id = 0;
+                        long.TryParse(context.Request.QueryString["id"], out id);
+                        if (id > 0)
+                        {
+                            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == id);
 
-                                if (d != null)
+                            if (d != null)
+                            {
+                                var details = new
                                 {
-                                    var details = new
-                                    {
-                                        id = d.id,
-                                        name = d.friendly_name,
-                                        on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
-                                        level = d.GetLevelMeter(),
-                                        level_txt = d.GetLevelText(),
-                                        type = d.device_types.name,
-                                        type_txt = d.device_types.friendly_name,
-                                        last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
-                                        groups = d.GetGroups
-                                    };
-                                    data = context.Request.QueryString["callback"] + "(" + js.Serialize(details) + ");";
-                                }
+                                    id = d.id,
+                                    name = d.friendly_name,
+                                    on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
+                                    level = d.GetLevelMeter(),
+                                    level_txt = d.GetLevelText(),
+                                    type = d.device_types.name,
+                                    type_txt = d.device_types.friendly_name,
+                                    last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
+                                    groups = d.GetGroups
+                                };
+                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(details) + ");";
                             }
+                        }
                         //}
                     }
+                    
+                    if (context.Request.RawUrl.Contains("/JSON/SendCmd"))
+                    {
+                        long dID = 0;
+                        long.TryParse(context.Request.QueryString["id"], out dID);
 
+                        string command = context.Request.QueryString["cmd"];
+                        string arg = context.Request.QueryString["arg"];
+                        string strtype = context.Request.QueryString["type"];
 
+                        if (!string.IsNullOrEmpty(strtype))
+                        {
+                            switch (strtype)
+                            {
+                                case "device":
+                                    {
+                                        device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                                        if (d != null)
+                                        {
+                                            device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == command);
+                                            if (cmd != null)
+                                            {
+                                                device_command_que.Run(new device_command_que
+                                                {
+                                                    device_id = d.id,
+                                                    device_command_id = cmd.id,
+                                                    arg = arg
+                                                });
+
+                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK" }) + ");";
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case "device_type":
+                                    {
+                                        device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                                        if (d != null)
+                                        {
+                                            device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == command);
+                                            if (cmd != null)
+                                            {
+                                                device_type_command_que.Run(new device_type_command_que
+                                                {
+                                                    device_id = d.id,
+                                                    device_type_command_id = cmd.id,
+                                                    arg = arg
+                                                });
+                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK" }) + ");";
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case "builtin":
+                                    {
+                                        builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == command);
+                                        if (cmd != null)
+                                        {
+                                            builtin_command_que.Run(new builtin_command_que
+                                            {
+                                                builtin_command_id = cmd.id,
+                                                arg = arg
+                                            });
+                                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK" }) + ");";
+                                        }
+                                        break;
+                                    }
+                            }
+                        }                        
+                    }
+
+                    if (context.Request.RawUrl.Contains("/JSON/GetSceneList"))
+                    {
+                        var q0 = from d in zvsEntityControl.zvsContext.scenes
+                                 select new {
+                                            id = d.id,
+                                            name = d.friendly_name,
+                                            is_running = d.is_running };
+
+                        data = context.Request.QueryString["callback"] + "(" + js.Serialize(q0) + ");";
+                    }
+
+                    if (context.Request.RawUrl.Contains("/JSON/ActivateScene"))
+                    {
+                        long sID = 0;
+                        long.TryParse(context.Request.QueryString["id"], out sID);
+
+                        scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == sID);
+
+                        if (scene != null)
+                        {
+                            string r = scene.RunScene();
+                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK", desc = r }) + ");";
+                        }
+                    }                    
 
                     response.StatusCode = (int)HttpStatusCode.OK;
                     MemoryStream stream = new MemoryStream();
@@ -224,13 +319,14 @@ namespace zvsMobile
                     response.OutputStream.Write(bytes, 0, bytes.Length);
                 }
 
-            }
-            catch (Exception ex)
-            {
-                WriteToLog(Urgency.ERROR, ex.Message + ex.InnerException + "END");
-            }
-        }     
-
-       
+            //}
+            //catch (Exception ex)
+            //{
+            //    WriteToLog(Urgency.ERROR, ex.Message + ex.InnerException + "END");
+            //}
+        }        
+    
+                   
+    
     }
 }

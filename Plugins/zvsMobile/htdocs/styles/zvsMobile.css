@@ -1,0 +1,130 @@
+.metadata {
+  font-size: 80%;
+  color: #999;
+}
+
+.x-tab img.bulb, .x-button img.x-icon-mask.bulb {
+	-webkit-mask-image:url('../images/bulb.png'); 
+}
+.x-tab img.doc_list, .x-button img.x-icon-mask.doc_list {
+	-webkit-mask-image:url('../images/doc_list.png'); 
+}
+.x-tab img.equalizer2, .x-button img.x-icon-mask.equalizer2 {
+	-webkit-mask-image:url('../images/equalizer2.png'); 
+}
+.x-tab img.spaces2, .x-button img.x-icon-mask.spaces2 {
+	-webkit-mask-image:url('../images/spaces2.png'); 
+}
+.x-tab img.settings5, .x-button img.x-icon-mask.settings5 {
+	-webkit-mask-image:url('../images/settings5.png'); 
+}
+
+/*Device List*/
+.DeviceListItem .device { position: relative; padding: 5px 200px 5px 85px !important;min-height: 70px !important;}
+.DeviceListItem .device .imageholder {
+	width: 60px;
+	height: 60px;
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	background-position: center center;
+	background-repeat: no-repeat;
+	}
+	
+.DeviceListItem .device .level{
+	position: absolute;
+	right: 20px;
+	top: 20px;
+	width: 50px;
+}
+
+.DeviceListItem .device .level .meter{
+	margin: .2em 0;
+	width: 100%;
+	height: 20px;
+	background-color: #EEE;
+	background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(2%, #ffffff), color-stop(100%, #dcdcdc));
+	background-image: linear-gradient(#ffffff,#ffffff 2%,#dcdcdc);
+	border: 1px solid #EEE;
+	-webkit-border-radius: 0.3em;
+	border-radius: 0.3em;
+}
+
+.DeviceListItem .device .level .meter .progress{
+	background-color: #00d228;
+	background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #cdffcd), color-stop(2%, #00d228), color-stop(100%, #05d62a));
+	background-image: linear-gradient(#cdffcd,#00d228 2%,#05d62a);
+	border: 1px solid #1ce133;
+	-webkit-border-radius: 0.3em;
+	border-radius: 0.3em;
+	height: 100%;
+}
+
+.DeviceListItem .device .level .percent {
+	text-align: center;
+	color: #999;
+	
+}
+
+/* Device Images */
+.DeviceListItem .device h2 {font-weight: bold; font-size: 1.2em;}
+.THERMOSTAT_ON, .THERMOSTAT_OFF{ background-image: url('../images/thermostat.png'); }
+.CONTROLLER_ON, .CONTROLLER_OFF{ background-image: url('../images/controler.png'); }
+
+.DIMMER_ON{ background-image: url('../images/lb_on.png'); }
+.DIMMER_DIM{ background-image: url('../images/lb_dim.png'); }
+.DIMMER_OFF{ background-image: url('../images/lb_off.png'); }
+
+.SWITCH_ON{ background-image: url('../images/switch_on.png'); }
+.SWITCH_OFF{ background-image: url('../images/switch_off.png'); }
+
+.device_info  
+{
+	position: relative; padding: 5px 70px 5px 5px !important;
+	color: #6c6c6c;
+}
+
+.device_info .imageholder {
+	width: 60px;
+	height: 60px;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	
+	}
+
+.device_info .level {
+	width: 60px;
+	height: 20px;
+	position: absolute;
+	right: 5px;
+	top: 70px;
+	text-align:center;
+	}
+	
+.device_info h1 
+{
+  font-size: 1.5em;
+  color: #9c9c9c;
+}
+
+/*Scene List*/
+.SceneListItem  .scene { position: relative; padding: 5px 5px 5px 85px !important;min-height: 70px !important;}
+.SceneListItem .scene .imageholder {
+	width: 60px;
+	height: 60px;
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	background-position: center center;
+	background-repeat: no-repeat;
+	}
+
+.SceneListItem .scene .running_true{ background-image: url('../images/scene_run.png'); }
+.SceneListItem .scene .running_false{ background-image: url('../images/scene.png'); }
+.SceneListItem .scene h2 {font-weight: bold; font-size: 1.2em;}
+
+	
+	
+	
+	
