@@ -10,7 +10,8 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
          var timer;
          Ext.apply(config || {}, {
              loadDevice: function (deviceId) {	
-                       //Get Device Details				       
+                       //Get Device Details		
+                       console.log('AJAX: GetDeviceDetails');		       
 				       Ext.util.JSONP.request({
                         url: 'http://10.1.0.55:9999/JSON/GetDeviceDetails',
                         callbackKey: 'callback',

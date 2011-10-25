@@ -7,9 +7,12 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
          var FirstTime = true; 
          var suspendAJAX = false;
          var timer;
+         self.deviceID = 0;
          Ext.apply(config || {}, {
              loadDevice: function (deviceId) {	
-                       //Get Device Details				       
+                       self.deviceID = deviceId;
+                       //Get Device Details			
+                       console.log('AJAX: GetDeviceDetails');	       
 				       Ext.util.JSONP.request({
                         url: 'http://10.1.0.55:9999/JSON/GetDeviceDetails',
                         callbackKey: 'callback',
@@ -101,15 +104,16 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
 								    '<div id="level_dimmer_img" class="imageholder {type}_{on_off}"></div>',
 								    '<div id="level_dimmer_details" class="level">{level_txt}</div>',								
 									    '<h1>{name}</h1>',
-									    '{type_txt}</br></br>',		
-									    'Groups: {groups}</br>',								
-									    '{last_heard_from}</br>',																
+									    '<h2>{type_txt}<h2>',		
+									    '<div class="overview"><strong>Groups: </strong>{groups}</br>',								
+									    '<strong>Updated: </strong>{last_heard_from}</div>',																
 								    '</div>'), 
 							},							
 							{
 								xtype: 'fieldset',
+                                 margin: 5,
 								defaults: {
-									labelAlign: 'right'
+									labelAlign: 'left'
 								},								
 								items: [
 										{
@@ -170,7 +174,40 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
 
 											},
 											
-										}																				
+										},
+                                        {
+                                           xtype: 'button',
+                                           label: 'Repoll',
+                                           text: 'Repoll',
+                                           ui: 'action',
+                                           margin: '5 0 0 0',
+                                           handler: function () { 
+                                           console.log('AJAX: SendCmd REPOLL_ME');
+                                             Ext.util.JSONP.request({
+														    url: 'http://10.1.0.55:9999/JSON/SendCmd',
+														    callbackKey: 'callback',
+														    params: {
+															    u: Math.random(),
+															    cmd: 'REPOLL_ME',
+															    arg: self.deviceID,
+															    type: 'builtin'
+											
+														        },
+														        callback: function (data) {
+															
+															        if(data.success)
+															        {
+															          console.log('OK');															          
+															        }
+															        else
+															        {
+																        console.log('ERROR');
+															        }
+														        }                    
+													        });
+                                            } 
+
+                                        }																				
 										]
 							}
                 ]

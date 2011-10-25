@@ -69,6 +69,7 @@ Ext.define('Scene', {
 	                    Ext.Msg.confirm('Acitvate Scene', 'Are you sure you want to activate &quot;' + records[0].data.name + '&quot;?',
 								function (choice) {
 								    if (choice === 'yes') {
+								        console.log('AJAX: ActivateScene');
 								        Ext.util.JSONP.request({
 								            url: 'http://10.1.0.55:9999/JSON/ActivateScene',
 								            callbackKey: 'callback',

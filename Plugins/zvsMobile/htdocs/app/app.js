@@ -33,7 +33,7 @@ Ext.application({
 				{
 					xtype: 'SceneViewPort',
 					title: "Scenes",
-				    iconCls: "home"
+					iconCls: "equalizer2"
 				},				
 				{
                     title: 'Settings',

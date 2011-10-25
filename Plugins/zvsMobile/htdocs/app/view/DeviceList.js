@@ -30,6 +30,7 @@ Ext.define('Device', {
          var self = this;
 
          Ext.apply(config || {}, {
+         scroll:'vertical',
              items: [{
                  xtype: 'toolbar',
                  docked: 'top',
