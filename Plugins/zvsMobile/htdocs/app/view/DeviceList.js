@@ -7,7 +7,7 @@ Ext.define('Device', {
 	 model: 'Device',
 	 proxy: {
 			type: 'scripttag',
-			url : 'http://10.1.0.55:9999/JSON/GetDeviceList',
+			url : 'http://10.1.0.56:9999/JSON/GetDeviceList',
 			extraParams: {
 				u: Math.random()
 			},
@@ -56,12 +56,12 @@ Ext.define('Device', {
 
 			            if (records[0].data.type === 'DIMMER') {
 			                DimmmerDetails.loadDevice(records[0].data.id);
-			                DeviceViewPort.setActiveItem(DimmmerDetails, { type: 'slide', reverse: false });
+			                DeviceViewPort.setActiveItem(DimmmerDetails);
 			            }
 
 			            if (records[0].data.type === 'SWITCH') {
 			                SwitchDetails.loadDevice(records[0].data.id);
-			                DeviceViewPort.setActiveItem(SwitchDetails, { type: 'slide', reverse: false });
+			                DeviceViewPort.setActiveItem(SwitchDetails);
 			            }
 			        }
 			    },

@@ -11,7 +11,7 @@ Ext.define('Scene', {
 	 model: 'Scene',
 	 proxy: {
 			type: 'scripttag',
-			url : 'http://10.1.0.55:9999/JSON/GetSceneList',
+			url : 'http://10.1.0.56:9999/JSON/GetSceneList',
 			extraParams: {
 				u: Math.random()
 			},
@@ -71,7 +71,7 @@ Ext.define('Scene', {
 								    if (choice === 'yes') {
 								        console.log('AJAX: ActivateScene');
 								        Ext.util.JSONP.request({
-								            url: 'http://10.1.0.55:9999/JSON/ActivateScene',
+								            url: 'http://10.1.0.56:9999/JSON/ActivateScene',
 								            callbackKey: 'callback',
 								            params: {
 								                u: Math.random(),
