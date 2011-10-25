@@ -10,7 +10,7 @@
 	-webkit-mask-image:url('../images/doc_list.png'); 
 }
 .x-tab img.equalizer2, .x-button img.x-icon-mask.equalizer2 {
-	-webkit-mask-image:url('../images/equalizer2.png'); 
+	 -webkit-mask-image:url('../images/equalizer2.png'); 
 }
 .x-tab img.spaces2, .x-button img.x-icon-mask.spaces2 {
 	-webkit-mask-image:url('../images/spaces2.png'); 
@@ -82,6 +82,7 @@
 {
 	position: relative; padding: 5px 70px 5px 5px !important;
 	color: #6c6c6c;
+	width: 100%;
 }
 
 .device_info .imageholder {

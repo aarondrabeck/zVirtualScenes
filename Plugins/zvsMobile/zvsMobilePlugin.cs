@@ -163,7 +163,7 @@ namespace zvsMobile
                     JavaScriptSerializer js = new JavaScriptSerializer();
                     response.ContentType = "application/javascript;charset=utf-8";
 
-                    string data = data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "ERROR" }) + ");";
+                    string data = data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "false", }) + ");";
 
                     if (context.Request.RawUrl.Contains("/JSON/GetDeviceList"))
                     {
@@ -182,7 +182,8 @@ namespace zvsMobile
 
                             devices.Add(device);
                         }
-                        data = context.Request.QueryString["callback"] + "(" + js.Serialize(devices) + ");";
+                        var json = new { success = "true", devices = devices };
+                        data = context.Request.QueryString["callback"] + "(" + js.Serialize(json) + ");";
                     }
 
                     if (context.Request.RawUrl.Contains("/JSON/GetDeviceDetails"))
@@ -197,11 +198,20 @@ namespace zvsMobile
 
                             if (d != null)
                             {
+                                string on_off = string.Empty;
+                                if(d.GetLevelMeter() == 0)                                
+                                    on_off = "OFF";                                
+                                else if (d.GetLevelMeter() > 98)                                
+                                    on_off = "ON";                                
+                                else
+                                    on_off = "DIM";    
+
+
                                 var details = new
-                                {
+                                {                                    
                                     id = d.id,
                                     name = d.friendly_name,
-                                    on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
+                                    on_off = on_off,
                                     level = d.GetLevelMeter(),
                                     level_txt = d.GetLevelText(),
                                     type = d.device_types.name,
@@ -243,7 +253,7 @@ namespace zvsMobile
                                                     arg = arg
                                                 });
 
-                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK" }) + ");";
+                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true" }) + ");";
                                             }
                                         }
                                         break;
@@ -262,7 +272,7 @@ namespace zvsMobile
                                                     device_type_command_id = cmd.id,
                                                     arg = arg
                                                 });
-                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK" }) + ");";
+                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true" }) + ");";
                                             }
                                         }
                                         break;
@@ -277,7 +287,7 @@ namespace zvsMobile
                                                 builtin_command_id = cmd.id,
                                                 arg = arg
                                             });
-                                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK" }) + ");";
+                                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true" }) + ");";
                                         }
                                         break;
                                     }
@@ -293,7 +303,9 @@ namespace zvsMobile
                                             name = d.friendly_name,
                                             is_running = d.is_running };
 
-                        data = context.Request.QueryString["callback"] + "(" + js.Serialize(q0) + ");";
+                        var scenes = new { success = "true", scenes = q0 };
+
+                        data = context.Request.QueryString["callback"] + "(" + js.Serialize(scenes) + ");";
                     }
 
                     if (context.Request.RawUrl.Contains("/JSON/ActivateScene"))
@@ -306,7 +318,7 @@ namespace zvsMobile
                         if (scene != null)
                         {
                             string r = scene.RunScene();
-                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { status = "OK", desc = r }) + ");";
+                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true", desc = r }) + ");";
                         }
                     }                    
 
