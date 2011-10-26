@@ -19,6 +19,9 @@
 					},
                     {
                        xtype:'DeviceDetailsSwitch'
+                    },
+                    {
+                       xtype:'DeviceDetailsTemp'
                     }
 		],		
 	}		

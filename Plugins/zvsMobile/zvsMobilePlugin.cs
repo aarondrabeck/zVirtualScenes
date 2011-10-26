@@ -177,7 +177,7 @@ namespace zvsMobile
                                 on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
                                 level = d.GetLevelMeter(),
                                 level_txt = d.GetLevelText(),
-                                type = d.device_types.name,
+                                type = d.device_types.name
                             };
 
                             devices.Add(device);
@@ -217,7 +217,14 @@ namespace zvsMobile
                                     type = d.device_types.name,
                                     type_txt = d.device_types.friendly_name,
                                     last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
-                                    groups = d.GetGroups
+                                    groups = d.GetGroups,
+                                    mode = d.device_values.SingleOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Mode").value,
+                                    fan_mode = d.device_values.SingleOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Fan Mode").value,
+                                    op_state = d.device_values.SingleOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Operating State").value,
+                                    fan_state = d.device_values.SingleOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Fan State").value,
+                                    heat_p = d.device_values.SingleOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Heating 1").value,
+                                    cool_p = d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1").value
+
                                 };
                                 data = context.Request.QueryString["callback"] + "(" + js.Serialize(details) + ");";
                             }
@@ -318,7 +325,10 @@ namespace zvsMobile
                         if (scene != null)
                         {
                             string r = scene.RunScene();
+
+                            
                             data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true", desc = r }) + ");";
+
                         }
                     }                    
 

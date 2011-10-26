@@ -79,10 +79,10 @@ Ext.define('Scene', {
 								            },
 								            callback: function (data) {
 								                if (data.success) {
-								                    console.log(data.desc);
+								                    Ext.Msg.alert('Scene Activation', data.desc);
 								                }
 								                else {
-								                    console.log(data.desc);
+								                    Ext.Msg.alert('Scene Activation', 'Communication Error!');
 								                }
 								            }
 								        });
