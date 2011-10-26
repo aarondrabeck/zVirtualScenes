@@ -1,11 +1,12 @@
 Ext.define('Scene', {
- extend: 'Ext.data.Model',
- fields: [
-			 {name: 'id', type: 'int'},
-			 {name: 'name',  type: 'string'},
-			 {name: 'is_running',       type: 'bool'}
-		 ] 
- });
+    extend: 'Ext.data.Model',
+    fields: [
+			 { name: 'id', type: 'int' },
+			 { name: 'name', type: 'string' },
+			 { name: 'is_running', type: 'bool' },
+             { name: 'cmd_count', type: 'string' }
+		 ]
+});
 
  var SceneStore = Ext.create('Ext.data.Store', {
 	 model: 'Scene',
@@ -56,15 +57,15 @@ Ext.define('Scene', {
 	        itemTpl: new Ext.XTemplate(
 						'<div class="scene">',
 						'<div class="imageholder running_{is_running}"></div>',
-						'<h2>{name}</h2>',
+						'<h2>{name} ({cmd_count})</h2>',
 						'</div>'
 					),
 	        cls: 'SceneListItem',
 	        store: SceneStore,
 	        listeners: {
-	            scope: this,
+	            scope: this,	           
 	            selectionchange: function (list, records) {
-	                if (records[0] !== undefined) {
+	                if (records[0] !== undefined) {	                   
 	                    var sceneId = records[0].data.id;
 	                    Ext.Msg.confirm('Acitvate Scene', 'Are you sure you want to activate &quot;' + records[0].data.name + '&quot;?',
 								function (choice) {

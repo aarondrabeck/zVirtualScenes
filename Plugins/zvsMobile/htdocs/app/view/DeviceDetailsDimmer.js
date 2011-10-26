@@ -7,6 +7,14 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
         var RepollTimer;
         self.deviceID = 0;
         Ext.apply(config || {}, {
+            delayedReload: function () {
+                if (RepollTimer) { clearInterval(RepollTimer); }
+
+                RepollTimer = setTimeout(function () {
+                    var id = self.items.items[0].items.items[1].getData().id;
+                    self.loadDevice(self.deviceID);
+                }, 5000);
+            },
             loadDevice: function (deviceId) {
                 self.deviceID = deviceId;
                 //Get Device Details			
@@ -122,13 +130,12 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
 					        },
                                     {
                                         xtype: 'button',
-                                        text: 'Change Level',
+                                        text: 'Set Level',
                                         ui: 'confirm',
                                         margin: 5,
                                         handler: function () {
-                                            var slider = self.items.items[0].items.items[2].items.items[0];
-                                            //console.log('AJAX: SendCmd SEt LEVEL' + slider.getValue()[0]);
-                                            self.UpdateLevel(slider.getValue()[0]);
+                                            var sliderValue = self.items.items[0].items.items[2].items.items[0].getValue()[0]
+                                            console.log('AJAX: SendCmd SEt LEVEL' + sliderValue);                                            
                                             Ext.util.JSONP.request({
                                                 url: 'http://10.1.0.56:9999/JSON/SendCmd',
                                                 callbackKey: 'callback',
@@ -136,17 +143,17 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                                                     u: Math.random(),
                                                     id: self.deviceID,
                                                     cmd: 'DYNAMIC_CMD_LEVEL',
-                                                    arg: slider.getValue()[0],
+                                                    arg: sliderValue,
                                                     type: 'device'
 
                                                 },
                                                 callback: function (data) {
-
                                                     if (data.success) {
-                                                        console.log('OK');
+                                                        self.delayedReload();
+                                                        Ext.Msg.alert('Dimmer Command', 'Dimmer set to ' + sliderValue + '%');
                                                     }
                                                     else {
-                                                        console.log('ERROR');
+                                                        Ext.Msg.alert('Dimmer Command', 'Communication Error!');
                                                     }
                                                 }
                                             });
@@ -157,7 +164,7 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                                     xtype: 'button',
                                     label: 'Repoll',
                                     text: 'Repoll',
-                                    ui: 'action',
+                                    ui: 'confirm',
                                     margin: '15 10 5 10',
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
@@ -174,13 +181,7 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                                             callback: function (data) {
 
                                                 if (data.success) {
-                                                    console.log('OK');
-                                                    if (RepollTimer) { clearInterval(RepollTimer); }
-
-                                                    RepollTimer = setTimeout(function () {
-                                                        var id = self.items.items[0].items.items[1].getData().id;
-                                                        self.loadDevice(self.deviceID);
-                                                    }, 1500);
+                                                    self.delayedReload();
                                                 }
                                                 else {
                                                     console.log('ERROR');

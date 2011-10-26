@@ -21,7 +21,7 @@
                        xtype:'DeviceDetailsSwitch'
                     },
                     {
-                       xtype:'DeviceDetailsTemp'
+                       xtype:'DeviceDetailsThermo'
                     }
 		],		
 	}		

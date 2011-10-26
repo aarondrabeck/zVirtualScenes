@@ -64,7 +64,7 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 .SWITCH_OFF{ background-image: url('../images/switch_off.png'); }
 
 /* Device Info */
-.device_info { 	position: relative; padding: 5px 70px 5px 5px !important; color: #222; width: 100%; }
+.device_info { 	position: relative; padding: 5px 70px 5px 5px !important; color: #222; -webkit-box-flex: 1; }
 .device_info .imageholder { width: 60px; height: 60px; position: absolute; right: 5px; top: 5px; }
 .device_info .level {width: 60px;height: 20px;position: absolute;right: 5px;top: 70px;text-align:center; }	
 .device_info h1  {   font-size: 1.2em;  color: #000; }

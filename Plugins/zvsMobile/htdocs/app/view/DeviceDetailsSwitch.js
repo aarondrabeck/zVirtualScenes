@@ -7,6 +7,14 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
         var RepollTimer;
         self.deviceID = 0;
         Ext.apply(config || {}, {
+            delayedReload: function () {
+                if (RepollTimer) { clearInterval(RepollTimer); }
+
+                RepollTimer = setTimeout(function () {
+                    var id = self.items.items[0].items.items[1].getData().id;
+                    self.loadDevice(self.deviceID);
+                }, 1500);
+            },
             loadDevice: function (deviceId) {
                 self.deviceID = deviceId;
                 //Get Device Details			
@@ -93,31 +101,30 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
 					        },
                                     {
                                         xtype: 'button',
-                                        text: 'Change Level',
+                                        text: 'Set Level',
                                         ui: 'confirm',
                                         margin: 5,
                                         handler: function () {
-                                            var toggle = self.items.items[0].items.items[2].items.items[0];
-                                            //console.log('AJAX: SendCmd SEt LEVEL' + slider.getValue()[0]);
-                                            self.UpdateLevel(toggle.getValue()[0]);
+                                            var toggleValue = self.items.items[0].items.items[2].items.items[0].getValue();
+                                            console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);                                            
                                             Ext.util.JSONP.request({
                                                 url: 'http://10.1.0.56:9999/JSON/SendCmd',
                                                 callbackKey: 'callback',
                                                 params: {
                                                     u: Math.random(),
                                                     id: self.deviceID,
-                                                    cmd: toggle.getValue() > 0 ? 'TURNON' : 'TURNOFF',
+                                                    cmd: toggleValue > 0 ? 'TURNON' : 'TURNOFF',
                                                     arg: 0,
                                                     type: 'device_type'
 
                                                 },
                                                 callback: function (data) {
-
                                                     if (data.success) {
-                                                        console.log('OK');
+                                                        self.delayedReload();
+                                                        Ext.Msg.alert('Switch Command', 'Switch set to ' + (toggleValue > 0 ? 'On' : 'Off'));
                                                     }
                                                     else {
-                                                        console.log('ERROR');
+                                                        Ext.Msg.alert('Switch Command', 'Communication Error!');
                                                     }
                                                 }
                                             });
@@ -128,7 +135,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                                     xtype: 'button',
                                     label: 'Repoll',
                                     text: 'Repoll',
-                                    ui: 'action',
+                                    ui: 'confirm',
                                     margin: '15 10 5 10',
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
@@ -145,13 +152,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                                             callback: function (data) {
 
                                                 if (data.success) {
-                                                    console.log('OK');
-                                                    if (RepollTimer) { clearInterval(RepollTimer); }
-
-                                                    RepollTimer = setTimeout(function () {
-                                                        var id = self.items.items[0].items.items[1].getData().id;
-                                                        self.loadDevice(self.deviceID);
-                                                    }, 1500);
+                                                    self.delayedReload();
                                                 }
                                                 else {
                                                     console.log('ERROR');
