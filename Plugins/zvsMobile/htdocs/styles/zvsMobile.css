@@ -55,7 +55,7 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 
 /* Device Images */
 .DeviceListItem .device h2 {font-weight: bold; font-size: 1.1em;padding-top:10px;}
-.THERMOSTAT_ON, .THERMOSTAT_OFF{ background-image: url('../images/thermostat.png'); }
+.THERMOSTAT_ON, .THERMOSTAT_OFF, .THERMOSTAT{ background-image: url('../images/thermostat.png'); }
 .CONTROLLER_ON, .CONTROLLER_OFF{ background-image: url('../images/controler.png'); }
 .DIMMER_ON{ background-image: url('../images/lb_on.png'); }
 .DIMMER_DIM{ background-image: url('../images/lb_dim.png'); }
@@ -69,8 +69,9 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 .device_info .level {width: 60px;height: 20px;position: absolute;right: 5px;top: 70px;text-align:center; }	
 .device_info h1  {   font-size: 1.2em;  color: #000; }
 .device_info h2 {  font-size: .9em; color: #777; padding-top:2px}
-.device_info .overview { padding: 15px 0 15px 0; font-size:.8em ;color: #333}
+.device_info .overview { padding: 15px 0 15px 0; font-size:.9em ;color: #333}
 .device_info strong { font-weight:bold}
+.device_info .x-button { font-size: .9em }
 
 /*Scene List*/
 .SceneListItem .x-list-item .x-list-item-label { padding: 0.3em 0.4em; }
