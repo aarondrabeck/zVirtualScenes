@@ -36,7 +36,8 @@ Ext.define('zvsMobile.view.SceneList', {
     constructor: function (config) {
         var self = this;
         Ext.apply(config || {}, {
-            items: [{
+            items: [
+            {
                 xtype: 'toolbar',
                 docked: 'top',
                 title: 'Scenes',
@@ -67,38 +68,18 @@ Ext.define('zvsMobile.view.SceneList', {
                              var SceneDetails = SceneViewPort.items.items[1];
                              var sceneId = records[0].data.id;
                              SceneDetails.loadScene(sceneId);
+                             SceneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
                              SceneViewPort.setActiveItem(SceneDetails);
-
-
-                             //	                    Ext.Msg.confirm('Acitvate Scene', 'Are you sure you want to activate &quot;' + records[0].data.name + '&quot;?',
-                             //								function (choice) {
-                             //								    if (choice === 'yes') {
-                             //								        console.log('AJAX: ActivateScene');
-                             //								        Ext.util.JSONP.request({
-                             //								            url: 'http://10.1.0.56:9999/JSON/ActivateScene',
-                             //								            callbackKey: 'callback',
-                             //								            params: {
-                             //								                u: Math.random(),
-                             //								                id: sceneId
-                             //								            },
-                             //								            callback: function (data) {
-                             //								                if (data.success) {
-                             //								                    Ext.Msg.alert('Scene Activation', data.desc);
-                             //								                }
-                             //								                else {
-                             //								                    Ext.Msg.alert('Scene Activation', 'Communication Error!');
-                             //								                }
-                             //								            }
-                             //								        });
-                             //								    }
-                             //								    list.deselectAll();
-                             //								}
-                             //								);
-
                          }
                      }
                  }
-             }]
+             }] , 
+             listeners: {
+                 scope: this,
+                 activate: function () {
+                     self.items.items[1].deselectAll();
+                 }
+             } 
         });
         this.callOverridden([config]);
     },

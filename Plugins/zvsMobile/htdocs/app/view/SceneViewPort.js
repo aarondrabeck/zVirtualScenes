@@ -7,7 +7,13 @@ Ext.define('zvsMobile.view.SceneViewPort', {
 	},
 	config: 
 	{
-		layout: 'fit',
+		layout: {
+            type: 'card',
+            animation: {
+                type: 'slide',
+                direction: 'left'
+            }
+        },
 		items: [   
 					{								
 						xtype:'SceneList'						

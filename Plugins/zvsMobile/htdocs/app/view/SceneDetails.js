@@ -3,55 +3,135 @@
     alias: 'widget.SceneDetails',
     constructor: function (config) {
         var self = this;
+        var RepollTimer;
         Ext.apply(config || {}, {
-                 loadScene: function (sceneId) {
-                    self.sceneId = sceneId;
-                    //Get Device Details			
-                    console.log('AJAX: GetSceneDetails');
+            delayedReload: function () {
+                if (RepollTimer) { clearInterval(RepollTimer); }
+
+                RepollTimer = setTimeout(function () {                    
+                    self.loadScene(self.sceneId);
+                }, 500);
+            },
+            loadScene: function (sceneId) {
+                self.sceneId = sceneId;
+                //Get Device Details			
+                console.log('AJAX: GetSceneDetails');
+                Ext.util.JSONP.request({
+                    url: 'http://10.1.0.56:9999/JSON/GetSceneDetails',
+                    callbackKey: 'callback',
+                    params: {
+                        u: Math.random(),
+                        id: sceneId
+                    },
+                    callback: function (data) {
+                        //Send data to panel TPL                            
+                        self.items.items[1].setData(data);
+                        self.items.items[3].setData(data);
+                    }
+                });
+            },
+            layout: {
+                type: 'vbox',
+                align: 'strech'
+            },
+            items: [
+            {
+                xtype: 'toolbar',
+                docked: 'top',
+                title: 'Scene Details',
+                items: [{
+                    xtype: 'button',
+                    iconMask: true,
+                    ui: 'back',
+                    text: 'Back',
+                    handler: function () {
+                        var SceneViewPort = self.parent;
+                        SceneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                        SceneViewPort.setActiveItem(SceneViewPort.items.items[0]);
+                    }
+                }]
+            },
+            {
+                xtype: 'panel',
+                tpl: new Ext.XTemplate(
+                        '<div class="scene_info">',
+                            '<div class="head">',
+							    '<div class="image s_img_{scene.is_running}"></div>',
+							    '<tpl for="scene">',
+					                '<h1>{name}</h1>',
+                                    '<div class="scene_overview"><strong>Running:</strong>',
+                                    '<tpl if="is_running">Yes<tpl else>No</tpl></div>',
+                            '</div>',
+                        '</tpl>',
+                    '</div>'
+                )
+            },
+            {
+                xtype: 'button',
+                text: 'Activate',
+                ui: 'confirm',
+                margin: '25 5',
+                handler: function () {
+                    var scene = self.items.items[1].getData();
+                    console.log('AJAX: ActivateScene');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetSceneDetails',
+                        url: 'http://10.1.0.56:9999/JSON/ActivateScene',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
-                            id: sceneId
+                            id: scene.scene.id
                         },
                         callback: function (data) {
-                            //Send data to panel TPL                            
-                            self.items.items[1].setData(data);
                             console.log(data);
+                            if (data.success) {
+                                self.delayedReload();
+                                Ext.Msg.alert('Scene Activation', data.desc);
+                                
+                            }
+                            else {
+                                Ext.Msg.alert('Scene Activation', 'Communication Error!');
+                            }
                         }
                     });
-                },
-	            items: [{
-                            xtype: 'toolbar',
-                            docked: 'top',
-                            title: 'Scene Details',
-                            items: [{
-                                        xtype: 'button',
-                                        iconMask: true,
-                                        iconCls: 'refresh',
-                                        handler: function () {
-                                            Ext.msg.alert('test');
-                                        }
-                                 }]
-                            },
-                            {
-                                        xtype: 'panel',
-                                        tpl: new Ext.XTemplate(
-							            '<tpl for="scene">', 					    
-					                        '<h2>{name} ({cmd_count})</h2>',
-                                            'Commands: <ol>',
-                                            '<tpl for="cmds">',  
-                                                '<li>{device} | {action}</li>',
-                                             '</tpl></ol>', 
-                                        '</tpl>')
-                             }]
+                }
+            },
+            {
+                xtype: 'panel',
+                tpl: new Ext.XTemplate(
+                     	'<tpl for="scene">',
+                         '<tpl if="cmd_count &gt; 0">',
+                            '<div class="scene_overview">',
+                                '<table class="s_cmds">',
+                                '<thead>',
+                                    '<tr>',
+                                        '<th></th>',
+                                        '<th scope="col" abbr="Device">Device / Cmd</th>',
+                                        '<th scope="col" abbr="Action">Action</th>',
+                                    '</tr>',
+                                '</thead>',
+                                '<tbody>',
+                                '<tpl for="cmds">',
+                                        '<tr>',
+                                            '<th scope="row">{order}</th>',
+                                            '<td>{device}</td>',
+                                            '<td>{action}</td>',
+                                            '</tr>',
+                                        '</tpl>',
+                                '</tbody>',
+                                '</table>',
+                            '</div>',
+                        '</tpl>',
+                        '</tpl>'
+                    )
+            }
+
+            ]
         });
         this.callOverridden([config]);
     },
     config:
 	{
 	    layout: 'fit',
-	   
+	    scrollable: 'vertical'
 	}
 });

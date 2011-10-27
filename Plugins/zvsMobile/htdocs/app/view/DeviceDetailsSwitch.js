@@ -73,7 +73,8 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                         text: 'Back',
                         handler: function () {
                             var DeviceViewPort = self.parent;
-                            DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0], { type: 'slide', reverse: true });
+                            DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                            DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
                         }
                     }]
                 },

@@ -57,16 +57,19 @@ Ext.define('zvsMobile.view.DeviceList', {
 
 			            if (records[0].data.type === 'DIMMER') {
 			                DimmmerDetails.loadDevice(records[0].data.id);
+			                DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
 			                DeviceViewPort.setActiveItem(DimmmerDetails);
 			            }
 
 			            if (records[0].data.type === 'SWITCH') {
 			                SwitchDetails.loadDevice(records[0].data.id);
+			                DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
 			                DeviceViewPort.setActiveItem(SwitchDetails);
 			            }
 
 			            if (records[0].data.type === 'THERMOSTAT') {
 			                TempDetails.loadDevice(records[0].data.id);
+			                DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
 			                DeviceViewPort.setActiveItem(TempDetails);
 			            }
 
@@ -74,31 +77,29 @@ Ext.define('zvsMobile.view.DeviceList', {
 			        }
 			    },
 			    activate: function () {
-
 			        self.deselectAll();
 			    }
 			}
-
         });
         this.callOverridden([config]);
     },
     config:
-     {
-         itemTpl: new Ext.XTemplate(
-		            '<div class="device">',
-			            '<div class="imageholder {type}_{on_off}"></div>',
-			            '<h2>{name}</h2>',
-			            '<div class="level">',
-				            '<div class="meter">',
-					            '<div class="progress" style="width:{level}%">',
-					            '</div>',
-				            '</div>',
-				            '<div class="percent">{level_txt}</div>',
-			            '</div>',
-		            '</div>'),
-         cls: 'DeviceListItem',
-         store: DeviceStore
-     }
+    {
+        itemTpl: new Ext.XTemplate(
+		        '<div class="device">',
+			        '<div class="imageholder {type}_{on_off}"></div>',
+			        '<h2>{name}</h2>',
+			        '<div class="level">',
+				        '<div class="meter">',
+					        '<div class="progress" style="width:{level}%">',
+					        '</div>',
+				        '</div>',
+				        '<div class="percent">{level_txt}</div>',
+			        '</div>',
+		        '</div>'),
+        cls: 'DeviceListItem',
+        store: DeviceStore
+    }
 });
 
 
