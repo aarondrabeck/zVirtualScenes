@@ -8,96 +8,106 @@ Ext.define('Scene', {
 		 ]
 });
 
- var SceneStore = Ext.create('Ext.data.Store', {
-	 model: 'Scene',
-	 proxy: {
-			type: 'scripttag',
-			url : 'http://10.1.0.56:9999/JSON/GetSceneList',
-			extraParams: {
-				u: Math.random()
-			},
-			reader: {
-				type: 'json',
-				root: 'scenes',
-				idProperty: 'id',
-				successProperty: 'success'				
-			},			
-            
-			callbackParam: 'callback'
-		},
-	autoLoad: true
- });
+var SceneStore = Ext.create('Ext.data.Store', {
+    model: 'Scene',
+    proxy: {
+        type: 'scripttag',
+        url: 'http://10.1.0.56:9999/JSON/GetSceneList',
+        extraParams: {
+            u: Math.random()
+        },
+        reader: {
+            type: 'json',
+            root: 'scenes',
+            idProperty: 'id',
+            successProperty: 'success'
+        },
+
+        callbackParam: 'callback'
+    },
+    autoLoad: true
+});
 
 
- Ext.define('zvsMobile.view.SceneList', {
-     extend: 'Ext.Panel',
-     alias: 'widget.SceneList',
-     initialize: function () {
-         var self = this;
-         this.add({
-             xtype: 'toolbar',
-             docked: 'top',
-             title: 'Scenes',
-             items: [{
-                 xtype: 'button',
-                 iconMask: true,
-                 iconCls: 'refresh',
-                 handler: function () {
-                     SceneStore.load();
+Ext.define('zvsMobile.view.SceneList', {
+    extend: 'Ext.Panel',
+    alias: 'widget.SceneList',
+
+    constructor: function (config) {
+        var self = this;
+        Ext.apply(config || {}, {
+            items: [{
+                xtype: 'toolbar',
+                docked: 'top',
+                title: 'Scenes',
+                items: [{
+                    xtype: 'button',
+                    iconMask: true,
+                    iconCls: 'refresh',
+                    handler: function () {
+                        SceneStore.load();
+                    }
+                }]
+            },
+             {
+                 xtype: 'list',
+                 itemTpl: new Ext.XTemplate(
+						    '<div class="scene">',
+						    '<div class="imageholder running_{is_running}"></div>',
+						    '<h2>{name} ({cmd_count})</h2>',
+						    '</div>'
+					    ),
+                 cls: 'SceneListItem',
+                 store: SceneStore,
+                 listeners: {
+                     scope: this,
+                     selectionchange: function (list, records) {
+                         if (records[0] !== undefined) {
+                             var SceneViewPort = self.parent;
+                             var SceneDetails = SceneViewPort.items.items[1];
+                             var sceneId = records[0].data.id;
+                             SceneDetails.loadScene(sceneId);
+                             SceneViewPort.setActiveItem(SceneDetails);
+
+
+                             //	                    Ext.Msg.confirm('Acitvate Scene', 'Are you sure you want to activate &quot;' + records[0].data.name + '&quot;?',
+                             //								function (choice) {
+                             //								    if (choice === 'yes') {
+                             //								        console.log('AJAX: ActivateScene');
+                             //								        Ext.util.JSONP.request({
+                             //								            url: 'http://10.1.0.56:9999/JSON/ActivateScene',
+                             //								            callbackKey: 'callback',
+                             //								            params: {
+                             //								                u: Math.random(),
+                             //								                id: sceneId
+                             //								            },
+                             //								            callback: function (data) {
+                             //								                if (data.success) {
+                             //								                    Ext.Msg.alert('Scene Activation', data.desc);
+                             //								                }
+                             //								                else {
+                             //								                    Ext.Msg.alert('Scene Activation', 'Communication Error!');
+                             //								                }
+                             //								            }
+                             //								        });
+                             //								    }
+                             //								    list.deselectAll();
+                             //								}
+                             //								);
+
+                         }
+                     }
                  }
              }]
-         });
-         this.callParent();
-     },
-     config:
+        });
+        this.callOverridden([config]);
+    },
+    config:
 	{
-	    layout: 'fit',
-	    items: [{
-	        xtype: 'list',
-	        itemTpl: new Ext.XTemplate(
-						'<div class="scene">',
-						'<div class="imageholder running_{is_running}"></div>',
-						'<h2>{name} ({cmd_count})</h2>',
-						'</div>'
-					),
-	        cls: 'SceneListItem',
-	        store: SceneStore,
-	        listeners: {
-	            scope: this,	           
-	            selectionchange: function (list, records) {
-	                if (records[0] !== undefined) {	                   
-	                    var sceneId = records[0].data.id;
-	                    Ext.Msg.confirm('Acitvate Scene', 'Are you sure you want to activate &quot;' + records[0].data.name + '&quot;?',
-								function (choice) {
-								    if (choice === 'yes') {
-								        console.log('AJAX: ActivateScene');
-								        Ext.util.JSONP.request({
-								            url: 'http://10.1.0.56:9999/JSON/ActivateScene',
-								            callbackKey: 'callback',
-								            params: {
-								                u: Math.random(),
-								                id: sceneId
-								            },
-								            callback: function (data) {
-								                if (data.success) {
-								                    Ext.Msg.alert('Scene Activation', data.desc);
-								                }
-								                else {
-								                    Ext.Msg.alert('Scene Activation', 'Communication Error!');
-								                }
-								            }
-								        });
-								    }
-								    list.deselectAll();
-								}
-								);
-	                }
-	            }
-	        }
-	    }]
+	    layout: 'fit'
 	}
- });
+});
 
 
-			
+
 					

@@ -11,7 +11,10 @@ Ext.define('zvsMobile.view.SceneViewPort', {
 		items: [   
 					{								
 						xtype:'SceneList'						
-					}
+					},
+                    {
+                        xtype:'SceneDetails'
+                    }
 		],		
 	}		
 });

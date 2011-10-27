@@ -168,7 +168,7 @@ namespace zvsMobile
                     if (context.Request.RawUrl.Contains("/JSON/GetDeviceList"))
                     {
                         List<object> devices = new List<object>();
-                        foreach (device d in zvsEntityControl.zvsContext.devices)
+                        foreach (device d in zvsEntityControl.zvsContext.devices.OrderBy(o => o.friendly_name))
                         {
                             var device = new
                             {
@@ -223,8 +223,8 @@ namespace zvsMobile
                                     op_state = d.device_values.SingleOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Operating State").value,
                                     fan_state = d.device_values.SingleOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Fan State").value,
                                     heat_p = d.device_values.SingleOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Heating 1").value,
-                                    cool_p = d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1").value
-
+                                    cool_p = d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1").value,
+                                    esm = d.device_values.SingleOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Basic").value
                                 };
                                 data = context.Request.QueryString["callback"] + "(" + js.Serialize(details) + ");";
                             }
@@ -308,11 +308,42 @@ namespace zvsMobile
                                  select new {
                                             id = d.id,
                                             name = d.friendly_name,
-                                            is_running = d.is_running };
+                                            is_running = d.is_running,
+                                            cmd_count = d.scene_commands.Count()};
 
                         var scenes = new { success = "true", scenes = q0 };
 
                         data = context.Request.QueryString["callback"] + "(" + js.Serialize(scenes) + ");";
+                    }
+
+                    if (context.Request.RawUrl.Contains("/JSON/GetSceneDetails"))
+                    {
+
+                        long sID = 0;
+                        long.TryParse(context.Request.QueryString["id"], out sID);
+
+                        scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == sID);
+
+                        if (scene != null)
+                        {
+                            List<object> s_cmds = new List<object>();
+                            foreach(scene_commands sc in scene.scene_commands.OrderBy(o=> o.sort_order))
+                            {
+                                s_cmds.Add(new { device = sc.Actionable_Object,
+                                                 action = sc.Action_Description, 
+                                                 order = sc.sort_order
+                                });
+                            }
+                            var s = new
+                            {
+                                name = scene.friendly_name,
+                                is_running = scene.is_running,
+                                cmd_count = scene.scene_commands.Count(),
+                                cmds = s_cmds
+                            };
+                            var scenes = new { success = "true", scene = s };
+                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(scenes) + ");";
+                        }
                     }
 
                     if (context.Request.RawUrl.Contains("/JSON/ActivateScene"))
