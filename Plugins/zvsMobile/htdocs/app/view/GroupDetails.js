@@ -1,7 +1,7 @@
 ﻿Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
-    Ext.define('zvsMobile.view.SceneDetails', {
+    Ext.define('zvsMobile.view.GroupDetails', {
         extend: 'Ext.Panel',
-        xtype: 'SceneDetails',
+        xtype: 'GroupDetails',
         constructor: function (config) {
             var self = this;
             var RepollTimer;
@@ -10,27 +10,27 @@
                     if (RepollTimer) { clearInterval(RepollTimer); }
 
                     RepollTimer = setTimeout(function () {
-                        self.loadScene(self.sceneId);
-                        SceneStore.load();
+                        self.loadScene(self.groupId);
                     }, 500);
                 },
-                loadScene: function (sceneId) {
-                    self.sceneId = sceneId;
+                loadScene: function (groupID) {
+                    self.groupId = groupID;
                     //Get Device Details			
                     console.log('AJAX: GetSceneDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetSceneDetails',
+                        url: 'http://10.1.0.56:9999/JSON/GetGroupDetails',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
-                            id: sceneId
+                            id: self.groupId
                         },
                         callback: function (data) {
                             //Send data to panel TPL                            
                             self.items.items[1].setData(data);
-                            self.items.items[3].setData(data);
+                            self.items.items[4].setData(data);
                         }
                     });
+                   
                 },
                 layout: {
                     type: 'vbox',
@@ -46,77 +46,104 @@
                         ui: 'back',
                         text: 'Back',
                         handler: function () {
-                            var SceneViewPort = self.parent;
-                            SceneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                            SceneViewPort.setActiveItem(SceneViewPort.items.items[0]);
+                            var ViewPort = self.parent;
+                            ViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                            ViewPort.setActiveItem(ViewPort.items.items[0]);
                         }
                     }]
                 }, {
                     xtype: 'panel',
                     tpl: new Ext.XTemplate(
-                        '<div class="scene_info">',
+                        '<div class="group_info">',
                             '<div class="head">',
-							    '<div class="image s_img_{scene.is_running}"></div>',
-							    '<tpl for="scene">',
+							    '<div class="image"></div>',
+							    '<tpl for="group">',
 					                '<h1>{name}</h1>',
-                                    '<div class="scene_overview"><strong>Running:</strong>',
-                                    '<tpl if="is_running">Yes<tpl else>No</tpl></div>',
-                            '</div>',
-                        '</tpl>',
-                    '</div>'
-                )
+                                    '</tpl>',
+                             '</div>',
+                        '</div>')
                 }, {
                     xtype: 'button',
-                    text: 'Activate',
+                    text: 'Turn On',
                     ui: 'confirm',
-                    margin: '25 5',
+                    margin: '25 5 5 5',
                     handler: function () {
-                        var scene = self.items.items[1].getData();
-                        console.log('AJAX: ActivateScene');
+                        console.log('AJAX: ActivateGroup' + self.groupId);
                         Ext.util.JSONP.request({
-                            url: 'http://10.1.0.56:9999/JSON/ActivateScene',
+                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
                             callbackKey: 'callback',
                             params: {
                                 u: Math.random(),
-                                id: scene.scene.id
+                                cmd: 'GROUP_ON',
+                                arg: self.groupId,
+                                type: 'builtin'
+
                             },
                             callback: function (data) {
                                 if (data.success) {
-                                    self.delayedReload();
-                                    Ext.Msg.alert('Scene Activation', data.desc);
+                                    Ext.Msg.alert('Group', "All device in group Turned On");
+
                                 }
                                 else {
-                                    Ext.Msg.alert('Scene Activation', 'Communication Error!');
+                                    Ext.Msg.alert('Group', 'Communication Error!');
                                 }
                             }
                         });
+
+                    }
+                }, {
+                    xtype: 'button',
+                    text: 'Turn Off',
+                    ui: 'confirm',
+                    margin: '5 5 25 5',
+                    handler: function () {
+                        console.log('AJAX: DeactivateGroup' + self.groupId);
+                        Ext.util.JSONP.request({
+                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                            callbackKey: 'callback',
+                            params: {
+                                u: Math.random(),
+                                cmd: 'GROUP_OFF',
+                                arg: self.groupId,
+                                type: 'builtin'
+
+                            },
+                            callback: function (data) {
+                                if (data.success) {
+                                    Ext.Msg.alert('Group', "All device in group Turned Off");
+
+                                }
+                                else {
+                                    Ext.Msg.alert('Group', 'Communication Error!');
+                                }
+                            }
+                        });
+
                     }
                 }, {
                     xtype: 'panel',
                     tpl: new Ext.XTemplate(
-                     	'<tpl for="scene">',
-                         '<tpl if="cmd_count &gt; 0">',
-                            '<div class="scene_overview">',
+                     	'<tpl for="group">',
+                         //'<tpl if="devices.length &gt; 0">',
+                            '<div class="group_overview">',
                                 '<table class="info">',
                                 '<thead>',
                                     '<tr>',
-                                        '<th></th>',
-                                        '<th scope="col" abbr="Device">Device / Cmd</th>',
-                                        '<th scope="col" abbr="Action">Action</th>',
+                                        '<th scope="col" abbr="Device">Device</th>',
+                                        '<th scope="col" abbr="Action">Type</th>',
                                     '</tr>',
                                 '</thead>',
                                 '<tbody>',
-                                '<tpl for="cmds">',
+                                '<tpl for="devices">',
                                         '<tr>',
-                                            '<th scope="row">{order}</th>',
-                                            '<td>{device}</td>',
-                                            '<td>{action}</td>',
+                                            '<td>{name}</td>',
+                                            '<td>{type}</td>',
                                             '</tr>',
                                         '</tpl>',
                                 '</tbody>',
                                 '</table>',
                             '</div>',
-                        '</tpl>',
+                        //'</tpl>',
                         '</tpl>'
                     )
 

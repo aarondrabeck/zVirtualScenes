@@ -12,7 +12,7 @@ Ext.Loader.setPath('Ext', 'touch/Ext');
 Ext.application({
     name: 'zvsMobile',
     launch: function () {
-        Ext.require(['Ext.tab.Panel', 'zvsMobile.view.DeviceViewPort', 'zvsMobile.view.SceneViewPort'], function () {
+        Ext.require(['Ext.tab.Panel', 'zvsMobile.view.DeviceViewPort', 'zvsMobile.view.SceneViewPort', 'zvsMobile.view.GroupViewPort'], function () {
             var tabpanel = Ext.create('Ext.tab.Panel', {
                 fullscreen: true,
                 tabBar: {
@@ -29,12 +29,20 @@ Ext.application({
                     xtype: 'SceneViewPort',
                     title: "Scenes",
                     iconCls: "equalizer2"
+
+                }, {
+                    xtype: 'GroupViewPort',
+                    title: "Groups",
+                    iconCls: "spaces2"
                 }, {
                     title: 'Settings',
                     html: '<h1>Settings Card</h1>',
                     cls: 'card4',
                     iconCls: 'settings'
-                }]
+                }
+
+
+                ]
             });
         });
     }

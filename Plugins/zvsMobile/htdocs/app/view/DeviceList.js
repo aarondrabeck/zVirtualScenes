@@ -1,27 +1,4 @@
-Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device'], function () {
-    console.log('1');
-
-    DeviceStore = Ext.create('Ext.data.Store', {
-        model: 'zvsMobile.model.Device',
-        requires: ['zvsMobile.model.Device'],
-        proxy: {
-            type: 'scripttag',
-            url: 'http://10.1.0.56:9999/JSON/GetDeviceList',
-            extraParams: {
-                u: Math.random()
-            },
-            reader: {
-                type: 'json',
-                root: 'devices',
-                idProperty: 'id',
-                successProperty: 'success'
-            },
-            callbackParam: 'callback'
-        },
-        autoLoad: true
-
-    });
-
+Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Devices'], function () {
 
     Ext.define('zvsMobile.view.DeviceList', {
         extend: 'Ext.dataview.List',
@@ -33,6 +10,7 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device'], function () {
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
+                    title: 'Devices',
                     scrollable: false,
                     items: [{
                         xtype: 'button',
@@ -41,13 +19,6 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device'], function () {
                         handler: function () {
                             DeviceStore.load();
                         }
-                    }, {
-                        xtype: 'spacer'
-                    }, {
-                        html: 'Devices',
-                        style: 'color:#fff;font-weight:bold'
-                    }, {
-                        xtype: 'spacer'
                     }]
                 }],
 
@@ -90,22 +61,21 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device'], function () {
             this.callOverridden([config]);
         },
         config:
-    {
-        itemTpl: new Ext.XTemplate(
-		        '<div class="device">',
-			        '<div class="imageholder {type}_{on_off}"></div>',
-			        '<h2>{name}</h2>',
-			        '<div class="level">',
-				        '<div class="meter">',
-					        '<div class="progress" style="width:{level}%">',
-					        '</div>',
-				        '</div>',
-				        '<div class="percent">{level_txt}</div>',
-			        '</div>',
-		        '</div>'),
-        cls: 'DeviceListItem',
-        store: DeviceStore
-    }
+        {
+            itemTpl: new Ext.XTemplate(
+		            '<div class="device">',
+			            '<div class="imageholder {type}_{on_off}"></div>',
+			            '<h2>{name}</h2>',
+			            '<div class="level">',
+				            '<div class="meter">',
+					            '<div class="progress" style="width:{level}%">',
+					            '</div>',
+				            '</div>',
+				            '<div class="percent">{level_txt}</div>',
+			            '</div>',
+		            '</div>'),
+            cls: 'DeviceListItem',
+            store: DeviceStore
+        }
     });
-console.log('3');
 });

@@ -1,11 +1,7 @@
 Ext.require(['Ext.Panel', 'zvsMobile.view.SceneList', 'zvsMobile.view.SceneDetails'], function () {
     Ext.define('zvsMobile.view.SceneViewPort', {
         extend: 'Ext.Panel',
-        alias: 'widget.SceneViewPort',
-        initialize: function () {
-            var self = this;
-            this.callParent();
-        },
+        alias: 'widget.SceneViewPort',        
         config:
 	{
 	    layout: {
