@@ -1,8 +1,9 @@
-﻿Ext.require(['zvsMobile.model.Device', 'Ext.data.Store'], function () {
-    Ext.define('zvsMobile.store.Devices', {
+﻿//Ext.require(['Ext.data.Store'], function () {
+    console.log('2');
+    window.SceneStore = Ext.create('Ext.data.Store', {
         extend: 'Ext.data.Store',
         model: 'zvsMobile.model.Device',
-       // requires: [],
+        requires: ['zvsMobile.model.Device'],
 
         config: {
             proxy: {
@@ -22,4 +23,7 @@
             autoLoad: true
         }
     });
-});
+    console.log('2');
+    //zvsMobile.DeviceStore = Ext.create('zvsMobile.store.Device', {
+    //});
+//});

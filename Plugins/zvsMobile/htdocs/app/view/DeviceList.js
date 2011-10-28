@@ -1,4 +1,36 @@
-Ext.require(['zvsMobile.store.Devices', 'Ext.dataview.List'], function () {
+Ext.require(['Ext.dataview.List'], function () {
+    console.log('1');
+
+    Ext.define('zvsMobile.model.Device', {
+        extend: 'Ext.data.Model',
+        fields: ['id', 'name', 'on_off', 'level', 'level_txt', 'type']
+    });
+
+    DeviceStore = Ext.create('Ext.data.Store', {
+        model: 'zvsMobile.model.Device',
+        requires: ['zvsMobile.model.Device'],
+
+ 
+            proxy: {
+                type: 'scripttag',
+                url: 'http://10.1.0.56:9999/JSON/GetDeviceList',
+                extraParams: {
+                    u: Math.random()
+                },
+                reader: {
+                    type: 'json',
+                    root: 'devices',
+                    idProperty: 'id',
+                    successProperty: 'success'
+                },
+                callbackParam: 'callback'
+            },
+            autoLoad: true
+        
+    });
+
+
+
 
     Ext.define('zvsMobile.view.DeviceList', {
         extend: 'Ext.dataview.List',
@@ -6,7 +38,7 @@ Ext.require(['zvsMobile.store.Devices', 'Ext.dataview.List'], function () {
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {
-                scroll: 'vertical',
+                scrollable: 'vertical',
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
@@ -16,7 +48,7 @@ Ext.require(['zvsMobile.store.Devices', 'Ext.dataview.List'], function () {
                         iconMask: true,
                         iconCls: 'refresh',
                         handler: function () {
-                            DeviceStore.load();
+                            zvsMobile.DeviceStore.load();
                         }
                     }, {
                         xtype: 'spacer'
@@ -81,7 +113,8 @@ Ext.require(['zvsMobile.store.Devices', 'Ext.dataview.List'], function () {
 			        '</div>',
 		        '</div>'),
         cls: 'DeviceListItem',
-        store: 'zvsMobile.store.Devices'
+        store: DeviceStore
     }
     });
+console.log('3');
 });

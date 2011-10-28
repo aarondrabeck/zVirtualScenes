@@ -163,7 +163,7 @@ namespace zvsMobile
                     JavaScriptSerializer js = new JavaScriptSerializer();
                     response.ContentType = "application/javascript;charset=utf-8";
 
-                    string data = data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "false", }) + ");";
+                    string data = data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = false, }) + ");";
 
                     if (context.Request.RawUrl.Contains("/JSON/GetDeviceList"))
                     {
@@ -182,7 +182,7 @@ namespace zvsMobile
 
                             devices.Add(device);
                         }
-                        var json = new { success = "true", devices = devices };
+                        var json = new { success = true, devices = devices };
                         data = context.Request.QueryString["callback"] + "(" + js.Serialize(json) + ");";
                     }
 
@@ -260,7 +260,7 @@ namespace zvsMobile
                                                     arg = arg
                                                 });
 
-                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true" }) + ");";
+                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = true }) + ");";
                                             }
                                         }
                                         break;
@@ -279,7 +279,7 @@ namespace zvsMobile
                                                     device_type_command_id = cmd.id,
                                                     arg = arg
                                                 });
-                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true" }) + ");";
+                                                data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = true }) + ");";
                                             }
                                         }
                                         break;
@@ -294,7 +294,7 @@ namespace zvsMobile
                                                 builtin_command_id = cmd.id,
                                                 arg = arg
                                             });
-                                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true" }) + ");";
+                                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = true }) + ");";
                                         }
                                         break;
                                     }
@@ -311,7 +311,7 @@ namespace zvsMobile
                                             is_running = d.is_running,
                                             cmd_count = d.scene_commands.Count()};
 
-                        var scenes = new { success = "true", scenes = q0 };
+                        var scenes = new { success = true, scenes = q0 };
 
                         data = context.Request.QueryString["callback"] + "(" + js.Serialize(scenes) + ");";
                     }
@@ -331,17 +331,18 @@ namespace zvsMobile
                             {
                                 s_cmds.Add(new { device = sc.Actionable_Object,
                                                  action = sc.Action_Description, 
-                                                 order = sc.sort_order
+                                                 order = (sc.sort_order + 1)
                                 });
                             }
                             var s = new
-                            {
+                            {   
+                                id = scene.id,
                                 name = scene.friendly_name,
                                 is_running = scene.is_running,
                                 cmd_count = scene.scene_commands.Count(),
                                 cmds = s_cmds
                             };
-                            var scenes = new { success = "true", scene = s };
+                            var scenes = new { success = true, scene = s };
                             data = context.Request.QueryString["callback"] + "(" + js.Serialize(scenes) + ");";
                         }
                     }
@@ -355,10 +356,8 @@ namespace zvsMobile
 
                         if (scene != null)
                         {
-                            string r = scene.RunScene();
-
-                            
-                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = "true", desc = r }) + ");";
+                            string r = scene.RunScene();                            
+                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = true, desc = r }) + ");";
 
                         }
                     }                    
