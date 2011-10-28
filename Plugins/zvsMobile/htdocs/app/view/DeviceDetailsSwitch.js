@@ -1,83 +1,84 @@
-Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
-    extend: 'Ext.Panel',
-    alias: 'widget.DeviceDetailsSwitch',
+Ext.require(['Ext.Panel', 'Ext.util.JSONP'], function () {
+    Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
+        extend: 'Ext.Panel',
+        alias: 'widget.DeviceDetailsSwitch',
 
-    constructor: function (config) {
-        var self = this;
-        var RepollTimer;
-        self.deviceID = 0;
-        Ext.apply(config || {}, {
-            delayedReload: function () {
-                if (RepollTimer) { clearInterval(RepollTimer); }
+        constructor: function (config) {
+            var self = this;
+            var RepollTimer;
+            self.deviceID = 0;
+            Ext.apply(config || {}, {
+                delayedReload: function () {
+                    if (RepollTimer) { clearInterval(RepollTimer); }
 
-                RepollTimer = setTimeout(function () {
-                    var id = self.items.items[0].items.items[1].getData().id;
-                    self.loadDevice(self.deviceID);
-                }, 1500);
-            },
-            loadDevice: function (deviceId) {
-                self.deviceID = deviceId;
-                //Get Device Details			
-                console.log('AJAX: GetDeviceDetails');
-                Ext.util.JSONP.request({
-                    url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
-                    callbackKey: 'callback',
-                    params: {
-                        u: Math.random(),
-                        id: deviceId
-                    },
-                    callback: function (data) {
-                        //Send data to panel TPL                            
-                        self.items.items[0].items.items[1].setData(data);
-
-                        //Update meter levels 
-                        self.UpdateLevel(data.level);
-                    }
-                });
-            },
-            UpdateLevel: function (value) {
-
-                var toggle = self.items.items[0].items.items[2].items.items[0];
-                toggle.setValue(value);
-
-                //Update panel TPL        
-                var data = Ext.clone(self.items.items[0].items.items[1].getData());
-                data.level = value;
-                data.level_txt = value > 0 ? 'ON' : 'OFF';
-                data.on_off = value > 0 ? 'ON' : 'OFF';
-                self.items.items[0].items.items[1].setData(data);
-
-                //Update the store 
-                data = DeviceStore.data.items;
-                for (i = 0, len = data.length; i < len; i++) {
-                    if (data[i].data.id === self.items.items[0].items.items[1]._data.id) {
-                        data[i].data.level = value;
-                        data[i].data.level_txt = value > 0 ? 'On' : 'Off';
-                        data[i].data.on_off = value > 0 ? 'ON' : 'OFF';
-                    }
-                }
-                DeviceStore.loadRecords(data);
-                self.parent.items.items[0].refresh();
-
-            },
-            items: {
-                xtype: 'panel',
-                items: [{
-                    xtype: 'toolbar',
-                    docked: 'top',
-                    title: 'Device Details',
-                    items: [{
-                        xtype: 'button',
-                        iconMask: true,
-                        ui: 'back',
-                        text: 'Back',
-                        handler: function () {
-                            var DeviceViewPort = self.parent;
-                            DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                            DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
-                        }
-                    }]
+                    RepollTimer = setTimeout(function () {
+                        var id = self.items.items[0].items.items[1].getData().id;
+                        self.loadDevice(self.deviceID);
+                    }, 1500);
                 },
+                loadDevice: function (deviceId) {
+                    self.deviceID = deviceId;
+                    //Get Device Details			
+                    console.log('AJAX: GetDeviceDetails');
+                    Ext.util.JSONP.request({
+                        url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
+                        callbackKey: 'callback',
+                        params: {
+                            u: Math.random(),
+                            id: deviceId
+                        },
+                        callback: function (data) {
+                            //Send data to panel TPL                            
+                            self.items.items[0].items.items[1].setData(data);
+
+                            //Update meter levels 
+                            self.UpdateLevel(data.level);
+                        }
+                    });
+                },
+                UpdateLevel: function (value) {
+
+                    var toggle = self.items.items[0].items.items[2].items.items[0];
+                    toggle.setValue(value);
+
+                    //Update panel TPL        
+                    var data = Ext.clone(self.items.items[0].items.items[1].getData());
+                    data.level = value;
+                    data.level_txt = value > 0 ? 'ON' : 'OFF';
+                    data.on_off = value > 0 ? 'ON' : 'OFF';
+                    self.items.items[0].items.items[1].setData(data);
+
+                    //Update the store 
+                    data = DeviceStore.data.items;
+                    for (i = 0, len = data.length; i < len; i++) {
+                        if (data[i].data.id === self.items.items[0].items.items[1]._data.id) {
+                            data[i].data.level = value;
+                            data[i].data.level_txt = value > 0 ? 'On' : 'Off';
+                            data[i].data.on_off = value > 0 ? 'ON' : 'OFF';
+                        }
+                    }
+                    DeviceStore.loadRecords(data);
+                    self.parent.items.items[0].refresh();
+
+                },
+                items: {
+                    xtype: 'panel',
+                    items: [{
+                        xtype: 'toolbar',
+                        docked: 'top',
+                        title: 'Device Details',
+                        items: [{
+                            xtype: 'button',
+                            iconMask: true,
+                            ui: 'back',
+                            text: 'Back',
+                            handler: function () {
+                                var DeviceViewPort = self.parent;
+                                DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                                DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
+                            }
+                        }]
+                    },
                         {
                             xtype: 'panel',
                             tpl: new Ext.XTemplate(
@@ -107,7 +108,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                                         margin: 5,
                                         handler: function () {
                                             var toggleValue = self.items.items[0].items.items[2].items.items[0].getValue();
-                                            console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);                                            
+                                            console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
                                             Ext.util.JSONP.request({
                                                 url: 'http://10.1.0.56:9999/JSON/SendCmd',
                                                 callbackKey: 'callback',
@@ -162,18 +163,19 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                                         });
                                     }
                                 }]
-            },
-            listeners: {
-                scope: this,
-                deactivate: function () {
-                    if (RepollTimer) { clearInterval(RepollTimer); }
+                },
+                listeners: {
+                    scope: this,
+                    deactivate: function () {
+                        if (RepollTimer) { clearInterval(RepollTimer); }
+                    }
                 }
-            }
-        });
-        this.callOverridden([config]);
-    },
-    config:
+            });
+            this.callOverridden([config]);
+        },
+        config:
 	{
 	    layout: 'fit'
 	}
+    });
 });

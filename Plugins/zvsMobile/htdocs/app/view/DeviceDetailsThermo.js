@@ -1,81 +1,82 @@
-﻿Ext.define('zvsMobile.view.DeviceDetailsThermo', {
-    extend: 'Ext.Panel',
-    alias: 'widget.DeviceDetailsThermo',
+﻿Ext.require(['Ext.Panel', 'Ext.util.JSONP'], function () {
+    Ext.define('zvsMobile.view.DeviceDetailsThermo', {
+        extend: 'Ext.Panel',
+        alias: 'widget.DeviceDetailsThermo',
 
-    constructor: function (config) {
-        var self = this;
-        var RepollTimer;
-        self.deviceID = 0;
-        Ext.apply(config || {}, {
-            delayedReload: function () {
-                if (RepollTimer) { clearInterval(RepollTimer); }
+        constructor: function (config) {
+            var self = this;
+            var RepollTimer;
+            self.deviceID = 0;
+            Ext.apply(config || {}, {
+                delayedReload: function () {
+                    if (RepollTimer) { clearInterval(RepollTimer); }
 
-                RepollTimer = setTimeout(function () {
-                    var id = self.items.items[0].items.items[1].getData().id;
-                    self.loadDevice(self.deviceID);
-                }, 1500);
-            },
-            loadDevice: function (deviceId) {
-                self.deviceID = deviceId;
-                //Get Device Details			
-                console.log('AJAX: GetDeviceDetails');
-                Ext.util.JSONP.request({
-                    url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
-                    callbackKey: 'callback',
-                    params: {
-                        u: Math.random(),
-                        id: deviceId
-                    },
-                    callback: function (data) {
-                        console.log(data);
-
-                        //Send data to panel TPL                            
-                        self.items.items[0].items.items[1].setData(data);
-
-                        //Update meter levels 
-                        self.UpdateLevel(data.level);
-                    }
-                });
-            },
-            UpdateLevel: function (value) {
-
-                //Update panel TPL        
-                var data = Ext.clone(self.items.items[0].items.items[1].getData());
-                data.level = value;
-                data.level_txt = value + 'F';
-                self.items.items[0].items.items[1].setData(data);
-
-                //Update the store 
-                data = DeviceStore.data.items;
-                for (i = 0, len = data.length; i < len; i++) {
-                    if (data[i].data.id === self.items.items[0].items.items[1]._data.id) {
-                        data[i].data.level = value;
-                        data[i].data.level_txt = value + 'F';
-                    }
-                }
-                DeviceStore.loadRecords(data);
-                self.parent.items.items[0].refresh();
-
-            },
-            items: [{
-                xtype: 'panel',
-                scrollable: 'vertical',
-                items: [{
-                    xtype: 'toolbar',
-                    docked: 'top',
-                    title: 'Device Details',
-                    items: [{
-                        xtype: 'button',
-                        iconMask: true,
-                        ui: 'back',
-                        text: 'Back',
-                        handler: function () {
-                            var DeviceViewPort = self.parent;
-                            DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                            DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
-                        }
-                    }]
+                    RepollTimer = setTimeout(function () {
+                        var id = self.items.items[0].items.items[1].getData().id;
+                        self.loadDevice(self.deviceID);
+                    }, 1500);
                 },
+                loadDevice: function (deviceId) {
+                    self.deviceID = deviceId;
+                    //Get Device Details			
+                    console.log('AJAX: GetDeviceDetails');
+                    Ext.util.JSONP.request({
+                        url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
+                        callbackKey: 'callback',
+                        params: {
+                            u: Math.random(),
+                            id: deviceId
+                        },
+                        callback: function (data) {
+                            console.log(data);
+
+                            //Send data to panel TPL                            
+                            self.items.items[0].items.items[1].setData(data);
+
+                            //Update meter levels 
+                            self.UpdateLevel(data.level);
+                        }
+                    });
+                },
+                UpdateLevel: function (value) {
+
+                    //Update panel TPL        
+                    var data = Ext.clone(self.items.items[0].items.items[1].getData());
+                    data.level = value;
+                    data.level_txt = value + 'F';
+                    self.items.items[0].items.items[1].setData(data);
+
+                    //Update the store 
+                    data = DeviceStore.data.items;
+                    for (i = 0, len = data.length; i < len; i++) {
+                        if (data[i].data.id === self.items.items[0].items.items[1]._data.id) {
+                            data[i].data.level = value;
+                            data[i].data.level_txt = value + 'F';
+                        }
+                    }
+                    DeviceStore.loadRecords(data);
+                    self.parent.items.items[0].refresh();
+
+                },
+                items: [{
+                    xtype: 'panel',
+                    scrollable: 'vertical',
+                    items: [{
+                        xtype: 'toolbar',
+                        docked: 'top',
+                        title: 'Device Details',
+                        items: [{
+                            xtype: 'button',
+                            iconMask: true,
+                            ui: 'back',
+                            text: 'Back',
+                            handler: function () {
+                                var DeviceViewPort = self.parent;
+                                DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                                DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
+                            }
+                        }]
+                    },
                      {
                          xtype: 'panel',
                          tpl: new Ext.XTemplate(
@@ -269,8 +270,8 @@
                                                 {
                                                     text: 'Auto Low',
                                                     value: 'Auto Low'
-                                           }]
-                                        },
+                                                }]
+                                      },
                                         {
                                             xtype: 'toolbar',
                                             docked: 'top',
@@ -459,23 +460,23 @@
                          }
                      }
                      ]
-            }],
-            listeners: {
-                scope: this,
-                deactivate: function () {
-                    if (RepollTimer) { clearInterval(RepollTimer); }
+                }],
+                listeners: {
+                    scope: this,
+                    deactivate: function () {
+                        if (RepollTimer) { clearInterval(RepollTimer); }
+                    }
                 }
-            }
-        });
-        this.callOverridden([config]);
-    },
-    config:
+            });
+            this.callOverridden([config]);
+        },
+        config:
 	{
 	    layout: 'fit'
 	}
-});
+    });
 
-var tempSetPoints = [{ text: '40&deg;', value: 40 },
+    var tempSetPoints = [{ text: '40&deg;', value: 40 },
                     { text: '41&deg;', value: 41 },
                     { text: '42&deg;', value: 42 },
                     { text: '43&deg;', value: 43 },
@@ -535,3 +536,5 @@ var tempSetPoints = [{ text: '40&deg;', value: 40 },
                     { text: '97&deg;', value: 97 },
                     { text: '98&deg;', value: 98 },
                     { text: '99&deg;', value: 99}];
+
+});
