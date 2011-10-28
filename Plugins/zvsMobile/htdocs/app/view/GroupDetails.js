@@ -39,7 +39,7 @@
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
-                    title: 'Scene Details',
+                    title: 'Group Details',
                     items: [{
                         xtype: 'button',
                         iconMask: true,
