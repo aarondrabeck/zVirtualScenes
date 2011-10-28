@@ -81,7 +81,7 @@ Ext.require(['zvsMobile.store.Devices', 'Ext.dataview.List'], function () {
 			        '</div>',
 		        '</div>'),
         cls: 'DeviceListItem',
-        store: 'Devices'
+        store: 'zvsMobile.store.Devices'
     }
     });
 });

@@ -1,8 +1,8 @@
-﻿Ext.require(['Ext.data.Store'], function () {
+﻿Ext.require(['zvsMobile.model.Device', 'Ext.data.Store'], function () {
     Ext.define('zvsMobile.store.Devices', {
         extend: 'Ext.data.Store',
         model: 'zvsMobile.model.Device',
-        requires: ['zvsMobile.model.Device'],
+       // requires: [],
 
         config: {
             proxy: {
