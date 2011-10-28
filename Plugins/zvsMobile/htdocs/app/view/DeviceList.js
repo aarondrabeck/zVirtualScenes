@@ -39,7 +39,7 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device'], function () {
                         iconMask: true,
                         iconCls: 'refresh',
                         handler: function () {
-                            zvsMobile.DeviceStore.load();
+                            DeviceStore.load();
                         }
                     }, {
                         xtype: 'spacer'

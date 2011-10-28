@@ -1,4 +1,4 @@
-Ext.require(['Ext.Panel', 'Ext.util.JSONP'], function () {
+Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
     Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
         extend: 'Ext.Panel',
         alias: 'widget.DeviceDetailsSwitch',
