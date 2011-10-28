@@ -1,35 +1,26 @@
-Ext.require(['Ext.dataview.List'], function () {
+Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device'], function () {
     console.log('1');
-
-    Ext.define('zvsMobile.model.Device', {
-        extend: 'Ext.data.Model',
-        fields: ['id', 'name', 'on_off', 'level', 'level_txt', 'type']
-    });
 
     DeviceStore = Ext.create('Ext.data.Store', {
         model: 'zvsMobile.model.Device',
         requires: ['zvsMobile.model.Device'],
-
- 
-            proxy: {
-                type: 'scripttag',
-                url: 'http://10.1.0.56:9999/JSON/GetDeviceList',
-                extraParams: {
-                    u: Math.random()
-                },
-                reader: {
-                    type: 'json',
-                    root: 'devices',
-                    idProperty: 'id',
-                    successProperty: 'success'
-                },
-                callbackParam: 'callback'
+        proxy: {
+            type: 'scripttag',
+            url: 'http://10.1.0.56:9999/JSON/GetDeviceList',
+            extraParams: {
+                u: Math.random()
             },
-            autoLoad: true
-        
+            reader: {
+                type: 'json',
+                root: 'devices',
+                idProperty: 'id',
+                successProperty: 'success'
+            },
+            callbackParam: 'callback'
+        },
+        autoLoad: true
+
     });
-
-
 
 
     Ext.define('zvsMobile.view.DeviceList', {
