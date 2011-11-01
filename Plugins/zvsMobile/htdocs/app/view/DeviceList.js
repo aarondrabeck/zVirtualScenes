@@ -6,7 +6,6 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Dev
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {
-                scrollable: 'vertical',
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
@@ -21,7 +20,6 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Dev
                         }
                     }]
                 }],
-
                 listeners:
 			{
 			    scope: this,
@@ -62,6 +60,7 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Dev
         },
         config:
         {
+            scrollable: 'vertical',
             itemTpl: new Ext.XTemplate(
 		            '<div class="device">',
 			            '<div class="imageholder {type}_{on_off}"></div>',

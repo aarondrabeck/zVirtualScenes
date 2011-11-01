@@ -175,7 +175,8 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
         },
         config:
 	{
-	    layout: 'fit'
+	    layout: 'fit',
+	    scrollable: 'vertical'
 	}
     });
 });

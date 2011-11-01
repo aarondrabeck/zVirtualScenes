@@ -356,11 +356,60 @@ namespace zvsMobile
 
                         if (scene != null)
                         {
-                            string r = scene.RunScene();                            
+                            string r = scene.RunScene();
                             data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = true, desc = r }) + ");";
 
                         }
-                    }                    
+                    }    
+
+                    if (context.Request.RawUrl.Contains("/JSON/GetGroupList"))
+                    {
+                        var q0 = from g in zvsEntityControl.zvsContext.groups
+                                 select new
+                                 {
+                                     id = g.id,
+                                     name = g.name,
+                                     count = g.group_devices.Count()
+                                 };
+
+                        var groups = new { success = true, groups = q0 };
+
+                        data = context.Request.QueryString["callback"] + "(" + js.Serialize(groups) + ");";
+                    }
+
+
+                    if (context.Request.RawUrl.Contains("/JSON/GetGroupDetails"))
+                    {
+
+                        long gID = 0;
+                        long.TryParse(context.Request.QueryString["id"], out gID);
+
+                        group group = zvsEntityControl.zvsContext.groups.SingleOrDefault(g => g.id == gID);
+
+                        if (group != null)
+                        {
+                            List<object> group_devices = new List<object>();
+                            foreach (group_devices gd in group.group_devices)
+                            {
+                                group_devices.Add(new
+                                {
+                                    id = gd.device.id,
+                                    name = gd.device.friendly_name,
+                                    type = gd.device.device_types.name                                  
+                                });
+                            }
+                            var g = new
+                            {
+                                id = group.id,
+                                name = group.name,
+                                devices = group_devices
+                            };                           
+                            data = context.Request.QueryString["callback"] + "(" + js.Serialize(new { success = true, group = g }) + ");";
+                        }
+                    }
+
+
+                                    
 
                     response.StatusCode = (int)HttpStatusCode.OK;
                     MemoryStream stream = new MemoryStream();

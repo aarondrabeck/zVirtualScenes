@@ -472,7 +472,8 @@
         },
         config:
 	{
-	    layout: 'fit'
+	    layout: 'fit',
+	    scrollable: 'vertical'
 	}
     });
 

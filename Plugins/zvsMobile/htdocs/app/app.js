@@ -19,6 +19,10 @@ Ext.application({
                     docked: 'bottom',
                     layout: {
                         pack: 'center'
+                    },
+                    scrollable: {
+                        direction: 'horizontal',
+                        indicator: true
                     }
                 },
                 items: [{
@@ -35,14 +39,23 @@ Ext.application({
                     title: "Groups",
                     iconCls: "spaces2"
                 }, {
+                    title: 'User',
+                    html: '<h1>User Card</h1>',
+                    iconCls: 'user'
+                }, {
                     title: 'Settings',
                     html: '<h1>Settings Card</h1>',
-                    cls: 'card4',
                     iconCls: 'settings'
-                }
-
-
-                ]
+                }, {
+                    title: 'About',
+                    html: '<h1>zvsMobile 2.0</h1>',
+                    iconCls: 'about',
+                    items: [{
+                        xtype: 'toolbar',
+                        docked: 'top',
+                        title: 'About'
+                    }]
+                }]
             });
         });
     }
