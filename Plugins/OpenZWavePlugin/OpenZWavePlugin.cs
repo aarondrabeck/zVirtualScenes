@@ -700,8 +700,10 @@ namespace OpenZWavePlugin
                             value.CommandClassID = vid.GetCommandClassId().ToString();
                             value.Help = m_manager.GetValueHelp(vid);
 
-                            string data;
-                            m_manager.GetValueAsString(vid, out data);
+                            string data = GetValue(vid);
+                          // m_manager.GetValueAsString(vid, out data);
+
+                           
 
                             Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
                      
@@ -1050,7 +1052,52 @@ namespace OpenZWavePlugin
                         break;
                     }                   
             }
-        }     
+        }
+
+        string GetValue(ZWValueID v)
+        {
+            switch (v.GetType())
+            {
+                case ZWValueID.ValueType.Bool:
+                    bool r1;
+                    m_manager.GetValueAsBool(v, out r1);
+                    return r1.ToString();
+                case ZWValueID.ValueType.Byte:
+                    byte r2;
+                    m_manager.GetValueAsByte(v, out r2);
+                    return r2.ToString();
+                case ZWValueID.ValueType.Decimal:
+                    decimal r3;
+                    m_manager.GetValueAsDecimal(v, out r3);
+                    return r3.ToString();
+                case ZWValueID.ValueType.Int:
+                    Int32 r4;
+                    m_manager.GetValueAsInt(v, out r4);
+                    return r4.ToString();
+                case ZWValueID.ValueType.List:
+                    string[] r5;
+                    m_manager.GetValueListItems(v, out r5);
+                    string r6 = "";
+                    foreach (string s in r5)
+                    {
+                        r6 += s;
+                        r6 += "/";
+                    }
+                    return r6;
+                case ZWValueID.ValueType.Schedule:
+                    return "Schedule";
+                case ZWValueID.ValueType.Short:
+                    short r7;
+                    m_manager.GetValueAsShort(v, out r7);
+                    return r7.ToString();
+                case ZWValueID.ValueType.String:
+                    string r8;
+                    m_manager.GetValueAsString(v, out r8);
+                    return r8;
+                default:
+                    return "";
+            }
+        }
 
         private Node GetNode(UInt32 homeId, Byte nodeId)
         {

@@ -100,6 +100,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                         }]
                     }, {
                         xtype: 'panel',
+                        scrollable: 'vertical',
                         tpl: new Ext.XTemplate(
 							    '<div class="device_info">',
 							    '<div id="level_dimmer_img" class="imageholder {type}_{on_off}"></div>',
@@ -117,16 +118,19 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                         },
                         items: [{
                             xtype: 'sliderfield',
+                            id: 'sliderfield',
                             label: 'Level',
                             minValue: 0,
-                            maxValue: 99
-                            //					            listeners: {
-                            //					                scope: this,
-                            //					                change: function (slider, thumb, newValue, oldValue) {
-                            //					                    console.log('change ' + newValue);
-                            //					                    //Ext.get('level_dimmer_details').dom.innerHTML = newValue.toString() + "%";
-                            //					                }
-                            //					            }
+                            maxValue: 99,
+                            listeners: {
+                                scope: this,
+                                change: function (slider, value) {
+                                    var details = Ext.get('sliderfield');
+                                    if (details) {
+                                        details.dom.childNodes[0].childNodes[1].childNodes[0].innerHTML = slider.getValue() + "%";
+                                    }
+                                }
+                            }
                         }, {
                             xtype: 'button',
                             text: 'Set Level',
@@ -201,8 +205,8 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
         },
         config:
 	{
-	    layout: 'fit',
-        scrollable: 'vertical'
+	    //layout: 'fit',
+	    //scrollable: 'vertical'
 	}
     });
 });

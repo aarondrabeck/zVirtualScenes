@@ -65,7 +65,7 @@ namespace zVirtualScenesCommon.Entity
             if (this.device_types.name.Equals("THERMOSTAT"))
             {
                 int temp = 0;
-                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Temperature");
+                device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
                 if (dv != null)                
                     int.TryParse(dv.value, out temp);
@@ -75,7 +75,7 @@ namespace zVirtualScenesCommon.Entity
             else if (this.device_types.name.Equals("SWITCH"))
             {
                 int level = 0;
-                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)  
                     int.TryParse(dv.value, out level);
@@ -85,7 +85,7 @@ namespace zVirtualScenesCommon.Entity
             else
             {
                 int level = 0;
-                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)
                     int.TryParse(dv.value, out level);
@@ -100,7 +100,7 @@ namespace zVirtualScenesCommon.Entity
             if (this.device_types.name.Equals("THERMOSTAT"))
             {
                 int temp = 0;
-                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Temperature");
+                device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
                 if (dv != null)
                     int.TryParse(dv.value, out temp);
@@ -110,7 +110,7 @@ namespace zVirtualScenesCommon.Entity
             else if (this.device_types.name.Equals("SWITCH"))
             {
                 int level = 0;
-                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)
                     int.TryParse(dv.value, out level);
@@ -120,7 +120,7 @@ namespace zVirtualScenesCommon.Entity
             else
             {
                 int level = 0;
-                device_values dv = this.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)
                     int.TryParse(dv.value, out level);
