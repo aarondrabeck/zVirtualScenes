@@ -89,7 +89,7 @@ Ext.define('Ext.util.SizeMonitor', {
     onDetectorScroll: function(name) {
         var detector = this.detectors[name],
             position = this.position[name];
-
+        
         if (detector.scrollLeft !== position.left || detector.scrollTop !== position.top) {
             this.refresh();
             this.fireSizeChangeEvent();
@@ -105,17 +105,16 @@ Ext.define('Ext.util.SizeMonitor', {
     doFireSizeChangeEvent: function() {
         var callback = this.getCallback(),
             scope = this.getScope();
-
+            
         callback.call(scope);
     },
 
     destroyDetector: function(name) {
-        var element = this.getElement(),
-            detector = this.detectors[name],
+        var detector = this.detectors[name],
             listener = this.listeners[name];
 
         detector.removeEventListener('scroll', listener, true);
-        element.dom.removeChild(detector);
+        Ext.removeNode(detector);
     },
 
     destroy: function() {

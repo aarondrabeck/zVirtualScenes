@@ -65,14 +65,10 @@ namespace zVirtualScenesApplication
             this.SourceCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.descCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.dataListEvents = new BrightIdeasSoftware.DataListView();
+            this.dataListTriggers = new BrightIdeasSoftware.DataListView();
             this.eventNameCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.eventObjName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.triggerName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.btnEditEvent = new System.Windows.Forms.Button();
-            this.btnDeleteEvent = new System.Windows.Forms.Button();
-            this.btnNewEvent = new System.Windows.Forms.Button();
+            this.triggerFriendlyName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.olvColumnEnabled = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.tabPage4 = new System.Windows.Forms.TabPage();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.dataListTasks = new BrightIdeasSoftware.DataListView();
@@ -80,11 +76,11 @@ namespace zVirtualScenesApplication
             this.FreqCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.EnabledCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.imageList25Icons = new System.Windows.Forms.ImageList(this.components);
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox_Seconds = new System.Windows.Forms.GroupBox();
             this.numericUpDownOccurSeconds = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.groupBox_Daily = new System.Windows.Forms.GroupBox();
@@ -157,6 +153,17 @@ namespace zVirtualScenesApplication
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenuStripTrigger = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deleteEventToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripTriggerNull = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItemEventsNull = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenuStripnotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showZVirtualSceneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitZVSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -166,20 +173,16 @@ namespace zVirtualScenesApplication
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewLog)).BeginInit();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataListEvents)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataListTriggers)).BeginInit();
             this.tabPage4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox_Seconds.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurSeconds)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox_Daily.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurDays)).BeginInit();
             this.groupBox_Weekly.SuspendLayout();
@@ -202,6 +205,9 @@ namespace zVirtualScenesApplication
             this.statusStrip1.SuspendLayout();
             this.cmsSceneCMD.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.contextMenuStripTrigger.SuspendLayout();
+            this.contextMenuStripTriggerNull.SuspendLayout();
+            this.contextMenuStripnotifyIcon.SuspendLayout();
             this.SuspendLayout();
             // 
             // imageListActionTypesSmall
@@ -387,7 +393,7 @@ namespace zVirtualScenesApplication
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1187, 706);
+            this.tabPage2.Size = new System.Drawing.Size(776, 438);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Log";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -416,7 +422,7 @@ namespace zVirtualScenesApplication
             this.dataListViewLog.OwnerDraw = true;
             this.dataListViewLog.ShowCommandMenuOnRightClick = true;
             this.dataListViewLog.ShowGroups = false;
-            this.dataListViewLog.Size = new System.Drawing.Size(1181, 700);
+            this.dataListViewLog.Size = new System.Drawing.Size(770, 432);
             this.dataListViewLog.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewLog.Sorting = System.Windows.Forms.SortOrder.Descending;
             this.dataListViewLog.TabIndex = 31;
@@ -450,104 +456,60 @@ namespace zVirtualScenesApplication
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.splitContainer1);
+            this.tabPage1.Controls.Add(this.dataListTriggers);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1187, 706);
+            this.tabPage1.Size = new System.Drawing.Size(776, 438);
             this.tabPage1.TabIndex = 6;
-            this.tabPage1.Text = "Events";
+            this.tabPage1.Text = "Triggers";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // splitContainer1
+            // dataListTriggers
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.Location = new System.Drawing.Point(3, 3);
-            this.splitContainer1.Name = "splitContainer1";
-            this.splitContainer1.Orientation = System.Windows.Forms.Orientation.Horizontal;
-            // 
-            // splitContainer1.Panel1
-            // 
-            this.splitContainer1.Panel1.Controls.Add(this.dataListEvents);
-            // 
-            // splitContainer1.Panel2
-            // 
-            this.splitContainer1.Panel2.Controls.Add(this.btnEditEvent);
-            this.splitContainer1.Panel2.Controls.Add(this.btnDeleteEvent);
-            this.splitContainer1.Panel2.Controls.Add(this.btnNewEvent);
-            this.splitContainer1.Size = new System.Drawing.Size(1181, 700);
-            this.splitContainer1.SplitterDistance = 644;
-            this.splitContainer1.TabIndex = 1;
-            // 
-            // dataListEvents
-            // 
-            this.dataListEvents.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
-            this.dataListEvents.AllColumns.Add(this.eventNameCol);
-            this.dataListEvents.AllColumns.Add(this.eventObjName);
-            this.dataListEvents.AllColumns.Add(this.triggerName);
-            this.dataListEvents.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.dataListTriggers.Alignment = System.Windows.Forms.ListViewAlignment.SnapToGrid;
+            this.dataListTriggers.AllColumns.Add(this.eventNameCol);
+            this.dataListTriggers.AllColumns.Add(this.triggerFriendlyName);
+            this.dataListTriggers.AllColumns.Add(this.olvColumnEnabled);
+            this.dataListTriggers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.eventNameCol,
-            this.eventObjName,
-            this.triggerName});
-            this.dataListEvents.DataSource = null;
-            this.dataListEvents.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataListEvents.HasCollapsibleGroups = false;
-            this.dataListEvents.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.dataListEvents.Location = new System.Drawing.Point(0, 0);
-            this.dataListEvents.Name = "dataListEvents";
-            this.dataListEvents.ShowGroups = false;
-            this.dataListEvents.Size = new System.Drawing.Size(1181, 644);
-            this.dataListEvents.TabIndex = 0;
-            this.dataListEvents.UseCompatibleStateImageBehavior = false;
-            this.dataListEvents.View = System.Windows.Forms.View.Details;
+            this.triggerFriendlyName,
+            this.olvColumnEnabled});
+            this.dataListTriggers.DataSource = null;
+            this.dataListTriggers.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataListTriggers.EmptyListMsg = "Right-Click to add an Event.";
+            this.dataListTriggers.EmptyListMsgFont = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dataListTriggers.FullRowSelect = true;
+            this.dataListTriggers.HasCollapsibleGroups = false;
+            this.dataListTriggers.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.dataListTriggers.Location = new System.Drawing.Point(3, 3);
+            this.dataListTriggers.MultiSelect = false;
+            this.dataListTriggers.Name = "dataListTriggers";
+            this.dataListTriggers.ShowGroups = false;
+            this.dataListTriggers.Size = new System.Drawing.Size(770, 432);
+            this.dataListTriggers.TabIndex = 0;
+            this.dataListTriggers.UseCompatibleStateImageBehavior = false;
+            this.dataListTriggers.View = System.Windows.Forms.View.Details;
+            this.dataListTriggers.CellRightClick += new System.EventHandler<BrightIdeasSoftware.CellRightClickEventArgs>(this.dataListEvents_CellRightClick);
+            this.dataListTriggers.DoubleClick += new System.EventHandler(this.dataListEvents_DoubleClick);
             // 
             // eventNameCol
             // 
-            this.eventNameCol.AspectName = "txt_event_name";
+            this.eventNameCol.AspectName = "Name";
             this.eventNameCol.Text = "Name";
             this.eventNameCol.Width = 200;
             // 
-            // eventObjName
+            // triggerFriendlyName
             // 
-            this.eventObjName.AspectName = "txt_object_name";
-            this.eventObjName.Text = "Object";
-            this.eventObjName.Width = 200;
+            this.triggerFriendlyName.AspectName = "FriendlyName";
+            this.triggerFriendlyName.FillsFreeSpace = true;
+            this.triggerFriendlyName.Text = "Trigger";
+            this.triggerFriendlyName.Width = 200;
             // 
-            // triggerName
+            // olvColumnEnabled
             // 
-            this.triggerName.AspectName = "txt_event_name";
-            this.triggerName.Text = "Event";
-            this.triggerName.Width = 200;
-            // 
-            // btnEditEvent
-            // 
-            this.btnEditEvent.Location = new System.Drawing.Point(106, 3);
-            this.btnEditEvent.Name = "btnEditEvent";
-            this.btnEditEvent.Size = new System.Drawing.Size(95, 23);
-            this.btnEditEvent.TabIndex = 2;
-            this.btnEditEvent.Text = "Edit Event";
-            this.btnEditEvent.UseVisualStyleBackColor = true;
-            this.btnEditEvent.Click += new System.EventHandler(this.btnEditEvent_Click);
-            // 
-            // btnDeleteEvent
-            // 
-            this.btnDeleteEvent.Location = new System.Drawing.Point(207, 3);
-            this.btnDeleteEvent.Name = "btnDeleteEvent";
-            this.btnDeleteEvent.Size = new System.Drawing.Size(95, 23);
-            this.btnDeleteEvent.TabIndex = 1;
-            this.btnDeleteEvent.Text = "Delete Event";
-            this.btnDeleteEvent.UseVisualStyleBackColor = true;
-            this.btnDeleteEvent.Click += new System.EventHandler(this.btnDeleteEvent_Click);
-            // 
-            // btnNewEvent
-            // 
-            this.btnNewEvent.Location = new System.Drawing.Point(5, 3);
-            this.btnNewEvent.Name = "btnNewEvent";
-            this.btnNewEvent.Size = new System.Drawing.Size(95, 23);
-            this.btnNewEvent.TabIndex = 0;
-            this.btnNewEvent.Text = "New Event";
-            this.btnNewEvent.UseVisualStyleBackColor = true;
-            this.btnNewEvent.Click += new System.EventHandler(this.btnNewEvent_Click);
+            this.olvColumnEnabled.AspectName = "enabled";
+            this.olvColumnEnabled.Text = "Enabled";
             // 
             // tabPage4
             // 
@@ -555,7 +517,7 @@ namespace zVirtualScenesApplication
             this.tabPage4.Location = new System.Drawing.Point(4, 22);
             this.tabPage4.Name = "tabPage4";
             this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(1187, 706);
+            this.tabPage4.Size = new System.Drawing.Size(776, 438);
             this.tabPage4.TabIndex = 3;
             this.tabPage4.Text = "Scene Scheduling";
             this.tabPage4.UseVisualStyleBackColor = true;
@@ -575,8 +537,11 @@ namespace zVirtualScenesApplication
             // 
             // splitContainer2.Panel2
             // 
-            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Seconds);
+            this.splitContainer2.Panel2.AutoScroll = true;
+            this.splitContainer2.Panel2.BackColor = System.Drawing.Color.White;
+            this.splitContainer2.Panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.splitContainer2.Panel2.Controls.Add(this.pictureBox1);
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Seconds);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
             this.splitContainer2.Panel2.Controls.Add(this.label6);
             this.splitContainer2.Panel2.Controls.Add(this.groupBox_Daily);
@@ -590,7 +555,7 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.Controls.Add(this.label17);
             this.splitContainer2.Panel2.Controls.Add(this.groupBox_Weekly);
             this.splitContainer2.Panel2MinSize = 553;
-            this.splitContainer2.Size = new System.Drawing.Size(1181, 700);
+            this.splitContainer2.Size = new System.Drawing.Size(770, 432);
             this.splitContainer2.SplitterDistance = global::zVirtualScenesApplication.Properties.Settings.Default.SpiltContainer2Distance;
             this.splitContainer2.TabIndex = 47;
             // 
@@ -614,7 +579,7 @@ namespace zVirtualScenesApplication
             this.dataListTasks.OwnerDraw = true;
             this.dataListTasks.ShowCommandMenuOnRightClick = true;
             this.dataListTasks.ShowGroups = false;
-            this.dataListTasks.Size = new System.Drawing.Size(322, 696);
+            this.dataListTasks.Size = new System.Drawing.Size(208, 428);
             this.dataListTasks.SmallImageList = this.imageList25Icons;
             this.dataListTasks.TabIndex = 46;
             this.dataListTasks.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientActiveCaption;
@@ -656,12 +621,22 @@ namespace zVirtualScenesApplication
             this.imageList25Icons.Images.SetKeyName(1, "Scene");
             this.imageList25Icons.Images.SetKeyName(2, "SceneRun");
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.pictureBox1.Image = global::zVirtualScenesApplication.Properties.Resources.task;
+            this.pictureBox1.Location = new System.Drawing.Point(381, 195);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(154, 142);
+            this.pictureBox1.TabIndex = 44;
+            this.pictureBox1.TabStop = false;
+            // 
             // groupBox_Seconds
             // 
             this.groupBox_Seconds.Controls.Add(this.numericUpDownOccurSeconds);
             this.groupBox_Seconds.Controls.Add(this.label1);
             this.groupBox_Seconds.Controls.Add(this.label2);
-            this.groupBox_Seconds.Location = new System.Drawing.Point(17, 142);
+            this.groupBox_Seconds.Location = new System.Drawing.Point(17, 172);
             this.groupBox_Seconds.Name = "groupBox_Seconds";
             this.groupBox_Seconds.Size = new System.Drawing.Size(234, 54);
             this.groupBox_Seconds.TabIndex = 41;
@@ -698,16 +673,6 @@ namespace zVirtualScenesApplication
             this.label2.TabIndex = 39;
             this.label2.Text = "Recur every";
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(702, 194);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(137, 130);
-            this.pictureBox1.TabIndex = 44;
-            this.pictureBox1.TabStop = false;
-            // 
             // label5
             // 
             this.label5.AutoSize = true;
@@ -731,7 +696,7 @@ namespace zVirtualScenesApplication
             this.groupBox_Daily.Controls.Add(this.numericUpDownOccurDays);
             this.groupBox_Daily.Controls.Add(this.label19);
             this.groupBox_Daily.Controls.Add(this.label20);
-            this.groupBox_Daily.Location = new System.Drawing.Point(17, 142);
+            this.groupBox_Daily.Location = new System.Drawing.Point(17, 172);
             this.groupBox_Daily.Name = "groupBox_Daily";
             this.groupBox_Daily.Size = new System.Drawing.Size(206, 54);
             this.groupBox_Daily.TabIndex = 37;
@@ -777,9 +742,8 @@ namespace zVirtualScenesApplication
             // 
             // checkBox_EnabledTask
             // 
-            this.checkBox_EnabledTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBox_EnabledTask.AutoSize = true;
-            this.checkBox_EnabledTask.Location = new System.Drawing.Point(744, 14);
+            this.checkBox_EnabledTask.Location = new System.Drawing.Point(112, 143);
             this.checkBox_EnabledTask.Name = "checkBox_EnabledTask";
             this.checkBox_EnabledTask.Size = new System.Drawing.Size(92, 17);
             this.checkBox_EnabledTask.TabIndex = 39;
@@ -789,7 +753,7 @@ namespace zVirtualScenesApplication
             // button_SaveTask
             // 
             this.button_SaveTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_SaveTask.Location = new System.Drawing.Point(742, 664);
+            this.button_SaveTask.Location = new System.Drawing.Point(438, 376);
             this.button_SaveTask.Name = "button_SaveTask";
             this.button_SaveTask.Size = new System.Drawing.Size(97, 25);
             this.button_SaveTask.TabIndex = 38;
@@ -855,7 +819,7 @@ namespace zVirtualScenesApplication
             this.groupBox_Weekly.Controls.Add(this.checkBox_RecurMonday);
             this.groupBox_Weekly.Controls.Add(this.label7);
             this.groupBox_Weekly.Controls.Add(this.label12);
-            this.groupBox_Weekly.Location = new System.Drawing.Point(17, 142);
+            this.groupBox_Weekly.Location = new System.Drawing.Point(17, 172);
             this.groupBox_Weekly.Name = "groupBox_Weekly";
             this.groupBox_Weekly.Size = new System.Drawing.Size(206, 165);
             this.groupBox_Weekly.TabIndex = 41;
@@ -968,7 +932,7 @@ namespace zVirtualScenesApplication
             this.tabPage5.Location = new System.Drawing.Point(4, 22);
             this.tabPage5.Name = "tabPage5";
             this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(1187, 706);
+            this.tabPage5.Size = new System.Drawing.Size(776, 438);
             this.tabPage5.TabIndex = 5;
             this.tabPage5.Text = "Devices";
             this.tabPage5.UseVisualStyleBackColor = true;
@@ -991,8 +955,8 @@ namespace zVirtualScenesApplication
             // 
             this.splitContainer3.Panel2.Controls.Add(this.uc_object_values1);
             this.splitContainer3.Panel2MinSize = 200;
-            this.splitContainer3.Size = new System.Drawing.Size(1181, 700);
-            this.splitContainer3.SplitterDistance = 492;
+            this.splitContainer3.Size = new System.Drawing.Size(770, 432);
+            this.splitContainer3.SplitterDistance = 228;
             this.splitContainer3.TabIndex = 1;
             // 
             // dataListViewDevices
@@ -1033,7 +997,7 @@ namespace zVirtualScenesApplication
             this.dataListViewDevices.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
             this.dataListViewDevices.ShowCommandMenuOnRightClick = true;
             this.dataListViewDevices.ShowGroups = false;
-            this.dataListViewDevices.Size = new System.Drawing.Size(1179, 490);
+            this.dataListViewDevices.Size = new System.Drawing.Size(768, 226);
             this.dataListViewDevices.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewDevices.SortGroupItemsByPrimaryColumn = false;
             this.dataListViewDevices.TabIndex = 0;
@@ -1103,14 +1067,14 @@ namespace zVirtualScenesApplication
             this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
             this.uc_object_values1.Name = "uc_object_values1";
-            this.uc_object_values1.Size = new System.Drawing.Size(1179, 202);
+            this.uc_object_values1.Size = new System.Drawing.Size(768, 198);
             this.uc_object_values1.TabIndex = 0;
             // 
             // MainTabControl
             // 
-            this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MainTabControl.Controls.Add(this.tabPage5);
             this.MainTabControl.Controls.Add(this.tabPage3);
             this.MainTabControl.Controls.Add(this.tabPage4);
@@ -1119,7 +1083,7 @@ namespace zVirtualScenesApplication
             this.MainTabControl.Location = new System.Drawing.Point(0, 24);
             this.MainTabControl.Name = "MainTabControl";
             this.MainTabControl.SelectedIndex = 0;
-            this.MainTabControl.Size = new System.Drawing.Size(1195, 732);
+            this.MainTabControl.Size = new System.Drawing.Size(784, 464);
             this.MainTabControl.TabIndex = 0;
             this.MainTabControl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.MainTabControl_KeyDown);
             // 
@@ -1129,7 +1093,7 @@ namespace zVirtualScenesApplication
             this.tabPage3.Location = new System.Drawing.Point(4, 22);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(1187, 706);
+            this.tabPage3.Size = new System.Drawing.Size(776, 438);
             this.tabPage3.TabIndex = 7;
             this.tabPage3.Text = "Scenes";
             this.tabPage3.UseVisualStyleBackColor = true;
@@ -1151,8 +1115,8 @@ namespace zVirtualScenesApplication
             this.splitContainer4.Panel2.Controls.Add(this.btnAddBltInCMD);
             this.splitContainer4.Panel2.Controls.Add(this.lbl_sceneActions);
             this.splitContainer4.Panel2.Controls.Add(this.dataListViewSceneCMDs);
-            this.splitContainer4.Size = new System.Drawing.Size(1181, 700);
-            this.splitContainer4.SplitterDistance = 392;
+            this.splitContainer4.Size = new System.Drawing.Size(770, 432);
+            this.splitContainer4.SplitterDistance = 255;
             this.splitContainer4.TabIndex = 0;
             // 
             // dataListViewScenes
@@ -1173,7 +1137,7 @@ namespace zVirtualScenesApplication
             this.dataListViewScenes.Name = "dataListViewScenes";
             this.dataListViewScenes.OwnerDraw = true;
             this.dataListViewScenes.ShowGroups = false;
-            this.dataListViewScenes.Size = new System.Drawing.Size(392, 700);
+            this.dataListViewScenes.Size = new System.Drawing.Size(255, 432);
             this.dataListViewScenes.SmallImageList = this.imageList25Icons;
             this.dataListViewScenes.SortGroupItemsByPrimaryColumn = false;
             this.dataListViewScenes.Sorting = System.Windows.Forms.SortOrder.Ascending;
@@ -1208,12 +1172,12 @@ namespace zVirtualScenesApplication
             // label3
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.Location = new System.Drawing.Point(654, 549);
+            this.label3.Location = new System.Drawing.Point(380, 281);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(117, 100);
             this.label3.TabIndex = 6;
             this.label3.Text = "Drag and drop device to add them to scenes or add a builtin command with the butt" +
-                "on below.";
+    "on below.";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // dataListViewDeviceSmallList
@@ -1222,8 +1186,8 @@ namespace zVirtualScenesApplication
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn5);
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn6);
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn4);
-            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDeviceSmallList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewDeviceSmallList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn5,
@@ -1235,7 +1199,7 @@ namespace zVirtualScenesApplication
             this.dataListViewDeviceSmallList.HasCollapsibleGroups = false;
             this.dataListViewDeviceSmallList.HideSelection = false;
             this.dataListViewDeviceSmallList.IsSimpleDragSource = true;
-            this.dataListViewDeviceSmallList.Location = new System.Drawing.Point(3, 521);
+            this.dataListViewDeviceSmallList.Location = new System.Drawing.Point(3, 253);
             this.dataListViewDeviceSmallList.Name = "dataListViewDeviceSmallList";
             this.dataListViewDeviceSmallList.OwnerDraw = true;
             this.dataListViewDeviceSmallList.RenderNonEditableCheckboxesAsDisabled = true;
@@ -1245,7 +1209,7 @@ namespace zVirtualScenesApplication
             this.dataListViewDeviceSmallList.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
             this.dataListViewDeviceSmallList.ShowCommandMenuOnRightClick = true;
             this.dataListViewDeviceSmallList.ShowGroups = false;
-            this.dataListViewDeviceSmallList.Size = new System.Drawing.Size(640, 174);
+            this.dataListViewDeviceSmallList.Size = new System.Drawing.Size(366, 174);
             this.dataListViewDeviceSmallList.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewDeviceSmallList.SortGroupItemsByPrimaryColumn = false;
             this.dataListViewDeviceSmallList.TabIndex = 5;
@@ -1276,7 +1240,7 @@ namespace zVirtualScenesApplication
             // btnAddBltInCMD
             // 
             this.btnAddBltInCMD.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAddBltInCMD.Location = new System.Drawing.Point(649, 672);
+            this.btnAddBltInCMD.Location = new System.Drawing.Point(375, 404);
             this.btnAddBltInCMD.Name = "btnAddBltInCMD";
             this.btnAddBltInCMD.Size = new System.Drawing.Size(131, 23);
             this.btnAddBltInCMD.TabIndex = 3;
@@ -1286,11 +1250,11 @@ namespace zVirtualScenesApplication
             // 
             // lbl_sceneActions
             // 
-            this.lbl_sceneActions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbl_sceneActions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbl_sceneActions.Location = new System.Drawing.Point(3, 6);
             this.lbl_sceneActions.Name = "lbl_sceneActions";
-            this.lbl_sceneActions.Size = new System.Drawing.Size(777, 15);
+            this.lbl_sceneActions.Size = new System.Drawing.Size(503, 15);
             this.lbl_sceneActions.TabIndex = 1;
             this.lbl_sceneActions.Text = "Scene 1";
             // 
@@ -1299,9 +1263,9 @@ namespace zVirtualScenesApplication
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn2);
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn3);
             this.dataListViewSceneCMDs.AllColumns.Add(this.SceneCMDOrderCol);
-            this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewSceneCMDs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewSceneCMDs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn2,
@@ -1318,7 +1282,7 @@ namespace zVirtualScenesApplication
             this.dataListViewSceneCMDs.SelectColumnsOnRightClick = false;
             this.dataListViewSceneCMDs.SelectColumnsOnRightClickBehaviour = BrightIdeasSoftware.ObjectListView.ColumnSelectBehaviour.None;
             this.dataListViewSceneCMDs.ShowGroups = false;
-            this.dataListViewSceneCMDs.Size = new System.Drawing.Size(777, 491);
+            this.dataListViewSceneCMDs.Size = new System.Drawing.Size(503, 223);
             this.dataListViewSceneCMDs.SmallImageList = this.imageListActionTypesSmall;
             this.dataListViewSceneCMDs.TabIndex = 0;
             this.dataListViewSceneCMDs.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientInactiveCaption;
@@ -1358,9 +1322,9 @@ namespace zVirtualScenesApplication
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 759);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 491);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1195, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(784, 22);
             this.statusStrip1.TabIndex = 7;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -1407,7 +1371,7 @@ namespace zVirtualScenesApplication
             this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1195, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(784, 24);
             this.menuStrip1.TabIndex = 8;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -1491,11 +1455,91 @@ namespace zVirtualScenesApplication
             this.pluginsToolStripMenuItem.Text = "&Options";
             this.pluginsToolStripMenuItem.Click += new System.EventHandler(this.pluginsToolStripMenuItem_Click);
             // 
+            // notifyIcon1
+            // 
+            this.notifyIcon1.ContextMenuStrip = this.contextMenuStripnotifyIcon;
+            this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+            this.notifyIcon1.Text = "zVirtualScenes";
+            this.notifyIcon1.Visible = true;
+            this.notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+            // 
+            // contextMenuStripTrigger
+            // 
+            this.contextMenuStripTrigger.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addToolStripMenuItem1,
+            this.editToolStripMenuItem,
+            this.deleteEventToolStripMenuItem});
+            this.contextMenuStripTrigger.Name = "contextMenuStripEvent";
+            this.contextMenuStripTrigger.Size = new System.Drawing.Size(141, 70);
+            // 
+            // addToolStripMenuItem1
+            // 
+            this.addToolStripMenuItem1.Name = "addToolStripMenuItem1";
+            this.addToolStripMenuItem1.Size = new System.Drawing.Size(140, 22);
+            this.addToolStripMenuItem1.Text = "&Create Event";
+            this.addToolStripMenuItem1.Click += new System.EventHandler(this.addToolStripMenuItem1_Click);
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.editToolStripMenuItem.Text = "&Edit Event";
+            this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
+            // 
+            // deleteEventToolStripMenuItem
+            // 
+            this.deleteEventToolStripMenuItem.Name = "deleteEventToolStripMenuItem";
+            this.deleteEventToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.deleteEventToolStripMenuItem.Text = "&Delete Event";
+            this.deleteEventToolStripMenuItem.Click += new System.EventHandler(this.deleteEventToolStripMenuItem_Click);
+            // 
+            // contextMenuStripTriggerNull
+            // 
+            this.contextMenuStripTriggerNull.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItemEventsNull});
+            this.contextMenuStripTriggerNull.Name = "contextMenuStripEvent";
+            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(153, 48);
+            // 
+            // toolStripMenuItemEventsNull
+            // 
+            this.toolStripMenuItemEventsNull.Name = "toolStripMenuItemEventsNull";
+            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemEventsNull.Text = "&Create Event";
+            this.toolStripMenuItemEventsNull.Click += new System.EventHandler(this.toolStripMenuItemEventsNull_Click);
+            // 
+            // contextMenuStripnotifyIcon
+            // 
+            this.contextMenuStripnotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showZVirtualSceneToolStripMenuItem,
+            this.toolStripSeparator6,
+            this.exitZVSToolStripMenuItem});
+            this.contextMenuStripnotifyIcon.Name = "contextMenuStripnotifyIcon";
+            this.contextMenuStripnotifyIcon.Size = new System.Drawing.Size(182, 54);
+            // 
+            // showZVirtualSceneToolStripMenuItem
+            // 
+            this.showZVirtualSceneToolStripMenuItem.Name = "showZVirtualSceneToolStripMenuItem";
+            this.showZVirtualSceneToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.showZVirtualSceneToolStripMenuItem.Text = "Show zVirtualScenes";
+            this.showZVirtualSceneToolStripMenuItem.Click += new System.EventHandler(this.showZVirtualSceneToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(178, 6);
+            // 
+            // exitZVSToolStripMenuItem
+            // 
+            this.exitZVSToolStripMenuItem.Name = "exitZVSToolStripMenuItem";
+            this.exitZVSToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.exitZVSToolStripMenuItem.Text = "E&xit  zVirtualScenes";
+            this.exitZVSToolStripMenuItem.Click += new System.EventHandler(this.exitZVSToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1195, 781);
+            this.ClientSize = new System.Drawing.Size(784, 513);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.MainTabControl);
@@ -1509,6 +1553,7 @@ namespace zVirtualScenesApplication
             this.Text = "Form1";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.zVirtualScenes_FormClosing);
             this.Load += new System.EventHandler(this.zVirtualScenes_Load);
+            this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.contextMenuStripScenes.ResumeLayout(false);
             this.contextMenuStripScenesNull.ResumeLayout(false);
             this.contextMenuStripActions.ResumeLayout(false);
@@ -1518,11 +1563,7 @@ namespace zVirtualScenesApplication
             this.tabPage2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewLog)).EndInit();
             this.tabPage1.ResumeLayout(false);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataListEvents)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataListTriggers)).EndInit();
             this.tabPage4.ResumeLayout(false);
             this.splitContainer2.Panel1.ResumeLayout(false);
             this.splitContainer2.Panel2.ResumeLayout(false);
@@ -1530,10 +1571,10 @@ namespace zVirtualScenesApplication
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox_Seconds.ResumeLayout(false);
             this.groupBox_Seconds.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurSeconds)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox_Daily.ResumeLayout(false);
             this.groupBox_Daily.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurDays)).EndInit();
@@ -1560,6 +1601,9 @@ namespace zVirtualScenesApplication
             this.cmsSceneCMD.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.contextMenuStripTrigger.ResumeLayout(false);
+            this.contextMenuStripTriggerNull.ResumeLayout(false);
+            this.contextMenuStripnotifyIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1609,7 +1653,6 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn olvColumn1;
         private BrightIdeasSoftware.OLVColumn EnabledCol;
         private BrightIdeasSoftware.OLVColumn FreqCol;
-        private PictureBox pictureBox1;
         private Label label5;
         private Label label6;
         private GroupBox groupBox_Daily;
@@ -1634,14 +1677,9 @@ namespace zVirtualScenesApplication
         private Label label7;
         private Label label12;
         private TabPage tabPage1;
-        private SplitContainer splitContainer1;
-        private BrightIdeasSoftware.DataListView dataListEvents;
+        private BrightIdeasSoftware.DataListView dataListTriggers;
         private BrightIdeasSoftware.OLVColumn eventNameCol;
-        private BrightIdeasSoftware.OLVColumn eventObjName;
-        private BrightIdeasSoftware.OLVColumn triggerName;
-        private Button btnEditEvent;
-        private Button btnDeleteEvent;
-        private Button btnNewEvent;
+        private BrightIdeasSoftware.OLVColumn triggerFriendlyName;
         private TabPage tabPage2;
         private BrightIdeasSoftware.DataListView dataListViewLog;
         private BrightIdeasSoftware.OLVColumn dateTimeCol;
@@ -1690,6 +1728,19 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn SceneCMDOrderCol;
         private BrightIdeasSoftware.OLVColumn olvColumn4;
         private Label label3;
+        private PictureBox pictureBox1;
+        private NotifyIcon notifyIcon1;
+        private ContextMenuStrip contextMenuStripTrigger;
+        private ToolStripMenuItem addToolStripMenuItem1;
+        private ToolStripMenuItem editToolStripMenuItem;
+        private ToolStripMenuItem deleteEventToolStripMenuItem;
+        private BrightIdeasSoftware.OLVColumn olvColumnEnabled;
+        private ContextMenuStrip contextMenuStripTriggerNull;
+        private ToolStripMenuItem toolStripMenuItemEventsNull;
+        private ContextMenuStrip contextMenuStripnotifyIcon;
+        private ToolStripSeparator toolStripSeparator6;
+        private ToolStripMenuItem exitZVSToolStripMenuItem;
+        private ToolStripMenuItem showZVirtualSceneToolStripMenuItem;
     }
 }
 

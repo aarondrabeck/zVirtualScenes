@@ -5120,7 +5120,7 @@ Ext.EventManager.on = Ext.EventManager.addListener;
 Ext.EventManager.un = Ext.EventManager.removeListener;
 
 
-Ext.setVersion('touch', '2.0.0.pr1');
+Ext.setVersion('touch', '2.0.0.pr2');
 
 Ext.apply(Ext, {
     
@@ -5301,6 +5301,11 @@ Ext.apply(Ext, {
         }
     },
 
+
+    log: function(msg) {
+        return Ext.Logger.log(msg);
+    },
+
     setup: function(config) {
         var defaultSetupConfig = Ext.defaultSetupConfig,
             onReady = config.onReady || Ext.emptyFn,
@@ -5318,6 +5323,7 @@ Ext.apply(Ext, {
         delete config.scope;
 
         requires.push('Ext.event.Dispatcher');
+        requires.push('Ext.dom.CompositeElementLite'); 
 
         Ext.require(requires);
 
@@ -5503,6 +5509,9 @@ Ext.apply(Ext, {
             else if ('type' in config) {
                 return manager.instantiateByAlias(aliasNamespace + '.' + config.type, config);
             }
+        }
+        else if (typeof config == 'string') {
+            return Ext.getCmp(config);
         }
 
         if (config === true) {
@@ -5736,12 +5745,20 @@ Ext.apply(Ext, {
                 scope: scope
             });
 
-            if (document.readyState.match(/interactive|complete|loaded/) !== null) {
-                triggerFn();
+            if (Ext.browser.is.PhoneGap) {
+                if (!Ext.readyListenerAttached) {
+                    Ext.readyListenerAttached = true;
+                    document.addEventListener('deviceready', triggerFn, false);
+                }
             }
-            else if (!Ext.readyListenerAttached) {
-                Ext.readyListenerAttached = true;
-                window.addEventListener('DOMContentLoaded', triggerFn, false);
+            else {
+                if (document.readyState.match(/interactive|complete|loaded/) !== null) {
+                    triggerFn();
+                }
+                else if (!Ext.readyListenerAttached) {
+                    Ext.readyListenerAttached = true;
+                    window.addEventListener('DOMContentLoaded', triggerFn, false);
+                }
             }
         }
     },
@@ -5874,6 +5891,7 @@ Ext.define('Ext.env.Browser', {
             engineName = engineNames.other,
             browserVersion = '',
             engineVersion = '',
+            isWebView = false,
             is, i, name;
 
         if (browserMatch) {
@@ -5926,8 +5944,17 @@ Ext.define('Ext.env.Browser', {
 
         this.setFlag('Standalone', !!navigator.standalone);
 
+        if (typeof window.PhoneGap != 'undefined') {
+            isWebView = true;
+            this.setFlag('PhoneGap');
+        }
+        else if (!!window.isNK) {
+            isWebView = true;
+            this.setFlag('Sencha');
+        }
+
         
-        this.setFlag('WebView', !!window.isNK);
+        this.setFlag('WebView', isWebView);
 
         this.isStrict = document.compatMode == "CSS1Compat";
 
@@ -6363,16 +6390,23 @@ Ext.define('Ext.dom.AbstractQuery', {
 
         for (i = 0,qlen = q.length; i < qlen; i++) {
             if (typeof q[i] == 'string') {
-                nodes = root.querySelectorAll(q[i]);
+                
+                
+                if (typeof q[i][0] == '@') {
+                    nodes = root.getAttributeNode(q[i].substring(1));
+                    results.push(nodes);
+                } else {
+                    nodes = root.querySelectorAll(q[i]);
 
-                for (j = 0,nlen = nodes.length; j < nlen; j++) {
-                    results.push(nodes[j]);
+                    for (j = 0,nlen = nodes.length; j < nlen; j++) {
+                        results.push(nodes[j]);
+                    }
                 }
             }
         }
 
         return results;
-    },
+    },    
 
     
     selectNode: function(q, root) {
@@ -14505,8 +14539,6 @@ Ext.define('Ext.mixin.Selectable', {
             isSelected = me.isSelected(record);
         switch (me.getMode()) {
             case 'MULTI':
-                me.select(record, false);
-                break;
             case 'SIMPLE':
                 if (isSelected) {
                     me.deselect(record);
@@ -14622,6 +14654,8 @@ Ext.define('Ext.mixin.Selectable', {
         if (records === null || this.getLocked()) {
             return;
         }
+        records = !Ext.isArray(records) ? [records] : records;
+
         var me = this,
             selected = me.getSelected(),
             ln = records.length,
@@ -14629,12 +14663,10 @@ Ext.define('Ext.mixin.Selectable', {
             i = 0,
             record;
 
-        records = !Ext.isArray(records) ? [records] : records;
         if (!keepExisting && selected.getCount() > 0) {
             change = true;
             me.deselect(me.getSelection(), true);
         }
-
         for (; i < ln; i++) {
             record = records[i];
             if (keepExisting && me.isSelected(record)) {
@@ -14642,7 +14674,7 @@ Ext.define('Ext.mixin.Selectable', {
             }
             change = true;
             me.setLastSelected(record);
-            me.getSelected().add(record);
+            selected.add(record);
             if (!suppressEvent) {
                 me.setLastFocused(record);
             }
@@ -14695,7 +14727,9 @@ Ext.define('Ext.mixin.Selectable', {
     fireSelectionChange: function(fireEvent) {
         var me = this;
         if (fireEvent) {
-            me.fireAction('selectionchange', [me, me.getSelection()], 'doSelectionChange');
+            me.fireAction('beforeselectionchange', [], function() {
+                me.fireAction('selectionchange', [me, me.getSelection()], 'doSelectionChange');
+            });
         }
     },
 
@@ -18333,6 +18367,8 @@ Ext.define('Ext.event.Dispatcher', {
     applyPublishers: function(publishers) {
         var i, publisher;
 
+        this.publishersCache = {};
+        
         for (i in publishers) {
             if (publishers.hasOwnProperty(i)) {
                 publisher = publishers[i];
@@ -20854,6 +20890,9 @@ var Observable = Ext.define('Ext.mixin.Observable', {
 
     mixinConfig: {
         id: 'observable',
+        beforeHooks: {
+            constructor: 'constructor'
+        },
         hooks: {
             destroy: 'destroy'
         }
@@ -20902,10 +20941,12 @@ var Observable = Ext.define('Ext.mixin.Observable', {
         if (config) {
             if ('listeners' in config) {
                 this.setListeners(config.listeners);
+                delete config.listeners;
             }
 
             if ('bubbleEvents' in config) {
                 this.setBubbleEvents(config.bubbleEvents);
+                delete config.bubbleEvents;
             }
         }
 
@@ -21190,7 +21231,7 @@ var Observable = Ext.define('Ext.mixin.Observable', {
             listeners,
             listenerOptionsRegex,
             actualOptions,
-            name, value, i, ln;
+            name, value, i, ln, listener;
 
         if (typeof fn != 'undefined') {
             
@@ -21205,6 +21246,15 @@ var Observable = Ext.define('Ext.mixin.Observable', {
             }
 
             this[action](eventName, fn, scope, options, order);
+        }
+        else if (Ext.isArray(eventName)) {
+            listeners = eventName;
+
+            for (i = 0,ln = listeners.length; i < ln; i++) {
+                listener = listeners[i];
+
+                this[action](listener.event, listener.fn, listener.scope, listener, listener.order);
+            }
         }
         else {
             listenerOptionsRegex = this.listenerOptionsRegex;
@@ -21221,6 +21271,10 @@ var Observable = Ext.define('Ext.mixin.Observable', {
                         scope = value;
                         continue;
                     }
+                    else if (name === 'order') {
+                        order = value;
+                        continue;
+                    }
 
                     if (!listenerOptionsRegex.test(name)) {
                         eventNames.push(name);
@@ -21233,8 +21287,7 @@ var Observable = Ext.define('Ext.mixin.Observable', {
             }
 
             for (i = 0,ln = eventNames.length; i < ln; i++) {
-                name = eventNames[i];
-                this[action](name, listeners[i], scope, actualOptions, order);
+                this[action](eventNames[i], listeners[i], scope, actualOptions, order);
             }
         }
 
@@ -23108,6 +23161,10 @@ Ext.define('Ext.data.proxy.WebStorage', {
                 length  = fields.length,
                 i, field, name, record;
 
+            if (!rawData) {
+                return;
+            }
+
             for (i = 0; i < length; i++) {
                 field = fields[i];
                 name  = field.name;
@@ -23207,10 +23264,6 @@ Ext.define('Ext.data.proxy.WebStorage', {
 
         if (length == 1 && ids[0] === "") {
             ids = [];
-        } else {
-            for (i = 0; i < length; i++) {
-                ids[i] = parseInt(ids[i], 10);
-            }
         }
 
         return ids;
@@ -24953,6 +25006,12 @@ Ext.define('Ext.data.AbstractStore', {
         if (needsSync && me.fireEvent('beforesync', options) !== false) {
             me.proxy.batch(options, me.getBatchListeners());
         }
+
+        return {
+            added: toCreate,
+            updated: toUpdate,
+            removed: toDestroy
+        };
     },
 
 
@@ -26552,6 +26611,15 @@ Ext.define('Ext.data.Store', {
     },
 
     
+    sync: function() {
+        if (typeof this.proxy.sync != 'function') {
+            this.callParent(arguments);
+        }else{
+            this.proxy.sync(this);
+        }
+    },
+
+    
     createModel: function(record) {
         if (!record.isModel) {
             record = Ext.ModelManager.create(record, this.model);
@@ -26654,7 +26722,10 @@ Ext.define('Ext.data.Store', {
         }
 
         if (successful) {
+            
+            me.suspendEvents();
             me.loadRecords(records, operation);
+            me.resumeEvents();
         }
 
         me.loading = false;
@@ -26789,6 +26860,7 @@ Ext.define('Ext.data.Store', {
                 }
                 
                 if (!doLocalSort || me.sorters.length < 1) {
+                    me.fireEvent('filter', me);
                     me.fireEvent('datachanged', me);
                 }
             }
@@ -26808,6 +26880,7 @@ Ext.define('Ext.data.Store', {
             delete me.snapshot;
 
             if (suppressEvent !== true) {
+                me.fireEvent('filter', me);
                 me.fireEvent('datachanged', me);
             }
         }
@@ -26825,6 +26898,7 @@ Ext.define('Ext.data.Store', {
 
         me.snapshot = me.snapshot || me.data.clone();
         me.data = me.queryBy(fn, scope || me);
+        me.fireEvent('filter', me);
         me.fireEvent('datachanged', me);
     },
 
@@ -26864,13 +26938,11 @@ Ext.define('Ext.data.Store', {
 
 
         if (!options.addRecords) {
-            delete me.snapshot;
-            me.clearData();
+            me.removeAll();
         }
 
-        me.data.addAll(records);
+        me.add(records);
 
-        
         for (; i < length; i++) {
             if (options.start !== undefined) {
                 records[i].index = options.start + i;
@@ -27266,6 +27338,7 @@ Ext.define('Ext.data.Store', {
                     range[i].index = i;
                 }
             }
+            me.fireEvent('sort', me);
             me.fireEvent('datachanged', me);
         }
     },
@@ -28277,7 +28350,6 @@ Ext.define('Ext.data.TreeStore', {
 
 Ext.define('Ext.data.XmlStore', {
     extend: 'Ext.data.Store',
-    alternateClassName: 'Ext.data.XmlStore',
     alias: 'store.xml',
 
     
@@ -29032,6 +29104,7 @@ Ext.define('Ext.direct.RemotingProvider', {
 
 
 Ext.define('Ext.EventedBase', {
+
     mixins: ['Ext.mixin.Observable'],
 
     initialized: false,
@@ -29112,7 +29185,7 @@ Ext.define('Ext.ItemCollection', {
     extend: 'Ext.util.MixedCollection',
 
     getKey: function(item) {
-        return item.getId();
+        return item.getItemId();
     },
 
     has: function(item) {
@@ -30264,7 +30337,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
         
         this.elements = [];
         this.add(elements, root);
-        this.el = new Ext.dom.Element();
+        this.el = new Ext.dom.AbstractElement.Fly();
     },
 
     isComposite: true,
@@ -32747,27 +32820,6 @@ Ext.define('Ext.layout.HBox', {
 
 
 
-Ext.define('Ext.layout.Navigation', {
-    extend: 'Ext.layout.HBox',
-
-    alias: 'layout.navigation',
-
-    constructor: function() {
-        this.callParent(arguments);
-        this.spacer = new Ext.Component();
-        this.container.innerElement.append(this.spacer.renderElement);
-        this.setItemFlex(this.spacer, 1);
-    },
-
-    doItemAdd: function(item, index) {
-        var index = this.container.indexOf(this.spacer);
-        if (item.config.align != 'right') {
-
-        }
-        this.callParent([item, index])
-    }
-});
-
 Ext.define('Ext.layout.VBox', {
     extend: 'Ext.layout.AbstractBox',
     alternateClassName: 'Ext.layout.VBoxLayout',
@@ -34243,122 +34295,132 @@ Ext.define('Ext.util.Droppable', {
 
 
 Ext.define('Ext.util.GeoLocation', {
-    mixins: {
-        observable: 'Ext.util.Observable'
-    },
 
-    
-    autoUpdate: true,
+    mixins: ['Ext.mixin.Observable'],
 
-    
-    
-    latitude: null,
-    
-    longitude: null,
-    
-    accuracy: null,
-    
-    altitude: null,
-    
-    altitudeAccuracy: null,
-    
-    heading: null,
-    
-    speed: null,
-    
-    timestamp: null,
-
-    
-    
-    allowHighAccuracy: false,
-
-    
-    timeout: Infinity,
-    
-    maximumAge: 0,
-    
-    setMaximumAge: function(maximumAge) {
-        this.maximumAge = maximumAge;
-        this.setAutoUpdate(this.autoUpdate);
-    },
-    
-    setTimeout: function(timeout) {
-        this.timeout = timeout;
-        this.setAutoUpdate(this.autoUpdate);
-    },
-    
-    setAllowHighAccuracy: function(allowHighAccuracy) {
-        this.allowHighAccuracy = allowHighAccuracy;
-        this.setAutoUpdate(this.autoUpdate);
-    },
-
-    
-    provider : null,
-    
-    watchOperation : null,
-
-    constructor: function(config) {
-        Ext.apply(this, config);
-
-        this.mixins.observable.constructor.call(this, config);
-
-        this.coords = this; //@deprecated
-
-
-        if (Ext.supports.GeoLocation) {
-            this.provider = this.provider ||
-                (navigator.geolocation ? navigator.geolocation :
-                    (window.google || {}).gears ? google.gears.factory.create('beta.geolocation') : null);
-        }
-
+    config: {
         
 
         
 
         
+        autoUpdate: true,
 
-        this.callParent();
+        
+        latitude: null,
 
-        this.mixins.observable.constructor.call(this);
+        
+        longitude: null,
 
-        if (this.autoUpdate) {
-            var me = this;
-            setTimeout(function() {
-                me.setAutoUpdate(me.autoUpdate);
-            }, 0);
+        
+        accuracy: null,
+
+        
+        altitude: null,
+
+        
+        altitudeAccuracy: null,
+
+        
+        heading: null,
+
+        
+        speed: null,
+
+        
+        timestamp: null,
+
+        
+        
+        allowHighAccuracy: false,
+
+        
+
+        timeout: Infinity,
+
+        
+        maximumAge: 0,
+
+        
+        provider : undefined
+    },
+
+    updateMaximumAge: function() {
+        if (this.watchOperation) {
+            this.updateWatchOperation();
+        }
+    },
+
+    updateTimeout: function() {
+        if (this.watchOperation) {
+            this.updateWatchOperation();
+        }
+    },
+
+    updateAllowHighAccuracy: function() {
+        if (this.watchOperation) {
+            this.updateWatchOperation();
+        }
+    },
+
+    applyProvider: function(config) {
+        if (Ext.feature.has.Geolocation) {
+            if (!config) {
+                if (navigator && navigator.geolocation) {
+                    config = navigator.geolocation;
+                }
+                else if (window.google) {
+                    config = google.gears.factory.create('beta.geolocation');
+                }
+            }
+        }
+        return config;
+    },
+
+    updateAutoUpdate: function(newAutoUpdate, oldAutoUpdate) {
+        var me = this,
+            provider = me.getProvider();
+
+        if (oldAutoUpdate && provider) {
+            provider.clearWatch(me.watchOperation);
+            me.watchOperation = null;
+        }
+
+        if (newAutoUpdate) {
+            if (!provider) {
+                me.fireEvent('locationerror', me, false, false, true, null);
+                return;
+            }
+
+            try {
+                me.updateWatchOperation();
+            }
+            catch(e) {
+                me.fireEvent('locationerror', me, false, false, true, e.message);
+            }
         }
     },
 
     
-    setAutoUpdate: function(autoUpdate) {
-        if (this.watchOperation !== null) {
-            this.provider.clearWatch(this.watchOperation);
-            this.watchOperation = null;
+    updateWatchOperation: function() {
+        var me = this,
+            provider = me.getProvider();
+
+        if (me.watchOperation) {
+            provider.clearWatch(me.watchOperation);
         }
-        if (!autoUpdate) {
-            return true;
-        }
-        if (!Ext.supports.GeoLocation) {
-            this.fireEvent('locationerror', this, false, false, true, null);
-            return false;
-        }
-        try {
-            this.watchOperation = this.provider.watchPosition(
-                Ext.createDelegate(this.fireUpdate, this),
-                Ext.createDelegate(this.fireError, this),
-                this.parseOptions());
-        }
-        catch(e) {
-            this.autoUpdate = false;
-            this.fireEvent('locationerror', this, false, false, true, e.message);
-            return false;
-        }
-        return true;
+
+        me.watchOperation = provider.watchPosition(
+            Ext.createDelegate(me.fireUpdate, me),
+            Ext.createDelegate(me.fireError, me),
+            me.parseOptions()
+        );
     },
 
     
     updateLocation: function(callback, scope, positionOptions) {
-        var me = this;
+        var me = this,
+            provider = me.getProvider();
 
         var failFunction = function(message, error) {
             if (error) {
@@ -34370,85 +34432,82 @@ Ext.define('Ext.util.GeoLocation', {
             if (callback) {
                 callback.call(scope || me, null, me); 
             }
-            me.fireEvent('update', false, me); 
         };
 
-        if (!Ext.supports.GeoLocation) {
-            setTimeout(function() {
+        if (!provider) {
+
                 failFunction(null);
-            }, 0);
+
             return;
         }
 
         try {
-            this.provider.getCurrentPosition(
+            provider.getCurrentPosition(
                 
                 function(position) {
                     me.fireUpdate(position);
                     if (callback) {
                         callback.call(scope || me, me, me); 
                     }
-                    me.fireEvent('update', me, me); 
                 },
                 
                 function(error) {
                     failFunction(null, error);
                 },
-                positionOptions ? positionOptions : this.parseOptions());
+                positionOptions || me.parseOptions()
+            );
         }
         catch(e) {
-            setTimeout(function() {
+
                 failFunction(e.message);
-            }, 0);
+
         }
     },
 
     
     fireUpdate: function(position) {
-        this.timestamp = position.timestamp;
-        this.latitude = position.coords.latitude;
-        this.longitude = position.coords.longitude;
-        this.accuracy = position.coords.accuracy;
-        this.altitude = position.coords.altitude;
-        this.altitudeAccuracy = position.coords.altitudeAccuracy;
+        var me = this,
+            coords = position.coords;
 
-        
-        this.heading = typeof position.coords.heading == 'undefined' ? null : position.coords.heading;
-        this.speed = typeof position.coords.speed == 'undefined' ? null : position.coords.speed;
-        this.fireEvent('locationupdate', this);
+        me.setConfig({
+            timestamp: position.timestamp,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            accuracy: coords.accuracy,
+            altitude: coords.altitude,
+            altitudeAccuracy: coords.altitudeAccuracy,
+            heading: coords.heading,
+            speed: coords.speed
+        });
+
+        me.fireEvent('locationupdate', me);
     },
 
     
     fireError: function(error) {
+        var errorCode = error.code;
         this.fireEvent('locationerror', this,
-            error.code == error.TIMEOUT,
-            error.code == error.PERMISSION_DENIED,
-            error.code == error.POSITION_UNAVAILABLE,
-            error.message == undefined ? null : error.message);
+            errorCode == error.TIMEOUT,
+            errorCode == error.PERMISSION_DENIED,
+            errorCode == error.POSITION_UNAVAILABLE,
+            error.message == undefined ? null : error.message
+        );
     },
 
     
     parseOptions: function() {
-        var ret = {
-            maximumAge: this.maximumAge,
-            allowHighAccuracy: this.allowHighAccuracy
-        };
+        var timeout = this.getTimeout(),
+            ret = {
+                maximumAge: this.getMaximumAge(),
+                allowHighAccuracy: this.getAllowHighAccuracy()
+            };
+
         
-        if (this.timeout !== Infinity) {
-            ret.timeout = this.timeout;
+        
+        if (timeout !== Infinity) {
+            ret.timeout = timeout;
         }
         return ret;
-    },
-
-    
-    getLocation: function(callback, scope) {
-        var me = this;
-        if (this.latitude !== null) {
-            callback.call(scope || me, me, me);
-        }
-        else {
-            me.updateLocation(callback, scope);
-        }
     }
 });
 Ext.define('Ext.util.SizeMonitor', {
@@ -34542,7 +34601,7 @@ Ext.define('Ext.util.SizeMonitor', {
     onDetectorScroll: function(name) {
         var detector = this.detectors[name],
             position = this.position[name];
-
+        
         if (detector.scrollLeft !== position.left || detector.scrollTop !== position.top) {
             this.refresh();
             this.fireSizeChangeEvent();
@@ -34558,17 +34617,16 @@ Ext.define('Ext.util.SizeMonitor', {
     doFireSizeChangeEvent: function() {
         var callback = this.getCallback(),
             scope = this.getScope();
-
+            
         callback.call(scope);
     },
 
     destroyDetector: function(name) {
-        var element = this.getElement(),
-            detector = this.detectors[name],
+        var detector = this.detectors[name],
             listener = this.listeners[name];
 
         detector.removeEventListener('scroll', listener, true);
-        element.dom.removeChild(detector);
+        Ext.removeNode(detector);
     },
 
     destroy: function() {
@@ -36220,13 +36278,13 @@ Ext.define('Ext.AbstractComponent', {
             config = members.config,
             cachedConfig = members.cachedConfig,
             cachedConfigList = prototype.cachedConfigList,
-            hasTemplateConfigMap = prototype.hasTemplateConfigMap,
+            hasCachedConfig = prototype.hasCachedConfig,
             name, value;
 
         delete members.cachedConfig;
 
         prototype.cachedConfigList = cachedConfigList = (cachedConfigList) ? cachedConfigList.slice() : [],
-        prototype.hasTemplateConfigMap = hasTemplateConfigMap = (hasTemplateConfigMap) ? Ext.Object.chain(hasTemplateConfigMap) : {};
+        prototype.hasCachedConfig = hasCachedConfig = (hasCachedConfig) ? Ext.Object.chain(hasCachedConfig) : {};
 
         if (!config) {
             members.config = config = {};
@@ -36236,8 +36294,8 @@ Ext.define('Ext.AbstractComponent', {
             if (cachedConfig.hasOwnProperty(name)) {
                 value = cachedConfig[name];
 
-                if (!hasTemplateConfigMap[name]) {
-                    hasTemplateConfigMap[name] = true;
+                if (!hasCachedConfig[name]) {
+                    hasCachedConfig[name] = true;
                     cachedConfigList.push(name);
                 }
 
@@ -36300,11 +36358,7 @@ Ext.define('Ext.AbstractComponent', {
             }
         }
 
-        this.initConfig(config);
-
-        this.initialized = true;
-
-        this.initialize();
+        this.callParent(arguments);
     },
 
     getElementConfig: Ext.emptyFn,
@@ -36462,6 +36516,7 @@ Ext.define('Ext.Component', {
         
         centered: null,
 
+        
         hidden: null,
 
         
@@ -36505,8 +36560,18 @@ Ext.define('Ext.Component', {
         modal: null,
 
         
-        hideOnMaskTap: true
+        hideOnMaskTap: true,
+
+        
+        contentEl: null,
+
+        
+        itemId: undefined
     },
+
+    
+
+    
 
     
 
@@ -36716,6 +36781,23 @@ Ext.define('Ext.Component', {
             } else {
                 innerElement.addCls(htmlCls);
             }
+        }
+    },
+
+    applyContentEl: function(contentEl) {
+        if (contentEl) {
+            return Ext.get(contentEl);
+        }
+    },
+
+    updateContentEl: function(newContentEl, oldContentEl) {
+        if (oldContentEl) {
+            oldContentEl.hide();
+            Ext.getBody().append(oldContentEl);
+        }
+        if (newContentEl) {
+            this.setHtml(newContentEl);
+            newContentEl.show();
         }
     },
 
@@ -36929,7 +37011,7 @@ Ext.define('Ext.Component', {
         var innerHtmlElement = this.innerHtmlElement,
             styleHtmlCls = this.getStyleHtmlCls();
 
-        if (!innerHtmlElement) {
+        if (!innerHtmlElement || !innerHtmlElement.dom || !innerHtmlElement.dom.parentNode) {
             this.innerHtmlElement = innerHtmlElement = this.innerElement.createChild({ cls: 'x-innerhtml ' });
 
             if (this.getStyleHtmlContent()) {
@@ -36942,7 +37024,13 @@ Ext.define('Ext.Component', {
     },
 
     updateHtml: function(html) {
-        this.getInnerHtmlElement().setHtml(html);
+        var innerHtmlElement = this.getInnerHtmlElement();
+        if (typeof html === 'string') {
+            innerHtmlElement.setHtml(html);
+        } else {
+            innerHtmlElement.setHtml('');
+            innerHtmlElement.append(html);
+        }
     },
 
     applyHidden: function(hidden) {
@@ -37017,8 +37105,8 @@ Ext.define('Ext.Component', {
         this.element.replaceCls(oldCls, newCls, prefix, suffix);
     },
 
-    getItemId: function() {
-        return this.itemId || this.id;
+    applyItemId: function(itemId) {
+        return itemId || this.getId();
     },
 
     
@@ -37446,12 +37534,14 @@ Ext.define('Ext.Component', {
         initComponent: emptyFn,
 
         show: function() {
-            var containerDom = this.renderElement.dom.parentNode;
+            if (this.renderElement.dom) {
+                var containerDom = this.renderElement.dom.parentNode;
 
-            if (containerDom && containerDom.nodeType == 11) {
-                Ext.Logger.deprecate("Showing a component that currently doesn't have any container, " +
-                    "please use Ext.Viewport.add() to add this component to the viewport", this);
-                Ext.Viewport.add(this);
+                if (containerDom && containerDom.nodeType == 11) {
+                    Ext.Logger.deprecate("Showing a component that currently doesn't have any container, " +
+                        "please use Ext.Viewport.add() to add this component to the viewport", this);
+                    Ext.Viewport.add(this);
+                }
             }
 
             return this.callParent(arguments);
@@ -37570,7 +37660,7 @@ Ext.define('Ext.Button', {
     updateBadgeText: function(badgeText) {
         var element = this.element,
             badgeElement = this.badgeElement;
-             
+
         if (badgeText) {
             badgeElement.show();
             badgeElement.setText(badgeText);
@@ -37660,8 +37750,13 @@ Ext.define('Ext.Button', {
         var element = this.element,
             baseCls = Ext.baseCSSPrefix + 'iconalign-';
 
+        if (!this.getText()) {
+            alignment = "center";
+        }
+
+        element.removeCls(baseCls + "center");
         element.removeCls(baseCls + oldAlignment);
-        if (this.getIcon()) {
+        if (this.getIcon() || this.getIconCls()) {
             element.addCls(baseCls + alignment);
         }
     },
@@ -37763,7 +37858,9 @@ Ext.define('Ext.Button', {
         }
 
         me.releasedTimeout = setTimeout(function() {
-            me.element.removeCls(me.getPressedCls());
+            if (me && me.element) {
+                me.element.removeCls(me.getPressedCls());
+            }
         }, 10);
     },
 
@@ -37794,10 +37891,30 @@ Ext.define('Ext.Button', {
 }, function() {
 
     
-    Ext.deprecateClassMethod(this, 'setBadge', this.prototype.setBadgeText, "'setBadge()' is deprecated, please use setBadgeText()")
+    Ext.deprecateClassMethod(this, 'setBadge', this.prototype.setBadgeText, "'setBadge()' is deprecated, please use setBadgeText()");
 
     
-    Ext.deprecateClassMethod(this, 'setIconClass', this.prototype.setIconCls, "'setIconClass()' is deprecated, please use setIconCls()")
+    Ext.deprecateClassMethod(this, 'setIconClass', this.prototype.setIconCls, "'setIconClass()' is deprecated, please use setIconCls()");
+
+    this.override({
+        constructor: function(config) {
+            if (config) {
+                
+                if (config.hasOwnProperty('badge')) {
+                    Ext.Logger.deprecate("'badge' config is deprecated, please use 'badgeText' config instead", this);
+                    config.badgeText = config.badge;
+                }
+
+                
+                if (config.hasOwnProperty('html')) {
+                    Ext.Logger.deprecate("'html' config is deprecated, please use 'text' config instead", this);
+                    config.text = config.html;
+                }
+            }
+
+            this.callParent([config]);
+        }
+    });
 
 });
 
@@ -37833,10 +37950,19 @@ Ext.define('Ext.Img', {
     }
 });
 
+Ext.define('Ext.Label', {
+    extend: 'Ext.Component',
+    xtype: 'label',
+
+    config: {
+        
+    }
+});
+
 Ext.define('Ext.Map', {
     extend: 'Ext.Component',
     xtype : 'map',
-    require: ['Ext.util.GeoLocation'],
+    requires: ['Ext.util.GeoLocation'],
 
     config: {
         
@@ -37876,36 +38002,52 @@ Ext.define('Ext.Map', {
         if (!(window.google || {}).maps) {
             this.setHtml('Google Maps API is required');
         }
-        else if (this.useCurrentLocation) {
-            this.geo = this.geo || Ext.create('Ext.util.GeoLocation', {autoLoad: false});
-            this.geo.on({
-                locationupdate : this.onGeoUpdate,
-                locationerror : this.onGeoError,
-                scope : this
-            });
-        }
+    },
 
-        if (this.geo) {
-            this.on({
-                painted: this.onUpdate,
-                scope: this,
-                single: true
-            });
-            this.geo.updateLocation();
+    updateUseCurrentLocation: function(useCurrentLocation) {
+        this.setGeo(useCurrentLocation);
+        if (!useCurrentLocation) {
+            this.renderMap();
         }
+    },
 
-        if (this.getMaskMap()) {
+    updateMaskMap: function(maskMap) {
+        if (maskMap) {
             this.element.mask(null, this.getMaskMapCls());
         }
-        this.renderMap();
+        else {
+            this.element.unmask();
+        }
+    },
+
+    applyGeo: function(config) {
+        return Ext.factory(config, Ext.util.GeoLocation, this.getGeo());
+    },
+
+    updateGeo: function(newGeo, oldGeo) {
+        var events = {
+            locationupdate : 'onGeoUpdate',
+            locationerror : 'onGeoError',
+            scope : this
+        };
+
+        if (oldGeo) {
+            oldGeo.un(events);
+        }
+
+        if (newGeo) {
+            newGeo.on(events);
+            newGeo.updateLocation();
+        }
     },
 
     
     renderMap: function() {
         var me = this,
             gm = (window.google || {}).maps,
-            renderElement = me.renderElement,
+            element = me.element,
             mapOptions = me.getMapOptions(),
+            map = me.getMap(),
             event;
 
         if (gm) {
@@ -37923,40 +38065,35 @@ Ext.define('Ext.Map', {
                 mapTypeId: gm.MapTypeId.ROADMAP
             });
 
-            if (me.maskMap && !me.mask) {
-                renderElement.mask(null, this.maskMapCls);
-                me.mask = true;
+            if (element.dom.firstChild) {
+                Ext.fly(element.dom.firstChild).remove();
             }
 
-            if (renderElement && renderElement.dom && renderElement.dom.firstChild) {
-                Ext.fly(renderElement.dom.firstChild).remove();
+            if (map) {
+                gm.event.clearInstanceListeners(map);
             }
 
-            if (me.map) {
-                gm.event.clearInstanceListeners(me.map);
-            }
+            me.setMap(new gm.Map(element.dom, mapOptions));
+            map = me.getMap();
 
-            me.map = new gm.Map(renderElement.dom, mapOptions);
-
-            event = gm.event;
             
-            event.addListener(me.map, 'zoom_changed', Ext.bind(me.onZoomChange, me));
-            event.addListener(me.map, 'maptypeid_changed', Ext.bind(me.onTypeChange, me));
-            event.addListener(me.map, 'center_changed', Ext.bind(me.onCenterChange, me));
+            event = gm.event;
+            event.addListener(map, 'zoom_changed', Ext.bind(me.onZoomChange, me));
+            event.addListener(map, 'maptypeid_changed', Ext.bind(me.onTypeChange, me));
+            event.addListener(map, 'center_changed', Ext.bind(me.onCenterChange, me));
 
-            me.fireEvent('maprender', me, me.map);
+            me.fireEvent('maprender', me, map);
         }
-
     },
 
     
-    onGeoUpdate: function(coords) {
+    onGeoUpdate: function(geo) {
         var center;
-        if (coords) {
-            center = this.getMapOptions().center = new google.maps.LatLng(coords.latitude, coords.longitude);
+        if (geo) {
+            center = this.getMapOptions().center = new google.maps.LatLng(geo.getLatitude(), geo.getLongitude());
         }
 
-        this.update(center);
+        this.setHtml(center);
     },
 
     
@@ -37964,32 +38101,29 @@ Ext.define('Ext.Map', {
 
     
     onUpdate: function(map, e, options) {
-        this.update((options || {}).data);
+        this.setHtml((options || {}).data);
     },
-
 
     
     update: function(coordinates) {
         var me = this,
+            map = me.getMap(),
             gm = (window.google || {}).maps;
 
         if (gm) {
-            coordinates = coordinates || me.getCoords() || new gm.LatLng(37.381592, -122.135672);
+            coordinates = coordinates || new gm.LatLng(37.381592, -122.135672);
 
             if (coordinates && !(coordinates instanceof gm.LatLng) && 'longitude' in coordinates) {
                 coordinates = new gm.LatLng(coordinates.latitude, coordinates.longitude);
             }
 
-            if (!me.getHidden()) {
-                if (!me.map) {
-                    me.renderMap();
-                }
-                if (me.map && coordinates instanceof gm.LatLng) {
-                    me.map.panTo(coordinates);
-                }
+            if (!map) {
+                me.renderMap();
+                map = me.getMap();
             }
-            else {
-                me.on('painted', me.onUpdate, me, {single: true, data: coordinates});
+
+            if (map && coordinates instanceof gm.LatLng) {
+                map.panTo(coordinates);
             }
         }
     },
@@ -37998,6 +38132,7 @@ Ext.define('Ext.Map', {
     onZoomChange : function() {
         var mapOptions = this.getMapOptions(),
             map = this.getMap();
+
         mapOptions.zoom = (map && map.getZoom) ? map.getZoom() : mapOptions.zoom || 10;
 
         this.fireEvent('zoomchange', this, map, mapOptions.zoom);
@@ -38007,6 +38142,7 @@ Ext.define('Ext.Map', {
     onTypeChange : function() {
         var mapOptions = this.getMapOptions(),
             map = this.getMap();
+
         mapOptions.mapTypeId = (map && map.getMapTypeId) ? map.getMapTypeId() : mapOptions.mapTypeId;
 
         this.fireEvent('typechange', this, map, mapOptions.mapTypeId);
@@ -38016,6 +38152,7 @@ Ext.define('Ext.Map', {
     onCenterChange: function() {
         var mapOptions = this.getMapOptions(),
             map = this.getMap();
+
         mapOptions.center = (map && map.getCenter) ? map.getCenter() : mapOptions.center;
 
         this.fireEvent('centerchange', this, map, mapOptions.center);
@@ -38024,13 +38161,17 @@ Ext.define('Ext.Map', {
 
     
     onDestroy: function() {
-        Ext.destroy(this.geo);
-        if (this.maskMap && this.mask) {
-            this.el.unmask();
+        Ext.destroy(this.getGeo());
+        var map = this.getMap();
+
+        if (this.getMaskMap() && this.mask) {
+            this.element.unmask();
         }
-        if (this.map && (window.google || {}).maps) {
-            google.maps.event.clearInstanceListeners(this.map);
+
+        if (map && (window.google || {}).maps) {
+            google.maps.event.clearInstanceListeners(map);
         }
+
         this.callParent();
     }
 }, function() {
@@ -38255,7 +38396,7 @@ Ext.define('Ext.Title', {
     xtype: 'title',
     
     config: {
-    	
+        
         baseCls: 'x-title',
 
         
@@ -38370,11 +38511,17 @@ Ext.define('Ext.carousel.Indicator', {
     },
 
     removeIndicator: function() {
-        this.indicators.pop().remove();
+        if (this.indicators.length) {
+            this.indicators.pop().remove();
+        }
     },
 
     setActiveIndex: function(index) {
-        this.indicators[index].radioCls(this.getBaseCls() + '-active');
+        var indicators = this.indicators;
+
+        if (indicators.length && indicators[index]) {
+            indicators[index].radioCls(this.getBaseCls() + '-active');
+        }
     },
 
     
@@ -38804,6 +38951,12 @@ Ext.define('Ext.field.Input', {
         inputCls: Ext.baseCSSPrefix + 'form-field',
 
         
+        focusCls: Ext.baseCSSPrefix + 'field-focus',
+
+        
+        maskCls: Ext.baseCSSPrefix + 'field-mask',
+        
+        
         useMask: 'auto',
 
         
@@ -38815,7 +38968,7 @@ Ext.define('Ext.field.Input', {
 
     config: {
         
-        baseCls: Ext.baseCSSPrefix + 'form-field-container',
+        baseCls: Ext.baseCSSPrefix + 'field-input',
 
         
         tag: 'input',
@@ -38826,8 +38979,6 @@ Ext.define('Ext.field.Input', {
         
         value: null,
         
-        focusCls: Ext.baseCSSPrefix + 'field-focus',
-
         
         isFocused: false,
 
@@ -38858,15 +39009,16 @@ Ext.define('Ext.field.Input', {
         
         autoCorrect: null,
 
+        
+        readOnly: null,
+
+        
         maxRows: null,
 
         
 
         
-        startValue: false,
-
-        
-        maskCls: Ext.baseCSSPrefix + 'field-mask'
+        startValue: false
     },
 
     
@@ -38878,6 +39030,11 @@ Ext.define('Ext.field.Input', {
             {
                 reference: 'input',
                 tag: this.getTag()
+            },
+            {
+                reference: 'clearIcon',
+                cls: 'x-clear-icon',
+                html: 'x'
             }
         ];
 
@@ -38901,15 +39058,22 @@ Ext.define('Ext.field.Input', {
             keyup    : 'onKeyUp',
             focus    : 'onFocus',
             blur     : 'onBlur',
-            paste    : 'onPaste',
-            mousedown: 'onMouseDown',
-            click    : 'onClick'
+            paste    : 'onPaste'
+            
+            
         });
 
         me.mask.on({
             tap: 'onMaskTap',
-            scope   : me
+            scope: me
         });
+
+        if (me.clearIcon) {
+            me.clearIcon.on({
+                tap: 'onClearIconTap',
+                scope: me
+            });
+        }
 
         me.doInitValue();
     },
@@ -38986,6 +39150,11 @@ Ext.define('Ext.field.Input', {
         if (input) {
             input.dom.value = newValue;
         }
+    },
+
+    setValue: function(newValue) {
+        this.updateValue(this.applyValue(newValue));
+        return this;
     },
 
     
@@ -39098,6 +39267,11 @@ Ext.define('Ext.field.Input', {
     },
 
     
+    updateReadOnly: function(readOnly) {
+        this.updateFieldAttribute('readonly', readOnly);
+    },
+
+    
     applyMaxRows: function(maxRows) {
         if (maxRows !== null && typeof maxRows !== 'number') {
             throw new Error("Ext.field.Input: [applyMaxRows] trying to pass a value which is not a number");
@@ -39131,6 +39305,11 @@ Ext.define('Ext.field.Input', {
     
     reset: function() {
         this.setValue(this.originalValue);
+    },
+
+    
+    onClearIconTap: function(e) {
+        this.fireEvent('clearicontap', this, e);
     },
 
     
@@ -39248,6 +39427,1075 @@ Ext.define('Ext.field.Input', {
 });
 
 
+Ext.define('Ext.field.Field', {
+    extend: 'Ext.Component',
+    alternateClassName: 'Ext.form.Field',
+    alias : 'widget.field',
+    requires: [
+        'Ext.field.Input'
+    ],
+
+    
+    isField: true,
+
+    
+    isFormField: true,
+
+    config: {
+        
+        baseCls: Ext.baseCSSPrefix + 'field',
+
+        
+        label: null,
+
+        
+        labelAlign: null,
+
+        
+        labelWidth: '30%',
+
+        
+        component: null,
+
+        
+
+        
+        clearIcon: null,
+
+        
+        required: false,
+
+        
+
+        
+        inputType: null,
+
+        
+        name: null,
+
+        
+        value: null,
+
+        
+        tabIndex: null
+    },
+
+    cachedConfig: {
+        
+        labelCls: null,
+
+        
+        requiredCls: Ext.baseCSSPrefix + 'field-required'
+    },
+
+    
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.hasOwnProperty('useClearIcon')) {
+            config.clearIcon = config.useClearIcon;
+        }
+
+        this.callParent([config]);
+    },
+
+    getElementConfig: function() {
+        var prefix = Ext.baseCSSPrefix;
+
+        return {
+            reference: 'element',
+            className: 'x-container',
+            children: [
+                {
+                    reference: 'label',
+                    cls: prefix + 'form-label',
+                    children: [{
+                        tag: 'span'
+                    }]
+                },
+                {
+                    reference: 'innerElement',
+                    cls      : prefix + 'component-outer'
+                }
+            ]
+        };
+    },
+
+    
+    updateLabel: function(newLabel, oldLabel) {
+        var renderElement = this.renderElement,
+            prefix = Ext.baseCSSPrefix;
+
+        if (newLabel) {
+            this.label.down('span').update(newLabel);
+            renderElement.addCls(prefix + 'field-labeled');
+        } else {
+            renderElement.removeCls(prefix + 'field-labeled');
+        }
+    },
+
+    
+    updateLabelAlign: function(newLabelAlign, oldLabelAlign) {
+        var renderElement = this.renderElement,
+            prefix = Ext.baseCSSPrefix;
+
+        if (newLabelAlign) {
+            renderElement.addCls(prefix + 'label-align-' + newLabelAlign);
+        }
+
+        if (oldLabelAlign) {
+            renderElement.removeCls(prefix + 'label-align-' + oldLabelAlign);
+        }
+    },
+
+    
+    updateLabelCls: function(newLabelCls, oldLabelCls) {
+        if (newLabelCls) {
+            this.label.addCls(newLabelCls);
+        }
+
+        if (oldLabelCls) {
+            this.label.removeCls(oldLabelCls);
+        }
+    },
+
+    
+    updateLabelWidth: function(newLabelWidth) {
+        if (newLabelWidth) {
+            this.label.setStyle('width', newLabelWidth);
+        }
+    },
+
+    
+    applyComponent: function(config) {
+        return Ext.factory(config);
+    },
+
+    
+    updateComponent: function(newComponent) {
+        if (this.componentElement) {
+            this.componentElement.destroy();
+        }
+
+        if (newComponent) {
+            this.componentElement = this.innerElement.appendChild(newComponent.element);
+        }
+    },
+
+    
+    updateRequired: function(newRequired) {
+        this.renderElement[newRequired ? 'addCls' : 'removeCls'](this.getRequiredCls());
+    },
+
+    
+    updateRequiredCls: function(newRequiredCls, oldRequiredCls) {
+        if (this.getRequired()) {
+            this.renderElement.replaceCls(oldRequiredCls, newRequiredCls);
+        }
+    },
+
+    
+    initialize: function() {
+        var me = this;
+        me.callParent(arguments);
+
+        me.doInitValue();
+    },
+
+    
+    doInitValue: function() {
+        
+            this.originalValue = this.getValue();
+    },
+
+    
+    reset: Ext.emptyFn,
+
+    
+    isDirty: function() {
+        return false;
+    }
+}, function() {
+    var prototype = this.prototype;
+
+    this.override({
+        constructor: function(config) {
+            config = config || {};
+
+            
+            var deprecateProperty = function(property, obj, newProperty) {
+                if (config.hasOwnProperty(property)) {
+                    if (obj) {
+                        config[obj] = config[obj] || {};
+                        config[obj][(newProperty) ? newProperty : property] = config[obj][(newProperty) ? newProperty : property] || config[property];
+                    } else {
+                        config[newProperty] = config[property];
+                    }
+
+                    delete config[property];
+
+                    Ext.Logger.deprecate("'" + property + "' config is deprecated, use the '" + ((obj) ? obj + "." : "") + ((newProperty) ? newProperty : property) + "' config instead", 2);
+                }
+            };
+
+            
+            
+            deprecateProperty('inputCls', 'input', 'inputCls');
+            
+            
+            deprecateProperty('fieldCls', 'input', 'inputCls');
+
+            
+            deprecateProperty('fieldLabel', null, 'label');
+
+            if (config.hasOwnProperty('autoCreateField')) {
+                Ext.Logger.deprecate("'autoCreateField' config is deprecated. If you are subclassing Ext.field.Field and you do not want a Ext.field.Input, set the 'input' config to false.", this);
+            }
+
+            this.callOverridden(arguments);
+        }
+    });
+
+    prototype.__defineGetter__('fieldEl', function() {
+        Ext.Logger.deprecate("'fieldEl' is deprecated, please use getInput() to get an instance of Ext.field.Field instead", this);
+
+        return this.getInput().input;
+    });
+
+    prototype.__defineGetter__('labelEl', function() {
+        Ext.Logger.deprecate("'labelEl' is deprecated", this);
+
+        return this.getLabel().element;
+    });
+});
+
+
+Ext.define('Ext.field.Checkbox', {
+    extend: 'Ext.field.Field',
+    alternateClassName: 'Ext.form.Checkbox',
+
+    xtype: 'checkboxfield',
+
+    isCheckbox: true,
+
+    
+
+    
+    config: {
+        
+        ui: 'checkbox',
+
+        
+        value: '',
+
+        
+        checked: false,
+
+        
+        tabIndex: -1,
+
+        
+        component: {
+            xtype   : 'input',
+            type    : 'checkbox',
+            useMask : true,
+            inputCls: Ext.baseCSSPrefix + 'input-checkbox'
+        }
+    },
+
+    
+    initialize: function() {
+        var me = this;
+
+        me.callParent(arguments);
+
+        me.getComponent().on({
+            scope: me,
+            masktap: 'onMaskTap'
+        });
+    },
+
+    
+    doInitValue: function() {
+        var me = this,
+            initialConfig = me.getInitialConfig();
+
+        
+        if (initialConfig.hasOwnProperty('value')) {
+            me.originalState = initialConfig.value;
+        }
+
+        if (initialConfig.hasOwnProperty('checked')) {
+            me.originalState = initialConfig.checked;
+        }
+
+        me.callParent(arguments);
+    },
+
+    
+    updateInputType: function(newInputType) {
+        var component = this.getComponent();
+        if (component) {
+            component.setType(newInputType);
+        }
+    },
+
+    
+    updateName: function(newName) {
+        var component = this.getComponent();
+        if (component) {
+            component.setName(newName);
+        }
+    },
+
+    
+    getChecked: function() {
+        var component = this.getComponent();
+
+        
+        var checked = component.getChecked();
+        this._checked = checked;
+
+        return this._checked;
+    },
+
+    getValue: function() {
+        return this.getChecked();
+    },
+
+    setValue: function(value) {
+        return this.setChecked(value);
+    },
+
+    setChecked: function(newChecked) {
+        this.getChecked(); 
+        this.updateChecked(newChecked);
+        this._checked = newChecked;
+    },
+
+    updateChecked: function(newChecked) {
+        var component = this.getComponent();
+        component.setChecked(newChecked);
+    },
+
+    
+    onMaskTap: function(component, e) {
+        var me = this;
+
+        if (me.getDisabled()) {
+            return false;
+        }
+
+        
+        component.input.dom.checked = !component.input.dom.checked;
+
+        
+        
+
+        
+        if (me.getChecked()) {
+            me.fireAction('check', [me, e], 'doChecked');
+        } else {
+            me.fireAction('uncheck', [me, e], 'doUnChecked');
+        }
+
+        
+        return false;
+    },
+
+    
+    doChecked: Ext.emptyFn,
+
+    
+    doUnChecked: Ext.emptyFn,
+
+    
+    isChecked: function() {
+        return this.getChecked();
+    },
+
+    
+    check: function() {
+        return this.setChecked(true);
+    },
+
+    
+    uncheck: function() {
+        return this.setChecked(false);
+    },
+
+    getSameGroupFields: function() {
+        var component = this.up('formpanel') || this.up('fieldset');
+
+        if (!component) {
+            return null;
+        }
+
+        return component.query('[name=' + this.getName() + ']');
+    },
+
+    
+    getGroupValues: function() {
+        var values = [];
+
+        this.getSameGroupFields().forEach(function(field) {
+            if (field.getChecked()) {
+                values.push(field.getValue());
+            }
+        });
+
+        return values;
+    },
+
+    
+    setGroupValues: function(values) {
+        this.getSameGroupFields().forEach(function(field) {
+            field.setChecked((values.indexOf(field.getValue()) !== -1));
+        });
+
+        return this;
+    },
+
+    
+    resetGroupValues: function() {
+        this.getSameGroupFields().forEach(function(field) {
+            field.setChecked(field.originalState);
+        });
+
+        return this;
+    },
+
+    
+    reset: function() {
+        this.callParent(arguments);
+        this.resetGroupValues();
+    }
+});
+
+
+Ext.define('Ext.field.Hidden', {
+    extend: 'Ext.field.Field',
+    alternateClassName: 'Ext.form.Hidden',
+    alias : 'widget.hiddenfield',
+
+    config: {
+        
+        component: {
+            xtype: 'input',
+            type : 'hidden'
+        },
+
+        
+        ui: 'hidden',
+
+        
+        hidden: true,
+
+        
+        tabIndex: -1
+    }
+
+});
+
+
+Ext.define('Ext.field.Radio', {
+    extend: 'Ext.field.Checkbox',
+    alias : 'widget.radiofield',
+    alternateClassName: 'Ext.form.Radio',
+
+    isRadio: true,
+
+    config: {
+        
+        ui: 'radio',
+
+        
+        component: {
+            type: 'radio',
+            inputCls: Ext.baseCSSPrefix + 'input-radio'
+        }
+    },
+
+    getValue: function() {
+        return this._value;
+    },
+
+    setValue: function(value) {
+        this._value = value;
+        return this;
+    },
+
+    
+    getGroupValue: function() {
+        var fields = this.getSameGroupFields(),
+            ln = fields.length,
+            i = 0,
+            field;
+
+        for (; i < ln; i++) {
+            field = fields[i];
+            if (field.getChecked()) {
+                return field.getValue();
+            }
+        }
+
+        return null;
+    },
+
+    
+    setGroupValue: function(value) {
+        var fields = this.getSameGroupFields(),
+            ln = fields.length,
+            i = 0,
+            field;
+
+        for (; i < ln; i++) {
+            field = fields[i];
+            if (field.getValue() === value) {
+                field.setChecked(true);
+                return field;
+            }
+        }
+    }
+});
+
+Ext.define('Ext.field.Text', {
+    extend: 'Ext.field.Field',
+    alias : 'widget.textfield',
+    alternateClassName: 'Ext.form.Text',
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    config: {
+        
+        ui: 'text',
+
+        
+        clearIcon: true,
+
+        
+        placeHolder: null,
+
+        
+        maxLength: null,
+
+        
+        autoComplete: null,
+
+        
+        autoCapitalize: null,
+
+        
+        autoCorrect: null,
+
+        
+        readOnly: null,
+
+        
+        component: {
+            xtype: 'input',
+            type : 'text'
+        }
+    },
+
+    
+    initialize: function() {
+        var me = this;
+
+        me.callParent(arguments);
+
+        me.getComponent().on({
+            scope: this,
+
+            keyup       : 'onKeyUp',
+            change      : 'onChange',
+            focus       : 'onFocus',
+            blur        : 'onBlur',
+            paste       : 'onPaste',
+            mousedown   : 'onMouseDown',
+            clearicontap: 'onClearIconTap'
+        });
+    },
+
+    
+    updateValue: function(newValue) {
+        var component = this.getComponent();
+        if (component) {
+            component.setValue(newValue);
+        }
+
+        this[newValue ? 'showClearIcon' : 'hideClearIcon']();
+    },
+
+    getValue: function() {
+        var me = this;
+        me._value = me.getComponent().getValue();
+        return me._value;
+    },
+
+    
+    updatePlaceHolder: function(newPlaceHolder) {
+        this.getComponent().setPlaceHolder(newPlaceHolder);
+    },
+
+    
+    updateMaxLength: function(newMaxLength) {
+        this.getComponent().setMaxLength(newMaxLength);
+    },
+
+    
+    updateAutoComplete: function(newAutoComplete) {
+        this.getComponent().setAutoComplete(newAutoComplete);
+    },
+
+    
+    updateAutoCapitalize: function(newAutoCapitalize) {
+        this.getComponent().setAutoCapitalize(newAutoCapitalize);
+    },
+
+    
+    updateAutoCorrect: function(newAutoCorrect) {
+        this.getComponent().setAutoCorrect(newAutoCorrect);
+    },
+
+    
+    updateReadOnly: function(newReadOnly) {
+        this.getComponent().setReadOnly(newReadOnly);
+    },
+
+    
+    updateInputType: function(newInputType) {
+        var component = this.getComponent();
+        if (component) {
+            component.setType(newInputType);
+        }
+    },
+
+    
+    updateName: function(newName) {
+        var component = this.getComponent();
+        if (component) {
+            component.setName(newName);
+        }
+    },
+
+    
+    updateTabIndex: function(newTabIndex) {
+        var component = this.getComponent();
+        if (component) {
+            component.setTabIndex(newTabIndex);
+        }
+    },
+
+    
+    doSetDisabled: function(disabled) {
+        this.callParent(arguments);
+
+        var component = this.getComponent();
+        if (component) {
+            component.setDisabled(disabled);
+        }
+
+        if (disabled) {
+            this.hideClearIcon();
+        } else {
+            this.showClearIcon();
+        }
+    },
+
+    
+    doClearIconTap: function() {
+        this.setValue('');
+    },
+
+    
+    showClearIcon: function() {
+        var me = this,
+            clearIcon = this.getClearIcon();
+
+        if (!me.getDisabled() && me.getValue() && clearIcon) {
+            this.element.addCls(Ext.baseCSSPrefix + 'field-clearable');
+        }
+
+        return this;
+    },
+
+    
+    hideClearIcon: function() {
+        var clearIcon = this.getClearIcon();
+
+        if (clearIcon) {
+            this.element.removeCls(Ext.baseCSSPrefix + 'field-clearable');
+        }
+    },
+
+    onChange: function(e) {
+        this.fireAction('change', [this, e], 'doChange');
+    },
+
+    doChange: Ext.emptyFn,
+
+    onKeyUp: function(e) {
+        this.fireAction('keyup', [this, e], 'doKeyUp');
+    },
+
+    onFocus: function(e) {
+        this.fireAction('focus', [this, e]);
+    },
+
+    onBlur: function(e) {
+        this.fireAction('blur', [this, e]);
+    },
+
+    onPaste: function(e) {
+        this.fireAction('paste', [this, e]);
+    },
+
+    onMouseDown: function(e) {
+        this.fireAction('mousedown', [this, e]);
+    },
+
+    onClearIconTap: function(e) {
+        this.fireAction('clearicontap', [this, e], 'doClearIconTap');
+    },
+
+    
+    doKeyUp: function(me, e) {
+        
+        var value = me.getValue();
+
+        
+        this[value ? 'showClearIcon' : 'hideClearIcon']();
+
+        if (e.browserEvent.keyCode === 13) {
+            me.fireAction('action', [me, e], 'doAction');
+        }
+    },
+
+    doAction: Ext.emptyFn,
+
+    
+    focus: function() {
+        this.getComponent().focus();
+        return this;
+    },
+
+    
+    blur: function() {
+        this.getComponent().blur();
+        return this;
+    },
+
+    
+    reset: function() {
+        this.getComponent().reset();
+
+        
+        this.getValue();
+
+        this[this._value ? 'showClearIcon' : 'hideClearIcon']();
+    },
+
+    
+    isDirty: function() {
+        var component = this.getComponent();
+        if (component) {
+            return component.isDirty();
+        }
+        return false;
+    }
+});
+
+
+
+
+Ext.define('Ext.field.Email', {
+    extend: 'Ext.field.Text',
+    alternateClassName: 'Ext.form.Email',
+    alias : 'widget.emailfield',
+
+    config: {
+        
+        component: {
+	        type: 'email'
+	    },
+
+        
+        autoCapitalize: false
+    }
+});
+
+
+
+
+
+
+
+Ext.define('Ext.field.Number', {
+    extend: 'Ext.field.Text',
+    alias : 'widget.numberfield',
+    alternateClassName: 'Ext.form.Number',
+
+    config: {
+        
+        component: {
+            type: 'number'
+        },
+
+        
+        ui: 'number',
+
+        
+        minValue: null,
+
+        
+        maxValue: null,
+
+        
+        stepValue: null
+    },
+
+    applyValue: function(value) {
+        var minValue = this.getMinValue(),
+            maxValue = this.getMaxValue();
+        
+        if (Ext.isNumber(minValue)) {
+            value = Math.max(value, minValue);
+        }
+
+        if (Ext.isNumber(maxValue)) {
+            value = Math.min(value, maxValue);
+        }
+
+        return parseFloat(value);
+    },
+
+    getValue: function() {
+        var value = this.callParent();
+        return parseFloat(value || 0);
+    },
+
+    
+    updateMinValue: function(newMinValue) {
+        this.getComponent().setMinValue(newMinValue);
+    },
+
+    
+    updateMaxValue: function(newMaxValue) {
+        this.getComponent().setMaxValue(newMaxValue);
+    },
+
+    
+    updateStepValue: function(newStepValue) {
+        this.getComponent().setStepValue(newStepValue);
+    }
+});
+
+
+Ext.define('Ext.field.Password', {
+    extend: 'Ext.field.Text',
+    alias : 'widget.passwordfield',
+    alternateClassName: 'Ext.form.Password',
+
+    config: {
+        
+        autoCapitalize: false,
+
+        
+        component: {
+	        type: 'password'
+	    }
+    }
+});
+
+
+Ext.define('Ext.field.Search', {
+    extend: 'Ext.field.Text',
+    alias : 'widget.searchfield',
+    alternateClassName: 'Ext.form.Search',
+
+    config: {
+        
+        component: {
+	        type: 'search'
+	    },
+
+	    
+	    ui: 'search'
+    }
+});
+
+
+Ext.define('Ext.field.Spinner', {
+    extend: 'Ext.field.Number',
+    alias : 'widget.spinnerfield',
+    alternateClassName: 'Ext.form.Spinner',
+    requires: ['Ext.util.TapRepeater'],
+
+    
+    
+    
+
+    config: {
+        
+        cls: Ext.baseCSSPrefix + 'spinner',
+
+        
+        minValue: Number.NEGATIVE_INFINITY,
+        
+        maxValue: Number.MAX_VALUE,
+
+        
+        increment: 1,
+
+        
+        accelerateOnTapHold: true,
+
+        
+        cycle: false,
+
+        
+        clearIcon: false,
+
+        defaultValue: 0,
+
+        
+        tabIndex: -1
+    },
+
+    constructor: function() {
+        this.callParent(arguments);
+
+        if (!this.getValue()) {
+            this.setValue(this.getDefaultValue());
+        }
+    },
+
+    
+    updateComponent: function(newComponent) {
+        this.callParent(arguments);
+
+        var cls = this.getCls();
+
+        if (newComponent) {
+            this.spinDownButton = newComponent.element.createChild({
+                cls : cls + '-button ' + cls + '-button-down',
+                html: '-'
+            });
+
+            newComponent.element.insertFirst(this.spinDownButton);
+
+            this.spinUpButton = newComponent.element.createChild({
+                cls : cls + '-button ' + cls + '-button-up',
+                html: '+'
+            });
+
+            this.downRepeater = this.createRepeater(this.spinDownButton, this.onSpinDown);
+            this.upRepeater = this.createRepeater(this.spinUpButton,     this.onSpinUp);
+        }
+    },
+
+    
+    applyValue: function(value) {
+        value = parseFloat(value);
+        if (isNaN(value)) {
+            value = this.getDefaultValue();
+        }
+        return this.callParent([value]);
+    },
+
+    
+    createRepeater: function(el, fn) {
+        var me = this,
+            repeater = Ext.create('Ext.util.TapRepeater', {
+                el: el,
+                accelerate: me.getAccelerateOnTapHold()
+            });
+
+        repeater.on({
+            tap: fn,
+            touchstart: 'onTouchStart',
+            touchend: 'onTouchEnd',
+            scope: me
+        });
+
+        return repeater;
+    },
+
+    
+    onSpinDown: function() {
+        if (!this.getDisabled()) {
+            this.spin(true);
+        }
+    },
+
+    
+    onSpinUp: function() {
+        if (!this.getDisabled()) {
+            this.spin(false);
+        }
+    },
+
+    
+    onTouchStart: function(repeater) {
+        if (!this.getDisabled()) {
+            repeater.getEl().addCls(Ext.baseCSSPrefix + 'button-pressed');
+        }
+    },
+
+    
+    onTouchEnd: function(repeater) {
+        repeater.getEl().removeCls(Ext.baseCSSPrefix + 'button-pressed');
+    },
+
+    
+    spin: function(down) {
+        var me = this,
+            value = parseInt(me.getValue(), 10),
+            increment = me.getIncrement(),
+            direction = down ? 'down' : 'up';
+
+        if (down) {
+            value -= increment;
+        }
+        else {
+            value += increment;
+        }
+
+        me.setValue(value);
+        value = me._value;
+
+        me.fireAction('spin', [me, value, direction], 'doSpin');
+        me.fireAction('spin' + direction, [me, value], 'doSpin' + Ext.String.capitalize(direction));
+    },
+
+    doSpin: Ext.emptyFn,
+    doSpinUp: Ext.emptyFn,
+    doSpinDown: Ext.emptyFn,
+
+    reset: function() {
+        this.setValue(this.getDefaultValue());
+    },
+
+    
+    destroy: function() {
+        var me = this;
+        Ext.destroy(me.downRepeater, me.upRepeater);
+        me.callParent(arguments);
+    }
+}, function() {
+    
+});
+
+
 Ext.define('Ext.field.TextAreaInput', {
     extend: 'Ext.field.Input',
     xtype : 'textareainput',
@@ -39263,6 +40511,11 @@ Ext.define('Ext.field.TextAreaInput', {
             {
                 reference: 'input',
                 tag: this.getTag()
+            },
+            {
+                reference: 'clearIcon',
+                cls: 'x-clear-icon',
+                html: 'x'
             }
         ];
 
@@ -39276,193 +40529,48 @@ Ext.define('Ext.field.TextAreaInput', {
 });
 
 
-Ext.define('Ext.field.slider.Thumb', {
-    extend: 'Ext.Component',
-    xtype : 'thumb',
+Ext.define('Ext.field.TextArea', {
+    extend: 'Ext.field.Text',
+    alias : 'widget.textareafield',
+    requires: ['Ext.field.TextAreaInput'],
+    alternateClassName: 'Ext.form.TextArea',
 
     config: {
         
-        baseCls: Ext.baseCSSPrefix + 'thumb',
+        ui: 'textarea',
 
         
-        value: 0,
+        autoCapitalize: false,
 
         
-        draggable: {
-            direction: 'horizontal'
-        }
-    },
+        component: {
+            xtype: 'textareainput'
+        },
 
-    
-    slider: null,
-
-    
-    initialize: function() {
-        var me = this;
-
-        me.callParent(arguments);
-
-        me.on({
-            scope: this,
-
-            painted: 'onPainted'
-        });
         
-        
-        me.getDraggable().on({
-            scope: this,
-
-            'dragstart': {
-                before: 'onBeforeDragStart',
-                after : 'onDragStart'
-            },
-            'drag'   : 'onDrag',
-            'dragend': 'onDragEnd'
-        });
-
-        this.slider = this.config.slider;
+        maxRows: null
     },
 
     
-    onPainted: function() {
-        
-        this.refreshValue();
-    },
-
-    
-    updateValue: function(newValue) {
-        var slider = this.slider,
-            offset, draggable;
-
-        if (slider) {
-            offset = slider.getOffsetForValue(newValue);
-            draggable = this.getDraggable();
-
-            draggable.setOffset({
-                x: offset
-            });
-        }
-
-        this.fireAction('change', [this, newValue]);
-    },
-
-    
-    refreshValue: function() {
-        this.updateValue(this.getValue());
-    },
-
-    
-    onBeforeDragStart: function(draggable, e) {
-        if (e.absDeltaX < 4) {
-            return false;
-        }
-    },
-
-    
-    onDragStart: function(draggable, e, offset) {
-        this.addCls(Ext.baseCSSPrefix + 'dragging');
-    },
-
-    
-    onDrag: function(draggable, e, offset) {
-        e.stopPropagation();
-
-        var value = this.slider.getValueForOffset(offset.x);
-        this.setValue(value);
-        this.updateValue(value);
-    },
-
-    
-    onDragEnd: function() {
-        var me     = this,
-            offset = me.getDraggable().getOffset(),
-            newValue;
-
-        newValue = me.slider.getValueForOffset(offset.x);
-
-        me.setValue(newValue);
-
-        me.removeCls(Ext.baseCSSPrefix + 'dragging');
+    updateMaxRows: function(newRows) {
+        this.getComponent().setMaxRows(newRows);
     }
 });
 
 
-Ext.define('Ext.form.ClearIcon', {
-    extend: 'Ext.Component',
-    xtype : 'clearicon',
+Ext.define('Ext.field.Url', {
+    extend: 'Ext.field.Text',
+    alias : 'widget.urlfield',
+    alternateClassName: 'Ext.form.Url',
 
     config: {
         
-        baseCls: Ext.baseCSSPrefix + 'field-clear-container',
+        autoCapitalize: false,
 
         
-        docked: 'right'  
-    },
-
-    template: [{
-        classList: [Ext.baseCSSPrefix + 'field-clear'],
-        text     : 'x'
-    }],
-
-    initialize: function() {
-        var me = this;
-
-        me.callParent(arguments);
-
-        me.renderElement.on({
-            scope: me,
-            tap  : 'onTap'
-        });
-    },
-
-    
-    onTap: function(e) {
-        this.fireAction('tap', [this, e]);
-    }
-});
-
-
-Ext.define('Ext.form.Label', {
-    extend: 'Ext.Component',
-    xtype : 'label',
-    
-    config: {
-        
-        baseCls: Ext.baseCSSPrefix + 'form-label',
-
-        
-        text: '&nbsp',
-
-        
-        width: '30%'
-    },
-
-    eventedConfig: {
-        
-        align: 'left'
-    },
-
-    
-    template: [
-        {
-            reference: 'textEl',
-            tag: 'span'
-        }
-    ],
-
-    
-    updateText: function(newText) {
-        this.textEl.setHtml(newText);
-    },
-
-    
-    doSetAlign: function(newAlign) {
-        this.setDocked(newAlign);
-
-        
-        if (newAlign && this.getWidth() && ['top', 'bottom'].indexOf(newAlign) != -1) {
-            this.setWidth('100%');
-        }
+        component: {
+	        type: 'url'
+	    }
     }
 });
 
@@ -40129,7 +41237,7 @@ Ext.define('Ext.Container', {
 
     eventedConfig: {
         
-        activeItem: null
+        activeItem: 0
     },
 
     config: {
@@ -40578,7 +41686,7 @@ Ext.define('Ext.Container', {
     onAdd: function(item, index) {
         this.getLayout().onItemAdd(item, index);
 
-        if (item.isInnerItem() && !this.getActiveItem()) {
+        if (this.initialized && item.isInnerItem() && !this.getActiveItem()) {
             this.setActiveItem(item);
         }
 
@@ -40666,6 +41774,9 @@ Ext.define('Ext.Container', {
 
     
     applyActiveItem: function(item) {
+        
+        this.getItems();
+
         if (typeof item == 'number') {
             return this.getInnerItems()[item] || null;
         }
@@ -40680,8 +41791,6 @@ Ext.define('Ext.Container', {
 
             return item;
         }
-
-        return null;
     },
 
     
@@ -40692,13 +41801,13 @@ Ext.define('Ext.Container', {
             if (!this.has(newActiveItem)) {
                 this.add(newActiveItem);
             }
-        }
 
-        if (oldActiveItem) {
-            oldActiveItem.fireAction('deactivate');
-        }
+            if (oldActiveItem) {
+                oldActiveItem.fireAction('deactivate');
+            }
 
-        this.getLayout().onActiveItemChange(newActiveItem, oldActiveItem);
+            this.getLayout().onActiveItemChange(newActiveItem, oldActiveItem);
+        }
     },
 
     
@@ -40783,6 +41892,25 @@ Ext.define('Ext.Container', {
     
     down: function(selector) {
         return this.query(selector)[0] || null;
+    },
+
+    doSetHidden: function(hidden) {
+        this.callParent(arguments);
+
+        if (hidden || !this.isPainted()) {
+            return;
+        }
+
+        var items = this.getItems().items,
+            ln = items.length,
+            item, i;
+
+        for (i = 0; i < ln; i++) {
+            item = items[i];
+            if (!item.getHidden()) {
+                item.doSetHidden(false);
+            }
+        }
     },
 
     onClassExtended: function(Class, members) {
@@ -41129,23 +42257,35 @@ Ext.define('Ext.SegmentedButton', {
 
     
 
-    
-    constructor: function() {
+    initialize: function() {
         var me = this;
 
         me.on({
             delegate: '> button',
             scope   : me,
-            tap: 'onButtonTap',
+
             release: 'onButtonRelease'
+        });
+
+        me.onAfter({
+            delegate: '> button',
+            scope   : me,
+
+            hiddenchange: 'onButtonHiddenChange'
         });
         
         me.callParent(arguments);
     },
 
+    updateAllowMultiple: function() {
+        if (!this.initialized && !this.getInitialConfig().hasOwnProperty('allowDepress')) {
+            this.setAllowDepress(true);
+        }
+    },
+
     
     applyItems: function() {
-        var me            = this,
+        var me = this,
             pressedButtons = [],
             ln, i, item, items;
         
@@ -41162,39 +42302,69 @@ Ext.define('Ext.SegmentedButton', {
             }
         }
 
+        me.updateFirstAndLastCls(items);
+
         me.setPressedButtons(pressedButtons);
     },
 
     
-    onButtonTap: function(btn) {
+    onButtonRelease: function(button) {
         var me             = this,
             pressedButtons = me.getPressedButtons(),
             ln             = pressedButtons.length,
-            btns           = [],
+            buttons        = [],
             alreadyPressed;
 
         if (!me.disabled) {
             
             if (me.getAllowMultiple()) {
-                btns = btns.concat(pressedButtons);
+                buttons = buttons.concat(pressedButtons);
             }
 
-            alreadyPressed = btns.indexOf(btn) !== -1;
+            alreadyPressed = buttons.indexOf(button) !== -1;
             
             
-            if (alreadyPressed && (me.getAllowDepress() || ln > 1)) {
-                Ext.Array.remove(btns, btn);
+            if (alreadyPressed && me.getAllowDepress()) {
+                Ext.Array.remove(buttons, button);
             } else if (!alreadyPressed) {
-                btns.push(btn);
+                buttons.push(button);
             }
 
-            me.setPressedButtons(btns);
+            me.setPressedButtons(buttons);
+
+            me.fireEvent('toggle', me, button, me.isPressed(button));
         }
+
+        return false;
     },
 
     
-    onButtonRelease: function() {
-        return false;
+    onButtonHiddenChange: function() {
+        this.updateFirstAndLastCls(this.getItems());
+    },
+
+    
+    updateFirstAndLastCls: function(items) {
+        var ln = items.length,
+        item, i;
+
+        
+        for (i = 0; i < ln; i++) {
+            item = items.items[i];
+            if (!item.isHidden()) {
+                item.addCls(Ext.baseCSSPrefix + 'first');
+                break;
+            }
+        }
+
+        
+        for (i = ln - 1; i >= 0; i--) {
+            item = items.items[i];
+            if (!item.isHidden()) {
+                item.addCls(Ext.baseCSSPrefix + 'last');
+                break;
+            }
+        }
     },
 
     
@@ -41207,13 +42377,13 @@ Ext.define('Ext.SegmentedButton', {
             ln = newButtons.length;
             for (i = 0; i< ln; i++) {
                 button = me.getComponent(newButtons[i]);
-                if (array.indexOf(button) === -1) {
+                if (button && array.indexOf(button) === -1) {
                     array.push(button);
                 }
             }
         } else {
             button = me.getComponent(newButtons);
-            if (array.indexOf(button) === -1) {
+            if (button && array.indexOf(button) === -1) {
                 array.push(button);
             }
         }
@@ -41223,11 +42393,6 @@ Ext.define('Ext.SegmentedButton', {
 
     
     updatePressedButtons: function(newButtons, oldButtons) {
-        this.fireAction('toggle', [newButtons], this.doUpdatePressedButtons);
-    },
-
-    
-    doUpdatePressedButtons: function(buttons) {
         var me    = this,
             items = me.getItems(),
             item, button, ln, i;
@@ -41240,30 +42405,25 @@ Ext.define('Ext.SegmentedButton', {
         }
 
         
-        ln = buttons.length;
+        ln = newButtons.length;
         for (i = 0; i < ln; i++) {
-            button = buttons[i];
+            button = newButtons[i];
             button.addCls(me.getPressedCls());
         }
     },
 
     
-    disable: function() {
-        var me = this;
-
-        me.items.each(function(item) {
-            item.disable();
-        }, me);
-
-        me.callParent(arguments);
+    isPressed: function(button) {
+        var pressedButtons = this.getPressedButtons();
+        return pressedButtons.indexOf(button) != -1;
     },
 
     
-    enable: function() {
+    doSetDisabled: function(disabled) {
         var me = this;
 
         me.items.each(function(item) {
-            item.enable();
+            item.setDisabled(disabled);
         }, me);
 
         me.callParent(arguments);
@@ -41465,6 +42625,352 @@ Ext.define('Ext.Toolbar', {
 });
 
 
+Ext.define('Ext.MessageBox', {
+    extend  : 'Ext.Sheet',
+    requires: [
+        'Ext.Toolbar',
+        'Ext.field.Text',
+        'Ext.field.TextArea'
+    ],
+
+    config: {
+        
+        ui: 'dark',
+
+        
+        baseCls: Ext.baseCSSPrefix + 'msgbox',
+
+        
+        cls: Ext.baseCSSPrefix + 'panel',
+
+        
+        iconCls: null,
+
+        
+        enterAnimation: 'pop',
+
+        
+        exitAnimation: 'pop',
+
+        
+        defaultTextHeight: 75,
+
+        
+        title: null,
+
+        
+        buttons: null,
+
+        
+        msg: null,
+        
+        
+        promptConfig: null,
+
+        
+        layout: {
+            type: 'vbox',
+            pack: 'center'
+        }
+    },
+
+    statics: {
+        OK    : {text: 'OK',     itemId: 'ok',  ui: 'action'},
+        YES   : {text: 'Yes',    itemId: 'yes', ui: 'action'},
+        NO    : {text: 'No',     itemId: 'no'},
+        CANCEL: {text: 'Cancel', itemId: 'cancel'},
+
+        INFO    : Ext.baseCSSPrefix + 'msgbox-info',
+        WARNING : Ext.baseCSSPrefix + 'msgbox-warning',
+        QUESTION: Ext.baseCSSPrefix + 'msgbox-question',
+        ERROR   : Ext.baseCSSPrefix + 'msgbox-error',
+
+        OKCANCEL: [
+            {text: 'Cancel', itemId: 'cancel'},
+            {text: 'OK',     itemId: 'ok',  ui : 'action'}
+        ],
+        YESNOCANCEL: [
+            {text: 'Cancel', itemId: 'cancel'},
+            {text: 'No',     itemId: 'no'},
+            {text: 'Yes',    itemId: 'yes', ui: 'action'}
+        ],
+        YESNO: [
+            {text: 'No',  itemId: 'no'},
+            {text: 'Yes', itemId: 'yes', ui: 'action'}
+        ]
+    },
+
+    
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.hasOwnProperty('prompt')) {
+            Ext.applyIf(config, {
+                promptConfig: config.prompt
+            });
+
+            delete config.prompt;
+        }
+
+        if (config.hasOwnProperty('multiline') || config.hasOwnProperty('multiLine')) {
+            config.promptConfig = config.promptConfig || {};
+            Ext.applyIf(config.promptConfig, {
+                multiLine: config.multiline || config.multiLine
+            });
+
+            delete config.multiline;
+            delete config.multiLine;
+        }
+
+        this.callParent([config]);
+    },
+
+    
+    applyTitle: function(config) {
+        if (typeof config == "string") {
+            config = {
+                title: config
+            };
+        }
+
+        Ext.applyIf(config, {
+            docked: 'top',
+            cls   : this.getBaseCls() + '-title'
+        });
+
+        return Ext.factory(config, Ext.Toolbar, this.getTitle());
+    },
+
+    
+    updateTitle: function(newTitle) {
+        if (newTitle) {
+            this.add(newTitle);
+        }
+    },
+
+    
+    updateButtons: function(newButtons) {
+        var me = this;
+
+
+        if (newButtons) {
+            if (me.buttonsToolbar) {
+                me.buttonsToolbar.removeAll();
+                me.buttonsToolbar.setItems(newButtons);
+            } else {
+                me.buttonsToolbar = Ext.create('Ext.Toolbar', {
+                    docked     : 'bottom',
+                    defaultType: 'button',
+                    layout     : {
+                        type: 'hbox',
+                        pack: 'center'
+                    },
+                    ui         : me.getUi(),
+                    cls        : me.getBaseCls() + '-buttons',
+                    items      : newButtons
+                });
+
+                me.add(me.buttonsToolbar);
+            }
+        }
+    },
+
+    
+    applyMsg: function(config) {
+        config = {
+            html : config,
+            cls  : this.getBaseCls() + '-text'
+        };
+
+        return Ext.factory(config, Ext.Component, this.getMsg());
+    },
+
+    
+    updateMsg: function(newMsg) {
+        if (newMsg) {
+            this.add(newMsg);
+        }
+    },
+
+    
+    updateIconCls: function(newIconCls, oldIconCls) {
+        if (newIconCls) {
+            var cfg = {
+                xtype : 'component',
+                docked: 'left',
+                width : 40,
+                height: 40,
+                cls   : newIconCls
+            };
+            
+        }
+    },
+
+    
+    applyPromptConfig: function(prompt) {
+        if (prompt) {
+            var config = {
+                label: false
+            };
+
+            if (typeof prompt == "object") {
+                Ext.apply(config, prompt);
+            }
+
+            if (config.multiLine) {
+                config.height = Ext.isNumber(config.multiLine) ? parseFloat(config.multiLine) : this.getDefaultTextHeight();
+                return Ext.factory(config, Ext.field.TextArea, this.getPromptConfig());
+            } else {
+                return Ext.factory(config, Ext.field.Text, this.getPromptConfig());
+            }
+        }
+
+        return prompt;
+    },
+
+    
+    updatePromptConfig: function(newPrompt, oldPrompt) {
+        if (newPrompt) {
+            this.add(newPrompt);
+        }
+
+        if (oldPrompt) {
+            this.remove(oldPrompt);
+        }
+    },
+
+    
+    
+    onClick: function(button) {
+        if (button) {
+            var config = button.userConfig || {};
+
+            if (typeof config.fn == 'function') {
+                config.fn.call(
+                    config.scope || null,
+                    button.itemId || button.text,
+                    config.input ? config.input.dom.value : null,
+                    config
+                );
+            }
+
+            if (config.cls) {
+                    this.el.removeCls(config.cls);
+                }
+
+            if (config.input) {
+                config.input.dom.blur();
+            }
+        }
+
+        this.hide();
+    },
+
+    
+    show: function(initialConfig) {
+        if (!initialConfig) {
+            return this.callParent();
+        }
+
+        var config = Ext.Object.merge({}, {
+            value: ''
+        }, initialConfig);
+
+        var buttons        = initialConfig.buttons || Ext.MessageBox.OK || [],
+            buttonBarItems = [],
+            userConfig     = initialConfig;
+
+        Ext.each(buttons, function(buttonConfig) {
+            if (!buttonConfig) {
+                return;
+            }
+
+            buttonBarItems.push(Ext.apply({
+                userConfig: userConfig,
+                scope     : this,
+                handler   : 'onClick'
+            }, buttonConfig));
+        }, this);
+
+        config.buttons = buttonBarItems;
+
+        this.setConfig(config);
+
+        var prompt = this.getPromptConfig();
+        if (prompt) {
+            prompt.setValue('');
+        }
+
+        this.callParent();
+
+        return this;
+    },
+
+    
+    alert: function(title, msg, fn, scope) {
+        return this.show({
+            title       : title,
+            msg         : msg,
+            buttons     : Ext.MessageBox.OK,
+            promptConfig: false,
+            fn          : fn,
+            scope       : scope,
+            iconCls     : Ext.MessageBox.INFO
+        });
+    },
+
+    
+    confirm: function(title, msg, fn, scope) {
+        return this.show({
+            title       : title,
+            msg         : msg,
+            buttons     : Ext.MessageBox.YESNO,
+            promptConfig: false,
+            scope       : scope,
+            iconCls     : Ext.MessageBox.QUESTION,
+            fn: function(button) {
+                fn.call(scope, button);
+            }
+        });
+     },
+
+    
+    prompt: function(title, msg, fn, scope, multiLine, value, promptConfig) {
+        return this.show({
+            title       : title,
+            msg         : msg,
+            buttons     : Ext.MessageBox.OKCANCEL,
+            scope       : scope,
+            iconCls     : Ext.MessageBox.QUESTION,
+            promptConfig: promptConfig || true,
+            multiLine   : multiLine,
+            value       : value,
+            fn: function(button, inputValue) {
+                fn.call(scope, button, inputValue);
+            }
+        });
+    }
+}, function() {
+    this.override({
+        
+
+        
+        setIcon: function(iconCls, doLayout){
+            Ext.Logger.deprecate("Ext.MessageBox#setIcon is deprecated, use setIconCls instead", 2);
+            this.setIconCls(iconCls);
+            if (doLayout) {
+                this.doComponentLayout();
+            }
+            return this;
+        }
+    });
+
+    
+    Ext.Msg = Ext.create('Ext.MessageBox');
+});
+
+
+
 Ext.define('Ext.dataview.DataItem', {
     extend: 'Ext.Container',
     xtype : 'dataitem',
@@ -41532,13 +43038,13 @@ Ext.define('Ext.dataview.DataItem', {
     
 
     updateRecord: function(newRecord) {
+        var data = newRecord.getData();
         if (newRecord) {
-            Ext.apply(newRecord.data, Ext.dataview.DataView.prepareAssociatedData(newRecord));
+            Ext.apply(data, Ext.dataview.DataView.prepareAssociatedData(newRecord));
         }
         var me = this,
             items = me.getItems(),
             item = items.first(),
-            data = newRecord.data,
             dataMap = me.getDataMap(),
             componentName, component, setterMap, setterName;
         if (!item) {
@@ -41557,7 +43063,7 @@ Ext.define('Ext.dataview.DataItem', {
         }
         
         
-        item.updateData(newRecord.data);
+        item.updateData(data);
     }
 });
 
@@ -41581,6 +43087,12 @@ Ext.define('Ext.dataview.DataView', {
 
         
         baseCls: Ext.baseCSSPrefix + 'dataview',
+
+        
+        emptyText: null,
+
+        
+        deferEmptyText: true,
 
         
         itemTpl: '<div>{text}</div>',
@@ -41667,6 +43179,8 @@ Ext.define('Ext.dataview.DataView', {
     storeEventHooks: {
         beforeload: 'onBeforeLoad',
         load      : 'refresh',
+        sort      : 'refresh',
+        filter    : 'refresh',
         add       : 'onStoreAdd',
         remove    : 'onStoreRemove',
         update    : 'onStoreUpdate',
@@ -41720,8 +43234,11 @@ Ext.define('Ext.dataview.DataView', {
     },
 
     
-    onContainerTrigger: function() {
+    onContainerTrigger: function(e) {
         var me = this;
+        if (e.target != me.element.dom) {
+            return;
+        }
         if (me.getDeselectOnContainerClick() && me.getStore()) {
             me.deselectAll();
         }
@@ -41941,6 +43458,9 @@ Ext.define('Ext.dataview.DataView', {
         this.unmask();
 
         if (!me.getStore()) {
+            if (!this.getDeferEmptyText()) {
+                this.doEmptyText();
+            }
             return;
         }
         me.fireAction('refresh', [me], 'doRefresh');
@@ -41957,28 +43477,29 @@ Ext.define('Ext.dataview.DataView', {
     },
 
     updateListItem: function(record, item) {
+        var data = record.getData();
         if (record) {
             
-            Ext.apply(record.data, this.self.prepareAssociatedData(record));
+            Ext.apply(data, this.self.prepareAssociatedData(record));
         }
         var index = this.getStore().indexOf(record),
             html;
 
         item.setAttribute('itemIndex', index);
-        html = this.getItemTpl().apply(record.data);
+        html = this.getItemTpl().apply(data);
         item.innerHTML = html;
-        
     },
 
     addListItem: function(index, record) {
+        var data = record.getData();
+
         if (record) {
             
-            Ext.apply(record.data, this.self.prepareAssociatedData(record));
+            Ext.apply(data, this.self.prepareAssociatedData(record));
         }
         var element = this.elementContainer.element,
             childNodes = element.dom.childNodes,
             ln = childNodes.length,
-            data = record.data,
             wrapElement;
 
         wrapElement = Ext.Element.create(this.getItemElementConfig(index, data));
@@ -42009,6 +43530,17 @@ Ext.define('Ext.dataview.DataView', {
             item = items[from + i];
             item.parentNode.removeChild(item);
         }
+        if (me.getViewItems().length == 0) {
+            this.doEmptyText();
+        }
+    },
+
+    doEmptyText: function() {
+        var emptyText = this.getEmptyText();
+        if (emptyText) {
+            this.elementContainer.setHtml('');
+            this.elementContainer.setHtml(emptyText);
+        }
     },
 
     
@@ -42022,6 +43554,8 @@ Ext.define('Ext.dataview.DataView', {
             record = records[i];
             me.addListItem(index + i, record);
         }
+        
+        me.elementContainer.setHtml('');
     },
 
     getViewItems: function() {
@@ -42049,7 +43583,9 @@ Ext.define('Ext.dataview.DataView', {
         
         if (deltaLn < 0) {
             this.moveItemsToCache(itemsLn + deltaLn, itemsLn - 1);
-            return;
+            
+            items = me.getViewItems();
+            itemsLn = items.length;
         }
         
         else if (deltaLn > 0) {
@@ -42070,7 +43606,9 @@ Ext.define('Ext.dataview.DataView', {
     onStoreClear: function() {
         var me = this,
             items = me.getViewItems();
+
         this.moveItemsToCache(0, items.length - 1);
+        this.doEmptyText();
     },
 
     
@@ -42354,17 +43892,16 @@ Ext.define('Ext.carousel.Carousel', {
         this.callParent();
 
         this.element.on({
-            drag     : 'onDrag',
+            drag: 'onDrag',
             dragstart: 'onDragStart',
-            dragend  : 'onDragEnd',
+            dragend: 'onDragEnd',
 
             scope: this
         });
 
         this.on({
-            painted         : 'onPainted',
+            painted: 'onPainted',
             activeitemchange: 'onActiveItemChange',
-
             scope: this
         });
     },
@@ -42403,6 +43940,8 @@ Ext.define('Ext.carousel.Carousel', {
         } else {
             this.sizeMonitor.refresh();
         }
+
+        this.onActiveItemChange(this, this.getActiveItem());
     },
 
     
@@ -42446,7 +43985,7 @@ Ext.define('Ext.carousel.Carousel', {
 
         var indicator = this.getIndicator();
         if (indicator) {
-            indicator.addIndicator();
+            indicator.removeIndicator();
         }
     },
 
@@ -42467,7 +44006,10 @@ Ext.define('Ext.carousel.Carousel', {
     
     getCardOffset: function(card, index, activeIndex) {
         var cardOffset = this.getCardIndexOffset(card, index, activeIndex),
-            currentSize = this.currentSize,
+            currentSize = this.currentSize || {
+                width: 0,
+                height: 0
+            },
             currentScroll = this.currentScroll;
 
         return this.getDirection() === 'horizontal' ?
@@ -42631,6 +44173,10 @@ Ext.define('Ext.carousel.Carousel', {
             indicator = this.getIndicator(),
             i, card;
 
+        if (activeIndex == -1) {
+            return;
+        }
+
         this.currentScroll = {
             x: 0,
             y: 0
@@ -42730,8 +44276,6 @@ Ext.define('Ext.dataview.List', {
     },
 
     constructor: function() {
-        this.previousHeaderIndices = [];
-
         this.translateHeader = (Ext.os.is.Android2) ? this.translateHeaderCssPosition : this.translateHeaderTransform;
         this.callParent(arguments);
     },
@@ -42807,6 +44351,13 @@ Ext.define('Ext.dataview.List', {
         }
     },
 
+    onStoreClear: function() {
+        this.callParent();
+        if (this.header) {
+            this.header.destroy();
+        }
+    },
+
     
     getClosestGroups : function() {
         var groups = this.pinHeaderInfo.offsets,
@@ -42831,8 +44382,8 @@ Ext.define('Ext.dataview.List', {
     },
 
     doRefreshHeaders: function() {
-        var headerIndicis = this.previousHeaderIndices,
-            ln = headerIndicis.length,
+        var headerIndices = this.findGroupHeaderIndices(),
+            ln = headerIndices.length,
             items = this.getViewItems(),
             headerInfo = this.pinHeaderInfo = {offsets: []},
             headerOffsets = headerInfo.offsets,
@@ -42840,18 +44391,22 @@ Ext.define('Ext.dataview.List', {
 
         if (ln) {
             for (i = 0; i < ln; i++) {
-                headerItem = items[headerIndicis[i].index];
-                header = this.getItemHeader(headerItem);
+                headerItem = items[headerIndices[i]];
+                if (headerItem) {
+                    header = this.getItemHeader(headerItem);
 
-                headerOffsets.push({
-                    header: header,
-                    offset: headerItem.offsetTop
-                });
+                    headerOffsets.push({
+                        header: header,
+                        offset: headerItem.offsetTop
+                    });
+                }
             }
 
             headerInfo.closest = this.getClosestGroups();
             this.setActiveGroup(headerInfo.closest.current);
-            headerInfo.headerHeight = Ext.get(header).getHeight();
+            if (header) {
+                headerInfo.headerHeight = Ext.get(header).getHeight();
+            }
         }
     },
 
@@ -42875,10 +44430,7 @@ Ext.define('Ext.dataview.List', {
             }
             return;
         }
-        else if (
-            (next && y > next.offset) ||
-            (y < current.offset)
-        ) {
+        else if ((next && y > next.offset) || (current && y < current.offset)) {
             closest = headerInfo.closest = this.getClosestGroups();
             next = closest.next;
             current = closest.current;
@@ -43000,12 +44552,31 @@ Ext.define('Ext.dataview.List', {
         }
     },
 
+    updateBaseCls: function(newBaseCls, oldBaseCls) {
+        var me = this;
+        me.callParent(arguments);
+        me.itemClsShortCache = newBaseCls + '-item';
+
+        me.headerClsShortCache = newBaseCls + '-header';
+        me.headerClsCache = '.' + me.headerClsShortCache;
+
+        me.labelClsShortCache = newBaseCls + '-item-label';
+        me.labelClsCache = '.' + me.labelClsShortCache;
+
+        me.disclosureClsShortCache = newBaseCls + '-disclosure';
+        me.disclosureClsCache = '.' + me.disclosureClsShortCache;
+
+        me.iconClsShortCache = newBaseCls + '-icon';
+        me.iconClsCache = '.' + me.iconClsShortCache;
+    },
+
+    hiddenDisplayCache: Ext.baseCSSPrefix + 'hidden-display',
+
     doDisclose: Ext.emptyFn,
 
     updateListItem: function(record, item) {
-        var baseCls = this.getBaseCls(),
-            extItem = Ext.get(item),
-            innerItem = extItem.down('.' + baseCls + '-item-label', true),
+        var extItem = Ext.get(item),
+            innerItem = extItem.down(this.labelClsCache, true),
             index = this.getStore().indexOf(record),
             data = record.data,
             disclosure = data && data.hasOwnProperty('disclosure'),
@@ -43013,26 +44584,25 @@ Ext.define('Ext.dataview.List', {
             disclosureEl, iconEl;
 
         item.setAttribute('itemIndex', index);
-        innerItem.innerHTML = this.getItemTpl().apply(record.data);
+        innerItem.innerHTML = this.getItemTpl().apply(data);
 
         if (this.getDisclosure() && disclosure) {
-            disclosureEl = extItem.down('.' + baseCls + '-disclosure');
-            disclosureEl[disclosure ? 'removeCls' : 'addCls'](Ext.baseCSSPrefix + 'hidden-display');
+            disclosureEl = extItem.down(this.disclosureClsCache);
+            disclosureEl[disclosure ? 'removeCls' : 'addCls'](this.hiddenDisplayCache);
         }
 
         if (this.getIcon()) {
-            iconEl = extItem.down('.' + baseCls + '-icon', true);
+            iconEl = extItem.down(this.iconClsCache, true);
             iconEl.style.backgroundImage = iconSrc ? 'url(' + iconSrc + ')' : '';
         }
     },
 
     getItemElementConfig: function(index, data) {
-        var baseCls = this.getBaseCls(),
-            config = {
-                cls: baseCls + '-item',
+        var config = {
+                cls: this.itemClsShortCache,
                 itemIndex: index,
                 children: [{
-                    cls: baseCls + '-item-label',
+                    cls: this.labelClsShortCache,
                     html: this.getItemTpl().apply(data)
                 }]
             },
@@ -43041,14 +44611,14 @@ Ext.define('Ext.dataview.List', {
         if (this.getIcon()) {
             iconSrc = data.iconSrc;
             config.children.push({
-                cls: baseCls + '-icon',
+                cls: this.iconClsShortCache,
                 style: 'background-image: ' + iconSrc ? 'url(' + iconSrc + ')' : ''
             });
         }
 
         if (this.getDisclosure()) {
             config.children.push({
-                cls: baseCls + '-disclosure ' + ((data.disclosure === false) ? Ext.baseCSSPrefix + 'hidden-display' : '')
+                cls: this.disclosureClsShortCache + ((data.disclosure === false) ? this.hiddenDisplayCache : '')
             });
         }
         return config;
@@ -43063,64 +44633,40 @@ Ext.define('Ext.dataview.List', {
             groups = store.getGroups(),
             groupLn = groups.length,
             items = me.getViewItems(),
-            i = 0,
-            previousHeaderIndices = me.previousHeaderIndices,
-            previousIndexLn = previousHeaderIndices.length,
-            newHeaderIndices = [],
-            firstGroupedRecord, index, oldItemWithHeader;
+            existingHeaders = me.elementContainer.element.query(me.headerClsCache),
+            existingHeadersLn = existingHeaders.length,
+            newHeaderItems = [],
+            i, firstGroupedRecord, index, item;
 
         
-        for (; i < groupLn; i++) {
+        for (i = 0; i < existingHeadersLn; i++) {
+            Ext.removeNode(existingHeaders[i]);
+        }
+
+        
+        for (i = 0; i < groupLn; i++) {
             firstGroupedRecord = groups[i].children[0];
             index = store.indexOf(firstGroupedRecord);
-            if (previousHeaderIndices.indexOf(firstGroupedRecord) == -1) {
-                me.doAddHeader(items[index], store.getGroupString(firstGroupedRecord));
-            }
-            newHeaderIndices.push(firstGroupedRecord);
+            item = items[index];
+            me.doAddHeader(item, store.getGroupString(firstGroupedRecord));
+            newHeaderItems.push(index);
         }
 
-        
-        for (i = 0; i < previousIndexLn; i++) {
-            oldItemWithHeader = previousHeaderIndices[i];
-            if (newHeaderIndices.indexOf(oldItemWithHeader) == -1) {
-                oldItemWithHeader = items[store.indexOf(oldItemWithHeader)];
-                if (oldItemWithHeader) {
-                    me.doRemoveHeader(oldItemWithHeader);
-                }
-            }
-        }
-
-        me.previousHeaderIndices = newHeaderIndices;
+        return newHeaderItems;
     },
 
     doAddHeader: function(item, html) {
         Ext.get(item).insertFirst(Ext.Element.create({
-            cls: this.getBaseCls() + '-header',
+            cls: this.headerClsShortCache,
             html: html
         }));
-    },
-
-    doRemoveHeader: function(item) {
-        item.removeChild(item.childNodes[0]);
-    },
-
-    doRefresh: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
-    },
-
-    onStoreAdd: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
-    },
-    onStoreRemove: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
-    },
-    onStoreUpdate: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
     }
+}, function() {
+    
+    var prototype = this.prototype;
+
+    prototype.cachedConfigList = prototype.cachedConfigList.slice();
+    Ext.Array.remove(prototype.cachedConfigList, 'baseCls');
 });
 
 
@@ -44055,1900 +45601,6 @@ Ext.define('Ext.dataview.NestedList', {
 });
 
 
-Ext.define('Ext.field.Field', {
-    extend: 'Ext.Container',
-    alternateClassName: 'Ext.form.Field',
-    alias : 'widget.field',
-    requires: [
-        'Ext.form.Label',
-        'Ext.field.Input',
-        'Ext.form.ClearIcon'
-    ],
-
-    
-    isField: true,
-
-    
-    isFormField: true,
-
-    config: {
-        
-        baseCls: Ext.baseCSSPrefix + 'field',
-
-        
-        label: null,
-
-        
-        labelCls: null,
-
-        
-        labelAlign: null,
-
-        
-        labelWidth: null,
-
-        
-        input: null,
-
-        
-
-        
-        clearIcon: null,
-
-        
-        required: false,
-
-        
-        requiredCls: Ext.baseCSSPrefix + 'field-required',
-
-        
-
-        
-        inputType: null,
-
-        
-        name: null,
-
-        
-        value: null,
-
-        
-        tabIndex: null
-    },
-
-    
-    constructor: function(config) {
-        config = config || {};
-
-        if (config.hasOwnProperty('useClearIcon')) {
-            config.clearIcon = config.useClearIcon;
-        }
-
-        this.callParent([config]);
-    },
-
-    
-    applyLabel: function(config) {
-        if (typeof config == "string") {
-            config = {
-                text: config
-            };
-        }
-
-        return Ext.factory(config, 'Ext.form.Label', this.getLabel());
-    },
-
-    
-    updateLabel: function(newLabel, oldLabel) {
-        if (newLabel) {
-            this.add(newLabel);
-
-            
-            newLabel.on('alignchange', this.onLabelAlignChange, this);
-
-            
-            this.onLabelAlignChange(newLabel, newLabel.getAlign());
-        }
-    },
-
-    
-    updateLabelAlign: function(newLabelAlign) {
-        var label = this.getLabel();
-        if (label) {
-            label.setAlign(newLabelAlign);
-        }
-    },
-
-    
-    updateLabelCls: function(newLabelCls) {
-        var label = this.getLabel();
-        if (label) {
-            label.setCls(newLabelCls);
-        }
-    },
-
-    
-    updateLabelWidth: function(newLabelWidth) {
-        var label = this.getLabel();
-        if (label) {
-            label.setWidth(newLabelWidth);
-        }
-    },
-
-    
-    onLabelAlignChange: function(label, newAlign, oldAlign) {
-        var prefix       = Ext.baseCSSPrefix + 'label-align-',
-            element = this.element;
-
-        if (oldAlign) {
-            element.removeCls(prefix + oldAlign);
-        }
-
-        element.addCls(prefix + newAlign);
-    },
-
-    
-    applyInput: function(config) {
-        return Ext.factory(config, Ext.field.Input, this.getInput());
-    },
-
-    
-    updateInput: function(newInput) {
-        if (newInput) {
-            this.add(newInput);
-        }
-    },
-
-    
-    applyClearIcon: function(config) {
-        if (config === true) {
-            config = {
-                hidden: true
-            };
-        }
-
-        return Ext.factory(config, 'Ext.form.ClearIcon', this.getClearIcon());
-    },
-
-    
-    updateClearIcon: function(newClearIcon) {
-        if (newClearIcon) {
-            this.add(newClearIcon);
-        }
-    },
-
-    
-    updateRequired: function(newRequired) {
-        this.element[newRequired ? 'addCls' : 'removeCls'](this.getRequiredCls());
-    },
-
-    
-    updateRequiredCls: function(newRequiredCls, oldRequiredCls) {
-        if (this.getRequired()) {
-            this.element.replaceCls(oldRequiredCls, newRequiredCls);
-        }
-    },
-
-    
-    updateInputType: function(newInputType) {
-        var input = this.getInput();
-        if (input) {
-            input.setType(newInputType);
-        }
-    },
-
-    
-    updateName: function(newName) {
-        var input = this.getInput();
-        if (input) {
-            input.setName(newName);
-        }
-    },
-
-    
-    getValue: function() {
-        var input = this.getInput();
-        if (input) {
-            
-            var value = input.getValue();
-            this._value = value;
-        }
-
-        return this._value;
-    },
-
-    
-    updateValue: function(newValue) {
-        var input = this.getInput();
-        if (input) {
-            input.setValue(newValue);
-        }
-    },
-
-    
-    updateTabIndex: function(newTabIndex) {
-        var input = this.getInput();
-        if (input) {
-            input.setTabIndex(newTabIndex);
-        }
-    },
-
-    
-    doSetDisabled: function(disabled) {
-        this.callParent(arguments);
-
-        var input = this.getInput(),
-            label = this.getLabel();
-
-        if (input) {
-            input.setDisabled(disabled);
-        }
-
-        if (label) {
-            label.setDisabled(disabled);
-        }
-    },
-
-    
-    initialize: function() {
-        var me = this;
-        me.callParent(arguments);
-
-        me.doInitValue();
-    },
-
-    
-    doInitValue: function() {
-        
-        this.originalValue = this.getValue();
-    },
-
-    
-    reset: function() {
-        this.getInput().reset();
-        
-        this.getValue();
-    },
-
-    
-    isDirty: function() {
-        var input = this.getInput();
-        if (input) {
-            return input.isDirty();
-        }
-        return false;
-    }
-}, function() {
-    var prototype = this.prototype;
-
-    this.override({
-        constructor: function(config) {
-            config = config || {};
-
-            
-            var deprecateProperty = function(property, obj, newProperty) {
-                if (config.hasOwnProperty(property)) {
-                    if (obj) {
-                        config[obj] = config[obj] || {};
-                        config[obj][(newProperty) ? newProperty : property] = config[obj][(newProperty) ? newProperty : property] || config[property];
-                    } else {
-                        config[newProperty] = config[property];
-                    }
-
-                    delete config[property];
-
-                    Ext.Logger.deprecate("'" + property + "' config is deprecated, use the '" + ((obj) ? obj + "." : "") + ((newProperty) ? newProperty : property) + "' config instead", 2);
-                }
-            };
-
-            
-            
-            deprecateProperty('inputCls', 'input', 'inputCls');
-            
-            
-            deprecateProperty('fieldCls', 'input', 'inputCls');
-
-            
-            deprecateProperty('fieldLabel', null, 'label');
-
-            if (config.hasOwnProperty('autoCreateField')) {
-                Ext.Logger.deprecate("'autoCreateField' config is deprecated. If you are subclassing Ext.field.Field and you do not want a Ext.field.Input, set the 'input' config to false.", this);
-            }
-
-            this.callOverridden(arguments);
-        }
-    });
-
-    prototype.__defineGetter__('fieldEl', function() {
-        Ext.Logger.deprecate("'fieldEl' is deprecated, please use getInput() to get an instance of Ext.field.Field instead", this);
-
-        return this.getInput().input;
-    });
-
-    prototype.__defineGetter__('labelEl', function() {
-        Ext.Logger.deprecate("'labelEl' is deprecated, please use getLabel() to get an instance of Ext.form.Label instead", this);
-
-        return this.getLabel().element;
-    });
-});
-
-
-Ext.define('Ext.field.Checkbox', {
-    extend: 'Ext.field.Field',
-    alternateClassName: 'Ext.form.Checkbox',
-
-    xtype: 'checkboxfield',
-
-    
-
-    
-    config: {
-        
-        ui: 'checkbox',
-
-        
-        value: '',
-
-        
-        checked: false,
-
-        
-        tabIndex: -1,
-
-        
-        input: {
-            type    : 'checkbox',
-            inputCls: Ext.baseCSSPrefix + 'input-checkbox'
-        }
-    },
-
-    
-    initialize: function() {
-        var me = this;
-
-        me.callParent(arguments);
-
-        me.on({
-            scope   : me,
-            delegate: 'input',
-
-            click: 'onClick',
-            masktap: 'onMaskTap'
-        });
-    },
-
-    
-    doInitValue: function() {
-        var me = this;
-
-        me.originalState = me.getInitialConfig().checked;
-
-        me.callParent(arguments);
-    },
-
-    
-    getChecked: function() {
-        var input = this.getInput();
-
-        
-        var checked = input.getChecked();
-        this._checked = checked;
-
-        return this._checked;
-    },
-
-    getValue: function() {
-        return this.getChecked();
-    },
-
-    setChecked: function(newChecked) {
-        this.getChecked(); 
-        this.updateChecked(newChecked);
-        this._checked = newChecked;
-    },
-
-    updateChecked: function(newChecked) {
-        var input = this.getInput();
-        input.setChecked(newChecked);
-    },
-
-    
-    onMaskTap: function(input, e) {
-        if (this.getDisabled()) {
-            return false;
-        }
-
-        
-        input.input.dom.checked = !input.input.dom.checked;
-
-        
-        this.onTap(input, e);
-
-        
-        return false;
-    },
-
-    
-    onClick: function(input, e) {
-        var me = this;
-
-        
-        if (me.getChecked()) {
-            me.fireAction('uncheck', [me, e], 'doUnChecked');
-        } else {
-            me.fireAction('check', [me, e], 'doChecked');
-        }
-    },
-
-    
-    doChecked: Ext.emptyFn,
-
-    
-    doUnChecked: Ext.emptyFn,
-
-    
-    isChecked: function() {
-        return this.getChecked();
-    },
-
-    
-    check: function() {
-        return this.setChecked(true);
-    },
-
-    
-    uncheck: function() {
-        return this.setChecked(false);
-    },
-
-    getSameGroupFields: function() {
-        var component = this.up('formpanel') || this.up('fieldset');
-
-        if (!component) {
-            return null;
-        }
-
-        return component.query('[name=' + this.getName() + ']');
-    },
-
-    
-    getGroupValues: function() {
-        var values = [];
-
-        this.getSameGroupFields().forEach(function(field) {
-            if (field.getChecked()) {
-                values.push(field.getValue());
-            }
-        });
-
-        return values;
-    },
-
-    
-    setGroupValues: function(values) {
-        this.getSameGroupFields().forEach(function(field) {
-            field.setChecked((values.indexOf(field.getValue()) !== -1));
-        });
-
-        return this;
-    },
-
-    
-    resetGroupValues: function() {
-        this.getSameGroupFields().forEach(function(field) {
-            field.setChecked(field.originalState);
-        });
-
-        return this;
-    },
-
-    
-    reset: function() {
-        this.callParent(arguments);
-        this.resetGroupValues();
-    }
-});
-
-
-Ext.define('Ext.field.Hidden', {
-    extend: 'Ext.field.Field',
-    alternateClassName: 'Ext.form.Hidden',
-    alias : 'widget.hiddenfield',
-
-    config: {
-        
-        input: {
-            type: 'hidden'
-        },
-
-        
-        ui: 'hidden',
-
-        
-        hidden: true,
-
-        
-        tabIndex: -1
-    }
-
-});
-
-
-Ext.define('Ext.field.Radio', {
-    extend: 'Ext.field.Checkbox',
-    alias : 'widget.radiofield',
-    alternateClassName: 'Ext.form.Radio',
-
-    config: {
-        
-        ui: 'radio',
-
-        
-        inputType: 'radio',
-
-        
-        input: {
-            inputCls: Ext.baseCSSPrefix + 'input-radio'
-        }
-    },
-
-    
-    getGroupValue: function() {
-        var fields = this.getSameGroupFields(),
-            ln = fields.length,
-            i = 0,
-            field;
-
-        for (; i < ln; i++) {
-            field = fields[i];
-            if (field.getChecked()) {
-                return field.getValue();
-            }
-        }
-
-        return null;
-    },
-
-    
-    setGroupValue: function(value) {
-        var fields = this.getSameGroupFields(),
-            ln = fields.length,
-            i = 0,
-            field;
-
-        for (; i < ln; i++) {
-            field = fields[i];
-            if (field.getValue() === value) {
-                field.setChecked(true);
-                return field;
-            }
-        }
-    }
-});
-
-Ext.define('Ext.field.Slider', {
-    extend  : 'Ext.field.Field',
-    alias   : 'widget.sliderfield',
-    requires: ['Ext.field.slider.Thumb'],
-    alternateClassName: 'Ext.form.Slider',
-
-    
-
-    config: {
-        
-        layout: null,
-
-        
-        cls: Ext.baseCSSPrefix + 'slider',
-
-        
-        thumbs: [],
-
-        
-        value: 0,
-
-        
-        tabIndex: -1,
-
-        
-        minValue: 0,
-
-        
-        maxValue: 100,
-
-        
-        increment: 1
-    },
-
-    
-    constructor: function(config) {
-        config = config || {};
-
-        if (config.hasOwnProperty('values')) {
-            config.value = config.values;
-            config._values = config.value;
-        }
-
-        this.callParent([config]);
-    },
-
-    
-    initialize: function() {
-        var me = this;
-
-        me.callParent(arguments);
-
-        me.on({
-            scope: this,
-            delegate: 'thumb',
-            change: 'onChange'
-        });
-
-        me.on('painted', 'onPainted');
-
-        me.element.on({
-            scope: this,
-
-            tap: 'onTap'
-        });
-
-        this.sizeMonitor = new Ext.util.SizeMonitor({
-            element : this.element,
-            callback: this.onSizeChange,
-            scope   : this
-        });
-    },
-
-    onPainted: function() {
-        this.sizeMonitor.refresh();
-    },
-
-    onSizeChange: function() {
-        var me = this;
-        me.refreshThumbs();
-    },
-
-    
-    refreshThumbs: function() {
-        var me = this;
-
-        
-        var thumbs = this.getThumbs(),
-            ln = thumbs.length,
-            i;
-
-        for (i = 0; i < ln; i++) {
-            thumbs[i].refreshValue();
-        }
-    },
-
-    
-    applyThumbs: function(thumbs) {
-        var i, ln, config, currentThumb, instance,
-            currentThumbs = this.getThumbs() || [],
-            instances = [];
-
-        if (thumbs && thumbs.length > 0) {
-            
-            if (!Ext.isArray(thumbs)) {
-                thumbs = [thumbs];
-            }
-
-            ln = thumbs.length;
-
-            for (i = 0; i < ln; i++) {
-                config = thumbs[i];
-                config.slider = this;
-                currentThumb = currentThumbs[i];
-
-                instance = Ext.factory(config, 'Ext.field.slider.Thumb', currentThumb);
-                instances.push(instance);
-            }
-
-            return instances;
-        }
-
-        return thumbs;
-    },
-
-    
-    updateThumbs: function(newThumbs) {
-        if (newThumbs) {
-            this.add(newThumbs);
-        }
-    },
-
-    
-    applyValue: function(value) {
-        
-        this.getValue();
-
-        
-        if (!Ext.isArray(value)) {
-            value = [value];
-        }
-
-        return value;
-    },
-
-    
-    updateValue: function(newValue) {
-        var thumbs = this.getThumbs(),
-            newThumbs = [],
-            ln = newValue.length,
-            thumb, i;
-
-        
-        if (thumbs.length === 0) {
-            for (i = 0; i < ln; i++) {
-                newThumbs.push({
-                    value: newValue[i]
-                });
-            }
-
-            this.setThumbs(newThumbs);
-
-            return;
-        }
-
-        
-        ln = newValue.length;
-        for (i = 0; i < ln; i++) {
-            thumb = thumbs[i];
-            if (thumb) {
-                thumbs[i].setValue(newValue);
-            }
-            else {
-                throw new Error("Ext.field.Slider: [setValue] calling setValue() with more values than there are thumbs (" + thumbs.length + " thumb(s), " + ln +" value(s)).");
-            }
-        }
-    },
-
-    
-    getValue: function() {
-        var thumbs = this.getThumbs(),
-            ln = thumbs.length,
-            value = [],
-            i;
-
-        
-        for (i = 0; i < ln; i++) {
-            value.push(thumbs[i].getValue());
-        }
-
-        this._value = value;
-        this._values = value;
-
-        return value;
-    },
-
-    
-    setValues: function() {
-        this.updateValue(this.applyValue(value));
-        this._values = this._value;
-    },
-
-    setValue: function(value) {
-        this.updateValue(this.applyValue(value));
-        this._value = this._values = value;
-    },
-
-    
-    getValues: function() {
-        return this.getValue();
-    },
-
-    
-    applyIncrement: function(increment) {
-        if (increment === 0) {
-            increment = 1;
-        }
-
-        increment = Math.abs(increment);
-
-        return increment;
-    },
-
-    
-    updateMinValue: function(newMinValue) {
-        this.refreshThumbs();
-    },
-
-    
-    updateMaxValue: function(newMaxValue) {
-        this.refreshThumbs();
-    },
-
-    
-    updateIncrement: function(newIncrement) {
-        this.refreshThumbs();
-    },
-
-    
-    getThumb: function(index) {
-        var thumbs = this.getThumbs();
-        return thumbs[index || 0];
-    },
-
-    
-    getClosestThumb: function(value) {
-        var thumbs = this.getThumbs(),
-            ln     = thumbs.length,
-            thumb  = thumbs[0],
-            difference = Infinity,
-            thumbDifference, thumbValue, i;
-
-        if (ln == 1) {
-           return thumb;
-        }
-
-        
-        for (i = 0; i < ln; i++) {
-            thumbValue = thumbs[i].getValue();
-            thumbDifference = Math.abs(thumbValue - value);
-            if (thumbDifference < difference) {
-                difference = thumbDifference;
-                thumb = thumbs[i];
-            }
-        }
-
-        return thumb;
-    },
-
-    
-    indexOf: function(thumb) {
-        return this.getThumbs().indexOf(thumb);
-    },
-
-    
-    getOffsetForValue: function(value) {
-        var me = this,
-            minValue   = me.getMinValue(),
-            maxValue   = me.getMaxValue(),
-            range      = maxValue - minValue,
-            trackWidth = me.innerElement.getWidth(),
-            thumbWidth = 0,
-            thumb, ratio;
-
-        thumb = me.getThumb();
-        if (thumb) {
-            thumbWidth = thumb.renderElement.getWidth();
-        }
-        trackWidth = trackWidth - thumbWidth;
-
-        value = this.constrain(value);
-        ratio = trackWidth / range;
-
-        return Math.round((ratio * (value - minValue)));
-    },
-
-    
-    getValueForOffset: function(offset, isTap) {
-        var me = this,
-            minValue   = me.getMinValue(),
-            maxValue   = me.getMaxValue(),
-            range      = maxValue - minValue,
-            trackWidth = me.innerElement.getWidth(),
-            thumbWidth = 0,
-            thumb, ratio;
-
-        thumb = me.getThumb();
-        if (thumb) {
-            thumbWidth = thumb.renderElement.getWidth();
-        }
-        trackWidth = trackWidth - ((isTap) ? 0 : thumbWidth);
-
-        ratio = range / trackWidth;
-
-        return Math.round(minValue + (ratio * (offset)));
-    },
-
-    
-    constrain: function(value) {
-        var me = this,
-            minValue  = me.getMinValue(),
-            maxValue  = me.getMaxValue(),
-            increment = me.getIncrement(),
-            remainder = value % increment;
-
-        value -= remainder;
-
-        if (Math.abs(remainder) >= (increment / 2)) {
-            value += (remainder > 0) ? increment : -increment;
-        }
-
-        value = Math.max(minValue, value);
-        value = Math.min(maxValue, value);
-
-        return value;
-    },
-
-    
-    setThumbsDisabled: function(disable) {
-        var me = this,
-            thumbs = me.thumbs,
-            ln     = thumbs.length,
-            i;
-
-        for (i = 0; i < ln; i++) {
-            thumbs[i][disable ? 'disable' : 'enable']();
-        }
-    },
-
-    
-    onChange: function(thumb, value) {
-        var thumbs = this.getThumbs(),
-            ln = thumbs.length,
-            thumbWidth = thumb.renderElement.getWidth(),
-            previousThumb, offset, previousOffset, i, thumbDraggable, previousThumbDraggable;
-
-        for (i = 0; i < ln; i++) {
-            thumb         = thumbs[i];
-            previousThumb = thumbs[i - 1];
-            thumbDraggable         = (thumb) ? thumb.getDraggable() : null;
-            previousThumbDraggable = (previousThumb) ? previousThumb.getDraggable() : null;
-
-            if (previousThumb && thumbDraggable && previousThumbDraggable) {
-                offset = thumbDraggable.getOffset().x;
-                previousOffset = previousThumb.getDraggable().getOffset().x;
-
-                thumbDraggable.setConstraint({
-                    min: {
-                        x: (previousOffset === 0) ? thumbWidth : previousOffset + thumbWidth
-                    }
-                });
-
-                previousThumbDraggable.setConstraint({
-                    max: {
-                        x: offset - thumbWidth
-                    }
-                });
-            }
-        }
-
-        this.fireEvent('change', this, thumb, value);
-    },
-
-    
-    onTap: function(e) {
-        var el = Ext.get(e.target);
-
-        if (el.hasCls(Ext.baseCSSPrefix + 'thumb')) {
-            return;
-        }
-
-        var touchX = e.touch.point.x,
-            parent = this.element,
-            parentX = parent.getX(),
-            offset = touchX - parentX,
-            value  = this.getValueForOffset(offset, true),
-            thumb  = this.getClosestThumb(value);
-
-        thumb.setValue(value);
-    },
-
-    
-    disable: function() {
-        this.callParent();
-        this.setThumbsDisabled(true);
-    },
-
-    
-    enable: function() {
-        this.callParent();
-        this.setThumbsDisabled(false);
-    },
-
-    
-    reset: function() {
-        this.setValue(this.originalValue);
-    }
-});
-
-
-Ext.define('Ext.field.Text', {
-    extend: 'Ext.field.Field',
-    alias : 'widget.textfield',
-    alternateClassName: 'Ext.form.Text',
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    config: {
-        
-        ui: 'text',
-
-        
-        input: {
-            type: 'text'
-        },
-
-        
-        clearIcon: true,
-
-        
-        placeHolder: null,
-
-        
-        maxLength: null,
-
-        
-        autoComplete: null,
-
-        
-        autoCapitalize: null,
-
-        
-        autoCorrect: null
-    },
-
-    
-    initialize: function() {
-        this.enableBubble('action');
-        this.callParent(arguments);
-
-        var me = this;
-
-        me.callParent(arguments);
-
-        me.on({
-            scope: me,
-
-            keyup : 'doKeyUp',
-            change: 'doChange'
-        });
-
-        me.on({
-            scope   : me,
-            delegate: 'clearicon',
-
-            tap: 'onClearIconTap'
-        });
-
-        this.relayEvents(me.getInput(), [
-            'keyup',
-            'change',
-            'focus',
-            'blur',
-            'paste',
-            'mousedown'
-        ]);
-    },
-
-    
-    updateValue: function(newValue) {
-        this.callParent(arguments);
-        this[newValue ? 'showClearIcon' : 'hideClearIcon']();
-    },
-
-    
-    updatePlaceHolder: function(newPlaceHolder) {
-        this.getInput().setPlaceHolder(newPlaceHolder);
-    },
-
-    
-    updateMaxLength: function(newMaxLength) {
-        this.getInput().setMaxLength(newMaxLength);
-    },
-
-    
-    updateAutoComplete: function(newAutoComplete) {
-        this.getInput().setAutoComplete(newAutoComplete);
-    },
-
-    
-    updateAutoCapitalize: function(newAutoCapitalize) {
-        this.getInput().setAutoCapitalize(newAutoCapitalize);
-    },
-
-    
-    updateAutoCorrect: function(newAutoCorrect) {
-        this.getInput().setAutoCorrect(newAutoCorrect);
-    },
-
-    
-    doSetDisabled: function(disabled) {
-        this.callParent(arguments);
-
-        if (disabled) {
-            this.hideClearIcon();
-        } else {
-            this.showClearIcon();
-        }
-    },
-
-    
-    onClearIconTap: function() {
-        this.setValue('');
-    },
-
-    
-    showClearIcon: function() {
-        var me = this,
-            clearIcon = this.getClearIcon();
-
-        if (!me.getDisabled() && me.getValue() && clearIcon) {
-            clearIcon.show();
-
-            this.element.addCls(Ext.baseCSSPrefix + 'field-clearable');
-        }
-
-        return this;
-    },
-
-    
-    hideClearIcon: function() {
-        var clearIcon = this.getClearIcon();
-        if (clearIcon) {
-            clearIcon.hide();
-            this.element.removeCls(Ext.baseCSSPrefix + 'field-clearable');
-        }
-    },
-
-    doChange: Ext.emptyFn,
-
-    
-    doKeyUp: function(e) {
-        
-        var me = this,
-            value = me.getValue();
-
-        
-        this[value ? 'showClearIcon' : 'hideClearIcon']();
-
-        if (e.browserEvent.keyCode === 13) {
-            me.getInput().blur();
-            me.fireAction('action', [me, e], 'doAction');
-        }
-    },
-
-    doAction: Ext.emptyFn,
-
-    
-    focus: function() {
-        this.getInput().focus();
-        return this;
-    },
-
-    
-    blur: function() {
-        this.getInput().blur();
-        return this;
-    },
-
-    
-    reset: function() {
-        this.callParent(arguments);
-        this[this._value ? 'showClearIcon' : 'hideClearIcon']();
-    }
-});
-
-
-
-
-Ext.define('Ext.field.Email', {
-    extend: 'Ext.field.Text',
-    alternateClassName: 'Ext.form.Email',
-    alias : 'widget.emailfield',
-
-    config: {
-        
-        input: {
-	        type: 'email'
-	    },
-
-        
-        autoCapitalize: false
-    }
-});
-
-
-
-
-
-
-
-Ext.define('Ext.field.Number', {
-    extend: 'Ext.field.Text',
-    alias : 'widget.numberfield',
-    alternateClassName: 'Ext.form.Number',
-
-    config: {
-        
-        input: {
-            type: 'number'
-        },
-
-        
-        ui: 'number',
-
-        
-        minValue: null,
-
-        
-        maxValue: null,
-
-        
-        stepValue: null
-    },
-
-    applyValue: function(value) {
-        var minValue = this.getMinValue(),
-            maxValue = this.getMaxValue();
-
-        value = Math.min(Math.max(value, minValue), maxValue);
-
-        return parseFloat(value);
-    },
-
-    getValue: function() {
-        var value = this.callParent();
-        return parseFloat(value);
-    },
-
-    
-    updateMinValue: function(newMinValue) {
-        this.getInput().setMinValue(newMinValue);
-    },
-
-    
-    updateMaxValue: function(newMaxValue) {
-        this.getInput().setMaxValue(newMaxValue);
-    },
-
-    
-    updateStepValue: function(newStepValue) {
-        this.getInput().setStepValue(newStepValue);
-    }
-});
-
-
-Ext.define('Ext.field.Password', {
-    extend: 'Ext.field.Text',
-    alias : 'widget.passwordfield',
-    alternateClassName: 'Ext.form.Password',
-
-    config: {
-        
-        autoCapitalize: false,
-
-        
-        input: {
-	        type: 'password'
-	    }
-    }
-});
-
-
-Ext.define('Ext.field.Search', {
-    extend: 'Ext.field.Text',
-    alias : 'widget.searchfield',
-    alternateClassName: 'Ext.form.Search',
-
-    config: {
-        
-        input: {
-	        type: 'search'
-	    },
-
-	    
-	    ui: 'search'
-    }
-});
-
-
-Ext.define('Ext.field.Spinner', {
-    extend: 'Ext.field.Number',
-    alias : 'widget.spinnerfield',
-    alternateClassName: 'Ext.form.Spinner',
-    requires: ['Ext.util.TapRepeater'],
-
-    
-    
-    
-
-    config: {
-        
-        cls: Ext.baseCSSPrefix + 'spinner',
-
-        
-        minValue: Number.NEGATIVE_INFINITY,
-        
-        maxValue: Number.MAX_VALUE,
-
-        
-        increment: 1,
-
-        
-        accelerateOnTapHold: true,
-
-        
-        cycle: false,
-
-        
-        clearIcon: false,
-
-        defaultValue: 0,
-
-        
-        tabIndex: -1,
-
-        input: {
-            flex: 2
-        },
-
-        
-        layout: {
-            type: 'hbox',
-            align: 'stretch'
-        }
-    },
-
-    constructor: function() {
-        this.callParent(arguments);
-
-        if (!this.getValue()) {
-            this.setValue(this.getDefaultValue());
-        }
-    },
-
-    
-    updateInput: function(newInput) {
-        if (newInput) {
-            this.spinDownButton = Ext.create('Ext.Button', {
-                baseCls: this.getCls() + '-button',
-                ui     : 'down',
-                text   : '-',
-                flex: 1
-            });
-
-            this.spinUpButton = Ext.create('Ext.Button', {
-                baseCls: this.getCls() + '-button',
-                ui     : 'up',
-                text   : '+',
-                flex: 1
-            });
-
-            this.add(this.spinDownButton, newInput, this.spinUpButton);
-
-            this.downRepeater = this.createRepeater(this.spinDownButton.element, this.onSpinDown);
-            this.upRepeater = this.createRepeater(this.spinUpButton.element, this.onSpinUp);
-        }
-    },
-
-    
-    applyValue: function(value) {
-        value = parseFloat(value);
-        if (isNaN(value)) {
-            value = this.getDefaultValue();
-        }
-
-        return this.callParent([value]);
-    },
-
-    
-    createRepeater: function(el, fn) {
-        var me = this,
-            repeater = Ext.create('Ext.util.TapRepeater', {
-                el: el,
-                accelerate: me.getAccelerateOnTapHold()
-            });
-
-        repeater.on({
-            tap: fn,
-            touchstart: 'onTouchStart',
-            touchend: 'onTouchEnd',
-            scope: me
-        });
-
-        return repeater;
-    },
-
-    
-    onSpinDown: function() {
-        if (!this.getDisabled()) {
-            this.spin(true);
-        }
-    },
-
-    
-    onSpinUp: function() {
-        if (!this.getDisabled()) {
-            this.spin(false);
-        }
-    },
-
-    
-    onTouchStart: function(repeater) {
-        if (!this.getDisabled()) {
-            repeater.getEl().addCls(Ext.baseCSSPrefix + 'button-pressed');
-        }
-    },
-
-    
-    onTouchEnd: function(repeater) {
-        repeater.getEl().removeCls(Ext.baseCSSPrefix + 'button-pressed');
-    },
-
-    
-    spin: function(down) {
-        var me = this,
-            value = parseInt(me.getValue(), 10),
-            increment = me.getIncrement(),
-            direction = down ? 'down' : 'up';
-
-        if (down) {
-            value -= increment;
-        }
-        else {
-            value += increment;
-        }
-
-        me.setValue(value);
-        value = me._value;
-
-        me.fireAction('spin', [me, value, direction], 'doSpin');
-        me.fireAction('spin' + direction, [me, value], 'doSpin' + Ext.String.capitalize(direction));
-    },
-
-    doSpin: Ext.emptyFn,
-    doSpinUp: Ext.emptyFn,
-    doSpinDown: Ext.emptyFn,
-
-    reset: function() {
-        this.setValue(this.getDefaultValue());
-    },
-
-    
-    destroy: function() {
-        var me = this;
-        Ext.destroy(me.downRepeater, me.upRepeater);
-        me.callParent(arguments);
-    }
-}, function() {
-    
-});
-
-
-Ext.define('Ext.field.TextArea', {
-    extend: 'Ext.field.Text',
-    alias : 'widget.textareafield',
-    requires: ['Ext.field.TextAreaInput'],
-    alternateClassName: 'Ext.form.TextArea',
-
-    config: {
-        
-        ui: 'textarea',
-
-        
-        autoCapitalize: false,
-
-        
-        input: {
-            xclass: 'Ext.field.TextAreaInput'
-        },
-
-        
-        maxRows: null
-    },
-
-    
-    updateMaxRows: function(newRows) {
-        this.getInput().setMaxRows(newRows);
-    }
-});
-
-
-Ext.define('Ext.MessageBox', {
-    extend  : 'Ext.Sheet',
-    requires: [
-        'Ext.Toolbar',
-        'Ext.field.Text',
-        'Ext.field.TextArea'
-    ],
-
-    config: {
-        
-        ui: 'dark',
-
-        
-        baseCls: Ext.baseCSSPrefix + 'msgbox',
-
-        
-        cls: Ext.baseCSSPrefix + 'panel',
-
-        
-        iconCls: null,
-
-        
-        enterAnimation: 'pop',
-
-        
-        exitAnimation: 'pop',
-
-        
-        defaultTextHeight: 75,
-
-        
-        title: null,
-
-        
-        buttons: null,
-
-        
-        msg: null,
-        
-        
-        promptConfig: null,
-
-        
-        layout: {
-            type: 'vbox',
-            pack: 'center'
-        }
-    },
-
-    statics: {
-        OK    : {text: 'OK',     itemId: 'ok',  ui: 'action'},
-        YES   : {text: 'Yes',    itemId: 'yes', ui: 'action'},
-        NO    : {text: 'No',     itemId: 'no'},
-        CANCEL: {text: 'Cancel', itemId: 'cancel'},
-
-        INFO    : Ext.baseCSSPrefix + 'msgbox-info',
-        WARNING : Ext.baseCSSPrefix + 'msgbox-warning',
-        QUESTION: Ext.baseCSSPrefix + 'msgbox-question',
-        ERROR   : Ext.baseCSSPrefix + 'msgbox-error',
-
-        OKCANCEL: [
-            {text: 'Cancel', itemId: 'cancel'},
-            {text: 'OK',     itemId: 'ok',  ui : 'action'}
-        ],
-        YESNOCANCEL: [
-            {text: 'Cancel', itemId: 'cancel'},
-            {text: 'No',     itemId: 'no'},
-            {text: 'Yes',    itemId: 'yes', ui: 'action'}
-        ],
-        YESNO: [
-            {text: 'No',  itemId: 'no'},
-            {text: 'Yes', itemId: 'yes', ui: 'action'}
-        ]
-    },
-
-    
-    constructor: function(config) {
-        config = config || {};
-
-        if (config.hasOwnProperty('prompt')) {
-            Ext.applyIf(config, {
-                promptConfig: config.prompt
-            });
-
-            delete config.prompt;
-        }
-
-        if (config.hasOwnProperty('multiline') || config.hasOwnProperty('multiLine')) {
-            config.promptConfig = config.promptConfig || {};
-            Ext.applyIf(config.promptConfig, {
-                multiLine: config.multiline || config.multiLine
-            });
-
-            delete config.multiline;
-            delete config.multiLine;
-        }
-
-        this.callParent([config]);
-    },
-
-    
-    applyTitle: function(config) {
-        if (typeof config == "string") {
-            config = {
-                title: config
-            };
-        }
-
-        Ext.applyIf(config, {
-            docked: 'top',
-            cls   : this.getBaseCls() + '-title'
-        });
-
-        return Ext.factory(config, Ext.Toolbar, this.getTitle());
-    },
-
-    
-    updateTitle: function(newTitle) {
-        if (newTitle) {
-            this.add(newTitle);
-        }
-    },
-
-    
-    updateButtons: function(newButtons) {
-        var me = this;
-
-
-        if (newButtons) {
-            if (me.buttonsToolbar) {
-                me.buttonsToolbar.removeAll();
-                me.buttonsToolbar.setItems(newButtons);
-            } else {
-                me.buttonsToolbar = Ext.create('Ext.Toolbar', {
-                    docked     : 'bottom',
-                    defaultType: 'button',
-                    layout     : {
-                        type: 'hbox',
-                        pack: 'center'
-                    },
-                    ui         : me.getUi(),
-                    cls        : me.getBaseCls() + '-buttons',
-                    items      : newButtons
-                });
-
-                me.add(me.buttonsToolbar);
-            }
-        }
-    },
-
-    
-    applyMsg: function(config) {
-        config = {
-            html : config,
-            cls  : this.getBaseCls() + '-text'
-        };
-
-        return Ext.factory(config, Ext.Component, this.getMsg());
-    },
-
-    
-    updateMsg: function(newMsg) {
-        if (newMsg) {
-            this.add(newMsg);
-        }
-    },
-
-    
-    updateIconCls: function(newIconCls, oldIconCls) {
-        if (newIconCls) {
-            var cfg = {
-                xtype : 'component',
-                docked: 'left',
-                width : 40,
-                height: 40,
-                cls   : newIconCls
-            };
-            
-        }
-    },
-
-    
-    applyPromptConfig: function(prompt) {
-        if (prompt) {
-            var config = {
-                label: false
-            };
-
-            if (typeof prompt == "object") {
-                Ext.apply(config, prompt);
-            }
-
-            if (config.multiLine) {
-                config.height = Ext.isNumber(config.multiLine) ? parseFloat(config.multiLine) : this.getDefaultTextHeight();
-                return Ext.factory(config, Ext.field.TextArea, this.getPromptConfig());
-            } else {
-                return Ext.factory(config, Ext.field.Text, this.getPromptConfig());
-            }
-        }
-
-        return prompt;
-    },
-
-    
-    updatePromptConfig: function(newPrompt, oldPrompt) {
-        if (newPrompt) {
-            this.add(newPrompt);
-        }
-
-        if (oldPrompt) {
-            this.remove(oldPrompt);
-        }
-    },
-
-    
-    
-    onClick: function(button) {
-        if (button) {
-            var config = button.userConfig || {};
-
-            if (typeof config.fn == 'function') {
-                config.fn.call(
-                    config.scope || null,
-                    button.itemId || button.text,
-                    config.input ? config.input.dom.value : null,
-                    config
-                );
-            }
-
-            if (config.cls) {
-                    this.el.removeCls(config.cls);
-                }
-
-            if (config.input) {
-                config.input.dom.blur();
-            }
-        }
-
-        this.hide();
-    },
-
-    
-    show: function(initialConfig) {
-        if (!initialConfig) {
-            return this.callParent();
-        }
-
-        var config = Ext.Object.merge({}, {
-            value: ''
-        }, initialConfig);
-
-        var buttons        = initialConfig.buttons || Ext.MessageBox.OK || [],
-            buttonBarItems = [],
-            userConfig     = initialConfig;
-
-        Ext.each(buttons, function(buttonConfig) {
-            if (!buttonConfig) {
-                return;
-            }
-
-            buttonBarItems.push(Ext.apply({
-                userConfig: userConfig,
-                scope     : this,
-                handler   : 'onClick'
-            }, buttonConfig));
-        }, this);
-
-        config.buttons = buttonBarItems;
-
-        this.setConfig(config);
-
-        var prompt = this.getPromptConfig();
-        if (prompt) {
-            prompt.setValue('');
-        }
-
-        this.callParent();
-
-        return this;
-    },
-
-    
-    alert: function(title, msg, fn, scope) {
-        return this.show({
-            title       : title,
-            msg         : msg,
-            buttons     : Ext.MessageBox.OK,
-            promptConfig: false,
-            fn          : fn,
-            scope       : scope,
-            iconCls     : Ext.MessageBox.INFO
-        });
-    },
-
-    
-    confirm: function(title, msg, fn, scope) {
-        return this.show({
-            title       : title,
-            msg         : msg,
-            buttons     : Ext.MessageBox.YESNO,
-            promptConfig: false,
-            scope       : scope,
-            iconCls     : Ext.MessageBox.QUESTION,
-            fn: function(button) {
-                fn.call(scope, button);
-            }
-        });
-     },
-
-    
-    prompt: function(title, msg, fn, scope, multiLine, value, promptConfig) {
-        return this.show({
-            title       : title,
-            msg         : msg,
-            buttons     : Ext.MessageBox.OKCANCEL,
-            scope       : scope,
-            iconCls     : Ext.MessageBox.QUESTION,
-            promptConfig: promptConfig || true,
-            multiLine   : multiLine,
-            value       : value,
-            fn: function(button, inputValue) {
-                fn.call(scope, button, inputValue);
-            }
-        });
-    }
-}, function() {
-    this.override({
-        
-
-        
-        setIcon: function(iconCls, doLayout){
-            Ext.Logger.deprecate("Ext.MessageBox#setIcon is deprecated, use setIconCls instead", 2);
-            this.setIconCls(iconCls);
-            if (doLayout) {
-                this.doComponentLayout();
-            }
-            return this;
-        }
-    });
-
-    
-    Ext.Msg = Ext.create('Ext.MessageBox');
-});
-
-
-
-Ext.define('Ext.field.Toggle', {
-    extend: 'Ext.field.Slider',
-    alias : 'widget.togglefield',
-    alternateClassName: 'Ext.form.Toggle',
-
-    config: {
-        
-        cls: 'x-toggle',
-
-        
-        minValue: 0,
-
-        
-        maxValue: 1,
-
-        
-        minValueCls: Ext.baseCSSPrefix + 'toggle-off',
-
-        
-        maxValueCls: Ext.baseCSSPrefix + 'toggle-on'
-
-        
-        
-    },
-
-    
-    onChange: function(thumb, newValue) {
-        var me     = this,
-            isOn   = newValue > 0,
-            onCls  = me.getMaxValueCls(),
-            offCls = me.getMinValueCls();
-
-        this.addCls(isOn ? onCls : offCls);
-        this.removeCls(isOn ? offCls : onCls);
-    },
-
-    onTap: function(e) {
-        var value = (this.getValue() > 0) ? 0 : 1;
-        this.setValue(value);
-    }
-});
-
-Ext.define('Ext.field.Url', {
-    extend: 'Ext.field.Text',
-    alias : 'widget.urlfield',
-    alternateClassName: 'Ext.form.Url',
-
-    config: {
-        
-        autoCapitalize: false,
-
-        
-        inputType: 'url'
-    }
-});
-
-
 Ext.define('Ext.form.FieldSet', {
     extend  : 'Ext.Container',
     alias   : 'widget.fieldset',
@@ -46025,7 +45677,7 @@ Ext.define('Ext.form.Panel', {
     alternateClassName: 'Ext.form.FormPanel',
     extend  : 'Ext.Panel',
     xtype   : 'formpanel',
-    requires: ['Ext.XTemplate', 'Ext.field.Checkbox'],
+    requires: ['Ext.XTemplate', 'Ext.field.Checkbox', 'Ext.Ajax'],
 
     
 
@@ -46185,9 +45837,17 @@ Ext.define('Ext.form.Panel', {
                     scope    : me,
                     callback: function(callbackOptions, success, response) {
                         var me = this,
-                            responseText = response.responseText;
+                            responseText = response.responseText,
+                            failureFn;
 
                         me.hideMask();
+
+                        failureFn = function() {
+                            if (Ext.isFunction(options.failure)) {
+                                options.failure.call(options.scope || me, me, response, responseText);
+                            }
+                            me.fireEvent('exception', me, response);
+                        };
 
                         if (success) {
                             response = Ext.decode(responseText);
@@ -46197,13 +45857,12 @@ Ext.define('Ext.form.Panel', {
                                     options.success.call(options.scope || me, me, response, responseText);
                                 }
                                 me.fireEvent('submit', me, response);
+                            } else {
+                                failureFn();
                             }
                         }
                         else {
-                            if (Ext.isFunction(options.failure)) {
-                                options.failure.call(options.scope || me, me, response, responseText);
-                            }
-                            me.fireEvent('exception', me, response);
+                            failureFn();
                         }
                     }
                 });
@@ -46239,11 +45898,13 @@ Ext.define('Ext.form.Panel', {
                 value = values[name];
                 if (field) {
                     if (Ext.isArray(field)) {
-                        field.forEach(function(field) {
-                            if (Ext.isArray(values[name])) {
-                                field.setChecked((value.indexOf(field.getValue()) != -1));
+                        field.forEach(function(f) {
+                            if (f.isRadio) {
+                                f.setGroupValue(value);
+                            } else if (Ext.isArray(values[name])) {
+                                f.setChecked((value.indexOf(f.getValue()) != -1));
                             } else {
-                                field.setChecked((value == field.getValue()));
+                                f.setChecked((value == f.getValue()));
                             }
                         });
                     } else {
@@ -46264,27 +45925,41 @@ Ext.define('Ext.form.Panel', {
     getValues: function(enabled) {
         var fields = this.getFields(),
             values = {},
-            field, name;
+            field, name, ln, i;
 
         for (name in fields) {
             if (fields.hasOwnProperty(name)) {
                 if (Ext.isArray(fields[name])) {
                     values[name] = [];
 
-                    fields[name].forEach(function(field) {
-                        if (field.getChecked() && !(enabled && field.getDisabled())) {
-                            if (field instanceof Ext.field.Radio) {
-                                values[name] = field.getValue();
+                    ln = fields[name].length;
+
+                    for (i = 0; i < ln; i++) {
+                        field = fields[name][i];
+
+                        if (!field.getChecked) {
+                            values[name] = field.getValue();
+
+                            throw new Error("Ext.form.Panel: [getValues] You have multiple fields with the same 'name' configuration of '" + name + "' in your form panel (#" + this.id + ").");
+
+                            break;
+                        }
+
+                        if (!(enabled && field.getDisabled())) {
+                            if (field.isRadio) {
+                                values[name] = field.getGroupValue();
                             } else {
                                 values[name].push(field.getValue());
                             }
                         }
-                    });
+
+                        
+                    }
                 } else {
                     field = fields[name];
 
                     if (!(enabled && field.getDisabled())) {
-                        if (field instanceof Ext.field.Checkbox) {
+                        if (field.isCheckbox) {
                             values[name] = (field.getChecked()) ? field.getValue() : null;
                         } else {
                             values[name] = field.getValue();
@@ -46394,9 +46069,11 @@ Ext.define('Ext.form.Panel', {
 
     
     hideMask: function() {
-        var me = this;
-        if (me.getMaskTarget()) {
-            me.maskTarget.unmask();
+        var me = this,
+            maskTarget = me.getMaskTarget();
+        
+        if (maskTarget) {
+            maskTarget.unmask();
             me.setMaskTarget(null);
         }
         return me;
@@ -46415,7 +46092,7 @@ Ext.define('Ext.form.Panel', {
 
         constructor: function(config) {
             
-            if (config.hasOwnProperty('waitMsgTarget')) {
+            if (config && config.hasOwnProperty('waitMsgTarget')) {
                 config.maskTarget = config.waitMsgTarget;
                 delete config.waitMsgTarget;
             }
@@ -47102,7 +46779,7 @@ Ext.define('Ext.field.Select', {
         hiddenName: null,
 
         
-        input: {
+        component: {
             useMask: true
         },
 
@@ -47114,13 +46791,14 @@ Ext.define('Ext.field.Select', {
     record: null,
 
     
+    previousRecord: null,
+
+    
     constructor: function(config) {
         config = config || {};
 
         if (!config.store) {
-            config.store = Ext.create('Ext.data.Store', {
-                fields: [config.valueField, config.displayField]
-            });
+            config.store = true;
         }
 
         this.callParent([config]);
@@ -47128,25 +46806,51 @@ Ext.define('Ext.field.Select', {
 
     
     initialize: function() {
-        this.on({
-            scope   : this,
-            delegate: 'input',
-
+        this.getComponent().on({
+            scope: this,
             masktap: 'onMaskTap'
         });
 
         this.callParent();
     },
 
-    getValue: function() {
-        var record = this.record;
+    applyValue: function(value) {
+        var record = value,
+            index;
+        
+        if (!(value instanceof Ext.data.Model)) {
+            index = this.getStore().find(this.getValueField(), value);
 
-        return (record) ? this.record.get(this.getValueField()) : null;
+            if (index == -1) {
+                index = this.getStore().find(this.getDisplayField(), value);
+            }
+
+            record = this.getStore().getAt(index);
+        }
+
+        return record;
     },
 
     updateValue: function(newValue, oldValue) {
-        this.callParent(arguments);
+        this.previousRecord = oldValue;
+        
+        if (newValue) {
+            this.record = newValue;
+
+            this.callParent([newValue.get(this.getDisplayField())]);
+        }
+
         this.fireAction('change', [this, newValue, oldValue]);
+    },
+
+    getValue: function() {
+        var record = this.record;
+
+        return (record) ? record.get(this.getValueField()) : null;
+    },
+
+    getRecord: function() {
+        return this.record;
     },
 
     
@@ -47211,14 +46915,14 @@ Ext.define('Ext.field.Select', {
 
     
     showComponent: function() {
-        if (Ext.os.deviceType === 'Phone') {
+        if (Ext.os.deviceType == 'Phone') {
             var picker = this.getPicker(),
                 name   = this.getName(),
                 value  = {};
 
-            value[name] = this.getValue();
+            value[name] = this.record.get(this.getValueField());
+            picker.setValue(value);
             picker.show();
-            
         } else {
             var listPanel = this.getListPanel(),
                 list = listPanel.down('list'),
@@ -47227,15 +46931,15 @@ Ext.define('Ext.field.Select', {
                 record = store.getAt((index == -1) ? 0 : index);
 
             listPanel.showBy(this);
-            list.select(record);
+            list.select(record, null, true);
         }
     },
 
     
     onListSelect: function(item, record) {
+        var me = this;
         if (record) {
-            this.record = record;
-            this.setValue(record.get(this.getDisplayField()));
+            me.setValue(record);
         }
     },
 
@@ -47249,14 +46953,14 @@ Ext.define('Ext.field.Select', {
 
     
     onPickerChange: function(picker, value) {
-        var currentValue = this.getValue(),
-            newValue = value[this.getName()],
-            store = this.getStore(),
-            index = store.find(this.getValueField(), newValue);
+        var me = this,
+            currentValue = me.getValue(),
+            newValue = value[me.getName()],
+            store = me.getStore(),
+            index = store.find(me.getValueField(), newValue);
             record = store.getAt(index);
         
-        this.record = record;
-        this.setValue(record.get(this.getDisplayField()));
+        me.setValue(record);
     },
 
     
@@ -47272,29 +46976,41 @@ Ext.define('Ext.field.Select', {
             store.loadData(newOptions);
 
             record = store.getAt(0);
-            this.record = record;
-            this.setValue(record.get(this.getDisplayField()));
+            this.setValue(record);
         }
+    },
+
+    applyStore: function(store) {
+        if (store === true) {
+            store = Ext.create('Ext.data.Store', {
+                fields: [this.getValueField(), this.getDisplayField()]
+            });
+        }
+
+        if (store) {
+            store = Ext.data.StoreManager.lookup(store);
+        }
+
+        return store;
     },
 
     updateStore: function(newStore) {
         var record = (newStore) ? newStore.getAt(0) : null;
 
         if (newStore && record) {
-            this.record = record;
-            this.setValue(record.get(this.getDisplayField()));
+            this.setValue(record);
         }
     },
 
     
     reset: function() {
         var store = this.getStore(),
-            record = (store) ? store.getAt(0) : null;
+            record = (this.originalValue) ? this.originalValue : store.getAt(0);
 
         if (store && record) {
-            this.record = record;
-            this.setValue(record.get(this.getDisplayField()));
+            this.setValue(record);
         }
+
         return this;
     },
 
@@ -47566,18 +47282,16 @@ Ext.define('Ext.field.DatePicker', {
         tabIndex: -1,
 
         
-        input: {
+        component: {
             useMask: true
         }
     },
 
     initialize: function() {
-        var me = this;
-        me.callParent(arguments);
+        this.callParent(arguments);
 
-        me.on({
-            scope   : me,
-            delegate: 'input',
+        this.getComponent().on({
+            scope: this,
 
             masktap: 'onMaskTap'
         });
@@ -47601,7 +47315,9 @@ Ext.define('Ext.field.DatePicker', {
         if (this.initialized && picker) {
             picker.setValue(newValue);
         }
-        this.getInput().setValue(Ext.Date.format(newValue, Ext.util.Format.defaultDateFormat));
+        this.getComponent().setValue(Ext.Date.format(newValue, Ext.util.Format.defaultDateFormat));
+
+        this._value = newValue;
     },
 
     getValue: function() {
@@ -47704,6 +47420,758 @@ Ext.define('Ext.field.DatePicker', {
     });
 });
 
+Ext.define('Ext.slider.Thumb', {
+    extend: 'Ext.Component',
+    xtype : 'thumb',
+
+    config: {
+        
+        baseCls: Ext.baseCSSPrefix + 'thumb',
+
+        
+        value: 0,
+
+        
+        draggable: {
+            direction: 'horizontal'
+        }
+    },
+
+    
+    slider: null,
+
+    
+    initialize: function() {
+        var me = this;
+
+        me.callParent(arguments);
+
+        me.on({
+            scope: this,
+
+            painted: 'onPainted'
+        });
+        
+        
+        me.getDraggable().on({
+            scope: this,
+
+            'dragstart': {
+                before: 'onBeforeDragStart',
+                after : 'onDragStart'
+            },
+            'drag'   : 'onDrag',
+            'dragend': 'onDragEnd'
+        });
+
+        this.slider = this.config.slider;
+    },
+
+    
+    onPainted: function() {
+        
+        this.refreshValue();
+    },
+
+    
+    updateValue: function(newValue) {
+        var slider = this.slider,
+            offset, draggable;
+
+        if (slider) {
+            offset = slider.getOffsetForValue(newValue);
+            draggable = this.getDraggable();
+
+            draggable.setOffset({
+                x: offset
+            });
+        }
+
+        this.fireAction('change', [this, newValue]);
+    },
+
+    
+    refreshValue: function() {
+        this.updateValue(this.getValue());
+    },
+
+    
+    onBeforeDragStart: function(draggable, e) {
+        if (e.absDeltaX < 4) {
+            return false;
+        }
+    },
+
+    
+    onDragStart: function(draggable, e, offset) {
+        this.addCls(Ext.baseCSSPrefix + 'dragging');
+    },
+
+    
+    onDrag: function(draggable, e, offset) {
+        e.stopPropagation();
+
+        var value = this.slider.getValueForOffset(offset.x);
+        this.setValue(value);
+        this.updateValue(value);
+    },
+
+    
+    onDragEnd: function() {
+        var me     = this,
+            offset = me.getDraggable().getOffset(),
+            newValue;
+
+        newValue = me.slider.getValueForOffset(offset.x);
+
+        me.setValue(newValue);
+
+        me.removeCls(Ext.baseCSSPrefix + 'dragging');
+    }
+});
+
+
+Ext.define('Ext.slider.Slider', {
+    extend  : 'Ext.Container',
+    alias   : 'widget.slider',
+    requires: ['Ext.slider.Thumb'],
+
+    config: {
+        
+        layout: null,
+
+        
+        thumbs: [],
+
+        
+        value: 0,
+
+        
+        tabIndex: -1,
+
+        
+        minValue: 0,
+
+        
+        maxValue: 100,
+
+        
+        increment: 1
+    },
+
+    
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.hasOwnProperty('values')) {
+            config.value = config.values;
+        }
+
+        this.callParent([config]);
+    },
+
+    
+    initialize: function() {
+        var me = this;
+
+        me.callParent(arguments);
+
+        me.on({
+            scope: this,
+            delegate: 'thumb',
+
+            change: 'onChange'
+        });
+    },
+
+    
+    refreshThumbs: function() {
+        var me = this;
+
+        
+        var thumbs = this.getThumbs(),
+            ln = thumbs.length,
+            i;
+
+        for (i = ln - 1; i >= 0; i--) {
+            thumbs[i].refreshValue();
+        }
+    },
+
+    
+    applyThumbs: function(thumbs) {
+        var i, ln, config, currentThumb, instance,
+            currentThumbs = this.getThumbs() || [],
+            instances = [];
+
+        if (thumbs && thumbs.length > 0) {
+            
+            if (!Ext.isArray(thumbs)) {
+                thumbs = [thumbs];
+            }
+
+            ln = thumbs.length;
+
+            for (i = 0; i < ln; i++) {
+                config = thumbs[i];
+                config.slider = this;
+                currentThumb = currentThumbs[i];
+
+                instance = Ext.factory(config, 'Ext.slider.Thumb', currentThumb);
+                instances.push(instance);
+            }
+
+            return instances;
+        }
+
+        return thumbs;
+    },
+
+    
+    updateThumbs: function(newThumbs) {
+        if (newThumbs) {
+            this.add(newThumbs);
+        }
+    },
+
+    
+    applyValue: function(value) {
+        
+        this.getValue();
+
+        
+        if (!Ext.isArray(value)) {
+            value = [value];
+        }
+
+        return value;
+    },
+
+    
+    updateValue: function(newValue) {
+        var thumbs = this.getThumbs(),
+            newThumbs = [],
+            ln = newValue.length,
+            thumb, i;
+
+        
+        if (thumbs.length === 0) {
+            for (i = 0; i < ln; i++) {
+                newThumbs.push({
+                    value: newValue[i]
+                });
+            }
+
+            this.setThumbs(newThumbs);
+
+            return;
+        }
+
+        
+        ln = newValue.length;
+        for (i = ln - 1; i >= 0; i--) {
+            thumb = thumbs[i];
+            if (thumb) {
+                thumbs[i].setValue(newValue[i]);
+            }
+            else {
+                throw new Error("Ext.slider.Slider: [setValue] calling setValue() with more values than there are thumbs (" + thumbs.length + " thumb(s), " + ln +" value(s)).");
+            }
+        }
+
+        this._value = newValue;
+    },
+
+    
+    getValue: function() {
+        var thumbs = this.getThumbs(),
+            ln = thumbs.length,
+            value = [],
+            i;
+        
+        
+        for (i = 0; i < ln; i++) {
+            value.push(thumbs[i].getValue());
+        }
+
+        this._value = value;
+
+        return value;
+    },
+
+    
+    setValues: function(value) {
+        this.updateValue(this.applyValue(value));
+        this._value = value;
+    },
+
+    
+    
+    
+    
+
+    
+    getValues: function() {
+        return this.getValue();
+    },
+
+    
+    applyIncrement: function(increment) {
+        if (increment === 0) {
+            increment = 1;
+        }
+
+        increment = Math.abs(increment);
+
+        return increment;
+    },
+
+    
+    updateMinValue: function(newMinValue) {
+        this.refreshThumbs();
+    },
+
+    
+    updateMaxValue: function(newMaxValue) {
+        this.refreshThumbs();
+    },
+
+    
+    updateIncrement: function(newIncrement) {
+        this.refreshThumbs();
+    },
+
+    
+    getThumb: function(index) {
+        var thumbs = this.getThumbs();
+        return thumbs[index || 0];
+    },
+
+    
+    getClosestThumb: function(value) {
+        var thumbs = this.getThumbs(),
+            ln     = thumbs.length,
+            thumb  = thumbs[0],
+            difference = Infinity,
+            thumbDifference, thumbValue, i;
+
+        if (ln == 1) {
+           return thumb;
+        }
+
+        
+        for (i = 0; i < ln; i++) {
+            thumbValue = thumbs[i].getValue();
+            thumbDifference = Math.abs(thumbValue - value);
+            if (thumbDifference < difference) {
+                difference = thumbDifference;
+                thumb = thumbs[i];
+            }
+        }
+
+        return thumb;
+    },
+
+    
+    indexOf: function(thumb) {
+        return this.getThumbs().indexOf(thumb);
+    },
+
+    
+    getOffsetForValue: function(value) {
+        var me = this,
+            minValue   = me.getMinValue(),
+            maxValue   = me.getMaxValue(),
+            range      = maxValue - minValue,
+            trackWidth = me.innerElement.getWidth(),
+            thumbWidth = 0,
+            thumb, ratio;
+
+        thumb = me.getThumb();
+        if (thumb) {
+            thumbWidth = thumb.renderElement.getWidth();
+        }
+        trackWidth = trackWidth - thumbWidth;
+
+        value = this.constrain(value);
+        ratio = trackWidth / range;
+
+        return Math.round((ratio * (value - minValue)));
+    },
+
+    
+    getValueForOffset: function(offset, isTap) {
+        var me = this,
+            minValue   = me.getMinValue(),
+            maxValue   = me.getMaxValue(),
+            range      = maxValue - minValue,
+            trackWidth = me.innerElement.getWidth(),
+            thumbWidth = 0,
+            thumb, ratio;
+
+        thumb = me.getThumb();
+        if (thumb) {
+            thumbWidth = thumb.renderElement.getWidth();
+        }
+        trackWidth = trackWidth - ((isTap) ? 0 : thumbWidth);
+
+        ratio = range / trackWidth;
+
+        return Math.round(minValue + (ratio * (offset)));
+    },
+
+    
+    constrain: function(value) {
+        var me = this,
+            minValue  = me.getMinValue(),
+            maxValue  = me.getMaxValue(),
+            increment = me.getIncrement(),
+            remainder = value % increment;
+
+        value -= remainder;
+
+        if (Math.abs(remainder) >= (increment / 2)) {
+            value += (remainder > 0) ? increment : -increment;
+        }
+
+        value = Math.max(minValue, value);
+        value = Math.min(maxValue, value);
+
+        return value;
+    },
+
+    
+    setThumbsDisabled: function(disable) {
+        var me = this,
+            thumbs = me.getThumbs(),
+            ln     = thumbs.length,
+            i;
+
+        for (i = 0; i < ln; i++) {
+            thumbs[i][disable ? 'disable' : 'enable']();
+        }
+    },
+
+    
+    onChange: function(thumb, value) {
+        var thumbs = this.getThumbs(),
+            ln = thumbs.length,
+            thumbWidth = thumb.renderElement.getWidth(),
+            previousThumb, offset, previousOffset, i, thumbDraggable, previousThumbDraggable;
+
+        for (i = 0; i < ln; i++) {
+            thumb         = thumbs[i];
+            previousThumb = thumbs[i - 1];
+            thumbDraggable         = (thumb) ? thumb.getDraggable() : null;
+            previousThumbDraggable = (previousThumb) ? previousThumb.getDraggable() : null;
+
+            if (previousThumb && thumbDraggable && previousThumbDraggable) {
+                offset = thumbDraggable.getOffset().x;
+                previousOffset = previousThumb.getDraggable().getOffset().x;
+
+                thumbDraggable.setConstraint({
+                    min: {
+                        x: (previousOffset === 0) ? thumbWidth : previousOffset + thumbWidth
+                    }
+                });
+
+                previousThumbDraggable.setConstraint({
+                    max: {
+                        x: offset - thumbWidth
+                    }
+                });
+            }
+        }
+
+        this.fireEvent('change', this, thumb, value);
+    },
+
+    doSetDisabled: function(disabled) {
+        this.callParent(arguments);
+        this.setThumbsDisabled(disabled);
+    },
+
+    
+    reset: function() {
+        this.setValues(this.originalValue);
+    }
+});
+
+
+Ext.define('Ext.field.Slider', {
+    extend  : 'Ext.field.Field',
+    alias   : 'widget.sliderfield',
+    requires: ['Ext.slider.Slider'],
+    alternateClassName: 'Ext.form.Slider',
+
+    
+
+    config: {
+        
+        cls: Ext.baseCSSPrefix + 'slider',
+
+        
+        thumbs: [],
+
+        
+        value: 0,
+
+        
+        tabIndex: -1,
+
+        
+        minValue: 0,
+
+        
+        maxValue: 100,
+
+        
+        increment: 1,
+
+        component: {
+            xtype: 'slider'
+        }
+    },
+
+    
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.hasOwnProperty('values')) {
+            config.value = config.values;
+        }
+
+        this.callParent([config]);
+    },
+
+    
+    initialize: function() {
+        var me = this;
+
+        me.callParent(arguments);
+
+        me.element.on({
+            scope: this,
+            tap: 'onTap'
+        });
+
+        me.on({
+            scope: this,
+            painted: 'onPainted',
+            show: 'onPainted'
+        });
+
+        me.getComponent().on({
+            scope: this,
+            change: 'onChange'
+        });
+        
+        this.sizeMonitor = Ext.create('Ext.util.SizeMonitor', {
+            element : this.element,
+            callback: this.onSizeChange,
+            scope   : this
+        });
+    },
+
+    onPainted: function() {
+        this.sizeMonitor.refresh();
+        this.onSizeChange();
+    },
+
+    onSizeChange: function() {
+        this.getComponent().refreshThumbs();
+    },
+
+    
+    applyComponent: function(config) {
+        Ext.applyIf(config, {
+            value: this.getValue()
+        });
+
+        return Ext.factory(config);
+    },
+
+    onChange: function(me, thumb, value) {
+        this.fireEvent('change', this, thumb, value);
+    },
+
+    
+    onTap: function(e) {
+        var el = Ext.get(e.target);
+
+        if (!el || el.hasCls(Ext.baseCSSPrefix + 'thumb')) {
+            return;
+        }
+
+        var component = this.getComponent(),
+            touchX = e.touch.point.x,
+            parent = component.element,
+            parentX = parent.getX(),
+            offset = touchX - parentX,
+            value  = component.getValueForOffset(offset, true),
+            thumb  = component.getClosestThumb(value);
+
+        thumb.setValue(value);
+    },
+
+    
+    updateMinValue: function(value) {
+        this.getComponent().setMinValue(value);
+    },
+
+    
+    updateMaxValue: function(value) {
+        this.getComponent().setMaxValue(value);
+    },
+
+    
+    updateIncrement: function(value) {
+        this.getComponent().setIncrement(value);
+    },
+
+    
+    getValue: function() {
+        var value;
+
+        if (this.initialized) {
+            value = this.getComponent().getValue();
+        } else {
+            value = this.getInitialConfig().value;
+        }
+
+        this._value = value;
+
+        return value;
+    },
+
+    
+    getValues: function() {
+        return this.getValue();
+    },
+
+    
+    setValues: function(value) {
+        return this.setValue(value);
+    },
+
+    updateValue: function(value) {
+        this.getComponent().setValue(value);
+    },
+
+    
+    applyIncrement: function(increment) {
+        if (increment === 0) {
+            increment = 1;
+        }
+
+        increment = Math.abs(increment);
+
+        return increment;
+    },
+
+    
+    getThumb: function(index) {
+        return this.getComponent().getThumb(index);
+    },
+
+    
+    getClosestThumb: function(value) {
+        return this.getClosestThumb(value);
+    },
+
+    
+    indexOf: function(thumb) {
+        return this.getComponent().indexOf(thumb);
+    },
+
+    
+    disable: function() {
+        this.callParent();
+        this.getComponent().disable();
+    },
+
+    
+    enable: function() {
+        this.callParent();
+        this.getComponent().enable();
+    },
+
+    
+    reset: function() {
+        var component = this.getComponent();
+
+        component.originalValue = this.originalValue;
+        component.reset();
+        
+        this.getValues();
+    }
+});
+
+
+Ext.define('Ext.field.Toggle', {
+    extend: 'Ext.field.Slider',
+    alias : 'widget.togglefield',
+    alternateClassName: 'Ext.form.Toggle',
+
+    config: {
+        
+        cls: 'x-toggle',
+
+        
+        minValue: 0,
+
+        
+        maxValue: 1,
+
+        
+        minValueCls: Ext.baseCSSPrefix + 'toggle-off',
+
+        
+        maxValueCls: Ext.baseCSSPrefix + 'toggle-on'
+
+        
+        
+    },
+
+    
+    onChange: function(slider, thumb, newValue) {
+        var me = this,
+            innerElement = me.innerElement,
+            isOn = newValue > 0,
+            onCls = me.getMaxValueCls(),
+            offCls = me.getMinValueCls();
+
+        innerElement.addCls(isOn ? onCls : offCls);
+        innerElement.removeCls(isOn ? offCls : onCls);
+
+        this.fireEvent('change', this, thumb, newValue);
+    },
+
+    onTap: function(e) {
+        var value = (this.getValue() > 0) ? 0 : 1;
+        this.setValue(value);
+    },
+
+    getValue: function() {
+        var value;
+
+        if (this.initialized) {
+            value = this.getComponent().getValue();
+        } else {
+            value = this.getInitialConfig().value;
+        }
+
+        if (Ext.isArray(value)) {
+            value = value[0];
+        }
+
+        this._value = value;
+        this._values = value;
+
+        return value;
+    }
+});
+
 Ext.define('Ext.tab.Tab', {
     extend: 'Ext.Button',
     xtype: 'tab',
@@ -47790,8 +48258,7 @@ Ext.define('Ext.tab.Bar', {
 
     
 
-    
-    constructor: function() {
+    initialize: function() {
         var me = this;
 
         me.on({
@@ -47923,7 +48390,7 @@ Ext.define('Ext.tab.Panel', {
         this.getTabBar().setActiveTab(this.getInnerItems().indexOf(newCard));
     },
 
-    setActiveItem: function(activeItem) {
+    doSetActiveItem: function(activeItem) {
         var items = this.getInnerItems(),
             currentIndex = items.indexOf(this.getActiveItem()),
             index = Ext.isNumber(activeItem) ? activeItem : items.indexOf(activeItem),

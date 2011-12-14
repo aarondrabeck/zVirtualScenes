@@ -46,11 +46,17 @@ Ext.define('Ext.carousel.Indicator', {
     },
 
     removeIndicator: function() {
-        this.indicators.pop().remove();
+        if (this.indicators.length) {
+            this.indicators.pop().remove();
+        }
     },
 
     setActiveIndex: function(index) {
-        this.indicators[index].radioCls(this.getBaseCls() + '-active');
+        var indicators = this.indicators;
+
+        if (indicators.length && indicators[index]) {
+            indicators[index].radioCls(this.getBaseCls() + '-active');
+        }
     },
 
     // @private

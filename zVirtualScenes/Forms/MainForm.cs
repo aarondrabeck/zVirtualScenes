@@ -30,6 +30,8 @@ namespace zVirtualScenesApplication
         private IBindingList sceneCMDsList;
         private IBindingList taskList;
 
+        private IBindingList triggerList;
+
         //Forms
         private GroupEditor grpEditorForm;
         private ActivateGroup grpActivateForm;
@@ -88,7 +90,8 @@ namespace zVirtualScenesApplication
 
         private void zVirtualScenes_Load(object sender, EventArgs e)
         {            
-            this.Text = ProgramName;            
+            this.Text = ProgramName;
+            notifyIcon1.Text = ProgramName;
             dataListViewLog.DataSource = _masterlog;
             Logger.WriteToLog(Urgency.INFO, "STARTED", "MainForm");
 
@@ -102,7 +105,7 @@ namespace zVirtualScenesApplication
             dataListViewDevices.DataSource = deviceList;
             dataListViewDeviceSmallList.DataSource = deviceList;
           
-            // Scenes            
+            //Scenes            
             sceneQuery1 = zvsEntityControl.zvsContext.scenes;
             sceneQuery1.MergeOption = MergeOption.AppendOnly;
             sceneList = ((IListSource)sceneQuery1).GetList() as IBindingList;
@@ -111,9 +114,10 @@ namespace zVirtualScenesApplication
             //SORT
             dataListViewScenes.Sort(this.SceneSortCol, SortOrder.Ascending);
 
-            // Events
-            //_masterEvents = DatabaseControl.GetEventScripts();
-            //dataListEvents.DataSource = _masterEvents;
+            // Triggers
+            ObjectQuery<device_value_triggers> triggers = zvsEntityControl.zvsContext.device_value_triggers;
+            triggerList = ((IListSource)triggers).GetList() as IBindingList;
+            dataListTriggers.DataSource = triggerList;
 
             //Scenes (allow rearrage but not drag and drop from other sources)
             dataListViewScenes.DropSink = new SceneDropSink();            
@@ -245,7 +249,69 @@ namespace zVirtualScenesApplication
                     if (!String.IsNullOrEmpty(PreviousValue))
                         Logger.WriteToLog(Urgency.INFO, device_name + " " + dv.label_name + " changed to " + dv.value + " from " + PreviousValue + ".", "EVENT");
                     else
-                        Logger.WriteToLog(Urgency.INFO, device_name + " " + dv.label_name + " changed to " + dv.value + ".", "EVENT");           
+                        Logger.WriteToLog(Urgency.INFO, device_name + " " + dv.label_name + " changed to " + dv.value + ".", "EVENT"); 
+          
+                    //Event Triggering
+                    foreach (device_value_triggers trigger in dv.device_value_triggers.Where(t => t.enabled))
+                    {
+                        switch ((device_value_triggers.TRIGGER_OPERATORS)trigger.trigger_operator)
+                        {
+                            case device_value_triggers.TRIGGER_OPERATORS.EqualTo:
+                                {
+                                    if (dv.value.Equals(trigger.trigger_value))
+                                    {
+                                        Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");                                        
+                                    }
+                                    break;
+                                }
+                            case device_value_triggers.TRIGGER_OPERATORS.GreaterThan:
+                                {
+                                    double deviceValue = 0;
+                                    double triggerValue = 0;
+
+                                    if (double.TryParse(dv.value, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                    {
+                                        if (deviceValue > triggerValue)
+                                        {
+                                            Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                            Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                        } 
+                                    }
+                                    else
+                                        Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+                                    
+                                    break;
+                                }
+                            case device_value_triggers.TRIGGER_OPERATORS.LessThan:
+                                {
+                                    double deviceValue = 0;
+                                    double triggerValue = 0;
+
+                                    if (double.TryParse(dv.value, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                    {
+                                        if (deviceValue < triggerValue)
+                                        {
+                                            Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                            Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                        }
+                                    }
+                                    else
+                                        Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+
+                                    break;
+                                }
+                            case device_value_triggers.TRIGGER_OPERATORS.NotEqualTo:
+                                {
+                                    if (!dv.value.Equals(trigger.trigger_value))
+                                    {
+                                        Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                    } 
+                                    break;
+                                }
+                        }
+                    }
                 }
 
             }
@@ -1238,64 +1304,62 @@ namespace zVirtualScenesApplication
         #region Task Scheduler Execution
 
         private void timer_TaskRunner_Tick(object sender, EventArgs e)
-        {
-            
-                foreach (scheduled_tasks task in taskList)
+        {            
+            foreach (scheduled_tasks task in taskList)
+            {
+                if (task.Enabled)
                 {
-                    if (task.Enabled)
+                    if (task.Frequency.HasValue)
                     {
-                        if (task.Frequency.HasValue)
+                        switch ((scheduled_tasks.frequencys)task.Frequency)
                         {
-                            switch ((scheduled_tasks.frequencys)task.Frequency)
-                            {
-                                case scheduled_tasks.frequencys.Seconds:
-                                    if (task.StartTime.HasValue)
+                            case scheduled_tasks.frequencys.Seconds:
+                                if (task.StartTime.HasValue)
+                                {
+                                    int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                    if (sec % task.RecurSeconds == 0)
                                     {
-                                        int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                        if (sec % task.RecurSeconds == 0)
-                                        {
-                                            task.Run();
-                                        }
+                                        task.Run();
                                     }
-                                    break;
-                                case scheduled_tasks.frequencys.Daily:
-                                    if (task.StartTime.HasValue)
+                                }
+                                break;
+                            case scheduled_tasks.frequencys.Daily:
+                                if (task.StartTime.HasValue)
+                                {
+                                    if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
                                     {
-                                        if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
+                                        Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                                        if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                            task.Run();
+                                    }
+                                }
+                                break;
+                            case scheduled_tasks.frequencys.Weekly:
+                                if (task.StartTime.HasValue)
+                                {
+                                    if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
+                                    {
+                                        if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                         {
                                             Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
                                             if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
                                                 task.Run();
                                         }
                                     }
-                                    break;
-                                case scheduled_tasks.frequencys.Weekly:
-                                    if (task.StartTime.HasValue)
-                                    {
-                                        if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
-                                        {
-                                            if (ShouldRunToday(task))  //IF RUN THIS DAY 
-                                            {
-                                                Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
-                                                if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
-                                                    task.Run();
-                                            }
-                                        }
-                                    }
-                                    break;
-                                case scheduled_tasks.frequencys.Once:
-                                    if (task.StartTime.HasValue)
-                                    {
-                                        Double SecondsBetween = (DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                        if (SecondsBetween < 1 && SecondsBetween > 0)
-                                            task.Run();
-                                    }
-                                    break;
-                            }
+                                }
+                                break;
+                            case scheduled_tasks.frequencys.Once:
+                                if (task.StartTime.HasValue)
+                                {
+                                    Double SecondsBetween = (DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                    if (SecondsBetween < 1 && SecondsBetween > 0)
+                                        task.Run();
+                                }
+                                break;
                         }
                     }
                 }
-
+            }
         }
 
         private bool ShouldRunToday(scheduled_tasks task)
@@ -1633,42 +1697,89 @@ namespace zVirtualScenesApplication
         }
         #endregion
 
-        #region Events
-        private void btnNewEvent_Click(object sender, EventArgs e)
+        #region Triggers
+
+        private void dataListEvents_CellRightClick(object sender, CellRightClickEventArgs e)
         {
-            AdvancedScriptEditor scriptEditor = new AdvancedScriptEditor();
-            scriptEditor.Show();
+            if (e.Item == null)
+                e.MenuStrip = contextMenuStripTriggerNull;
+            else
+                e.MenuStrip = contextMenuStripTrigger;
         }
 
-        private void btnEditEvent_Click(object sender, EventArgs e)
+        private void dataListEvents_DoubleClick(object sender, EventArgs e)
         {
-            if (dataListEvents.SelectedIndex > -1)
+            if (dataListTriggers.SelectedObject != null)
             {
-                //int scriptId;
-                //int.TryParse(_masterEvents.Rows[dataListEvents.SelectedIndex]["id"].ToString(), out scriptId);
-                //ScriptEditor scriptEditor = new ScriptEditor(scriptId);
-                //scriptEditor.Show();
+                AddEditTriggers eventform = new AddEditTriggers(triggerList, (device_value_triggers)dataListTriggers.SelectedObject);
+                eventform.Show();
             }
         }
 
-        private void btnDeleteEvent_Click(object sender, EventArgs e)
+        private void addToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            if (dataListEvents.SelectedIndex > -1)
+            AddEditTriggers eventform = new AddEditTriggers(triggerList, null);
+            eventform.Show();
+        }
+
+        private void toolStripMenuItemEventsNull_Click(object sender, EventArgs e)
+        {
+            AddEditTriggers eventform = new AddEditTriggers(triggerList, null);
+            eventform.Show();
+        }
+
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddEditTriggers eventform = new AddEditTriggers(triggerList, (device_value_triggers)dataListTriggers.SelectedObject);
+            eventform.Show();
+        }
+
+        private void deleteEventToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (dataListTriggers.SelectedObject != null)
             {
-                if (
-                    MessageBox.Show("Are you sure you want to delete this event?", "Are you sure?",
+                if (MessageBox.Show("Are you sure you want to delete this trigger?", "Are you sure?",
                                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                 //   int scriptId;
-                  //  int.TryParse(_masterEvents.Rows[dataListEvents.SelectedIndex]["id"].ToString(), out scriptId);
-                    //DatabaseControl.DeleteEventScript(scriptId);
-                 //   UpdateScripts = true;
+                    triggerList.Remove((device_value_triggers)dataListTriggers.SelectedObject);
+                    zvsEntityControl.zvsContext.SaveChanges(); 
                 }
             }
         }
-        #endregion 
+        
+        #endregion     
+
+        #region Minimize to Toolbar
+        private void MainForm_Resize(object sender, EventArgs e)
+        {
+            if (WindowState == FormWindowState.Minimized)
+            {
+                Hide();
+                notifyIcon1.BalloonTipTitle = zvsEntityControl.zvsNameAndVersion;
+                notifyIcon1.BalloonTipText = "zVirtualScenes has been minimized to the taskbar.";
+                notifyIcon1.ShowBalloonTip(3000);
+            }
+        }
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+        }
+
+        private void showZVirtualSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Show();
+            WindowState = FormWindowState.Normal;
+        }
+
+        private void exitZVSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
 
         
-         
+
     }
 }

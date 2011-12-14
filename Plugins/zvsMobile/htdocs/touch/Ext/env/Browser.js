@@ -159,6 +159,7 @@ Ext.define('Ext.env.Browser', {
             engineName = engineNames.other,
             browserVersion = '',
             engineVersion = '',
+            isWebView = false,
             is, i, name;
 
         if (browserMatch) {
@@ -211,8 +212,17 @@ Ext.define('Ext.env.Browser', {
 
         this.setFlag('Standalone', !!navigator.standalone);
 
-        // Flag to check if it we are in the WebView (NKBuild)
-        this.setFlag('WebView', !!window.isNK);
+        if (typeof window.PhoneGap != 'undefined') {
+            isWebView = true;
+            this.setFlag('PhoneGap');
+        }
+        else if (!!window.isNK) {
+            isWebView = true;
+            this.setFlag('Sencha');
+        }
+
+        // Flag to check if it we are in the WebView
+        this.setFlag('WebView', isWebView);
 
         this.isStrict = document.compatMode == "CSS1Compat";
 

@@ -1,76 +1,76 @@
 /**
  * @class Ext.Container
  * @extend Ext.Component
- * 
- * A Container has all of the abilities of {@link Ext.Component Component}, but lets you nest other Components inside 
- * it. Applications are made up of lots of components, usually nested inside one another. Containers allow you to 
- * render and arrange child Components inside them. Most apps have a single top-level Container called a Viewport, 
- * which takes up the entire screen. Inside of this are child components, for example in a mail app the Viewport 
+ *
+ * A Container has all of the abilities of {@link Ext.Component Component}, but lets you nest other Components inside
+ * it. Applications are made up of lots of components, usually nested inside one another. Containers allow you to
+ * render and arrange child Components inside them. Most apps have a single top-level Container called a Viewport,
+ * which takes up the entire screen. Inside of this are child components, for example in a mail app the Viewport
  * Container's two children might be a message List and an email preview pane.
- * 
+ *
  * Containers give the following extra functionality:
- * 
+ *
  * * Adding child Components at instantiation and run time
  * * Removing child Components
  * * Specifying a [Layout](#!/guide/layouts)
- * 
- * Layouts determine how the child Components should be laid out on the screen. In our mail app example we'd use an 
- * HBox layout so that we can pin the email list to the left hand edge of the screen and allow the preview pane to 
- * occupy the rest. There are several layouts in Sencha Touch 2, each of which help you achieve your desired 
+ *
+ * Layouts determine how the child Components should be laid out on the screen. In our mail app example we'd use an
+ * HBox layout so that we can pin the email list to the left hand edge of the screen and allow the preview pane to
+ * occupy the rest. There are several layouts in Sencha Touch 2, each of which help you achieve your desired
  * application structure, further explained in the [Layout guide](#!/guide/layouts).
- * 
+ *
  * ## Adding Components to Containers
- * 
+ *
  * As we mentioned above, Containers are special Components that can have child Components arranged by a Layout. One of
- * the code samples above showed how to create a Panel with 2 child Panels already defined inside it but it's easy to 
+ * the code samples above showed how to create a Panel with 2 child Panels already defined inside it but it's easy to
  * do this at run time too:
- * 
+ *
  *     @example
  *     //this is the Panel we'll be adding below
  *     var aboutPanel = Ext.create('Ext.Panel', {
- *         html: 'About this app' 
+ *         html: 'About this app'
  *     });
- * 
+ *
  *     //this is the Panel we'll be adding to
  *     var mainPanel = Ext.create('Ext.Panel', {
  *         fullscreen: true,
- * 
+ *
  *         layout: 'hbox',
  *         defaults: {
  *             flex: 1
  *         },
- * 
+ *
  *         items: {
  *             html: 'First Panel',
  *             style: 'background-color: #5E99CC;'
  *         }
  *     });
- * 
+ *
  *     //now we add the first panel inside the second
  *     mainPanel.add(aboutPanel);
- * 
- * Here we created three Panels in total. First we made the aboutPanel, which we might use to tell the user a little 
- * about the app. Then we create one called mainPanel, which already contains a third Panel in its 
- * {@link Ext.Container#items items} configuration, with some dummy text ("First Panel"). Finally, we add the first 
+ *
+ * Here we created three Panels in total. First we made the aboutPanel, which we might use to tell the user a little
+ * about the app. Then we create one called mainPanel, which already contains a third Panel in its
+ * {@link Ext.Container#items items} configuration, with some dummy text ("First Panel"). Finally, we add the first
  * panel to the second by calling the {@link Ext.Container#add add} method on mainPanel.
- * 
- * In this case we gave our mainPanel another hbox layout, but we also introduced some 
- * {@link Ext.Container#defaults defaults}. These are applied to every item in the Panel, so in this case every child 
- * inside mainPanel will be given a flex: 1 configuration. The effect of this is that when we first render the screen 
- * only a single child is present inside mainPanel, so that child takes up the full width available to it. Once the 
- * mainPanel.add line is called though, the aboutPanel is rendered inside of it and also given a flex of 1, which will 
+ *
+ * In this case we gave our mainPanel another hbox layout, but we also introduced some
+ * {@link Ext.Container#defaults defaults}. These are applied to every item in the Panel, so in this case every child
+ * inside mainPanel will be given a flex: 1 configuration. The effect of this is that when we first render the screen
+ * only a single child is present inside mainPanel, so that child takes up the full width available to it. Once the
+ * mainPanel.add line is called though, the aboutPanel is rendered inside of it and also given a flex of 1, which will
  * cause it and the first panel to both receive half the full width of the mainPanel.
- * 
+ *
  * Likewise, it's easy to remove items from a Container:
- * 
+ *
  *     mainPanel.remove(aboutPanel);
- * 
- * After this line is run everything is back to how it was, with the first child panel once again taking up the full 
+ *
+ * After this line is run everything is back to how it was, with the first child panel once again taking up the full
  * width inside mainPanel.
- * 
+ *
  * ## Further Reading
- * 
- * See the [Component & Container Guide](#!/guide/components) for more information, and check out the 
+ *
+ * See the [Component & Container Guide](#!/guide/components) for more information, and check out the
  * {@link Ext.Container} class docs also.
  */
 Ext.define('Ext.Container', {
@@ -95,7 +95,7 @@ Ext.define('Ext.Container', {
          * @accessor
          * @evented
          */
-        activeItem: null
+        activeItem: 0
     },
 
     config: {
@@ -688,7 +688,7 @@ Ext.define('Ext.Container', {
     onAdd: function(item, index) {
         this.getLayout().onItemAdd(item, index);
 
-        if (item.isInnerItem() && !this.getActiveItem()) {
+        if (this.initialized && item.isInnerItem() && !this.getActiveItem()) {
             this.setActiveItem(item);
         }
 
@@ -790,6 +790,9 @@ Ext.define('Ext.Container', {
      * @private
      */
     applyActiveItem: function(item) {
+        // Make sure the items are already initialized
+        this.getItems();
+
         if (typeof item == 'number') {
             return this.getInnerItems()[item] || null;
         }
@@ -806,8 +809,6 @@ Ext.define('Ext.Container', {
 
             return item;
         }
-
-        return null;
     },
 
     /**
@@ -820,13 +821,13 @@ Ext.define('Ext.Container', {
             if (!this.has(newActiveItem)) {
                 this.add(newActiveItem);
             }
-        }
 
-        if (oldActiveItem) {
-            oldActiveItem.fireAction('deactivate');
-        }
+            if (oldActiveItem) {
+                oldActiveItem.fireAction('deactivate');
+            }
 
-        this.getLayout().onActiveItemChange(newActiveItem, oldActiveItem);
+            this.getLayout().onActiveItemChange(newActiveItem, oldActiveItem);
+        }
     },
 
     /**
@@ -946,6 +947,25 @@ Ext.define('Ext.Container', {
      */
     down: function(selector) {
         return this.query(selector)[0] || null;
+    },
+
+    doSetHidden: function(hidden) {
+        this.callParent(arguments);
+
+        if (hidden || !this.isPainted()) {
+            return;
+        }
+
+        var items = this.getItems().items,
+            ln = items.length,
+            item, i;
+
+        for (i = 0; i < ln; i++) {
+            item = items[i];
+            if (!item.getHidden()) {
+                item.doSetHidden(false);
+            }
+        }
     },
 
     //<debug>

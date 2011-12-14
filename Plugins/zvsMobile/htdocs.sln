@@ -1,24 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "htdocs", "htdocs\", "{50A7E692-EC2B-4754-90AE-4C9FB39F4EDB}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "htdocs", "htdocs\", "{7070E45D-423D-4D57-982E-B0FC2F96F6D7}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/htdocs"
-		Debug.AspNetCompiler.PhysicalPath = "..\..\..\..\Desktop\zvirtualscenes\Plugins\zvsMobile\htdocs\"
+		Debug.AspNetCompiler.PhysicalPath = "D:\Hobby\zvirtualscenes\Plugins\zvsMobile\htdocs\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\htdocs\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.VirtualPath = "/htdocs"
-		Release.AspNetCompiler.PhysicalPath = "..\..\..\..\Desktop\zvirtualscenes\Plugins\zvsMobile\htdocs\"
+		Release.AspNetCompiler.PhysicalPath = "D:\Hobby\zvirtualscenes\Plugins\zvsMobile\htdocs\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\htdocs\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "1903"
+		VWDPort = "1072"
 	EndProjectSection
 EndProject
 Global
@@ -26,8 +26,8 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{50A7E692-EC2B-4754-90AE-4C9FB39F4EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50A7E692-EC2B-4754-90AE-4C9FB39F4EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7070E45D-423D-4D57-982E-B0FC2F96F6D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7070E45D-423D-4D57-982E-B0FC2F96F6D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

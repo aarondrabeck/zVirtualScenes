@@ -39,7 +39,7 @@ Ext.define('Ext.field.Search', {
 
     config: {
         // @inherit
-        input: {
+        component: {
 	        type: 'search'
 	    },
 

@@ -19,7 +19,7 @@
                     //Get Device Details			
                     console.log('AJAX: GetSceneDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetSceneDetails',
+                        url: 'http://10.1.0.61:9999/JSON/GetSceneDetails',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
@@ -74,7 +74,7 @@
                         var scene = self.items.items[1].getData();
                         console.log('AJAX: ActivateScene');
                         Ext.util.JSONP.request({
-                            url: 'http://10.1.0.56:9999/JSON/ActivateScene',
+                            url: 'http://10.1.0.61:9999/JSON/ActivateScene',
                             callbackKey: 'callback',
                             params: {
                                 u: Math.random(),

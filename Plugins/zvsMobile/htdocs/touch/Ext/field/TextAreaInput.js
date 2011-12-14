@@ -19,6 +19,11 @@ Ext.define('Ext.field.TextAreaInput', {
             {
                 reference: 'input',
                 tag: this.getTag()
+            },
+            {
+                reference: 'clearIcon',
+                cls: 'x-clear-icon',
+                html: 'x'
             }
         ];
 

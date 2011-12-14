@@ -2,6 +2,7 @@
  * @private
  */
 Ext.define('Ext.EventedBase', {
+
     mixins: ['Ext.mixin.Observable'],
 
     initialized: false,

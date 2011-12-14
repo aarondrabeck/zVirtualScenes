@@ -10,9 +10,9 @@ using System.Data.Objects;
 namespace zVirtualScenesCommon.Entity
 {
     public partial class scene_property_value : EntityObject
-    {        
-       public static string GetPropertyValue(zvsEntities2 context, long sceneID, string property_value_name)
-       {           
+    {
+        public static string GetPropertyValue(zvsEntities2 context, long sceneID, string property_value_name)
+        {
             //Find the property
             scene_property property = context.scene_property.SingleOrDefault(p => p.name == property_value_name);
 
@@ -32,7 +32,6 @@ namespace zVirtualScenesCommon.Entity
                     return spv.value;
                 }
             }
-           
-       }
-    }
+        }
+    }    
 }

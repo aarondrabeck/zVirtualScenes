@@ -850,6 +850,19 @@ Ext.define('Ext.data.Store', {
     },
 
     /**
+     * Synchronizes the Store with its Proxy. This asks the Proxy to batch together any new, updated
+     * and deleted records in the store, updating the Store's internal representation of the records
+     * as each operation completes.
+     */
+    sync: function() {
+        if (typeof this.proxy.sync != 'function') {
+            this.callParent(arguments);
+        }else{
+            this.proxy.sync(this);
+        }
+    },
+
+    /**
      * Converts a literal to a model, if it's not a model already
      * @private
      * @param record {Ext.data.Model/Object} The record to create
@@ -999,7 +1012,10 @@ Ext.define('Ext.data.Store', {
         }
 
         if (successful) {
+            // We suspend events here so we don't fire clear/add events when the proxy handles the load
+            me.suspendEvents();
             me.loadRecords(records, operation);
+            me.resumeEvents();
         }
 
         me.loading = false;
@@ -1188,6 +1204,7 @@ Ext.define('Ext.data.Store', {
                 }
                 // fire datachanged event if it hasn't already been fired by doSort
                 if (!doLocalSort || me.sorters.length < 1) {
+                    me.fireEvent('filter', me);
                     me.fireEvent('datachanged', me);
                 }
             }
@@ -1211,6 +1228,7 @@ Ext.define('Ext.data.Store', {
             delete me.snapshot;
 
             if (suppressEvent !== true) {
+                me.fireEvent('filter', me);
                 me.fireEvent('datachanged', me);
             }
         }
@@ -1241,6 +1259,7 @@ Ext.define('Ext.data.Store', {
 
         me.snapshot = me.snapshot || me.data.clone();
         me.data = me.queryBy(fn, scope || me);
+        me.fireEvent('filter', me);
         me.fireEvent('datachanged', me);
     },
 
@@ -1300,13 +1319,11 @@ Ext.define('Ext.data.Store', {
 
 
         if (!options.addRecords) {
-            delete me.snapshot;
-            me.clearData();
+            me.removeAll();
         }
 
-        me.data.addAll(records);
+        me.add(records);
 
-        //FIXME: this is not a good solution. Ed Spencer is totally responsible for this and should be forced to fix it immediately.
         for (; i < length; i++) {
             if (options.start !== undefined) {
                 records[i].index = options.start + i;
@@ -1768,6 +1785,7 @@ Ext.define('Ext.data.Store', {
                     range[i].index = i;
                 }
             }
+            me.fireEvent('sort', me);
             me.fireEvent('datachanged', me);
         }
     },

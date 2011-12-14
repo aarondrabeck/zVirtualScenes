@@ -112,8 +112,6 @@ Ext.define('Ext.dataview.List', {
     },
 
     constructor: function() {
-        this.previousHeaderIndices = [];
-
         this.translateHeader = (Ext.os.is.Android2) ? this.translateHeaderCssPosition : this.translateHeaderTransform;
         this.callParent(arguments);
     },
@@ -189,6 +187,13 @@ Ext.define('Ext.dataview.List', {
         }
     },
 
+    onStoreClear: function() {
+        this.callParent();
+        if (this.header) {
+            this.header.destroy();
+        }
+    },
+
     // @private
     getClosestGroups : function() {
         var groups = this.pinHeaderInfo.offsets,
@@ -213,8 +218,8 @@ Ext.define('Ext.dataview.List', {
     },
 
     doRefreshHeaders: function() {
-        var headerIndicis = this.previousHeaderIndices,
-            ln = headerIndicis.length,
+        var headerIndices = this.findGroupHeaderIndices(),
+            ln = headerIndices.length,
             items = this.getViewItems(),
             headerInfo = this.pinHeaderInfo = {offsets: []},
             headerOffsets = headerInfo.offsets,
@@ -222,18 +227,22 @@ Ext.define('Ext.dataview.List', {
 
         if (ln) {
             for (i = 0; i < ln; i++) {
-                headerItem = items[headerIndicis[i].index];
-                header = this.getItemHeader(headerItem);
+                headerItem = items[headerIndices[i]];
+                if (headerItem) {
+                    header = this.getItemHeader(headerItem);
 
-                headerOffsets.push({
-                    header: header,
-                    offset: headerItem.offsetTop
-                });
+                    headerOffsets.push({
+                        header: header,
+                        offset: headerItem.offsetTop
+                    });
+                }
             }
 
             headerInfo.closest = this.getClosestGroups();
             this.setActiveGroup(headerInfo.closest.current);
-            headerInfo.headerHeight = Ext.get(header).getHeight();
+            if (header) {
+                headerInfo.headerHeight = Ext.get(header).getHeight();
+            }
         }
     },
 
@@ -257,10 +266,7 @@ Ext.define('Ext.dataview.List', {
             }
             return;
         }
-        else if (
-            (next && y > next.offset) ||
-            (y < current.offset)
-        ) {
+        else if ((next && y > next.offset) || (current && y < current.offset)) {
             closest = headerInfo.closest = this.getClosestGroups();
             next = closest.next;
             current = closest.current;
@@ -386,12 +392,31 @@ Ext.define('Ext.dataview.List', {
         }
     },
 
+    updateBaseCls: function(newBaseCls, oldBaseCls) {
+        var me = this;
+        me.callParent(arguments);
+        me.itemClsShortCache = newBaseCls + '-item';
+
+        me.headerClsShortCache = newBaseCls + '-header';
+        me.headerClsCache = '.' + me.headerClsShortCache;
+
+        me.labelClsShortCache = newBaseCls + '-item-label';
+        me.labelClsCache = '.' + me.labelClsShortCache;
+
+        me.disclosureClsShortCache = newBaseCls + '-disclosure';
+        me.disclosureClsCache = '.' + me.disclosureClsShortCache;
+
+        me.iconClsShortCache = newBaseCls + '-icon';
+        me.iconClsCache = '.' + me.iconClsShortCache;
+    },
+
+    hiddenDisplayCache: Ext.baseCSSPrefix + 'hidden-display',
+
     doDisclose: Ext.emptyFn,
 
     updateListItem: function(record, item) {
-        var baseCls = this.getBaseCls(),
-            extItem = Ext.get(item),
-            innerItem = extItem.down('.' + baseCls + '-item-label', true),
+        var extItem = Ext.get(item),
+            innerItem = extItem.down(this.labelClsCache, true),
             index = this.getStore().indexOf(record),
             data = record.data,
             disclosure = data && data.hasOwnProperty('disclosure'),
@@ -399,26 +424,25 @@ Ext.define('Ext.dataview.List', {
             disclosureEl, iconEl;
 
         item.setAttribute('itemIndex', index);
-        innerItem.innerHTML = this.getItemTpl().apply(record.data);
+        innerItem.innerHTML = this.getItemTpl().apply(data);
 
         if (this.getDisclosure() && disclosure) {
-            disclosureEl = extItem.down('.' + baseCls + '-disclosure');
-            disclosureEl[disclosure ? 'removeCls' : 'addCls'](Ext.baseCSSPrefix + 'hidden-display');
+            disclosureEl = extItem.down(this.disclosureClsCache);
+            disclosureEl[disclosure ? 'removeCls' : 'addCls'](this.hiddenDisplayCache);
         }
 
         if (this.getIcon()) {
-            iconEl = extItem.down('.' + baseCls + '-icon', true);
+            iconEl = extItem.down(this.iconClsCache, true);
             iconEl.style.backgroundImage = iconSrc ? 'url(' + iconSrc + ')' : '';
         }
     },
 
     getItemElementConfig: function(index, data) {
-        var baseCls = this.getBaseCls(),
-            config = {
-                cls: baseCls + '-item',
+        var config = {
+                cls: this.itemClsShortCache,
                 itemIndex: index,
                 children: [{
-                    cls: baseCls + '-item-label',
+                    cls: this.labelClsShortCache,
                     html: this.getItemTpl().apply(data)
                 }]
             },
@@ -427,14 +451,14 @@ Ext.define('Ext.dataview.List', {
         if (this.getIcon()) {
             iconSrc = data.iconSrc;
             config.children.push({
-                cls: baseCls + '-icon',
+                cls: this.iconClsShortCache,
                 style: 'background-image: ' + iconSrc ? 'url(' + iconSrc + ')' : ''
             });
         }
 
         if (this.getDisclosure()) {
             config.children.push({
-                cls: baseCls + '-disclosure ' + ((data.disclosure === false) ? Ext.baseCSSPrefix + 'hidden-display' : '')
+                cls: this.disclosureClsShortCache + ((data.disclosure === false) ? this.hiddenDisplayCache : '')
             });
         }
         return config;
@@ -449,62 +473,38 @@ Ext.define('Ext.dataview.List', {
             groups = store.getGroups(),
             groupLn = groups.length,
             items = me.getViewItems(),
-            i = 0,
-            previousHeaderIndices = me.previousHeaderIndices,
-            previousIndexLn = previousHeaderIndices.length,
-            newHeaderIndices = [],
-            firstGroupedRecord, index, oldItemWithHeader;
+            existingHeaders = me.elementContainer.element.query(me.headerClsCache),
+            existingHeadersLn = existingHeaders.length,
+            newHeaderItems = [],
+            i, firstGroupedRecord, index, item;
 
-        // Add header to an item if needed
-        for (; i < groupLn; i++) {
+        // Remove headers
+        for (i = 0; i < existingHeadersLn; i++) {
+            Ext.removeNode(existingHeaders[i]);
+        }
+
+        // Add header
+        for (i = 0; i < groupLn; i++) {
             firstGroupedRecord = groups[i].children[0];
             index = store.indexOf(firstGroupedRecord);
-            if (previousHeaderIndices.indexOf(firstGroupedRecord) == -1) {
-                me.doAddHeader(items[index], store.getGroupString(firstGroupedRecord));
-            }
-            newHeaderIndices.push(firstGroupedRecord);
+            item = items[index];
+            me.doAddHeader(item, store.getGroupString(firstGroupedRecord));
+            newHeaderItems.push(index);
         }
 
-        // Remove header from an item if needed
-        for (i = 0; i < previousIndexLn; i++) {
-            oldItemWithHeader = previousHeaderIndices[i];
-            if (newHeaderIndices.indexOf(oldItemWithHeader) == -1) {
-                oldItemWithHeader = items[store.indexOf(oldItemWithHeader)];
-                if (oldItemWithHeader) {
-                    me.doRemoveHeader(oldItemWithHeader);
-                }
-            }
-        }
-
-        me.previousHeaderIndices = newHeaderIndices;
+        return newHeaderItems;
     },
 
     doAddHeader: function(item, html) {
         Ext.get(item).insertFirst(Ext.Element.create({
-            cls: this.getBaseCls() + '-header',
+            cls: this.headerClsShortCache,
             html: html
         }));
-    },
-
-    doRemoveHeader: function(item) {
-        item.removeChild(item.childNodes[0]);
-    },
-
-    doRefresh: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
-    },
-
-    onStoreAdd: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
-    },
-    onStoreRemove: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
-    },
-    onStoreUpdate: function() {
-        this.callParent(arguments);
-        this.findGroupHeaderIndices();
     }
+}, function() {
+    //TODO This is hacky, find a better way @Jacky
+    var prototype = this.prototype;
+
+    prototype.cachedConfigList = prototype.cachedConfigList.slice();
+    Ext.Array.remove(prototype.cachedConfigList, 'baseCls');
 });

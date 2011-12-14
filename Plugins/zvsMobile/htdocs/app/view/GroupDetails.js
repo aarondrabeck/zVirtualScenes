@@ -18,7 +18,7 @@
                     //Get Device Details			
                     console.log('AJAX: GetSceneDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetGroupDetails',
+                        url: 'http://10.1.0.61:9999/JSON/GetGroupDetails',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
@@ -70,7 +70,7 @@
                     handler: function () {
                         console.log('AJAX: ActivateGroup' + self.groupId);
                         Ext.util.JSONP.request({
-                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
                             callbackKey: 'callback',
                             params: {
                                 u: Math.random(),
@@ -99,7 +99,7 @@
                     handler: function () {
                         console.log('AJAX: DeactivateGroup' + self.groupId);
                         Ext.util.JSONP.request({
-                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
                             callbackKey: 'callback',
                             params: {
                                 u: Math.random(),

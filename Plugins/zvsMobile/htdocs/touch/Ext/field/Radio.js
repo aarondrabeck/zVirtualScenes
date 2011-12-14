@@ -40,17 +40,26 @@ Ext.define('Ext.field.Radio', {
     alias : 'widget.radiofield',
     alternateClassName: 'Ext.form.Radio',
 
+    isRadio: true,
+
     config: {
         // @inherit
         ui: 'radio',
 
-        // @private
-        inputType: 'radio',
-
         // @inherit
-        input: {
+        component: {
+            type: 'radio',
             inputCls: Ext.baseCSSPrefix + 'input-radio'
         }
+    },
+
+    getValue: function() {
+        return this._value;
+    },
+
+    setValue: function(value) {
+        this._value = value;
+        return this;
     },
 
     /**
@@ -76,7 +85,7 @@ Ext.define('Ext.field.Radio', {
     /**
      * Set the matched radio field's status (that has the same value as the given string) to checked
      * @param {String} value The value of the radio field to check
-     * @return {String}
+     * @return {Ext.field.Radio} The field that is checked
      */
     setGroupValue: function(value) {
         var fields = this.getSameGroupFields(),

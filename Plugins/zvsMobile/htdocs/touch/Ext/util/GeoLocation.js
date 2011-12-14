@@ -1,21 +1,21 @@
 /**
  * # **Does not work. Coming in a future release.**
- * 
+ *
  * Provides a cross browser class for retrieving location information.
- * 
+ *
  * Based on the [Geolocation API Specification](http://dev.w3.org/geo/api/spec-source.html)
- * 
+ *
  * When instantiated, by default this class immediately begins tracking location information,
  * firing a {@link #locationupdate} event when new location information is available.  To disable this
  * location tracking (which may be battery intensive on mobile devices), set {@link #autoUpdate} to false.
- * 
+ *
  * When this is done, only calls to {@link #updateLocation} will trigger a location retrieval.
- * 
+ *
  * A {@link #locationerror} event is raised when an error occurs retrieving the location, either due to a user
  * denying the application access to it, or the browser not supporting it.
- * 
+ *
  * The below code shows a GeoLocation making a single retrieval of location information.
- * 
+ *
  *     var geo = new Ext.util.GeoLocation({
  *         autoUpdate: false,
  *         listeners: {
@@ -34,172 +34,10 @@
  *     geo.updateLocation();
  */
 Ext.define('Ext.util.GeoLocation', {
-    mixins: {
-        observable: 'Ext.util.Observable'
-    },
 
-    /**
-     * @cfg {Boolean} autoUpdate
-     * When set to true, continually monitor the location of the device (beginning immediately)
-     * and fire {@link #locationupdate}/{@link #locationerror} events.
-     * When using google gears, if the user denies access or another error occurs, this will be reset to false.
-     */
-    autoUpdate: true,
+    mixins: ['Ext.mixin.Observable'],
 
-    //Position interface
-    /**
-     * Read-only property representing the last retrieved
-     * geographical coordinate specified in degrees.
-     * @type Number
-     */
-    latitude: null,
-    /**
-     * Read-only property representing the last retrieved
-     * geographical coordinate specified in degrees.
-     * @type Number
-     */
-    longitude: null,
-    /**
-     * Read-only property representing the last retrieved
-     * accuracy level of the latitude and longitude coordinates,
-     * specified in meters.<br/>
-     * This will always be a non-negative number.<br/>
-     * This corresponds to a 95% confidence level.
-     * @type Number
-     */
-    accuracy: null,
-    /**
-     * Read-only property representing the last retrieved
-     * height of the position, specified in meters above the ellipsoid
-     * <a href="http://dev.w3.org/geo/api/spec-source.html#ref-wgs">[WGS84]</a>.
-     * @type Number
-     */
-    altitude: null,
-    /**
-     * Read-only property representing the last retrieved
-     * accuracy level of the altitude coordinate, specified in meters.<br/>
-     * If altitude is not null then this will be a non-negative number.
-     * Otherwise this returns null.<br/>
-     * This corresponds to a 95% confidence level.
-     * @type Number
-     */
-    altitudeAccuracy: null,
-    /**
-     * Read-only property representing the last retrieved
-     * direction of travel of the hosting device,
-     * specified in non-negative degrees between 0 and 359,
-     * counting clockwise relative to the true north.<br/>
-     * If speed is 0 (device is stationary), then this returns NaN
-     * @type Number
-     */
-    heading: null,
-    /**
-     * Read-only property representing the last retrieved
-     * current ground speed of the device, specified in meters per second.<br/>
-     * If this feature is unsupported by the device, this returns null.<br/>
-     * If the device is stationary, this returns 0,
-     * otherwise it returns a non-negative number.
-     * @type Number
-     */
-    speed: null,
-    /**
-     * Read-only property representing when the last retrieved
-     * positioning information was acquired by the device.
-     * @type Date
-     */
-    timestamp: null,
-
-    //PositionOptions interface
-    /**
-     * @cfg {Boolean} allowHighAccuracy
-     * When set to true, provide a hint that the application would like to receive
-     * the best possible results. This may result in slower response times or increased power consumption.
-     * The user might also deny this capability, or the device might not be able to provide more accurate
-     * results than if this option was set to false.
-     */
-    allowHighAccuracy: false,
-
-    /**
-     * @cfg {Number} timeout
-     * The maximum number of milliseconds allowed to elapse between a location update operation
-     * and the corresponding {@link #locationupdate} event being raised.  If a location was not successfully
-     * acquired before the given timeout elapses (and no other internal errors have occurred in this interval),
-     * then a {@link #locationerror} event will be raised indicating a timeout as the cause.<br/>
-     * Note that the time that is spent obtaining the user permission is <b>not</b> included in the period
-     * covered by the timeout.  The timeout attribute only applies to the location acquisition operation.<br/>
-     * In the case of calling updateLocation, the {@link #locationerror} event will be raised only once.<br/>
-     * If {@link #autoUpdate} is set to true, the {@link #locationerror} event could be raised repeatedly.
-     * The first timeout is relative to the moment {@link #autoUpdate} was set to true
-     * (or this {@link Ext.util.GeoLocation} was initialized with the {@link #autoUpdate} config option set to true).
-     * Subsequent timeouts are relative to the moment when the device determines that it's position has changed.
-     */
-    timeout: Infinity,
-    /**
-     * @cfg {Number} maximumAge
-     * This option indicates that the application is willing to accept cached location information whose age
-     * is no greater than the specified time in milliseconds. If maximumAge is set to 0, an attempt to retrieve
-     * new location information is made immediately.<br/>
-     * Setting the maximumAge to Infinity returns a cached position regardless of its age.<br/>
-     * If the device does not have cached location information available whose age is no
-     * greater than the specified maximumAge, then it must acquire new location information.<br/>
-     * For example, if location information no older than 10 minutes is required, set this property to 600000.
-     */
-    maximumAge: 0,
-    /**
-     * Changes the {@link #maximumAge} option and restarts any active
-     * location monitoring with the updated setting.
-     * @param {Number} maximumAge The value to set the maximumAge option to.
-     */
-    setMaximumAge: function(maximumAge) {
-        this.maximumAge = maximumAge;
-        this.setAutoUpdate(this.autoUpdate);
-    },
-    /**
-     * Changes the {@link #timeout} option and restarts any active
-     * location monitoring with the updated setting.
-     * @param {Number} timeout The value to set the timeout option to.
-     */
-    setTimeout: function(timeout) {
-        this.timeout = timeout;
-        this.setAutoUpdate(this.autoUpdate);
-    },
-    /**
-     * Changes the {@link #allowHighAccuracy} option and restarts any active
-     * location monitoring with the updated setting.
-     * @param {Number} allowHighAccuracy The value to set the allowHighAccuracy option to.
-     */
-    setAllowHighAccuracy: function(allowHighAccuracy) {
-        this.allowHighAccuracy = allowHighAccuracy;
-        this.setAutoUpdate(this.autoUpdate);
-    },
-
-    // private Object geolocation provider
-    provider : null,
-    // private Number tracking current watchPosition
-    watchOperation : null,
-
-    constructor: function(config) {
-        Ext.apply(this, config);
-
-        this.mixins.observable.constructor.call(this, config);
-
-        this.coords = this; //@deprecated
-
-        if (Ext.supports.GeoLocation) {
-            this.provider = this.provider ||
-                (navigator.geolocation ? navigator.geolocation :
-                    (window.google || {}).gears ? google.gears.factory.create('beta.geolocation') : null);
-        }
-
-        /**
-         * @private
-         * @event update
-         * @param {Ext.util.GeoLocation/False} coords
-         * Will return false if geolocation fails (disabled, denied access, timed out).
-         * @param {Ext.util.GeoLocation} this
-         * @deprecated
-         */
-
+    config: {
         /**
          * @event locationerror
          * Raised when a location retrieval operation failed.<br/>
@@ -231,53 +69,196 @@ Ext.define('Ext.util.GeoLocation', {
          * properties latitude, longitude, accuracy, altitude, altitudeAccuracy, heading, and speed.
          */
 
-        this.callParent();
+        /**
+         * @cfg {Boolean} autoUpdate
+         * When set to true, continually monitor the location of the device (beginning immediately)
+         * and fire {@link #locationupdate}/{@link #locationerror} events.
+         * When using google gears, if the user denies access or another error occurs, this will be reset to false.
+         */
+        autoUpdate: true,
 
-        this.mixins.observable.constructor.call(this);
+        /**
+         * Read-only property representing the last retrieved
+         * geographical coordinate specified in degrees.
+         * @type Number
+         */
+        latitude: null,
 
-        if (this.autoUpdate) {
-            var me = this;
-            setTimeout(function() {
-                me.setAutoUpdate(me.autoUpdate);
-            }, 0);
+        /**
+         * Read-only property representing the last retrieved
+         * geographical coordinate specified in degrees.
+         * @type Number
+         */
+        longitude: null,
+
+        /**
+         * Read-only property representing the last retrieved
+         * accuracy level of the latitude and longitude coordinates,
+         * specified in meters.<br/>
+         * This will always be a non-negative number.<br/>
+         * This corresponds to a 95% confidence level.
+         * @type Number
+         */
+        accuracy: null,
+
+        /**
+         * Read-only property representing the last retrieved
+         * height of the position, specified in meters above the ellipsoid
+         * <a href="http://dev.w3.org/geo/api/spec-source.html#ref-wgs">[WGS84]</a>.
+         * @type Number
+         */
+        altitude: null,
+
+        /**
+         * Read-only property representing the last retrieved
+         * accuracy level of the altitude coordinate, specified in meters.<br/>
+         * If altitude is not null then this will be a non-negative number.
+         * Otherwise this returns null.<br/>
+         * This corresponds to a 95% confidence level.
+         * @type Number
+         */
+        altitudeAccuracy: null,
+
+        /**
+         * Read-only property representing the last retrieved
+         * direction of travel of the hosting device,
+         * specified in non-negative degrees between 0 and 359,
+         * counting clockwise relative to the true north.<br/>
+         * If speed is 0 (device is stationary), then this returns NaN
+         * @type Number
+         */
+        heading: null,
+
+        /**
+         * Read-only property representing the last retrieved
+         * current ground speed of the device, specified in meters per second.<br/>
+         * If this feature is unsupported by the device, this returns null.<br/>
+         * If the device is stationary, this returns 0,
+         * otherwise it returns a non-negative number.
+         * @type Number
+         */
+        speed: null,
+
+        /**
+         * Read-only property representing when the last retrieved
+         * positioning information was acquired by the device.
+         * @type Date
+         */
+        timestamp: null,
+
+        //PositionOptions interface
+        /**
+         * @cfg {Boolean} allowHighAccuracy
+         * When set to true, provide a hint that the application would like to receive
+         * the best possible results. This may result in slower response times or increased power consumption.
+         * The user might also deny this capability, or the device might not be able to provide more accurate
+         * results than if this option was set to false.
+         */
+        allowHighAccuracy: false,
+
+        /**
+         * @cfg {Number} timeout
+         * The maximum number of milliseconds allowed to elapse between a location update operation
+         * and the corresponding {@link #locationupdate} event being raised.  If a location was not successfully
+         * acquired before the given timeout elapses (and no other internal errors have occurred in this interval),
+         * then a {@link #locationerror} event will be raised indicating a timeout as the cause.<br/>
+         * Note that the time that is spent obtaining the user permission is <b>not</b> included in the period
+         * covered by the timeout.  The timeout attribute only applies to the location acquisition operation.<br/>
+         * In the case of calling updateLocation, the {@link #locationerror} event will be raised only once.<br/>
+         * If {@link #autoUpdate} is set to true, the {@link #locationerror} event could be raised repeatedly.
+         * The first timeout is relative to the moment {@link #autoUpdate} was set to true
+         * (or this {@link Ext.util.GeoLocation} was initialized with the {@link #autoUpdate} config option set to true).
+         * Subsequent timeouts are relative to the moment when the device determines that it's position has changed.
+         */
+
+        timeout: Infinity,
+
+        /**
+         * @cfg {Number} maximumAge
+         * This option indicates that the application is willing to accept cached location information whose age
+         * is no greater than the specified time in milliseconds. If maximumAge is set to 0, an attempt to retrieve
+         * new location information is made immediately.<br/>
+         * Setting the maximumAge to Infinity returns a cached position regardless of its age.<br/>
+         * If the device does not have cached location information available whose age is no
+         * greater than the specified maximumAge, then it must acquire new location information.<br/>
+         * For example, if location information no older than 10 minutes is required, set this property to 600000.
+         */
+        maximumAge: 0,
+
+        // @private
+        provider : undefined
+    },
+
+    updateMaximumAge: function() {
+        if (this.watchOperation) {
+            this.updateWatchOperation();
         }
     },
 
-    /**
-     * Enabled/disables the auto-retrieval of the location information.<br/>
-     * If called with autoUpdate=true, it will execute an immediate location update
-     * and continue monitoring for location updates.<br/>
-     * If autoUpdate=false, any current location change monitoring will be disabled.
-     * A {@link #locationerror} event is fired if the location cannot be determined due
-     * di an error supporting geolocation.
-     * @param {Boolean} autoUpdate Whether to start/stop location monitoring.
-     * @return {Boolean} If enabling autoUpdate, returns false if the location tracking
-     * cannot begin due to an error supporting geolocation.
-     */
-    setAutoUpdate: function(autoUpdate) {
-        if (this.watchOperation !== null) {
-            this.provider.clearWatch(this.watchOperation);
-            this.watchOperation = null;
+    updateTimeout: function() {
+        if (this.watchOperation) {
+            this.updateWatchOperation();
         }
-        if (!autoUpdate) {
-            return true;
+    },
+
+    updateAllowHighAccuracy: function() {
+        if (this.watchOperation) {
+            this.updateWatchOperation();
         }
-        if (!Ext.supports.GeoLocation) {
-            this.fireEvent('locationerror', this, false, false, true, null);
-            return false;
+    },
+
+    applyProvider: function(config) {
+        if (Ext.feature.has.Geolocation) {
+            if (!config) {
+                if (navigator && navigator.geolocation) {
+                    config = navigator.geolocation;
+                }
+                else if (window.google) {
+                    config = google.gears.factory.create('beta.geolocation');
+                }
+            }
         }
-        try {
-            this.watchOperation = this.provider.watchPosition(
-                Ext.createDelegate(this.fireUpdate, this),
-                Ext.createDelegate(this.fireError, this),
-                this.parseOptions());
+        return config;
+    },
+
+    updateAutoUpdate: function(newAutoUpdate, oldAutoUpdate) {
+        var me = this,
+            provider = me.getProvider();
+
+        if (oldAutoUpdate && provider) {
+            provider.clearWatch(me.watchOperation);
+            me.watchOperation = null;
         }
-        catch(e) {
-            this.autoUpdate = false;
-            this.fireEvent('locationerror', this, false, false, true, e.message);
-            return false;
+
+        if (newAutoUpdate) {
+            if (!provider) {
+                me.fireEvent('locationerror', me, false, false, true, null);
+                return;
+            }
+
+            try {
+                me.updateWatchOperation();
+            }
+            catch(e) {
+                me.fireEvent('locationerror', me, false, false, true, e.message);
+            }
         }
-        return true;
+    },
+
+    // @private
+    updateWatchOperation: function() {
+        var me = this,
+            provider = me.getProvider();
+
+        if (me.watchOperation) {
+            provider.clearWatch(me.watchOperation);
+        }
+
+        me.watchOperation = provider.watchPosition(
+            Ext.createDelegate(me.fireUpdate, me),
+            Ext.createDelegate(me.fireError, me),
+            me.parseOptions()
+        );
     },
 
     /**
@@ -300,7 +281,8 @@ Ext.define('Ext.util.GeoLocation', {
      * <!--positonOptions undocumented param, see W3C spec-->
      */
     updateLocation: function(callback, scope, positionOptions) {
-        var me = this;
+        var me = this,
+            provider = me.getProvider();
 
         var failFunction = function(message, error) {
             if (error) {
@@ -312,88 +294,81 @@ Ext.define('Ext.util.GeoLocation', {
             if (callback) {
                 callback.call(scope || me, null, me); //last parameter for legacy purposes
             }
-            me.fireEvent('update', false, me); //legacy, deprecated
         };
 
-        if (!Ext.supports.GeoLocation) {
-            setTimeout(function() {
+        if (!provider) {
+//            setTimeout(function() {
                 failFunction(null);
-            }, 0);
+//            }, 0);
             return;
         }
 
         try {
-            this.provider.getCurrentPosition(
+            provider.getCurrentPosition(
                 //success callback
                 function(position) {
                     me.fireUpdate(position);
                     if (callback) {
                         callback.call(scope || me, me, me); //last parameter for legacy purposes
                     }
-                    me.fireEvent('update', me, me); //legacy, deprecated
                 },
                 //error callback
                 function(error) {
                     failFunction(null, error);
                 },
-                positionOptions ? positionOptions : this.parseOptions());
+                positionOptions || me.parseOptions()
+            );
         }
         catch(e) {
-            setTimeout(function() {
+//            setTimeout(function() {
                 failFunction(e.message);
-            }, 0);
+//            }, 0);
         }
     },
 
     // @private
     fireUpdate: function(position) {
-        this.timestamp = position.timestamp;
-        this.latitude = position.coords.latitude;
-        this.longitude = position.coords.longitude;
-        this.accuracy = position.coords.accuracy;
-        this.altitude = position.coords.altitude;
-        this.altitudeAccuracy = position.coords.altitudeAccuracy;
+        var me = this,
+            coords = position.coords;
 
-        //google doesn't provide these two
-        this.heading = typeof position.coords.heading == 'undefined' ? null : position.coords.heading;
-        this.speed = typeof position.coords.speed == 'undefined' ? null : position.coords.speed;
-        this.fireEvent('locationupdate', this);
+        me.setConfig({
+            timestamp: position.timestamp,
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+            accuracy: coords.accuracy,
+            altitude: coords.altitude,
+            altitudeAccuracy: coords.altitudeAccuracy,
+            heading: coords.heading,
+            speed: coords.speed
+        });
+
+        me.fireEvent('locationupdate', me);
     },
 
     // @private
     fireError: function(error) {
+        var errorCode = error.code;
         this.fireEvent('locationerror', this,
-            error.code == error.TIMEOUT,
-            error.code == error.PERMISSION_DENIED,
-            error.code == error.POSITION_UNAVAILABLE,
-            error.message == undefined ? null : error.message);
+            errorCode == error.TIMEOUT,
+            errorCode == error.PERMISSION_DENIED,
+            errorCode == error.POSITION_UNAVAILABLE,
+            error.message == undefined ? null : error.message
+        );
     },
 
     // @private
     parseOptions: function() {
-        var ret = {
-            maximumAge: this.maximumAge,
-            allowHighAccuracy: this.allowHighAccuracy
-        };
+        var timeout = this.getTimeout(),
+            ret = {
+                maximumAge: this.getMaximumAge(),
+                allowHighAccuracy: this.getAllowHighAccuracy()
+            };
+
         //Google doesn't like Infinity
-        if (this.timeout !== Infinity) {
-            ret.timeout = this.timeout;
+        // @TODO: Then what does it like?
+        if (timeout !== Infinity) {
+            ret.timeout = timeout;
         }
         return ret;
-    },
-
-    /**
-     * @private
-     * Returns cached coordinates, and updates if there are no cached coords yet.
-     * @deprecated
-     */
-    getLocation: function(callback, scope) {
-        var me = this;
-        if (this.latitude !== null) {
-            callback.call(scope || me, me, me);
-        }
-        else {
-            me.updateLocation(callback, scope);
-        }
     }
 });

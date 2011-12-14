@@ -44,7 +44,7 @@ Ext.define('Ext.field.Password', {
         autoCapitalize: false,
 
         // @inherit
-        input: {
+        component: {
 	        type: 'password'
 	    }
     }

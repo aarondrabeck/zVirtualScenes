@@ -61,6 +61,8 @@ Ext.define('Ext.field.Checkbox', {
 
     xtype: 'checkboxfield',
 
+    isCheckbox: true,
+
     /**
      * @event check
      * Fires when the checkbox is checked.
@@ -91,13 +93,14 @@ Ext.define('Ext.field.Checkbox', {
         /**
          * @cfg {Number} tabIndex
          * @hide
-         * @accessor
          */
         tabIndex: -1,
 
         // @inherit
-        input: {
+        component: {
+            xtype   : 'input',
             type    : 'checkbox',
+            useMask : true,
             inputCls: Ext.baseCSSPrefix + 'input-checkbox'
         }
     },
@@ -108,22 +111,43 @@ Ext.define('Ext.field.Checkbox', {
 
         me.callParent(arguments);
 
-        me.on({
-            scope   : me,
-            delegate: 'input',
-
-            click: 'onClick',
+        me.getComponent().on({
+            scope: me,
             masktap: 'onMaskTap'
         });
     },
 
     // @private
     doInitValue: function() {
-        var me = this;
+        var me = this,
+            initialConfig = me.getInitialConfig();
 
-        me.originalState = me.getInitialConfig().checked;
+        // you can have a value or checked config, but checked get priority
+        if (initialConfig.hasOwnProperty('value')) {
+            me.originalState = initialConfig.value;
+        }
+
+        if (initialConfig.hasOwnProperty('checked')) {
+            me.originalState = initialConfig.checked;
+        }
 
         me.callParent(arguments);
+    },
+
+    // @private
+    updateInputType: function(newInputType) {
+        var component = this.getComponent();
+        if (component) {
+            component.setType(newInputType);
+        }
+    },
+
+    // @private
+    updateName: function(newName) {
+        var component = this.getComponent();
+        if (component) {
+            component.setName(newName);
+        }
     },
 
     /**
@@ -131,10 +155,10 @@ Ext.define('Ext.field.Checkbox', {
      * @return {Mixed} The field value
      */
     getChecked: function() {
-        var input = this.getInput();
+        var component = this.getComponent();
 
         // we need to get the latest value from the {@link #input} and then update the value
-        var checked = input.getChecked();
+        var checked = component.getChecked();
         this._checked = checked;
 
         return this._checked;
@@ -144,6 +168,10 @@ Ext.define('Ext.field.Checkbox', {
         return this.getChecked();
     },
 
+    setValue: function(value) {
+        return this.setChecked(value);
+    },
+
     setChecked: function(newChecked) {
         this.getChecked(); //we do this to sync the input field and field values
         this.updateChecked(newChecked);
@@ -151,36 +179,33 @@ Ext.define('Ext.field.Checkbox', {
     },
 
     updateChecked: function(newChecked) {
-        var input = this.getInput();
-        input.setChecked(newChecked);
+        var component = this.getComponent();
+        component.setChecked(newChecked);
     },
 
     // @private
-    onMaskTap: function(input, e) {
-        if (this.getDisabled()) {
+    onMaskTap: function(component, e) {
+        var me = this;
+
+        if (me.getDisabled()) {
             return false;
         }
 
         //we must manually update the input dom with the new checked value
-        input.input.dom.checked = !input.input.dom.checked;
+        component.input.dom.checked = !component.input.dom.checked;
 
         //continue as normal, like a normal tap
-        this.onTap(input, e);
-
-        //return false so the mask does not disappear
-        return false;
-    },
-
-    // @private
-    onClick: function(input, e) {
-        var me = this;
+        // this.onTap(component, e);
 
         //calling getchecked will sync the new checked value
         if (me.getChecked()) {
-            me.fireAction('uncheck', [me, e], 'doUnChecked');
-        } else {
             me.fireAction('check', [me, e], 'doChecked');
+        } else {
+            me.fireAction('uncheck', [me, e], 'doUnChecked');
         }
+
+        //return false so the mask does not disappear
+        return false;
     },
 
     /**

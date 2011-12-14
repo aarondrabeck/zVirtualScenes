@@ -24,13 +24,11 @@ fieldset         {@link Ext.form.FieldSet}
  * functionality.
  */
 Ext.define('Ext.field.Field', {
-    extend: 'Ext.Container',
+    extend: 'Ext.Component',
     alternateClassName: 'Ext.form.Field',
     alias : 'widget.field',
     requires: [
-        'Ext.form.Label',
-        'Ext.field.Input',
-        'Ext.form.ClearIcon'
+        'Ext.field.Input'
     ],
 
     /**
@@ -49,37 +47,31 @@ Ext.define('Ext.field.Field', {
         baseCls: Ext.baseCSSPrefix + 'field',
 
         /**
-         * @cfg {String} label The label to associate with this field.
+         * The label of this field
+         * @cfg {String} label
          * @accessor
          */
         label: null,
 
         /**
-         * @cfg {String} labelCls Optional CSS class to add to the Label element
-         * @accessor
-         */
-        labelCls: null,
-
-        /**
          * @cfg {String} labelAlign The position to render the label relative to the field input. Defaults to 'left'.
-         * See {@link Ext.form.Label} for more information
          * @accessor
          */
         labelAlign: null,
 
         /**
          * @cfg {Number} labelWidth The width to make this field's label (defaults to 30%).
-         * See {@link Ext.form.Label} for more information
          * @accessor
          */
-        labelWidth: null,
+        labelWidth: '30%',
 
         /**
-         * @cfg {Boolean/Object/Ext.field.Input} input An instance of the inner input for this field, if one
+         * @cfg {Boolean/Object} input An instance of the inner input for this field, if one
          * has been defined.
+         * @todo
          * @accessor
          */
-        input: null,
+        component: null,
 
         /**
          * @cfg {Boolean} useClearIcon True to use a clear icon in this field
@@ -100,14 +92,8 @@ Ext.define('Ext.field.Field', {
         required: false,
 
         /**
-         * @cfg {String} requiredCls The className to be applied to this Field when the {@link #required} configuration is set to true
-         * @accessor
-         */
-        requiredCls: Ext.baseCSSPrefix + 'field-required',
-
-        /**
          * <p>The label Element associated with this Field. <b>Only available if a {@link #label} is specified.</b></p>
-         * <p>This has been deprecated. Please use {@link #getLabel} instead (which will return a {@link Ext.form.Label} instance).
+<p>This has been deprecated.
          * @type Ext.Element
          * @property labelEl
          * @deprecated 2.0
@@ -145,6 +131,20 @@ Ext.define('Ext.field.Field', {
         tabIndex: null
     },
 
+    cachedConfig: {
+        /**
+         * @cfg {String} labelCls Optional CSS class to add to the Label element
+         * @accessor
+         */
+        labelCls: null,
+
+        /**
+         * @cfg {String} requiredCls The className to be applied to this Field when the {@link #required} configuration is set to true
+         * @accessor
+         */
+        requiredCls: Ext.baseCSSPrefix + 'field-required'
+    },
+
     // @inherit
     constructor: function(config) {
         config = config || {};
@@ -156,120 +156,86 @@ Ext.define('Ext.field.Field', {
         this.callParent([config]);
     },
 
-    /**
-     * Creates a new {@link Ext.form.Label} instance using {@link Ext.Factory}
-     * @private
-     */
-    applyLabel: function(config) {
-        if (typeof config == "string") {
-            config = {
-                text: config
-            };
-        }
+    getElementConfig: function() {
+        var prefix = Ext.baseCSSPrefix;
 
-        return Ext.factory(config, 'Ext.form.Label', this.getLabel());
+        return {
+            reference: 'element',
+            className: 'x-container',
+            children: [
+                {
+                    reference: 'label',
+                    cls: prefix + 'form-label',
+                    children: [{
+                        tag: 'span'
+                    }]
+                },
+                {
+                    reference: 'innerElement',
+                    cls      : prefix + 'component-outer'
+                }
+            ]
+        };
     },
 
-    /**
-     * Adds the new {@link Ext.form.Label} instance into this field
-     * @private
-     */
+    // @private
     updateLabel: function(newLabel, oldLabel) {
+        var renderElement = this.renderElement,
+            prefix = Ext.baseCSSPrefix;
+
         if (newLabel) {
-            this.add(newLabel);
-
-            //add a listener for any alignment changes
-            newLabel.on('alignchange', this.onLabelAlignChange, this);
-
-            //set the label class
-            this.onLabelAlignChange(newLabel, newLabel.getAlign());
+            this.label.down('span').update(newLabel);
+            renderElement.addCls(prefix + 'field-labeled');
+        } else {
+            renderElement.removeCls(prefix + 'field-labeled');
         }
     },
 
-    /**
-     * @private
-     */
-    updateLabelAlign: function(newLabelAlign) {
-        var label = this.getLabel();
-        if (label) {
-            label.setAlign(newLabelAlign);
+    // @private
+    updateLabelAlign: function(newLabelAlign, oldLabelAlign) {
+        var renderElement = this.renderElement,
+            prefix = Ext.baseCSSPrefix;
+
+        if (newLabelAlign) {
+            renderElement.addCls(prefix + 'label-align-' + newLabelAlign);
+        }
+
+        if (oldLabelAlign) {
+            renderElement.removeCls(prefix + 'label-align-' + oldLabelAlign);
         }
     },
 
-    /**
-     * @private
-     */
-    updateLabelCls: function(newLabelCls) {
-        var label = this.getLabel();
-        if (label) {
-            label.setCls(newLabelCls);
+    // @private
+    updateLabelCls: function(newLabelCls, oldLabelCls) {
+        if (newLabelCls) {
+            this.label.addCls(newLabelCls);
+        }
+
+        if (oldLabelCls) {
+            this.label.removeCls(oldLabelCls);
         }
     },
 
-    /**
-     * @private
-     */
+    // @private
     updateLabelWidth: function(newLabelWidth) {
-        var label = this.getLabel();
-        if (label) {
-            label.setWidth(newLabelWidth);
+        if (newLabelWidth) {
+            this.label.setStyle('width', newLabelWidth);
         }
     },
 
-    /**
-     * Updates the class on this field when the label alignment changes
-     * @private
-     */
-    onLabelAlignChange: function(label, newAlign, oldAlign) {
-        var prefix       = Ext.baseCSSPrefix + 'label-align-',
-            element = this.element;
+    // @private
+    applyComponent: function(config) {
+        return Ext.factory(config);
+    },
 
-        if (oldAlign) {
-            element.removeCls(prefix + oldAlign);
+    // @private
+    updateComponent: function(newComponent) {
+        if (this.componentElement) {
+            this.componentElement.destroy();
         }
 
-        element.addCls(prefix + newAlign);
-    },
-
-    /**
-     * Creates a new {@link Ext.field.Input} instance using {@link Ext.Factory}
-     * @private
-     */
-    applyInput: function(config) {
-        return Ext.factory(config, Ext.field.Input, this.getInput());
-    },
-
-    /**
-     * Adds the new {@link Ext.field.Input} instance into this field
-     * @private
-     */
-    updateInput: function(newInput) {
-        if (newInput) {
-            this.add(newInput);
-        }
-    },
-
-    /**
-     * Creates a new {@link Ext.form.ClearIcon} instance using {@link Ext.Factory}
-     * @private
-     */
-    applyClearIcon: function(config) {
-        if (config === true) {
-            config = {
-                hidden: true
-            };
-        }
-
-        return Ext.factory(config, 'Ext.form.ClearIcon', this.getClearIcon());
-    },
-
-    /**
-     * Adds the new {@link Ext.form.ClearIcon} instance into this field
-     * @private
-     */
-    updateClearIcon: function(newClearIcon) {
-        if (newClearIcon) {
-            this.add(newClearIcon);
+        if (newComponent) {
+            this.componentElement = this.innerElement.appendChild(newComponent.element);
         }
     },
 
@@ -278,7 +244,7 @@ Ext.define('Ext.field.Field', {
      * @private
      */
     updateRequired: function(newRequired) {
-        this.element[newRequired ? 'addCls' : 'removeCls'](this.getRequiredCls());
+        this.renderElement[newRequired ? 'addCls' : 'removeCls'](this.getRequiredCls());
     },
 
     /**
@@ -287,78 +253,7 @@ Ext.define('Ext.field.Field', {
      */
     updateRequiredCls: function(newRequiredCls, oldRequiredCls) {
         if (this.getRequired()) {
-            this.element.replaceCls(oldRequiredCls, newRequiredCls);
-        }
-    },
-
-    /**
-     * @private
-     */
-    updateInputType: function(newInputType) {
-        var input = this.getInput();
-        if (input) {
-            input.setType(newInputType);
-        }
-    },
-
-    /**
-     * @private
-     */
-    updateName: function(newName) {
-        var input = this.getInput();
-        if (input) {
-            input.setName(newName);
-        }
-    },
-
-    /**
-     * Returns the field data value
-     * @return {String} The field value
-     */
-    getValue: function() {
-        var input = this.getInput();
-        if (input) {
-            // we need to get the latest value from the {@link #input} and then update the value
-            var value = input.getValue();
-            this._value = value;
-        }
-
-        return this._value;
-    },
-
-    /**
-     * @private
-     */
-    updateValue: function(newValue) {
-        var input = this.getInput();
-        if (input) {
-            input.setValue(newValue);
-        }
-    },
-
-    /**
-     * @private
-     */
-    updateTabIndex: function(newTabIndex) {
-        var input = this.getInput();
-        if (input) {
-            input.setTabIndex(newTabIndex);
-        }
-    },
-
-    // @inherit
-    doSetDisabled: function(disabled) {
-        this.callParent(arguments);
-
-        var input = this.getInput(),
-            label = this.getLabel();
-
-        if (input) {
-            input.setDisabled(disabled);
-        }
-
-        if (label) {
-            label.setDisabled(disabled);
+            this.renderElement.replaceCls(oldRequiredCls, newRequiredCls);
         }
     },
 
@@ -379,17 +274,14 @@ Ext.define('Ext.field.Field', {
          * The original value of the field as configured in the {@link #value} configuration.
          * setting is <code>true</code>.
          */
-        this.originalValue = this.getValue();
+            this.originalValue = this.getValue();
     },
 
     /**
      * Resets the current field value to the originally loaded value and clears any validation messages.
+     * @return {Ext.field.Field} this
      */
-    reset: function() {
-        this.getInput().reset();
-        //we need to call this to sync the input with this field
-        this.getValue();
-    },
+    reset: Ext.emptyFn,
 
     /**
      * <p>Returns true if the value of this Field has been changed from its {@link #originalValue}.
@@ -398,10 +290,6 @@ Ext.define('Ext.field.Field', {
      * is not disabled), false otherwise.
      */
     isDirty: function() {
-        var input = this.getInput();
-        if (input) {
-            return input.isDirty();
-        }
         return false;
     }
 }, function() {
@@ -472,7 +360,7 @@ Ext.define('Ext.field.Field', {
 
     prototype.__defineGetter__('labelEl', function() {
         //<debug warn>
-        Ext.Logger.deprecate("'labelEl' is deprecated, please use getLabel() to get an instance of Ext.form.Label instead", this);
+        Ext.Logger.deprecate("'labelEl' is deprecated", this);
         //</debug>
 
         return this.getLabel().element;

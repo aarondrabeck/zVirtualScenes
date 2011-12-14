@@ -412,7 +412,7 @@ namespace HTTPControl
             }
             #endregion
 
-            #region Object Listing
+            #region Device Listing
             if (rawURL.Contains(acceptedCMDs[3]))
             {
                 try
@@ -422,7 +422,7 @@ namespace HTTPControl
 
                     foreach(device d in zvsEntityControl.zvsContext.devices)
                     {
-                        zvsDevices.Add(new zvsDevice { friendly_name = d.friendly_name, id = d.id, type_name = d.device_types.name } );
+                        zvsDevices.Add(new zvsDevice { friendly_name = d.friendly_name, id = d.id, type_name = d.device_types.name, friendly_level = d.GetLevelText()} );
                     }
 
                     XmlWriterSettings xmlwritersettings = new XmlWriterSettings();

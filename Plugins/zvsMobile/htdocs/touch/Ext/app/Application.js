@@ -107,8 +107,11 @@ Ext.define('Ext.app.Application', {
     appFolder: 'app',
 
     /**
-     * @cfg {Boolean} autoCreateViewport True to automatically load and instantiate AppName.view.Viewport
-     * before firing the launch function (defaults to false).
+     * @cfg {Boolean} autoCreateViewport True to automatically load and instantiate AppName.view.Viewport class
+     * before firing the launch function (defaults to false). Note that AppName.view.Viewport should not extend
+     * the Ext.viewport.Viewport class, since that is a singleton class that always exists on the page. Instead
+     * you usually want to extend Container or Panel and set the configuration option fullscreen to true. This
+     * causes your AppName.view.Viewport to be automatically added as a child to the singleton Viewport.
      */
     autoCreateViewport: false,
 

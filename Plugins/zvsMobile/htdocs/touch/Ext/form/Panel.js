@@ -112,7 +112,7 @@ Ext.define('Ext.form.Panel', {
     alternateClassName: 'Ext.form.FormPanel',
     extend  : 'Ext.Panel',
     xtype   : 'formpanel',
-    requires: ['Ext.XTemplate', 'Ext.field.Checkbox'],
+    requires: ['Ext.XTemplate', 'Ext.field.Checkbox', 'Ext.Ajax'],
 
     /**
      * @event submit
@@ -406,9 +406,17 @@ Ext.define('Ext.form.Panel', {
                     scope    : me,
                     callback: function(callbackOptions, success, response) {
                         var me = this,
-                            responseText = response.responseText;
+                            responseText = response.responseText,
+                            failureFn;
 
                         me.hideMask();
+
+                        failureFn = function() {
+                            if (Ext.isFunction(options.failure)) {
+                                options.failure.call(options.scope || me, me, response, responseText);
+                            }
+                            me.fireEvent('exception', me, response);
+                        };
 
                         if (success) {
                             response = Ext.decode(responseText);
@@ -418,13 +426,12 @@ Ext.define('Ext.form.Panel', {
                                     options.success.call(options.scope || me, me, response, responseText);
                                 }
                                 me.fireEvent('submit', me, response);
+                            } else {
+                                failureFn();
                             }
                         }
                         else {
-                            if (Ext.isFunction(options.failure)) {
-                                options.failure.call(options.scope || me, me, response, responseText);
-                            }
-                            me.fireEvent('exception', me, response);
+                            failureFn();
                         }
                     }
                 });
@@ -488,11 +495,13 @@ Ext.define('Ext.form.Panel', {
                 value = values[name];
                 if (field) {
                     if (Ext.isArray(field)) {
-                        field.forEach(function(field) {
-                            if (Ext.isArray(values[name])) {
-                                field.setChecked((value.indexOf(field.getValue()) != -1));
+                        field.forEach(function(f) {
+                            if (f.isRadio) {
+                                f.setGroupValue(value);
+                            } else if (Ext.isArray(values[name])) {
+                                f.setChecked((value.indexOf(f.getValue()) != -1));
                             } else {
-                                field.setChecked((value == field.getValue()));
+                                f.setChecked((value == f.getValue()));
                             }
                         });
                     } else {
@@ -530,27 +539,43 @@ Ext.define('Ext.form.Panel', {
     getValues: function(enabled) {
         var fields = this.getFields(),
             values = {},
-            field, name;
+            field, name, ln, i;
 
         for (name in fields) {
             if (fields.hasOwnProperty(name)) {
                 if (Ext.isArray(fields[name])) {
                     values[name] = [];
 
-                    fields[name].forEach(function(field) {
-                        if (field.getChecked() && !(enabled && field.getDisabled())) {
-                            if (field instanceof Ext.field.Radio) {
-                                values[name] = field.getValue();
+                    ln = fields[name].length;
+
+                    for (i = 0; i < ln; i++) {
+                        field = fields[name][i];
+
+                        if (!field.getChecked) {
+                            values[name] = field.getValue();
+
+                            //<debug>
+                            throw new Error("Ext.form.Panel: [getValues] You have multiple fields with the same 'name' configuration of '" + name + "' in your form panel (#" + this.id + ").");
+                            //</debug>
+
+                            break;
+                        }
+
+                        if (!(enabled && field.getDisabled())) {
+                            if (field.isRadio) {
+                                values[name] = field.getGroupValue();
                             } else {
                                 values[name].push(field.getValue());
                             }
                         }
-                    });
+
+                        
+                    }
                 } else {
                     field = fields[name];
 
                     if (!(enabled && field.getDisabled())) {
-                        if (field instanceof Ext.field.Checkbox) {
+                        if (field.isCheckbox) {
                             values[name] = (field.getChecked()) ? field.getValue() : null;
                         } else {
                             values[name] = field.getValue();
@@ -694,9 +719,11 @@ Ext.define('Ext.form.Panel', {
      * @return {Ext.form.Panel} this
      */
     hideMask: function() {
-        var me = this;
-        if (me.getMaskTarget()) {
-            me.maskTarget.unmask();
+        var me = this,
+            maskTarget = me.getMaskTarget();
+        
+        if (maskTarget) {
+            maskTarget.unmask();
             me.setMaskTarget(null);
         }
         return me;
@@ -723,7 +750,7 @@ Ext.define('Ext.form.Panel', {
              * @cfg {Ext.dom.Element} waitMsgTarget The target of any mask shown on this form.
              * @deprecated 2.0.0 Please use {@link #maskTarget} instead
              */
-            if (config.hasOwnProperty('waitMsgTarget')) {
+            if (config && config.hasOwnProperty('waitMsgTarget')) {
                 config.maskTarget = config.waitMsgTarget;
                 delete config.waitMsgTarget;
             }

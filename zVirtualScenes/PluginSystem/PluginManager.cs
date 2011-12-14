@@ -76,7 +76,7 @@ namespace zVirtualScenesApplication.PluginSystem
             {
                 name = "ENABLEPOLLING",
                 friendly_name = "Enable polling for this device.",
-                default_value = "true",
+                default_value = "false",
                 value_data_type = (int)Data_Types.BOOL
             });
             

@@ -13,13 +13,13 @@ Ext.define('Ext.AbstractComponent', {
             config = members.config,
             cachedConfig = members.cachedConfig,
             cachedConfigList = prototype.cachedConfigList,
-            hasTemplateConfigMap = prototype.hasTemplateConfigMap,
+            hasCachedConfig = prototype.hasCachedConfig,
             name, value;
 
         delete members.cachedConfig;
 
         prototype.cachedConfigList = cachedConfigList = (cachedConfigList) ? cachedConfigList.slice() : [],
-        prototype.hasTemplateConfigMap = hasTemplateConfigMap = (hasTemplateConfigMap) ? Ext.Object.chain(hasTemplateConfigMap) : {};
+        prototype.hasCachedConfig = hasCachedConfig = (hasCachedConfig) ? Ext.Object.chain(hasCachedConfig) : {};
 
         if (!config) {
             members.config = config = {};
@@ -29,8 +29,8 @@ Ext.define('Ext.AbstractComponent', {
             if (cachedConfig.hasOwnProperty(name)) {
                 value = cachedConfig[name];
 
-                if (!hasTemplateConfigMap[name]) {
-                    hasTemplateConfigMap[name] = true;
+                if (!hasCachedConfig[name]) {
+                    hasCachedConfig[name] = true;
                     cachedConfigList.push(name);
                 }
 
@@ -93,11 +93,7 @@ Ext.define('Ext.AbstractComponent', {
             }
         }
 
-        this.initConfig(config);
-
-        this.initialized = true;
-
-        this.initialize();
+        this.callParent(arguments);
     },
 
     getElementConfig: Ext.emptyFn,

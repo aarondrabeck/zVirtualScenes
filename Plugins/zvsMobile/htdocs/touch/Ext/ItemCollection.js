@@ -2,7 +2,7 @@ Ext.define('Ext.ItemCollection', {
     extend: 'Ext.util.MixedCollection',
 
     getKey: function(item) {
-        return item.getId();
+        return item.getItemId();
     },
 
     has: function(item) {

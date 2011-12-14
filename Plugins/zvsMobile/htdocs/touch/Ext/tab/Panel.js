@@ -128,7 +128,7 @@ Ext.define('Ext.tab.Panel', {
         this.getTabBar().setActiveTab(this.getInnerItems().indexOf(newCard));
     },
 
-    setActiveItem: function(activeItem) {
+    doSetActiveItem: function(activeItem) {
         var items = this.getInnerItems(),
             currentIndex = items.indexOf(this.getActiveItem()),
             index = Ext.isNumber(activeItem) ? activeItem : items.indexOf(activeItem),

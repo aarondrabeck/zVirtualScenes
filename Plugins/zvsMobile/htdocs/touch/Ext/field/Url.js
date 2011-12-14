@@ -39,6 +39,8 @@ Ext.define('Ext.field.Url', {
         autoCapitalize: false,
 
         // @inherit
-        inputType: 'url'
+        component: {
+	        type: 'url'
+	    }
     }
 });

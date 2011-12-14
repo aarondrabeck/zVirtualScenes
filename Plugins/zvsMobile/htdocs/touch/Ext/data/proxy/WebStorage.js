@@ -186,6 +186,10 @@ Ext.define('Ext.data.proxy.WebStorage', {
                 length  = fields.length,
                 i, field, name, record;
 
+            if (!rawData) {
+                return;
+            }
+
             for (i = 0; i < length; i++) {
                 field = fields[i];
                 name  = field.name;
@@ -309,10 +313,6 @@ Ext.define('Ext.data.proxy.WebStorage', {
 
         if (length == 1 && ids[0] === "") {
             ids = [];
-        } else {
-            for (i = 0; i < length; i++) {
-                ids[i] = parseInt(ids[i], 10);
-            }
         }
 
         return ids;

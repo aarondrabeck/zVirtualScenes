@@ -13,6 +13,15 @@ Ext.define('Ext.field.Input', {
         inputCls: Ext.baseCSSPrefix + 'form-field',
 
         /**
+         * @cfg {String} focusCls The CSS class to use when the field receives focus
+         * @accessor
+         */
+        focusCls: Ext.baseCSSPrefix + 'field-focus',
+
+        // @private
+        maskCls: Ext.baseCSSPrefix + 'field-mask',
+        
+        /**
          * True to use a mask on this field, or `auto` to automatically select when you should use it.
          * @cfg {String/Boolean} useMask
          * @private
@@ -37,7 +46,7 @@ Ext.define('Ext.field.Input', {
 
     config: {
         // @inherit
-        baseCls: Ext.baseCSSPrefix + 'form-field-container',
+        baseCls: Ext.baseCSSPrefix + 'field-input',
 
         /**
          * @cfg {String} tag The el tag
@@ -58,12 +67,7 @@ Ext.define('Ext.field.Input', {
          * @accessor
          */
         value: null,
-        /**
-         * @cfg {String} focusCls The CSS class to use when the field receives focus
-         * @accessor
-         */
-        focusCls: Ext.baseCSSPrefix + 'field-focus',
-
+        
         /**
          * @property {Boolean} <tt>True</tt> if the field currently has focus.
          * @accessor
@@ -129,6 +133,18 @@ Ext.define('Ext.field.Input', {
          */
         autoCorrect: null,
 
+        /**
+         * True to set the field DOM element readonly attribute to "true". Defaults to undefined, leaving the attribute unset.
+         * @cfg {Boolean} readOnly
+         * @accessor
+         */
+        readOnly: null,
+
+        /**
+         * Sets the field DOM element maxRows attribute. Defaults to undefined, leaving the attribute unset.
+         * @cfg {Number} maxRows
+         * @accessor
+         */
         maxRows: null,
 
         /**
@@ -145,10 +161,7 @@ Ext.define('Ext.field.Input', {
          * @cfg {Mixed} startValue
          * @accessor
          */
-        startValue: false,
-
-        // @private
-        maskCls: Ext.baseCSSPrefix + 'field-mask'
+        startValue: false
     },
 
     /**
@@ -163,6 +176,11 @@ Ext.define('Ext.field.Input', {
             {
                 reference: 'input',
                 tag: this.getTag()
+            },
+            {
+                reference: 'clearIcon',
+                cls: 'x-clear-icon',
+                html: 'x'
             }
         ];
 
@@ -186,15 +204,22 @@ Ext.define('Ext.field.Input', {
             keyup    : 'onKeyUp',
             focus    : 'onFocus',
             blur     : 'onBlur',
-            paste    : 'onPaste',
-            mousedown: 'onMouseDown',
-            click    : 'onClick'
+            paste    : 'onPaste'
+            // mousedown: 'onMouseDown',
+            // click    : 'onClick'
         });
 
         me.mask.on({
             tap: 'onMaskTap',
-            scope   : me
+            scope: me
         });
+
+        if (me.clearIcon) {
+            me.clearIcon.on({
+                tap: 'onClearIconTap',
+                scope: me
+            });
+        }
 
         me.doInitValue();
     },
@@ -293,6 +318,11 @@ Ext.define('Ext.field.Input', {
         if (input) {
             input.dom.value = newValue;
         }
+    },
+
+    setValue: function(newValue) {
+        this.updateValue(this.applyValue(newValue));
+        return this;
     },
 
     //<debug>
@@ -441,6 +471,14 @@ Ext.define('Ext.field.Input', {
         this.input.dom.checked = newChecked;
     },
 
+    /**
+     * Updates the readonly attribute with the {@link #readOnly} configuration
+     * @private
+     */
+    updateReadOnly: function(readOnly) {
+        this.updateFieldAttribute('readonly', readOnly);
+    },
+
     //<debug>
     // @private
     applyMaxRows: function(maxRows) {
@@ -482,6 +520,11 @@ Ext.define('Ext.field.Input', {
      */
     reset: function() {
         this.setValue(this.originalValue);
+    },
+
+    // @private
+    onClearIconTap: function(e) {
+        this.fireEvent('clearicontap', this, e);
     },
 
     // @private

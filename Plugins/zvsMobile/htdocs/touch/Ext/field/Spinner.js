@@ -81,19 +81,8 @@ Ext.define('Ext.field.Spinner', {
         /**
          * @cfg {Number} tabIndex
          * @hide
-         * @accessor
          */
-        tabIndex: -1,
-
-        input: {
-            flex: 2
-        },
-
-        // @hide
-        layout: {
-            type: 'hbox',
-            align: 'stretch'
-        }
+        tabIndex: -1
     },
 
     constructor: function() {
@@ -107,26 +96,26 @@ Ext.define('Ext.field.Spinner', {
     /**
      * Updates the {@link #input} configuration
      */
-    updateInput: function(newInput) {
-        if (newInput) {
-            this.spinDownButton = Ext.create('Ext.Button', {
-                baseCls: this.getCls() + '-button',
-                ui     : 'down',
-                text   : '-',
-                flex: 1
+    updateComponent: function(newComponent) {
+        this.callParent(arguments);
+
+        var cls = this.getCls();
+
+        if (newComponent) {
+            this.spinDownButton = newComponent.element.createChild({
+                cls : cls + '-button ' + cls + '-button-down',
+                html: '-'
             });
 
-            this.spinUpButton = Ext.create('Ext.Button', {
-                baseCls: this.getCls() + '-button',
-                ui     : 'up',
-                text   : '+',
-                flex: 1
+            newComponent.element.insertFirst(this.spinDownButton);
+
+            this.spinUpButton = newComponent.element.createChild({
+                cls : cls + '-button ' + cls + '-button-up',
+                html: '+'
             });
 
-            this.add(this.spinDownButton, newInput, this.spinUpButton);
-
-            this.downRepeater = this.createRepeater(this.spinDownButton.element, this.onSpinDown);
-            this.upRepeater = this.createRepeater(this.spinUpButton.element, this.onSpinUp);
+            this.downRepeater = this.createRepeater(this.spinDownButton, this.onSpinDown);
+            this.upRepeater = this.createRepeater(this.spinUpButton,     this.onSpinUp);
         }
     },
 
@@ -136,7 +125,6 @@ Ext.define('Ext.field.Spinner', {
         if (isNaN(value)) {
             value = this.getDefaultValue();
         }
-
         return this.callParent([value]);
     },
 

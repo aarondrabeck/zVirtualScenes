@@ -3986,8 +3986,6 @@ var noArgs = [],
          *     Ext.define('My.Cat', {
          *         constructor: function() {
          *             alert("I'm a cat!");
-         *
-         *             return this;
          *         }
          *     });
          *
@@ -4262,8 +4260,6 @@ var noArgs = [],
          *             alert(this.self.speciesName);   // dependent on 'this'
          *
          *             statics.totalCreated++;
-         *
-         *             return this;
          *         },
          *
          *         clone: function() {
@@ -4416,8 +4412,6 @@ var noArgs = [],
          *
          *         constructor: function() {
          *             alert(this.self.speciesName); / dependentOL on 'this'
-         *
-         *             return this;
          *         },
          *
          *         clone: function() {
@@ -4460,8 +4454,6 @@ var noArgs = [],
          *
          *         constructor: function(config) {
          *             this.initConfig(config);
-         *
-         *             return this;
          *         }
          *     });
          *
@@ -4622,8 +4614,6 @@ var noArgs = [],
      *     Ext.define('My.Cat', {
      *         constructor: function() {
      *             alert("I'm a cat!");
-     *
-     *             return this;
      *         }
      *     });
      *
@@ -7408,9 +7398,7 @@ This process will be automated with Sencha Command, to be released and documente
             }
         },
 
-        /**
-         * @ignore
-         */
+        // documented above
         syncRequire: function() {
             var syncModeEnabled = this.syncModeEnabled;
 
@@ -7427,9 +7415,7 @@ This process will be automated with Sencha Command, to be released and documente
             this.refreshQueue();
         },
 
-        /**
-         * @ignore
-         */
+        // documented above
         require: function(expressions, fn, scope, excludes) {
             var excluded = {},
                 included = {},
@@ -7935,7 +7921,7 @@ Ext.EventManager.un = Ext.EventManager.removeListener;
  * The functions listed below are mostly utility functions used internally by many of the classes shipped in the
  * framework, but also often useful in your own apps.
  */
-Ext.setVersion('touch', '2.0.0.pr1');
+Ext.setVersion('touch', '2.0.0.pr2');
 
 Ext.apply(Ext, {
     /**
@@ -8174,6 +8160,11 @@ function(el){
         }
     },
 
+
+    log: function(msg) {
+        return Ext.Logger.log(msg);
+    },
+
     setup: function(config) {
         var defaultSetupConfig = Ext.defaultSetupConfig,
             onReady = config.onReady || Ext.emptyFn,
@@ -8191,6 +8182,7 @@ function(el){
         delete config.scope;
 
         requires.push('Ext.event.Dispatcher');
+        requires.push('Ext.dom.CompositeElementLite'); // this is so Ext.select exists
 
         Ext.require(requires);
 
@@ -8388,6 +8380,9 @@ function(el){
             else if ('type' in config) {
                 return manager.instantiateByAlias(aliasNamespace + '.' + config.type, config);
             }
+        }
+        else if (typeof config == 'string') {
+            return Ext.getCmp(config);
         }
 
         if (config === true) {
@@ -8616,12 +8611,20 @@ function(el){
                 scope: scope
             });
 
-            if (document.readyState.match(/interactive|complete|loaded/) !== null) {
-                triggerFn();
+            if (Ext.browser.is.PhoneGap) {
+                if (!Ext.readyListenerAttached) {
+                    Ext.readyListenerAttached = true;
+                    document.addEventListener('deviceready', triggerFn, false);
+                }
             }
-            else if (!Ext.readyListenerAttached) {
-                Ext.readyListenerAttached = true;
-                window.addEventListener('DOMContentLoaded', triggerFn, false);
+            else {
+                if (document.readyState.match(/interactive|complete|loaded/) !== null) {
+                    triggerFn();
+                }
+                else if (!Ext.readyListenerAttached) {
+                    Ext.readyListenerAttached = true;
+                    window.addEventListener('DOMContentLoaded', triggerFn, false);
+                }
             }
         }
     },
@@ -8823,6 +8826,7 @@ Ext.define('Ext.env.Browser', {
             engineName = engineNames.other,
             browserVersion = '',
             engineVersion = '',
+            isWebView = false,
             is, i, name;
 
         if (browserMatch) {
@@ -8875,8 +8879,17 @@ Ext.define('Ext.env.Browser', {
 
         this.setFlag('Standalone', !!navigator.standalone);
 
-        // Flag to check if it we are in the WebView (NKBuild)
-        this.setFlag('WebView', !!window.isNK);
+        if (typeof window.PhoneGap != 'undefined') {
+            isWebView = true;
+            this.setFlag('PhoneGap');
+        }
+        else if (!!window.isNK) {
+            isWebView = true;
+            this.setFlag('Sencha');
+        }
+
+        // Flag to check if it we are in the WebView
+        this.setFlag('WebView', isWebView);
 
         this.isStrict = document.compatMode == "CSS1Compat";
 
@@ -9382,16 +9395,23 @@ Ext.define('Ext.dom.AbstractQuery', {
 
         for (i = 0,qlen = q.length; i < qlen; i++) {
             if (typeof q[i] == 'string') {
-                nodes = root.querySelectorAll(q[i]);
+                
+                //support for node attribute selection
+                if (typeof q[i][0] == '@') {
+                    nodes = root.getAttributeNode(q[i].substring(1));
+                    results.push(nodes);
+                } else {
+                    nodes = root.querySelectorAll(q[i]);
 
-                for (j = 0,nlen = nodes.length; j < nlen; j++) {
-                    results.push(nodes[j]);
+                    for (j = 0,nlen = nodes.length; j < nlen; j++) {
+                        results.push(nodes[j]);
+                    }
                 }
             }
         }
 
         return results;
-    },
+    },    
 
     /**
      * Selects a single element.
@@ -12451,6 +12471,8 @@ this.ExtBootstrapData = {
         "Ext.Img":["widget.image"
         ],
         "Ext.ItemCollection":[],
+        "Ext.Label":["widget.label"
+        ],
         "Ext.LoadMask":[],
         "Ext.Map":["widget.map"
         ],
@@ -12576,13 +12598,7 @@ this.ExtBootstrapData = {
         ],
         "Ext.field.Url":["widget.urlfield"
         ],
-        "Ext.field.slider.Thumb":["widget.thumb"
-        ],
-        "Ext.form.ClearIcon":["widget.clearicon"
-        ],
         "Ext.form.FieldSet":["widget.fieldset"
-        ],
-        "Ext.form.Label":["widget.label"
         ],
         "Ext.form.Panel":["widget.formpanel"
         ],
@@ -12634,8 +12650,6 @@ this.ExtBootstrapData = {
         "Ext.layout.HBox":["layout.hbox"
         ],
         "Ext.layout.Layout":[],
-        "Ext.layout.Navigation":["layout.navigation"
-        ],
         "Ext.layout.VBox":["layout.vbox"
         ],
         "Ext.log.Base":[],
@@ -12677,6 +12691,10 @@ this.ExtBootstrapData = {
         "Ext.scroll.scroller.CssTransform":[],
         "Ext.scroll.scroller.Infinite":[],
         "Ext.scroll.scroller.ScrollPosition":[],
+        "Ext.slider.Slider":["widget.slider"
+        ],
+        "Ext.slider.Thumb":["widget.thumb"
+        ],
         "Ext.tab.Bar":["widget.tabbar"
         ],
         "Ext.tab.Panel":["widget.tabpanel"
@@ -12707,7 +12725,6 @@ this.ExtBootstrapData = {
         "Ext.StoreMgr":"Ext.data.StoreManager",
         "Ext.data.StoreMgr":"Ext.data.StoreManager",
         "Ext.StoreManager":"Ext.data.StoreManager",
-        "Ext.data.XmlStore":"Ext.data.XmlStore",
         "Ext.data.Association":"Ext.data.association.Association",
         "Ext.data.BelongsToAssociation":"Ext.data.association.BelongsTo",
         "Ext.data.HasManyAssociation":"Ext.data.association.HasMany",

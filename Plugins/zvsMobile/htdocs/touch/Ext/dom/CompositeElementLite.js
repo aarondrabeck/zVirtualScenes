@@ -79,7 +79,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
          */
         this.elements = [];
         this.add(elements, root);
-        this.el = new Ext.dom.Element();
+        this.el = new Ext.dom.AbstractElement.Fly();
     },
 
     isComposite: true,

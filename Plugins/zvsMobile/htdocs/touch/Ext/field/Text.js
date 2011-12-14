@@ -106,16 +106,10 @@ Ext.define('Ext.field.Text', {
         ui: 'text',
 
         // @inherit
-        input: {
-            type: 'text'
-        },
-
-        // @inherit
         clearIcon: true,
 
         /**
          * @cfg {String} placeHolder A string value displayed in the input (if supported) when the control is empty.
-         * @deprecated 2.0
          * @accessor
          */
         placeHolder: null,
@@ -145,76 +139,119 @@ Ext.define('Ext.field.Text', {
          * @cfg {Boolean} autoCorrect
          * @accessor
          */
-        autoCorrect: null
+        autoCorrect: null,
+
+        /**
+         * True to set the field DOM element readonly attribute to true.
+         * @cfg {Boolean} readOnly
+         * @accessor
+         */
+        readOnly: null,
+
+        // @inherit
+        component: {
+            xtype: 'input',
+            type : 'text'
+        }
     },
 
     // @private
     initialize: function() {
-        this.enableBubble('action');
-        this.callParent(arguments);
-
         var me = this;
 
         me.callParent(arguments);
 
-        me.on({
-            scope: me,
+        me.getComponent().on({
+            scope: this,
 
-            keyup : 'doKeyUp',
-            change: 'doChange'
+            keyup       : 'onKeyUp',
+            change      : 'onChange',
+            focus       : 'onFocus',
+            blur        : 'onBlur',
+            paste       : 'onPaste',
+            mousedown   : 'onMouseDown',
+            clearicontap: 'onClearIconTap'
         });
-
-        me.on({
-            scope   : me,
-            delegate: 'clearicon',
-
-            tap: 'onClearIconTap'
-        });
-
-        this.relayEvents(me.getInput(), [
-            'keyup',
-            'change',
-            'focus',
-            'blur',
-            'paste',
-            'mousedown'
-        ]);
     },
 
-    // @inherit
+    // @private
     updateValue: function(newValue) {
-        this.callParent(arguments);
+        var component = this.getComponent();
+        if (component) {
+            component.setValue(newValue);
+        }
+
         this[newValue ? 'showClearIcon' : 'hideClearIcon']();
+    },
+
+    getValue: function() {
+        var me = this;
+        me._value = me.getComponent().getValue();
+        return me._value;
     },
 
     // @private
     updatePlaceHolder: function(newPlaceHolder) {
-        this.getInput().setPlaceHolder(newPlaceHolder);
+        this.getComponent().setPlaceHolder(newPlaceHolder);
     },
 
     // @private
     updateMaxLength: function(newMaxLength) {
-        this.getInput().setMaxLength(newMaxLength);
+        this.getComponent().setMaxLength(newMaxLength);
     },
 
     // @private
     updateAutoComplete: function(newAutoComplete) {
-        this.getInput().setAutoComplete(newAutoComplete);
+        this.getComponent().setAutoComplete(newAutoComplete);
     },
 
     // @private
     updateAutoCapitalize: function(newAutoCapitalize) {
-        this.getInput().setAutoCapitalize(newAutoCapitalize);
+        this.getComponent().setAutoCapitalize(newAutoCapitalize);
     },
 
     // @private
     updateAutoCorrect: function(newAutoCorrect) {
-        this.getInput().setAutoCorrect(newAutoCorrect);
+        this.getComponent().setAutoCorrect(newAutoCorrect);
     },
 
     // @private
+    updateReadOnly: function(newReadOnly) {
+        this.getComponent().setReadOnly(newReadOnly);
+    },
+
+    // @private
+    updateInputType: function(newInputType) {
+        var component = this.getComponent();
+        if (component) {
+            component.setType(newInputType);
+        }
+    },
+
+    // @private
+    updateName: function(newName) {
+        var component = this.getComponent();
+        if (component) {
+            component.setName(newName);
+        }
+    },
+
+    // @private
+    updateTabIndex: function(newTabIndex) {
+        var component = this.getComponent();
+        if (component) {
+            component.setTabIndex(newTabIndex);
+        }
+    },
+
+    // @inherit
     doSetDisabled: function(disabled) {
         this.callParent(arguments);
+
+        var component = this.getComponent();
+        if (component) {
+            component.setDisabled(disabled);
+        }
 
         if (disabled) {
             this.hideClearIcon();
@@ -224,7 +261,7 @@ Ext.define('Ext.field.Text', {
     },
 
     // @private
-    onClearIconTap: function() {
+    doClearIconTap: function() {
         this.setValue('');
     },
 
@@ -234,8 +271,6 @@ Ext.define('Ext.field.Text', {
             clearIcon = this.getClearIcon();
 
         if (!me.getDisabled() && me.getValue() && clearIcon) {
-            clearIcon.show();
-
             this.element.addCls(Ext.baseCSSPrefix + 'field-clearable');
         }
 
@@ -245,28 +280,54 @@ Ext.define('Ext.field.Text', {
     // @private
     hideClearIcon: function() {
         var clearIcon = this.getClearIcon();
+
         if (clearIcon) {
-            clearIcon.hide();
             this.element.removeCls(Ext.baseCSSPrefix + 'field-clearable');
         }
     },
 
+    onChange: function(e) {
+        this.fireAction('change', [this, e], 'doChange');
+    },
+
     doChange: Ext.emptyFn,
+
+    onKeyUp: function(e) {
+        this.fireAction('keyup', [this, e], 'doKeyUp');
+    },
+
+    onFocus: function(e) {
+        this.fireAction('focus', [this, e]);
+    },
+
+    onBlur: function(e) {
+        this.fireAction('blur', [this, e]);
+    },
+
+    onPaste: function(e) {
+        this.fireAction('paste', [this, e]);
+    },
+
+    onMouseDown: function(e) {
+        this.fireAction('mousedown', [this, e]);
+    },
+
+    onClearIconTap: function(e) {
+        this.fireAction('clearicontap', [this, e], 'doClearIconTap');
+    },
 
     /**
      * Called when a key has been pressed in the {@link #input}
      * @private
      */
-    doKeyUp: function(e) {
+    doKeyUp: function(me, e) {
         // getValue to ensure that we are in sync with the dom
-        var me = this,
-            value = me.getValue();
+        var value = me.getValue();
 
         // show the {@link #clearIcon} if it is being used
         this[value ? 'showClearIcon' : 'hideClearIcon']();
 
         if (e.browserEvent.keyCode === 13) {
-            me.getInput().blur();
             me.fireAction('action', [me, e], 'doAction');
         }
     },
@@ -278,7 +339,7 @@ Ext.define('Ext.field.Text', {
      * @return {Ext.field.Text} This field
      */
     focus: function() {
-        this.getInput().focus();
+        this.getComponent().focus();
         return this;
     },
 
@@ -287,14 +348,27 @@ Ext.define('Ext.field.Text', {
      * @return {Ext.field.Text} This field
      */
     blur: function() {
-        this.getInput().blur();
+        this.getComponent().blur();
         return this;
     },
 
     // @inherit
     reset: function() {
-        this.callParent(arguments);
+        this.getComponent().reset();
+
+        //we need to call this to sync the input with this field
+        this.getValue();
+
         this[this._value ? 'showClearIcon' : 'hideClearIcon']();
+    },
+
+    // @inherit
+    isDirty: function() {
+        var component = this.getComponent();
+        if (component) {
+            return component.isDirty();
+        }
+        return false;
     }
 });
 

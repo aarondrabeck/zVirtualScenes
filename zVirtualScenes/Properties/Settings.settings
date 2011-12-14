@@ -9,7 +9,7 @@
       <Value Profile="(Default)">200</Value>
     </Setting>
     <Setting Name="SpiltContainer2Distance" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">326</Value>
+      <Value Profile="(Default)">212</Value>
     </Setting>
     <Setting Name="SpiltContainer3Distance" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">187</Value>
@@ -51,13 +51,13 @@
       <Value Profile="(Default)">250</Value>
     </Setting>
     <Setting Name="taskWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">185</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="enabledWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">52</Value>
     </Setting>
     <Setting Name="freqWidth" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">120</Value>
+      <Value Profile="(Default)">50</Value>
     </Setting>
     <Setting Name="datetimeWidth" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">170</Value>

@@ -110,6 +110,8 @@ Ext.define('Ext.event.Dispatcher', {
     applyPublishers: function(publishers) {
         var i, publisher;
 
+        this.publishersCache = {};
+        
         for (i in publishers) {
             if (publishers.hasOwnProperty(i)) {
                 publisher = publishers[i];

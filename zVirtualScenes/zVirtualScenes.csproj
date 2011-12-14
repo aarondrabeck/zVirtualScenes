@@ -114,6 +114,12 @@
     <Compile Include="Forms\ActivateGroup.Designer.cs">
       <DependentUpon>ActivateGroup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\AddEditTriggers.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddEditTriggers.Designer.cs">
+      <DependentUpon>AddEditTriggers.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\AddEditGroupName.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -131,12 +137,6 @@
     </Compile>
     <Compile Include="Forms\AddEditSceneDeviceCMD.Designer.cs">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\AdvancedScriptEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\AdvancedScriptEditor.Designer.cs">
-      <DependentUpon>AdvancedScriptEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\formPropertiesScene.cs">
       <SubType>Form</SubType>
@@ -234,6 +234,9 @@
     <EmbeddedResource Include="Forms\ActivateGroup.resx">
       <DependentUpon>ActivateGroup.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddEditTriggers.resx">
+      <DependentUpon>AddEditTriggers.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddEditGroupName.resx">
       <DependentUpon>AddEditGroupName.cs</DependentUpon>
     </EmbeddedResource>
@@ -242,9 +245,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddEditSceneDeviceCMD.resx">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\AdvancedScriptEditor.resx">
-      <DependentUpon>AdvancedScriptEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\formPropertiesScene.resx">
       <DependentUpon>formPropertiesScene.cs</DependentUpon>
@@ -390,6 +390,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
+    <None Include="Resources\arrow_equal.gif" />
+    <None Include="Resources\equal.png" />
+    <None Include="Resources\task.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

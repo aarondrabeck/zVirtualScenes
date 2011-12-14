@@ -42,8 +42,7 @@ Ext.define('Ext.tab.Bar', {
      * @param {Ext.Component} card The component that has been activated
      */
 
-    // @private
-    constructor: function() {
+    initialize: function() {
         var me = this;
 
         me.on({

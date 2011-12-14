@@ -21,7 +21,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
+                        url: 'http://10.1.0.61:9999/JSON/GetDeviceDetails',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
@@ -110,7 +110,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                             var toggleValue = self.items.items[0].items.items[2].items.items[0].getValue();
                                             console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
                                             Ext.util.JSONP.request({
-                                                url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                                url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                                 callbackKey: 'callback',
                                                 params: {
                                                     u: Math.random(),
@@ -142,7 +142,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
                                         Ext.util.JSONP.request({
-                                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                             callbackKey: 'callback',
                                             params: {
                                                 u: Math.random(),

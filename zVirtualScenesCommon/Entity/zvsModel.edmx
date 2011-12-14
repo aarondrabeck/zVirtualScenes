@@ -19,6 +19,7 @@
           <EntitySet Name="device_type_command_que" EntityType="zvsModel.Store.device_type_command_que" store:Type="Tables" />
           <EntitySet Name="device_type_commands" EntityType="zvsModel.Store.device_type_commands" store:Type="Tables" />
           <EntitySet Name="device_types" EntityType="zvsModel.Store.device_types" store:Type="Tables" />
+          <EntitySet Name="device_value_triggers" EntityType="zvsModel.Store.device_value_triggers" store:Type="Tables" />
           <EntitySet Name="device_values" EntityType="zvsModel.Store.device_values" store:Type="Tables" />
           <EntitySet Name="devices" EntityType="zvsModel.Store.devices" store:Type="Tables" />
           <EntitySet Name="group_devices" EntityType="zvsModel.Store.group_devices" store:Type="Tables" />
@@ -73,11 +74,11 @@
             <End Role="device_type_command_options" EntitySet="device_type_command_options" />
           </AssociationSet>
           <AssociationSet Name="FK_device_type_command_que_0" Association="zvsModel.Store.FK_device_type_command_que_0">
-            <End Role="devices" EntitySet="devices" />
+            <End Role="device_type_commands" EntitySet="device_type_commands" />
             <End Role="device_type_command_que" EntitySet="device_type_command_que" />
           </AssociationSet>
           <AssociationSet Name="FK_device_type_command_que_1" Association="zvsModel.Store.FK_device_type_command_que_1">
-            <End Role="device_type_commands" EntitySet="device_type_commands" />
+            <End Role="devices" EntitySet="devices" />
             <End Role="device_type_command_que" EntitySet="device_type_command_que" />
           </AssociationSet>
           <AssociationSet Name="FK_device_type_commands_0" Association="zvsModel.Store.FK_device_type_commands_0">
@@ -87,6 +88,14 @@
           <AssociationSet Name="FK_device_types_0" Association="zvsModel.Store.FK_device_types_0">
             <End Role="plugins" EntitySet="plugins" />
             <End Role="device_types" EntitySet="device_types" />
+          </AssociationSet>
+          <AssociationSet Name="FK_device_value_triggers_0" Association="zvsModel.Store.FK_device_value_triggers_0">
+            <End Role="device_values" EntitySet="device_values" />
+            <End Role="device_value_triggers" EntitySet="device_value_triggers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_device_value_triggers_1" Association="zvsModel.Store.FK_device_value_triggers_1">
+            <End Role="scenes" EntitySet="scenes" />
+            <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
           <AssociationSet Name="FK_device_values_0" Association="zvsModel.Store.FK_device_values_0">
             <End Role="devices" EntitySet="devices" />
@@ -264,6 +273,18 @@
           <Property Name="name" Type="nvarchar" Nullable="false" MaxLength="255" />
           <Property Name="show_in_list" Type="bit" Nullable="false" />
           <Property Name="friendly_name" Type="nvarchar" MaxLength="255" />
+        </EntityType>
+        <EntityType Name="device_value_triggers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="device_value_id" Type="integer" Nullable="false" />
+          <Property Name="trigger_operator" Type="int" />
+          <Property Name="trigger_value" Type="nvarchar" MaxLength="255" />
+          <Property Name="enabled" Type="bit" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="255" />
+          <Property Name="scene_id" Type="integer" />
         </EntityType>
         <EntityType Name="device_values">
           <Key>
@@ -528,18 +549,6 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_type_command_que_0">
-          <End Role="devices" Type="zvsModel.Store.devices" Multiplicity="1" />
-          <End Role="device_type_command_que" Type="zvsModel.Store.device_type_command_que" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="devices">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="device_type_command_que">
-              <PropertyRef Name="device_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_device_type_command_que_1">
           <End Role="device_type_commands" Type="zvsModel.Store.device_type_commands" Multiplicity="1" />
           <End Role="device_type_command_que" Type="zvsModel.Store.device_type_command_que" Multiplicity="*" />
           <ReferentialConstraint>
@@ -548,6 +557,18 @@
             </Principal>
             <Dependent Role="device_type_command_que">
               <PropertyRef Name="device_type_command_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_device_type_command_que_1">
+          <End Role="devices" Type="zvsModel.Store.devices" Multiplicity="1" />
+          <End Role="device_type_command_que" Type="zvsModel.Store.device_type_command_que" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="devices">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="device_type_command_que">
+              <PropertyRef Name="device_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -572,6 +593,30 @@
             </Principal>
             <Dependent Role="device_types">
               <PropertyRef Name="plugin_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_device_value_triggers_0">
+          <End Role="device_values" Type="zvsModel.Store.device_values" Multiplicity="1" />
+          <End Role="device_value_triggers" Type="zvsModel.Store.device_value_triggers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device_values">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="device_value_triggers">
+              <PropertyRef Name="device_value_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_device_value_triggers_1">
+          <End Role="scenes" Type="zvsModel.Store.scenes" Multiplicity="0..1" />
+          <End Role="device_value_triggers" Type="zvsModel.Store.device_value_triggers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scenes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="device_value_triggers">
+              <PropertyRef Name="scene_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -838,6 +883,15 @@
             <End Role="scene" EntitySet="scenes" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
+          <EntitySet Name="device_value_triggers" EntityType="zvsModel.device_value_triggers" />
+          <AssociationSet Name="FK_device_value_triggers_0" Association="zvsModel.FK_device_value_triggers_0">
+            <End Role="device_values" EntitySet="device_values" />
+            <End Role="device_value_triggers" EntitySet="device_value_triggers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_device_value_triggers_01" Association="zvsModel.FK_device_value_triggers_01">
+            <End Role="scene" EntitySet="scenes" />
+            <End Role="device_value_triggers" EntitySet="device_value_triggers" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="builtin_command_options">
           <Key>
@@ -1009,6 +1063,7 @@
           <Property Type="String" Name="commandClassId" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="value" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="device" Relationship="zvsModel.FK_device_values_0" FromRole="device_values" ToRole="device" />
+          <NavigationProperty Name="device_value_triggers" Relationship="zvsModel.FK_device_value_triggers_0" FromRole="device_values" ToRole="device_value_triggers" />
         </EntityType>
         <EntityType Name="device">
           <Key>
@@ -1138,6 +1193,7 @@
           <Property Type="Boolean" Name="is_running" Nullable="false" />
           <NavigationProperty Name="scene_commands" Relationship="zvsModel.FK_scene_commands_1" FromRole="scene" ToRole="scene_commands" />
           <NavigationProperty Name="scene_property_value" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene" ToRole="scene_property_value" />
+          <NavigationProperty Name="device_value_triggers" Relationship="zvsModel.FK_device_value_triggers_01" FromRole="scene" ToRole="device_value_triggers" />
         </EntityType>
         <EntityType Name="scheduled_tasks">
           <Key>
@@ -1483,6 +1539,44 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="device_value_triggers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int64" Name="device_value_id" Nullable="false" />
+          <Property Type="Int32" Name="trigger_operator" />
+          <Property Type="String" Name="trigger_value" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="enabled" Nullable="false" />
+          <Property Type="String" Name="Name" MaxLength="255" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="device_values" Relationship="zvsModel.FK_device_value_triggers_0" FromRole="device_value_triggers" ToRole="device_values" />
+          <Property Type="Int64" Name="scene_id" />
+          <NavigationProperty Name="scene" Relationship="zvsModel.FK_device_value_triggers_01" FromRole="device_value_triggers" ToRole="scene" />
+        </EntityType>
+        <Association Name="FK_device_value_triggers_0">
+          <End Type="zvsModel.device_values" Role="device_values" Multiplicity="1" />
+          <End Type="zvsModel.device_value_triggers" Role="device_value_triggers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device_values">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="device_value_triggers">
+              <PropertyRef Name="device_value_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_device_value_triggers_01">
+          <End Type="zvsModel.scene" Role="scene" Multiplicity="0..1" />
+          <End Type="zvsModel.device_value_triggers" Role="device_value_triggers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scene">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="device_value_triggers">
+              <PropertyRef Name="scene_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1789,6 +1883,19 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="device_value_triggers">
+            <EntityTypeMapping TypeName="zvsModel.device_value_triggers">
+              <MappingFragment StoreEntitySet="device_value_triggers">
+                <ScalarProperty Name="scene_id" ColumnName="scene_id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="enabled" ColumnName="enabled" />
+                <ScalarProperty Name="trigger_value" ColumnName="trigger_value" />
+                <ScalarProperty Name="trigger_operator" ColumnName="trigger_operator" />
+                <ScalarProperty Name="device_value_id" ColumnName="device_value_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -1846,16 +1953,22 @@
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_options_0" >
           <ConnectorPoint PointX="9" PointY="17.768992513020834" />
+          <ConnectorPoint PointX="9.4166666666666661" PointY="17.768992513020834" />
+          <ConnectorPoint PointX="9.5833333333333339" PointY="17.768992513020834" />
           <ConnectorPoint PointX="9.75" PointY="17.768992513020834" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_que_0" >
           <ConnectorPoint PointX="9" PointY="16" />
           <ConnectorPoint PointX="9.375" PointY="15.625" />
           <ConnectorPoint PointX="9.375" PointY="15.79758789062501" />
+          <ConnectorPoint PointX="9.44107443490112" PointY="15.731513455723889" />
+          <ConnectorPoint PointX="9.5589255650988783" PointY="15.613662325526132" />
           <ConnectorPoint PointX="9.75" PointY="15.42258789062501" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_que_1" >
           <ConnectorPoint PointX="6.75" PointY="15.180041445312504" />
+          <ConnectorPoint PointX="9.4166666666666661" PointY="15.180041445312504" />
+          <ConnectorPoint PointX="9.5833333333333339" PointY="15.180041445312504" />
           <ConnectorPoint PointX="9.75" PointY="15.180041445312504" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_commands_0" >
@@ -1873,13 +1986,15 @@
           <ConnectorPoint PointX="9.205372721354161" PointY="15.711293945312505" />
           <ConnectorPoint PointX="9.3720393880208288" PointY="15.711293945312505" />
           <ConnectorPoint PointX="9.3779606119791712" PointY="15.711293945312505" />
-          <ConnectorPoint PointX="9.544627278645839" PointY="15.711293945312505" />
+          <ConnectorPoint PointX="9.5833333333333339" PointY="15.711293945312505" />
           <ConnectorPoint PointX="11.65625" PointY="15.711293945312505" />
           <ConnectorPoint PointX="11.65625" PointY="19.625" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_property_values_1" >
           <ConnectorPoint PointX="9.40625" PointY="27.5" />
           <ConnectorPoint PointX="9.40625" PointY="20.711293945312505" />
+          <ConnectorPoint PointX="9.4166666666666661" PointY="20.711293945312505" />
+          <ConnectorPoint PointX="9.5833333333333339" PointY="20.711293945312505" />
           <ConnectorPoint PointX="10.5" PointY="20.711293945312505" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_type_command_options_0" >
@@ -1911,8 +2026,8 @@
         <AssociationConnector Association="zvsModel.FK_device_values_0" >
           <ConnectorPoint PointX="6.75" PointY="18.518697916666667" />
           <ConnectorPoint PointX="7.125" PointY="18.893697916666667" />
-          <ConnectorPoint PointX="7.125" PointY="24.720896809895834" />
-          <ConnectorPoint PointX="7.5" PointY="24.720896809895834" />
+          <ConnectorPoint PointX="7.125" PointY="24.817047526041669" />
+          <ConnectorPoint PointX="7.5" PointY="24.817047526041669" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_group_devices_0" >
           <ConnectorPoint PointX="6.75" PointY="15.84375" />
@@ -1920,6 +2035,8 @@
           <ConnectorPoint PointX="7.333333333333333" PointY="15.84375" />
           <ConnectorPoint PointX="9.0729166666666661" PointY="15.84375" />
           <ConnectorPoint PointX="9.2395833333333339" PointY="15.84375" />
+          <ConnectorPoint PointX="9.4166666666666661" PointY="15.84375" />
+          <ConnectorPoint PointX="9.5833333333333339" PointY="15.84375" />
           <ConnectorPoint PointX="11.572916666666666" PointY="15.84375" />
           <ConnectorPoint PointX="11.739583333333334" PointY="15.84375" />
           <ConnectorPoint PointX="12.5" PointY="15.84375" />
@@ -1928,7 +2045,7 @@
           <ConnectorPoint PointX="6.75" PointY="16.551549479166667" />
           <ConnectorPoint PointX="7.25" PointY="16.551549479166667" />
           <ConnectorPoint PointX="7.25" PointY="15.625" />
-          <ConnectorPoint PointX="9.4642545572916763" PointY="15.625" />
+          <ConnectorPoint PointX="9.4166666666666661" PointY="15.625" />
           <ConnectorPoint PointX="9.6309212239583442" PointY="15.625" />
           <ConnectorPoint PointX="12.25" PointY="15.625" />
           <ConnectorPoint PointX="12.25" PointY="15.5" />
@@ -1950,8 +2067,8 @@
           <ConnectorPoint PointX="3" PointY="22.499746093749991" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_scene_commands_1" >
-          <ConnectorPoint PointX="11.75" PointY="11.586293945312491" />
-          <ConnectorPoint PointX="12.5" PointY="11.586293945312491" />
+          <ConnectorPoint PointX="11.75" PointY="11.682444661458334" />
+          <ConnectorPoint PointX="12.5" PointY="11.682444661458334" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_scene_property_option_0" >
           <ConnectorPoint PointX="11.75" PointY="6.0814925130208337" />
@@ -1966,6 +2083,25 @@
           <ConnectorPoint PointX="12.125" PointY="9.25" />
           <ConnectorPoint PointX="12.125" PointY="10.172587890624982" />
           <ConnectorPoint PointX="12.5" PointY="9.7975878906249818" />
+        </AssociationConnector>
+        <EntityTypeShape EntityType="zvsModel.device_value_triggers" Width="1.5" PointX="2.875" PointY="28.125" Height="2.3648893229166674" />
+        <AssociationConnector Association="zvsModel.FK_device_value_triggers_0" >
+          <ConnectorPoint PointX="7.84375" PointY="26.384095052083335" />
+          <ConnectorPoint PointX="7.84375" PointY="30.400940755208332" />
+          <ConnectorPoint PointX="4.375" PointY="30.400940755208332" />
+        </AssociationConnector>
+        <AssociationConnector Association="zvsModel.FK_device_value_triggers_01" >
+          <ConnectorPoint PointX="11" PointY="11.989889322916666" />
+          <ConnectorPoint PointX="11" PointY="13" />
+          <ConnectorPoint PointX="9.5" PointY="13" />
+          <ConnectorPoint PointX="9.5" PointY="27.25" />
+          <ConnectorPoint PointX="9.4895833333333339" PointY="27.25" />
+          <ConnectorPoint PointX="9.3229166666666661" PointY="27.25" />
+          <ConnectorPoint PointX="8" PointY="27.25" />
+          <ConnectorPoint PointX="8" PointY="29.231718377604174" />
+          <ConnectorPoint PointX="7.927083333333333" PointY="29.231718377604174" />
+          <ConnectorPoint PointX="7.760416666666667" PointY="29.231718377604174" />
+          <ConnectorPoint PointX="4.375" PointY="29.231718377604174" />
         </AssociationConnector>
       </Diagram>
     </Diagrams>

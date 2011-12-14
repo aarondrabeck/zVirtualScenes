@@ -5,7 +5,7 @@
         requires: ['zvsMobile.model.Group'],
         proxy: {
             type: 'scripttag',
-            url: 'http://10.1.0.56:9999/JSON/GetGroupList',
+            url: 'http://10.1.0.61:9999/JSON/GetGroupList',
             extraParams: {
                 u: Math.random()
             },

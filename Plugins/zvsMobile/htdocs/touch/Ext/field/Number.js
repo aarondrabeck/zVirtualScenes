@@ -57,7 +57,7 @@ Ext.define('Ext.field.Number', {
 
     config: {
         // @inherit
-        input: {
+        component: {
             type: 'number'
         },
 
@@ -87,29 +87,35 @@ Ext.define('Ext.field.Number', {
     applyValue: function(value) {
         var minValue = this.getMinValue(),
             maxValue = this.getMaxValue();
+        
+        if (Ext.isNumber(minValue)) {
+            value = Math.max(value, minValue);
+        }
 
-        value = Math.min(Math.max(value, minValue), maxValue);
+        if (Ext.isNumber(maxValue)) {
+            value = Math.min(value, maxValue);
+        }
 
         return parseFloat(value);
     },
 
     getValue: function() {
         var value = this.callParent();
-        return parseFloat(value);
+        return parseFloat(value || 0);
     },
 
     // @private
     updateMinValue: function(newMinValue) {
-        this.getInput().setMinValue(newMinValue);
+        this.getComponent().setMinValue(newMinValue);
     },
 
     // @private
     updateMaxValue: function(newMaxValue) {
-        this.getInput().setMaxValue(newMaxValue);
+        this.getComponent().setMaxValue(newMaxValue);
     },
 
     // @private
     updateStepValue: function(newStepValue) {
-        this.getInput().setStepValue(newStepValue);
+        this.getComponent().setStepValue(newStepValue);
     }
 });

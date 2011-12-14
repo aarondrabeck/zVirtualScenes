@@ -36,18 +36,40 @@ Ext.define('Ext.field.Toggle', {
     /**
      * @private
      */
-    onChange: function(thumb, newValue) {
-        var me     = this,
-            isOn   = newValue > 0,
-            onCls  = me.getMaxValueCls(),
+    onChange: function(slider, thumb, newValue) {
+        var me = this,
+            innerElement = me.innerElement,
+            isOn = newValue > 0,
+            onCls = me.getMaxValueCls(),
             offCls = me.getMinValueCls();
 
-        this.addCls(isOn ? onCls : offCls);
-        this.removeCls(isOn ? offCls : onCls);
+        innerElement.addCls(isOn ? onCls : offCls);
+        innerElement.removeCls(isOn ? offCls : onCls);
+
+        this.fireEvent('change', this, thumb, newValue);
     },
 
     onTap: function(e) {
         var value = (this.getValue() > 0) ? 0 : 1;
         this.setValue(value);
+    },
+
+    getValue: function() {
+        var value;
+
+        if (this.initialized) {
+            value = this.getComponent().getValue();
+        } else {
+            value = this.getInitialConfig().value;
+        }
+
+        if (Ext.isArray(value)) {
+            value = value[0];
+        }
+
+        this._value = value;
+        this._values = value;
+
+        return value;
     }
 });

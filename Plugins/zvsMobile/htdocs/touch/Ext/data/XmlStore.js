@@ -59,7 +59,6 @@ var store = new Ext.data.XmlStore({
  */
 Ext.define('Ext.data.XmlStore', {
     extend: 'Ext.data.Store',
-    alternateClassName: 'Ext.data.XmlStore',
     alias: 'store.xml',
 
     /**

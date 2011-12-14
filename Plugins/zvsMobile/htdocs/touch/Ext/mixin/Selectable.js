@@ -168,8 +168,6 @@ Ext.define('Ext.mixin.Selectable', {
             isSelected = me.isSelected(record);
         switch (me.getMode()) {
             case 'MULTI':
-                me.select(record, false);
-                break;
             case 'SIMPLE':
                 if (isSelected) {
                     me.deselect(record);
@@ -296,6 +294,8 @@ Ext.define('Ext.mixin.Selectable', {
         if (records === null || this.getLocked()) {
             return;
         }
+        records = !Ext.isArray(records) ? [records] : records;
+
         var me = this,
             selected = me.getSelected(),
             ln = records.length,
@@ -303,12 +303,10 @@ Ext.define('Ext.mixin.Selectable', {
             i = 0,
             record;
 
-        records = !Ext.isArray(records) ? [records] : records;
         if (!keepExisting && selected.getCount() > 0) {
             change = true;
             me.deselect(me.getSelection(), true);
         }
-
         for (; i < ln; i++) {
             record = records[i];
             if (keepExisting && me.isSelected(record)) {
@@ -316,7 +314,7 @@ Ext.define('Ext.mixin.Selectable', {
             }
             change = true;
             me.setLastSelected(record);
-            me.getSelected().add(record);
+            selected.add(record);
             if (!suppressEvent) {
                 me.setLastFocused(record);
             }
@@ -377,7 +375,13 @@ Ext.define('Ext.mixin.Selectable', {
     fireSelectionChange: function(fireEvent) {
         var me = this;
         if (fireEvent) {
-            me.fireAction('selectionchange', [me, me.getSelection()], 'doSelectionChange');
+            //<deprecated product=touch since=2.0>
+            me.fireAction('beforeselectionchange', [], function() {
+            //</deprecated>
+                me.fireAction('selectionchange', [me, me.getSelection()], 'doSelectionChange');
+            //<deprecated product=touch since=2.0>
+            });
+            //</deprecated>
         }
     },
 

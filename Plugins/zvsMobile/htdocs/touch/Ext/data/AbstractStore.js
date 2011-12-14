@@ -600,6 +600,12 @@ Ext.define('Ext.data.AbstractStore', {
         if (needsSync && me.fireEvent('beforesync', options) !== false) {
             me.proxy.batch(options, me.getBatchListeners());
         }
+
+        return {
+            added: toCreate,
+            updated: toUpdate,
+            removed: toDestroy
+        };
     },
 
 

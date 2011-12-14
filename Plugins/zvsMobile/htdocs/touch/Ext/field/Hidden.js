@@ -40,24 +40,23 @@ Ext.define('Ext.field.Hidden', {
 
     config: {
         // @inherit
-        input: {
-            type: 'hidden'
+        component: {
+            xtype: 'input',
+            type : 'hidden'
         },
 
         // @inherit
         ui: 'hidden',
 
         /**
-         * @cfg
+         * @cfg hidden
          * @hide
-         * @accessor
          */
         hidden: true,
 
         /**
          * @cfg {Number} tabIndex
          * @hide
-         * @accessor
          */
         tabIndex: -1
     }

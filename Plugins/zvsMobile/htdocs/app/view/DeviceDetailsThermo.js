@@ -21,7 +21,7 @@
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
+                        url: 'http://10.1.0.61:9999/JSON/GetDeviceDetails',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
@@ -115,7 +115,7 @@
                          handler: function () {
                              console.log('AJAX: SendCmd ESM');
                              Ext.util.JSONP.request({
-                                 url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                  callbackKey: 'callback',
                                  params: {
                                      u: Math.random(),
@@ -144,7 +144,7 @@
                          handler: function () {
                              console.log('AJAX: SendCmd Confort');
                              Ext.util.JSONP.request({
-                                 url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                  callbackKey: 'callback',
                                  params: {
                                      u: Math.random(),
@@ -218,7 +218,7 @@
                                                                             var mode = this.SetMode.items.items[0].getValue()
                                                                             console.log('AJAX DYNAMIC_CMD_MODE ' + mode);
                                                                             Ext.util.JSONP.request({
-                                                                                url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                                                                url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                                                                 callbackKey: 'callback',
                                                                                 params: {
                                                                                     u: Math.random(),
@@ -295,7 +295,7 @@
                                                         var mode = this.SetFanMode.items.items[0].getValue()
                                                         console.log('DYNAMIC_CMD_FAN MODE' + mode);
                                                         Ext.util.JSONP.request({
-                                                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                                             callbackKey: 'callback',
                                                             params: {
                                                                 u: Math.random(),
@@ -347,7 +347,7 @@
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_HEATING 1' + selected_temp);
                                                 Ext.util.JSONP.request({
-                                                    url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                                    url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                                     callbackKey: 'callback',
                                                     params: {
                                                         u: Math.random(),
@@ -396,7 +396,7 @@
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_COOLING 1 :' + selected_temp);
                                                 Ext.util.JSONP.request({
-                                                    url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                                    url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                                     callbackKey: 'callback',
                                                     params: {
                                                         u: Math.random(),
@@ -432,7 +432,7 @@
                          handler: function () {
                              console.log('AJAX: SendCmd REPOLL_ME');
                              Ext.util.JSONP.request({
-                                 url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                  callbackKey: 'callback',
                                  params: {
                                      u: Math.random(),

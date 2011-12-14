@@ -52,8 +52,8 @@ Ext.define('Ext.field.TextArea', {
         autoCapitalize: false,
 
         // @inherit
-        input: {
-            xclass: 'Ext.field.TextAreaInput'
+        component: {
+            xtype: 'textareainput'
         },
 
         /**
@@ -65,6 +65,6 @@ Ext.define('Ext.field.TextArea', {
 
     // @private
     updateMaxRows: function(newRows) {
-        this.getInput().setMaxRows(newRows);
+        this.getComponent().setMaxRows(newRows);
     }
 });

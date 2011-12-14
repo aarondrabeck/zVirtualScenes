@@ -14,7 +14,7 @@
  * The functions listed below are mostly utility functions used internally by many of the classes shipped in the
  * framework, but also often useful in your own apps.
  */
-Ext.setVersion('touch', '2.0.0.pr1');
+Ext.setVersion('touch', '2.0.0.pr2');
 
 Ext.apply(Ext, {
     /**
@@ -255,6 +255,13 @@ function(el){
         }
     },
 
+
+    //<feature logger>
+    log: function(msg) {
+        return Ext.Logger.log(msg);
+    },
+    //</feature>
+
     setup: function(config) {
         var defaultSetupConfig = Ext.defaultSetupConfig,
             onReady = config.onReady || Ext.emptyFn,
@@ -272,6 +279,7 @@ function(el){
         delete config.scope;
 
         requires.push('Ext.event.Dispatcher');
+        requires.push('Ext.dom.CompositeElementLite'); // this is so Ext.select exists
 
         Ext.require(requires);
 
@@ -474,6 +482,9 @@ function(el){
             else if ('type' in config) {
                 return manager.instantiateByAlias(aliasNamespace + '.' + config.type, config);
             }
+        }
+        else if (typeof config == 'string') {
+            return Ext.getCmp(config);
         }
 
         if (config === true) {
@@ -759,12 +770,20 @@ function(el){
                 scope: scope
             });
 
-            if (document.readyState.match(/interactive|complete|loaded/) !== null) {
-                triggerFn();
+            if (Ext.browser.is.PhoneGap) {
+                if (!Ext.readyListenerAttached) {
+                    Ext.readyListenerAttached = true;
+                    document.addEventListener('deviceready', triggerFn, false);
+                }
             }
-            else if (!Ext.readyListenerAttached) {
-                Ext.readyListenerAttached = true;
-                window.addEventListener('DOMContentLoaded', triggerFn, false);
+            else {
+                if (document.readyState.match(/interactive|complete|loaded/) !== null) {
+                    triggerFn();
+                }
+                else if (!Ext.readyListenerAttached) {
+                    Ext.readyListenerAttached = true;
+                    window.addEventListener('DOMContentLoaded', triggerFn, false);
+                }
             }
         }
     },

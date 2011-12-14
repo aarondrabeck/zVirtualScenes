@@ -41,7 +41,7 @@ Ext.define('Ext.field.Email', {
 
     config: {
         // @inherit
-        input: {
+        component: {
 	        type: 'email'
 	    },
 

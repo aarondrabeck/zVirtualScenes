@@ -4,18 +4,18 @@
  *
  * Carousels, like [tabs](#!/guide/tabs), are a great way to allow the user to swipe through multiple full-screen pages.
  * A Carousel shows only one of its pages at a time but allows you to swipe through with your finger.
- * 
+ *
  * Carousels can be oriented either horizontally or vertically and are easy to configure - they just work like any other
  * Container. Here's how to set up a simple horizontal Carousel:
- * 
+ *
  *     @example
  *     Ext.create('Ext.Carousel', {
  *         fullscreen: true,
- * 
+ *
  *         defaults: {
  *             styleHtmlContent: true
  *         },
- * 
+ *
  *         items: [
  *             {
  *                 html : 'Item 1',
@@ -30,18 +30,18 @@
  *             }
  *         ]
  *     });
- * 
+ *
  * We can also make Carousels orient themselves vertically:
  *
  *     @example preview
  *     Ext.create('Ext.Carousel', {
  *         fullscreen: true,
  *         direction: 'vertical',
- *     
+ *
  *         defaults: {
  *             styleHtmlContent: true
  *         },
- *     
+ *
  *         items: [
  *             {
  *                 html : 'Item 1',
@@ -53,7 +53,7 @@
  *             }
  *         ]
  *     });
- * 
+ *
  * ### Common Configurations
  * * {@link #ui} defines the style of the carousel
  * * {@link #direction} defines the direction of the carousel
@@ -65,7 +65,7 @@
  * * {@link #setActiveItem} moves to the passed card
  *
  * ## Further Reading
- * 
+ *
  * For more information about Carousels see the [Carousel guide](#!/guide/carousel).
  */
 Ext.define('Ext.carousel.Carousel', {
@@ -121,17 +121,16 @@ Ext.define('Ext.carousel.Carousel', {
         this.callParent();
 
         this.element.on({
-            drag     : 'onDrag',
+            drag: 'onDrag',
             dragstart: 'onDragStart',
-            dragend  : 'onDragEnd',
+            dragend: 'onDragEnd',
 
             scope: this
         });
 
         this.on({
-            painted         : 'onPainted',
+            painted: 'onPainted',
             activeitemchange: 'onActiveItemChange',
-
             scope: this
         });
     },
@@ -170,6 +169,8 @@ Ext.define('Ext.carousel.Carousel', {
         } else {
             this.sizeMonitor.refresh();
         }
+
+        this.onActiveItemChange(this, this.getActiveItem());
     },
 
     // @private
@@ -213,7 +214,7 @@ Ext.define('Ext.carousel.Carousel', {
 
         var indicator = this.getIndicator();
         if (indicator) {
-            indicator.addIndicator();
+            indicator.removeIndicator();
         }
     },
 
@@ -237,7 +238,10 @@ Ext.define('Ext.carousel.Carousel', {
      */
     getCardOffset: function(card, index, activeIndex) {
         var cardOffset = this.getCardIndexOffset(card, index, activeIndex),
-            currentSize = this.currentSize,
+            currentSize = this.currentSize || {
+                width: 0,
+                height: 0
+            },
             currentScroll = this.currentScroll;
 
         return this.getDirection() === 'horizontal' ?
@@ -409,6 +413,10 @@ Ext.define('Ext.carousel.Carousel', {
             activeIndex = cards.indexOf(activeItem),
             indicator = this.getIndicator(),
             i, card;
+
+        if (activeIndex == -1) {
+            return;
+        }
 
         this.currentScroll = {
             x: 0,

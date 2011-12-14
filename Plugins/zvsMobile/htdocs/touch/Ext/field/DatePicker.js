@@ -156,27 +156,23 @@ Ext.define('Ext.field.DatePicker', {
         /**
          * @cfg {Number} tabIndex
          * @hide
-         * @accessor
          */
         tabIndex: -1,
 
         /**
          * @cfg
          * @hide
-         * @accessor
          */
-        input: {
+        component: {
             useMask: true
         }
     },
 
     initialize: function() {
-        var me = this;
-        me.callParent(arguments);
+        this.callParent(arguments);
 
-        me.on({
-            scope   : me,
-            delegate: 'input',
+        this.getComponent().on({
+            scope: this,
 
             masktap: 'onMaskTap'
         });
@@ -200,7 +196,9 @@ Ext.define('Ext.field.DatePicker', {
         if (this.initialized && picker) {
             picker.setValue(newValue);
         }
-        this.getInput().setValue(Ext.Date.format(newValue, Ext.util.Format.defaultDateFormat));
+        this.getComponent().setValue(Ext.Date.format(newValue, Ext.util.Format.defaultDateFormat));
+
+        this._value = newValue;
     },
 
     getValue: function() {

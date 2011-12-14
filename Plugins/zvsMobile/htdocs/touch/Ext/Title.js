@@ -6,7 +6,7 @@ Ext.define('Ext.Title', {
     xtype: 'title',
     
     config: {
-    	// @inherit
+        // @inherit
         baseCls: 'x-title',
 
         /**

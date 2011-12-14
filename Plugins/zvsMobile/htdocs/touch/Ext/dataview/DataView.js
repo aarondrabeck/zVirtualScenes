@@ -50,7 +50,7 @@
  *
  * This will get the first record in the Store (Jamie), change the age to 42 and automatically update what's on the
  * screen.
- * 
+ *
  *     @example miniphone
  *     var touchTeam = Ext.create('Ext.DataView', {
  *         fullscreen: true,
@@ -67,12 +67,12 @@
  *
  *         itemTpl: '<div>{name} is {age} years old</div>'
  *     });
- * 
+ *
  *     touchTeam.getStore().add({
  *         name: 'Abe Elias',
  *         age: 33
  *     });
- *     
+ *
  *     touchTeam.getStore.getAt(0).set('age', 42);
  *
  * # Loading data from a server
@@ -111,7 +111,7 @@
  * JSON and that the tweets can be found in the 'results' part of the JSON response.
  *
  * The last thing we did is update our template to render the image, twitter username and message. All we need to do
- * now is add a little CSS to style the list the way we want it and we end up with a very basic twitter viewer. Click 
+ * now is add a little CSS to style the list the way we want it and we end up with a very basic twitter viewer. Click
  * the preview button on the example above to see it in action.
  */
 Ext.define('Ext.dataview.DataView', {
@@ -139,6 +139,17 @@ Ext.define('Ext.dataview.DataView', {
 
         // @inherit
         baseCls: Ext.baseCSSPrefix + 'dataview',
+
+        /**
+         * @cfg {String} emptyText
+         * The text to display in the view when there is no data to display
+         */
+        emptyText: null,
+
+        /**
+         * @cfg {Boolean} deferEmptyText True to defer emptyText being applied until the store's first load
+         */
+        deferEmptyText: true,
 
         /**
          * @cfg {String/String[]/Ext.XTemplate} itemTpl
@@ -286,6 +297,8 @@ Ext.define('Ext.dataview.DataView', {
     storeEventHooks: {
         beforeload: 'onBeforeLoad',
         load      : 'refresh',
+        sort      : 'refresh',
+        filter    : 'refresh',
         add       : 'onStoreAdd',
         remove    : 'onStoreRemove',
         update    : 'onStoreUpdate',
@@ -338,8 +351,11 @@ Ext.define('Ext.dataview.DataView', {
     },
 
     // apply to the selection model to maintain visual UI cues
-    onContainerTrigger: function() {
+    onContainerTrigger: function(e) {
         var me = this;
+        if (e.target != me.element.dom) {
+            return;
+        }
         if (me.getDeselectOnContainerClick() && me.getStore()) {
             me.deselectAll();
         }
@@ -561,6 +577,9 @@ Ext.define('Ext.dataview.DataView', {
         this.unmask();
 
         if (!me.getStore()) {
+            if (!this.getDeferEmptyText()) {
+                this.doEmptyText();
+            }
             return;
         }
         me.fireAction('refresh', [me], 'doRefresh');
@@ -577,28 +596,29 @@ Ext.define('Ext.dataview.DataView', {
     },
 
     updateListItem: function(record, item) {
+        var data = record.getData();
         if (record) {
             // TODO: Move this into nestedStore...
-            Ext.apply(record.data, this.self.prepareAssociatedData(record));
+            Ext.apply(data, this.self.prepareAssociatedData(record));
         }
         var index = this.getStore().indexOf(record),
             html;
 
         item.setAttribute('itemIndex', index);
-        html = this.getItemTpl().apply(record.data);
+        html = this.getItemTpl().apply(data);
         item.innerHTML = html;
-        // TODO: We may need to account for headers here in List
     },
 
     addListItem: function(index, record) {
+        var data = record.getData();
+
         if (record) {
             // TODO: Move this into nestedStore...
-            Ext.apply(record.data, this.self.prepareAssociatedData(record));
+            Ext.apply(data, this.self.prepareAssociatedData(record));
         }
         var element = this.elementContainer.element,
             childNodes = element.dom.childNodes,
             ln = childNodes.length,
-            data = record.data,
             wrapElement;
 
         wrapElement = Ext.Element.create(this.getItemElementConfig(index, data));
@@ -629,6 +649,17 @@ Ext.define('Ext.dataview.DataView', {
             item = items[from + i];
             item.parentNode.removeChild(item);
         }
+        if (me.getViewItems().length == 0) {
+            this.doEmptyText();
+        }
+    },
+
+    doEmptyText: function() {
+        var emptyText = this.getEmptyText();
+        if (emptyText) {
+            this.elementContainer.setHtml('');
+            this.elementContainer.setHtml(emptyText);
+        }
     },
 
     // Add
@@ -642,6 +673,8 @@ Ext.define('Ext.dataview.DataView', {
             record = records[i];
             me.addListItem(index + i, record);
         }
+        // Remove any emptyText that may be displayed
+        me.elementContainer.setHtml('');
     },
 
     getViewItems: function() {
@@ -669,7 +702,9 @@ Ext.define('Ext.dataview.DataView', {
         // Too many items, hide the unused ones
         if (deltaLn < 0) {
             this.moveItemsToCache(itemsLn + deltaLn, itemsLn - 1);
-            return;
+            // Items can changed, we need to refresh our references
+            items = me.getViewItems();
+            itemsLn = items.length;
         }
         // Not enough items, create new ones
         else if (deltaLn > 0) {
@@ -690,7 +725,9 @@ Ext.define('Ext.dataview.DataView', {
     onStoreClear: function() {
         var me = this,
             items = me.getViewItems();
+
         this.moveItemsToCache(0, items.length - 1);
+        this.doEmptyText();
     },
 
     // private

@@ -21,7 +21,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.56:9999/JSON/GetDeviceDetails',
+                        url: 'http://10.1.0.61:9999/JSON/GetDeviceDetails',
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
@@ -127,7 +127,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                 change: function (slider, value) {
                                     var details = Ext.get('sliderfield');
                                     if (details) {
-                                        details.dom.childNodes[0].childNodes[1].childNodes[0].innerHTML = slider.getValue() + "%";
+                                        details.dom.childNodes[0].childNodes[0].childNodes[0].innerHTML = slider.getValue() + "%";
                                     }
                                 }
                             }
@@ -140,7 +140,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                 var sliderValue = self.items.items[0].items.items[2].items.items[0].getValue()[0]
                                 console.log('AJAX: SendCmd SEt LEVEL' + sliderValue);
                                 Ext.util.JSONP.request({
-                                    url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                    url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                     callbackKey: 'callback',
                                     params: {
                                         u: Math.random(),
@@ -172,7 +172,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
                                         Ext.util.JSONP.request({
-                                            url: 'http://10.1.0.56:9999/JSON/SendCmd',
+                                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                             callbackKey: 'callback',
                                             params: {
                                                 u: Math.random(),

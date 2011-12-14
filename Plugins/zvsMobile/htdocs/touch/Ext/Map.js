@@ -21,7 +21,7 @@
 Ext.define('Ext.Map', {
     extend: 'Ext.Component',
     xtype : 'map',
-    require: ['Ext.util.GeoLocation'],
+    requires: ['Ext.util.GeoLocation'],
 
     config: {
         /**
@@ -73,6 +73,7 @@ Ext.define('Ext.Map', {
         map: null,
 
         /**
+         * @private
          * @cfg {Ext.util.GeoLocation} geo
          * @accessor
          */
@@ -108,36 +109,52 @@ Ext.define('Ext.Map', {
         if (!(window.google || {}).maps) {
             this.setHtml('Google Maps API is required');
         }
-        else if (this.useCurrentLocation) {
-            this.geo = this.geo || Ext.create('Ext.util.GeoLocation', {autoLoad: false});
-            this.geo.on({
-                locationupdate : this.onGeoUpdate,
-                locationerror : this.onGeoError,
-                scope : this
-            });
-        }
+    },
 
-        if (this.geo) {
-            this.on({
-                painted: this.onUpdate,
-                scope: this,
-                single: true
-            });
-            this.geo.updateLocation();
+    updateUseCurrentLocation: function(useCurrentLocation) {
+        this.setGeo(useCurrentLocation);
+        if (!useCurrentLocation) {
+            this.renderMap();
         }
+    },
 
-        if (this.getMaskMap()) {
+    updateMaskMap: function(maskMap) {
+        if (maskMap) {
             this.element.mask(null, this.getMaskMapCls());
         }
-        this.renderMap();
+        else {
+            this.element.unmask();
+        }
+    },
+
+    applyGeo: function(config) {
+        return Ext.factory(config, Ext.util.GeoLocation, this.getGeo());
+    },
+
+    updateGeo: function(newGeo, oldGeo) {
+        var events = {
+            locationupdate : 'onGeoUpdate',
+            locationerror : 'onGeoError',
+            scope : this
+        };
+
+        if (oldGeo) {
+            oldGeo.un(events);
+        }
+
+        if (newGeo) {
+            newGeo.on(events);
+            newGeo.updateLocation();
+        }
     },
 
     // @private
     renderMap: function() {
         var me = this,
             gm = (window.google || {}).maps,
-            renderElement = me.renderElement,
+            element = me.element,
             mapOptions = me.getMapOptions(),
+            map = me.getMap(),
             event;
 
         if (gm) {
@@ -155,40 +172,35 @@ Ext.define('Ext.Map', {
                 mapTypeId: gm.MapTypeId.ROADMAP
             });
 
-            if (me.maskMap && !me.mask) {
-                renderElement.mask(null, this.maskMapCls);
-                me.mask = true;
+            if (element.dom.firstChild) {
+                Ext.fly(element.dom.firstChild).remove();
             }
 
-            if (renderElement && renderElement.dom && renderElement.dom.firstChild) {
-                Ext.fly(renderElement.dom.firstChild).remove();
+            if (map) {
+                gm.event.clearInstanceListeners(map);
             }
 
-            if (me.map) {
-                gm.event.clearInstanceListeners(me.map);
-            }
+            me.setMap(new gm.Map(element.dom, mapOptions));
+            map = me.getMap();
 
-            me.map = new gm.Map(renderElement.dom, mapOptions);
-
-            event = gm.event;
             //Track zoomLevel and mapType changes
-            event.addListener(me.map, 'zoom_changed', Ext.bind(me.onZoomChange, me));
-            event.addListener(me.map, 'maptypeid_changed', Ext.bind(me.onTypeChange, me));
-            event.addListener(me.map, 'center_changed', Ext.bind(me.onCenterChange, me));
+            event = gm.event;
+            event.addListener(map, 'zoom_changed', Ext.bind(me.onZoomChange, me));
+            event.addListener(map, 'maptypeid_changed', Ext.bind(me.onTypeChange, me));
+            event.addListener(map, 'center_changed', Ext.bind(me.onCenterChange, me));
 
-            me.fireEvent('maprender', me, me.map);
+            me.fireEvent('maprender', me, map);
         }
-
     },
 
     // @private
-    onGeoUpdate: function(coords) {
+    onGeoUpdate: function(geo) {
         var center;
-        if (coords) {
-            center = this.getMapOptions().center = new google.maps.LatLng(coords.latitude, coords.longitude);
+        if (geo) {
+            center = this.getMapOptions().center = new google.maps.LatLng(geo.getLatitude(), geo.getLongitude());
         }
 
-        this.update(center);
+        this.setHtml(center);
     },
 
     // @private
@@ -196,9 +208,8 @@ Ext.define('Ext.Map', {
 
     // @private
     onUpdate: function(map, e, options) {
-        this.update((options || {}).data);
+        this.setHtml((options || {}).data);
     },
-
 
     /**
      * Moves the map center to the designated coordinates hash of the form:
@@ -212,25 +223,23 @@ Ext.define('Ext.Map', {
      */
     update: function(coordinates) {
         var me = this,
+            map = me.getMap(),
             gm = (window.google || {}).maps;
 
         if (gm) {
-            coordinates = coordinates || me.getCoords() || new gm.LatLng(37.381592, -122.135672);
+            coordinates = coordinates || new gm.LatLng(37.381592, -122.135672);
 
             if (coordinates && !(coordinates instanceof gm.LatLng) && 'longitude' in coordinates) {
                 coordinates = new gm.LatLng(coordinates.latitude, coordinates.longitude);
             }
 
-            if (!me.getHidden()) {
-                if (!me.map) {
-                    me.renderMap();
-                }
-                if (me.map && coordinates instanceof gm.LatLng) {
-                    me.map.panTo(coordinates);
-                }
+            if (!map) {
+                me.renderMap();
+                map = me.getMap();
             }
-            else {
-                me.on('painted', me.onUpdate, me, {single: true, data: coordinates});
+
+            if (map && coordinates instanceof gm.LatLng) {
+                map.panTo(coordinates);
             }
         }
     },
@@ -239,6 +248,7 @@ Ext.define('Ext.Map', {
     onZoomChange : function() {
         var mapOptions = this.getMapOptions(),
             map = this.getMap();
+
         mapOptions.zoom = (map && map.getZoom) ? map.getZoom() : mapOptions.zoom || 10;
 
         this.fireEvent('zoomchange', this, map, mapOptions.zoom);
@@ -248,6 +258,7 @@ Ext.define('Ext.Map', {
     onTypeChange : function() {
         var mapOptions = this.getMapOptions(),
             map = this.getMap();
+
         mapOptions.mapTypeId = (map && map.getMapTypeId) ? map.getMapTypeId() : mapOptions.mapTypeId;
 
         this.fireEvent('typechange', this, map, mapOptions.mapTypeId);
@@ -257,6 +268,7 @@ Ext.define('Ext.Map', {
     onCenterChange: function() {
         var mapOptions = this.getMapOptions(),
             map = this.getMap();
+
         mapOptions.center = (map && map.getCenter) ? map.getCenter() : mapOptions.center;
 
         this.fireEvent('centerchange', this, map, mapOptions.center);
@@ -265,13 +277,17 @@ Ext.define('Ext.Map', {
 
     // @private
     onDestroy: function() {
-        Ext.destroy(this.geo);
-        if (this.maskMap && this.mask) {
-            this.el.unmask();
+        Ext.destroy(this.getGeo());
+        var map = this.getMap();
+
+        if (this.getMaskMap() && this.mask) {
+            this.element.unmask();
         }
-        if (this.map && (window.google || {}).maps) {
-            google.maps.event.clearInstanceListeners(this.map);
+
+        if (map && (window.google || {}).maps) {
+            google.maps.event.clearInstanceListeners(map);
         }
+
         this.callParent();
     }
 }, function() {

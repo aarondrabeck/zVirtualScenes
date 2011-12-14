@@ -43,6 +43,8 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_option_0", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_option", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_option), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_1", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_0", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_value_triggers_0", "device_values", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_values), "device_value_triggers", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_value_triggers), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_device_value_triggers_01", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(zVirtualScenesCommon.Entity.scene), "device_value_triggers", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_value_triggers), true)]
 
 #endregion
 
@@ -509,6 +511,22 @@ namespace zVirtualScenesCommon.Entity
             }
         }
         private ObjectSet<scheduled_tasks> _scheduled_tasks;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<device_value_triggers> device_value_triggers
+        {
+            get
+            {
+                if ((_device_value_triggers == null))
+                {
+                    _device_value_triggers = base.CreateObjectSet<device_value_triggers>("device_value_triggers");
+                }
+                return _device_value_triggers;
+            }
+        }
+        private ObjectSet<device_value_triggers> _device_value_triggers;
 
         #endregion
         #region AddTo Methods
@@ -719,6 +737,14 @@ namespace zVirtualScenesCommon.Entity
         public void AddToscheduled_tasks(scheduled_tasks scheduled_tasks)
         {
             base.AddObject("scheduled_tasks", scheduled_tasks);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the device_value_triggers EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddTodevice_value_triggers(device_value_triggers device_value_triggers)
+        {
+            base.AddObject("device_value_triggers", device_value_triggers);
         }
 
         #endregion
@@ -3962,6 +3988,288 @@ namespace zVirtualScenesCommon.Entity
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="zvsModel", Name="device_value_triggers")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class device_value_triggers : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new device_value_triggers object.
+        /// </summary>
+        /// <param name="id">Initial value of the id property.</param>
+        /// <param name="device_value_id">Initial value of the device_value_id property.</param>
+        /// <param name="enabled">Initial value of the enabled property.</param>
+        public static device_value_triggers Createdevice_value_triggers(global::System.Int64 id, global::System.Int64 device_value_id, global::System.Boolean enabled)
+        {
+            device_value_triggers device_value_triggers = new device_value_triggers();
+            device_value_triggers.id = id;
+            device_value_triggers.device_value_id = device_value_id;
+            device_value_triggers.enabled = enabled;
+            return device_value_triggers;
+        }
+
+        #endregion
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int64 id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                if (_id != value)
+                {
+                    OnidChanging(value);
+                    ReportPropertyChanging("id");
+                    _id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("id");
+                    OnidChanged();
+                }
+            }
+        }
+        private global::System.Int64 _id;
+        partial void OnidChanging(global::System.Int64 value);
+        partial void OnidChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int64 device_value_id
+        {
+            get
+            {
+                return _device_value_id;
+            }
+            set
+            {
+                Ondevice_value_idChanging(value);
+                ReportPropertyChanging("device_value_id");
+                _device_value_id = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("device_value_id");
+                Ondevice_value_idChanged();
+            }
+        }
+        private global::System.Int64 _device_value_id;
+        partial void Ondevice_value_idChanging(global::System.Int64 value);
+        partial void Ondevice_value_idChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int32> trigger_operator
+        {
+            get
+            {
+                return _trigger_operator;
+            }
+            set
+            {
+                Ontrigger_operatorChanging(value);
+                ReportPropertyChanging("trigger_operator");
+                _trigger_operator = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("trigger_operator");
+                Ontrigger_operatorChanged();
+            }
+        }
+        private Nullable<global::System.Int32> _trigger_operator;
+        partial void Ontrigger_operatorChanging(Nullable<global::System.Int32> value);
+        partial void Ontrigger_operatorChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String trigger_value
+        {
+            get
+            {
+                return _trigger_value;
+            }
+            set
+            {
+                Ontrigger_valueChanging(value);
+                ReportPropertyChanging("trigger_value");
+                _trigger_value = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("trigger_value");
+                Ontrigger_valueChanged();
+            }
+        }
+        private global::System.String _trigger_value;
+        partial void Ontrigger_valueChanging(global::System.String value);
+        partial void Ontrigger_valueChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Boolean enabled
+        {
+            get
+            {
+                return _enabled;
+            }
+            set
+            {
+                OnenabledChanging(value);
+                ReportPropertyChanging("enabled");
+                _enabled = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("enabled");
+                OnenabledChanged();
+            }
+        }
+        private global::System.Boolean _enabled;
+        partial void OnenabledChanging(global::System.Boolean value);
+        partial void OnenabledChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String Name
+        {
+            get
+            {
+                return _Name;
+            }
+            set
+            {
+                OnNameChanging(value);
+                ReportPropertyChanging("Name");
+                _Name = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("Name");
+                OnNameChanged();
+            }
+        }
+        private global::System.String _Name;
+        partial void OnNameChanging(global::System.String value);
+        partial void OnNameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Int64> scene_id
+        {
+            get
+            {
+                return _scene_id;
+            }
+            set
+            {
+                Onscene_idChanging(value);
+                ReportPropertyChanging("scene_id");
+                _scene_id = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("scene_id");
+                Onscene_idChanged();
+            }
+        }
+        private Nullable<global::System.Int64> _scene_id;
+        partial void Onscene_idChanging(Nullable<global::System.Int64> value);
+        partial void Onscene_idChanged();
+
+        #endregion
+    
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_value_triggers_0", "device_values")]
+        public device_values device_values
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_values>("zvsModel.FK_device_value_triggers_0", "device_values").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_values>("zvsModel.FK_device_value_triggers_0", "device_values").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<device_values> device_valuesReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<device_values>("zvsModel.FK_device_value_triggers_0", "device_values");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device_values>("zvsModel.FK_device_value_triggers_0", "device_values", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_value_triggers_01", "scene")]
+        public scene scene
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_device_value_triggers_01", "scene").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_device_value_triggers_01", "scene").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<scene> sceneReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<scene>("zvsModel.FK_device_value_triggers_01", "scene");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<scene>("zvsModel.FK_device_value_triggers_01", "scene", value);
+                }
+            }
+        }
+
+        #endregion
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
     [EdmEntityTypeAttribute(NamespaceName="zvsModel", Name="device_values")]
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
@@ -4242,6 +4550,28 @@ namespace zVirtualScenesCommon.Entity
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<device>("zvsModel.FK_device_values_0", "device", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_value_triggers_0", "device_value_triggers")]
+        public EntityCollection<device_value_triggers> device_value_triggers
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_value_triggers>("zvsModel.FK_device_value_triggers_0", "device_value_triggers");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_value_triggers>("zvsModel.FK_device_value_triggers_0", "device_value_triggers", value);
                 }
             }
         }
@@ -5332,6 +5662,28 @@ namespace zVirtualScenesCommon.Entity
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<scene_property_value>("zvsModel.FK_scene_property_value_0", "scene_property_value", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_value_triggers_01", "device_value_triggers")]
+        public EntityCollection<device_value_triggers> device_value_triggers
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<device_value_triggers>("zvsModel.FK_device_value_triggers_01", "device_value_triggers");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_value_triggers>("zvsModel.FK_device_value_triggers_01", "device_value_triggers", value);
                 }
             }
         }
