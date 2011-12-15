@@ -875,7 +875,7 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            Console.WriteLine("OpenZWave Plugin | [Node Protocol Info] " + node.Label);  
+                            WriteToLog(Urgency.INFO, "OpenZWave Plugin | [Node Protocol Info] " + node.Label);
 
                             switch (node.Label)
                             {
@@ -943,6 +943,11 @@ namespace OpenZWavePlugin
                                     deviceName = "OpenZWave Sensor " + node.ID;
                                     device_type = GetDeviceType("SENSOR");
                                     break;
+                                default:
+                                    {
+                                        WriteToLog(Urgency.INFO, "OpenZWave Plugin | [Node Label] " + node.Label);
+                                        break;
+                                    }
                             }
                             if (device_type != null)
                             {               
