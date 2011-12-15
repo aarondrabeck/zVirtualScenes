@@ -940,6 +940,7 @@ namespace OpenZWavePlugin
                                 case "Basic Zensor Smoke Sensor":
                                 case "Zensor Smoke Sensor":
                                 case "Advanced Zensor Smoke Sensor":
+                                case "Routing Binary Sensor": 
                                     deviceName = "OpenZWave Sensor " + node.ID;
                                     device_type = GetDeviceType("SENSOR");
                                     break;
