@@ -43,7 +43,7 @@ namespace zVirtualScenesCommon.Entity
                     {
                         case command_types.builtin:
                             {
-                                builtin_commands bc = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.id == this.command_id);
+                                builtin_commands bc = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == this.command_id);
                                 if (bc != null)
                                     return bc.friendly_name;
                                 break;
@@ -51,7 +51,7 @@ namespace zVirtualScenesCommon.Entity
                         case command_types.device_command:
                         case command_types.device_type_command:
                             {
-                                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == this.device_id);
+                                device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == this.device_id);
                                 if (d != null)
                                     return d.friendly_name;
                                 break;
@@ -69,7 +69,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     case command_types.builtin:
                         {
-                            builtin_commands bc = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.id == this.command_id);
+                            builtin_commands bc = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == this.command_id);
                             if (bc != null)
                             {
                                 switch (bc.name)
@@ -79,7 +79,7 @@ namespace zVirtualScenesCommon.Entity
                                             long d_id = 0;
                                             long.TryParse(this.arg, out d_id);
 
-                                            device device_to_repoll = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.id == d_id);
+                                            device device_to_repoll = zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.id == d_id);
                                             if (device_to_repoll != null && d_id > 0)
                                             {
                                                 return device_to_repoll.friendly_name;
@@ -94,7 +94,7 @@ namespace zVirtualScenesCommon.Entity
                                         {
                                             long g_id = 0;
                                             long.TryParse(this.arg, out g_id);
-                                            group g = zvsEntityControl.zvsContext.groups.SingleOrDefault(gr => gr.id == g_id);
+                                            group g = zvsEntityControl.zvsContext.groups.FirstOrDefault(gr => gr.id == g_id);
 
                                             if (g != null)
                                                 return g.name;
@@ -108,7 +108,7 @@ namespace zVirtualScenesCommon.Entity
                         }
                     case command_types.device_command:
                         {
-                            device_commands bc = zvsEntityControl.zvsContext.device_commands.SingleOrDefault(c => c.id == this.command_id);
+                            device_commands bc = zvsEntityControl.zvsContext.device_commands.FirstOrDefault(c => c.id == this.command_id);
                             if (bc != null)
                             {                                
                                 switch ((Data_Types)bc.arg_data_type)
@@ -129,7 +129,7 @@ namespace zVirtualScenesCommon.Entity
                         }
                     case command_types.device_type_command:
                         {
-                            device_type_commands bc = zvsEntityControl.zvsContext.device_type_commands.SingleOrDefault(c => c.id == this.command_id);
+                            device_type_commands bc = zvsEntityControl.zvsContext.device_type_commands.FirstOrDefault(c => c.id == this.command_id);
                             if (bc != null)
                             {
                                 switch ((Data_Types)bc.arg_data_type)

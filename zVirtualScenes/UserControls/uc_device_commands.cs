@@ -44,7 +44,7 @@ namespace zVirtualScenesApplication.UserControls
             {
                 //get the current value from the value table list
                 string current_value = string.Empty;
-                device_values dv = d_cmd.device.device_values.SingleOrDefault(v => v.value_id == d_cmd.custom_data2);
+                device_values dv = d_cmd.device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
                 if (dv != null)
                     current_value = dv.value;
 

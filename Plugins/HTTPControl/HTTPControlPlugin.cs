@@ -211,7 +211,8 @@ namespace HTTPControl
                                                         "/zVirtualScene?cmd=ListDevices",
                                                         "/zVirtualScene?cmd=ListScenes",    
                                                         "/zVirtualScene?cmd=GetDeviceCommands&deviceID=",
-                                                        "/zVirtualScene?cmd=GetBuiltinCommands"};
+                                                        "/zVirtualScene?cmd=GetBuiltinCommands",
+                                                        "/zVirtualScene?cmd=ListDeviceValues&deviceID=",  };
 
             #region RUN SCENE
             if (rawURL.Contains(acceptedCMDs[0]))
@@ -221,7 +222,7 @@ namespace HTTPControl
 
                 if (sceneID > 0)
                 {
-                    scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == sceneID);
+                    scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sceneID);
 
                     if (scene != null)
                     {
@@ -267,10 +268,10 @@ namespace HTTPControl
                     return result;
                 }
 
-                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
                 if (d != null)
                 {
-                    device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == "DYNAMIC_CMD_BASIC");
+                    device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == "DYNAMIC_CMD_BASIC");
                     if (cmd != null)
                     {  
                         device_command_que.Run(new device_command_que
@@ -327,10 +328,10 @@ namespace HTTPControl
                 {
                     case "device":
                         {
-                            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
                             if (d != null)
                             {
-                                device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == command);
+                                device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == command);
                                 if (cmd != null)
                                 {
                                     device_command_que.Run(new device_command_que
@@ -355,10 +356,10 @@ namespace HTTPControl
                         }
                     case "device_type":
                         {
-                            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
                             if (d != null)
                             {
-                                device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == command);
+                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == command);
                                 if (cmd != null)
                                 {
                                     device_type_command_que.Run(new device_type_command_que
@@ -383,7 +384,7 @@ namespace HTTPControl
                         }
                     case "builtin":
                         {
-                            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == command);
+                            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == command);
                             if (cmd != null)
                             {
                                 builtin_command_que.Run(new builtin_command_que
@@ -475,7 +476,7 @@ namespace HTTPControl
                 int dId = 0;
                 int.TryParse(rawURL.Remove(0, acceptedCMDs[5].Length), out dId);
 
-                device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dId);
+                device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dId);
                 if (d != null)
                 {
                     List<zvsCommand> zvscommands = new List<zvsCommand>();
@@ -555,6 +556,52 @@ namespace HTTPControl
                 
             }
             #endregion
+
+            #region Get Device Commands
+            if (rawURL.Contains(acceptedCMDs[7]))
+            {
+                int dId = 0;
+                int.TryParse(rawURL.Remove(0, acceptedCMDs[7].Length), out dId);
+
+                device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dId);
+                if (d != null)
+                {
+                    List<zvsValues> zvsvalues = new List<zvsValues>();
+                    foreach (device_values val in d.device_values)
+                    {
+                        zvsvalues.Add(new zvsValues
+                        {
+                            id = val.id,
+                            genre = val.genre,
+                            index = val.index,
+                            label_name = val.label_name,
+                            type = val.type,
+                            value = val.value,
+                            value_id = val.value_id
+                        });
+                    }                   
+
+                    XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
+                    xmlwritersettings.NewLineHandling = NewLineHandling.None;
+                    xmlwritersettings.Indent = false;
+
+                    StringWriter devices = new StringWriter();
+                    XmlSerializer DevicetoXML = new System.Xml.Serialization.XmlSerializer(zvsvalues.GetType());
+                    DevicetoXML.Serialize(XmlWriter.Create(devices, xmlwritersettings), zvsvalues);
+                    result.HadError = false;
+                    result.Description = devices.ToString();
+                    result.DescriptionIsXML = true;
+                    return result;
+                }
+                else
+                {
+                    result.HadError = true;
+                    result.Description = "Device ID not vaild.";
+                    return result;
+                }
+            }
+            #endregion
+            
                      
             return result;
         }

@@ -16,7 +16,7 @@ namespace zVirtualScenesCommon.Entity
 
         public static void InstallBuiltInCommand(builtin_commands c)
         {
-            builtin_commands existing_c = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(cmd => cmd.name == c.name);
+            builtin_commands existing_c = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(cmd => cmd.name == c.name);
             if (existing_c == null)
             {
                 zvsEntityControl.zvsContext.builtin_commands.AddObject(c);

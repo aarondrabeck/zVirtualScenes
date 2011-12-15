@@ -15,7 +15,7 @@ namespace zVirtualScenesCommon.Entity
         {
             if (p != null)
             {
-                scene_property existing_property = zvsEntityControl.zvsContext.scene_property.SingleOrDefault(ep => ep.name == p.name);
+                scene_property existing_property = zvsEntityControl.zvsContext.scene_property.FirstOrDefault(ep => ep.name == p.name);
 
                 if (existing_property == null)
                 {

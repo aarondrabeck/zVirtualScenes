@@ -33,7 +33,7 @@ namespace zVirtualScenesApplication.UserControls
                 int top = 5;
 
                 #region Populate Builtin Settings
-                Plugin zvsPlugin = this.mainForm.pm.GetPlugins().SingleOrDefault(pl => pl.Name == p.name);
+                Plugin zvsPlugin = this.mainForm.pm.GetPlugins().FirstOrDefault(pl => pl.Name == p.name);
 
                 if (zvsPlugin != null)
                 {

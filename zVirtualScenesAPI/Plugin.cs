@@ -25,7 +25,7 @@ namespace zVirtualScenesAPI
 
             using (var context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                plugin pl = context.plugins.SingleOrDefault(p => p.name == this._name);
+                plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
 
                 if (pl != null)
                 {
@@ -58,7 +58,7 @@ namespace zVirtualScenesAPI
             {
                 using (var context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    plugin pl = context.plugins.SingleOrDefault(p => p.name == this._name);
+                    plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
 
                     if (pl != null)
                         return pl.enabled;
@@ -70,7 +70,7 @@ namespace zVirtualScenesAPI
             {
                 using (var context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    plugin pl = context.plugins.SingleOrDefault(p => p.name == this._name);
+                    plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
 
                     if (pl != null)
                     {
@@ -104,10 +104,10 @@ namespace zVirtualScenesAPI
 
         public void DefineOrUpdateDeviceValue(device_values dv)
         {
-            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dv.device_id);
+            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dv.device_id);
             if (d != null)
             {
-                device_values existing_dv = d.device_values.SingleOrDefault(o => o.value_id == dv.value_id);
+                device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == dv.value_id);
 
                 if (existing_dv == null)
                 {
@@ -130,10 +130,10 @@ namespace zVirtualScenesAPI
         public void DefineOrUpdateSetting(plugin_settings ps)
         {
 
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
                 if (pl != null)
                 {
-                    plugin_settings existing_ps = pl.plugin_settings.SingleOrDefault(pls => pls.name == ps.name);
+                    plugin_settings existing_ps = pl.plugin_settings.FirstOrDefault(pls => pls.name == ps.name);
                     if (existing_ps == null)
                     {
                         pl.plugin_settings.Add(ps);
@@ -153,10 +153,10 @@ namespace zVirtualScenesAPI
         public void SetSetting(string settingName, string settingValue)
         {
 
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                plugin_settings ps = pl.plugin_settings.SingleOrDefault(p => p.name == settingName);
+                plugin_settings ps = pl.plugin_settings.FirstOrDefault(p => p.name == settingName);
                 if (ps != null)
                 {
                     ps.value = settingValue;
@@ -168,10 +168,10 @@ namespace zVirtualScenesAPI
 
         public string GetSettingValue(string settingName)
         {
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                plugin_settings ps = pl.plugin_settings.SingleOrDefault(p => p.name == settingName);
+                plugin_settings ps = pl.plugin_settings.FirstOrDefault(p => p.name == settingName);
                 if (ps != null)
                 {
                     return ps.value;
@@ -183,11 +183,11 @@ namespace zVirtualScenesAPI
 
         //public void DefineDevice(device dt)
         //{
-        //    plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+        //    plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             
         //    if (pl != null)
         //    {
-        //        device existing_device = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.node_id == dt.node_id && d.device_types.plugin.name == pl.name);
+        //        device existing_device = zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.node_id == dt.node_id && d.device_types.plugin.name == pl.name);
 
         //        if (existing_device == null)
         //        {
@@ -200,7 +200,7 @@ namespace zVirtualScenesAPI
 
         public IQueryable<device> GetDevices()
         {
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
                 return zvsEntityControl.zvsContext.devices.Where(d => d.device_types.plugin.name == pl.name); 
@@ -211,11 +211,11 @@ namespace zVirtualScenesAPI
         public void DefineOrUpdateDeviceType(device_types dt)
         {
 
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
                 //Does device type exist? 
-                device_types existing_dt = pl.device_types.SingleOrDefault(d => d.name == dt.name);
+                device_types existing_dt = pl.device_types.FirstOrDefault(d => d.name == dt.name);
 
                 if (existing_dt == null)
                 {
@@ -228,7 +228,7 @@ namespace zVirtualScenesAPI
 
                     foreach (device_type_commands dtc in dt.device_type_commands)
                     {
-                        device_type_commands exsisting_dtc = existing_dt.device_type_commands.SingleOrDefault(d => d.name == dtc.name);
+                        device_type_commands exsisting_dtc = existing_dt.device_type_commands.FirstOrDefault(d => d.name == dtc.name);
 
                         if (exsisting_dtc == null)
                         {
@@ -263,10 +263,10 @@ namespace zVirtualScenesAPI
         {
 
 
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                group g = zvsEntityControl.zvsContext.groups.SingleOrDefault(gr => gr.id == GroupID);
+                group g = zvsEntityControl.zvsContext.groups.FirstOrDefault(gr => gr.id == GroupID);
                 if (g != null)
                 {
                     return g.group_devices.Where(gd => gd.device.device_types.plugin == pl).Select(d => d.device).AsQueryable(); 
@@ -278,10 +278,10 @@ namespace zVirtualScenesAPI
         public device_types GetDeviceType(string DeviceTypeName)
         {
 
-            plugin pl = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == this._name);
+            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                return pl.device_types.SingleOrDefault(dt => dt.name == DeviceTypeName);
+                return pl.device_types.FirstOrDefault(dt => dt.name == DeviceTypeName);
             }
 
             return null;
@@ -290,11 +290,11 @@ namespace zVirtualScenesAPI
         public void DefineOrUpdateDeviceCommand(device_commands dc)
         {
 
-            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dc.device_id);
+            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dc.device_id);
             if (d != null)
             {
                 //Does device type exist? 
-                device_commands existing_dc = d.device_commands.SingleOrDefault(c => c.name == dc.name);
+                device_commands existing_dc = d.device_commands.FirstOrDefault(c => c.name == dc.name);
 
                 if (existing_dc == null)
                 {

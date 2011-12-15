@@ -194,7 +194,7 @@ namespace zvsMobile
                         long.TryParse(context.Request.QueryString["id"], out id);
                         if (id > 0)
                         {
-                            device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == id);
+                            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
 
                             if (d != null)
                             {
@@ -218,13 +218,13 @@ namespace zvsMobile
                                     type_txt = d.device_types.friendly_name,
                                     last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
                                     groups = d.GetGroups,
-                                    mode = d.device_values.SingleOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Mode").value,
-                                    fan_mode = d.device_values.SingleOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Fan Mode").value,
-                                    op_state = d.device_values.SingleOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Operating State").value,
-                                    fan_state = d.device_values.SingleOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Fan State").value,
-                                    heat_p = d.device_values.SingleOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Heating 1").value,
-                                    cool_p = d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Cooling 1").value,
-                                    esm = d.device_values.SingleOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.SingleOrDefault(o => o.label_name == "Basic").value
+                                    mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value,
+                                    fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value,
+                                    op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value,
+                                    fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value,
+                                    heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1").value,
+                                    cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1").value,
+                                    esm = d.device_values.FirstOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Basic").value
                                 };
                                 data = context.Request.QueryString["callback"] + "(" + js.Serialize(details) + ");";
                             }
@@ -247,10 +247,10 @@ namespace zvsMobile
                             {
                                 case "device":
                                     {
-                                        device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                                        device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
                                         if (d != null)
                                         {
-                                            device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == command);
+                                            device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == command);
                                             if (cmd != null)
                                             {
                                                 device_command_que.Run(new device_command_que
@@ -267,10 +267,10 @@ namespace zvsMobile
                                     }
                                 case "device_type":
                                     {
-                                        device d = zvsEntityControl.zvsContext.devices.SingleOrDefault(o => o.id == dID);
+                                        device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
                                         if (d != null)
                                         {
-                                            device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == command);
+                                            device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == command);
                                             if (cmd != null)
                                             {
                                                 device_type_command_que.Run(new device_type_command_que
@@ -286,7 +286,7 @@ namespace zvsMobile
                                     }
                                 case "builtin":
                                     {
-                                        builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == command);
+                                        builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == command);
                                         if (cmd != null)
                                         {
                                             builtin_command_que.Run(new builtin_command_que
@@ -322,7 +322,7 @@ namespace zvsMobile
                         long sID = 0;
                         long.TryParse(context.Request.QueryString["id"], out sID);
 
-                        scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == sID);
+                        scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sID);
 
                         if (scene != null)
                         {
@@ -352,7 +352,7 @@ namespace zvsMobile
                         long sID = 0;
                         long.TryParse(context.Request.QueryString["id"], out sID);
 
-                        scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == sID);
+                        scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sID);
 
                         if (scene != null)
                         {
@@ -384,7 +384,7 @@ namespace zvsMobile
                         long gID = 0;
                         long.TryParse(context.Request.QueryString["id"], out gID);
 
-                        group group = zvsEntityControl.zvsContext.groups.SingleOrDefault(g => g.id == gID);
+                        group group = zvsEntityControl.zvsContext.groups.FirstOrDefault(g => g.id == gID);
 
                         if (group != null)
                         {

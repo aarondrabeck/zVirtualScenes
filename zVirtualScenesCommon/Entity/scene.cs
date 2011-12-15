@@ -50,7 +50,7 @@ namespace zVirtualScenesCommon.Entity
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                scene _scene = context.scenes.SingleOrDefault(s => s.id == (long)e.Result);
+                scene _scene = context.scenes.FirstOrDefault(s => s.id == (long)e.Result);
                 if (_scene != null)
                 {
                     _scene.is_running = false;
@@ -71,7 +71,7 @@ namespace zVirtualScenesCommon.Entity
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 //Find Scene
-                scene _scene = context.scenes.SingleOrDefault(s => s.id == (long)e.Argument);
+                scene _scene = context.scenes.FirstOrDefault(s => s.id == (long)e.Argument);
                 if(_scene != null)
                 {
                     e.Result = (long)e.Argument;
@@ -82,7 +82,7 @@ namespace zVirtualScenesCommon.Entity
                         {
                             case command_types.builtin:
                                 {
-                                    builtin_commands cmd = context.builtin_commands.SingleOrDefault(c => c.id == sCMD.command_id);
+                                    builtin_commands cmd = context.builtin_commands.FirstOrDefault(c => c.id == sCMD.command_id);
                                     if (cmd != null)
                                     {
                                         if (cmd.name.Equals("TIMEDELAY"))

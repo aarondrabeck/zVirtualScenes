@@ -85,7 +85,7 @@ namespace zVirtualScenesApplication.PluginSystem
             {
                 using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    plugin ent_p = context.plugins.SingleOrDefault(pl => pl.name == p.Name);
+                    plugin ent_p = context.plugins.FirstOrDefault(pl => pl.name == p.Name);
                     if (ent_p == null)
                     {
                         ent_p = new plugin { name = p.Name, friendly_name = p.ToString() };
@@ -107,7 +107,7 @@ namespace zVirtualScenesApplication.PluginSystem
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device_type_command_que cmd = context.device_type_command_que.SingleOrDefault(c => c.id == device_type_command_que_id);
+                device_type_command_que cmd = context.device_type_command_que.FirstOrDefault(c => c.id == device_type_command_que_id);
 
                 if (cmd != null)
                 {
@@ -169,7 +169,7 @@ namespace zVirtualScenesApplication.PluginSystem
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device_command_que cmd = context.device_command_que.SingleOrDefault(c => c.id == device_command_que_id);
+                device_command_que cmd = context.device_command_que.FirstOrDefault(c => c.id == device_command_que_id);
 
                 if (cmd != null && cmd.device != null)
                 {
@@ -232,7 +232,7 @@ namespace zVirtualScenesApplication.PluginSystem
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
 
-                builtin_command_que cmd = context.builtin_command_que.SingleOrDefault(c => c.id == builtin_command_que_id);
+                builtin_command_que cmd = context.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
 
                 if (cmd != null)
                 {
@@ -244,7 +244,7 @@ namespace zVirtualScenesApplication.PluginSystem
                             {
                                 long d_id = 0;
                                 long.TryParse(cmd.arg, out d_id);
-                                device d = device.GetAllDevices(false).SingleOrDefault(o => o.id == d_id);
+                                device d = device.GetAllDevices(false).FirstOrDefault(o => o.id == d_id);
 
                                 if (d.device_types.plugin.enabled)
                                 {
@@ -314,7 +314,7 @@ namespace zVirtualScenesApplication.PluginSystem
 
         public Plugin GetPlugin(string pluginName)
         {
-            return _plugins.SingleOrDefault(p => p.Name == pluginName);
+            return _plugins.FirstOrDefault(p => p.Name == pluginName);
         }
     }
 }

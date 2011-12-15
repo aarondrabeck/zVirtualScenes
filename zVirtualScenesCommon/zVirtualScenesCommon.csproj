@@ -81,7 +81,6 @@
     <Compile Include="Util\Logger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\LogItem.cs" />
-    <Compile Include="Version.cs" />
   </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="Entity\zvsModel.edmx">

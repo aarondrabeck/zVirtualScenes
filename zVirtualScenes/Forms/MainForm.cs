@@ -210,7 +210,7 @@ namespace zVirtualScenesApplication
             {
                 using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    scene _scene = context.scenes.SingleOrDefault(s => s.id == scene_id);
+                    scene _scene = context.scenes.FirstOrDefault(s => s.id == scene_id);
                     if (_scene != null)
                     {
                         Logger.WriteToLog(Urgency.INFO, "Scene '" + _scene.friendly_name + "' has completed with " + ErrorCount + " errors.", "EVENT");
@@ -1089,7 +1089,7 @@ namespace zVirtualScenesApplication
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
             device d = (device)item.Tag;
 
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "REPOLL_ME");
+            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
             if (cmd != null)                         
                 cmd.Run(d.id.ToString());           
         }
@@ -1126,7 +1126,7 @@ namespace zVirtualScenesApplication
 
         private void manuallyRepollToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "REPOLL_ME");
+            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
             if (cmd != null)
             {
                 foreach (device selecteddevice in dataListViewDevices.SelectedObjects)
@@ -1136,7 +1136,7 @@ namespace zVirtualScenesApplication
 
         private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "REPOLL_ALL");
+            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
             if (cmd != null)
                 cmd.Run(); 
         }
@@ -1190,7 +1190,7 @@ namespace zVirtualScenesApplication
 
         private void repollAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "REPOLL_ALL");
+            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
             if (cmd != null)
                 cmd.Run(); 
         }
@@ -1286,7 +1286,7 @@ namespace zVirtualScenesApplication
         {
             if ((e.KeyCode == Keys.F5))
             {
-                builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == "REPOLL_ALL");
+                builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
                 if (cmd != null)                
                     cmd.Run();                  
             }
@@ -1314,48 +1314,56 @@ namespace zVirtualScenesApplication
                         switch ((scheduled_tasks.frequencys)task.Frequency)
                         {
                             case scheduled_tasks.frequencys.Seconds:
-                                if (task.StartTime.HasValue)
                                 {
-                                    int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                    if (sec % task.RecurSeconds == 0)
+                                    if (task.StartTime.HasValue)
                                     {
-                                        task.Run();
+                                        int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                        if (sec % task.RecurSeconds == 0)                                        
+                                            task.Run();                                        
                                     }
+                                    break;
                                 }
-                                break;
                             case scheduled_tasks.frequencys.Daily:
-                                if (task.StartTime.HasValue)
                                 {
-                                    if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
+                                    if (task.StartTime.HasValue)
                                     {
-                                        Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
-                                        if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
-                                            task.Run();
-                                    }
-                                }
-                                break;
-                            case scheduled_tasks.frequencys.Weekly:
-                                if (task.StartTime.HasValue)
-                                {
-                                    if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
-                                    {
-                                        if (ShouldRunToday(task))  //IF RUN THIS DAY 
+                                        //Console.WriteLine("totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
+                                        if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
                                         {
-                                            Double SecondsBetweenTime = (task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds;
+                                            Double SecondsBetweenTime = Math.Abs((task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds);
+                                            //Console.WriteLine("SecondsBetweenTime:" + SecondsBetweenTime);
                                             if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
                                                 task.Run();
                                         }
                                     }
+                                    break;
                                 }
-                                break;
-                            case scheduled_tasks.frequencys.Once:
-                                if (task.StartTime.HasValue)
+                            case scheduled_tasks.frequencys.Weekly:
                                 {
-                                    Double SecondsBetween = (DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                    if (SecondsBetween < 1 && SecondsBetween > 0)
-                                        task.Run();
+                                    if (task.StartTime.HasValue)
+                                    {
+                                        if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
+                                        {
+                                            if (ShouldRunToday(task))  //IF RUN THIS DAY 
+                                            {
+                                                Double SecondsBetweenTime = Math.Abs((task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds);
+                                                if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                                    task.Run();
+                                            }
+                                        }
+                                    }
+                                    break;
                                 }
-                                break;
+                            case scheduled_tasks.frequencys.Once:
+                                {
+                                    if (task.StartTime.HasValue)
+                                    {
+                                        Double SecondsBetween = Math.Abs((DateTime.Now - task.StartTime.Value).TotalSeconds);
+                                        if (SecondsBetween < 1 && SecondsBetween > 0)
+                                            task.Run();
+                                    }
+                                    break;
+                                }
                         }
                     }
                 }
@@ -1495,7 +1503,7 @@ namespace zVirtualScenesApplication
             checkBox_RecurSunday.Checked = Task.RecurSunday.Value;
 
             //Look for Scene, if it was deleted then set index to -1
-            scene selected_scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == Task.Scene_id);
+            scene selected_scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == Task.Scene_id);
             if(selected_scene != null)
                 comboBox_ActionsTask.SelectedItem = selected_scene;
             else

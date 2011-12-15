@@ -78,7 +78,7 @@ namespace zVirtualScenesApplication
 
                 if (mi.Group.Equals("Plugins"))
                 {
-                    plugin plgin = zvsEntityControl.zvsContext.plugins.SingleOrDefault(p => p.name == mi.API);
+                    plugin plgin = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == mi.API);
                     if (plgin != null)
                     {
                         uc_plugin_properties_form1.PopulatePluginSettings(plgin, _mainForm);

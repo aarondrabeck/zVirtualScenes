@@ -40,7 +40,7 @@ namespace zVirtualScenesApplication.UserControls
             {
                 case "DIMMER":
                     {
-                        device_values dv_basic = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                        device_values dv_basic = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         
                         if (dv_basic != null)
                         {
@@ -59,7 +59,7 @@ namespace zVirtualScenesApplication.UserControls
                     }
                 case "SWITCH":
                     {
-                        device_values dv_basic = d.device_values.SingleOrDefault(v=>v.label_name=="Basic");
+                        device_values dv_basic = d.device_values.FirstOrDefault(v=>v.label_name=="Basic");
                         if (dv_basic != null)
                         {
                             int level = 0;
@@ -80,7 +80,7 @@ namespace zVirtualScenesApplication.UserControls
                             uc_object_values_grid1.Visible = true;                                
                             pictureBoxMain.Image = zVirtualScenesApplication.Properties.Resources.thermometer;
                                 
-                            device_values dv_temp = d.device_values.SingleOrDefault(v=>v.label_name=="Temperature");
+                            device_values dv_temp = d.device_values.FirstOrDefault(v=>v.label_name=="Temperature");
                             if (dv_temp != null)
                             {
                                 int temp = 0;
@@ -98,6 +98,12 @@ namespace zVirtualScenesApplication.UserControls
                         {                            
                             uc_object_values_grid1.Visible = true;
                             pictureBoxMain.Image = zVirtualScenesApplication.Properties.Resources.doorlock;
+                            break;
+                        }
+                case "SENSOR":
+                        {
+                            uc_object_values_grid1.Visible = true;
+                            pictureBoxMain.Image = zVirtualScenesApplication.Properties.Resources.sensor_128;
                             break;
                         }
                 default:                    

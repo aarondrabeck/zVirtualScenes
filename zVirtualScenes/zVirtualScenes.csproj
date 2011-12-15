@@ -390,6 +390,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
+    <None Include="Resources\sensor_128.png" />
     <None Include="Resources\arrow_equal.gif" />
     <None Include="Resources\equal.png" />
     <None Include="Resources\task.png" />

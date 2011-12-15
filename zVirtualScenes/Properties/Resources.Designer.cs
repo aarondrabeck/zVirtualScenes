@@ -172,6 +172,13 @@ namespace zVirtualScenesApplication.Properties {
             }
         }
         
+        internal static System.Drawing.Bitmap sensor_128 {
+            get {
+                object obj = ResourceManager.GetObject("sensor_128", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
         internal static System.Drawing.Bitmap switch_32 {
             get {
                 object obj = ResourceManager.GetObject("switch_32", resourceCulture);

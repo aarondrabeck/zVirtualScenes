@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="zvsValues.cs" />
     <Compile Include="zvsCommand.cs" />
     <Compile Include="HTTPCMDResult.cs" />
     <Compile Include="zvsDevice.cs" />

@@ -27,7 +27,7 @@ namespace zVirtualScenesCommon.Entity
 
         public void Run()
         {
-            scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == this.Scene_id);
+            scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == this.Scene_id);
             if (scene != null)
             {
                 string result = scene.RunScene();

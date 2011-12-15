@@ -200,7 +200,7 @@ namespace LightSwitchPlugin
 
         void zvsEntityControl_SceneRunCompleteEvent(long scene_id, int ErrorCount)
         {
-            scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == scene_id);
+            scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == scene_id);
             if (scene != null)
             {
                 BroadcastMessage("MSG~" + "Scene '" + scene.friendly_name + "' has completed with " + ErrorCount + " errors." + Environment.NewLine);
@@ -476,10 +476,10 @@ namespace LightSwitchPlugin
                                         long groupId = long.TryParse(values[1], out groupId) ? groupId : 0;
                                         string cmd_name = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
 
-                                        group g = zvsEntityControl.zvsContext.groups.SingleOrDefault(o=> o.id == groupId);
+                                        group g = zvsEntityControl.zvsContext.groups.FirstOrDefault(o=> o.id == groupId);
                                         if (g != null)
                                         {
-                                            builtin_commands zvs_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.name == cmd_name);
+                                            builtin_commands zvs_cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == cmd_name);
                                             if (zvs_cmd != null)
                                             {
                                                 string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.friendly_name, g.name);
@@ -599,7 +599,7 @@ namespace LightSwitchPlugin
                 case "SWITCH":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                        device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
                             int.TryParse(dv.value, out level);
 
@@ -608,7 +608,7 @@ namespace LightSwitchPlugin
                 case "DIMMER":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                        device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
                             int.TryParse(dv.value, out level);
 
@@ -617,7 +617,7 @@ namespace LightSwitchPlugin
                 case "THERMOSTAT":
                     {
                         int temp = 0;
-                        device_values dv_temp = d.device_values.SingleOrDefault(v => v.label_name == "Temperature");
+                        device_values dv_temp = d.device_values.FirstOrDefault(v => v.label_name == "Temperature");
                         if (dv_temp != null)
                             int.TryParse(dv_temp.value, out temp);
 
@@ -626,7 +626,7 @@ namespace LightSwitchPlugin
                 case "SENSOR":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.SingleOrDefault(v => v.label_name == "Basic");
+                        device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
                             int.TryParse(dv.value, out level);
 
@@ -691,7 +691,7 @@ namespace LightSwitchPlugin
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device d = context.devices.SingleOrDefault(o => o.id == device_id);
+                device d = context.devices.FirstOrDefault(o => o.id == device_id);
 
                 if (d != null)
                 {
@@ -700,7 +700,7 @@ namespace LightSwitchPlugin
                         case "SWITCH":
                             {
                                 string cmd_name = (Level == 0 ? "TURNOFF" : "TURNON");
-                                device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == cmd_name);
+                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == cmd_name);
                                 if (cmd != null)
                                 {
                                     string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.friendly_name, d.friendly_name);
@@ -736,7 +736,7 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void ExecuteZVSCommand(long SceneID, Socket Client)
         {
-            scene scene = zvsEntityControl.zvsContext.scenes.SingleOrDefault(s => s.id == SceneID);
+            scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == SceneID);
             if (scene != null)
             {
                 string result = scene.RunScene();   
@@ -747,7 +747,7 @@ namespace LightSwitchPlugin
 
         private bool ExecuteDynamicCMD(device d, string device_cmd_name, string arg, Socket Client)
         {
-            device_commands cmd = d.device_commands.SingleOrDefault(c => c.name == device_cmd_name);
+            device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == device_cmd_name);
             if (cmd != null)
             {
                 string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.friendly_name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.friendly_name);
@@ -769,7 +769,7 @@ namespace LightSwitchPlugin
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device d = context.devices.SingleOrDefault(o => o.id == deviceID);
+                device d = context.devices.FirstOrDefault(o => o.id == deviceID);
 
                 if (d != null && d.device_types.name.Equals("THERMOSTAT"))
                 {
@@ -798,7 +798,7 @@ namespace LightSwitchPlugin
 
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device d = context.devices.SingleOrDefault(o => o.id == deviceID);
+                device d = context.devices.FirstOrDefault(o => o.id == deviceID);
 
                 if (d != null && d.device_types.name.Equals("THERMOSTAT"))
                 {
@@ -842,7 +842,7 @@ namespace LightSwitchPlugin
                             }
                         case 6:
                             {                               
-                                device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == "SETENERGYMODE");
+                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == "SETENERGYMODE");
                                 if (cmd != null)
                                 {
                                     WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.friendly_name + " on " + d.friendly_name + ".");
@@ -861,7 +861,7 @@ namespace LightSwitchPlugin
                             }
                             case 7:
                             {                               
-                                device_type_commands cmd = d.device_types.device_type_commands.SingleOrDefault(c => c.name == "SETCONFORTMODE");
+                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == "SETCONFORTMODE");
                                 if (cmd != null)
                                 {
                                     WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command" + cmd.friendly_name + " on " + d.friendly_name + ".");

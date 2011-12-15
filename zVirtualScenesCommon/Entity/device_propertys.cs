@@ -15,7 +15,7 @@ namespace zVirtualScenesCommon.Entity
         public static void DefineOrUpdateDeviceProperty(device_propertys dp)
         {
 
-            device_propertys existing_dp = zvsEntityControl.zvsContext.device_propertys.SingleOrDefault(d => d.name == dp.name);
+            device_propertys existing_dp = zvsEntityControl.zvsContext.device_propertys.FirstOrDefault(d => d.name == dp.name);
 
             if (existing_dp == null)
             {

@@ -50,7 +50,7 @@ namespace zVirtualScenesApplication.Forms
                             radioBtnDeviceCMD.Checked = true;
                             comboBoxCommands.DataSource = _device.device_commands;                            
 
-                            device_commands dc = _device.device_commands.SingleOrDefault(c => c.id == _scene_cmd.command_id);
+                            device_commands dc = _device.device_commands.FirstOrDefault(c => c.id == _scene_cmd.command_id);
                             if (dc != null)
                             {
                                 comboBoxCommands.SelectedItem = dc;
@@ -62,7 +62,7 @@ namespace zVirtualScenesApplication.Forms
                             radioBtnTypeCommand.Checked = true;
                             comboBoxCommands.DataSource = _device.device_types.device_type_commands;                            
 
-                            device_type_commands dtc = _device.device_types.device_type_commands.SingleOrDefault(c => c.id == _scene_cmd.command_id);
+                            device_type_commands dtc = _device.device_types.device_type_commands.FirstOrDefault(c => c.id == _scene_cmd.command_id);
                             if (dtc != null)
                             {
                                 comboBoxCommands.SelectedItem = dtc;
@@ -197,7 +197,7 @@ namespace zVirtualScenesApplication.Forms
                         cmbo.SelectedIndex = 0;
 
                     if (PrefilledValue != null)
-                        cmbo.SelectedItem = OptionList.SingleOrDefault(o=> o.ToString() == PrefilledValue);
+                        cmbo.SelectedItem = OptionList.FirstOrDefault(o=> o.ToString() == PrefilledValue);
 
                     panelUserInputControls.Controls.Add(cmbo);
                     break;

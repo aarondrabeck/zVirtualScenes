@@ -115,11 +115,11 @@ namespace zVirtualScenesApplication.UserControls
                     break;
             }
 
-            device_propertys dp = zvsEntityControl.zvsContext.device_propertys.SingleOrDefault(p => p.name == btn.Name);
+            device_propertys dp = zvsEntityControl.zvsContext.device_propertys.FirstOrDefault(p => p.name == btn.Name);
 
             if(dp != null)
             {
-                device_property_values dpv = _d.device_property_values.SingleOrDefault(v => v.device_property_id == dp.id);
+                device_property_values dpv = _d.device_property_values.FirstOrDefault(v => v.device_property_id == dp.id);
                 if(dpv != null)
                 {
                     dpv.value = arg;

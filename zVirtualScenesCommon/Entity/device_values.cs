@@ -18,7 +18,10 @@ namespace zVirtualScenesCommon.Entity
         {
             if (DeviceValueDataChangedEvent != null)
                 DeviceValueDataChangedEvent(this, prevVal);
+
         }      
+
+        
        
     }
 }

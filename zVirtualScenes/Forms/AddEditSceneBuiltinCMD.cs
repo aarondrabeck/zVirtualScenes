@@ -43,7 +43,7 @@ namespace zVirtualScenesApplication.Forms
             comboBoxCommand.DisplayMember = "friendly_name";
 
             //if editing
-            builtin_commands b_cmd = zvsEntityControl.zvsContext.builtin_commands.SingleOrDefault(c => c.id == _scene_command.command_id);
+            builtin_commands b_cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == _scene_command.command_id);
             if(b_cmd != null)
                 comboBoxCommand.SelectedItem = b_cmd;           
         }     
@@ -72,7 +72,7 @@ namespace zVirtualScenesApplication.Forms
                     {
                         long d_id = 0;
                         long.TryParse(_scene_command.arg, out d_id);
-                        cmbo.SelectedItem = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.id == d_id);
+                        cmbo.SelectedItem = zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.id == d_id);
                     }
 
                     panelUserInputControls.Controls.Add(cmbo);
@@ -95,7 +95,7 @@ namespace zVirtualScenesApplication.Forms
                     {
                         long g_id = 0;
                         long.TryParse(_scene_command.arg, out g_id);
-                        cmbo.SelectedItem = zvsEntityControl.zvsContext.groups.SingleOrDefault(g => g.id == g_id);
+                        cmbo.SelectedItem = zvsEntityControl.zvsContext.groups.FirstOrDefault(g => g.id == g_id);
                     }
 
                     panelUserInputControls.Controls.Add(cmbo);

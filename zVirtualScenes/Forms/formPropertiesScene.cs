@@ -64,7 +64,7 @@ namespace zVirtualScenesApplication
                     string value = string.Empty;
                     if (_scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
                     {
-                        value = _scene.scene_property_value.SingleOrDefault(sp => sp.scene_property_id == property.id).value;
+                        value = _scene.scene_property_value.FirstOrDefault(sp => sp.scene_property_id == property.id).value;
                     }
                     else
                     {
@@ -162,7 +162,7 @@ namespace zVirtualScenesApplication
 
             if (_scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
             {
-                _scene.scene_property_value.SingleOrDefault(sp => sp.scene_property_id == property.id).value = arg;
+                _scene.scene_property_value.FirstOrDefault(sp => sp.scene_property_id == property.id).value = arg;
             }
             else
             {

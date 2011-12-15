@@ -188,6 +188,10 @@ namespace OpenZWavePlugin
             device_types lock_dt = new device_types { name = "DOORLOCK", friendly_name = "OpenZWave Doorlock", show_in_list = true };
             DefineOrUpdateDeviceType(lock_dt);
 
+            //Sensors
+            device_types sensor_dt = new device_types { name = "SENSOR", friendly_name = "OpenZWave Sensor", show_in_list = true };
+            DefineOrUpdateDeviceType(sensor_dt);
+
             device_propertys.DefineOrUpdateDeviceProperty(new device_propertys
             {
                 name = "DEFAULONLEVEL",
@@ -222,7 +226,7 @@ namespace OpenZWavePlugin
 
             //    DefineOrUpdateDeviceValue(new device_values
             //    {
-            //        device_id = zvsEntityControl.zvsContext.devices.SingleOrDefault(d => d.node_id == 1).id,
+            //        device_id = zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.node_id == 1).id,
             //        value_id = "1!",
             //        label_name = "Basic",
             //        genre = "Genre",
@@ -558,7 +562,7 @@ namespace OpenZWavePlugin
                     {
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
 
-                        device d = GetDevices().SingleOrDefault(o => o.node_id == node.ID);
+                        device d = GetDevices().FirstOrDefault(o => o.node_id == node.ID);
                         if (d != null)
                         {
                             ZWValueID vid = m_notification.GetValueID();
@@ -707,7 +711,7 @@ namespace OpenZWavePlugin
 
                             Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
                      
-                            device d = GetDevices().SingleOrDefault(o => o.node_id == node.ID);
+                            device d = GetDevices().FirstOrDefault(o => o.node_id == node.ID);
 
                             if (d != null)
                             {
@@ -732,7 +736,7 @@ namespace OpenZWavePlugin
                                             break;
                                     }
 
-                                    device_commands dc = d.device_commands.SingleOrDefault(c => c.custom_data2 == vid.GetId().ToString());
+                                    device_commands dc = d.device_commands.FirstOrDefault(c => c.custom_data2 == vid.GetId().ToString());
 
                                     if (dc != null)
                                     {
@@ -762,7 +766,7 @@ namespace OpenZWavePlugin
                                                 {
                                                     case "Level":
                                                     case "Basic":
-                                                        string prevVal = d.device_values.SingleOrDefault(v => v.value_id == vid.GetId().ToString()).value;
+                                                        string prevVal = d.device_values.FirstOrDefault(v => v.value_id == vid.GetId().ToString()).value;
 
                                                         //If it is truely new
                                                         if (!prevVal.Equals(data))
@@ -783,7 +787,7 @@ namespace OpenZWavePlugin
                                     }
                                 }
 
-                                device_values dv = d.device_values.SingleOrDefault(v => v.value_id == vid.GetId().ToString());
+                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == vid.GetId().ToString());
                                                                 
                                 dv.index = value.Index;
                                 string prev_value = dv.value;
@@ -921,9 +925,23 @@ namespace OpenZWavePlugin
                                 case "Secure Keypad Door Lock":
                                 case "Advanced Door Lock":
                                 case "Door Lock":
-                                case "Entry Control":                                    
-                                     deviceName = "Door Lock " + node.ID;
+                                case "Entry Control":
+                                     deviceName = "OpenZWave Door Lock " + node.ID;
                                     device_type = GetDeviceType("DOORLOCK");
+                                    break;
+                                case "Alarm Sensor":
+                                case "Basic Routing Alarm Sensor":
+                                case "Routing Alarm Sensor":
+                                case "Basic Zensor Alarm Sensor":
+                                case "Zensor Alarm Sensor":
+                                case "Advanced Zensor Alarm Sensor":
+                                case "Basic Routing Smoke Sensor":
+                                case "Routing Smoke Sensor":
+                                case "Basic Zensor Smoke Sensor":
+                                case "Zensor Smoke Sensor":
+                                case "Advanced Zensor Smoke Sensor":
+                                    deviceName = "OpenZWave Sensor " + node.ID;
+                                    device_type = GetDeviceType("SENSOR");
                                     break;
                             }
                             if (device_type != null)
@@ -1010,7 +1028,7 @@ namespace OpenZWavePlugin
                         if (node != null)
                         {
                             
-                            device d = GetDevices().SingleOrDefault(o => o.node_id == node.ID);
+                            device d = GetDevices().FirstOrDefault(o => o.node_id == node.ID);
 
                             if (d != null)
                             {
@@ -1029,7 +1047,7 @@ namespace OpenZWavePlugin
                     {
                         foreach (Node n in m_nodeList)
                         {
-                            device d = GetDevices().SingleOrDefault(o => o.node_id == n.ID); 
+                            device d = GetDevices().FirstOrDefault(o => o.node_id == n.ID); 
                             
                             if (d != null)
                             {

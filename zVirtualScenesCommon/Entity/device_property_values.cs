@@ -13,11 +13,11 @@ namespace zVirtualScenesCommon.Entity
     {
         public static string GetDevicePropertyValue(zvsEntities2 context, long DeviceId, string SettingName)
         {            
-            device device = context.devices.SingleOrDefault(o => o.id == DeviceId);
+            device device = context.devices.FirstOrDefault(o => o.id == DeviceId);
 
             if (device != null)
             {
-                device_property_values dpv = device.device_property_values.SingleOrDefault(o => o.device_propertys.name == SettingName);
+                device_property_values dpv = device.device_property_values.FirstOrDefault(o => o.device_propertys.name == SettingName);
 
                 if (dpv != null)
                 {
@@ -25,7 +25,7 @@ namespace zVirtualScenesCommon.Entity
                 }
                 else
                 {
-                    device_propertys dp = context.device_propertys.SingleOrDefault(o => o.name == SettingName);
+                    device_propertys dp = context.device_propertys.FirstOrDefault(o => o.name == SettingName);
                     if (dp != null)
                     {
                         return dp.default_value;
