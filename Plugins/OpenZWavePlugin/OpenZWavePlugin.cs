@@ -705,9 +705,7 @@ namespace OpenZWavePlugin
                             value.Help = m_manager.GetValueHelp(vid);
 
                             string data = GetValue(vid);
-                          // m_manager.GetValueAsString(vid, out data);
-
-                           
+                          // m_manager.GetValueAsString(vid, out data);                          
 
                             Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
                      
@@ -987,6 +985,21 @@ namespace OpenZWavePlugin
                 case ZWNotification.Type.NodeEvent:
                     {
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
+                        ZWValueID vid = m_notification.GetValueID();
+                        Value value = new Value();
+                        value.ValueID = vid;
+                        value.Label = m_manager.GetValueLabel(vid);
+                        value.Genre = vid.GetGenre().ToString();
+                        value.Index = vid.GetIndex().ToString();
+                        value.Type = vid.GetType().ToString();
+                        value.CommandClassID = vid.GetCommandClassId().ToString();
+                        value.Help = m_manager.GetValueHelp(vid);
+
+                        string data = GetValue(vid);
+                        // m_manager.GetValueAsString(vid, out data);                          
+
+                        
+
 
                         if (node != null)
                         {
