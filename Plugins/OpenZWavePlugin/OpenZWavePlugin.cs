@@ -1003,8 +1003,9 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            Console.WriteLine("OpenZWave Plugin | [NodeEvent] Node:" + node.ID + ", Name:" + node.Name + ", ID:" + node.ID);
-                        }
+                            Console.WriteLine("OpenZWave Plugin | [NodeEvent] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
+                     
+                            }
                         break;
                         
                     }
