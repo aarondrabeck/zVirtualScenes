@@ -705,7 +705,7 @@ namespace OpenZWavePlugin
                             value.Help = m_manager.GetValueHelp(vid);
 
                             string data = GetValue(vid);
-                          // m_manager.GetValueAsString(vid, out data);                          
+                            //m_manager.GetValueAsString(vid, out data);                          
 
                             Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
                      
@@ -944,7 +944,7 @@ namespace OpenZWavePlugin
                                     break;
                                 default:
                                     {
-                                        WriteToLog(Urgency.INFO, "OpenZWave Plugin | [Node Label] " + node.Label);
+                                        Console.WriteLine("OpenZWave Plugin | [Node Label] " + node.Label);
                                         break;
                                     }
                             }
@@ -996,6 +996,8 @@ namespace OpenZWavePlugin
                         value.Help = m_manager.GetValueHelp(vid);
 
                         string data = GetValue(vid);
+                        byte gevent = m_notification.GetEvent(); 
+                        
                         // m_manager.GetValueAsString(vid, out data);                          
 
                         
@@ -1003,9 +1005,9 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            Console.WriteLine("OpenZWave Plugin | [NodeEvent] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);   
-                     
-                            }
+                            WriteToLog(Urgency.INFO, string.Format("[NodeEvent] Node: {0}, Label: {1}, Data: {2}, Event: {3}", node.ID, value.Label, data, gevent));
+                            m_notification.GetEvent(); 
+                        }
                         break;
                         
                     }
@@ -1113,14 +1115,16 @@ namespace OpenZWavePlugin
                     m_manager.GetValueAsInt(v, out r4);
                     return r4.ToString();
                 case ZWValueID.ValueType.List:
-                    string[] r5;
-                    m_manager.GetValueListItems(v, out r5);
-                    string r6 = "";
-                    foreach (string s in r5)
-                    {
-                        r6 += s;
-                        r6 += "/";
-                    }
+                   // string[] r5;
+                  //  m_manager.GetValueListSelection(v, out r5);
+                    //string r6 = "";
+                    //foreach (string s in r5)
+                   // {
+                   //     r6 += s;
+                    //    r6 += "/";
+                    //}
+                    string r6 = string.Empty;
+                    m_manager.GetValueListSelection(v, out r6);
                     return r6;
                 case ZWValueID.ValueType.Schedule:
                     return "Schedule";
