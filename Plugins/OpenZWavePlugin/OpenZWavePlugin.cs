@@ -1161,16 +1161,28 @@ namespace OpenZWavePlugin
                 ZWValueID zv = null;
                 switch (n.Label)
                 {
+                    case "Toggle Switch":
+                    case "Binary Toggle Switch":
                     case "Binary Switch":
                     case "Binary Power Switch":
-                        foreach (Value v in n.Values)
+                    case "Binary Scene Switch":
+                    case "Binary Toggle Remote Switch":
+                         foreach (Value v in n.Values)
                         {
                             if (v.Label == "Switch")
                                 zv = v.ValueID;
                         }
                         break;
+                    case "Multilevel Toggle Remote Switch":
+                    case "Multilevel Remote Switch":
+                    case "Multilevel Toggle Switch":
                     case "Multilevel Switch":
                     case "Multilevel Power Switch":
+                    case "Multilevel Scene Switch":
+                    case "Multiposition Motor":
+                    case "Motor Control Class A":
+                    case "Motor Control Class B":
+                    case "Motor Control Class C":
                         foreach (Value v in n.Values)
                         {
                             if (v.Genre == "User" && v.Label == "Level")
@@ -1178,9 +1190,52 @@ namespace OpenZWavePlugin
                         }
                         break;
                     case "General Thermostat V2":
+                    case "Heating Thermostat":
+                    case "General Thermostat":
+                    case "Setback Schedule Thermostat":
+                    case "Setpoint Thermostat":
+                    case "Setback Thermostat":
                         foreach (Value v in n.Values)
                         {
                             if (v.Label == "Temperature")
+                                zv = v.ValueID;
+                        }
+                        break;
+                    case "Static PC Controller":
+                    case "Static Controller":
+                    case "Portable Remote Controller":
+                    case "Portable Installer Tool":
+                    case "Static Scene Controller":
+                    case "Static Installer Tool":
+                        //todo:  put some decent values in here
+                        break;
+                    case "Secure Keypad Door Lock":
+                    case "Advanced Door Lock":
+                    case "Door Lock":
+                    case "Entry Control":
+                        foreach (Value v in n.Values)
+                        {
+                            //todo:  put some decent values in here
+                            if (v.Genre == "User" && v.Label == "Basic")
+                                zv = v.ValueID;
+                        }
+                        break;
+                    case "Alarm Sensor":
+                    case "Basic Routing Alarm Sensor":
+                    case "Routing Alarm Sensor":
+                    case "Basic Zensor Alarm Sensor":
+                    case "Zensor Alarm Sensor":
+                    case "Advanced Zensor Alarm Sensor":
+                    case "Basic Routing Smoke Sensor":
+                    case "Routing Smoke Sensor":
+                    case "Basic Zensor Smoke Sensor":
+                    case "Zensor Smoke Sensor":
+                    case "Advanced Zensor Smoke Sensor":
+                    case "Routing Binary Sensor":
+                         foreach (Value v in n.Values)
+                        {
+                             //todo:  put some decent values in here
+                            if (v.Genre == "User" && v.Label == "Basic")
                                 zv = v.ValueID;
                         }
                         break;
