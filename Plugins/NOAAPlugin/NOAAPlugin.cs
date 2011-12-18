@@ -148,10 +148,10 @@ namespace NOAAPlugin
         private void LoadLatLong()
         {
             Lat = 30.6772222222222;
-            Double.TryParse(GetSettingValue("Latitude"), out Lat);
+            Double.TryParse(GetSettingValue("LAT"), out Lat);
 
             Long = -100.061666666667;
-            Double.TryParse(GetSettingValue("Longitude"), out Long);
+            Double.TryParse(GetSettingValue("LONG"), out Long);
         }
 
         void timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
