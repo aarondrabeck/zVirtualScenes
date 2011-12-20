@@ -117,7 +117,7 @@ namespace OpenZWavePlugin
                 name = "COMPORT",
                 friendly_name = "Com Port",
                 value = (3).ToString(),
-                value_data_type = (int)Data_Types.INTEGER,
+                value_data_type = (int)Data_Types.COMPORT,
                 description = "The COM port that your z-wave controller is assigned to."
             });
 
@@ -950,7 +950,7 @@ namespace OpenZWavePlugin
                             }
                             if (device_type != null)
                             {               
-                                //If we already have the device
+                                //If we dont already have the device
                                 if (!GetDevices().Any(d => d.node_id == node.ID))
                                 {
                                     zvsEntityControl.zvsContext.devices.AddObject(new device { node_id = node.ID, 
@@ -968,7 +968,12 @@ namespace OpenZWavePlugin
                     }
 
                 case ZWNotification.Type.NodeNaming:
-                    {                        
+                    {
+                        string ManufacturerNameValueId = "9999058723211334120";
+                        string ProductNameValueId = "9999058723211334121";
+                        string NodeLocationValueId = "9999058723211334122";
+                        string NodeNameValueId = "9999058723211334123";
+
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         if (node != null)
                         {
@@ -977,6 +982,121 @@ namespace OpenZWavePlugin
                             node.Location = m_manager.GetNodeLocation(m_homeId, node.ID);
                             node.Name = m_manager.GetNodeName(m_homeId, node.ID);
 
+                            
+                            device d = GetDevices().FirstOrDefault(o => o.node_id == node.ID);
+                            if (d != null)
+                            {
+
+                                #region Manufacturer Name
+                                //lets store the manufacturer name and product name in the values table.   Giving ManufacturerName a random value_id 9999058723211334120
+                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == ManufacturerNameValueId);
+                                if (dv == null)
+                                {
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = ManufacturerNameValueId,
+                                        label_name = "Manufacturer Name",
+                                        genre = "Custom",
+                                        index = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value = node.Manufacturer
+                                    });
+                                }
+                                else
+                                {
+                                   string prev_value = dv.value; 
+                                   dv.value = node.Manufacturer;
+                                   if (!prev_value.Equals(node.Manufacturer))                                    
+                                       dv.DeviceValueDataChanged(prev_value);
+                                }
+                                #endregion
+
+                                #region Product Name
+                                //lets store the manufacturer name and product name in the values table.   Giving ManufacturerName a random value_id 9999058723211334120
+                                device_values p_dv = d.device_values.FirstOrDefault(v => v.value_id == ProductNameValueId);
+                                if (p_dv == null)
+                                {
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = ProductNameValueId,
+                                        label_name = "Product Name",
+                                        genre = "Custom",
+                                        index = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value = node.Product
+                                    });
+                                }
+                                else
+                                {
+                                    string prev_value = p_dv.value;
+                                    p_dv.value = node.Product;
+                                    if (!prev_value.Equals(node.Product))
+                                        p_dv.DeviceValueDataChanged(prev_value);
+                                }
+                                #endregion
+
+                                #region Node Location
+                                //lets store the manufacturer name and product name in the values table.   Giving ManufacturerName a random value_id 9999058723211334120
+                                device_values l_dv = d.device_values.FirstOrDefault(v => v.value_id == NodeLocationValueId);
+                                if (l_dv == null)
+                                {
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = NodeLocationValueId,
+                                        label_name = "Node Location",
+                                        genre = "Custom",
+                                        index = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value = node.Location
+                                    });
+                                }
+                                else
+                                {
+                                    string prev_value = l_dv.value;
+                                    l_dv.value = node.Location;
+                                    if (!prev_value.Equals(node.Location))
+                                        l_dv.DeviceValueDataChanged(prev_value);
+                                }
+                                #endregion
+
+                                #region Node Name
+                                //lets store the manufacturer name and product name in the values table.   Giving ManufacturerName a random value_id 9999058723211334120
+                                device_values nn_dv = d.device_values.FirstOrDefault(v => v.value_id == NodeNameValueId);
+                                if (nn_dv == null)
+                                {
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = NodeNameValueId,
+                                        label_name = "Node Name",
+                                        genre = "Custom",
+                                        index = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value = node.Name
+                                    });
+                                }
+                                else
+                                {
+                                    string prev_value = nn_dv.value;
+                                    nn_dv.value = node.Name;
+                                    if (!prev_value.Equals(node.Name))
+                                        nn_dv.DeviceValueDataChanged(prev_value);
+                                }
+                                #endregion
+                            }
+                            
+
+                           
+
+
+                            zvsEntityControl.zvsContext.SaveChanges();    
                             Console.WriteLine("OpenZWave Plugin | [NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
                         }
                         break;

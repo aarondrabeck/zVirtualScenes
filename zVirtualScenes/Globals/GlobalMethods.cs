@@ -146,6 +146,25 @@ namespace zVirtualScenesApplication.Globals
                         if (!String.IsNullOrEmpty(value))
                             cmbo.SelectedIndex = cmbo.Items.IndexOf(value);
                         break;
+                    case Data_Types.COMPORT:
+                        Numeric.Name = UniqueName;
+                        Numeric.Top = top;
+                        Numeric.Left = left;
+                        Numeric.Tag = tag;
+                        Numeric.Width = 75;
+                        Numeric.Maximum = 99;
+                        Numeric.Minimum = 0;
+                        p.Controls.Add(Numeric);
+                        left += Numeric.Width + 5;
+
+                        if (!String.IsNullOrEmpty(value))
+                        {
+                            Int32 i = 0;
+                            Int32.TryParse(value, out i);
+                            Numeric.Value = i;
+                        }
+
+                        break;
                 }
             return left;
         }

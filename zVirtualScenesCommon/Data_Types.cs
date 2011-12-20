@@ -9,6 +9,7 @@
         BYTE,
         BOOL,
         SHORT,
-        LIST        
+        LIST,
+        COMPORT
     }
 }

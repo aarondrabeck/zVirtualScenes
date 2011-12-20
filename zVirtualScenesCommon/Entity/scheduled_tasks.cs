@@ -31,11 +31,10 @@ namespace zVirtualScenesCommon.Entity
             if (scene != null)
             {
                 string result = scene.RunScene();
-
-                Logger.WriteToLog(Urgency.INFO, "Scheduled task '" + this.friendly_name + "': " + result, "TASK");
+                Logger.WriteToLog(Urgency.INFO, string.Format("Scheduled task '{0}' {1}", this.friendly_name, result), "TASK");                
             }
             else
-                Logger.WriteToLog(Urgency.WARNING, "Scheduled task '" + this.friendly_name + "': Failed to find scene ID '" + this.Scene_id + "'.", "TASK");
+                Logger.WriteToLog(Urgency.WARNING, "Scheduled task '" + this.friendly_name + "' Failed to find scene ID '" + this.Scene_id + "'.", "TASK");
                    
         }
     }

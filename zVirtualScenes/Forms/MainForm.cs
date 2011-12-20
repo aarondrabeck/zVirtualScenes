@@ -1330,10 +1330,12 @@ namespace zVirtualScenesApplication
                                         //Console.WriteLine("totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
                                         if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
                                         {
-                                            Double SecondsBetweenTime = Math.Abs((task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds);
-                                            //Console.WriteLine("SecondsBetweenTime:" + SecondsBetweenTime);
-                                            if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
-                                                task.Run();
+                                            TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                            TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
+                                            
+                                            //Console.WriteLine(string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
+                                            if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))                                            
+                                                task.Run();                                            
                                         }
                                     }
                                     break;
@@ -1346,8 +1348,10 @@ namespace zVirtualScenesApplication
                                         {
                                             if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                             {
-                                                Double SecondsBetweenTime = Math.Abs((task.StartTime.Value.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds);
-                                                if (SecondsBetweenTime < 1 && SecondsBetweenTime > 0)
+                                                TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                                TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
+                                          
+                                                if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
                                                     task.Run();
                                             }
                                         }
@@ -1358,8 +1362,10 @@ namespace zVirtualScenesApplication
                                 {
                                     if (task.StartTime.HasValue)
                                     {
-                                        Double SecondsBetween = Math.Abs((DateTime.Now - task.StartTime.Value).TotalSeconds);
-                                        if (SecondsBetween < 1 && SecondsBetween > 0)
+                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                        TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
+                                           
+                                        if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
                                             task.Run();
                                     }
                                     break;
