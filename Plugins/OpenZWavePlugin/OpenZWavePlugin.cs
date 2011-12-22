@@ -55,7 +55,7 @@ namespace OpenZWavePlugin
                 m_manager.OnNotification += NotificationHandler;
                 
                 bool useHID = false;
-                bool.TryParse(GetSettingValue("HID"), out useHID);
+                //bool.TryParse(GetSettingValue("HID"), out useHID);
 
                 if (!useHID)
                 {
@@ -124,14 +124,14 @@ namespace OpenZWavePlugin
                 description = "The COM port that your z-wave controller is assigned to."
             });
 
-            DefineOrUpdateSetting(new plugin_settings
-            {
-                name = "HID",
-                friendly_name = "Use HID",
-                value = false.ToString(),
-                value_data_type = (int)Data_Types.BOOL,
-                description = "Use HID rather than COM port. (use this for ControlThink Sticks)"
-            });
+            //DefineOrUpdateSetting(new plugin_settings
+            //{
+            //    name = "HID",
+            //    friendly_name = "Use HID",
+            //    value = false.ToString(),
+            //    value_data_type = (int)Data_Types.BOOL,
+            //    description = "Use HID rather than COM port. (use this for ControlThink Sticks)"
+            //});
 
             DefineOrUpdateSetting(new plugin_settings
             {

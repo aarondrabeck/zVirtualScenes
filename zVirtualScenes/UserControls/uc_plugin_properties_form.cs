@@ -139,6 +139,7 @@ namespace zVirtualScenesApplication.UserControls
                                     case Data_Types.INTEGER:
                                     case Data_Types.SHORT:
                                     case Data_Types.BYTE:
+                                    case Data_Types.COMPORT:
                                         ps.value = ((NumericUpDown)c).Value.ToString();
                                         break;
                                     case Data_Types.BOOL:

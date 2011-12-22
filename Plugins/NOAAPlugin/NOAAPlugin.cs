@@ -43,7 +43,7 @@ namespace NOAAPlugin
             DefineOrUpdateSetting(new plugin_settings
             {
                 name = "LONG",
-                friendly_name = "Polling Interval",
+                friendly_name = "Longitude",
                 value = "-113.061666666667",
                 value_data_type = (int)Data_Types.DECIMAL,
                 description = "Your Longitude in Decimal Notation. ex. -113.061666666667"
