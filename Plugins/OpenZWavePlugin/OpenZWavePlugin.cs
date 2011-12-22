@@ -17,6 +17,8 @@ using zVirtualScenesCommon;
 using System.Drawing;
 using System.Text;
 using zVirtualScenesCommon.Util;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace OpenZWavePlugin
 {
@@ -37,7 +39,8 @@ namespace OpenZWavePlugin
                 ) { }
        
         protected override bool StartPlugin()
-        {
+        {           
+            
             try
             {
                 WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
@@ -82,7 +85,7 @@ namespace OpenZWavePlugin
 
             return true;
         }
-
+        
         protected override bool StopPlugin()
         {
             WriteToLog(Urgency.INFO, Friendly_Name + " plugin stopped.");            
@@ -543,8 +546,8 @@ namespace OpenZWavePlugin
             }
             return true;
         }
-          
-        #region ZWaveInterface Stuff
+        
+        #region OpenZWave Interface
 
         public void NotificationHandler(ZWNotification notification)
         {

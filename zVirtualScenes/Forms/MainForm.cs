@@ -63,11 +63,10 @@ namespace zVirtualScenesApplication
         {
             InitializeComponent();
 
-             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(HandlerMethod);
-
-
-
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(HandlerMethod);
+            
             zvsEntityControl.zvsContext.Connection.Open();
+            
 
             //Load form size
             GeometryFromString(Properties.Settings.Default.WindowGeometry, this);

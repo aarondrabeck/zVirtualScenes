@@ -4,6 +4,9 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Diagnostics;
+using zVirtualScenesCommon.Entity;
+using System.IO;
+using zVirtualScenesCommon.Util;
 
 namespace zVirtualScenesApplication
 {
@@ -15,10 +18,7 @@ namespace zVirtualScenesApplication
         /// </summary>
         [STAThread]
         static void Main()
-        {
-            try
-            {
-
+        {           
                 //Check is already running
                 string proc = Process.GetCurrentProcess().ProcessName;
                 Process[] processes = Process.GetProcessesByName(proc);
@@ -48,25 +48,31 @@ namespace zVirtualScenesApplication
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
 
+                //Check for VCRedist
+                if(!DetectVCRedist.IsVCRedistInstalled())
+                {
+                    MessageBox.Show(string.Format("Visual C++ Redistributable Missing!\n\n zVirtualScenes cannot open because Visual C++ Redistributable is not installed.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                //ONLY LAUCH IF WE CAN CONNECT TO THE DATABASE
-                //if (!String.IsNullOrEmpty(DatabaseControl.ExamineDatabase()) || DatabaseControl.GetOutdatedDbVersion() != null)
-                //{
-                //    DatabaseConnection FormDatabaseConnection = new DatabaseConnection();
-                //    FormDatabaseConnection.ShowDialog();
+                //Check if DB exists
+                FileInfo database = new FileInfo(zvsEntityControl.GetDBPath);
+                if (!database.Exists)
+                {
+                    MessageBox.Show(string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                //    if (FormDatabaseConnection.DialogResult == DialogResult.Cancel)
-                //    {
-                //        return;
-                //    }
-                //}           
+                //Check DB integrity
+                string name = zvsEntityControl.zvsContext.ExecuteStoreQuery<string>(@"SELECT name FROM sqlite_master WHERE name='devices';").SingleOrDefault();
+                if (string.IsNullOrEmpty(name))
+                {
+                    MessageBox.Show(string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             
                 Application.Run(new MainForm());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("zvs Fatal Error", ex.Message);
-            }
+            
         }
     }
 }

@@ -12,19 +12,26 @@ namespace zVirtualScenesCommon.Entity
     {
         public static zvsEntities2 zvsContext = new zvsEntities2(GetzvsConnectionString);
 
+        public static string GetDBPath
+        {
+            get
+            {
+                #if !DEBUG
+                    return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs-debug.db");
+                #else
+                    return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs.db");
+                #endif
+            }
+        }
+
+
         public static string GetzvsConnectionString
         {
             get
             {
-                string dbpath = string.Empty;
 
-                #if !DEBUG   
-                dbpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs-debug.db");
-                #else
-                dbpath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs.db");
-                #endif
 
-                string sqlLiteConnectionString = string.Format("data source=\"{0}\"", dbpath);
+                string sqlLiteConnectionString = string.Format("data source=\"{0}\"", GetDBPath);
 
                 EntityConnectionStringBuilder ee = new EntityConnectionStringBuilder
                 {
