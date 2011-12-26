@@ -166,21 +166,17 @@ namespace HTTPControl
                         WriteToLog(Urgency.ERROR, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
                     else
                         WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", context.Request.UserHostName, CMDresult.Description));
-                           
-                    string XMLResult;
-                    if (!CMDresult.DescriptionIsXML)
-                        XMLResult = SerializeResult(CMDresult);
-                    else
-                        XMLResult = CMDresult.Description;
 
-                    //RESPOND
                     response.StatusCode = (int)HttpStatusCode.OK;
-                    MemoryStream stream = new MemoryStream();
-                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(XMLResult + Environment.NewLine);
-                    stream.Write(buffer, 0, buffer.Length);
+                    response.ContentType = "text/xml;charset=utf-8";
 
-                    byte[] bytes = stream.ToArray();
-                    response.OutputStream.Write(bytes, 0, bytes.Length);
+                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toXML(CMDresult));
+                    // Get a response stream and write the response to it.
+                    response.ContentLength64 = buffer.Length;
+                    System.IO.Stream output = response.OutputStream;
+                    output.Write(buffer, 0, buffer.Length);
+                    // You must close the output stream.
+                    output.Close();
                 }
 
             }
@@ -606,16 +602,29 @@ namespace HTTPControl
             return result;
         }
 
-        private string SerializeResult(HTTPCMDResult result)
+        private string toXML<T>(T obj)
         {
             XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
             xmlwritersettings.NewLineHandling = NewLineHandling.None;
             xmlwritersettings.Indent = false;
+            xmlwritersettings.Encoding = Encoding.UTF8;
+            XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
 
-            StringWriter result_str = new StringWriter();
-            XmlSerializer ResulttoXML = new System.Xml.Serialization.XmlSerializer(typeof(HTTPCMDResult));
-            ResulttoXML.Serialize(XmlWriter.Create(result_str, xmlwritersettings), result);
-            return result_str.ToString();
+            string utf8;
+            using (Utf8StringWriter writer = new Utf8StringWriter())
+            {
+                serializer.Serialize(XmlWriter.Create(writer, xmlwritersettings), obj);
+                utf8 = writer.ToString();
+            }
+            return utf8;
+        }
+
+        public class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding
+            {
+                get { return Encoding.UTF8; }
+            }
         }
     }
 }

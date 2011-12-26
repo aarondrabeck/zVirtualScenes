@@ -122,6 +122,7 @@ namespace zVirtualScenesAPI
                     existing_dv.index = dv.index;
                     existing_dv.genre = dv.genre;
                     existing_dv.commandClassId = dv.commandClassId;
+                    existing_dv.read_only = dv.read_only;
                 }
                 zvsEntityControl.zvsContext.SaveChanges();                  
             }

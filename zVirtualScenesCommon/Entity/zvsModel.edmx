@@ -90,11 +90,11 @@
             <End Role="device_types" EntitySet="device_types" />
           </AssociationSet>
           <AssociationSet Name="FK_device_value_triggers_0" Association="zvsModel.Store.FK_device_value_triggers_0">
-            <End Role="device_values" EntitySet="device_values" />
+            <End Role="scenes" EntitySet="scenes" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
           <AssociationSet Name="FK_device_value_triggers_1" Association="zvsModel.Store.FK_device_value_triggers_1">
-            <End Role="scenes" EntitySet="scenes" />
+            <End Role="device_values" EntitySet="device_values" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
           <AssociationSet Name="FK_device_values_0" Association="zvsModel.Store.FK_device_values_0">
@@ -299,6 +299,7 @@
           <Property Name="type" Type="nvarchar" MaxLength="255" />
           <Property Name="commandClassId" Type="nvarchar" MaxLength="255" />
           <Property Name="value" Type="nvarchar" MaxLength="255" />
+          <Property Name="read_only" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="devices">
           <Key>
@@ -427,6 +428,7 @@
           <Property Name="RecurSeconds" Type="integer" />
           <Property Name="StartTime" Type="datetime" />
           <Property Name="sort_order" Type="integer" />
+          <Property Name="RecurEven" Type="bit" />
         </EntityType>
         <Association Name="FK_builtin_command_options_0">
           <End Role="builtin_commands" Type="zvsModel.Store.builtin_commands" Multiplicity="1" />
@@ -597,18 +599,6 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_value_triggers_0">
-          <End Role="device_values" Type="zvsModel.Store.device_values" Multiplicity="1" />
-          <End Role="device_value_triggers" Type="zvsModel.Store.device_value_triggers" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="device_values">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="device_value_triggers">
-              <PropertyRef Name="device_value_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_device_value_triggers_1">
           <End Role="scenes" Type="zvsModel.Store.scenes" Multiplicity="0..1" />
           <End Role="device_value_triggers" Type="zvsModel.Store.device_value_triggers" Multiplicity="*" />
           <ReferentialConstraint>
@@ -617,6 +607,18 @@
             </Principal>
             <Dependent Role="device_value_triggers">
               <PropertyRef Name="scene_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_device_value_triggers_1">
+          <End Role="device_values" Type="zvsModel.Store.device_values" Multiplicity="1" />
+          <End Role="device_value_triggers" Type="zvsModel.Store.device_value_triggers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="device_values">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="device_value_triggers">
+              <PropertyRef Name="device_value_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -782,7 +784,6 @@
           <EntitySet Name="scene_property_option" EntityType="zvsModel.scene_property_option" />
           <EntitySet Name="scene_property_value" EntityType="zvsModel.scene_property_value" />
           <EntitySet Name="scenes" EntityType="zvsModel.scene" />
-          <EntitySet Name="scheduled_tasks" EntityType="zvsModel.scheduled_tasks" />
           <AssociationSet Name="FK_builtin_command_options_0" Association="zvsModel.FK_builtin_command_options_0">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_options" EntitySet="builtin_command_options" />
@@ -892,6 +893,7 @@
             <End Role="scene" EntitySet="scenes" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
+          <EntitySet Name="scheduled_tasks" EntityType="zvsModel.scheduled_tasks" />
         </EntityContainer>
         <EntityType Name="builtin_command_options">
           <Key>
@@ -1064,6 +1066,7 @@
           <Property Type="String" Name="value" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="device" Relationship="zvsModel.FK_device_values_0" FromRole="device_values" ToRole="device" />
           <NavigationProperty Name="device_value_triggers" Relationship="zvsModel.FK_device_value_triggers_0" FromRole="device_values" ToRole="device_value_triggers" />
+          <Property Type="Boolean" Name="read_only" Nullable="false" />
         </EntityType>
         <EntityType Name="device">
           <Key>
@@ -1194,30 +1197,6 @@
           <NavigationProperty Name="scene_commands" Relationship="zvsModel.FK_scene_commands_1" FromRole="scene" ToRole="scene_commands" />
           <NavigationProperty Name="scene_property_value" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene" ToRole="scene_property_value" />
           <NavigationProperty Name="device_value_triggers" Relationship="zvsModel.FK_device_value_triggers_01" FromRole="scene" ToRole="device_value_triggers" />
-        </EntityType>
-        <EntityType Name="scheduled_tasks">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Type="Boolean" Name="Enabled" Nullable="false" />
-          <Property Type="Int64" Name="Scene_id" Nullable="false" />
-          <Property Type="Int64" Name="Frequency" />
-          <Property Type="Boolean" Name="RecurMonday" />
-          <Property Type="Boolean" Name="RecurTuesday" />
-          <Property Type="Boolean" Name="RecurWednesday" />
-          <Property Type="Boolean" Name="RecurThursday" />
-          <Property Type="Boolean" Name="RecurFriday" />
-          <Property Type="Boolean" Name="RecurSaturday" />
-          <Property Type="Boolean" Name="RecurSunday" />
-          <Property Type="Int64" Name="RecurDays" />
-          <Property Type="Int64" Name="RecurWeeks" />
-          <Property Type="Int64" Name="RecurMonth" />
-          <Property Type="Int64" Name="RecurDayofMonth" />
-          <Property Type="Int64" Name="RecurSeconds" />
-          <Property Type="DateTime" Name="StartTime" />
-          <Property Type="Int64" Name="sort_order" />
         </EntityType>
         <Association Name="FK_builtin_command_options_0">
           <End Type="zvsModel.builtin_commands" Role="builtin_commands" Multiplicity="1" />
@@ -1490,7 +1469,9 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_scene_commands_1">
-          <End Type="zvsModel.scene" Role="scene" Multiplicity="1" />
+          <End Type="zvsModel.scene" Role="scene" Multiplicity="1" >
+            <OnDelete Action="Cascade" />
+          </End>
           <End Type="zvsModel.scene_commands" Role="scene_commands" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="scene">
@@ -1577,6 +1558,31 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="scheduled_tasks">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="Enabled" Nullable="false" />
+          <Property Type="Int64" Name="Scene_id" Nullable="false" />
+          <Property Type="Int64" Name="Frequency" />
+          <Property Type="Boolean" Name="RecurMonday" />
+          <Property Type="Boolean" Name="RecurTuesday" />
+          <Property Type="Boolean" Name="RecurWednesday" />
+          <Property Type="Boolean" Name="RecurThursday" />
+          <Property Type="Boolean" Name="RecurFriday" />
+          <Property Type="Boolean" Name="RecurSaturday" />
+          <Property Type="Boolean" Name="RecurSunday" />
+          <Property Type="Int64" Name="RecurDays" />
+          <Property Type="Int64" Name="RecurWeeks" />
+          <Property Type="Int64" Name="RecurMonth" />
+          <Property Type="Int64" Name="RecurDayofMonth" />
+          <Property Type="Int64" Name="RecurSeconds" />
+          <Property Type="DateTime" Name="StartTime" />
+          <Property Type="Int64" Name="sort_order" />
+          <Property Type="Boolean" Name="RecurEven" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1731,6 +1737,7 @@
           <EntitySetMapping Name="device_values">
             <EntityTypeMapping TypeName="zvsModel.device_values">
               <MappingFragment StoreEntitySet="device_values">
+                <ScalarProperty Name="read_only" ColumnName="read_only" />
                 <ScalarProperty Name="value" ColumnName="value" />
                 <ScalarProperty Name="commandClassId" ColumnName="commandClassId" />
                 <ScalarProperty Name="type" ColumnName="type" />
@@ -1858,9 +1865,23 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="device_value_triggers">
+            <EntityTypeMapping TypeName="zvsModel.device_value_triggers">
+              <MappingFragment StoreEntitySet="device_value_triggers">
+                <ScalarProperty Name="scene_id" ColumnName="scene_id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="enabled" ColumnName="enabled" />
+                <ScalarProperty Name="trigger_value" ColumnName="trigger_value" />
+                <ScalarProperty Name="trigger_operator" ColumnName="trigger_operator" />
+                <ScalarProperty Name="device_value_id" ColumnName="device_value_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="scheduled_tasks">
             <EntityTypeMapping TypeName="zvsModel.scheduled_tasks">
               <MappingFragment StoreEntitySet="scheduled_tasks">
+                <ScalarProperty Name="RecurEven" ColumnName="RecurEven" />
                 <ScalarProperty Name="sort_order" ColumnName="sort_order" />
                 <ScalarProperty Name="StartTime" ColumnName="StartTime" />
                 <ScalarProperty Name="RecurSeconds" ColumnName="RecurSeconds" />
@@ -1879,19 +1900,6 @@
                 <ScalarProperty Name="Scene_id" ColumnName="Scene_id" />
                 <ScalarProperty Name="Enabled" ColumnName="Enabled" />
                 <ScalarProperty Name="friendly_name" ColumnName="friendly_name" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="device_value_triggers">
-            <EntityTypeMapping TypeName="zvsModel.device_value_triggers">
-              <MappingFragment StoreEntitySet="device_value_triggers">
-                <ScalarProperty Name="scene_id" ColumnName="scene_id" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="enabled" ColumnName="enabled" />
-                <ScalarProperty Name="trigger_value" ColumnName="trigger_value" />
-                <ScalarProperty Name="trigger_operator" ColumnName="trigger_operator" />
-                <ScalarProperty Name="device_value_id" ColumnName="device_value_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -1930,7 +1938,7 @@
         <EntityTypeShape EntityType="zvsModel.device_type_command_que" Width="1.875" PointX="7.125" PointY="12.25" Height="2.1725878906250102" />
         <EntityTypeShape EntityType="zvsModel.device_type_commands" Width="1.5" PointX="5.25" PointY="8.875" Height="3.5186979166666674" />
         <EntityTypeShape EntityType="zvsModel.device_types" Width="1.5" PointX="3" PointY="13.375" Height="2.5571907552083246" />
-        <EntityTypeShape EntityType="zvsModel.device_values" Width="1.5" PointX="7.5" PointY="23.25" Height="2.9417936197916674" />
+        <EntityTypeShape EntityType="zvsModel.device_values" Width="1.5" PointX="7.5" PointY="23.25" Height="3.3263964843749996" />
         <EntityTypeShape EntityType="zvsModel.device" Width="1.5" PointX="5.25" PointY="15" Height="3.5186979166666674" />
         <EntityTypeShape EntityType="zvsModel.group_devices" Width="1.5" PointX="12.5" PointY="15.75" Height="1.9802864583333388" />
         <EntityTypeShape EntityType="zvsModel.group" Width="1.5" PointX="10.25" PointY="23" Height="1.595683593749996" />
@@ -1942,7 +1950,6 @@
         <EntityTypeShape EntityType="zvsModel.scene_property_option" Width="1.875" PointX="12.5" PointY="4.875" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.scene_property_value" Width="1.5" PointX="12.5" PointY="7.625" Height="2.1725878906249818" />
         <EntityTypeShape EntityType="zvsModel.scene" Width="1.5" PointX="10.25" PointY="9.625" Height="2.1725878906249818" />
-        <EntityTypeShape EntityType="zvsModel.scheduled_tasks" Width="1.5" PointX="5.75" PointY="0.75" Height="4.6725065104166674" />
         <AssociationConnector Association="zvsModel.FK_builtin_command_options_0" >
           <ConnectorPoint PointX="2.25" PointY="2.1439925130208337" />
           <ConnectorPoint PointX="3" PointY="2.1439925130208337" />
@@ -2026,8 +2033,8 @@
         <AssociationConnector Association="zvsModel.FK_device_values_0" >
           <ConnectorPoint PointX="6.75" PointY="18.518697916666667" />
           <ConnectorPoint PointX="7.125" PointY="18.893697916666667" />
-          <ConnectorPoint PointX="7.125" PointY="24.817047526041669" />
-          <ConnectorPoint PointX="7.5" PointY="24.817047526041669" />
+          <ConnectorPoint PointX="7.125" PointY="24.913198242187498" />
+          <ConnectorPoint PointX="7.5" PointY="24.913198242187498" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_group_devices_0" >
           <ConnectorPoint PointX="6.75" PointY="15.84375" />
@@ -2086,7 +2093,7 @@
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.device_value_triggers" Width="1.5" PointX="2.875" PointY="28.125" Height="2.3648893229166674" />
         <AssociationConnector Association="zvsModel.FK_device_value_triggers_0" >
-          <ConnectorPoint PointX="7.84375" PointY="26.384095052083335" />
+          <ConnectorPoint PointX="7.84375" PointY="26.576396484375" />
           <ConnectorPoint PointX="7.84375" PointY="30.400940755208332" />
           <ConnectorPoint PointX="4.375" PointY="30.400940755208332" />
         </AssociationConnector>
@@ -2103,6 +2110,7 @@
           <ConnectorPoint PointX="7.760416666666667" PointY="29.231718377604174" />
           <ConnectorPoint PointX="4.375" PointY="29.231718377604174" />
         </AssociationConnector>
+        <EntityTypeShape EntityType="zvsModel.scheduled_tasks" Width="1.5" PointX="5.375" PointY="0.75" Height="4.8648079427083246" />
       </Diagram>
     </Diagrams>
   </Designer>

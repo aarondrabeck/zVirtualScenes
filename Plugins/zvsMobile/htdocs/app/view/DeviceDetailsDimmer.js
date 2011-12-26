@@ -21,18 +21,17 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61:9999/JSON/GetDeviceDetails',
+                        url: 'http://10.1.0.61:9999/API/device/' + deviceId,
                         callbackKey: 'callback',
                         params: {
-                            u: Math.random(),
-                            id: deviceId
+                            u: Math.random()
                         },
                         callback: function (data) {
                             //Send data to panel TPL                            
-                            self.items.items[0].items.items[1].setData(data);
+                            self.items.items[0].items.items[1].setData(data.details);
 
                             //Update meter levels 
-                            self.UpdateLevel(data.level);
+                            self.UpdateLevel(data.details.level);
                         }
                     });
                 },

@@ -1275,6 +1275,9 @@ namespace zVirtualScenesApplication
                     case 27:
                        d.friendly_name = "Aeon Labs Z-Stick Series 1 (Secondary)";
                        break;
+                    case 28:
+                       d.friendly_name = "Xmas Lights";
+                       break;
                 }
             }
             zvsEntityControl.zvsContext.SaveChanges();
@@ -1355,6 +1358,22 @@ namespace zVirtualScenesApplication
                                             }
                                         }
                                     }
+                                    break;
+                                }
+                            case scheduled_tasks.frequencys.OddEven:
+                                {
+                                    if (task.RecurEven.HasValue && (task.RecurEven.Value == (DateTime.Now.Day % 2 == 0)) && task.StartTime.HasValue)
+                                    {                                        
+                                        //Console.WriteLine("totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
+                                           
+                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                        TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
+
+                                        // Console.WriteLine(string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
+                                        if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                            task.Run();
+                                    }
+
                                     break;
                                 }
                             case scheduled_tasks.frequencys.Once:
@@ -1467,6 +1486,8 @@ namespace zVirtualScenesApplication
             checkBox_RecurSaturday.Enabled = true;
             checkBox_RecurSunday.Enabled = true;
             comboBox_ActionsTask.Enabled = true;
+            radioButton_even.Enabled = true;
+            radioButton_odd.Enabled = true; 
 
             textBox_TaskName.Text = Task.friendly_name;
             checkBox_EnabledTask.Checked = Task.Enabled;
@@ -1507,6 +1528,12 @@ namespace zVirtualScenesApplication
             if (Task.RecurSunday.HasValue)
             checkBox_RecurSunday.Checked = Task.RecurSunday.Value;
 
+            if (Task.RecurEven.HasValue)
+            {
+                radioButton_even.Checked = Task.RecurEven.Value;
+                radioButton_odd.Checked = !Task.RecurEven.Value;
+            }
+
             //Look for Scene, if it was deleted then set index to -1
             scene selected_scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == Task.Scene_id);
             if(selected_scene != null)
@@ -1539,6 +1566,7 @@ namespace zVirtualScenesApplication
             groupBox_Daily.Visible = false;
             groupBox_Weekly.Visible = false;
             groupBox_Seconds.Visible = false;
+            groupBox_OddEven.Visible = false; 
 
             switch (comboBox_FrequencyTask.SelectedIndex)
             {
@@ -1551,6 +1579,9 @@ namespace zVirtualScenesApplication
                 case (int)scheduled_tasks.frequencys.Seconds:
                     groupBox_Seconds.Visible = true;
                     break;
+                case (int)scheduled_tasks.frequencys.OddEven:
+                    groupBox_OddEven.Visible = true;
+                    break;                    
             }
         }
 
@@ -1611,7 +1642,11 @@ namespace zVirtualScenesApplication
                     SelectedTask.RecurSaturday = checkBox_RecurSaturday.Checked;
                     SelectedTask.RecurSunday = checkBox_RecurSunday.Checked;
                     #endregion
-                }               
+                }
+                else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.OddEven.ToString()))
+                {
+                    SelectedTask.RecurEven = radioButton_even.Checked; 
+                } 
 
                 zvsEntityControl.zvsContext.SaveChanges();
             }
@@ -1638,6 +1673,8 @@ namespace zVirtualScenesApplication
                 checkBox_RecurSaturday.Enabled = false;
                 checkBox_RecurSunday.Enabled = false;
                 comboBox_ActionsTask.Enabled = false;
+                radioButton_even.Enabled = false;
+                radioButton_odd.Enabled = false; 
             }
 
         }
@@ -1680,6 +1717,22 @@ namespace zVirtualScenesApplication
         private void toolStripAddTaks_Click(object sender, EventArgs e)
         {
             AddNewTask();
+        }
+
+        private void radioButton_odd_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton_odd.Checked)
+            {
+                radioButton_even.Checked = false;
+            }
+        }
+
+        private void radioButton_even_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton_even.Checked)
+            {
+                radioButton_odd.Checked = false;
+            }
         }
 
         #endregion
@@ -1791,6 +1844,8 @@ namespace zVirtualScenesApplication
             this.Close();
         }
         #endregion
+
+        
 
         
 

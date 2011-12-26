@@ -76,6 +76,11 @@ namespace zVirtualScenesApplication
             this.FreqCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.EnabledCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.imageList25Icons = new System.Windows.Forms.ImageList(this.components);
+            this.groupBox_OddEven = new System.Windows.Forms.GroupBox();
+            this.radioButton_even = new System.Windows.Forms.RadioButton();
+            this.radioButton_odd = new System.Windows.Forms.RadioButton();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox_Seconds = new System.Windows.Forms.GroupBox();
             this.numericUpDownOccurSeconds = new System.Windows.Forms.NumericUpDown();
@@ -154,16 +159,16 @@ namespace zVirtualScenesApplication
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.pluginsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.contextMenuStripnotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showZVirtualSceneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitZVSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripTrigger = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteEventToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripTriggerNull = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemEventsNull = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStripnotifyIcon = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.showZVirtualSceneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitZVSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -180,6 +185,7 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).BeginInit();
+            this.groupBox_OddEven.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox_Seconds.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurSeconds)).BeginInit();
@@ -205,9 +211,9 @@ namespace zVirtualScenesApplication
             this.statusStrip1.SuspendLayout();
             this.cmsSceneCMD.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.contextMenuStripnotifyIcon.SuspendLayout();
             this.contextMenuStripTrigger.SuspendLayout();
             this.contextMenuStripTriggerNull.SuspendLayout();
-            this.contextMenuStripnotifyIcon.SuspendLayout();
             this.SuspendLayout();
             // 
             // imageListActionTypesSmall
@@ -540,6 +546,7 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.AutoScroll = true;
             this.splitContainer2.Panel2.BackColor = System.Drawing.Color.White;
             this.splitContainer2.Panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox_OddEven);
             this.splitContainer2.Panel2.Controls.Add(this.pictureBox1);
             this.splitContainer2.Panel2.Controls.Add(this.groupBox_Seconds);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
@@ -620,6 +627,61 @@ namespace zVirtualScenesApplication
             this.imageList25Icons.Images.SetKeyName(0, "Task");
             this.imageList25Icons.Images.SetKeyName(1, "Scene");
             this.imageList25Icons.Images.SetKeyName(2, "SceneRun");
+            // 
+            // groupBox_OddEven
+            // 
+            this.groupBox_OddEven.Controls.Add(this.radioButton_even);
+            this.groupBox_OddEven.Controls.Add(this.radioButton_odd);
+            this.groupBox_OddEven.Controls.Add(this.label4);
+            this.groupBox_OddEven.Controls.Add(this.label8);
+            this.groupBox_OddEven.Location = new System.Drawing.Point(17, 172);
+            this.groupBox_OddEven.Name = "groupBox_OddEven";
+            this.groupBox_OddEven.Size = new System.Drawing.Size(234, 54);
+            this.groupBox_OddEven.TabIndex = 46;
+            this.groupBox_OddEven.TabStop = false;
+            this.groupBox_OddEven.Text = "Days";
+            // 
+            // radioButton_even
+            // 
+            this.radioButton_even.AutoSize = true;
+            this.radioButton_even.Location = new System.Drawing.Point(127, 20);
+            this.radioButton_even.Name = "radioButton_even";
+            this.radioButton_even.Size = new System.Drawing.Size(50, 17);
+            this.radioButton_even.TabIndex = 47;
+            this.radioButton_even.TabStop = true;
+            this.radioButton_even.Text = "Even";
+            this.radioButton_even.UseVisualStyleBackColor = true;
+            this.radioButton_even.CheckedChanged += new System.EventHandler(this.radioButton_even_CheckedChanged);
+            // 
+            // radioButton_odd
+            // 
+            this.radioButton_odd.AutoSize = true;
+            this.radioButton_odd.Location = new System.Drawing.Point(76, 20);
+            this.radioButton_odd.Name = "radioButton_odd";
+            this.radioButton_odd.Size = new System.Drawing.Size(45, 17);
+            this.radioButton_odd.TabIndex = 46;
+            this.radioButton_odd.TabStop = true;
+            this.radioButton_odd.Text = "Odd";
+            this.radioButton_odd.UseVisualStyleBackColor = true;
+            this.radioButton_odd.CheckedChanged += new System.EventHandler(this.radioButton_odd_CheckedChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(178, 22);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(32, 13);
+            this.label4.TabIndex = 40;
+            this.label4.Text = "days.";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(19, 22);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(51, 13);
+            this.label8.TabIndex = 39;
+            this.label8.Text = "Recur on";
             // 
             // pictureBox1
             // 
@@ -1463,6 +1525,34 @@ namespace zVirtualScenesApplication
             this.notifyIcon1.Visible = true;
             this.notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
             // 
+            // contextMenuStripnotifyIcon
+            // 
+            this.contextMenuStripnotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showZVirtualSceneToolStripMenuItem,
+            this.toolStripSeparator6,
+            this.exitZVSToolStripMenuItem});
+            this.contextMenuStripnotifyIcon.Name = "contextMenuStripnotifyIcon";
+            this.contextMenuStripnotifyIcon.Size = new System.Drawing.Size(182, 54);
+            // 
+            // showZVirtualSceneToolStripMenuItem
+            // 
+            this.showZVirtualSceneToolStripMenuItem.Name = "showZVirtualSceneToolStripMenuItem";
+            this.showZVirtualSceneToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.showZVirtualSceneToolStripMenuItem.Text = "Show zVirtualScenes";
+            this.showZVirtualSceneToolStripMenuItem.Click += new System.EventHandler(this.showZVirtualSceneToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(178, 6);
+            // 
+            // exitZVSToolStripMenuItem
+            // 
+            this.exitZVSToolStripMenuItem.Name = "exitZVSToolStripMenuItem";
+            this.exitZVSToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
+            this.exitZVSToolStripMenuItem.Text = "E&xit  zVirtualScenes";
+            this.exitZVSToolStripMenuItem.Click += new System.EventHandler(this.exitZVSToolStripMenuItem_Click);
+            // 
             // contextMenuStripTrigger
             // 
             this.contextMenuStripTrigger.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1507,34 +1597,6 @@ namespace zVirtualScenesApplication
             this.toolStripMenuItemEventsNull.Text = "&Create Event";
             this.toolStripMenuItemEventsNull.Click += new System.EventHandler(this.toolStripMenuItemEventsNull_Click);
             // 
-            // contextMenuStripnotifyIcon
-            // 
-            this.contextMenuStripnotifyIcon.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.showZVirtualSceneToolStripMenuItem,
-            this.toolStripSeparator6,
-            this.exitZVSToolStripMenuItem});
-            this.contextMenuStripnotifyIcon.Name = "contextMenuStripnotifyIcon";
-            this.contextMenuStripnotifyIcon.Size = new System.Drawing.Size(182, 54);
-            // 
-            // showZVirtualSceneToolStripMenuItem
-            // 
-            this.showZVirtualSceneToolStripMenuItem.Name = "showZVirtualSceneToolStripMenuItem";
-            this.showZVirtualSceneToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.showZVirtualSceneToolStripMenuItem.Text = "Show zVirtualScenes";
-            this.showZVirtualSceneToolStripMenuItem.Click += new System.EventHandler(this.showZVirtualSceneToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(178, 6);
-            // 
-            // exitZVSToolStripMenuItem
-            // 
-            this.exitZVSToolStripMenuItem.Name = "exitZVSToolStripMenuItem";
-            this.exitZVSToolStripMenuItem.Size = new System.Drawing.Size(181, 22);
-            this.exitZVSToolStripMenuItem.Text = "E&xit  zVirtualScenes";
-            this.exitZVSToolStripMenuItem.Click += new System.EventHandler(this.exitZVSToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1571,6 +1633,8 @@ namespace zVirtualScenesApplication
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).EndInit();
+            this.groupBox_OddEven.ResumeLayout(false);
+            this.groupBox_OddEven.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox_Seconds.ResumeLayout(false);
             this.groupBox_Seconds.PerformLayout();
@@ -1601,9 +1665,9 @@ namespace zVirtualScenesApplication
             this.cmsSceneCMD.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.contextMenuStripnotifyIcon.ResumeLayout(false);
             this.contextMenuStripTrigger.ResumeLayout(false);
             this.contextMenuStripTriggerNull.ResumeLayout(false);
-            this.contextMenuStripnotifyIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1741,6 +1805,11 @@ namespace zVirtualScenesApplication
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem exitZVSToolStripMenuItem;
         private ToolStripMenuItem showZVirtualSceneToolStripMenuItem;
+        private GroupBox groupBox_OddEven;
+        private RadioButton radioButton_even;
+        private RadioButton radioButton_odd;
+        private Label label4;
+        private Label label8;
     }
 }
 

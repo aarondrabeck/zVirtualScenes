@@ -32,6 +32,7 @@
             this.olvColumn4 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.olvColumn1 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewStates)).BeginInit();
             this.SuspendLayout();
             // 
@@ -39,10 +40,12 @@
             // 
             this.dataListViewStates.AllColumns.Add(this.olvColumn4);
             this.dataListViewStates.AllColumns.Add(this.olvColumn5);
+            this.dataListViewStates.AllColumns.Add(this.olvColumn1);
             this.dataListViewStates.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewStates.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn4,
-            this.olvColumn5});
+            this.olvColumn5,
+            this.olvColumn1});
             this.dataListViewStates.DataSource = null;
             this.dataListViewStates.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataListViewStates.FullRowSelect = true;
@@ -69,15 +72,22 @@
             // olvColumn5
             // 
             this.olvColumn5.AspectName = "value";
+            this.olvColumn5.FillsFreeSpace = true;
             this.olvColumn5.Text = "Value";
             this.olvColumn5.Width = global::zVirtualScenesApplication.Properties.Settings.Default.ColActionwidth;
             // 
-            // uc_object_values_grid
+            // olvColumn1
+            // 
+            this.olvColumn1.AspectName = "read_only";
+            this.olvColumn1.Text = "R/O";
+            this.olvColumn1.Width = 75;
+            // 
+            // uc_device_values_grid
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.dataListViewStates);
-            this.Name = "uc_object_values_grid";
+            this.Name = "uc_device_values_grid";
             this.Size = new System.Drawing.Size(474, 200);
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewStates)).EndInit();
             this.ResumeLayout(false);
@@ -90,5 +100,6 @@
         private BrightIdeasSoftware.OLVColumn olvColumn4;
         private BrightIdeasSoftware.OLVColumn olvColumn5;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private BrightIdeasSoftware.OLVColumn olvColumn1;
     }
 }

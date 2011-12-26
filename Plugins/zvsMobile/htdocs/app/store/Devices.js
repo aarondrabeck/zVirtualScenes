@@ -5,7 +5,7 @@
         requires: ['zvsMobile.model.Device'],
         proxy: {
             type: 'scripttag',
-            url: 'http://10.1.0.61:9999/JSON/GetDeviceList',
+            url: 'http://10.1.0.61:9999/API/Devices/',
             extraParams: {
                 u: Math.random()
             },

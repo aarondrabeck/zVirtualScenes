@@ -499,22 +499,6 @@ namespace zVirtualScenesCommon.Entity
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        public ObjectSet<scheduled_tasks> scheduled_tasks
-        {
-            get
-            {
-                if ((_scheduled_tasks == null))
-                {
-                    _scheduled_tasks = base.CreateObjectSet<scheduled_tasks>("scheduled_tasks");
-                }
-                return _scheduled_tasks;
-            }
-        }
-        private ObjectSet<scheduled_tasks> _scheduled_tasks;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
         public ObjectSet<device_value_triggers> device_value_triggers
         {
             get
@@ -527,6 +511,22 @@ namespace zVirtualScenesCommon.Entity
             }
         }
         private ObjectSet<device_value_triggers> _device_value_triggers;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<scheduled_tasks> scheduled_tasks
+        {
+            get
+            {
+                if ((_scheduled_tasks == null))
+                {
+                    _scheduled_tasks = base.CreateObjectSet<scheduled_tasks>("scheduled_tasks");
+                }
+                return _scheduled_tasks;
+            }
+        }
+        private ObjectSet<scheduled_tasks> _scheduled_tasks;
 
         #endregion
         #region AddTo Methods
@@ -732,19 +732,19 @@ namespace zVirtualScenesCommon.Entity
         }
     
         /// <summary>
-        /// Deprecated Method for adding a new object to the scheduled_tasks EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToscheduled_tasks(scheduled_tasks scheduled_tasks)
-        {
-            base.AddObject("scheduled_tasks", scheduled_tasks);
-        }
-    
-        /// <summary>
         /// Deprecated Method for adding a new object to the device_value_triggers EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
         /// </summary>
         public void AddTodevice_value_triggers(device_value_triggers device_value_triggers)
         {
             base.AddObject("device_value_triggers", device_value_triggers);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the scheduled_tasks EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToscheduled_tasks(scheduled_tasks scheduled_tasks)
+        {
+            base.AddObject("scheduled_tasks", scheduled_tasks);
         }
 
         #endregion
@@ -4282,11 +4282,13 @@ namespace zVirtualScenesCommon.Entity
         /// </summary>
         /// <param name="id">Initial value of the id property.</param>
         /// <param name="device_id">Initial value of the device_id property.</param>
-        public static device_values Createdevice_values(global::System.Int64 id, global::System.Int64 device_id)
+        /// <param name="read_only">Initial value of the read_only property.</param>
+        public static device_values Createdevice_values(global::System.Int64 id, global::System.Int64 device_id, global::System.Boolean read_only)
         {
             device_values device_values = new device_values();
             device_values.id = id;
             device_values.device_id = device_id;
+            device_values.read_only = read_only;
             return device_values;
         }
 
@@ -4511,6 +4513,30 @@ namespace zVirtualScenesCommon.Entity
         private global::System.String _value;
         partial void OnvalueChanging(global::System.String value);
         partial void OnvalueChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Boolean read_only
+        {
+            get
+            {
+                return _read_only;
+            }
+            set
+            {
+                Onread_onlyChanging(value);
+                ReportPropertyChanging("read_only");
+                _read_only = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("read_only");
+                Onread_onlyChanged();
+            }
+        }
+        private global::System.Boolean _read_only;
+        partial void Onread_onlyChanging(global::System.Boolean value);
+        partial void Onread_onlyChanged();
 
         #endregion
     
@@ -7051,6 +7077,30 @@ namespace zVirtualScenesCommon.Entity
         private Nullable<global::System.Int64> _sort_order;
         partial void Onsort_orderChanging(Nullable<global::System.Int64> value);
         partial void Onsort_orderChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurEven
+        {
+            get
+            {
+                return _RecurEven;
+            }
+            set
+            {
+                OnRecurEvenChanging(value);
+                ReportPropertyChanging("RecurEven");
+                _RecurEven = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurEven");
+                OnRecurEvenChanged();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurEven;
+        partial void OnRecurEvenChanging(Nullable<global::System.Boolean> value);
+        partial void OnRecurEvenChanged();
 
         #endregion
     
