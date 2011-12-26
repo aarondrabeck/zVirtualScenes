@@ -1,43 +1,396 @@
-﻿<!DOCTYPE html>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>zvsMobile</title>
-
-     <link rel="stylesheet" type="text/css" href="touch/css/sencha-touch.css">
-	 <link rel="stylesheet" type="text/css" href="styles/zvsMobile.css"/> 
-	 <!--<script type="text/javascript" src="touch/sencha-touch-debug.js"></script>-->
-	 <script type="text/javascript" src="touch/sencha-touch-all.js"></script>
-
-     <script src="app/model/Device.js" type="text/javascript"></script>
-    <script src="app/model/Scene.js" type="text/javascript"></script>
-    <script src="app/model/Group.js" type="text/javascript"></script>
-
-        <script src="app/store/Devices.js" type="text/javascript"></script>
-    <script src="app/store/Scenes.js" type="text/javascript"></script>
-    <script src="app/store/Groups.js" type="text/javascript"></script>
-	 
-    <script src="app/view/DeviceDetailsDimmer.js" type="text/javascript"></script>
-   
-    <script src="app/view/DeviceDetailsSwitch.js" type="text/javascript"></script>
-    <script src="app/view/DeviceDetailsThermo.js" type="text/javascript"></script>
-    <script src="app/view/DeviceList.js" type="text/javascript"></script>
-    <script src="app/view/DeviceViewPort.js" type="text/javascript"></script>
-    <script src="app/view/GroupDetails.js" type="text/javascript"></script>
-    <script src="app/view/GroupList.js" type="text/javascript"></script>
-    <script src="app/view/GroupViewPort.js" type="text/javascript"></script>
-    <script src="app/view/SceneDetails.js" type="text/javascript"></script>
-    <script src="app/view/SceneList.js" type="text/javascript"></script>
+<!DOCTYPE html> 
+<html> 
+    <head> 
+    <title>zvsMobile</title> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"> 
+    <link rel="stylesheet" href="/styles/jquery.mobile.min.css" />
+    <link rel="stylesheet" type="text/css" href="/styles/zvsMobile-jquery.css"/>
+    <script type="text/javascript" src="/scripts/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="/scripts/jquery.Storage.js"></script>
+    <script type="text/javascript" src="/scripts/jquery-tmpl.js"></script>
+    <script type="text/javascript" src="/scripts/backbone-min.js"></script>
+    <script type="text/javascript" src="/scripts/jquery.mobile.js"></script>
     
-
-     <script src="app/view/SceneViewPort.js" type="text/javascript"></script>
+    <link rel="apple-touch-icon" href="/images/switch_on.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/switch_on.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/switch_on.png" />
     
+    <!-- STARTUP IMAGES -->
+    <!-- startup image for web apps - iPad - landscape (748x1024) 
+         Note: iPad landscape startup image has to be exactly 748x1024 pixels (portrait, with contents rotated).-->
+    <link rel="apple-touch-startup-image" href="/images/landscapeScreen.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
+    <!-- startup image for web apps - iPad - portrait (768x1004) -->
+    <link rel="apple-touch-startup-image" href="/images/portraitScreen.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
+    <!-- startup image for web apps (320x460) -->
+    <link rel="apple-touch-startup-image" href="/images/loresScreen.jpg" media="screen and (max-device-width: 320px)" />
 
-
-     <script type="text/javascript" src="app/app.js"></script>
-</head>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    
+    
+    <script id="devicesTemplate" type="text/x-jquery-tmpl"> 
+      <li class="device" id="device-${id}" data-device-id="${id}">
+          <img src="${$item.getImage()}" />
+              ${name}
+            {{if type == "SWITCH"}}
+            <select name="slider" class="slider" id="slider-${id}" data-role="slider" data-device-id="${id}">
+                <option value="OFF">Off</option>
+                <option value="ON" {{if on_off == "ON" }}selected="selected"{{/if}}>On</option>
+            </select>
+            {{/if}}
+            
+            {{if type == "DIMMER"}}
+            <div class="range-container">
+                <input type="range" name="range" id="range-${id}" class="range" value="${level}" min="0" max="99" data-device-id="${id}" />
+            </div>
+            {{/if}}
+      </li>
+    </script>
+    
+    <script id="scenesTemplate" type="text/x-jquery-tmpl"> 
+      <li class="scene" id="scene-${id}" data-scene-id="${id}">
+          <img src="${$item.getImage()}" />
+              ${name}
+              <div class="ui-scene-button" data-scene-id="${id}"><a href="#" data-role="button" data-scene-id="${id}">Run Scene</a></div>
+              <span class="ui-li-count">${cmd_count}</span>
+          
+      </li>
+    </script>
+    
+    <script id="groupsTemplate" type="text/x-jquery-tmpl"> 
+      <li class="group" id="group-${id}" data-group-id="${id}">
+          <a href="/group/${id}"><img src="/images/group64.png" />
+              ${name}
+              <span class="ui-li-count">${count}</span>
+          </a>
+      </li>
+    </script>
+    
+    <script>
+         //Reset the page to login if they reloaded
+        (function() {
+            var url = $.mobile.path.parseUrl(document.location);
+            if(url.hash) {
+                document.location = url.origin;
+            }
+        })();
+        
+        $.mobile.page.prototype.options.domCache = true;
+        $.mobile.defaultPageTransition = "none";
+        
+        var Device = Backbone.Model.extend({
+            setState: function(on_off, level) {
+                var level = level || ((on_off == "ON") ? 99 : 0);
+                
+                //don't send a command unless it changed
+                if(level == this.get("level")) {
+                    return false;
+                }
+                
+                this.set({
+                   on_off: on_off,
+                   level_txt: on_off,
+                   level: level
+                });
+                
+                this.sendCommand();    
+            },
+            setDimmer: function(level) {
+              level = parseInt(level);
+              if(level < 5) {
+                  this.setState("OFF", 0);
+              } else if(level > 95) {
+                  this.setState("ON", 99);
+              } else {
+                  this.setState("ON", level);
+              }
+            },
+            isSwitch: function() {
+                return (this.get("type") == "SWITCH");
+            },
+            isDimmer: function() {
+                return (this.get("type") == "DIMMER");
+            },
+            getType: function() {
+               return this.isSwitch() ? "device_type" : "device";  
+            },
+            getCommand: function() {
+                if(this.isSwitch()) {
+                    return (this.get("on_off") == "OFF") ? 'TURNOFF' : 'TURNON';
+                } else if(this.isDimmer()) {
+                    return "DYNAMIC_CMD_LEVEL";
+                }
+            },
+            sendCommand: function() {
+                $.ajax({
+                    url: HOST + '/JSON/SendCmd',
+                    crossDomain: true,
+                    dataType: 'jsonp',
+                    success: this.update(),
+                    data: {
+                        u: Math.random(),
+                        id: this.id,
+                        cmd: this.getCommand(),
+                        arg: this.get("level"),
+                        type: this.getType()
+                    }
+                });
+            },
+            getImage: function() {
+              if(this.isSwitch()) {
+                return "/images/switch_" + this.get("on_off").toLowerCase() + ".png";
+              } else if(this.isDimmer()) {
+                var level = this.get("level"),
+                    state = "dim";
+                if(level === 99 || level === 0) {
+                    state = this.get("on_off").toLowerCase();
+                }
+                return "/images/lb_" + state + ".png";  
+              }  
+            },
+            update: function() {
+                $('#device-' + this.id + " img").first().attr("src", this.getImage());
+            }
+        }),
+        
+        Devices = Backbone.Collection.extend({
+            model: Device,
+            url: HOST + '/JSON/GetDeviceList'
+        }),
+        
+        Scene = Backbone.Model.extend({
+            run: function() {
+                $.ajax({
+                    url: HOST + '/JSON/ActivateScene',
+                    crossDomain: true,
+                    dataType: 'jsonp',
+                    success: this.update(),
+                    data: {
+                        u: Math.random(),
+                        id: this.id
+                    }
+                });
+            },
+            update: function() {
+                var scene = this;
+                this.set({is_running: true});
+                var img = $("#scene-" + this.id + " img")
+                img.attr("src", this.getImage());
+                setTimeout(function() {
+                    scene.set({is_running: false});
+                    img.attr("src", scene.getImage());
+                }, 2000);
+            },
+            getImage: function() {
+                return "/images/" + ((this.get("is_running")) ? "scene_run64.png" : "scene64.png");
+            }
+        }),
+        
+        Scenes = Backbone.Collection.extend({
+            model: Scene
+        }),
+        
+        Group = Backbone.Model.extend({
+            getDetails: function(cb) {
+                $.ajax({
+                    url: HOST + '/JSON/GetGroupDetails',
+                    crossDomain: true,
+                    dataType: 'jsonp',
+                    success: cb,
+                    data: {
+                        u: Math.random(),
+                        id: this.id
+                    }
+                });
+            }
+        }),
+        Groups = Backbone.Collection.extend({
+            model: Group
+        });
+        
+        //var sampleDevices = {"success":true,"devices":[{"id":25,"name":"Aeon Labs Z-Stick Series 1 (Secondary)","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":1,"name":"Aeon Labs Z-Stick Series 2","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":21,"name":"Brother Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":11,"name":"Can Lights","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":13,"name":"Dining Table Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":17,"name":"Driveway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":10,"name":"Entryway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":8,"name":"Family Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":14,"name":"Fan Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":19,"name":"Fireplace Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":15,"name":"Kitchen Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":20,"name":"Label Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":2,"name":"Master Bathtub Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":3,"name":"Masterbath Mirror Light","on_off":"ON","level":99,"level_txt":"99%","type":"DIMMER"},{"id":6,"name":"Masterbed Bed Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":5,"name":"Masterbed East Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":4,"name":"Masterbed Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":24,"name":"Masterbed Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":23,"name":"Masterbed Window Fan","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":7,"name":"Office Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":9,"name":"Outside Entry Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":12,"name":"Pourch Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":16,"name":"Rear Garage Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":22,"name":"South Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":18,"name":"TV Backlight","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"}]};
+        
+        
+        var HOST, helpers = { 
+            getImage: function() {
+                var path = "/images/", $item = this.data;
+                
+                if(/SWITCH|DIMMER/.test($item.type)) {
+                    return Devices.get($item.id).getImage();
+                } else if($item.hasOwnProperty("is_running")) {
+                    //SCENE
+                    return path + (($item.is_running) ? "scene_64run.png" : "scene64.png");
+                }
+                return path + "controller.png";
+            }
+        };
+        
+        function handleChange(event) {
+            var $item = $(event.target),
+                device = Devices.get($item.attr("data-device-id"));
+            
+            device.isSwitch() ? device.setState($item.val()) : device.setDimmer($item.val());
+            event.preventDefault();
+        }
+        
+        var sliderDone = false;
+        function handleSlider(event) {
+            clearTimeout(sliderDone);
+            sliderDone = setTimeout(function() {
+                handleChange(event);
+            }, 500);
+        }
+        
+        $("#devices-data .range").live("change", handleSlider);
+        $("#devices-data .slider").live("change", handleChange);
+        $(".ui-scene-button").live("click", runScene);
+        $("#login button").live("click", function() {
+            HOST = $("#zvsServer").val();
+            $.Storage.set("server", HOST);
+            
+            load("Device");
+            load("Scene");
+            load("Group");
+            
+            $.mobile.showPageLoadingMsg();
+        });
+        
+        
+        
+        var loaded = 0;
+        function handleLoad(data, type) {
+            if(type == "devices") {
+                Devices = new Devices(data.devices);
+            }
+            
+            var list = $("#" + type + "-data").html(
+                $("#" + type + "Template").tmpl(data[type], helpers)   
+            );
+            
+            if(type == "scenes") {
+                Scenes = new Scenes(data.scenes);
+            } else if(type == "groups") {
+                Groups = new Groups(data.groups);
+            }
+            
+            loaded++;
+            if(loaded == 3) {
+                $.mobile.changePage($("#devices"));
+                $(document).trigger("pagecreate");
+                $.mobile.hidePageLoadingMsg();
+            }
+        }
+        
+        function runScene(event) {
+            var $item = $(this);
+            Scenes.get($item.attr("data-scene-id")).run();
+            event.preventDefault();
+        }
+        
+        function load(type) {
+            $.ajax({
+                url: HOST + '/JSON/Get' + type + 'List',
+                crossDomain: true,
+                dataType: 'jsonp',
+                success: function(data) {
+                    var name = type.toLowerCase() + "s";
+                    handleLoad(data, name);
+                }
+            });
+        }
+        
+        function loadGroup(id) {
+            Groups.get(id).getDetails(function(data) {
+                console.log(data);
+            })
+        }
+        
+        $(document).bind("pagebeforechange", function( event, data ) {
+            //Handle initial page load by doing nothing
+            if(typeof data.toPage != "string") {
+                return; 
+            }
+            event.preventDefault();
+            
+            var url = $.mobile.path.parseUrl(data.toPage),
+                page = url.hash || "#devices";
+            
+            if(url.directory == "/group/") {
+                loadGroup(url.filename);
+                return false;
+            }
+            
+            
+            $("div:jqmData(role='content') ul").hide();
+            
+            if(page == "#scenes") {
+                $("#header").html("Scenes");
+            } else if(page == "#groups") {
+                $("#header").html("Groups");
+            } else {
+                $("#header").html("Devices");
+            }
+            
+            $(page + "-data").show();
+            
+            //We're done changing pages so let the framework do its stuff.
+            //$.mobile.pageContainer.trigger("updatelayout");
+            $.mobile.fixedToolbars.show(true);
+        });
+        
+       $(function() {
+          var server = $.Storage.get("server");
+          if(server) {
+            $("#zvsServer").val(server);
+          }
+       });
+    </script>
+</head> 
 <body>
 
+<div data-role="page" id="login">
+    <div align="center" data-role="content">
+        <h1><img src="/images/logo.png" /> zVirtualScenes</h1>
+        
+        <form action="/login" method="post">
+            <div data-role="fieldcontain">
+                <label for="username">Username:</label>
+                <input type="text" name="username" id="username" value="" placeholder="Username"/>
+                
+                <label for="password">Password:</label>
+                <input type="password" name="password" id="password" value="" placeholder="Password"/>
+                
+                <label for="zvsServer">zvsServer:</label>
+                <input type="text" name="zvsServer" id="zvsServer" value="http://192.168.1.:9999" placeholder="zvsServer"/>
+            </div>
+            
+            <button type="button">Login</button>
+        </form>
+    </div>
+</div>
+
+<div data-role="page" id="devices">
+    <div data-role="header">
+        <h1 id="header">Devices</h1>
+    </div>
+
+    <div data-role="content"> 
+        <ul id="devices-data" data-role="listview"></ul>
+        <ul id="scenes-data" data-role="listview" style="display: none;"></ul>
+        <ul id="groups-data" data-role="listview" style="display: none;"></ul>      
+    </div>
+    
+    <div id="footerBar" class="footerBar" data-role="footer" data-position="fixed" data-grid="d" data-theme="a" data-id="sharedFooter">
+        <div data-role="navbar">
+        <ul>
+            <li><a class="ui-btn-active" href="#devices" data-icon="devices">Devices</a></li>
+            <li><a href="#scenes" data-iconpos="top" data-icon="scenes" >Scenes</a></li>
+            <li><a href="#groups" data-iconpos="top" data-icon="groups" >Groups</a></li>
+        </ul>
+        </div>
+    </div>
+</div><!-- /page -->
 
 </body>
 </html>

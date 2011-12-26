@@ -1,0 +1,87 @@
+html, body {
+    background: #F0F0F0;
+}
+
+h1 {
+    margin-bottom: 5px;
+}
+
+.ui-listview img {
+    width: 80px;
+    height: 80px;
+}
+
+.ui-li-has-thumb .ui-btn-inner a.ui-link-inherit, .ui-li-static.ui-li-has-thumb {
+  min-height: 60px;
+  padding: 1em 0 .7em 95px;
+  
+}
+
+.ui-scene-button {
+    width: 200px;
+    margin-left: -10px;
+}
+
+.device .level{
+    width: 50px;
+}
+
+.device .level .meter{
+    margin: .2em 0;
+    width: 100%;
+    height: 20px;
+    background-color: #EEE;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(2%, #ffffff), color-stop(100%, #dcdcdc));
+    background-image: linear-gradient(#ffffff,#ffffff 2%,#dcdcdc);
+    border: 1px solid #dcdcdc;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
+}
+
+.device .level .meter .progress{
+    background-color: #00d228;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #cdffcd), color-stop(2%, #00d228), color-stop(100%, #05d62a));
+    background-image: linear-gradient(#cdffcd,#00d228 2%,#05d62a);
+    border: 1px solid #1ce133;
+    -webkit-border-radius: 0.3em;
+    border-radius: 0.3em;
+    height: 100%;
+}
+
+.device .level .percent {
+    text-align: center;
+    color: #999;
+}
+
+.footerBar .ui-btn .ui-btn-inner { padding-top: 37px !important; }
+.footerBar .ui-btn .ui-icon { width: 30px!important; height: 30px!important; margin-left: -15px !important; box-shadow: none!important; -moz-box-shadow: none!important; -webkit-box-shadow: none!important; -webkit-border-radius: 0 !important; border-radius: 0 !important; }
+
+.ui-icon-devices {
+    background:  url(../images/bulb-w.png) 50% 50% no-repeat;  background-size: 30px 30px;
+}
+
+.ui-icon-scenes {
+    background:  url(../images/equalizer2-w.png) 50% 50% no-repeat;  background-size: 30px 30px;
+}
+
+.ui-icon-groups {
+    background:  url(../images/spaces2-w.png) 50% 50% no-repeat;  background-size: 30px 30px;
+}
+
+div.ui-slider-switch {
+    display: block;
+    max-width: 150px;
+}
+
+.range-container  {
+    margin-top: 10px;
+    margin-left: -16px;
+}
+
+div.ui-slider {
+    width: 80%;
+}
+
+.range {
+    display: none !important;
+}
