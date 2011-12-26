@@ -7101,6 +7101,750 @@ namespace zVirtualScenesCommon.Entity
         private Nullable<global::System.Boolean> _RecurEven;
         partial void OnRecurEvenChanging(Nullable<global::System.Boolean> value);
         partial void OnRecurEvenChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay01
+        {
+            get
+            {
+                return _RecurDay01;
+            }
+            set
+            {
+                OnRecurDay01Changing(value);
+                ReportPropertyChanging("RecurDay01");
+                _RecurDay01 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay01");
+                OnRecurDay01Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay01;
+        partial void OnRecurDay01Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay01Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay02
+        {
+            get
+            {
+                return _RecurDay02;
+            }
+            set
+            {
+                OnRecurDay02Changing(value);
+                ReportPropertyChanging("RecurDay02");
+                _RecurDay02 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay02");
+                OnRecurDay02Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay02;
+        partial void OnRecurDay02Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay02Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay03
+        {
+            get
+            {
+                return _RecurDay03;
+            }
+            set
+            {
+                OnRecurDay03Changing(value);
+                ReportPropertyChanging("RecurDay03");
+                _RecurDay03 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay03");
+                OnRecurDay03Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay03;
+        partial void OnRecurDay03Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay03Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay04
+        {
+            get
+            {
+                return _RecurDay04;
+            }
+            set
+            {
+                OnRecurDay04Changing(value);
+                ReportPropertyChanging("RecurDay04");
+                _RecurDay04 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay04");
+                OnRecurDay04Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay04;
+        partial void OnRecurDay04Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay04Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay05
+        {
+            get
+            {
+                return _RecurDay05;
+            }
+            set
+            {
+                OnRecurDay05Changing(value);
+                ReportPropertyChanging("RecurDay05");
+                _RecurDay05 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay05");
+                OnRecurDay05Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay05;
+        partial void OnRecurDay05Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay05Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay06
+        {
+            get
+            {
+                return _RecurDay06;
+            }
+            set
+            {
+                OnRecurDay06Changing(value);
+                ReportPropertyChanging("RecurDay06");
+                _RecurDay06 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay06");
+                OnRecurDay06Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay06;
+        partial void OnRecurDay06Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay06Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay07
+        {
+            get
+            {
+                return _RecurDay07;
+            }
+            set
+            {
+                OnRecurDay07Changing(value);
+                ReportPropertyChanging("RecurDay07");
+                _RecurDay07 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay07");
+                OnRecurDay07Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay07;
+        partial void OnRecurDay07Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay07Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay08
+        {
+            get
+            {
+                return _RecurDay08;
+            }
+            set
+            {
+                OnRecurDay08Changing(value);
+                ReportPropertyChanging("RecurDay08");
+                _RecurDay08 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay08");
+                OnRecurDay08Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay08;
+        partial void OnRecurDay08Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay08Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay09
+        {
+            get
+            {
+                return _RecurDay09;
+            }
+            set
+            {
+                OnRecurDay09Changing(value);
+                ReportPropertyChanging("RecurDay09");
+                _RecurDay09 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay09");
+                OnRecurDay09Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay09;
+        partial void OnRecurDay09Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay09Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay10
+        {
+            get
+            {
+                return _RecurDay10;
+            }
+            set
+            {
+                OnRecurDay10Changing(value);
+                ReportPropertyChanging("RecurDay10");
+                _RecurDay10 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay10");
+                OnRecurDay10Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay10;
+        partial void OnRecurDay10Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay10Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay11
+        {
+            get
+            {
+                return _RecurDay11;
+            }
+            set
+            {
+                OnRecurDay11Changing(value);
+                ReportPropertyChanging("RecurDay11");
+                _RecurDay11 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay11");
+                OnRecurDay11Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay11;
+        partial void OnRecurDay11Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay11Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay12
+        {
+            get
+            {
+                return _RecurDay12;
+            }
+            set
+            {
+                OnRecurDay12Changing(value);
+                ReportPropertyChanging("RecurDay12");
+                _RecurDay12 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay12");
+                OnRecurDay12Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay12;
+        partial void OnRecurDay12Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay12Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay13
+        {
+            get
+            {
+                return _RecurDay13;
+            }
+            set
+            {
+                OnRecurDay13Changing(value);
+                ReportPropertyChanging("RecurDay13");
+                _RecurDay13 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay13");
+                OnRecurDay13Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay13;
+        partial void OnRecurDay13Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay13Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay14
+        {
+            get
+            {
+                return _RecurDay14;
+            }
+            set
+            {
+                OnRecurDay14Changing(value);
+                ReportPropertyChanging("RecurDay14");
+                _RecurDay14 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay14");
+                OnRecurDay14Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay14;
+        partial void OnRecurDay14Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay14Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay15
+        {
+            get
+            {
+                return _RecurDay15;
+            }
+            set
+            {
+                OnRecurDay15Changing(value);
+                ReportPropertyChanging("RecurDay15");
+                _RecurDay15 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay15");
+                OnRecurDay15Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay15;
+        partial void OnRecurDay15Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay15Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay16
+        {
+            get
+            {
+                return _RecurDay16;
+            }
+            set
+            {
+                OnRecurDay16Changing(value);
+                ReportPropertyChanging("RecurDay16");
+                _RecurDay16 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay16");
+                OnRecurDay16Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay16;
+        partial void OnRecurDay16Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay16Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay17
+        {
+            get
+            {
+                return _RecurDay17;
+            }
+            set
+            {
+                OnRecurDay17Changing(value);
+                ReportPropertyChanging("RecurDay17");
+                _RecurDay17 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay17");
+                OnRecurDay17Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay17;
+        partial void OnRecurDay17Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay17Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay18
+        {
+            get
+            {
+                return _RecurDay18;
+            }
+            set
+            {
+                OnRecurDay18Changing(value);
+                ReportPropertyChanging("RecurDay18");
+                _RecurDay18 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay18");
+                OnRecurDay18Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay18;
+        partial void OnRecurDay18Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay18Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay19
+        {
+            get
+            {
+                return _RecurDay19;
+            }
+            set
+            {
+                OnRecurDay19Changing(value);
+                ReportPropertyChanging("RecurDay19");
+                _RecurDay19 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay19");
+                OnRecurDay19Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay19;
+        partial void OnRecurDay19Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay19Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay20
+        {
+            get
+            {
+                return _RecurDay20;
+            }
+            set
+            {
+                OnRecurDay20Changing(value);
+                ReportPropertyChanging("RecurDay20");
+                _RecurDay20 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay20");
+                OnRecurDay20Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay20;
+        partial void OnRecurDay20Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay20Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay21
+        {
+            get
+            {
+                return _RecurDay21;
+            }
+            set
+            {
+                OnRecurDay21Changing(value);
+                ReportPropertyChanging("RecurDay21");
+                _RecurDay21 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay21");
+                OnRecurDay21Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay21;
+        partial void OnRecurDay21Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay21Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay22
+        {
+            get
+            {
+                return _RecurDay22;
+            }
+            set
+            {
+                OnRecurDay22Changing(value);
+                ReportPropertyChanging("RecurDay22");
+                _RecurDay22 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay22");
+                OnRecurDay22Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay22;
+        partial void OnRecurDay22Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay22Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay23
+        {
+            get
+            {
+                return _RecurDay23;
+            }
+            set
+            {
+                OnRecurDay23Changing(value);
+                ReportPropertyChanging("RecurDay23");
+                _RecurDay23 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay23");
+                OnRecurDay23Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay23;
+        partial void OnRecurDay23Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay23Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay24
+        {
+            get
+            {
+                return _RecurDay24;
+            }
+            set
+            {
+                OnRecurDay24Changing(value);
+                ReportPropertyChanging("RecurDay24");
+                _RecurDay24 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay24");
+                OnRecurDay24Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay24;
+        partial void OnRecurDay24Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay24Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay25
+        {
+            get
+            {
+                return _RecurDay25;
+            }
+            set
+            {
+                OnRecurDay25Changing(value);
+                ReportPropertyChanging("RecurDay25");
+                _RecurDay25 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay25");
+                OnRecurDay25Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay25;
+        partial void OnRecurDay25Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay25Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay26
+        {
+            get
+            {
+                return _RecurDay26;
+            }
+            set
+            {
+                OnRecurDay26Changing(value);
+                ReportPropertyChanging("RecurDay26");
+                _RecurDay26 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay26");
+                OnRecurDay26Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay26;
+        partial void OnRecurDay26Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay26Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay27
+        {
+            get
+            {
+                return _RecurDay27;
+            }
+            set
+            {
+                OnRecurDay27Changing(value);
+                ReportPropertyChanging("RecurDay27");
+                _RecurDay27 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay27");
+                OnRecurDay27Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay27;
+        partial void OnRecurDay27Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay27Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay28
+        {
+            get
+            {
+                return _RecurDay28;
+            }
+            set
+            {
+                OnRecurDay28Changing(value);
+                ReportPropertyChanging("RecurDay28");
+                _RecurDay28 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay28");
+                OnRecurDay28Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay28;
+        partial void OnRecurDay28Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay28Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay29
+        {
+            get
+            {
+                return _RecurDay29;
+            }
+            set
+            {
+                OnRecurDay29Changing(value);
+                ReportPropertyChanging("RecurDay29");
+                _RecurDay29 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay29");
+                OnRecurDay29Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay29;
+        partial void OnRecurDay29Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay29Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay30
+        {
+            get
+            {
+                return _RecurDay30;
+            }
+            set
+            {
+                OnRecurDay30Changing(value);
+                ReportPropertyChanging("RecurDay30");
+                _RecurDay30 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay30");
+                OnRecurDay30Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay30;
+        partial void OnRecurDay30Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay30Changed();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public Nullable<global::System.Boolean> RecurDay31
+        {
+            get
+            {
+                return _RecurDay31;
+            }
+            set
+            {
+                OnRecurDay31Changing(value);
+                ReportPropertyChanging("RecurDay31");
+                _RecurDay31 = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("RecurDay31");
+                OnRecurDay31Changed();
+            }
+        }
+        private Nullable<global::System.Boolean> _RecurDay31;
+        partial void OnRecurDay31Changing(Nullable<global::System.Boolean> value);
+        partial void OnRecurDay31Changed();
 
         #endregion
     

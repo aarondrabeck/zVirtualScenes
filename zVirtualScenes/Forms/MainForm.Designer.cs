@@ -76,11 +76,55 @@ namespace zVirtualScenesApplication
             this.FreqCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.EnabledCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.imageList25Icons = new System.Windows.Forms.ImageList(this.components);
-            this.groupBox_OddEven = new System.Windows.Forms.GroupBox();
-            this.radioButton_even = new System.Windows.Forms.RadioButton();
-            this.radioButton_odd = new System.Windows.Forms.RadioButton();
+            this.groupBox_Montly = new System.Windows.Forms.GroupBox();
+            this.btn_clear = new System.Windows.Forms.Button();
+            this.btn_even = new System.Windows.Forms.Button();
+            this.btn_odd = new System.Windows.Forms.Button();
+            this.checkBoxDay31 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay30 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay29 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay28 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay27 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay26 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay25 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay24 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay23 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay22 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay21 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay20 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay19 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay18 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay17 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay16 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay15 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay14 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay13 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay12 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay11 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay10 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay09 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay08 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay07 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay06 = new System.Windows.Forms.CheckBox();
+            this.numericUpDownOccurMonths = new System.Windows.Forms.NumericUpDown();
+            this.checkBoxDay05 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay04 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay03 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay02 = new System.Windows.Forms.CheckBox();
+            this.checkBoxDay01 = new System.Windows.Forms.CheckBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.groupBox_Weekly = new System.Windows.Forms.GroupBox();
+            this.numericUpDownOccurWeeks = new System.Windows.Forms.NumericUpDown();
+            this.checkBox_RecurSunday = new System.Windows.Forms.CheckBox();
+            this.checkBox_RecurSaturday = new System.Windows.Forms.CheckBox();
+            this.checkBox_RecurFriday = new System.Windows.Forms.CheckBox();
+            this.checkBox_RecurThursday = new System.Windows.Forms.CheckBox();
+            this.checkBox_RecurWednesday = new System.Windows.Forms.CheckBox();
+            this.checkBox_RecurTuesday = new System.Windows.Forms.CheckBox();
+            this.checkBox_RecurMonday = new System.Windows.Forms.CheckBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox_Seconds = new System.Windows.Forms.GroupBox();
             this.numericUpDownOccurSeconds = new System.Windows.Forms.NumericUpDown();
@@ -100,17 +144,6 @@ namespace zVirtualScenesApplication
             this.dateTimePickerStartTask = new System.Windows.Forms.DateTimePicker();
             this.comboBox_FrequencyTask = new System.Windows.Forms.ComboBox();
             this.label17 = new System.Windows.Forms.Label();
-            this.groupBox_Weekly = new System.Windows.Forms.GroupBox();
-            this.numericUpDownOccurWeeks = new System.Windows.Forms.NumericUpDown();
-            this.checkBox_RecurSunday = new System.Windows.Forms.CheckBox();
-            this.checkBox_RecurSaturday = new System.Windows.Forms.CheckBox();
-            this.checkBox_RecurFriday = new System.Windows.Forms.CheckBox();
-            this.checkBox_RecurThursday = new System.Windows.Forms.CheckBox();
-            this.checkBox_RecurWednesday = new System.Windows.Forms.CheckBox();
-            this.checkBox_RecurTuesday = new System.Windows.Forms.CheckBox();
-            this.checkBox_RecurMonday = new System.Windows.Forms.CheckBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
             this.tabPage5 = new System.Windows.Forms.TabPage();
             this.splitContainer3 = new System.Windows.Forms.SplitContainer();
             this.dataListViewDevices = new BrightIdeasSoftware.DataListView();
@@ -185,14 +218,15 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).BeginInit();
-            this.groupBox_OddEven.SuspendLayout();
+            this.groupBox_Montly.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurMonths)).BeginInit();
+            this.groupBox_Weekly.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurWeeks)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox_Seconds.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurSeconds)).BeginInit();
             this.groupBox_Daily.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurDays)).BeginInit();
-            this.groupBox_Weekly.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurWeeks)).BeginInit();
             this.tabPage5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).BeginInit();
             this.splitContainer3.Panel1.SuspendLayout();
@@ -546,7 +580,8 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.AutoScroll = true;
             this.splitContainer2.Panel2.BackColor = System.Drawing.Color.White;
             this.splitContainer2.Panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.splitContainer2.Panel2.Controls.Add(this.groupBox_OddEven);
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Montly);
+            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Weekly);
             this.splitContainer2.Panel2.Controls.Add(this.pictureBox1);
             this.splitContainer2.Panel2.Controls.Add(this.groupBox_Seconds);
             this.splitContainer2.Panel2.Controls.Add(this.label5);
@@ -560,7 +595,6 @@ namespace zVirtualScenesApplication
             this.splitContainer2.Panel2.Controls.Add(this.dateTimePickerStartTask);
             this.splitContainer2.Panel2.Controls.Add(this.comboBox_FrequencyTask);
             this.splitContainer2.Panel2.Controls.Add(this.label17);
-            this.splitContainer2.Panel2.Controls.Add(this.groupBox_Weekly);
             this.splitContainer2.Panel2MinSize = 553;
             this.splitContainer2.Size = new System.Drawing.Size(770, 432);
             this.splitContainer2.SplitterDistance = global::zVirtualScenesApplication.Properties.Settings.Default.SpiltContainer2Distance;
@@ -628,60 +662,541 @@ namespace zVirtualScenesApplication
             this.imageList25Icons.Images.SetKeyName(1, "Scene");
             this.imageList25Icons.Images.SetKeyName(2, "SceneRun");
             // 
-            // groupBox_OddEven
+            // groupBox_Montly
             // 
-            this.groupBox_OddEven.Controls.Add(this.radioButton_even);
-            this.groupBox_OddEven.Controls.Add(this.radioButton_odd);
-            this.groupBox_OddEven.Controls.Add(this.label4);
-            this.groupBox_OddEven.Controls.Add(this.label8);
-            this.groupBox_OddEven.Location = new System.Drawing.Point(17, 172);
-            this.groupBox_OddEven.Name = "groupBox_OddEven";
-            this.groupBox_OddEven.Size = new System.Drawing.Size(234, 54);
-            this.groupBox_OddEven.TabIndex = 46;
-            this.groupBox_OddEven.TabStop = false;
-            this.groupBox_OddEven.Text = "Days";
+            this.groupBox_Montly.Controls.Add(this.btn_clear);
+            this.groupBox_Montly.Controls.Add(this.btn_even);
+            this.groupBox_Montly.Controls.Add(this.btn_odd);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay31);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay30);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay29);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay28);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay27);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay26);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay25);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay24);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay23);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay22);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay21);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay20);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay19);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay18);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay17);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay16);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay15);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay14);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay13);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay12);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay11);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay10);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay09);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay08);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay07);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay06);
+            this.groupBox_Montly.Controls.Add(this.numericUpDownOccurMonths);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay05);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay04);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay03);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay02);
+            this.groupBox_Montly.Controls.Add(this.checkBoxDay01);
+            this.groupBox_Montly.Controls.Add(this.label4);
+            this.groupBox_Montly.Controls.Add(this.label8);
+            this.groupBox_Montly.Location = new System.Drawing.Point(18, 172);
+            this.groupBox_Montly.Name = "groupBox_Montly";
+            this.groupBox_Montly.Size = new System.Drawing.Size(335, 247);
+            this.groupBox_Montly.TabIndex = 46;
+            this.groupBox_Montly.TabStop = false;
+            this.groupBox_Montly.Text = "Monthly";
+            this.groupBox_Montly.Enter += new System.EventHandler(this.groupBox_Montly_Enter);
             // 
-            // radioButton_even
+            // btn_clear
             // 
-            this.radioButton_even.AutoSize = true;
-            this.radioButton_even.Location = new System.Drawing.Point(127, 20);
-            this.radioButton_even.Name = "radioButton_even";
-            this.radioButton_even.Size = new System.Drawing.Size(50, 17);
-            this.radioButton_even.TabIndex = 47;
-            this.radioButton_even.TabStop = true;
-            this.radioButton_even.Text = "Even";
-            this.radioButton_even.UseVisualStyleBackColor = true;
-            this.radioButton_even.CheckedChanged += new System.EventHandler(this.radioButton_even_CheckedChanged);
+            this.btn_clear.Location = new System.Drawing.Point(283, 218);
+            this.btn_clear.Name = "btn_clear";
+            this.btn_clear.Size = new System.Drawing.Size(46, 23);
+            this.btn_clear.TabIndex = 87;
+            this.btn_clear.Text = "Clear";
+            this.btn_clear.UseVisualStyleBackColor = true;
+            this.btn_clear.Click += new System.EventHandler(this.btn_clear_Click);
             // 
-            // radioButton_odd
+            // btn_even
             // 
-            this.radioButton_odd.AutoSize = true;
-            this.radioButton_odd.Location = new System.Drawing.Point(76, 20);
-            this.radioButton_odd.Name = "radioButton_odd";
-            this.radioButton_odd.Size = new System.Drawing.Size(45, 17);
-            this.radioButton_odd.TabIndex = 46;
-            this.radioButton_odd.TabStop = true;
-            this.radioButton_odd.Text = "Odd";
-            this.radioButton_odd.UseVisualStyleBackColor = true;
-            this.radioButton_odd.CheckedChanged += new System.EventHandler(this.radioButton_odd_CheckedChanged);
+            this.btn_even.Location = new System.Drawing.Point(231, 12);
+            this.btn_even.Name = "btn_even";
+            this.btn_even.Size = new System.Drawing.Size(46, 23);
+            this.btn_even.TabIndex = 86;
+            this.btn_even.Text = "Even";
+            this.btn_even.UseVisualStyleBackColor = true;
+            this.btn_even.Click += new System.EventHandler(this.btn_even_Click);
+            // 
+            // btn_odd
+            // 
+            this.btn_odd.Location = new System.Drawing.Point(283, 12);
+            this.btn_odd.Name = "btn_odd";
+            this.btn_odd.Size = new System.Drawing.Size(46, 23);
+            this.btn_odd.TabIndex = 85;
+            this.btn_odd.Text = "Odd";
+            this.btn_odd.UseVisualStyleBackColor = true;
+            this.btn_odd.Click += new System.EventHandler(this.btn_odd_Click);
+            // 
+            // checkBoxDay31
+            // 
+            this.checkBoxDay31.AutoSize = true;
+            this.checkBoxDay31.Location = new System.Drawing.Point(198, 190);
+            this.checkBoxDay31.Name = "checkBoxDay31";
+            this.checkBoxDay31.Size = new System.Drawing.Size(46, 17);
+            this.checkBoxDay31.TabIndex = 84;
+            this.checkBoxDay31.Text = "31st";
+            this.checkBoxDay31.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay30
+            // 
+            this.checkBoxDay30.AutoSize = true;
+            this.checkBoxDay30.Location = new System.Drawing.Point(198, 167);
+            this.checkBoxDay30.Name = "checkBoxDay30";
+            this.checkBoxDay30.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay30.TabIndex = 83;
+            this.checkBoxDay30.Text = "30th";
+            this.checkBoxDay30.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay29
+            // 
+            this.checkBoxDay29.AutoSize = true;
+            this.checkBoxDay29.Location = new System.Drawing.Point(198, 145);
+            this.checkBoxDay29.Name = "checkBoxDay29";
+            this.checkBoxDay29.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay29.TabIndex = 82;
+            this.checkBoxDay29.Text = "29th";
+            this.checkBoxDay29.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay28
+            // 
+            this.checkBoxDay28.AutoSize = true;
+            this.checkBoxDay28.Location = new System.Drawing.Point(198, 122);
+            this.checkBoxDay28.Name = "checkBoxDay28";
+            this.checkBoxDay28.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay28.TabIndex = 81;
+            this.checkBoxDay28.Text = "28th";
+            this.checkBoxDay28.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay27
+            // 
+            this.checkBoxDay27.AutoSize = true;
+            this.checkBoxDay27.Location = new System.Drawing.Point(198, 99);
+            this.checkBoxDay27.Name = "checkBoxDay27";
+            this.checkBoxDay27.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay27.TabIndex = 80;
+            this.checkBoxDay27.Text = "27th";
+            this.checkBoxDay27.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay26
+            // 
+            this.checkBoxDay26.AutoSize = true;
+            this.checkBoxDay26.Location = new System.Drawing.Point(198, 76);
+            this.checkBoxDay26.Name = "checkBoxDay26";
+            this.checkBoxDay26.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay26.TabIndex = 79;
+            this.checkBoxDay26.Text = "26th";
+            this.checkBoxDay26.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay25
+            // 
+            this.checkBoxDay25.AutoSize = true;
+            this.checkBoxDay25.Location = new System.Drawing.Point(198, 53);
+            this.checkBoxDay25.Name = "checkBoxDay25";
+            this.checkBoxDay25.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay25.TabIndex = 78;
+            this.checkBoxDay25.Text = "25th";
+            this.checkBoxDay25.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay24
+            // 
+            this.checkBoxDay24.AutoSize = true;
+            this.checkBoxDay24.Location = new System.Drawing.Point(136, 213);
+            this.checkBoxDay24.Name = "checkBoxDay24";
+            this.checkBoxDay24.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay24.TabIndex = 77;
+            this.checkBoxDay24.Text = "24th";
+            this.checkBoxDay24.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay23
+            // 
+            this.checkBoxDay23.AutoSize = true;
+            this.checkBoxDay23.Location = new System.Drawing.Point(136, 190);
+            this.checkBoxDay23.Name = "checkBoxDay23";
+            this.checkBoxDay23.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay23.TabIndex = 76;
+            this.checkBoxDay23.Text = "23rd";
+            this.checkBoxDay23.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay22
+            // 
+            this.checkBoxDay22.AutoSize = true;
+            this.checkBoxDay22.Location = new System.Drawing.Point(136, 167);
+            this.checkBoxDay22.Name = "checkBoxDay22";
+            this.checkBoxDay22.Size = new System.Drawing.Size(50, 17);
+            this.checkBoxDay22.TabIndex = 75;
+            this.checkBoxDay22.Text = "22nd";
+            this.checkBoxDay22.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay21
+            // 
+            this.checkBoxDay21.AutoSize = true;
+            this.checkBoxDay21.Location = new System.Drawing.Point(136, 145);
+            this.checkBoxDay21.Name = "checkBoxDay21";
+            this.checkBoxDay21.Size = new System.Drawing.Size(46, 17);
+            this.checkBoxDay21.TabIndex = 74;
+            this.checkBoxDay21.Text = "21st";
+            this.checkBoxDay21.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay20
+            // 
+            this.checkBoxDay20.AutoSize = true;
+            this.checkBoxDay20.Location = new System.Drawing.Point(136, 122);
+            this.checkBoxDay20.Name = "checkBoxDay20";
+            this.checkBoxDay20.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay20.TabIndex = 73;
+            this.checkBoxDay20.Text = "20th";
+            this.checkBoxDay20.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay19
+            // 
+            this.checkBoxDay19.AutoSize = true;
+            this.checkBoxDay19.Location = new System.Drawing.Point(136, 99);
+            this.checkBoxDay19.Name = "checkBoxDay19";
+            this.checkBoxDay19.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay19.TabIndex = 72;
+            this.checkBoxDay19.Text = "19th";
+            this.checkBoxDay19.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay18
+            // 
+            this.checkBoxDay18.AutoSize = true;
+            this.checkBoxDay18.Location = new System.Drawing.Point(136, 76);
+            this.checkBoxDay18.Name = "checkBoxDay18";
+            this.checkBoxDay18.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay18.TabIndex = 71;
+            this.checkBoxDay18.Text = "18th";
+            this.checkBoxDay18.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay17
+            // 
+            this.checkBoxDay17.AutoSize = true;
+            this.checkBoxDay17.Location = new System.Drawing.Point(136, 53);
+            this.checkBoxDay17.Name = "checkBoxDay17";
+            this.checkBoxDay17.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay17.TabIndex = 70;
+            this.checkBoxDay17.Text = "17th";
+            this.checkBoxDay17.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay16
+            // 
+            this.checkBoxDay16.AutoSize = true;
+            this.checkBoxDay16.Location = new System.Drawing.Point(72, 213);
+            this.checkBoxDay16.Name = "checkBoxDay16";
+            this.checkBoxDay16.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay16.TabIndex = 69;
+            this.checkBoxDay16.Text = "16th";
+            this.checkBoxDay16.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay15
+            // 
+            this.checkBoxDay15.AutoSize = true;
+            this.checkBoxDay15.Location = new System.Drawing.Point(72, 190);
+            this.checkBoxDay15.Name = "checkBoxDay15";
+            this.checkBoxDay15.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay15.TabIndex = 68;
+            this.checkBoxDay15.Text = "15th";
+            this.checkBoxDay15.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay14
+            // 
+            this.checkBoxDay14.AutoSize = true;
+            this.checkBoxDay14.Location = new System.Drawing.Point(72, 167);
+            this.checkBoxDay14.Name = "checkBoxDay14";
+            this.checkBoxDay14.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay14.TabIndex = 67;
+            this.checkBoxDay14.Text = "14th";
+            this.checkBoxDay14.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay13
+            // 
+            this.checkBoxDay13.AutoSize = true;
+            this.checkBoxDay13.Location = new System.Drawing.Point(72, 145);
+            this.checkBoxDay13.Name = "checkBoxDay13";
+            this.checkBoxDay13.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay13.TabIndex = 66;
+            this.checkBoxDay13.Text = "13th";
+            this.checkBoxDay13.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay12
+            // 
+            this.checkBoxDay12.AutoSize = true;
+            this.checkBoxDay12.Location = new System.Drawing.Point(72, 122);
+            this.checkBoxDay12.Name = "checkBoxDay12";
+            this.checkBoxDay12.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay12.TabIndex = 65;
+            this.checkBoxDay12.Text = "12th";
+            this.checkBoxDay12.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay11
+            // 
+            this.checkBoxDay11.AutoSize = true;
+            this.checkBoxDay11.Location = new System.Drawing.Point(72, 99);
+            this.checkBoxDay11.Name = "checkBoxDay11";
+            this.checkBoxDay11.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay11.TabIndex = 64;
+            this.checkBoxDay11.Text = "11th";
+            this.checkBoxDay11.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay10
+            // 
+            this.checkBoxDay10.AutoSize = true;
+            this.checkBoxDay10.Location = new System.Drawing.Point(72, 76);
+            this.checkBoxDay10.Name = "checkBoxDay10";
+            this.checkBoxDay10.Size = new System.Drawing.Size(47, 17);
+            this.checkBoxDay10.TabIndex = 63;
+            this.checkBoxDay10.Text = "10th";
+            this.checkBoxDay10.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay09
+            // 
+            this.checkBoxDay09.AutoSize = true;
+            this.checkBoxDay09.Location = new System.Drawing.Point(72, 53);
+            this.checkBoxDay09.Name = "checkBoxDay09";
+            this.checkBoxDay09.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay09.TabIndex = 62;
+            this.checkBoxDay09.Text = "9th";
+            this.checkBoxDay09.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay08
+            // 
+            this.checkBoxDay08.AutoSize = true;
+            this.checkBoxDay08.Location = new System.Drawing.Point(17, 213);
+            this.checkBoxDay08.Name = "checkBoxDay08";
+            this.checkBoxDay08.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay08.TabIndex = 61;
+            this.checkBoxDay08.Text = "8th";
+            this.checkBoxDay08.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay07
+            // 
+            this.checkBoxDay07.AutoSize = true;
+            this.checkBoxDay07.Location = new System.Drawing.Point(17, 190);
+            this.checkBoxDay07.Name = "checkBoxDay07";
+            this.checkBoxDay07.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay07.TabIndex = 60;
+            this.checkBoxDay07.Text = "7th";
+            this.checkBoxDay07.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay06
+            // 
+            this.checkBoxDay06.AutoSize = true;
+            this.checkBoxDay06.Location = new System.Drawing.Point(17, 167);
+            this.checkBoxDay06.Name = "checkBoxDay06";
+            this.checkBoxDay06.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay06.TabIndex = 59;
+            this.checkBoxDay06.Text = "6th";
+            this.checkBoxDay06.UseVisualStyleBackColor = true;
+            // 
+            // numericUpDownOccurMonths
+            // 
+            this.numericUpDownOccurMonths.Location = new System.Drawing.Point(86, 21);
+            this.numericUpDownOccurMonths.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numericUpDownOccurMonths.Name = "numericUpDownOccurMonths";
+            this.numericUpDownOccurMonths.Size = new System.Drawing.Size(58, 20);
+            this.numericUpDownOccurMonths.TabIndex = 56;
+            // 
+            // checkBoxDay05
+            // 
+            this.checkBoxDay05.AutoSize = true;
+            this.checkBoxDay05.Location = new System.Drawing.Point(17, 145);
+            this.checkBoxDay05.Name = "checkBoxDay05";
+            this.checkBoxDay05.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay05.TabIndex = 55;
+            this.checkBoxDay05.Text = "5th";
+            this.checkBoxDay05.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay04
+            // 
+            this.checkBoxDay04.AutoSize = true;
+            this.checkBoxDay04.Location = new System.Drawing.Point(17, 122);
+            this.checkBoxDay04.Name = "checkBoxDay04";
+            this.checkBoxDay04.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay04.TabIndex = 54;
+            this.checkBoxDay04.Text = "4th";
+            this.checkBoxDay04.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay03
+            // 
+            this.checkBoxDay03.AutoSize = true;
+            this.checkBoxDay03.Location = new System.Drawing.Point(17, 99);
+            this.checkBoxDay03.Name = "checkBoxDay03";
+            this.checkBoxDay03.Size = new System.Drawing.Size(41, 17);
+            this.checkBoxDay03.TabIndex = 53;
+            this.checkBoxDay03.Text = "3rd";
+            this.checkBoxDay03.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay02
+            // 
+            this.checkBoxDay02.AutoSize = true;
+            this.checkBoxDay02.Location = new System.Drawing.Point(17, 76);
+            this.checkBoxDay02.Name = "checkBoxDay02";
+            this.checkBoxDay02.Size = new System.Drawing.Size(44, 17);
+            this.checkBoxDay02.TabIndex = 52;
+            this.checkBoxDay02.Text = "2nd";
+            this.checkBoxDay02.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxDay01
+            // 
+            this.checkBoxDay01.AutoSize = true;
+            this.checkBoxDay01.Location = new System.Drawing.Point(17, 53);
+            this.checkBoxDay01.Name = "checkBoxDay01";
+            this.checkBoxDay01.Size = new System.Drawing.Size(40, 17);
+            this.checkBoxDay01.TabIndex = 51;
+            this.checkBoxDay01.Text = "1st";
+            this.checkBoxDay01.UseVisualStyleBackColor = true;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(178, 22);
+            this.label4.Location = new System.Drawing.Point(151, 27);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(32, 13);
-            this.label4.TabIndex = 40;
-            this.label4.Text = "days.";
+            this.label4.Size = new System.Drawing.Size(44, 13);
+            this.label4.TabIndex = 50;
+            this.label4.Text = "months.";
             // 
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(19, 22);
+            this.label8.Location = new System.Drawing.Point(14, 27);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(51, 13);
-            this.label8.TabIndex = 39;
-            this.label8.Text = "Recur on";
+            this.label8.Size = new System.Drawing.Size(65, 13);
+            this.label8.TabIndex = 49;
+            this.label8.Text = "Recur every";
+            // 
+            // groupBox_Weekly
+            // 
+            this.groupBox_Weekly.Controls.Add(this.numericUpDownOccurWeeks);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurSunday);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurSaturday);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurFriday);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurThursday);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurWednesday);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurTuesday);
+            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurMonday);
+            this.groupBox_Weekly.Controls.Add(this.label7);
+            this.groupBox_Weekly.Controls.Add(this.label12);
+            this.groupBox_Weekly.Location = new System.Drawing.Point(17, 172);
+            this.groupBox_Weekly.Name = "groupBox_Weekly";
+            this.groupBox_Weekly.Size = new System.Drawing.Size(206, 165);
+            this.groupBox_Weekly.TabIndex = 41;
+            this.groupBox_Weekly.TabStop = false;
+            this.groupBox_Weekly.Text = "Weekly";
+            // 
+            // numericUpDownOccurWeeks
+            // 
+            this.numericUpDownOccurWeeks.Location = new System.Drawing.Point(91, 16);
+            this.numericUpDownOccurWeeks.Maximum = new decimal(new int[] {
+            99999,
+            0,
+            0,
+            0});
+            this.numericUpDownOccurWeeks.Name = "numericUpDownOccurWeeks";
+            this.numericUpDownOccurWeeks.Size = new System.Drawing.Size(58, 20);
+            this.numericUpDownOccurWeeks.TabIndex = 47;
+            // 
+            // checkBox_RecurSunday
+            // 
+            this.checkBox_RecurSunday.AutoSize = true;
+            this.checkBox_RecurSunday.Location = new System.Drawing.Point(124, 71);
+            this.checkBox_RecurSunday.Name = "checkBox_RecurSunday";
+            this.checkBox_RecurSunday.Size = new System.Drawing.Size(62, 17);
+            this.checkBox_RecurSunday.TabIndex = 48;
+            this.checkBox_RecurSunday.Text = "Sunday";
+            this.checkBox_RecurSunday.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_RecurSaturday
+            // 
+            this.checkBox_RecurSaturday.AutoSize = true;
+            this.checkBox_RecurSaturday.Location = new System.Drawing.Point(124, 48);
+            this.checkBox_RecurSaturday.Name = "checkBox_RecurSaturday";
+            this.checkBox_RecurSaturday.Size = new System.Drawing.Size(68, 17);
+            this.checkBox_RecurSaturday.TabIndex = 47;
+            this.checkBox_RecurSaturday.Text = "Saturday";
+            this.checkBox_RecurSaturday.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_RecurFriday
+            // 
+            this.checkBox_RecurFriday.AutoSize = true;
+            this.checkBox_RecurFriday.Location = new System.Drawing.Point(22, 140);
+            this.checkBox_RecurFriday.Name = "checkBox_RecurFriday";
+            this.checkBox_RecurFriday.Size = new System.Drawing.Size(54, 17);
+            this.checkBox_RecurFriday.TabIndex = 46;
+            this.checkBox_RecurFriday.Text = "Friday";
+            this.checkBox_RecurFriday.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_RecurThursday
+            // 
+            this.checkBox_RecurThursday.AutoSize = true;
+            this.checkBox_RecurThursday.Location = new System.Drawing.Point(22, 117);
+            this.checkBox_RecurThursday.Name = "checkBox_RecurThursday";
+            this.checkBox_RecurThursday.Size = new System.Drawing.Size(70, 17);
+            this.checkBox_RecurThursday.TabIndex = 45;
+            this.checkBox_RecurThursday.Text = "Thursday";
+            this.checkBox_RecurThursday.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_RecurWednesday
+            // 
+            this.checkBox_RecurWednesday.AutoSize = true;
+            this.checkBox_RecurWednesday.Location = new System.Drawing.Point(22, 94);
+            this.checkBox_RecurWednesday.Name = "checkBox_RecurWednesday";
+            this.checkBox_RecurWednesday.Size = new System.Drawing.Size(83, 17);
+            this.checkBox_RecurWednesday.TabIndex = 44;
+            this.checkBox_RecurWednesday.Text = "Wednesday";
+            this.checkBox_RecurWednesday.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_RecurTuesday
+            // 
+            this.checkBox_RecurTuesday.AutoSize = true;
+            this.checkBox_RecurTuesday.Location = new System.Drawing.Point(22, 71);
+            this.checkBox_RecurTuesday.Name = "checkBox_RecurTuesday";
+            this.checkBox_RecurTuesday.Size = new System.Drawing.Size(67, 17);
+            this.checkBox_RecurTuesday.TabIndex = 43;
+            this.checkBox_RecurTuesday.Text = "Tuesday";
+            this.checkBox_RecurTuesday.UseVisualStyleBackColor = true;
+            // 
+            // checkBox_RecurMonday
+            // 
+            this.checkBox_RecurMonday.AutoSize = true;
+            this.checkBox_RecurMonday.Location = new System.Drawing.Point(22, 48);
+            this.checkBox_RecurMonday.Name = "checkBox_RecurMonday";
+            this.checkBox_RecurMonday.Size = new System.Drawing.Size(64, 17);
+            this.checkBox_RecurMonday.TabIndex = 42;
+            this.checkBox_RecurMonday.Text = "Monday";
+            this.checkBox_RecurMonday.UseVisualStyleBackColor = true;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(156, 22);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(41, 13);
+            this.label7.TabIndex = 40;
+            this.label7.Text = "weeks.";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(19, 22);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(65, 13);
+            this.label12.TabIndex = 39;
+            this.label12.Text = "Recur every";
             // 
             // pictureBox1
             // 
@@ -868,125 +1383,6 @@ namespace zVirtualScenesApplication
             this.label17.Size = new System.Drawing.Size(87, 13);
             this.label17.TabIndex = 34;
             this.label17.Text = "Task Frequency:";
-            // 
-            // groupBox_Weekly
-            // 
-            this.groupBox_Weekly.Controls.Add(this.numericUpDownOccurWeeks);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurSunday);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurSaturday);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurFriday);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurThursday);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurWednesday);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurTuesday);
-            this.groupBox_Weekly.Controls.Add(this.checkBox_RecurMonday);
-            this.groupBox_Weekly.Controls.Add(this.label7);
-            this.groupBox_Weekly.Controls.Add(this.label12);
-            this.groupBox_Weekly.Location = new System.Drawing.Point(17, 172);
-            this.groupBox_Weekly.Name = "groupBox_Weekly";
-            this.groupBox_Weekly.Size = new System.Drawing.Size(206, 165);
-            this.groupBox_Weekly.TabIndex = 41;
-            this.groupBox_Weekly.TabStop = false;
-            this.groupBox_Weekly.Text = "Weekly";
-            // 
-            // numericUpDownOccurWeeks
-            // 
-            this.numericUpDownOccurWeeks.Location = new System.Drawing.Point(91, 16);
-            this.numericUpDownOccurWeeks.Maximum = new decimal(new int[] {
-            99999,
-            0,
-            0,
-            0});
-            this.numericUpDownOccurWeeks.Name = "numericUpDownOccurWeeks";
-            this.numericUpDownOccurWeeks.Size = new System.Drawing.Size(58, 20);
-            this.numericUpDownOccurWeeks.TabIndex = 47;
-            // 
-            // checkBox_RecurSunday
-            // 
-            this.checkBox_RecurSunday.AutoSize = true;
-            this.checkBox_RecurSunday.Location = new System.Drawing.Point(124, 71);
-            this.checkBox_RecurSunday.Name = "checkBox_RecurSunday";
-            this.checkBox_RecurSunday.Size = new System.Drawing.Size(62, 17);
-            this.checkBox_RecurSunday.TabIndex = 48;
-            this.checkBox_RecurSunday.Text = "Sunday";
-            this.checkBox_RecurSunday.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_RecurSaturday
-            // 
-            this.checkBox_RecurSaturday.AutoSize = true;
-            this.checkBox_RecurSaturday.Location = new System.Drawing.Point(124, 48);
-            this.checkBox_RecurSaturday.Name = "checkBox_RecurSaturday";
-            this.checkBox_RecurSaturday.Size = new System.Drawing.Size(68, 17);
-            this.checkBox_RecurSaturday.TabIndex = 47;
-            this.checkBox_RecurSaturday.Text = "Saturday";
-            this.checkBox_RecurSaturday.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_RecurFriday
-            // 
-            this.checkBox_RecurFriday.AutoSize = true;
-            this.checkBox_RecurFriday.Location = new System.Drawing.Point(22, 140);
-            this.checkBox_RecurFriday.Name = "checkBox_RecurFriday";
-            this.checkBox_RecurFriday.Size = new System.Drawing.Size(54, 17);
-            this.checkBox_RecurFriday.TabIndex = 46;
-            this.checkBox_RecurFriday.Text = "Friday";
-            this.checkBox_RecurFriday.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_RecurThursday
-            // 
-            this.checkBox_RecurThursday.AutoSize = true;
-            this.checkBox_RecurThursday.Location = new System.Drawing.Point(22, 117);
-            this.checkBox_RecurThursday.Name = "checkBox_RecurThursday";
-            this.checkBox_RecurThursday.Size = new System.Drawing.Size(70, 17);
-            this.checkBox_RecurThursday.TabIndex = 45;
-            this.checkBox_RecurThursday.Text = "Thursday";
-            this.checkBox_RecurThursday.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_RecurWednesday
-            // 
-            this.checkBox_RecurWednesday.AutoSize = true;
-            this.checkBox_RecurWednesday.Location = new System.Drawing.Point(22, 94);
-            this.checkBox_RecurWednesday.Name = "checkBox_RecurWednesday";
-            this.checkBox_RecurWednesday.Size = new System.Drawing.Size(83, 17);
-            this.checkBox_RecurWednesday.TabIndex = 44;
-            this.checkBox_RecurWednesday.Text = "Wednesday";
-            this.checkBox_RecurWednesday.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_RecurTuesday
-            // 
-            this.checkBox_RecurTuesday.AutoSize = true;
-            this.checkBox_RecurTuesday.Location = new System.Drawing.Point(22, 71);
-            this.checkBox_RecurTuesday.Name = "checkBox_RecurTuesday";
-            this.checkBox_RecurTuesday.Size = new System.Drawing.Size(67, 17);
-            this.checkBox_RecurTuesday.TabIndex = 43;
-            this.checkBox_RecurTuesday.Text = "Tuesday";
-            this.checkBox_RecurTuesday.UseVisualStyleBackColor = true;
-            // 
-            // checkBox_RecurMonday
-            // 
-            this.checkBox_RecurMonday.AutoSize = true;
-            this.checkBox_RecurMonday.Location = new System.Drawing.Point(22, 48);
-            this.checkBox_RecurMonday.Name = "checkBox_RecurMonday";
-            this.checkBox_RecurMonday.Size = new System.Drawing.Size(64, 17);
-            this.checkBox_RecurMonday.TabIndex = 42;
-            this.checkBox_RecurMonday.Text = "Monday";
-            this.checkBox_RecurMonday.UseVisualStyleBackColor = true;
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(156, 22);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(41, 13);
-            this.label7.TabIndex = 40;
-            this.label7.Text = "weeks.";
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(19, 22);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(65, 13);
-            this.label12.TabIndex = 39;
-            this.label12.Text = "Recur every";
             // 
             // tabPage5
             // 
@@ -1588,12 +1984,12 @@ namespace zVirtualScenesApplication
             this.contextMenuStripTriggerNull.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemEventsNull});
             this.contextMenuStripTriggerNull.Name = "contextMenuStripEvent";
-            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(153, 48);
+            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(141, 26);
             // 
             // toolStripMenuItemEventsNull
             // 
             this.toolStripMenuItemEventsNull.Name = "toolStripMenuItemEventsNull";
-            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(152, 22);
+            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(140, 22);
             this.toolStripMenuItemEventsNull.Text = "&Create Event";
             this.toolStripMenuItemEventsNull.Click += new System.EventHandler(this.toolStripMenuItemEventsNull_Click);
             // 
@@ -1633,8 +2029,12 @@ namespace zVirtualScenesApplication
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataListTasks)).EndInit();
-            this.groupBox_OddEven.ResumeLayout(false);
-            this.groupBox_OddEven.PerformLayout();
+            this.groupBox_Montly.ResumeLayout(false);
+            this.groupBox_Montly.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurMonths)).EndInit();
+            this.groupBox_Weekly.ResumeLayout(false);
+            this.groupBox_Weekly.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurWeeks)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox_Seconds.ResumeLayout(false);
             this.groupBox_Seconds.PerformLayout();
@@ -1642,9 +2042,6 @@ namespace zVirtualScenesApplication
             this.groupBox_Daily.ResumeLayout(false);
             this.groupBox_Daily.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurDays)).EndInit();
-            this.groupBox_Weekly.ResumeLayout(false);
-            this.groupBox_Weekly.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOccurWeeks)).EndInit();
             this.tabPage5.ResumeLayout(false);
             this.splitContainer3.Panel1.ResumeLayout(false);
             this.splitContainer3.Panel2.ResumeLayout(false);
@@ -1805,11 +2202,44 @@ namespace zVirtualScenesApplication
         private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem exitZVSToolStripMenuItem;
         private ToolStripMenuItem showZVirtualSceneToolStripMenuItem;
-        private GroupBox groupBox_OddEven;
-        private RadioButton radioButton_even;
-        private RadioButton radioButton_odd;
+        private GroupBox groupBox_Montly;
+        private NumericUpDown numericUpDownOccurMonths;
+        private CheckBox checkBoxDay05;
+        private CheckBox checkBoxDay04;
+        private CheckBox checkBoxDay03;
+        private CheckBox checkBoxDay02;
+        private CheckBox checkBoxDay01;
         private Label label4;
         private Label label8;
+        private CheckBox checkBoxDay08;
+        private CheckBox checkBoxDay07;
+        private CheckBox checkBoxDay06;
+        private CheckBox checkBoxDay31;
+        private CheckBox checkBoxDay30;
+        private CheckBox checkBoxDay29;
+        private CheckBox checkBoxDay28;
+        private CheckBox checkBoxDay27;
+        private CheckBox checkBoxDay26;
+        private CheckBox checkBoxDay25;
+        private CheckBox checkBoxDay24;
+        private CheckBox checkBoxDay23;
+        private CheckBox checkBoxDay22;
+        private CheckBox checkBoxDay21;
+        private CheckBox checkBoxDay20;
+        private CheckBox checkBoxDay19;
+        private CheckBox checkBoxDay18;
+        private CheckBox checkBoxDay17;
+        private CheckBox checkBoxDay16;
+        private CheckBox checkBoxDay15;
+        private CheckBox checkBoxDay14;
+        private CheckBox checkBoxDay13;
+        private CheckBox checkBoxDay12;
+        private CheckBox checkBoxDay11;
+        private CheckBox checkBoxDay10;
+        private CheckBox checkBoxDay09;
+        private Button btn_even;
+        private Button btn_odd;
+        private Button btn_clear;
     }
 }
 

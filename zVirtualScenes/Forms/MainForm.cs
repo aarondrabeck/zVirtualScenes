@@ -1360,18 +1360,23 @@ namespace zVirtualScenesApplication
                                     }
                                     break;
                                 }
-                            case scheduled_tasks.frequencys.OddEven:
+                            case scheduled_tasks.frequencys.Monthly:
                                 {
-                                    if (task.RecurEven.HasValue && (task.RecurEven.Value == (DateTime.Now.Day % 2 == 0)) && task.StartTime.HasValue)
-                                    {                                        
-                                        //Console.WriteLine("totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
-                                           
-                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                        TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
+                                    if (task.StartTime.HasValue)
+                                    {
+                                        int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
+                                        //Console.WriteLine(string.Format("Months Apart: {0}", monthsapart));
+                                        if (monthsapart > -1 && monthsapart % task.RecurMonth == 0)  //IF RUN THIS Month
+                                        {
+                                            if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
+                                            {
+                                                TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                                TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                        // Console.WriteLine(string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
-                                        if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
-                                            task.Run();
+                                                if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                    task.Run();
+                                            }
+                                        }
                                     }
 
                                     break;
@@ -1392,6 +1397,107 @@ namespace zVirtualScenesApplication
                     }
                 }
             }
+        }
+
+        private bool ShouldRunThisDayOfMonth(scheduled_tasks task)
+        {
+            switch (DateTime.Now.Day)
+            {
+                case 1:
+                        if (task.RecurDay01.HasValue && task.RecurDay01.Value) { return true; }
+                        break;
+                case 2:
+                        if (task.RecurDay02.HasValue && task.RecurDay02.Value) { return true; }
+                        break;
+                case 3:
+                        if (task.RecurDay03.HasValue && task.RecurDay03.Value) { return true; }
+                        break;
+                case 4:
+                        if (task.RecurDay04.HasValue && task.RecurDay04.Value) { return true; }
+                        break;
+                case 5:                    
+                        if (task.RecurDay05.HasValue && task.RecurDay05.Value) { return true; }
+                        break;                    
+                case 6:                    
+                        if (task.RecurDay06.HasValue && task.RecurDay06.Value) { return true; }
+                        break;                    
+                case 7:                    
+                        if (task.RecurDay07.HasValue && task.RecurDay07.Value) { return true; }
+                        break;                    
+                case 8:                    
+                        if (task.RecurDay08.HasValue && task.RecurDay08.Value) { return true; }
+                        break;                    
+                case 9:                    
+                        if (task.RecurDay09.HasValue && task.RecurDay09.Value) { return true; }
+                        break;                    
+                case 10:                    
+                        if (task.RecurDay10.HasValue && task.RecurDay10.Value) { return true; }
+                        break;
+                case 11:
+                        if (task.RecurDay11.HasValue && task.RecurDay11.Value) { return true; }
+                        break;
+                case 12:
+                        if (task.RecurDay12.HasValue && task.RecurDay12.Value) { return true; }
+                        break;
+                case 13:
+                        if (task.RecurDay13.HasValue && task.RecurDay13.Value) { return true; }
+                        break;
+                case 14:
+                        if (task.RecurDay14.HasValue && task.RecurDay14.Value) { return true; }
+                        break;
+                case 15:
+                        if (task.RecurDay15.HasValue && task.RecurDay15.Value) { return true; }
+                        break;
+                case 16:
+                        if (task.RecurDay16.HasValue && task.RecurDay16.Value) { return true; }
+                        break;
+                case 17:
+                        if (task.RecurDay17.HasValue && task.RecurDay17.Value) { return true; }
+                        break;
+                case 18:
+                        if (task.RecurDay18.HasValue && task.RecurDay18.Value) { return true; }
+                        break;
+                case 19:
+                        if (task.RecurDay19.HasValue && task.RecurDay19.Value) { return true; }
+                        break;
+                case 20:
+                        if (task.RecurDay20.HasValue && task.RecurDay20.Value) { return true; }
+                        break;
+                case 21:
+                        if (task.RecurDay21.HasValue && task.RecurDay21.Value) { return true; }
+                        break;
+                case 22:
+                        if (task.RecurDay22.HasValue && task.RecurDay22.Value) { return true; }
+                        break;
+                case 23:
+                        if (task.RecurDay23.HasValue && task.RecurDay23.Value) { return true; }
+                        break;
+                case 24:
+                        if (task.RecurDay24.HasValue && task.RecurDay24.Value) { return true; }
+                        break;
+                case 25:
+                        if (task.RecurDay25.HasValue && task.RecurDay25.Value) { return true; }
+                        break;
+                case 26:
+                        if (task.RecurDay26.HasValue && task.RecurDay26.Value) { return true; }
+                        break;
+                case 27:
+                        if (task.RecurDay27.HasValue && task.RecurDay27.Value) { return true; }
+                        break;
+                case 28:
+                        if (task.RecurDay28.HasValue && task.RecurDay28.Value) { return true; }
+                        break;
+                case 29:
+                        if (task.RecurDay29.HasValue && task.RecurDay29.Value) { return true; }
+                        break;
+                case 30:
+                        if (task.RecurDay30.HasValue && task.RecurDay30.Value) { return true; }
+                        break;
+                case 31:
+                        if (task.RecurDay31.HasValue && task.RecurDay31.Value) { return true; }
+                        break;
+            }
+            return false; 
         }
 
         private bool ShouldRunToday(scheduled_tasks task)
@@ -1486,8 +1592,41 @@ namespace zVirtualScenesApplication
             checkBox_RecurSaturday.Enabled = true;
             checkBox_RecurSunday.Enabled = true;
             comboBox_ActionsTask.Enabled = true;
-            radioButton_even.Enabled = true;
-            radioButton_odd.Enabled = true; 
+            //monthly
+            btn_odd.Enabled = true;
+            btn_even.Enabled = true;
+            numericUpDownOccurMonths.Enabled = true;
+            checkBoxDay01.Enabled = true;
+            checkBoxDay02.Enabled = true;
+            checkBoxDay03.Enabled = true;
+            checkBoxDay04.Enabled = true;
+            checkBoxDay05.Enabled = true;
+            checkBoxDay06.Enabled = true;
+            checkBoxDay07.Enabled = true;
+            checkBoxDay08.Enabled = true;
+            checkBoxDay09.Enabled = true;
+            checkBoxDay10.Enabled = true;
+            checkBoxDay11.Enabled = true;
+            checkBoxDay12.Enabled = true;
+            checkBoxDay13.Enabled = true;
+            checkBoxDay14.Enabled = true;
+            checkBoxDay15.Enabled = true;
+            checkBoxDay16.Enabled = true;
+            checkBoxDay17.Enabled = true;
+            checkBoxDay18.Enabled = true;
+            checkBoxDay19.Enabled = true;
+            checkBoxDay20.Enabled = true;
+            checkBoxDay21.Enabled = true;
+            checkBoxDay22.Enabled = true;
+            checkBoxDay23.Enabled = true;
+            checkBoxDay24.Enabled = true;
+            checkBoxDay25.Enabled = true;
+            checkBoxDay26.Enabled = true;
+            checkBoxDay27.Enabled = true;
+            checkBoxDay28.Enabled = true;
+            checkBoxDay29.Enabled = true;
+            checkBoxDay30.Enabled = true;
+            checkBoxDay31.Enabled = true;            
 
             textBox_TaskName.Text = Task.friendly_name;
             checkBox_EnabledTask.Checked = Task.Enabled;
@@ -1499,40 +1638,72 @@ namespace zVirtualScenesApplication
                 dateTimePickerStartTask.Value = Task.StartTime.Value;
 
             if (Task.RecurWeeks.HasValue)
-            numericUpDownOccurWeeks.Value = (decimal)Task.RecurWeeks;
+                numericUpDownOccurWeeks.Value = (decimal)Task.RecurWeeks;
 
             if (Task.RecurDays.HasValue)
-            numericUpDownOccurDays.Value = (decimal)Task.RecurDays;
+                numericUpDownOccurDays.Value = (decimal)Task.RecurDays;
 
             if (Task.RecurSeconds.HasValue)
-            numericUpDownOccurSeconds.Value = (decimal)Task.RecurSeconds;
+                numericUpDownOccurSeconds.Value = (decimal)Task.RecurSeconds;
 
             if (Task.RecurMonday.HasValue)
-            checkBox_RecurMonday.Checked = Task.RecurMonday.Value;
+                checkBox_RecurMonday.Checked = Task.RecurMonday.Value;
 
             if (Task.RecurTuesday.HasValue)
-            checkBox_RecurTuesday.Checked = Task.RecurTuesday.Value;
+                checkBox_RecurTuesday.Checked = Task.RecurTuesday.Value;
 
             if (Task.RecurWednesday.HasValue)
-            checkBox_RecurWednesday.Checked = Task.RecurWednesday.Value;
+                checkBox_RecurWednesday.Checked = Task.RecurWednesday.Value;
 
             if (Task.RecurThursday.HasValue)
-            checkBox_RecurThursday.Checked = Task.RecurThursday.Value;
+                checkBox_RecurThursday.Checked = Task.RecurThursday.Value;
 
             if (Task.RecurFriday.HasValue)
-            checkBox_RecurFriday.Checked = Task.RecurFriday.Value;
+                checkBox_RecurFriday.Checked = Task.RecurFriday.Value;
 
             if (Task.RecurSaturday.HasValue)
-            checkBox_RecurSaturday.Checked = Task.RecurSaturday.Value;
+                checkBox_RecurSaturday.Checked = Task.RecurSaturday.Value;
 
             if (Task.RecurSunday.HasValue)
-            checkBox_RecurSunday.Checked = Task.RecurSunday.Value;
+                checkBox_RecurSunday.Checked = Task.RecurSunday.Value;
 
-            if (Task.RecurEven.HasValue)
-            {
-                radioButton_even.Checked = Task.RecurEven.Value;
-                radioButton_odd.Checked = !Task.RecurEven.Value;
-            }
+            #region Monthly
+            if (Task.RecurMonth.HasValue)
+                numericUpDownOccurMonths.Value = (decimal)Task.RecurMonth.Value;
+
+            if (Task.RecurDay01.HasValue) { checkBoxDay01.Checked = Task.RecurDay01.Value; }
+            if (Task.RecurDay02.HasValue) { checkBoxDay02.Checked = Task.RecurDay02.Value; }
+            if (Task.RecurDay03.HasValue) { checkBoxDay03.Checked = Task.RecurDay03.Value; }
+            if (Task.RecurDay04.HasValue) { checkBoxDay04.Checked = Task.RecurDay04.Value; }
+            if (Task.RecurDay05.HasValue) { checkBoxDay05.Checked = Task.RecurDay05.Value; }
+            if (Task.RecurDay06.HasValue) { checkBoxDay06.Checked = Task.RecurDay06.Value; }
+            if (Task.RecurDay07.HasValue) { checkBoxDay07.Checked = Task.RecurDay07.Value; }
+            if (Task.RecurDay08.HasValue) { checkBoxDay08.Checked = Task.RecurDay08.Value; }
+            if (Task.RecurDay09.HasValue) { checkBoxDay09.Checked = Task.RecurDay09.Value; }
+            if (Task.RecurDay10.HasValue) { checkBoxDay10.Checked = Task.RecurDay10.Value; }
+            if (Task.RecurDay11.HasValue) { checkBoxDay11.Checked = Task.RecurDay11.Value; }
+            if (Task.RecurDay12.HasValue) { checkBoxDay12.Checked = Task.RecurDay12.Value; }
+            if (Task.RecurDay13.HasValue) { checkBoxDay13.Checked = Task.RecurDay13.Value; }
+            if (Task.RecurDay14.HasValue) { checkBoxDay14.Checked = Task.RecurDay14.Value; }
+            if (Task.RecurDay15.HasValue) { checkBoxDay15.Checked = Task.RecurDay15.Value; }
+            if (Task.RecurDay16.HasValue) { checkBoxDay16.Checked = Task.RecurDay16.Value; }
+            if (Task.RecurDay17.HasValue) { checkBoxDay17.Checked = Task.RecurDay17.Value; }
+            if (Task.RecurDay18.HasValue) { checkBoxDay18.Checked = Task.RecurDay18.Value; }
+            if (Task.RecurDay19.HasValue) { checkBoxDay19.Checked = Task.RecurDay19.Value; }
+            if (Task.RecurDay20.HasValue) { checkBoxDay20.Checked = Task.RecurDay20.Value; }
+            if (Task.RecurDay21.HasValue) { checkBoxDay21.Checked = Task.RecurDay21.Value; }
+            if (Task.RecurDay22.HasValue) { checkBoxDay22.Checked = Task.RecurDay22.Value; }
+            if (Task.RecurDay23.HasValue) { checkBoxDay23.Checked = Task.RecurDay23.Value; }
+            if (Task.RecurDay24.HasValue) { checkBoxDay24.Checked = Task.RecurDay24.Value; }
+            if (Task.RecurDay25.HasValue) { checkBoxDay25.Checked = Task.RecurDay25.Value; }
+            if (Task.RecurDay26.HasValue) { checkBoxDay26.Checked = Task.RecurDay26.Value; }
+            if (Task.RecurDay27.HasValue) { checkBoxDay27.Checked = Task.RecurDay27.Value; }
+            if (Task.RecurDay28.HasValue) { checkBoxDay28.Checked = Task.RecurDay28.Value; }
+            if (Task.RecurDay29.HasValue) { checkBoxDay29.Checked = Task.RecurDay29.Value; }
+            if (Task.RecurDay30.HasValue) { checkBoxDay30.Checked = Task.RecurDay30.Value; }
+            if (Task.RecurDay31.HasValue) { checkBoxDay31.Checked = Task.RecurDay31.Value; }
+
+            #endregion
 
             //Look for Scene, if it was deleted then set index to -1
             scene selected_scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == Task.Scene_id);
@@ -1566,7 +1737,7 @@ namespace zVirtualScenesApplication
             groupBox_Daily.Visible = false;
             groupBox_Weekly.Visible = false;
             groupBox_Seconds.Visible = false;
-            groupBox_OddEven.Visible = false; 
+            groupBox_Montly.Visible = false; 
 
             switch (comboBox_FrequencyTask.SelectedIndex)
             {
@@ -1579,8 +1750,8 @@ namespace zVirtualScenesApplication
                 case (int)scheduled_tasks.frequencys.Seconds:
                     groupBox_Seconds.Visible = true;
                     break;
-                case (int)scheduled_tasks.frequencys.OddEven:
-                    groupBox_OddEven.Visible = true;
+                case (int)scheduled_tasks.frequencys.Monthly:
+                    groupBox_Montly.Visible = true;
                     break;                    
             }
         }
@@ -1643,9 +1814,42 @@ namespace zVirtualScenesApplication
                     SelectedTask.RecurSunday = checkBox_RecurSunday.Checked;
                     #endregion
                 }
-                else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.OddEven.ToString()))
+                else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Monthly.ToString()))
                 {
-                    SelectedTask.RecurEven = radioButton_even.Checked; 
+                    #region Monthly
+                    SelectedTask.RecurMonth = (int)numericUpDownOccurMonths.Value;
+                    SelectedTask.RecurDay01 = checkBoxDay01.Checked;
+                    SelectedTask.RecurDay02 = checkBoxDay02.Checked;
+                    SelectedTask.RecurDay03 = checkBoxDay03.Checked;
+                    SelectedTask.RecurDay04 = checkBoxDay04.Checked;
+                    SelectedTask.RecurDay05 = checkBoxDay05.Checked;
+                    SelectedTask.RecurDay06 = checkBoxDay06.Checked;
+                    SelectedTask.RecurDay07 = checkBoxDay07.Checked;
+                    SelectedTask.RecurDay08 = checkBoxDay08.Checked;
+                    SelectedTask.RecurDay09 = checkBoxDay09.Checked;
+                    SelectedTask.RecurDay10 = checkBoxDay10.Checked;
+                    SelectedTask.RecurDay11 = checkBoxDay11.Checked;
+                    SelectedTask.RecurDay12 = checkBoxDay12.Checked;
+                    SelectedTask.RecurDay13 = checkBoxDay13.Checked;
+                    SelectedTask.RecurDay14 = checkBoxDay14.Checked;
+                    SelectedTask.RecurDay15 = checkBoxDay15.Checked;
+                    SelectedTask.RecurDay16 = checkBoxDay16.Checked;
+                    SelectedTask.RecurDay17 = checkBoxDay17.Checked;
+                    SelectedTask.RecurDay18 = checkBoxDay18.Checked;
+                    SelectedTask.RecurDay19 = checkBoxDay19.Checked;
+                    SelectedTask.RecurDay20 = checkBoxDay20.Checked;
+                    SelectedTask.RecurDay21 = checkBoxDay21.Checked;
+                    SelectedTask.RecurDay22 = checkBoxDay22.Checked;
+                    SelectedTask.RecurDay23 = checkBoxDay23.Checked;
+                    SelectedTask.RecurDay24 = checkBoxDay24.Checked;
+                    SelectedTask.RecurDay25 = checkBoxDay25.Checked;
+                    SelectedTask.RecurDay26 = checkBoxDay26.Checked;
+                    SelectedTask.RecurDay27 = checkBoxDay27.Checked;
+                    SelectedTask.RecurDay28 = checkBoxDay28.Checked;
+                    SelectedTask.RecurDay29 = checkBoxDay29.Checked;
+                    SelectedTask.RecurDay30 = checkBoxDay30.Checked;
+                    SelectedTask.RecurDay31 = checkBoxDay31.Checked;
+                    #endregion
                 } 
 
                 zvsEntityControl.zvsContext.SaveChanges();
@@ -1673,8 +1877,41 @@ namespace zVirtualScenesApplication
                 checkBox_RecurSaturday.Enabled = false;
                 checkBox_RecurSunday.Enabled = false;
                 comboBox_ActionsTask.Enabled = false;
-                radioButton_even.Enabled = false;
-                radioButton_odd.Enabled = false; 
+                //monthly
+                btn_odd.Enabled = false;
+                btn_even.Enabled = false;
+                numericUpDownOccurMonths.Enabled = false;
+                checkBoxDay01.Enabled = false;
+                checkBoxDay02.Enabled = false;
+                checkBoxDay03.Enabled = false;
+                checkBoxDay04.Enabled = false;
+                checkBoxDay05.Enabled = false;
+                checkBoxDay06.Enabled = false;
+                checkBoxDay07.Enabled = false;
+                checkBoxDay08.Enabled = false;
+                checkBoxDay09.Enabled = false;
+                checkBoxDay10.Enabled = false;
+                checkBoxDay11.Enabled = false;
+                checkBoxDay12.Enabled = false;
+                checkBoxDay13.Enabled = false;
+                checkBoxDay14.Enabled = false;
+                checkBoxDay15.Enabled = false;
+                checkBoxDay16.Enabled = false;
+                checkBoxDay17.Enabled = false;
+                checkBoxDay18.Enabled = false;
+                checkBoxDay19.Enabled = false;
+                checkBoxDay20.Enabled = false;
+                checkBoxDay21.Enabled = false;
+                checkBoxDay22.Enabled = false;
+                checkBoxDay23.Enabled = false;
+                checkBoxDay24.Enabled = false;
+                checkBoxDay25.Enabled = false;
+                checkBoxDay26.Enabled = false;
+                checkBoxDay27.Enabled = false;
+                checkBoxDay28.Enabled = false;
+                checkBoxDay29.Enabled = false;
+                checkBoxDay30.Enabled = false;
+                checkBoxDay31.Enabled = false; 
             }
 
         }
@@ -1719,22 +1956,111 @@ namespace zVirtualScenesApplication
             AddNewTask();
         }
 
-        private void radioButton_odd_CheckedChanged(object sender, EventArgs e)
+        private void btn_clear_Click(object sender, EventArgs e)
         {
-            if (radioButton_odd.Checked)
-            {
-                radioButton_even.Checked = false;
-            }
+            checkBoxDay01.Checked = false;
+            checkBoxDay02.Checked = false;
+            checkBoxDay03.Checked = false;
+            checkBoxDay04.Checked = false;
+            checkBoxDay05.Checked = false;
+            checkBoxDay06.Checked = false;
+            checkBoxDay07.Checked = false;
+            checkBoxDay08.Checked = false;
+            checkBoxDay09.Checked = false;
+            checkBoxDay10.Checked = false;
+            checkBoxDay11.Checked = false;
+            checkBoxDay12.Checked = false;
+            checkBoxDay13.Checked = false;
+            checkBoxDay14.Checked = false;
+            checkBoxDay15.Checked = false;
+            checkBoxDay16.Checked = false;
+            checkBoxDay17.Checked = false;
+            checkBoxDay18.Checked = false;
+            checkBoxDay19.Checked = false;
+            checkBoxDay20.Checked = false;
+            checkBoxDay21.Checked = false;
+            checkBoxDay22.Checked = false;
+            checkBoxDay23.Checked = false;
+            checkBoxDay24.Checked = false;
+            checkBoxDay25.Checked = false;
+            checkBoxDay26.Checked = false;
+            checkBoxDay27.Checked = false;
+            checkBoxDay28.Checked = false;
+            checkBoxDay29.Checked = false;
+            checkBoxDay30.Checked = false;
+            checkBoxDay31.Checked = false;
         }
 
-        private void radioButton_even_CheckedChanged(object sender, EventArgs e)
+        private void btn_odd_Click(object sender, EventArgs e)
         {
-            if (radioButton_even.Checked)
-            {
-                radioButton_odd.Checked = false;
-            }
+            checkBoxDay01.Checked = true;
+            checkBoxDay02.Checked = false;
+            checkBoxDay03.Checked = true;
+            checkBoxDay04.Checked = false;
+            checkBoxDay05.Checked = true;
+            checkBoxDay06.Checked = false;
+            checkBoxDay07.Checked = true;
+            checkBoxDay08.Checked = false;
+            checkBoxDay09.Checked = true;
+            checkBoxDay10.Checked = false;
+            checkBoxDay11.Checked = true;
+            checkBoxDay12.Checked = false;
+            checkBoxDay13.Checked = true;
+            checkBoxDay14.Checked = false;
+            checkBoxDay15.Checked = true;
+            checkBoxDay16.Checked = false;
+            checkBoxDay17.Checked = true;
+            checkBoxDay18.Checked = false;
+            checkBoxDay19.Checked = true;
+            checkBoxDay20.Checked = false;
+            checkBoxDay21.Checked = true;
+            checkBoxDay22.Checked = false;
+            checkBoxDay23.Checked = true;
+            checkBoxDay24.Checked = false;
+            checkBoxDay25.Checked = true;
+            checkBoxDay26.Checked = false;
+            checkBoxDay27.Checked = true;
+            checkBoxDay28.Checked = false;
+            checkBoxDay29.Checked = true;
+            checkBoxDay30.Checked = false;
+            checkBoxDay31.Checked = true;
         }
 
+        private void btn_even_Click(object sender, EventArgs e)
+        {
+            checkBoxDay01.Checked = false;
+            checkBoxDay02.Checked = true;
+            checkBoxDay03.Checked = false;
+            checkBoxDay04.Checked = true;
+            checkBoxDay05.Checked = false;
+            checkBoxDay06.Checked = true;
+            checkBoxDay07.Checked = false;
+            checkBoxDay08.Checked = true;
+            checkBoxDay09.Checked = false;
+            checkBoxDay10.Checked = true;
+            checkBoxDay11.Checked = false;
+            checkBoxDay12.Checked = true;
+            checkBoxDay13.Checked = false;
+            checkBoxDay14.Checked = true;
+            checkBoxDay15.Checked = false;
+            checkBoxDay16.Checked = true;
+            checkBoxDay17.Checked = false;
+            checkBoxDay18.Checked = true;
+            checkBoxDay19.Checked = false;
+            checkBoxDay20.Checked = true;
+            checkBoxDay21.Checked = false;
+            checkBoxDay22.Checked = true;
+            checkBoxDay23.Checked = false;
+            checkBoxDay24.Checked = true;
+            checkBoxDay25.Checked = false;
+            checkBoxDay26.Checked = true;
+            checkBoxDay27.Checked = false;
+            checkBoxDay28.Checked = true;
+            checkBoxDay29.Checked = false;
+            checkBoxDay30.Checked = true;
+            checkBoxDay31.Checked = false;
+        }
+        
         #endregion
 
         #endregion
@@ -1844,6 +2170,13 @@ namespace zVirtualScenesApplication
             this.Close();
         }
         #endregion
+
+        private void groupBox_Montly_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        
 
         
 

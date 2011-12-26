@@ -429,6 +429,37 @@
           <Property Name="StartTime" Type="datetime" />
           <Property Name="sort_order" Type="integer" />
           <Property Name="RecurEven" Type="bit" />
+          <Property Name="RecurDay01" Type="bit" />
+          <Property Name="RecurDay02" Type="bit" />
+          <Property Name="RecurDay03" Type="bit" />
+          <Property Name="RecurDay04" Type="bit" />
+          <Property Name="RecurDay05" Type="bit" />
+          <Property Name="RecurDay06" Type="bit" />
+          <Property Name="RecurDay07" Type="bit" />
+          <Property Name="RecurDay08" Type="bit" />
+          <Property Name="RecurDay09" Type="bit" />
+          <Property Name="RecurDay10" Type="bit" />
+          <Property Name="RecurDay11" Type="bit" />
+          <Property Name="RecurDay12" Type="bit" />
+          <Property Name="RecurDay13" Type="bit" />
+          <Property Name="RecurDay14" Type="bit" />
+          <Property Name="RecurDay15" Type="bit" />
+          <Property Name="RecurDay16" Type="bit" />
+          <Property Name="RecurDay17" Type="bit" />
+          <Property Name="RecurDay18" Type="bit" />
+          <Property Name="RecurDay19" Type="bit" />
+          <Property Name="RecurDay20" Type="bit" />
+          <Property Name="RecurDay21" Type="bit" />
+          <Property Name="RecurDay22" Type="bit" />
+          <Property Name="RecurDay23" Type="bit" />
+          <Property Name="RecurDay24" Type="bit" />
+          <Property Name="RecurDay25" Type="bit" />
+          <Property Name="RecurDay26" Type="bit" />
+          <Property Name="RecurDay27" Type="bit" />
+          <Property Name="RecurDay28" Type="bit" />
+          <Property Name="RecurDay29" Type="bit" />
+          <Property Name="RecurDay30" Type="bit" />
+          <Property Name="RecurDay31" Type="bit" />
         </EntityType>
         <Association Name="FK_builtin_command_options_0">
           <End Role="builtin_commands" Type="zvsModel.Store.builtin_commands" Multiplicity="1" />
@@ -1582,6 +1613,37 @@
           <Property Type="DateTime" Name="StartTime" />
           <Property Type="Int64" Name="sort_order" />
           <Property Type="Boolean" Name="RecurEven" />
+          <Property Type="Boolean" Name="RecurDay01" />
+          <Property Type="Boolean" Name="RecurDay02" />
+          <Property Type="Boolean" Name="RecurDay03" />
+          <Property Type="Boolean" Name="RecurDay04" />
+          <Property Type="Boolean" Name="RecurDay05" />
+          <Property Type="Boolean" Name="RecurDay06" />
+          <Property Type="Boolean" Name="RecurDay07" />
+          <Property Type="Boolean" Name="RecurDay08" />
+          <Property Type="Boolean" Name="RecurDay09" />
+          <Property Type="Boolean" Name="RecurDay10" />
+          <Property Type="Boolean" Name="RecurDay11" />
+          <Property Type="Boolean" Name="RecurDay12" />
+          <Property Type="Boolean" Name="RecurDay13" />
+          <Property Type="Boolean" Name="RecurDay14" />
+          <Property Type="Boolean" Name="RecurDay15" />
+          <Property Type="Boolean" Name="RecurDay16" />
+          <Property Type="Boolean" Name="RecurDay17" />
+          <Property Type="Boolean" Name="RecurDay18" />
+          <Property Type="Boolean" Name="RecurDay19" />
+          <Property Type="Boolean" Name="RecurDay20" />
+          <Property Type="Boolean" Name="RecurDay21" />
+          <Property Type="Boolean" Name="RecurDay22" />
+          <Property Type="Boolean" Name="RecurDay23" />
+          <Property Type="Boolean" Name="RecurDay24" />
+          <Property Type="Boolean" Name="RecurDay25" />
+          <Property Type="Boolean" Name="RecurDay26" />
+          <Property Type="Boolean" Name="RecurDay27" />
+          <Property Type="Boolean" Name="RecurDay28" />
+          <Property Type="Boolean" Name="RecurDay29" />
+          <Property Type="Boolean" Name="RecurDay30" />
+          <Property Type="Boolean" Name="RecurDay31" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -1881,6 +1943,37 @@
           <EntitySetMapping Name="scheduled_tasks">
             <EntityTypeMapping TypeName="zvsModel.scheduled_tasks">
               <MappingFragment StoreEntitySet="scheduled_tasks">
+                <ScalarProperty Name="RecurDay31" ColumnName="RecurDay31" />
+                <ScalarProperty Name="RecurDay30" ColumnName="RecurDay30" />
+                <ScalarProperty Name="RecurDay29" ColumnName="RecurDay29" />
+                <ScalarProperty Name="RecurDay28" ColumnName="RecurDay28" />
+                <ScalarProperty Name="RecurDay27" ColumnName="RecurDay27" />
+                <ScalarProperty Name="RecurDay26" ColumnName="RecurDay26" />
+                <ScalarProperty Name="RecurDay25" ColumnName="RecurDay25" />
+                <ScalarProperty Name="RecurDay24" ColumnName="RecurDay24" />
+                <ScalarProperty Name="RecurDay23" ColumnName="RecurDay23" />
+                <ScalarProperty Name="RecurDay22" ColumnName="RecurDay22" />
+                <ScalarProperty Name="RecurDay21" ColumnName="RecurDay21" />
+                <ScalarProperty Name="RecurDay20" ColumnName="RecurDay20" />
+                <ScalarProperty Name="RecurDay19" ColumnName="RecurDay19" />
+                <ScalarProperty Name="RecurDay18" ColumnName="RecurDay18" />
+                <ScalarProperty Name="RecurDay17" ColumnName="RecurDay17" />
+                <ScalarProperty Name="RecurDay16" ColumnName="RecurDay16" />
+                <ScalarProperty Name="RecurDay15" ColumnName="RecurDay15" />
+                <ScalarProperty Name="RecurDay14" ColumnName="RecurDay14" />
+                <ScalarProperty Name="RecurDay13" ColumnName="RecurDay13" />
+                <ScalarProperty Name="RecurDay12" ColumnName="RecurDay12" />
+                <ScalarProperty Name="RecurDay11" ColumnName="RecurDay11" />
+                <ScalarProperty Name="RecurDay10" ColumnName="RecurDay10" />
+                <ScalarProperty Name="RecurDay09" ColumnName="RecurDay09" />
+                <ScalarProperty Name="RecurDay08" ColumnName="RecurDay08" />
+                <ScalarProperty Name="RecurDay07" ColumnName="RecurDay07" />
+                <ScalarProperty Name="RecurDay06" ColumnName="RecurDay06" />
+                <ScalarProperty Name="RecurDay05" ColumnName="RecurDay05" />
+                <ScalarProperty Name="RecurDay04" ColumnName="RecurDay04" />
+                <ScalarProperty Name="RecurDay03" ColumnName="RecurDay03" />
+                <ScalarProperty Name="RecurDay02" ColumnName="RecurDay02" />
+                <ScalarProperty Name="RecurDay01" ColumnName="RecurDay01" />
                 <ScalarProperty Name="RecurEven" ColumnName="RecurEven" />
                 <ScalarProperty Name="sort_order" ColumnName="sort_order" />
                 <ScalarProperty Name="StartTime" ColumnName="StartTime" />
@@ -1927,7 +2020,7 @@
       <Diagram Name="Model1" ZoomLevel="88">
         <EntityTypeShape EntityType="zvsModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_command_que" Width="1.5" PointX="3" PointY="3.625" Height="1.7879850260416674" />
-        <EntityTypeShape EntityType="zvsModel.builtin_commands" Width="1.5" PointX="0.75" PointY="1.5" Height="3.3263964843750107" />
+        <EntityTypeShape EntityType="zvsModel.builtin_commands" Width="1.5" PointX="5.875" PointY="1.75" Height="3.3263964843750107" />
         <EntityTypeShape EntityType="zvsModel.device_command_options" Width="1.5" PointX="9.75" PointY="16.875" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.device_command_que" Width="1.5" PointX="9.75" PointY="13.25" Height="2.1725878906250102" />
         <EntityTypeShape EntityType="zvsModel.device_commands" Width="1.5" PointX="7.5" PointY="16" Height="3.5186979166666674" />
@@ -1951,12 +2044,12 @@
         <EntityTypeShape EntityType="zvsModel.scene_property_value" Width="1.5" PointX="12.5" PointY="7.625" Height="2.1725878906249818" />
         <EntityTypeShape EntityType="zvsModel.scene" Width="1.5" PointX="10.25" PointY="9.625" Height="2.1725878906249818" />
         <AssociationConnector Association="zvsModel.FK_builtin_command_options_0" >
-          <ConnectorPoint PointX="2.25" PointY="2.1439925130208337" />
-          <ConnectorPoint PointX="3" PointY="2.1439925130208337" />
+          <ConnectorPoint PointX="5.875" PointY="2.2689925130208337" />
+          <ConnectorPoint PointX="4.5" PointY="2.2689925130208337" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_builtin_command_que_0" >
-          <ConnectorPoint PointX="2.25" PointY="4.2256982421875051" />
-          <ConnectorPoint PointX="3" PointY="4.2256982421875051" />
+          <ConnectorPoint PointX="5.875" PointY="4.3506982421875051" />
+          <ConnectorPoint PointX="4.5" PointY="4.3506982421875051" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_options_0" >
           <ConnectorPoint PointX="9" PointY="17.768992513020834" />
@@ -2110,7 +2203,7 @@
           <ConnectorPoint PointX="7.760416666666667" PointY="29.231718377604174" />
           <ConnectorPoint PointX="4.375" PointY="29.231718377604174" />
         </AssociationConnector>
-        <EntityTypeShape EntityType="zvsModel.scheduled_tasks" Width="1.5" PointX="5.375" PointY="0.75" Height="4.8648079427083246" />
+        <EntityTypeShape EntityType="zvsModel.scheduled_tasks" Width="1.5" PointX="0.5" PointY="0.875" Height="10.82615234375" />
       </Diagram>
     </Diagrams>
   </Designer>

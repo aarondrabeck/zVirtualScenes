@@ -23,7 +23,7 @@ namespace zVirtualScenesCommon.Entity
             Weekly = 1,
             Once = 2,
             Seconds = 3,
-            OddEven = 4
+            Monthly = 4
         }
 
         public void Run()
