@@ -277,7 +277,7 @@ namespace zvsMobile
                     }
                 }
 
-                if (request.Url.Segments[2].ToLower().Equals("device_values/") && request.Url.Segments.Length == 4 && request.HttpMethod == "GET")
+                if (request.Url.Segments[2].ToLower().Equals("values/") && request.Url.Segments.Length == 4 && request.HttpMethod == "GET")
                 {
                     long id = 0;
                     long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
@@ -544,7 +544,7 @@ namespace zvsMobile
 
                 }
 
-                if (request.Url.Segments[2].ToLower().StartsWith("builtin_commands") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
+                if (request.Url.Segments[2].ToLower().StartsWith("commands") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
                 {   
                     List<object> bi_commands = new List<object>();                 
                     foreach (builtin_commands cmd in zvsEntityControl.zvsContext.builtin_commands)
@@ -560,7 +560,7 @@ namespace zvsMobile
                     return new { success = true, builtin_commands = bi_commands };                       
                 }
 
-                if (request.Url.Segments[2].ToLower().Equals("builtin_command/") && request.Url.Segments.Length == 4 && request.HttpMethod == "POST")
+                if (request.Url.Segments[2].ToLower().Equals("command/") && request.Url.Segments.Length == 4 && request.HttpMethod == "POST")
                 {
                     NameValueCollection postData = GetPostData(request);
                     string arg = postData["arg"];
@@ -578,7 +578,15 @@ namespace zvsMobile
                         });
                         return new { success = true };
                     }
-                }              
+                }
+
+                if (request.Url.Segments[2].ToLower().StartsWith("login") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
+                {
+                    NameValueCollection postData = GetPostData(request);
+
+                    //todo: check for session
+                        return new { success = true, isLoggedIn = false };
+                }
 
                 if (request.Url.Segments[2].ToLower().StartsWith("login") && request.Url.Segments.Length == 3 && request.HttpMethod == "POST")
                 {
