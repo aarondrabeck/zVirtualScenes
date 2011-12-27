@@ -196,13 +196,13 @@
         
         Devices = Backbone.Collection.extend({
             model: Device,
-            url: HOST + '/JSON/GetDeviceList'
+            url: HOST + '/API/devices'
         }),
         
         Scene = Backbone.Model.extend({
             run: function() {
                 $.ajax({
-                    url: HOST + '/JSON/ActivateScene',
+                    url: HOST + '/API/scenes',
                     crossDomain: true,
                     dataType: 'jsonp',
                     success: this.update(),
@@ -234,7 +234,7 @@
         Group = Backbone.Model.extend({
             getDetails: function(cb) {
                 $.ajax({
-                    url: HOST + '/JSON/GetGroupDetails',
+                    url: HOST + '/api/groups',
                     crossDomain: true,
                     dataType: 'jsonp',
                     success: cb,
@@ -340,7 +340,7 @@
         
         function load(type) {
             $.ajax({
-                url: HOST + '/JSON/Get' + type + 'List',
+                url: HOST + '/API/'+ type +'s',
                 crossDomain: true,
                 dataType: 'jsonp',
                 success: function(data) {
