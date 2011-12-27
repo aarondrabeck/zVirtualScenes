@@ -6,6 +6,11 @@ h1 {
     margin-bottom: 5px;
 }
 
+#login input, #login label {
+    margin-bottom: 10px;
+    vertical-align: inherit;
+}
+
 .ui-listview img {
     width: 80px;
     height: 80px;
@@ -53,6 +58,19 @@ h1 {
     color: #999;
 }
 
+.device-CONTROLLER {
+    display: none !important;
+}
+
+.temperature {
+    position: absolute;
+    left: 27px;
+    top: 32px;
+    color: #FFF;
+    font-weight: normal;
+    text-shadow: 1px 1px #000;
+}
+
 .footerBar .ui-btn .ui-btn-inner { padding-top: 37px !important; }
 .footerBar .ui-btn .ui-icon { width: 30px!important; height: 30px!important; margin-left: -15px !important; box-shadow: none!important; -moz-box-shadow: none!important; -webkit-box-shadow: none!important; -webkit-border-radius: 0 !important; border-radius: 0 !important; }
 
@@ -78,9 +96,22 @@ div.ui-slider-switch {
     margin-left: -16px;
 }
 
+.range-container.thermostat {
+    margin-left: 0px;
+}
+
+.thermostat input.ui-slider-input {
+    width: 30px;
+}
+
 div.ui-slider {
     width: 80%;
 }
+
+.thermostat div.ui-slider {
+    width: 62%;
+}
+
 
 .range {
     display: none !important;

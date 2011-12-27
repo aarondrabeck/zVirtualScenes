@@ -10,6 +10,7 @@
     <script type="text/javascript" src="/scripts/jquery-tmpl.js"></script>
     <script type="text/javascript" src="/scripts/backbone-min.js"></script>
     <script type="text/javascript" src="/scripts/jquery.mobile.js"></script>
+    <script type="text/javascript" src="/scripts/jquery.websockets.js"></script>
     
     <link rel="apple-touch-icon" href="/images/switch_on.png" />
     <link rel="apple-touch-icon" sizes="72x72" href="/images/switch_on.png" />
@@ -30,8 +31,9 @@
     
     
     <script id="devicesTemplate" type="text/x-jquery-tmpl"> 
-      <li class="device" id="device-${id}" data-device-id="${id}">
-          <img src="${$item.getImage()}" />
+      <li class="device device-${type}" id="device-${id}" data-device-id="${id}">
+          <img src="${$item.device().getImage()}" />
+              {{if type == "THERMOSTAT"}}<span class="temperature">${level_txt}</span>{{/if}}
               ${name}
             {{if type == "SWITCH"}}
             <select name="slider" class="slider" id="slider-${id}" data-role="slider" data-device-id="${id}">
@@ -45,12 +47,18 @@
                 <input type="range" name="range" id="range-${id}" class="range" value="${level}" min="0" max="99" data-device-id="${id}" />
             </div>
             {{/if}}
+            
+            {{if type == "THERMOSTAT"}}
+            <div class="range-container thermostat">
+                <input type="range" name="range" id="range-${id}" class="thermostat-range" value="${level}" min="55" max="85" data-device-id="${id}" />
+            </div>
+            {{/if}}
       </li>
     </script>
     
     <script id="scenesTemplate" type="text/x-jquery-tmpl"> 
       <li class="scene" id="scene-${id}" data-scene-id="${id}">
-          <img src="${$item.getImage()}" />
+          <img src="${$item.scene().getImage()}" />
               ${name}
               <div class="ui-scene-button" data-scene-id="${id}"><a href="#" data-role="button" data-scene-id="${id}">Run Scene</a></div>
               <span class="ui-li-count">${cmd_count}</span>
@@ -106,20 +114,44 @@
                   this.setState("ON", level);
               }
             },
+            setTemperature: function(level) {
+                //{"id":24,"name":"Masterbed Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"}
+                if(level == this.get("level")) {
+                    return false;
+                }
+                
+                this.set({
+                    level: level,
+                    level_txt: level + " F"
+                });
+                
+                this.sendCommand();
+            },
             isSwitch: function() {
                 return (this.get("type") == "SWITCH");
             },
             isDimmer: function() {
                 return (this.get("type") == "DIMMER");
             },
+            isThermostat: function() {
+                return (this.get("type") == "THERMOSTAT");
+            },
             getType: function() {
-               return this.isSwitch() ? "device_type" : "device";  
+                if(this.isSwitch()) {
+                    return "device_type";
+                } else if(this.isDimmer()) {
+                    return "device";
+                } else if(this.isThermostat()) {
+                    return "device";
+                }
             },
             getCommand: function() {
                 if(this.isSwitch()) {
                     return (this.get("on_off") == "OFF") ? 'TURNOFF' : 'TURNON';
                 } else if(this.isDimmer()) {
                     return "DYNAMIC_CMD_LEVEL";
+                } else if(this.isThermostat()) {
+                    return "DYNAMIC_CMD_COOLING 1";
                 }
             },
             sendCommand: function() {
@@ -147,10 +179,18 @@
                     state = this.get("on_off").toLowerCase();
                 }
                 return "/images/lb_" + state + ".png";  
-              }  
+              } else if(this.isThermostat()) {
+                  return "/images/thermostat-round.png";
+              } else {
+                  return "/images/controller.png";
+              }
             },
             update: function() {
-                $('#device-' + this.id + " img").first().attr("src", this.getImage());
+                if(this.isThermostat()) {
+                    $('#device-' + this.id + " .temperature").html(this.get("level_txt"));
+                } else {
+                    $('#device-' + this.id + " img").first().attr("src", this.getImage());
+                }
             }
         }),
         
@@ -209,20 +249,18 @@
             model: Group
         });
         
-        //var sampleDevices = {"success":true,"devices":[{"id":25,"name":"Aeon Labs Z-Stick Series 1 (Secondary)","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":1,"name":"Aeon Labs Z-Stick Series 2","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":21,"name":"Brother Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":11,"name":"Can Lights","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":13,"name":"Dining Table Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":17,"name":"Driveway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":10,"name":"Entryway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":8,"name":"Family Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":14,"name":"Fan Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":19,"name":"Fireplace Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":15,"name":"Kitchen Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":20,"name":"Label Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":2,"name":"Master Bathtub Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":3,"name":"Masterbath Mirror Light","on_off":"ON","level":99,"level_txt":"99%","type":"DIMMER"},{"id":6,"name":"Masterbed Bed Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":5,"name":"Masterbed East Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":4,"name":"Masterbed Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":24,"name":"Masterbed Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":23,"name":"Masterbed Window Fan","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":7,"name":"Office Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":9,"name":"Outside Entry Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":12,"name":"Pourch Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":16,"name":"Rear Garage Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":22,"name":"South Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":18,"name":"TV Backlight","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"}]};
+        var sampleDevices = {"success":true,"devices":[{"id":25,"name":"Aeon Labs Z-Stick Series 1 (Secondary)","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":1,"name":"Aeon Labs Z-Stick Series 2","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":21,"name":"Brother Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":11,"name":"Can Lights","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":13,"name":"Dining Table Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":17,"name":"Driveway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":10,"name":"Entryway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":8,"name":"Family Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":14,"name":"Fan Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":19,"name":"Fireplace Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":15,"name":"Kitchen Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":20,"name":"Label Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":2,"name":"Master Bathtub Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":3,"name":"Masterbath Mirror Light","on_off":"ON","level":99,"level_txt":"99%","type":"DIMMER"},{"id":6,"name":"Masterbed Bed Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":5,"name":"Masterbed East Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":4,"name":"Masterbed Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":24,"name":"Masterbed Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":23,"name":"Masterbed Window Fan","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":7,"name":"Office Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":9,"name":"Outside Entry Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":12,"name":"Pourch Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":16,"name":"Rear Garage Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":22,"name":"South Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":18,"name":"TV Backlight","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"}]};
         
         
         var HOST, helpers = { 
-            getImage: function() {
-                var path = "/images/", $item = this.data;
-                
-                if(/SWITCH|DIMMER/.test($item.type)) {
-                    return Devices.get($item.id).getImage();
-                } else if($item.hasOwnProperty("is_running")) {
-                    //SCENE
-                    return path + (($item.is_running) ? "scene_64run.png" : "scene64.png");
-                }
-                return path + "controller.png";
+            device: function() {
+                return Devices.get(this.data.id);
+            },
+            scene: function() {
+                return Scenes.get(this.data.id);
+            },
+            group: function() {
+                return Groups.get(this.data.id);
             }
         };
         
@@ -230,7 +268,13 @@
             var $item = $(event.target),
                 device = Devices.get($item.attr("data-device-id"));
             
-            device.isSwitch() ? device.setState($item.val()) : device.setDimmer($item.val());
+            if(device.isSwitch()) {
+                device.setState($item.val());
+            } else if(device.isDimmer()) {
+                device.setDimmer($item.val())
+            } else if(device.isThermostat()) {
+                device.setTemperature($item.val());
+            }
             event.preventDefault();
         }
         
@@ -242,14 +286,21 @@
             }, 500);
         }
         
+        function handleSwipe(event, data) {
+            console.log(event);
+        }
+        
         $("#devices-data .range").live("change", handleSlider);
+        $("#devices-data .thermostat-range").live("change", handleSlider);
         $("#devices-data .slider").live("change", handleChange);
+        $("#devices-data li").live("swipeleft swiperight", handleSwipe);
         $(".ui-scene-button").live("click", runScene);
         $("#login button").live("click", function() {
             HOST = $("#zvsServer").val();
             $.Storage.set("server", HOST);
             
-            load("Device");
+            //load("Device");
+            handleLoad(sampleDevices, "devices");
             load("Scene");
             load("Group");
             
@@ -262,17 +313,16 @@
         function handleLoad(data, type) {
             if(type == "devices") {
                 Devices = new Devices(data.devices);
-            }
-            
-            var list = $("#" + type + "-data").html(
-                $("#" + type + "Template").tmpl(data[type], helpers)   
-            );
-            
-            if(type == "scenes") {
+            } else if(type == "scenes") {
                 Scenes = new Scenes(data.scenes);
             } else if(type == "groups") {
                 Groups = new Groups(data.groups);
             }
+            
+            
+            var list = $("#" + type + "-data").html(
+                $("#" + type + "Template").tmpl(data[type], helpers)   
+            );
             
             loaded++;
             if(loaded == 3) {
@@ -355,9 +405,6 @@
         
         <form action="/login" method="post">
             <div data-role="fieldcontain">
-                <label for="username">Username:</label>
-                <input type="text" name="username" id="username" value="" placeholder="Username"/>
-                
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" value="" placeholder="Password"/>
                 
