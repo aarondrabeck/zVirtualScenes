@@ -47,7 +47,16 @@ namespace zvsMobile
                 value = "9999",
                 value_data_type = (int)Data_Types.INTEGER,
                 description = "The port that HTTP will listen for commands on."
-            });           
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "PASSWORD",
+                friendly_name = "Password",
+                value = "C52632B4BCDB6F8CF0F6E4545",
+                value_data_type = (int)Data_Types.STRING,
+                description = "Password that protects public facing web services."
+            }); 
         }
 
         protected override bool StartPlugin()
@@ -570,6 +579,16 @@ namespace zvsMobile
                         return new { success = true };
                     }
                 }              
+
+                if (request.Url.Segments[2].ToLower().StartsWith("login") && request.Url.Segments.Length == 3 && request.HttpMethod == "POST")
+                {
+                    NameValueCollection postData = GetPostData(request);
+
+                    if(postData["password"] == GetSettingValue("PASSWORD"))
+                        return new { success = true };
+                    else
+                        return new { success = false };
+                }
             }
 
             return new { success = false, reason = "Invalid Command" };    
