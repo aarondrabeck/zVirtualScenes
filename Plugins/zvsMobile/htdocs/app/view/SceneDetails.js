@@ -19,11 +19,10 @@
                     //Get Device Details			
                     console.log('AJAX: GetSceneDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61:9999/JSON/GetSceneDetails',
+                        url: 'http://10.1.0.61:9999/API/scene/' + sceneId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random(),
-                            id: sceneId
                         },
                         callback: function (data) {
                             //Send data to panel TPL                            
@@ -73,23 +72,22 @@
                     handler: function () {
                         var scene = self.items.items[1].getData();
                         console.log('AJAX: ActivateScene');
-                        Ext.util.JSONP.request({
-                            url: 'http://10.1.0.61:9999/JSON/ActivateScene',
-                            callbackKey: 'callback',
-                            params: {
-                                u: Math.random(),
-                                id: scene.scene.id
-                            },
-                            callback: function (data) {
-                                if (data.success) {
+						
+						Ext.Ajax.request({
+                            url: 'http://10.1.0.61:9999/API/scene/' + scene.scene.id,
+							method: 'POST',
+                            success: function(response, opts) {
+                                if (response.success) {
                                     self.delayedReload();
-                                    Ext.Msg.alert('Scene Activation', data.desc);
+                                    Ext.Msg.alert('Scene Activation', response.desc);
                                 }
                                 else {
                                     Ext.Msg.alert('Scene Activation', 'Communication Error!');
                                 }
                             }
                         });
+						
+                       
                     }
                 }, {
                     xtype: 'panel',

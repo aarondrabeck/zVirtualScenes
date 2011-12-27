@@ -19,6 +19,8 @@ using System.Runtime.Serialization;
 using System.Web.Script.Serialization;
 using System.Xml.Linq;
 using System.Reflection;
+using System.Web;
+using System.Collections.Specialized;
 
 namespace zvsMobile
 {
@@ -202,7 +204,7 @@ namespace zvsMobile
         {
             if (request.Url.Segments.Length > 2 && request.Url.Segments[1].ToLower().Equals("api/"))
             {
-                if (request.Url.Segments[2].ToLower().Contains("devices") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
+                if (request.Url.Segments[2].ToLower().StartsWith("devices") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
                 {
                     List<object> devices = new List<object>();
                     foreach (device d in zvsEntityControl.zvsContext.devices.OrderBy(o => o.friendly_name))
@@ -299,77 +301,7 @@ namespace zvsMobile
                     }
                 }
 
-                if (request.RawUrl.Contains("/JSON/SendCmd"))
-                {
-                    long dID = 0;
-                    long.TryParse(request.QueryString["id"], out dID);
-
-                    string command = request.QueryString["cmd"];
-                    string arg = request.QueryString["arg"];
-                    string strtype = request.QueryString["type"];
-
-                    if (!string.IsNullOrEmpty(strtype))
-                    {
-                        switch (strtype)
-                        {
-                            case "device":
-                                {
-                                    device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
-                                    if (d != null)
-                                    {
-                                        device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == command);
-                                        if (cmd != null)
-                                        {
-                                            device_command_que.Run(new device_command_que
-                                            {
-                                                device_id = d.id,
-                                                device_command_id = cmd.id,
-                                                arg = arg
-                                            });
-
-                                            return new { success = true };
-                                        }
-                                    }
-                                    break;
-                                }
-                            case "device_type":
-                                {
-                                    device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dID);
-                                    if (d != null)
-                                    {
-                                        device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == command);
-                                        if (cmd != null)
-                                        {
-                                            device_type_command_que.Run(new device_type_command_que
-                                            {
-                                                device_id = d.id,
-                                                device_type_command_id = cmd.id,
-                                                arg = arg
-                                            });
-                                            return new { success = true };
-                                        }
-                                    }
-                                    break;
-                                }
-                            case "builtin":
-                                {
-                                    builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == command);
-                                    if (cmd != null)
-                                    {
-                                        builtin_command_que.Run(new builtin_command_que
-                                        {
-                                            builtin_command_id = cmd.id,
-                                            arg = arg
-                                        });
-                                        return new { success = true };
-                                    }
-                                    break;
-                                }
-                        }
-                    }
-                }
-
-                if (request.RawUrl.ToLower().Contains("/scenes"))
+                if (request.Url.Segments[2].ToLower().StartsWith("scenes") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
                 {
                     var q0 = from d in zvsEntityControl.zvsContext.scenes
                              select new
@@ -383,11 +315,10 @@ namespace zvsMobile
                     return new { success = true, scenes = q0 };
                 }
 
-                if (request.RawUrl.Contains("/JSON/GetSceneDetails"))
+                if (request.Url.Segments[2].ToLower().Equals("scene/") && request.Url.Segments.Length == 4 && request.HttpMethod == "GET")
                 {
-
                     long sID = 0;
-                    long.TryParse(request.QueryString["id"], out sID);
+                    long.TryParse(request.Url.Segments[3], out sID);
 
                     scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sID);
 
@@ -413,24 +344,45 @@ namespace zvsMobile
                         };
                         return new { success = true, scene = s };
                     }
+                    else
+                        return new { success = false, reason = "Scene not found." };
                 }
 
-                if (request.RawUrl.Contains("/JSON/ActivateScene"))
+                if (request.Url.Segments[2].ToLower().Equals("scene/") && request.Url.Segments.Length == 4 && request.HttpMethod == "POST")
                 {
+                    NameValueCollection postData = GetPostData(request);                     
+                    
                     long sID = 0;
-                    long.TryParse(request.QueryString["id"], out sID);
+                    long.TryParse(request.Url.Segments[3], out sID);
+                                       
+                    bool is_running = false;
+                    bool.TryParse(postData["is_running"], out is_running);
+                    string name = postData["name"];
 
                     scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sID);
 
-                    if (scene != null)
+                    if (scene != null )
                     {
-                        string r = scene.RunScene();
-                        return new { success = true, desc = r };
+                        if (is_running)
+                        {
+                            string r = scene.RunScene();
+                            return new { success = true, desc = r };
+                        }
+
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            scene.friendly_name = name;
+                            zvsEntityControl.zvsContext.SaveChanges();
+                            return new { success = true, desc = "Scene Name Updated." };
+                        }
+                       
 
                     }
+                    else
+                        return new { success = false, reason = "Scene not found." };
                 }
 
-                if (request.RawUrl.Contains("/JSON/GetGroupList"))
+                if (request.Url.Segments[2].ToLower().StartsWith("groups") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
                 {
                     var q0 = from g in zvsEntityControl.zvsContext.groups
                              select new
@@ -443,11 +395,11 @@ namespace zvsMobile
                     return new { success = true, groups = q0 };
                 }
 
-                if (request.RawUrl.ToLower().Contains("/groups"))
+                if (request.Url.Segments[2].ToLower().Equals("group/") && request.Url.Segments.Length == 4 && request.HttpMethod == "GET")
                 {
 
                     long gID = 0;
-                    long.TryParse(request.QueryString["id"], out gID);
+                    long.TryParse(request.Url.Segments[3], out gID);
 
                     group group = zvsEntityControl.zvsContext.groups.FirstOrDefault(g => g.id == gID);
 
@@ -471,10 +423,166 @@ namespace zvsMobile
                         };
                         return new { success = true, group = g };
                     }
+                    else
+                        return new { success = false, reason = "Group not found." };
                 }
+
+                if (request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments.Length == 5 &&
+                    request.Url.Segments[4].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
+                {
+                    long id = 0;
+                    long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                    if (id > 0)
+                    {
+                        device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
+
+                        if (d != null)
+                        {
+                            List<object> device_commands = new List<object>();
+                            foreach (device_commands cmd in d.device_commands)
+                            {
+                                device_commands.Add(new
+                                {
+                                    CommandId = cmd.id,
+                                    CommandType = "device",
+                                    FriendlyName = cmd.friendly_name,
+                                    HelpText = cmd.help,
+                                    Name = cmd.name
+                                });
+                            }
+
+                            foreach (device_type_commands cmd in d.device_types.device_type_commands)
+                            {
+                                device_commands.Add(new
+                                {
+                                    CommandId = cmd.id,
+                                    CommandType = "device_type",
+                                    FriendlyName = cmd.friendly_name,
+                                    HelpText = cmd.help,
+                                    Name = cmd.name
+                                });
+                            }
+
+                            return new { success = true, device_commands = device_commands };
+                        }
+                        else
+                            return new { success = false, reason = "Device not found." };
+                    }
+                }
+                
+                if (request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments.Length == 6 &&
+                    request.Url.Segments[4].ToLower().Equals("command/") && request.HttpMethod == "POST")
+                {
+                    NameValueCollection postData = GetPostData(request);  
+
+                    long id = 0;
+                    long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                    if (id > 0)
+                    {
+                        device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
+
+                        if (d != null)
+                        {
+                            long c_id = 0;
+                            long.TryParse(request.Url.Segments[5].Replace("/", ""), out c_id);
+
+                            string arg = postData["arg"];
+                            string strtype = postData["type"];
+
+                            switch (strtype)
+                            {
+                                case "device":
+                                    {
+                                        device_commands cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
+                                        if (cmd != null)
+                                        {
+                                            device_command_que.Run(new device_command_que
+                                            {
+                                                device_id = d.id,
+                                                device_command_id = cmd.id,
+                                                arg = arg
+                                            });
+
+                                            return new { success = true };
+                                        }  
+                                        else
+                                            return new { success = false, reason = "Device command not found." };
+                                    }
+                                case "device_type":
+                                    {
+                                        device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.id == c_id);
+                                        if (cmd != null)
+                                        {
+                                            device_type_command_que.Run(new device_type_command_que
+                                            {
+                                                device_id = d.id,
+                                                device_type_command_id = cmd.id,
+                                                arg = arg
+                                            });
+                                            return new { success = true };
+                                        }
+                                        return new { success = false, reason = "Device type command not found." };
+                                    }
+                                default:
+                                    {
+                                        return new { success = false, reason = "Invalid command type." }; 
+                                    }
+                            }
+                        }
+                        else
+                            return new { success = false, reason = "Device not found." };
+                    }
+
+                }
+
+                if (request.Url.Segments[2].ToLower().StartsWith("builtin_commands") && request.Url.Segments.Length == 3 && request.HttpMethod == "GET")
+                {   
+                    List<object> bi_commands = new List<object>();                 
+                    foreach (builtin_commands cmd in zvsEntityControl.zvsContext.builtin_commands)
+                    {
+                        bi_commands.Add(new
+                        {
+                            CommandId = cmd.id,
+                            FriendlyName = cmd.friendly_name,
+                            HelpText = cmd.help,
+                            Name = cmd.name
+                        });
+                    }
+                    return new { success = true, builtin_commands = bi_commands };                       
+                }
+
+                if (request.Url.Segments[2].ToLower().Equals("builtin_command/") && request.Url.Segments.Length == 4 && request.HttpMethod == "POST")
+                {
+                    NameValueCollection postData = GetPostData(request);
+                    string arg = postData["arg"];
+
+                    long id = 0;
+                    long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+
+                    builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == id);
+                    if (cmd != null)
+                    {
+                        builtin_command_que.Run(new builtin_command_que
+                        {
+                            builtin_command_id = cmd.id,
+                            arg = arg
+                        });
+                        return new { success = true };
+                    }
+                }              
             }
 
             return new { success = false, reason = "Invalid Command" };    
+        }
+
+        private NameValueCollection GetPostData(HttpListenerRequest request)
+        {
+            string input = null;
+            using (StreamReader reader = new StreamReader(request.InputStream))
+            {
+                input = reader.ReadToEnd();
+            }
+            return HttpUtility.ParseQueryString(input);
         }
 
         private string toJSON<T>(T obj, string callback)
