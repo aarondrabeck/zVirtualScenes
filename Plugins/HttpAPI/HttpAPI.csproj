@@ -8,8 +8,8 @@
     <ProjectGuid>{F8B3CD45-0712-4388-B576-EBA5267E636C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>zvsMobilePlugin</RootNamespace>
-    <AssemblyName>zvsMobilePlugin</AssemblyName>
+    <RootNamespace>HttpAPI</RootNamespace>
+    <AssemblyName>HttpAPI</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,7 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="zvsMobilePlugin.cs" />
+    <Compile Include="HttpAPIPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

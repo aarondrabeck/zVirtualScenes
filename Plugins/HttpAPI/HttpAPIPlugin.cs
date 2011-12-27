@@ -22,17 +22,17 @@ using System.Reflection;
 using System.Web;
 using System.Collections.Specialized;
 
-namespace zvsMobile
+namespace HttpAPI
 {
     [Export(typeof(Plugin))]
-    public class zvsMobilePlugin : Plugin
+    public class HttpAPIPlugin : Plugin
     {
         public volatile bool isActive;
 
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
 
-        public zvsMobilePlugin()
+        public HttpAPIPlugin()
             : base("ZVSMOBILE",
                "zvsMobile Plugin",
                 "This plug-in acts as a HTTP server to send respond to JSON AJAX requests."
