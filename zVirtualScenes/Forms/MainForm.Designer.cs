@@ -202,6 +202,7 @@ namespace zVirtualScenesApplication
             this.deleteEventToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripTriggerNull = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemEventsNull = new System.Windows.Forms.ToolStripMenuItem();
+            this.createEventAdvancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -1530,9 +1531,9 @@ namespace zVirtualScenesApplication
             // 
             // MainTabControl
             // 
-            this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.MainTabControl.Controls.Add(this.tabPage5);
             this.MainTabControl.Controls.Add(this.tabPage3);
             this.MainTabControl.Controls.Add(this.tabPage4);
@@ -1635,7 +1636,7 @@ namespace zVirtualScenesApplication
             this.label3.Size = new System.Drawing.Size(117, 100);
             this.label3.TabIndex = 6;
             this.label3.Text = "Drag and drop device to add them to scenes or add a builtin command with the butt" +
-    "on below.";
+                "on below.";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // dataListViewDeviceSmallList
@@ -1644,8 +1645,8 @@ namespace zVirtualScenesApplication
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn5);
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn6);
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn4);
-            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDeviceSmallList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewDeviceSmallList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn5,
@@ -1708,8 +1709,8 @@ namespace zVirtualScenesApplication
             // 
             // lbl_sceneActions
             // 
-            this.lbl_sceneActions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbl_sceneActions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.lbl_sceneActions.Location = new System.Drawing.Point(3, 6);
             this.lbl_sceneActions.Name = "lbl_sceneActions";
             this.lbl_sceneActions.Size = new System.Drawing.Size(503, 15);
@@ -1721,9 +1722,9 @@ namespace zVirtualScenesApplication
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn2);
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn3);
             this.dataListViewSceneCMDs.AllColumns.Add(this.SceneCMDOrderCol);
-            this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewSceneCMDs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewSceneCMDs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn2,
@@ -1982,16 +1983,24 @@ namespace zVirtualScenesApplication
             // contextMenuStripTriggerNull
             // 
             this.contextMenuStripTriggerNull.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItemEventsNull});
+            this.toolStripMenuItemEventsNull,
+            this.createEventAdvancedToolStripMenuItem});
             this.contextMenuStripTriggerNull.Name = "contextMenuStripEvent";
-            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(141, 26);
+            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(197, 70);
             // 
             // toolStripMenuItemEventsNull
             // 
             this.toolStripMenuItemEventsNull.Name = "toolStripMenuItemEventsNull";
-            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(140, 22);
+            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(152, 22);
             this.toolStripMenuItemEventsNull.Text = "&Create Event";
             this.toolStripMenuItemEventsNull.Click += new System.EventHandler(this.toolStripMenuItemEventsNull_Click);
+            // 
+            // createEventAdvancedToolStripMenuItem
+            // 
+            this.createEventAdvancedToolStripMenuItem.Name = "createEventAdvancedToolStripMenuItem";
+            this.createEventAdvancedToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.createEventAdvancedToolStripMenuItem.Text = "Create Event &Advanced";
+            this.createEventAdvancedToolStripMenuItem.Click += new System.EventHandler(this.createEventAdvancedToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -2240,6 +2249,7 @@ namespace zVirtualScenesApplication
         private Button btn_even;
         private Button btn_odd;
         private Button btn_clear;
+        private ToolStripMenuItem createEventAdvancedToolStripMenuItem;
     }
 }
 

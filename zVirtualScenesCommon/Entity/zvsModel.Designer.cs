@@ -4183,6 +4183,54 @@ namespace zVirtualScenesCommon.Entity
         private Nullable<global::System.Int64> _scene_id;
         partial void Onscene_idChanging(Nullable<global::System.Int64> value);
         partial void Onscene_idChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int64 trigger_type
+        {
+            get
+            {
+                return _trigger_type;
+            }
+            set
+            {
+                Ontrigger_typeChanging(value);
+                ReportPropertyChanging("trigger_type");
+                _trigger_type = StructuralObject.SetValidValue(value);
+                ReportPropertyChanged("trigger_type");
+                Ontrigger_typeChanged();
+            }
+        }
+        private global::System.Int64 _trigger_type = 0;
+        partial void Ontrigger_typeChanging(global::System.Int64 value);
+        partial void Ontrigger_typeChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String trigger_script
+        {
+            get
+            {
+                return _trigger_script;
+            }
+            set
+            {
+                Ontrigger_scriptChanging(value);
+                ReportPropertyChanging("trigger_script");
+                _trigger_script = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("trigger_script");
+                Ontrigger_scriptChanged();
+            }
+        }
+        private global::System.String _trigger_script;
+        partial void Ontrigger_scriptChanging(global::System.String value);
+        partial void Ontrigger_scriptChanged();
 
         #endregion
     

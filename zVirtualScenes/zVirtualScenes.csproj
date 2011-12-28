@@ -138,6 +138,12 @@
     <Compile Include="Forms\AddEditSceneDeviceCMD.Designer.cs">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\AdvancedScripting.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AdvancedScripting.Designer.cs">
+      <DependentUpon>AdvancedScripting.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\formPropertiesScene.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,20 +203,11 @@
     <Compile Include="UserControls\uc_device_values_grid.Designer.cs">
       <DependentUpon>uc_device_values_grid.cs</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\uc_intellisense_listbox.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="UserControls\uc_plugin_properties_form.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="UserControls\uc_plugin_properties_form.Designer.cs">
       <DependentUpon>uc_plugin_properties_form.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\uc_script_editor.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="UserControls\uc_script_editor.Designer.cs">
-      <DependentUpon>uc_script_editor.cs</DependentUpon>
     </Compile>
     <Compile Include="UserControls\uc_device_values.cs">
       <SubType>UserControl</SubType>
@@ -246,6 +243,9 @@
     <EmbeddedResource Include="Forms\AddEditSceneDeviceCMD.resx">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AdvancedScripting.resx">
+      <DependentUpon>AdvancedScripting.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\formPropertiesScene.resx">
       <DependentUpon>formPropertiesScene.cs</DependentUpon>
     </EmbeddedResource>
@@ -276,9 +276,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="UserControls\uc_plugin_properties_form.resx">
       <DependentUpon>uc_plugin_properties_form.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserControls\uc_script_editor.resx">
-      <DependentUpon>uc_script_editor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControls\uc_device_values.resx">
       <DependentUpon>uc_device_values.cs</DependentUpon>

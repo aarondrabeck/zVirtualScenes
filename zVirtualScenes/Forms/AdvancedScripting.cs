@@ -10,15 +10,16 @@ using zVirtualScenesCommon.Entity;
 
 namespace zVirtualScenesApplication.Forms
 {
-    public partial class AddEditTriggers : Form
+    public partial class AdvancedScripting : Form
     {
         private device_value_triggers trigger_to_edit = null;
         private IBindingList alltriggers;
+
         /// <summary>
         /// If editing pass the device_value_triggers to edit
         /// </summary>
         /// <param name="triggerToEdit"></param>
-        public AddEditTriggers(IBindingList eventList, device_value_triggers triggerToEdit)
+        public AdvancedScripting(IBindingList eventList, device_value_triggers triggerToEdit)
         {
             alltriggers = eventList;
             trigger_to_edit = triggerToEdit;
@@ -26,36 +27,22 @@ namespace zVirtualScenesApplication.Forms
             InitializeComponent();
         }
 
-        private void AddEditEvent_Load(object sender, EventArgs e)
+        private void AdvancedScripting_Load(object sender, EventArgs e)
         {
-            labelTitle.Text = (trigger_to_edit == null) ? "Create Trigger" : "Edit Trigger";
-
-            //Load cmb box values
             cmbo_devices.DisplayMember = "friendly_name";
             cmbo_devices.DataSource = zvsEntityControl.zvsContext.devices;
 
-            cmbo_scene.DisplayMember = "friendly_name";
-            cmbo_scene.DataSource = zvsEntityControl.zvsContext.scenes;
-
-            cmbo_operator.DataSource = Enum.GetValues(typeof(device_value_triggers.TRIGGER_OPERATORS)); 
-
-            //prefill if editing
             if (trigger_to_edit != null)
             {
-                if(trigger_to_edit.trigger_operator.HasValue)
-                    cmbo_operator.Text = Enum.GetName(typeof(device_value_triggers.TRIGGER_OPERATORS), trigger_to_edit.trigger_operator.Value); 
                 cmbo_devices.SelectedItem = trigger_to_edit.device_values.device;
                 cmbo_devicevalues.SelectedItem = trigger_to_edit.device_values;
-                cmbo_scene.SelectedItem = trigger_to_edit.scene;
-                txTriggertValue.Text = trigger_to_edit.trigger_value;
                 txt_name.Text = trigger_to_edit.Name;
-                checkBoxEnabled.Checked = trigger_to_edit.enabled;
+                ckEnabled.Checked = trigger_to_edit.enabled;
+                txt_script.Text = trigger_to_edit.trigger_script;
             }
-
-            
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void cmbo_devices_SelectedIndexChanged(object sender, EventArgs e)
         {
             device selected_device = (device)cmbo_devices.SelectedItem;
 
@@ -66,19 +53,19 @@ namespace zVirtualScenesApplication.Forms
             }
         }
 
-        private void btn_Save_Click(object sender, EventArgs e)
+        private void btnSave_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txt_name.Text))
             {
                 MessageBox.Show("Please enter a name for this trigger.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 ActiveControl = txt_name;
-                return; 
+                return;
             }
 
-            if (string.IsNullOrEmpty(txTriggertValue.Text))
+            if (string.IsNullOrEmpty(txt_script.Text))
             {
-                MessageBox.Show("Please enter a trigger value for this trigger.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                ActiveControl = txt_name;
+                MessageBox.Show("Please enter a script for this trigger.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                ActiveControl = txt_script;
                 return;
             }
 
@@ -87,15 +74,7 @@ namespace zVirtualScenesApplication.Forms
             {
                 MessageBox.Show("Please select a device value for this trigger.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                 ActiveControl = cmbo_devicevalues;
-                return; 
-            }
-
-            scene selected_scene = (scene)cmbo_scene.SelectedItem;
-            if (selected_scene == null)
-            {
-                MessageBox.Show("Please select a scene for this trigger.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                ActiveControl = cmbo_scene;
-                return; 
+                return;
             }
 
             //if we are editing dont create a new 
@@ -103,16 +82,14 @@ namespace zVirtualScenesApplication.Forms
             if (trigger_to_edit != null)
                 newtrigger = trigger_to_edit;
             else
-                newtrigger = new device_value_triggers(); 
+                newtrigger = new device_value_triggers();
 
             newtrigger.device_value_id = selected_device_value.id;
-            newtrigger.enabled = true; 
-            newtrigger.trigger_value = txTriggertValue.Text;
-            newtrigger.trigger_operator = (int)cmbo_operator.SelectedItem;
-            newtrigger.scene_id = selected_scene.id;
+            newtrigger.enabled = true;
+            newtrigger.trigger_script = txt_script.Text;
             newtrigger.Name = txt_name.Text;
-            newtrigger.enabled = checkBoxEnabled.Checked;
-            newtrigger.trigger_type = (int)device_value_triggers.TRIGGER_TYPE.Basic;
+            newtrigger.enabled = ckEnabled.Checked;
+            newtrigger.trigger_type = (int)device_value_triggers.TRIGGER_TYPE.Advanced;
 
             //if we are not editing add new trigger to trigger list
             if (trigger_to_edit == null)
@@ -120,11 +97,6 @@ namespace zVirtualScenesApplication.Forms
 
             zvsEntityControl.zvsContext.SaveChanges();
             this.Close();            
-        }
-
-        private void cmbo_devicevalues_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

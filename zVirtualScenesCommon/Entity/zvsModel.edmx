@@ -285,6 +285,8 @@
           <Property Name="enabled" Type="bit" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="255" />
           <Property Name="scene_id" Type="integer" />
+          <Property Name="trigger_type" Type="integer" Nullable="false" />
+          <Property Name="trigger_script" Type="nvarchar" />
         </EntityType>
         <EntityType Name="device_values">
           <Key>
@@ -1564,6 +1566,8 @@
           <NavigationProperty Name="device_values" Relationship="zvsModel.FK_device_value_triggers_0" FromRole="device_value_triggers" ToRole="device_values" />
           <Property Type="Int64" Name="scene_id" />
           <NavigationProperty Name="scene" Relationship="zvsModel.FK_device_value_triggers_01" FromRole="device_value_triggers" ToRole="scene" />
+          <Property Type="Int64" Name="trigger_type" Nullable="false" DefaultValue="0" />
+          <Property Type="String" Name="trigger_script" MaxLength="2147483647" FixedLength="false" Unicode="true" />
         </EntityType>
         <Association Name="FK_device_value_triggers_0">
           <End Type="zvsModel.device_values" Role="device_values" Multiplicity="1" />
@@ -1930,6 +1934,8 @@
           <EntitySetMapping Name="device_value_triggers">
             <EntityTypeMapping TypeName="zvsModel.device_value_triggers">
               <MappingFragment StoreEntitySet="device_value_triggers">
+                <ScalarProperty Name="trigger_script" ColumnName="trigger_script" />
+                <ScalarProperty Name="trigger_type" ColumnName="trigger_type" />
                 <ScalarProperty Name="scene_id" ColumnName="scene_id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="enabled" ColumnName="enabled" />
@@ -2017,7 +2023,7 @@
     </Options>
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
-      <Diagram Name="Model1" ZoomLevel="88">
+      <Diagram Name="Model1" ZoomLevel="69">
         <EntityTypeShape EntityType="zvsModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_command_que" Width="1.5" PointX="3" PointY="3.625" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_commands" Width="1.5" PointX="5.875" PointY="1.75" Height="3.3263964843750107" />
