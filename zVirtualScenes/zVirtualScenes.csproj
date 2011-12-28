@@ -398,6 +398,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
+    <Content Include="database\upgrade.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Resources\sensor_128.png" />
     <None Include="Resources\arrow_equal.gif" />
     <None Include="Resources\equal.png" />
