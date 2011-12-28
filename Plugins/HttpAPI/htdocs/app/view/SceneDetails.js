@@ -76,10 +76,14 @@
 						Ext.Ajax.request({
                             url: 'http://10.1.0.61:9999/API/scene/' + scene.scene.id,
 							method: 'POST',
+                            params: {
+                                is_running: true
+                            },
                             success: function(response, opts) {
-                                if (response.success) {
+                                var result = JSON.parse(response.responseText);
+                                if (result.success) {
                                     self.delayedReload();
-                                    Ext.Msg.alert('Scene Activation', response.desc);
+                                    Ext.Msg.alert('Scene Activation', result.desc);
                                 }
                                 else {
                                     Ext.Msg.alert('Scene Activation', 'Communication Error!');

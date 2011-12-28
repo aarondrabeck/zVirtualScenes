@@ -108,6 +108,34 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                         handler: function () {
                                             var toggleValue = self.items.items[0].items.items[2].items.items[0].getValue();
                                             console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
+
+
+                                            //TODO: continue here
+                                            ///device/2/command/812
+                                            Ext.Ajax.request({
+                                                url: 'http://10.1.0.61:9999/API/scene/' + scene.scene.id,
+                                                method: 'POST',
+                                                params: {
+                                                    is_running: true
+                                                },
+                                                success: function (response, opts) {
+                                                    var result = JSON.parse(response.responseText);
+                                                    if (result.success) {
+                                                        self.delayedReload();
+                                                        Ext.Msg.alert('Scene Activation', result.desc);
+                                                    }
+                                                    else {
+                                                        Ext.Msg.alert('Scene Activation', 'Communication Error!');
+                                                    }
+                                                }
+                                            });
+
+
+                                            
+
+
+
+
                                             Ext.util.JSONP.request({
                                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
                                                 callbackKey: 'callback',
