@@ -16,6 +16,7 @@ using zVirtualScenesApplication.Structs;
 using zVirtualScenesCommon;
 using System.Data.Objects;
 using zVirtualScenesCommon.Entity;
+using zVirtualScenesApplication.Scripting;
 
 namespace zVirtualScenesApplication
 {
@@ -315,7 +316,7 @@ namespace zVirtualScenesApplication
                         }
                         else
                         {
-                            // Advanced Trigger!
+                            ScriptManager.RunScript(trigger);
                         }
                     }
                 }

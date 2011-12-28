@@ -177,6 +177,7 @@
     <Compile Include="Globals\GlobalMethods.cs" />
     <Compile Include="PluginSystem\PluginManager.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Scripting\ScriptManager.cs" />
     <Compile Include="Structs\zwObjectState.cs" />
     <Compile Include="UserControls\BtnInfo.cs" />
     <Compile Include="UserControls\uc_device_type_commands.cs">
