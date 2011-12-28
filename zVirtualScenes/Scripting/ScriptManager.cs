@@ -11,7 +11,7 @@ namespace zVirtualScenesApplication.Scripting
     {
         public static void RunScript(device_value_triggers trigger)
         {
-            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Running Advanced Script", "ADVANCEDSCRIPT");
+            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Running Advanced Script - " + trigger.FriendlyName, "ADVANCEDSCRIPT");
 
             // Step 1: Split up the lines of the script
             String[] splitScript = trigger.trigger_script.ToLower().Split('\n');
@@ -145,8 +145,9 @@ namespace zVirtualScenesApplication.Scripting
                         return;
                     }
                 }
-                
             }
+
+            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Finished Running Advanced Script - " + trigger.FriendlyName, "ADVANCEDSCRIPT");
         }
 
         private static int GetValue(String triggerName, String strValue)
