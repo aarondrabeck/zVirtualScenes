@@ -24,6 +24,14 @@ namespace zVirtualScenesCommon.Entity
             }
         }
 
+        public static string GetBlankDBPath
+        {
+            get
+            {
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs-blank.db");
+            }
+        }
+
 
         public static string GetzvsConnectionString
         {

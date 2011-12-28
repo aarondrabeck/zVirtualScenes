@@ -59,8 +59,14 @@ namespace zVirtualScenesApplication
                 FileInfo database = new FileInfo(zvsEntityControl.GetDBPath);
                 if (!database.Exists)
                 {
-                    MessageBox.Show(string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    FileInfo blank_database = new FileInfo(zvsEntityControl.GetBlankDBPath);
+                    if (!database.Exists)
+                    {
+                        MessageBox.Show(string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    blank_database.CopyTo(zvsEntityControl.GetDBPath);
                 }
 
                 //Check DB integrity

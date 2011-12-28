@@ -300,7 +300,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="database\zvs.db">
+    <None Include="database\zvs-blank.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\app.manifest">
