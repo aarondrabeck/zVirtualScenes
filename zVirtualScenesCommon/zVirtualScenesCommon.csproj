@@ -46,6 +46,7 @@
     <Compile Include="command_types.cs" />
     <Compile Include="Data_Types.cs" />
     <Compile Include="Entity\builtin_commands.cs" />
+    <Compile Include="Entity\program_options.cs" />
     <Compile Include="Entity\device_value_triggers.cs" />
     <Compile Include="Entity\device_commands.cs" />
     <Compile Include="Entity\device_type_commands.cs" />

@@ -180,6 +180,12 @@
     <Compile Include="Scripting\ScriptManager.cs" />
     <Compile Include="Structs\zwObjectState.cs" />
     <Compile Include="UserControls\BtnInfo.cs" />
+    <Compile Include="UserControls\uc_general_properties.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserControls\uc_general_properties.Designer.cs">
+      <DependentUpon>uc_general_properties.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\uc_device_type_commands.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -262,6 +268,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ProgramSettings.resx">
       <DependentUpon>ProgramSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserControls\uc_general_properties.resx">
+      <DependentUpon>uc_general_properties.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UserControls\uc_device_type_commands.resx">
       <DependentUpon>uc_device_type_commands.cs</DependentUpon>

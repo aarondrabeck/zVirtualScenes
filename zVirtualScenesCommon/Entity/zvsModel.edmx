@@ -9,6 +9,7 @@
           <EntitySet Name="builtin_command_options" EntityType="zvsModel.Store.builtin_command_options" store:Type="Tables" />
           <EntitySet Name="builtin_command_que" EntityType="zvsModel.Store.builtin_command_que" store:Type="Tables" />
           <EntitySet Name="builtin_commands" EntityType="zvsModel.Store.builtin_commands" store:Type="Tables" />
+          <EntitySet Name="db_info" EntityType="zvsModel.Store.db_info" store:Type="Tables" />
           <EntitySet Name="device_command_options" EntityType="zvsModel.Store.device_command_options" store:Type="Tables" />
           <EntitySet Name="device_command_que" EntityType="zvsModel.Store.device_command_que" store:Type="Tables" />
           <EntitySet Name="device_commands" EntityType="zvsModel.Store.device_commands" store:Type="Tables" />
@@ -27,6 +28,7 @@
           <EntitySet Name="plugin_setting_options" EntityType="zvsModel.Store.plugin_setting_options" store:Type="Tables" />
           <EntitySet Name="plugin_settings" EntityType="zvsModel.Store.plugin_settings" store:Type="Tables" />
           <EntitySet Name="plugins" EntityType="zvsModel.Store.plugins" store:Type="Tables" />
+          <EntitySet Name="program_options" EntityType="zvsModel.Store.program_options" store:Type="Tables" />
           <EntitySet Name="scene_commands" EntityType="zvsModel.Store.scene_commands" store:Type="Tables" />
           <EntitySet Name="scene_property" EntityType="zvsModel.Store.scene_property" store:Type="Tables" />
           <EntitySet Name="scene_property_option" EntityType="zvsModel.Store.scene_property_option" store:Type="Tables" />
@@ -134,11 +136,11 @@
             <End Role="scene_property_option" EntitySet="scene_property_option" />
           </AssociationSet>
           <AssociationSet Name="FK_scene_property_value_0" Association="zvsModel.Store.FK_scene_property_value_0">
-            <End Role="scenes" EntitySet="scenes" />
+            <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
           <AssociationSet Name="FK_scene_property_value_1" Association="zvsModel.Store.FK_scene_property_value_1">
-            <End Role="scene_property" EntitySet="scene_property" />
+            <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
         </EntityContainer>
@@ -172,6 +174,14 @@
           <Property Name="show_on_dynamic_obj_list" Type="bit" Nullable="false" />
           <Property Name="help" Type="nvarchar" MaxLength="255" />
           <Property Name="sort_order" Type="integer" />
+        </EntityType>
+        <EntityType Name="db_info">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="info_name" Type="nvarchar" Nullable="false" MaxLength="50" />
+          <Property Name="info_value" Type="nvarchar" Nullable="false" MaxLength="50" />
         </EntityType>
         <EntityType Name="device_command_options">
           <Key>
@@ -358,6 +368,14 @@
           <Property Name="enabled" Type="bit" Nullable="false" />
           <Property Name="description" Type="nvarchar" MaxLength="1024" />
         </EntityType>
+        <EntityType Name="program_options">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="integer" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="nvarchar" />
+          <Property Name="value" Type="nvarchar" />
+        </EntityType>
         <EntityType Name="scene_commands">
           <Key>
             <PropertyRef Name="id" />
@@ -397,6 +415,7 @@
           <Property Name="scene_id" Type="integer" Nullable="false" />
           <Property Name="scene_property_id" Type="integer" Nullable="false" />
           <Property Name="value" Type="nvarchar" MaxLength="1024" />
+          <Property Name="trigger_script" Type="nvarchar" />
         </EntityType>
         <EntityType Name="scenes">
           <Key>
@@ -764,18 +783,6 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_scene_property_value_0">
-          <End Role="scenes" Type="zvsModel.Store.scenes" Multiplicity="1" />
-          <End Role="scene_property_value" Type="zvsModel.Store.scene_property_value" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="scenes">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="scene_property_value">
-              <PropertyRef Name="scene_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_scene_property_value_1">
           <End Role="scene_property" Type="zvsModel.Store.scene_property" Multiplicity="1" />
           <End Role="scene_property_value" Type="zvsModel.Store.scene_property_value" Multiplicity="*" />
           <ReferentialConstraint>
@@ -784,6 +791,18 @@
             </Principal>
             <Dependent Role="scene_property_value">
               <PropertyRef Name="scene_property_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_scene_property_value_1">
+          <End Role="scenes" Type="zvsModel.Store.scenes" Multiplicity="1" />
+          <End Role="scene_property_value" Type="zvsModel.Store.scene_property_value" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scenes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scene_property_value">
+              <PropertyRef Name="scene_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -927,6 +946,8 @@
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
           <EntitySet Name="scheduled_tasks" EntityType="zvsModel.scheduled_tasks" />
+          <EntitySet Name="db_info" EntityType="zvsModel.db_info" />
+          <EntitySet Name="program_options" EntityType="zvsModel.program_options" />
         </EntityContainer>
         <EntityType Name="builtin_command_options">
           <Key>
@@ -1218,6 +1239,7 @@
           <Property Type="String" Name="value" MaxLength="1024" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="scene_property" Relationship="zvsModel.FK_scene_property_value_1" FromRole="scene_property_value" ToRole="scene_property" />
           <NavigationProperty Name="scene" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene_property_value" ToRole="scene" />
+          <Property Type="String" Name="trigger_script" MaxLength="2147483647" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="scene">
           <Key>
@@ -1649,6 +1671,22 @@
           <Property Type="Boolean" Name="RecurDay30" />
           <Property Type="Boolean" Name="RecurDay31" />
         </EntityType>
+        <EntityType Name="db_info">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="info_name" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="info_value" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="program_options">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="name" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="value" MaxLength="2147483647" FixedLength="false" Unicode="true" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1914,6 +1952,7 @@
           <EntitySetMapping Name="scene_property_value">
             <EntityTypeMapping TypeName="zvsModel.scene_property_value">
               <MappingFragment StoreEntitySet="scene_property_value">
+                <ScalarProperty Name="trigger_script" ColumnName="trigger_script" />
                 <ScalarProperty Name="value" ColumnName="value" />
                 <ScalarProperty Name="scene_property_id" ColumnName="scene_property_id" />
                 <ScalarProperty Name="scene_id" ColumnName="scene_id" />
@@ -2003,6 +2042,24 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="db_info">
+            <EntityTypeMapping TypeName="zvsModel.db_info">
+              <MappingFragment StoreEntitySet="db_info">
+                <ScalarProperty Name="info_value" ColumnName="info_value" />
+                <ScalarProperty Name="info_name" ColumnName="info_name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="program_options">
+            <EntityTypeMapping TypeName="zvsModel.program_options">
+              <MappingFragment StoreEntitySet="program_options">
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -2023,7 +2080,7 @@
     </Options>
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
-      <Diagram Name="Model1" ZoomLevel="69">
+      <Diagram Name="Model1" ZoomLevel="52">
         <EntityTypeShape EntityType="zvsModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_command_que" Width="1.5" PointX="3" PointY="3.625" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_commands" Width="1.5" PointX="5.875" PointY="1.75" Height="3.3263964843750107" />
@@ -2185,10 +2242,8 @@
           <ConnectorPoint PointX="12.5" PointY="7.8410953776041623" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_scene_property_value_0" >
-          <ConnectorPoint PointX="11.75" PointY="9.625" />
-          <ConnectorPoint PointX="12.125" PointY="9.25" />
-          <ConnectorPoint PointX="12.125" PointY="10.172587890624982" />
-          <ConnectorPoint PointX="12.5" PointY="9.7975878906249818" />
+          <ConnectorPoint PointX="11.75" PointY="9.8074446614583337" />
+          <ConnectorPoint PointX="12.5" PointY="9.8074446614583337" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.device_value_triggers" Width="1.5" PointX="2.875" PointY="28.125" Height="2.3648893229166674" />
         <AssociationConnector Association="zvsModel.FK_device_value_triggers_0" >
@@ -2210,6 +2265,8 @@
           <ConnectorPoint PointX="4.375" PointY="29.231718377604174" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.scheduled_tasks" Width="1.5" PointX="0.5" PointY="0.875" Height="10.82615234375" />
+        <EntityTypeShape EntityType="zvsModel.db_info" Width="1.5" PointX="7.375" PointY="6.75" Height="1.5956835937500102" />
+        <EntityTypeShape EntityType="zvsModel.program_options" Width="1.5" PointX="8.375" PointY="0.75" Height="1.5956835937500102" />
       </Diagram>
     </Diagrams>
   </Designer>

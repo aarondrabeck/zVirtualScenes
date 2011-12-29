@@ -37,6 +37,7 @@
             this.dataListViewMenu = new BrightIdeasSoftware.DataListView();
             this.colSettings = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.uc_plugin_properties_form1 = new zVirtualScenesApplication.UserControls.uc_plugin_properties_form();
+            this.uc_general_properties1 = new zVirtualScenesApplication.UserControls.uc_general_properties();
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewMenu)).BeginInit();
             this.SuspendLayout();
             // 
@@ -118,11 +119,22 @@
             this.uc_plugin_properties_form1.TabIndex = 26;
             this.uc_plugin_properties_form1.Visible = false;
             // 
+            // uc_general_properties1
+            // 
+            this.uc_general_properties1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.uc_general_properties1.Location = new System.Drawing.Point(189, 12);
+            this.uc_general_properties1.Name = "uc_general_properties1";
+            this.uc_general_properties1.Size = new System.Drawing.Size(786, 474);
+            this.uc_general_properties1.TabIndex = 28;
+            // 
             // ProgramSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(987, 535);
+            this.Controls.Add(this.uc_general_properties1);
             this.Controls.Add(this.dataListViewMenu);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.btnDone);
@@ -151,5 +163,6 @@
         private UserControls.uc_plugin_properties_form uc_plugin_properties_form1;
         private BrightIdeasSoftware.DataListView dataListViewMenu;
         private BrightIdeasSoftware.OLVColumn colSettings;
+        private UserControls.uc_general_properties uc_general_properties1;
     }
 }

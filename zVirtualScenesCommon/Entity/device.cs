@@ -105,7 +105,7 @@ namespace zVirtualScenesCommon.Entity
                 if (dv != null)
                     int.TryParse(dv.value, out temp);
 
-                return temp + " F";
+                return temp + " " + program_options.GetProgramOption("TempAbbreviation");
             }
             else if (this.device_types.name.Equals("SWITCH"))
             {

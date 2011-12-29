@@ -527,6 +527,38 @@ namespace zVirtualScenesCommon.Entity
             }
         }
         private ObjectSet<scheduled_tasks> _scheduled_tasks;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<db_info> db_info
+        {
+            get
+            {
+                if ((_db_info == null))
+                {
+                    _db_info = base.CreateObjectSet<db_info>("db_info");
+                }
+                return _db_info;
+            }
+        }
+        private ObjectSet<db_info> _db_info;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<program_options> program_options
+        {
+            get
+            {
+                if ((_program_options == null))
+                {
+                    _program_options = base.CreateObjectSet<program_options>("program_options");
+                }
+                return _program_options;
+            }
+        }
+        private ObjectSet<program_options> _program_options;
 
         #endregion
         #region AddTo Methods
@@ -745,6 +777,22 @@ namespace zVirtualScenesCommon.Entity
         public void AddToscheduled_tasks(scheduled_tasks scheduled_tasks)
         {
             base.AddObject("scheduled_tasks", scheduled_tasks);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the db_info EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddTodb_info(db_info db_info)
+        {
+            base.AddObject("db_info", db_info);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the program_options EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToprogram_options(program_options program_options)
+        {
+            base.AddObject("program_options", program_options);
         }
 
         #endregion
@@ -1375,6 +1423,113 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="zvsModel", Name="db_info")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class db_info : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new db_info object.
+        /// </summary>
+        /// <param name="id">Initial value of the id property.</param>
+        /// <param name="info_name">Initial value of the info_name property.</param>
+        /// <param name="info_value">Initial value of the info_value property.</param>
+        public static db_info Createdb_info(global::System.Int64 id, global::System.String info_name, global::System.String info_value)
+        {
+            db_info db_info = new db_info();
+            db_info.id = id;
+            db_info.info_name = info_name;
+            db_info.info_value = info_value;
+            return db_info;
+        }
+
+        #endregion
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int64 id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                if (_id != value)
+                {
+                    OnidChanging(value);
+                    ReportPropertyChanging("id");
+                    _id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("id");
+                    OnidChanged();
+                }
+            }
+        }
+        private global::System.Int64 _id;
+        partial void OnidChanging(global::System.Int64 value);
+        partial void OnidChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String info_name
+        {
+            get
+            {
+                return _info_name;
+            }
+            set
+            {
+                Oninfo_nameChanging(value);
+                ReportPropertyChanging("info_name");
+                _info_name = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("info_name");
+                Oninfo_nameChanged();
+            }
+        }
+        private global::System.String _info_name;
+        partial void Oninfo_nameChanging(global::System.String value);
+        partial void Oninfo_nameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.String info_value
+        {
+            get
+            {
+                return _info_value;
+            }
+            set
+            {
+                Oninfo_valueChanging(value);
+                ReportPropertyChanging("info_value");
+                _info_value = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("info_value");
+                Oninfo_valueChanged();
+            }
+        }
+        private global::System.String _info_value;
+        partial void Oninfo_valueChanging(global::System.String value);
+        partial void Oninfo_valueChanged();
+
+        #endregion
+    
     }
     
     /// <summary>
@@ -5570,6 +5725,109 @@ namespace zVirtualScenesCommon.Entity
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="zvsModel", Name="program_options")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class program_options : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new program_options object.
+        /// </summary>
+        /// <param name="id">Initial value of the id property.</param>
+        public static program_options Createprogram_options(global::System.Int64 id)
+        {
+            program_options program_options = new program_options();
+            program_options.id = id;
+            return program_options;
+        }
+
+        #endregion
+        #region Primitive Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Int64 id
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                if (_id != value)
+                {
+                    OnidChanging(value);
+                    ReportPropertyChanging("id");
+                    _id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("id");
+                    OnidChanged();
+                }
+            }
+        }
+        private global::System.Int64 _id;
+        partial void OnidChanging(global::System.Int64 value);
+        partial void OnidChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                OnnameChanging(value);
+                ReportPropertyChanging("name");
+                _name = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("name");
+                OnnameChanged();
+            }
+        }
+        private global::System.String _name;
+        partial void OnnameChanging(global::System.String value);
+        partial void OnnameChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String value
+        {
+            get
+            {
+                return _value;
+            }
+            set
+            {
+                OnvalueChanging(value);
+                ReportPropertyChanging("value");
+                _value = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("value");
+                OnvalueChanged();
+            }
+        }
+        private global::System.String _value;
+        partial void OnvalueChanging(global::System.String value);
+        partial void OnvalueChanged();
+
+        #endregion
+    
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
     [EdmEntityTypeAttribute(NamespaceName="zvsModel", Name="scene")]
     [Serializable()]
     [DataContractAttribute(IsReference=true)]
@@ -6553,6 +6811,30 @@ namespace zVirtualScenesCommon.Entity
         private global::System.String _value;
         partial void OnvalueChanging(global::System.String value);
         partial void OnvalueChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String trigger_script
+        {
+            get
+            {
+                return _trigger_script;
+            }
+            set
+            {
+                Ontrigger_scriptChanging(value);
+                ReportPropertyChanging("trigger_script");
+                _trigger_script = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("trigger_script");
+                Ontrigger_scriptChanged();
+            }
+        }
+        private global::System.String _trigger_script;
+        partial void Ontrigger_scriptChanging(global::System.String value);
+        partial void Ontrigger_scriptChanged();
 
         #endregion
     

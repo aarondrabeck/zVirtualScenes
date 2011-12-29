@@ -87,15 +87,15 @@ namespace zVirtualScenesApplication
                 }
                 else
                 {
-                    //TODO: Load a General Settings Control 
-                    //Add Entitys Connection Setting UC
+                    uc_general_properties1.Visible = true;
                 }
             }
         }
 
         private void HideAllUserControls()
         {
-            uc_plugin_properties_form1.Visible = false; 
+            uc_plugin_properties_form1.Visible = false;
+            uc_general_properties1.Visible = false; 
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

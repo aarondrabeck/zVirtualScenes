@@ -722,8 +722,7 @@ namespace OpenZWavePlugin
 
                             if (d != null)
                             {
-                                //Update las heard from
-                                d.last_heard_from = DateTime.Now;
+                                
 
                                 //Update Device Commands
                                 if (!read_only)
@@ -806,12 +805,19 @@ namespace OpenZWavePlugin
                                     dv.type = value.Type;
                                     dv.genre = value.Genre;
                                     dv.label_name = value.Label;
+
+                                    //Update las heard from
+                                    //NOTE:  THIS TRIGGERS THE REDAW OF THE DEVICE LIST SO MAKE SURE OTHER VALUES ARE SET FIRST
+                                    d.last_heard_from = DateTime.Now;
+
                                     zvsEntityControl.zvsContext.SaveChanges();
 
                                     if (!prev_value.Equals(data))
                                     {
                                         dv.DeviceValueDataChanged(prev_value);
                                     }
+
+
                                 }
                                 else
                                 {
