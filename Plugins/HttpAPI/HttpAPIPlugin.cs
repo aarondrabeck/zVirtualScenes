@@ -45,7 +45,7 @@ namespace HttpAPI
             {
                 name = "PORT",
                 friendly_name = "HTTP Port",
-                value = "9999",
+                value = "80",
                 value_data_type = (int)Data_Types.INTEGER,
                 description = "The port that HTTP will listen for commands on."
             });
@@ -75,7 +75,8 @@ namespace HttpAPI
                     int port = 9999;
                     int.TryParse(GetSettingValue("PORT"), out port);
                     httplistener.Prefixes.Add("http://*:" + port + "/");
-                    httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
+                    //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
+                    //httplistener.IgnoreWriteExceptions = true; 
                     httplistener.Start();
 
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
@@ -264,7 +265,15 @@ namespace HttpAPI
                         response.ContentType = contentType;
                         byte[] buffer = File.ReadAllBytes(f.ToString());
                         response.ContentLength64 = buffer.Length;
-                        using (var s = response.OutputStream) s.Write(buffer, 0, buffer.Length);
+                        try
+                        {
+                            using (var s = response.OutputStream) 
+                                s.Write(buffer, 0, buffer.Length);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("HTTAPI ERROR: {0}",e.Message);
+                        }
                     }
                 }
             }
@@ -289,9 +298,7 @@ namespace HttpAPI
             //context.Response.AddHeader("Content-Length: ", headerData.Length.ToString());
             context.Response.OutputStream.Write(headerData, 0, headerData.Length);
             context.Response.Close();
-        }
-
-        
+        }               
 
         private object GetResponse(HttpListenerRequest request)
         {           
@@ -535,10 +542,10 @@ namespace HttpAPI
                             device_commands.Add(new
                             {
                                 id = cmd.id,
-                                CommandType = "device",
-                                FriendlyName = cmd.friendly_name,
-                                HelpText = cmd.help,
-                                Name = cmd.name
+                                type = "device",
+                                friendlyname = cmd.friendly_name,
+                                helptext = cmd.help,
+                                name = cmd.name
                             });
                         }
 
@@ -547,10 +554,10 @@ namespace HttpAPI
                             device_commands.Add(new
                             {
                                 id = cmd.id,
-                                CommandType = "device_type",
-                                FriendlyName = cmd.friendly_name,
-                                HelpText = cmd.help,
-                                Name = cmd.name
+                                type = "device_type",
+                                friendlyname = cmd.friendly_name,
+                                helptext = cmd.help,
+                                name = cmd.name
                             });
                         }
 
@@ -561,10 +568,14 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 6 && request.Url.Segments[2].ToLower().Equals("device/") && 
-                request.Url.Segments[4].ToLower().Equals("command/") && request.HttpMethod == "POST")
+            if ((request.Url.Segments.Length == 5 || request.Url.Segments.Length == 6) && request.Url.Segments[2].ToLower().Equals("device/") &&
+                request.Url.Segments[4].ToLower().StartsWith("command") && request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(request);
+
+                long c_id = 0;
+                if (request.Url.Segments.Length == 6)
+                    long.TryParse(request.Url.Segments[5].Replace("/", ""), out c_id);
 
                 long id = 0;
                 long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
@@ -573,18 +584,24 @@ namespace HttpAPI
                     device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
 
                     if (d != null)
-                    {
-                        long c_id = 0;
-                        long.TryParse(request.Url.Segments[5].Replace("/", ""), out c_id);
-
+                    {         
                         string arg = postData["arg"];
                         string strtype = postData["type"];
+                        string commandName = postData["name"];
+                        string friendlyname = postData["friendlyname"];
 
                         switch (strtype)
                         {
                             case "device":
                                 {
-                                    device_commands cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
+                                    //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
+                                    device_commands cmd = null;
+                                    if (!string.IsNullOrEmpty(friendlyname))
+                                        cmd = d.device_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
+                                    else if(!string.IsNullOrEmpty(commandName))
+                                        cmd = d.device_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                                    else if(c_id>0)
+                                        cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
                                     if (cmd != null)
                                     {
                                         device_command_que.Run(new device_command_que
@@ -601,7 +618,15 @@ namespace HttpAPI
                                 }
                             case "device_type":
                                 {
-                                    device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.id == c_id);
+                                    //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
+                                    device_type_commands cmd = null;
+                                    if (!string.IsNullOrEmpty(friendlyname))
+                                        cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
+                                    else if (!string.IsNullOrEmpty(commandName))
+                                        cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                                    else if (c_id > 0)
+                                        cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.id == c_id);
+                                   
                                     if (cmd != null)
                                     {
                                         device_type_command_que.Run(new device_type_command_que
@@ -636,23 +661,34 @@ namespace HttpAPI
                     bi_commands.Add(new
                     {
                         id = cmd.id,
-                        FriendlyName = cmd.friendly_name,
-                        HelpText = cmd.help,
-                        Name = cmd.name
+                        friendlyname = cmd.friendly_name,
+                        helptext = cmd.help,
+                        name = cmd.name
                     });
                 }
                 return new { success = true, builtin_commands = bi_commands };
             }
 
-            if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("command/") && request.HttpMethod == "POST")
+            if ((request.Url.Segments.Length == 3 || request.Url.Segments.Length == 4) && request.Url.Segments[2].ToLower().StartsWith("command") && request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(request);
                 string arg = postData["arg"];
+                string commandName = postData["name"];
+                string friendlyname = postData["friendlyname"];
 
                 long id = 0;
-                long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                if(request.Url.Segments.Length == 4)
+                    long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
 
-                builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == id);
+                builtin_commands cmd = null;
+
+                if (!string.IsNullOrEmpty(friendlyname))
+                    cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
+                else if (!string.IsNullOrEmpty(commandName))
+                    cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                else
+                    cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == id);
+                 
                 if (cmd != null)
                 {
                     builtin_command_que.Run(new builtin_command_que
@@ -681,8 +717,7 @@ namespace HttpAPI
                 else
                     return new { success = false };
             }
-            
-            
+                        
             return new { success = false, reason = "Invalid Command" };    
         }
 
@@ -704,9 +739,7 @@ namespace HttpAPI
             else            
                 return js.Serialize(obj);
             
-        }
-
-       
+        }       
 
         //private string toXML<T>(T obj)
         //{
@@ -731,8 +764,7 @@ namespace HttpAPI
         //    {
         //        get { return Encoding.UTF8; }
         //    }
-        //}          
-    
+        //}              
     }
 
     public static class ObjectExtensions

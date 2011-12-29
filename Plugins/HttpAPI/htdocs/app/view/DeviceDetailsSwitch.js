@@ -21,7 +21,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61:9999/API/device/' + deviceId,
+                        url: 'http://10.1.0.61/API/device/' + deviceId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random()
@@ -109,46 +109,18 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                             var toggleValue = self.items.items[0].items.items[2].items.items[0].getValue();
                                             console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
 
-
-                                            //TODO: continue here
-                                            ///device/2/command/812
                                             Ext.Ajax.request({
-                                                url: 'http://10.1.0.61:9999/API/scene/' + scene.scene.id,
+                                                url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
                                                 method: 'POST',
                                                 params: {
-                                                    is_running: true
+                                                    u: Math.random(),
+                                                    name: toggleValue > 0 ? 'TURNON' : 'TURNOFF',
+                                                    arg: 0,
+                                                    type: 'device_type'
                                                 },
                                                 success: function (response, opts) {
                                                     var result = JSON.parse(response.responseText);
                                                     if (result.success) {
-                                                        self.delayedReload();
-                                                        Ext.Msg.alert('Scene Activation', result.desc);
-                                                    }
-                                                    else {
-                                                        Ext.Msg.alert('Scene Activation', 'Communication Error!');
-                                                    }
-                                                }
-                                            });
-
-
-                                            
-
-
-
-
-                                            Ext.util.JSONP.request({
-                                                url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                                callbackKey: 'callback',
-                                                params: {
-                                                    u: Math.random(),
-                                                    id: self.deviceID,
-                                                    cmd: toggleValue > 0 ? 'TURNON' : 'TURNOFF',
-                                                    arg: 0,
-                                                    type: 'device_type'
-
-                                                },
-                                                callback: function (data) {
-                                                    if (data.success) {
                                                         self.delayedReload();
                                                         Ext.Msg.alert('Switch Command', 'Switch set to ' + (toggleValue > 0 ? 'On' : 'Off'));
                                                     }
@@ -168,19 +140,18 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                     margin: '15 10 5 10',
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
-                                        Ext.util.JSONP.request({
-                                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                            callbackKey: 'callback',
+
+                                        Ext.Ajax.request({
+                                            url: 'http://10.1.0.61/API/commands/',
+                                            method: 'POST',
                                             params: {
                                                 u: Math.random(),
-                                                cmd: 'REPOLL_ME',
-                                                arg: self.deviceID,
-                                                type: 'builtin'
-
+                                                name: 'REPOLL_ME',
+                                                arg: self.deviceID
                                             },
-                                            callback: function (data) {
-
-                                                if (data.success) {
+                                            success: function (response, opts) {
+                                                var result = JSON.parse(response.responseText);
+                                                if (result.success) {
                                                     self.delayedReload();
                                                 }
                                                 else {

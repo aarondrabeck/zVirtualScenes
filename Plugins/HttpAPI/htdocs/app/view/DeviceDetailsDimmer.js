@@ -21,7 +21,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61:9999/API/device/' + deviceId,
+                        url: 'http://10.1.0.61/API/device/' + deviceId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random()
@@ -138,19 +138,19 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                             handler: function () {
                                 var sliderValue = self.items.items[0].items.items[2].items.items[0].getValue()[0]
                                 console.log('AJAX: SendCmd SEt LEVEL' + sliderValue);
-                                Ext.util.JSONP.request({
-                                    url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                    callbackKey: 'callback',
+
+                                Ext.Ajax.request({
+                                    url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                    method: 'POST',
                                     params: {
                                         u: Math.random(),
-                                        id: self.deviceID,
-                                        cmd: 'DYNAMIC_CMD_LEVEL',
+                                        name: 'DYNAMIC_CMD_LEVEL',
                                         arg: sliderValue,
                                         type: 'device'
-
                                     },
-                                    callback: function (data) {
-                                        if (data.success) {
+                                    success: function (response, opts) {
+                                        var result = JSON.parse(response.responseText);
+                                        if (result.success) {
                                             self.delayedReload();
                                             Ext.Msg.alert('Dimmer Command', 'Dimmer set to ' + sliderValue + '%');
                                         }
@@ -170,26 +170,24 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                     margin: '15 10 5 10',
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
-                                        Ext.util.JSONP.request({
-                                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                            callbackKey: 'callback',
+                                        Ext.Ajax.request({
+                                            url: 'http://10.1.0.61/API/commands/',
+                                            method: 'POST',
                                             params: {
                                                 u: Math.random(),
-                                                cmd: 'REPOLL_ME',
-                                                arg: self.deviceID,
-                                                type: 'builtin'
-
+                                                name: 'REPOLL_ME',
+                                                arg: self.deviceID
                                             },
-                                            callback: function (data) {
-
-                                                if (data.success) {
+                                            success: function (response, opts) {
+                                                var result = JSON.parse(response.responseText);
+                                                if (result.success) {
                                                     self.delayedReload();
                                                 }
                                                 else {
                                                     console.log('ERROR');
                                                 }
                                             }
-                                        });
+                                        });                                        
                                     }
                                 }]
                 },

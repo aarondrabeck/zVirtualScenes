@@ -124,10 +124,10 @@ namespace zVirtualScenesAPI
                     existing_dv.commandClassId = dv.commandClassId;
                     existing_dv.read_only = dv.read_only;
                 }
-                lock (zvsEntityControl.zvsContext)
-                {
+                //lock (zvsEntityControl.zvsContext)
+                //{
                     zvsEntityControl.zvsContext.SaveChanges();
-                }
+                //}
                 
             }
         }

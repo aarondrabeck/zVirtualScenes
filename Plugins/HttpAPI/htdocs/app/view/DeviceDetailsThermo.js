@@ -21,7 +21,7 @@
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61:9999/API/device/' + deviceId,
+                        url: 'http://10.1.0.61/API/device/' + deviceId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random()
@@ -113,18 +113,18 @@
                          margin: 5,
                          handler: function () {
                              console.log('AJAX: SendCmd ESM');
-                             Ext.util.JSONP.request({
-                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                 callbackKey: 'callback',
+                             Ext.Ajax.request({
+                                 url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                 method: 'POST',
                                  params: {
                                      u: Math.random(),
-                                     cmd: 'SETENERGYMODE',
-                                     id: self.deviceID,
+                                     name: 'SETENERGYMODE',
                                      arg: 0,
                                      type: 'device_type'
                                  },
-                                 callback: function (data) {
-                                     if (data.success) {
+                                 success: function (response, opts) {
+                                     var result = JSON.parse(response.responseText);
+                                     if (result.success) {
                                          self.delayedReload();
                                          Ext.Msg.alert('Thermostat Command', 'Thermostat set to Energy Savings Mode');
                                      }
@@ -142,18 +142,18 @@
                          margin: '5 5 30 5',
                          handler: function () {
                              console.log('AJAX: SendCmd Confort');
-                             Ext.util.JSONP.request({
-                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                 callbackKey: 'callback',
+                             Ext.Ajax.request({
+                                 url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                 method: 'POST',
                                  params: {
                                      u: Math.random(),
-                                     cmd: 'SETCONFORTMODE',
-                                     id: self.deviceID,
+                                     name: 'SETCONFORTMODE',
                                      arg: 0,
                                      type: 'device_type'
                                  },
-                                 callback: function (data) {
-                                     if (data.success) {
+                                 success: function (response, opts) {
+                                     var result = JSON.parse(response.responseText);
+                                     if (result.success) {
                                          self.delayedReload();
                                          Ext.Msg.alert('Thermostat Command', 'Thermostat set to Comfort Mode');
                                      }
@@ -161,7 +161,7 @@
                                          Ext.Msg.alert('Thermostat Command', 'Communication Error!');
                                      }
                                  }
-                             });
+                             }); 
                          }
                      },
                      {
@@ -216,18 +216,19 @@
                                                                         handler: function () {
                                                                             var mode = this.SetMode.items.items[0].getValue()
                                                                             console.log('AJAX DYNAMIC_CMD_MODE ' + mode);
-                                                                            Ext.util.JSONP.request({
-                                                                                url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                                                                callbackKey: 'callback',
+
+                                                                            Ext.Ajax.request({
+                                                                                url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                                                method: 'POST',
                                                                                 params: {
                                                                                     u: Math.random(),
-                                                                                    id: self.deviceID,
-                                                                                    cmd: 'DYNAMIC_CMD_MODE',
+                                                                                    name: 'DYNAMIC_CMD_MODE',
                                                                                     arg: mode,
                                                                                     type: 'device'
                                                                                 },
-                                                                                callback: function (data) {
-                                                                                    if (data.success) {
+                                                                                success: function (response, opts) {
+                                                                                    var result = JSON.parse(response.responseText);
+                                                                                    if (result.success) {
                                                                                         self.delayedReload();
                                                                                         Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
                                                                                     }
@@ -235,7 +236,7 @@
                                                                                         Ext.Msg.alert('Thermostat Command', 'Communication Error!');
                                                                                     }
                                                                                 }
-                                                                            });
+                                                                            }); 
                                                                             this.SetMode.hide();
                                                                         }
                                                                     }]
@@ -293,18 +294,20 @@
                                                     handler: function () {
                                                         var mode = this.SetFanMode.items.items[0].getValue()
                                                         console.log('DYNAMIC_CMD_FAN MODE' + mode);
-                                                        Ext.util.JSONP.request({
-                                                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                                            callbackKey: 'callback',
+
+
+                                                        Ext.Ajax.request({
+                                                            url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                            method: 'POST',
                                                             params: {
                                                                 u: Math.random(),
-                                                                id: self.deviceID,
-                                                                cmd: 'DYNAMIC_CMD_FAN MODE',
+                                                                name: 'DYNAMIC_CMD_FAN MODE',
                                                                 arg: mode,
                                                                 type: 'device'
                                                             },
-                                                            callback: function (data) {
-                                                                if (data.success) {
+                                                            success: function (response, opts) {
+                                                                var result = JSON.parse(response.responseText);
+                                                                if (result.success) {
                                                                     self.delayedReload();
                                                                     Ext.Msg.alert('Thermostat Command', 'Fan mode set to ' + mode);
                                                                 }
@@ -312,7 +315,7 @@
                                                                     Ext.Msg.alert('Thermostat Command', 'Communication Error!');
                                                                 }
                                                             }
-                                                        });
+                                                        });                                                        
                                                         this.SetFanMode.hide();
                                                     }
                                                 }]
@@ -345,18 +348,18 @@
                                             handler: function () {
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_HEATING 1' + selected_temp);
-                                                Ext.util.JSONP.request({
-                                                    url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                                    callbackKey: 'callback',
+                                                Ext.Ajax.request({
+                                                    url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                    method: 'POST',
                                                     params: {
                                                         u: Math.random(),
-                                                        id: self.deviceID,
-                                                        cmd: 'DYNAMIC_CMD_HEATING 1',
+                                                        name: 'DYNAMIC_CMD_HEATING 1',
                                                         arg: selected_temp,
                                                         type: 'device'
                                                     },
-                                                    callback: function (data) {
-                                                        if (data.success) {
+                                                    success: function (response, opts) {
+                                                        var result = JSON.parse(response.responseText);
+                                                        if (result.success) {
                                                             self.delayedReload();
                                                             Ext.Msg.alert('Thermostat Command', 'Heat Point set to ' + selected_temp + '&deg; F');
                                                         }
@@ -364,7 +367,7 @@
                                                             Ext.Msg.alert('Thermostat Command', 'Communication Error!');
                                                         }
                                                     }
-                                                });
+                                                });                                               
                                             }
                                         }
                              });
@@ -394,18 +397,18 @@
                                             handler: function () {
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_COOLING 1 :' + selected_temp);
-                                                Ext.util.JSONP.request({
-                                                    url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                                    callbackKey: 'callback',
+                                                Ext.Ajax.request({
+                                                    url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                    method: 'POST',
                                                     params: {
                                                         u: Math.random(),
-                                                        id: self.deviceID,
-                                                        cmd: 'DYNAMIC_CMD_COOLING 1',
+                                                        name: 'DYNAMIC_CMD_COOLING 1',
                                                         arg: selected_temp,
                                                         type: 'device'
                                                     },
-                                                    callback: function (data) {
-                                                        if (data.success) {
+                                                    success: function (response, opts) {
+                                                        var result = JSON.parse(response.responseText);
+                                                        if (result.success) {
                                                             self.delayedReload();
                                                             Ext.Msg.alert('Thermostat Command', 'Cool Point set to ' + selected_temp + '&deg; F');
                                                         }
@@ -430,26 +433,19 @@
                          flex: 1,
                          handler: function () {
                              console.log('AJAX: SendCmd REPOLL_ME');
-                             Ext.util.JSONP.request({
-                                 url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                                 callbackKey: 'callback',
+
+                             Ext.Ajax.request({
+                                 url: 'http://10.1.0.61/API/commands/',
+                                 method: 'POST',
                                  params: {
                                      u: Math.random(),
-                                     cmd: 'REPOLL_ME',
-                                     arg: self.deviceID,
-                                     type: 'builtin'
-
+                                     name: 'REPOLL_ME',
+                                     arg: self.deviceID
                                  },
-                                 callback: function (data) {
-
-                                     if (data.success) {
-                                         console.log('OK');
-                                         if (RepollTimer) { clearInterval(RepollTimer); }
-
-                                         RepollTimer = setTimeout(function () {
-                                             var id = self.items.items[0].items.items[1].getData().id;
-                                             self.loadDevice(self.deviceID);
-                                         }, 1500);
+                                 success: function (response, opts) {
+                                     var result = JSON.parse(response.responseText);
+                                     if (result.success) {
+                                         self.delayedReload();
                                      }
                                      else {
                                          console.log('ERROR');

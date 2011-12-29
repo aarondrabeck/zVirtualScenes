@@ -16,13 +16,12 @@
                 loadScene: function (groupID) {
                     self.groupId = groupID;
                     //Get Device Details			
-                    console.log('AJAX: GetSceneDetails');
+                    console.log('AJAX: GetgroupDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61:9999/JSON/GetGroupDetails',
+                        url: 'http://10.1.0.61/API/group/' + self.groupId,
                         callbackKey: 'callback',
                         params: {
-                            u: Math.random(),
-                            id: self.groupId
+                            u: Math.random()
                         },
                         callback: function (data) {
                             //Send data to panel TPL                            
@@ -69,27 +68,24 @@
                     margin: '25 5 5 5',
                     handler: function () {
                         console.log('AJAX: ActivateGroup' + self.groupId);
-                        Ext.util.JSONP.request({
-                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                            callbackKey: 'callback',
+                        Ext.Ajax.request({
+                            url: 'http://10.1.0.61/API/commands/',
+                            method: 'POST',
                             params: {
                                 u: Math.random(),
-                                cmd: 'GROUP_ON',
-                                arg: self.groupId,
-                                type: 'builtin'
-
+                                name: 'GROUP_ON',
+                                arg: self.groupId
                             },
-                            callback: function (data) {
-                                if (data.success) {
+                            success: function (response, opts) {
+                                var result = JSON.parse(response.responseText);
+                                if (result.success) {
                                     Ext.Msg.alert('Group', "All device in group Turned On");
-
                                 }
                                 else {
                                     Ext.Msg.alert('Group', 'Communication Error!');
                                 }
                             }
-                        });
-
+                        }); 
                     }
                 }, {
                     xtype: 'button',
@@ -98,26 +94,24 @@
                     margin: '5 5 25 5',
                     handler: function () {
                         console.log('AJAX: DeactivateGroup' + self.groupId);
-                        Ext.util.JSONP.request({
-                            url: 'http://10.1.0.61:9999/JSON/SendCmd',
-                            callbackKey: 'callback',
+                        Ext.Ajax.request({
+                            url: 'http://10.1.0.61/API/commands/',
+                            method: 'POST',
                             params: {
                                 u: Math.random(),
-                                cmd: 'GROUP_OFF',
-                                arg: self.groupId,
-                                type: 'builtin'
-
+                                name: 'GROUP_OFF',
+                                arg: self.groupId
                             },
-                            callback: function (data) {
-                                if (data.success) {
+                            success: function (response, opts) {
+                                var result = JSON.parse(response.responseText);
+                                if (result.success) {
                                     Ext.Msg.alert('Group', "All device in group Turned Off");
-
                                 }
                                 else {
                                     Ext.Msg.alert('Group', 'Communication Error!');
                                 }
                             }
-                        });
+                        });                       
 
                     }
                 }, {
