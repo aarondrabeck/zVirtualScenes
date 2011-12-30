@@ -34,11 +34,14 @@ Ext.application({
                     xtype: 'GroupViewPort',
                     title: "Groups",
                     iconCls: "spaces2"
-                }, {
-                    title: 'Settings',
-                    html: '<h1>Settings Card</h1>',
-                    iconCls: 'settings'
-                }]
+                }
+//                , {
+//                    title: 'Settings',
+//                    html: '<h1>Settings Card</h1>',
+//                    iconCls: 'settings'
+//                }
+                
+                ]
             });
         });
     }
