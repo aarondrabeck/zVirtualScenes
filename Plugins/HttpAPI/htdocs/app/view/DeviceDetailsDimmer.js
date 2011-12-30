@@ -21,7 +21,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61/API/device/' + deviceId,
+                        url: '/API/device/' + deviceId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random()
@@ -140,7 +140,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                 console.log('AJAX: SendCmd SEt LEVEL' + sliderValue);
 
                                 Ext.Ajax.request({
-                                    url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                    url: '/API/device/' + self.deviceID + '/command/',
                                     method: 'POST',
                                     params: {
                                         u: Math.random(),
@@ -171,7 +171,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                     handler: function () {
                                         console.log('AJAX: SendCmd REPOLL_ME');
                                         Ext.Ajax.request({
-                                            url: 'http://10.1.0.61/API/commands/',
+                                            url: '/API/commands/',
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),

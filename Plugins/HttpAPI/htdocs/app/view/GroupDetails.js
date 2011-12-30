@@ -18,7 +18,7 @@
                     //Get Device Details			
                     console.log('AJAX: GetgroupDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61/API/group/' + self.groupId,
+                        url: '/API/group/' + self.groupId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random()
@@ -69,7 +69,7 @@
                     handler: function () {
                         console.log('AJAX: ActivateGroup' + self.groupId);
                         Ext.Ajax.request({
-                            url: 'http://10.1.0.61/API/commands/',
+                            url: '/API/commands/',
                             method: 'POST',
                             params: {
                                 u: Math.random(),
@@ -95,7 +95,7 @@
                     handler: function () {
                         console.log('AJAX: DeactivateGroup' + self.groupId);
                         Ext.Ajax.request({
-                            url: 'http://10.1.0.61/API/commands/',
+                            url: '/API/commands/',
                             method: 'POST',
                             params: {
                                 u: Math.random(),

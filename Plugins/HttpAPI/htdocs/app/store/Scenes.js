@@ -5,7 +5,7 @@
         requires: ['zvsMobile.model.Scene'],
         proxy: {
             type: 'scripttag',
-            url: 'http://10.1.0.61/API/Scenes/',
+            url: '/API/Scenes/',
             extraParams: {
                 u: Math.random()
             },

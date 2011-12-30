@@ -21,7 +21,7 @@
                     //Get Device Details			
                     console.log('AJAX: GetDeviceDetails');
                     Ext.util.JSONP.request({
-                        url: 'http://10.1.0.61/API/device/' + deviceId,
+                        url: '/API/device/' + deviceId,
                         callbackKey: 'callback',
                         params: {
                             u: Math.random()
@@ -114,7 +114,7 @@
                          handler: function () {
                              console.log('AJAX: SendCmd ESM');
                              Ext.Ajax.request({
-                                 url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                 url: '/API/device/' + self.deviceID + '/command/',
                                  method: 'POST',
                                  params: {
                                      u: Math.random(),
@@ -143,7 +143,7 @@
                          handler: function () {
                              console.log('AJAX: SendCmd Confort');
                              Ext.Ajax.request({
-                                 url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                 url: '/API/device/' + self.deviceID + '/command/',
                                  method: 'POST',
                                  params: {
                                      u: Math.random(),
@@ -218,7 +218,7 @@
                                                                             console.log('AJAX DYNAMIC_CMD_MODE ' + mode);
 
                                                                             Ext.Ajax.request({
-                                                                                url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                                                url: '/API/device/' + self.deviceID + '/command/',
                                                                                 method: 'POST',
                                                                                 params: {
                                                                                     u: Math.random(),
@@ -297,7 +297,7 @@
 
 
                                                         Ext.Ajax.request({
-                                                            url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                            url: '/API/device/' + self.deviceID + '/command/',
                                                             method: 'POST',
                                                             params: {
                                                                 u: Math.random(),
@@ -349,7 +349,7 @@
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_HEATING 1' + selected_temp);
                                                 Ext.Ajax.request({
-                                                    url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                    url: '/API/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
@@ -398,7 +398,7 @@
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_COOLING 1 :' + selected_temp);
                                                 Ext.Ajax.request({
-                                                    url: 'http://10.1.0.61/API/device/' + self.deviceID + '/command/',
+                                                    url: '/API/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
@@ -435,7 +435,7 @@
                              console.log('AJAX: SendCmd REPOLL_ME');
 
                              Ext.Ajax.request({
-                                 url: 'http://10.1.0.61/API/commands/',
+                                 url: '/API/commands/',
                                  method: 'POST',
                                  params: {
                                      u: Math.random(),
