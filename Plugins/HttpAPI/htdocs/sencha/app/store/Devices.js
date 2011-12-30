@@ -1,26 +1,26 @@
 ﻿Ext.require(['Ext.data.Store'], function () {
-    Ext.define('zvsMobile.store.Groups', {
+    Ext.define('zvsMobile.store.Devices', {
         extend: 'Ext.data.Store',
-        model: 'zvsMobile.model.Group',
-        requires: ['zvsMobile.model.Group'],
+        model: 'zvsMobile.model.Device',
+        requires: ['zvsMobile.model.Device'],
         proxy: {
             type: 'scripttag',
-            url: '/API/Groups/',
+            url: '/API/Devices/',
             extraParams: {
                 u: Math.random()
             },
             reader: {
                 type: 'json',
-                root: 'groups',
+                root: 'devices',
                 idProperty: 'id',
                 successProperty: 'success'
             },
             callbackParam: 'callback'
         },
-        autoLoad: true
+        //autoLoad: true
     });
 
-    GroupsStore = Ext.create('zvsMobile.store.Groups', {
+    DeviceStore = Ext.create('zvsMobile.store.Devices', {
     });
 });
 

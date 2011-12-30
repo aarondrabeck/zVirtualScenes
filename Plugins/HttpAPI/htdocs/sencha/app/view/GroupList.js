@@ -36,7 +36,7 @@ Ext.require(['Ext.Panel', 'zvsMobile.store.Groups'], function () {
                                 var ViewPort = self.parent;
                                 var GroupDetails = ViewPort.items.items[1];
                                 var groupId = records[0].data.id;
-                                GroupDetails.loadScene(groupId);
+                                GroupDetails.loadGroup(groupId);
                                 ViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
                                 ViewPort.setActiveItem(GroupDetails);
                             }

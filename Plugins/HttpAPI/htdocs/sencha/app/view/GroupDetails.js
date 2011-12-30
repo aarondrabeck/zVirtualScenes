@@ -10,10 +10,10 @@
                     if (RepollTimer) { clearInterval(RepollTimer); }
 
                     RepollTimer = setTimeout(function () {
-                        self.loadScene(self.groupId);
+                        self.loadGroup(self.groupId);
                     }, 500);
                 },
-                loadScene: function (groupID) {
+                loadGroup: function (groupID) {
                     self.groupId = groupID;
                     //Get Device Details			
                     console.log('AJAX: GetgroupDetails');

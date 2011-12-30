@@ -29,9 +29,10 @@ namespace HttpAPI
     public class HttpAPIPlugin : Plugin
     {
         public volatile bool isActive;
-
+        private Guid CookieValue; 
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
+
 
         public HttpAPIPlugin()
             : base("HttpAPI",
@@ -72,12 +73,14 @@ namespace HttpAPI
 
                 if (!httplistener.IsListening)
                 {
+                    CookieValue = Guid.NewGuid(); 
                     int port = 9999;
                     int.TryParse(GetSettingValue("PORT"), out port);
                     httplistener.Prefixes.Add("http://*:" + port + "/");
                     //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
                     //httplistener.IgnoreWriteExceptions = true; 
                     httplistener.Start();
+
 
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
 
@@ -180,9 +183,24 @@ namespace HttpAPI
             // Obtain a response object
             using (System.Net.HttpListenerResponse response = context.Response)
             {
+                //doesnt have valid cookies 
+                if (context.Request.Cookies.Count == 0 || (context.Request.Cookies.Count > 0 && context.Request.Cookies["zvs"] != null && context.Request.Cookies["zvs"].Value != CookieValue.ToString()))
+                {
+                    bool allowed = false; 
+                    if(!context.Request.RawUrl.ToLower().StartsWith("/api")) {allowed = true; }
+                    if(context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("login") && (context.Request.HttpMethod == "POST" || context.Request.HttpMethod == "GET") ) {allowed = true; }
+                    if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("logout") && context.Request.HttpMethod == "POST") { allowed = true; } 
+
+                    if(!allowed)
+                    {                        
+                        sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", context);
+                        return;
+                    }
+                }
+
                 if (context.Request.Url.Segments.Length > 2 && context.Request.Url.Segments[1].ToLower().Equals("api/"))
                 {
-                    object result_obj = GetResponse(context.Request);
+                    object result_obj = GetResponse(context.Request, response);
 
                     //Serialize depending type
                     string RespondWith = "json";
@@ -194,14 +212,14 @@ namespace HttpAPI
                         case "json":
                             {
 
-                                response.ContentType = "application/javascript;charset=utf-8";
+                                response.ContentType = "application/json;charset=utf-8";
                                 response.StatusCode = (int)HttpStatusCode.OK;
                                 MemoryStream stream = new MemoryStream();
                                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toJSON(result_obj, context.Request.QueryString["callback"]));
                                 stream.Write(buffer, 0, buffer.Length);
                                 byte[] bytes = stream.ToArray();
                                 response.OutputStream.Write(bytes, 0, bytes.Length);
-                                stream.Close(); 
+                                stream.Close();
                                 break;
                             }
                         case "xml":
@@ -213,7 +231,7 @@ namespace HttpAPI
                                 stream.Write(buffer, 0, buffer.Length);
                                 byte[] bytes = stream.ToArray();
                                 response.OutputStream.Write(bytes, 0, bytes.Length);
-                                stream.Close(); 
+                                stream.Close();
                                 break;
                             }
                     }
@@ -221,16 +239,16 @@ namespace HttpAPI
                 else
                 {
                     string htdocs_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"plugins\htdocs");
-                    
+
                     string relative_file_path = context.Request.Url.LocalPath.Replace("/", @"\");
                     if (context.Request.RawUrl.Equals("/"))
-                        relative_file_path = @"\index.htm";                   
+                        relative_file_path = @"\index.htm";
 
-                    FileInfo f = new FileInfo(htdocs_path +relative_file_path);
+                    FileInfo f = new FileInfo(htdocs_path + relative_file_path);
 
                     if (!f.Exists)
                     {
-                        sendResponse((int)HttpStatusCode.NotFound, "404 Not Found", "The resource requested does not exist.", context); 
+                        sendResponse((int)HttpStatusCode.NotFound, "404 Not Found", "The resource requested does not exist.", context);
                     }
                     else
                     {
@@ -238,16 +256,16 @@ namespace HttpAPI
                         response.StatusCode = (int)HttpStatusCode.OK;
                         switch (f.Extension.ToLower())
                         {
-                            case ".js": contentType = "application/javascript;charset=utf-8"; break;
-                            case ".css":  contentType = "text/css";  break;
-                            case ".manifest": contentType = "text/cache-manifest"; break;                         
+                            case ".js": contentType = "application/javascript"; break;
+                            case ".css": contentType = "text/css"; break;
+                            case ".manifest": contentType = "text/cache-manifest"; break;
 
                             //images
-                            case ".gif":  contentType = MediaTypeNames.Image.Gif; break;
+                            case ".gif": contentType = MediaTypeNames.Image.Gif; break;
                             case ".jpg":
                             case ".jpeg": contentType = MediaTypeNames.Image.Jpeg; break;
                             case ".tiff": contentType = MediaTypeNames.Image.Tiff; break;
-                            case ".png":  contentType = "image/png"; break;
+                            case ".png": contentType = "image/png"; break;
                             case ".ico": contentType = "image/ico"; break;
 
                             // application
@@ -267,18 +285,16 @@ namespace HttpAPI
                         response.ContentLength64 = buffer.Length;
                         try
                         {
-                            using (var s = response.OutputStream) 
+                            using (var s = response.OutputStream)
                                 s.Write(buffer, 0, buffer.Length);
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("HTTAPI ERROR: {0}",e.Message);
+                            Console.WriteLine("HTTAPI ERROR: {0}", e.Message);
                         }
                     }
                 }
             }
-
-
         }
 
         private void sendResponse(int statusCode, String status, String statusMessage, HttpListenerContext context)
@@ -300,8 +316,9 @@ namespace HttpAPI
             context.Response.Close();
         }               
 
-        private object GetResponse(HttpListenerRequest request)
+        private object GetResponse(HttpListenerRequest request, HttpListenerResponse response)
         {           
+            
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
@@ -700,12 +717,20 @@ namespace HttpAPI
                 }
             }
 
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logout") && request.HttpMethod == "POST")
+            {
+                Cookie c = new Cookie("zvs", "No Access");
+                c.Expires = DateTime.Today.AddDays(-5);
+                c.Domain = "";
+                c.Path = "/";
+                response.Cookies.Add(c);
+
+                return new { success = true, isLoggedIn = false };
+            }
+
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "GET")
             {
-                NameValueCollection postData = GetPostData(request);
-
-                //todo: check for session
-                return new { success = true, isLoggedIn = false };
+                return new { success = true, isLoggedIn = (request.Cookies.Count > 0 && request.Cookies["zvs"] != null && request.Cookies["zvs"].Value == CookieValue.ToString()) };
             }
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "POST")
@@ -713,11 +738,19 @@ namespace HttpAPI
                 NameValueCollection postData = GetPostData(request);
 
                 if (postData["password"] == GetSettingValue("PASSWORD"))
-                    return new { success = true };
+                {
+                    Cookie c = new Cookie("zvs", CookieValue.ToString());
+                    c.Expires = DateTime.Today.AddDays(5);
+                    c.Domain = "";
+                    c.Path = "/";
+                    response.Cookies.Add(c);
+
+                    return new { success = true };                    
+                }
                 else
                     return new { success = false };
             }
-                        
+                                   
             return new { success = false, reason = "Invalid Command" };    
         }
 
@@ -765,6 +798,8 @@ namespace HttpAPI
         //        get { return Encoding.UTF8; }
         //    }
         //}              
+
+         
     }
 
     public static class ObjectExtensions
@@ -876,4 +911,7 @@ namespace HttpAPI
         #endregion helpers
         #endregion .ToXml
     }
+
+
+     
 }
