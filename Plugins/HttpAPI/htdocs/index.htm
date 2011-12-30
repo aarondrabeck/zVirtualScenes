@@ -10,7 +10,6 @@
     <script type="text/javascript" src="/scripts/jquery-tmpl.js"></script>
     <script type="text/javascript" src="/scripts/backbone-min.js"></script>
     <script type="text/javascript" src="/scripts/jquery.mobile.js"></script>
-    <script type="text/javascript" src="/scripts/jquery.websockets.js"></script>
     
     <link rel="apple-touch-icon" href="/images/switch_on.png" />
     <link rel="apple-touch-icon" sizes="72x72" href="/images/switch_on.png" />
@@ -19,13 +18,12 @@
     <!-- STARTUP IMAGES -->
     <!-- startup image for web apps - iPad - landscape (748x1024) 
          Note: iPad landscape startup image has to be exactly 748x1024 pixels (portrait, with contents rotated).-->
-    <link rel="apple-touch-startup-image" href="/images/landscapeScreen.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
+    <link rel="apple-touch-startup-image" href="/images/landscapeScreen.jpg" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)" />
     <!-- startup image for web apps - iPad - portrait (768x1004) -->
-    <link rel="apple-touch-startup-image" href="/images/portraitScreen.png" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
+    <link rel="apple-touch-startup-image" href="/images/portraitScreen.jpg" media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)" />
     <!-- startup image for web apps (320x460) -->
     <link rel="apple-touch-startup-image" href="/images/loresScreen.jpg" media="screen and (max-device-width: 320px)" />
 
-    
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     
@@ -84,8 +82,15 @@
             }
         })();
         
-        $.mobile.page.prototype.options.domCache = true;
+        $.mobile.hashListeningEnabled = false;
         $.mobile.defaultPageTransition = "none";
+        $.mobile.page.prototype.options.domCache = true;
+        $.mobile.linkBindingEnabled = false;
+        $.mobile.touchOverflowEnabled = true;
+        
+        $(document).bind("mobileinit", function(){
+          $.mobile.fixedToolbars.setTouchToggleEnabled(false);
+        });
         
         var Device = Backbone.Model.extend({
             setState: function(on_off, level) {
@@ -155,19 +160,14 @@
                 }
             },
             sendCommand: function() {
-                $.ajax({
-                    url: HOST + '/JSON/SendCmd',
-                    crossDomain: true,
-                    dataType: 'jsonp',
-                    success: this.update(),
-                    data: {
-                        u: Math.random(),
-                        id: this.id,
-                        cmd: this.getCommand(),
+                $.post('/API/device/' + this.id + '/command',
+                    {
                         arg: this.get("level"),
-                        type: this.getType()
-                    }
-                });
+                        type: this.getType(),
+                        name: this.getCommand()
+                    },
+                    this.update.call(this)
+                );
             },
             getImage: function() {
               if(this.isSwitch()) {
@@ -196,13 +196,13 @@
         
         Devices = Backbone.Collection.extend({
             model: Device,
-            url: HOST + '/API/devices'
+            url: '/API/devices'
         }),
         
         Scene = Backbone.Model.extend({
             run: function() {
                 $.ajax({
-                    url: HOST + '/API/scenes',
+                    url: '/API/scenes',
                     crossDomain: true,
                     dataType: 'jsonp',
                     success: this.update(),
@@ -234,7 +234,7 @@
         Group = Backbone.Model.extend({
             getDetails: function(cb) {
                 $.ajax({
-                    url: HOST + '/api/groups',
+                    url: '/API/groups',
                     crossDomain: true,
                     dataType: 'jsonp',
                     success: cb,
@@ -252,7 +252,7 @@
         var sampleDevices = {"success":true,"devices":[{"id":25,"name":"Aeon Labs Z-Stick Series 1 (Secondary)","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":1,"name":"Aeon Labs Z-Stick Series 2","on_off":"OFF","level":0,"level_txt":"0%","type":"CONTROLLER"},{"id":21,"name":"Brother Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":11,"name":"Can Lights","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":13,"name":"Dining Table Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":17,"name":"Driveway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":10,"name":"Entryway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":8,"name":"Family Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":14,"name":"Fan Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":19,"name":"Fireplace Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":15,"name":"Kitchen Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":20,"name":"Label Printer","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":2,"name":"Master Bathtub Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":3,"name":"Masterbath Mirror Light","on_off":"ON","level":99,"level_txt":"99%","type":"DIMMER"},{"id":6,"name":"Masterbed Bed Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":5,"name":"Masterbed East Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":4,"name":"Masterbed Hallway Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":24,"name":"Masterbed Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":23,"name":"Masterbed Window Fan","on_off":"OFF","level":0,"level_txt":"OFF","type":"SWITCH"},{"id":7,"name":"Office Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":9,"name":"Outside Entry Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":12,"name":"Pourch Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":16,"name":"Rear Garage Light","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"},{"id":22,"name":"South Thermostat","on_off":"ON","level":64,"level_txt":"64 F","type":"THERMOSTAT"},{"id":18,"name":"TV Backlight","on_off":"OFF","level":0,"level_txt":"0%","type":"DIMMER"}]};
         
         
-        var HOST, helpers = { 
+        var helpers = { 
             device: function() {
                 return Devices.get(this.data.id);
             },
@@ -287,7 +287,7 @@
         }
         
         function handleSwipe(event, data) {
-            console.log(event);
+            //console.log(event);
         }
         
         $("#devices-data .range").live("change", handleSlider);
@@ -296,16 +296,20 @@
         $("#devices-data li").live("swipeleft swiperight", handleSwipe);
         $(".ui-scene-button").live("click", runScene);
         $("#login button").live("click", function() {
-            HOST = $("#zvsServer").val();
-            $.Storage.set("server", HOST);
+            $.post("/API/login", {
+                password: $("#password").val()
+            }, 
+            function() {
+                load("devices");
+                load("scenes");
+                load("groups");
+                
+                $.mobile.showPageLoadingMsg();    
+            });
             
-            load("Device");
-            //handleLoad(sampleDevices, "devices");
-            load("Scene");
-            load("Group");
             
-            $.mobile.showPageLoadingMsg();
         });
+        $("#footerBar a").live("click", changePage);
         
         
         
@@ -320,9 +324,13 @@
             }
             
             
-            var list = $("#" + type + "-data").html(
-                $("#" + type + "Template").tmpl(data[type], helpers)   
-            );
+            if(data[type].length) {
+                $("#" + type + "-data").html(
+                    $("#" + type + "Template").tmpl(data[type], helpers)   
+                );
+            } else {
+                $("#" + type + "-data").html("Please add some " + type + " to zVirtualScenes");
+            }
             
             loaded++;
             if(loaded == 3) {
@@ -340,12 +348,10 @@
         
         function load(type) {
             $.ajax({
-                url: HOST + '/API/'+ type +'s',
-                crossDomain: true,
-                dataType: 'jsonp',
+                url: '/API/'+ type,
+                dataType: 'json',
                 success: function(data) {
-                    var name = type.toLowerCase() + "s";
-                    handleLoad(data, name);
+                    handleLoad(data, type);
                 }
             });
         }
@@ -356,14 +362,15 @@
             })
         }
         
-        $(document).bind("pagebeforechange", function( event, data ) {
-            //Handle initial page load by doing nothing
-            if(typeof data.toPage != "string") {
+        function changePage(event, data) {
+            data = data || {};
+            var toPage = $(this).attr("href") || data.toPage;
+            
+            if(typeof toPage != "string") {
                 return; 
             }
-            event.preventDefault();
-            
-            var url = $.mobile.path.parseUrl(data.toPage),
+
+            var url = $.mobile.path.parseUrl(toPage),
                 page = url.hash || "#devices";
             
             if(url.directory == "/group/") {
@@ -372,28 +379,29 @@
             }
             
             
-            $("div:jqmData(role='content') ul").hide();
-            
-            if(page == "#scenes") {
-                $("#header").html("Scenes");
-            } else if(page == "#groups") {
-                $("#header").html("Groups");
-            } else {
-                $("#header").html("Devices");
-            }
+            all_content.hide();
+            var capTitle = page[1].toUpperCase() + page.slice(2); 
+            $("#header").html(capTitle);
+            document.title = capTitle;
             
             $(page + "-data").show();
             
+            //Update nav bar
+            $("#footerBar a").removeClass( $.mobile.activeBtnClass );
+            $( this ).addClass( $.mobile.activeBtnClass );
+            
             //We're done changing pages so let the framework do its stuff.
             //$.mobile.pageContainer.trigger("updatelayout");
-            $.mobile.fixedToolbars.show(true);
-        });
-        
+            window.scrollTo(0, 0);
+            
+            event.preventDefault();
+            return false;
+        }
+        $(document).bind("pagebeforechange", changePage);
+       
+       var all_content;
        $(function() {
-          var server = $.Storage.get("server");
-          if(server) {
-            $("#zvsServer").val(server);
-          }
+          all_content = $("div:jqmData(role='content') ul");
        });
     </script>
 </head> 
@@ -407,9 +415,6 @@
             <div data-role="fieldcontain">
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" value="" placeholder="Password"/>
-                
-                <label for="zvsServer">zvsServer:</label>
-                <input type="text" name="zvsServer" id="zvsServer" value="http://192.168.1.:9999" placeholder="zvsServer"/>
             </div>
             
             <button type="button">Login</button>
@@ -417,18 +422,18 @@
     </div>
 </div>
 
-<div data-role="page" id="devices">
-    <div data-role="header">
+<div data-role="page" id="devices" data-fullscreen="false">
+    <div data-role="header" data-position="fixed">
         <h1 id="header">Devices</h1>
     </div>
 
     <div data-role="content"> 
-        <ul id="devices-data" data-role="listview"></ul>
-        <ul id="scenes-data" data-role="listview" style="display: none;"></ul>
-        <ul id="groups-data" data-role="listview" style="display: none;"></ul>      
+        <ul id="devices-data" class="data-list" data-role="listview"></ul>
+        <ul id="scenes-data" class="data-list" data-role="listview" style="display: none;"></ul>
+        <ul id="groups-data" class="data-list" data-role="listview" style="display: none;"></ul>      
     </div>
     
-    <div id="footerBar" class="footerBar" data-role="footer" data-position="fixed" data-grid="d" data-theme="a" data-id="sharedFooter">
+    <div id="footerBar" class="footerBar" data-role="footer" data-position="fixed" data-theme="a">
         <div data-role="navbar">
         <ul>
             <li><a class="ui-btn-active" href="#devices" data-icon="devices">Devices</a></li>
