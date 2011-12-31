@@ -55,7 +55,7 @@ namespace zVirtualScenesCommon.Entity
         {
             get { 
                 
-                string version = "zVirtualScenes v2.5 Beta 10 prerelease 3";
+                string version = "zVirtualScenes v2.5 Beta 10 prerelease 4";
 
                 #if (!DEBUG)
                 return version + " DEBUG MODE";

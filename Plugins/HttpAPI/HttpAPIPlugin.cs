@@ -29,11 +29,11 @@ namespace HttpAPI
     public class HttpAPIPlugin : Plugin
     {
         public volatile bool isActive;
+        bool verbose = true;
         private Guid CookieValue; 
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
-
-
+        
         public HttpAPIPlugin()
             : base("HttpAPI",
                "HttpAPI Plugin",
@@ -58,7 +58,16 @@ namespace HttpAPI
                 value = "C52632B4BCDB6F8CF0F6E4545",
                 value_data_type = (int)Data_Types.STRING,
                 description = "Password that protects public facing web services."
-            }); 
+            });
+
+            DefineOrUpdateSetting(new plugin_settings
+            {
+                name = "VERBOSE",
+                friendly_name = "Verbose Logging",
+                value = false.ToString(),
+                value_data_type = (int)Data_Types.BOOL,
+                description = "(Writes all server client communication to the log for debugging.)"
+            });
         }
 
         protected override bool StartPlugin()
@@ -73,6 +82,8 @@ namespace HttpAPI
 
                 if (!httplistener.IsListening)
                 {
+                    bool.TryParse(GetSettingValue("VERBOSE"), out verbose);
+
                     CookieValue = Guid.NewGuid(); 
                     int port = 9999;
                     int.TryParse(GetSettingValue("PORT"), out port);
@@ -183,6 +194,12 @@ namespace HttpAPI
             // Obtain a response object
             using (System.Net.HttpListenerResponse response = context.Response)
             {
+                string ip = string.Empty; 
+                if(context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString();};
+
+                if (verbose)
+                    WriteToLog(Urgency.INFO, string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip,context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
+
                 //doesnt have valid cookies 
                 if (context.Request.Cookies.Count == 0 || (context.Request.Cookies.Count > 0 && context.Request.Cookies["zvs"] != null && context.Request.Cookies["zvs"].Value != CookieValue.ToString()))
                 {
@@ -192,7 +209,8 @@ namespace HttpAPI
                     if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("logout") && context.Request.HttpMethod == "POST") { allowed = true; } 
 
                     if(!allowed)
-                    {                        
+                    {
+                        WriteToLog(Urgency.INFO, string.Format("[{0}] was denied access to '{1}'", ip, context.Request.RawUrl));
                         sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", context);
                         return;
                     }
@@ -226,8 +244,10 @@ namespace HttpAPI
                             {
                                 response.ContentType = "text/xml;charset=utf-8";
                                 response.StatusCode = (int)HttpStatusCode.OK;
+                                XElement xml = result_obj.ToXml();
+                                string xmlstring = xml.ToString();
                                 MemoryStream stream = new MemoryStream();
-                                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(result_obj.ToXml().ToString());
+                                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(xmlstring);
                                 stream.Write(buffer, 0, buffer.Length);
                                 byte[] bytes = stream.ToArray();
                                 response.OutputStream.Write(bytes, 0, bytes.Length);
@@ -317,7 +337,9 @@ namespace HttpAPI
         }               
 
         private object GetResponse(HttpListenerRequest request, HttpListenerResponse response)
-        {           
+        {
+            string ip = string.Empty;
+            if (request.RemoteEndPoint != null && request.RemoteEndPoint.Address != null) { ip = request.RemoteEndPoint.Address.ToString(); };
             
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
@@ -336,7 +358,7 @@ namespace HttpAPI
 
                     devices.Add(device);
                 }
-                return new { success = true, devices = devices };
+                return new { success = true, devices = devices.ToArray() };
             }
 
             if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("device/") && request.HttpMethod == "GET")
@@ -383,7 +405,7 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("values/") && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments[4].ToLower().StartsWith("values")  && request.HttpMethod == "GET")
             {
                 long id = 0;
                 long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
@@ -409,7 +431,7 @@ namespace HttpAPI
                             });
                         }
 
-                        return new { success = true, values = values };
+                        return new { success = true, values = values.ToArray() };
                     }
                     else
                         return new { success = false, reason = "Device not found." };
@@ -427,7 +449,7 @@ namespace HttpAPI
                                 cmd_count = d.scene_commands.Count()
                             };
 
-                return new { success = true, scenes = q0 };
+                return new { success = true, scenes = q0.ToArray() };
             }
 
             if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "GET")
@@ -455,7 +477,7 @@ namespace HttpAPI
                         name = scene.friendly_name,
                         is_running = scene.is_running,
                         cmd_count = scene.scene_commands.Count(),
-                        cmds = s_cmds
+                        cmds = s_cmds.ToArray()
                     };
                     return new { success = true, scene = s };
                 }
@@ -507,7 +529,7 @@ namespace HttpAPI
                                 count = g.group_devices.Count()
                             };
 
-                return new { success = true, groups = q0 };
+                return new { success = true, groups = q0.ToArray() };
             }
 
             if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("group/") && request.HttpMethod == "GET")
@@ -534,7 +556,7 @@ namespace HttpAPI
                     {
                         id = group.id,
                         name = group.name,
-                        devices = group_devices
+                        devices = group_devices.ToArray()
                     };
                     return new { success = true, group = g };
                 }
@@ -578,7 +600,7 @@ namespace HttpAPI
                             });
                         }
 
-                        return new { success = true, device_commands = device_commands };
+                        return new { success = true, device_commands = device_commands.ToArray() };
                     }
                     else
                         return new { success = false, reason = "Device not found." };
@@ -683,7 +705,7 @@ namespace HttpAPI
                         name = cmd.name
                     });
                 }
-                return new { success = true, builtin_commands = bi_commands };
+                return new { success = true, builtin_commands = bi_commands.ToArray() };
             }
 
             if ((request.Url.Segments.Length == 3 || request.Url.Segments.Length == 4) && request.Url.Segments[2].ToLower().StartsWith("command") && request.HttpMethod == "POST")
@@ -745,10 +767,15 @@ namespace HttpAPI
                     c.Path = "/";
                     response.Cookies.Add(c);
 
-                    return new { success = true };                    
+                    WriteToLog(Urgency.INFO, string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, request.UserAgent));
+
+                    return new { success = true };
                 }
                 else
+                {
+                    WriteToLog(Urgency.INFO, string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], request.UserAgent));
                     return new { success = false };
+                }
             }
                                    
             return new { success = false, reason = "Invalid Command" };    
@@ -772,146 +799,33 @@ namespace HttpAPI
             else            
                 return js.Serialize(obj);
             
-        }       
+        }
 
-        //private string toXML<T>(T obj)
-        //{
-        //    XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
-        //    xmlwritersettings.NewLineHandling = NewLineHandling.None;
-        //    xmlwritersettings.Indent = false;
-        //    xmlwritersettings.Encoding = Encoding.UTF8;
-        //    XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
+        private string toXML<T>(T obj)
+        {
+            XmlWriterSettings xmlwritersettings = new XmlWriterSettings();
+            xmlwritersettings.NewLineHandling = NewLineHandling.None;
+            xmlwritersettings.Indent = false;
+            xmlwritersettings.Encoding = Encoding.UTF8;
+            XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
 
-        //    string utf8;
-        //    using (Utf8StringWriter writer = new Utf8StringWriter())
-        //    {
-        //        serializer.Serialize(XmlWriter.Create(writer, xmlwritersettings), obj);
-        //        utf8 = writer.ToString();
-        //    }
-        //    return utf8;
-        //}
+            string utf8;
+            using (Utf8StringWriter writer = new Utf8StringWriter())
+            {
+                serializer.Serialize(XmlWriter.Create(writer, xmlwritersettings), obj);
+                utf8 = writer.ToString();
+            }
+            return utf8;
+        }
 
-        //public class Utf8StringWriter : StringWriter
-        //{
-        //    public override Encoding Encoding
-        //    {
-        //        get { return Encoding.UTF8; }
-        //    }
-        //}              
+        public class Utf8StringWriter : StringWriter
+        {
+            public override Encoding Encoding
+            {
+                get { return Encoding.UTF8; }
+            }
+        }              
 
          
     }
-
-    public static class ObjectExtensions
-    {
-        #region Private Fields
-        private static readonly Type[] WriteTypes = new[] {
-        typeof(string), typeof(DateTime), typeof(Enum), 
-        typeof(decimal), typeof(Guid),
-    };
-        #endregion Private Fields
-        #region .ToXml
-        /// <summary>
-        /// Converts an anonymous type to an XElement.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <returns>Returns the object as it's XML representation in an XElement.</returns>
-        public static XElement ToXml(this object input)
-        {
-            return input.ToXml(null);
-        }
-
-        /// <summary>
-        /// Converts an anonymous type to an XElement.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="element">The element name.</param>
-        /// <returns>Returns the object as it's XML representation in an XElement.</returns>
-        public static XElement ToXml(this object input, string element)
-        {
-            return _ToXml(input, element);
-        }
-
-        private static XElement _ToXml(object input, string element, int? arrayIndex = null, string arrayName = null)
-        {
-            if (input == null)
-                return null;
-
-            if (String.IsNullOrEmpty(element))
-            {
-                string name = input.GetType().Name;
-                element = name.Contains("AnonymousType")
-                    ? "Object"
-                    : arrayIndex != null
-                        ? arrayName + "_" + arrayIndex
-                        : name;
-            }
-
-            element = XmlConvert.EncodeName(element);
-            var ret = new XElement(element);
-
-            if (input != null)
-            {
-                var type = input.GetType();
-                var props = type.GetProperties();
-
-                var elements = props.Select(p =>
-                {
-                    var pType = Nullable.GetUnderlyingType(p.PropertyType) ?? p.PropertyType;
-                    var name = XmlConvert.EncodeName(p.Name);
-                    var val = pType.IsArray ? "array" : p.GetValue(input, null);
-                    var value = pType.IsArray
-                        ? GetArrayElement(p, (Array)p.GetValue(input, null))
-                        : pType.IsSimpleType() || pType.IsEnum
-                            ? new XElement(name, val)
-                            : val.ToXml(name);
-                    return value;
-                })
-                .Where(v => v != null);
-
-                ret.Add(elements);
-            }
-
-            return ret;
-        }
-
-        #region helpers
-        /// <summary>
-        /// Gets the array element.
-        /// </summary>
-        /// <param name="info">The property info.</param>
-        /// <param name="input">The input object.</param>
-        /// <returns>Returns an XElement with the array collection as child elements.</returns>
-        private static XElement GetArrayElement(PropertyInfo info, Array input)
-        {
-            var name = XmlConvert.EncodeName(info.Name);
-
-            XElement rootElement = new XElement(name);
-
-            var arrayCount = input == null ? 0 : input.GetLength(0);
-
-            for (int i = 0; i < arrayCount; i++)
-            {
-                var val = input.GetValue(i);
-                XElement childElement = val.GetType().IsSimpleType() ? new XElement(name + "_" + i, val) : _ToXml(val, null, i, name);
-
-                rootElement.Add(childElement);
-            }
-
-            return rootElement;
-        }
-
-        #region .IsSimpleType
-        public static bool IsSimpleType(this Type type)
-        {
-            return type.IsPrimitive || WriteTypes.Contains(type);
-        }
-        #endregion .IsSimpleType
-
-        #endregion helpers
-        #endregion .ToXml
-    }
-
-
-     
 }
