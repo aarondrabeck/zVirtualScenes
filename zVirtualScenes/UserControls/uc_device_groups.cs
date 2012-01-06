@@ -18,13 +18,16 @@ namespace zVirtualScenesApplication.UserControls
             InitializeComponent();
         }
 
-        public void UpdateControl(device d)
+        public void UpdateControl(long device_id)
         {
             listBoxGroups.Items.Clear();
 
-            foreach (group_devices gd in d.group_devices)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                listBoxGroups.Items.Add(gd.group.name);
+                device device = db.devices.FirstOrDefault(d => d.id == device_id);
+                if (device != null)                
+                    foreach (group_devices gd in device.group_devices)                    
+                        listBoxGroups.Items.Add(gd.group.name);
             }
         }
     }

@@ -10,8 +10,7 @@ using System.Data.Objects;
 namespace zVirtualScenesApplication.Forms
 {
     public partial class GroupEditor : Form
-    {
-        private ObjectQuery<group> groupQuery; 
+    {               
         public GroupEditor()
         {
             InitializeComponent();             
@@ -25,8 +24,10 @@ namespace zVirtualScenesApplication.Forms
 
         private void RebindGroupList()
         {
-            groupQuery = zvsEntityControl.zvsContext.groups;
-            cboGroups.DataSource = groupQuery.Execute(MergeOption.AppendOnly);
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                cboGroups.DataSource = db.groups.OfType<group>().Execute(MergeOption.AppendOnly);
+            }
             cboGroups.DisplayMember = "name";
         }
 
@@ -43,8 +44,12 @@ namespace zVirtualScenesApplication.Forms
             if (FormAddEditGroupName.DialogResult == DialogResult.OK)
             {
                 group new_g = group.Creategroup(0, FormAddEditGroupName.gName);
-                zvsEntityControl.zvsContext.groups.AddObject(new_g);
-                zvsEntityControl.zvsContext.SaveChanges();
+
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    db.groups.AddObject(new_g);
+                    db.SaveChanges();
+                }
                 RebindGroupList();
                 cboGroups.SelectedIndex = cboGroups.Items.Count - 1;
             }
@@ -62,8 +67,13 @@ namespace zVirtualScenesApplication.Forms
                                         "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) ==
                         DialogResult.Yes)
                     {
-                        zvsEntityControl.zvsContext.groups.DeleteObject(g);
-                        zvsEntityControl.zvsContext.SaveChanges();
+                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                        {
+                            db.groups.DeleteObject(g);
+                            db.SaveChanges();
+
+                            zvsEntityControl.CallDeviceModified(this, "group");
+                        }
                         cboGroups.SelectedIndex = cboGroups.Items.Count - 1;
                     }
                 }
@@ -82,12 +92,16 @@ namespace zVirtualScenesApplication.Forms
             {
                 if (g != null)
                 {
-                    lstAdded.DataSource = zvsEntityControl.zvsContext.group_devices.Where(dg => dg.group_id == g.id).Select(d => d.device);
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    {
+                        lstAdded.DataSource = db.group_devices.Where(dg => dg.group_id == g.id).Select(d => d.device);
 
-                    var device_query = from d in zvsEntityControl.zvsContext.devices
-                                       where !d.group_devices.Any(gd => gd.group_id == g.id)
-                                       select d;
-                    lstNotAdded.DataSource = device_query;
+                        var device_query = from d in db.devices
+                                           where !d.group_devices.Any(gd => gd.group_id == g.id)
+                                           select d;
+                        lstNotAdded.DataSource = device_query;
+
+                    }
                 }
             }
             else
@@ -105,27 +119,36 @@ namespace zVirtualScenesApplication.Forms
 
              if (selected_group != null)
              {
-                 foreach (device d in lstNotAdded.Objects)
+                 using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                  {
-                     zvsEntityControl.zvsContext.group_devices.AddObject(new group_devices { device_id = d.id, group_id = selected_group.id });
+                     foreach (device d in lstNotAdded.Objects)
+                     {
+                         db.group_devices.AddObject(new group_devices { device_id = d.id, group_id = selected_group.id });
+                     }
+                     db.SaveChanges();
                  }
-                 zvsEntityControl.zvsContext.SaveChanges();
+                 zvsEntityControl.CallDeviceModified(this, "group");
                  RebindGroup();
              }
         }
 
         private void btnRemoveAll_Click(object sender, EventArgs e)
         {
-            group selected_group = (group)cboGroups.SelectedItem;
-            if (selected_group != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                foreach (device d in lstAdded.Objects)
-                {
-                    group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == d.id);
-                    zvsEntityControl.zvsContext.group_devices.DeleteObject(device);
+                group selected_group = db.groups.FirstOrDefault(g => g.id == ((group)cboGroups.SelectedItem).id);
+                if (selected_group != null)
+                {                    
+                    foreach (device d in lstAdded.Objects)
+                    {
+                        group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == d.id);
+                        db.group_devices.DeleteObject(device);
+                    }
+                    db.SaveChanges();
+                    
+                    zvsEntityControl.CallDeviceModified(this, "group");
+                    RebindGroup();
                 }
-                zvsEntityControl.zvsContext.SaveChanges();
-                RebindGroup();
             }
         }
 
@@ -135,42 +158,57 @@ namespace zVirtualScenesApplication.Forms
      
             if (selected_group != null)
             {
-                foreach (device d in lstNotAdded.SelectedObjects)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    zvsEntityControl.zvsContext.group_devices.AddObject(new group_devices { device_id = d.id, group_id = selected_group.id });
+                    foreach (device d in lstNotAdded.SelectedObjects)
+                    {
+                        db.group_devices.AddObject(new group_devices { device_id = d.id, group_id = selected_group.id });
+                    }
+                    db.SaveChanges();
                 }
-                zvsEntityControl.zvsContext.SaveChanges();
+                zvsEntityControl.CallDeviceModified(this, "group");
                 RebindGroup();
             }
         }
 
         private void btnRemoveOne_Click(object sender, EventArgs e)
         {
-            group selected_group = (group)cboGroups.SelectedItem;
-            if (selected_group != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                foreach (device d in lstAdded.SelectedObjects)
+                group selected_group = db.groups.FirstOrDefault(g => g.id == ((group)cboGroups.SelectedItem).id); 
+                if (selected_group != null)
                 {
-                    group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == d.id);
-                    zvsEntityControl.zvsContext.group_devices.DeleteObject(device);
+
+                    foreach (device d in lstAdded.SelectedObjects)
+                    {
+                        group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == d.id);
+                        db.group_devices.DeleteObject(device);
+                    }
+                    db.SaveChanges();
+
+                    zvsEntityControl.CallDeviceModified(this, "group");
+                    RebindGroup();
                 }
-                zvsEntityControl.zvsContext.SaveChanges();
-                RebindGroup();
             }
         }       
 
         private void btnEdit_Click_1(object sender, EventArgs e)
         {
-            group selected_group = (group)cboGroups.SelectedItem;
-            if (selected_group != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                AddEditGroupName FormAddEditGroupName = new AddEditGroupName(selected_group.name);
-                FormAddEditGroupName.ShowDialog();
-
-                if (FormAddEditGroupName.DialogResult == DialogResult.OK)
+                group selected_group = db.groups.FirstOrDefault(g => g.id == ((group)cboGroups.SelectedItem).id);
+                if (selected_group != null)
                 {
-                    selected_group.name = FormAddEditGroupName.gName;
-                    zvsEntityControl.zvsContext.SaveChanges();
+                    AddEditGroupName FormAddEditGroupName = new AddEditGroupName(selected_group.name);
+                    FormAddEditGroupName.ShowDialog();
+
+
+                    if (FormAddEditGroupName.DialogResult == DialogResult.OK)
+                    {
+                        selected_group.name = FormAddEditGroupName.gName;
+                        db.SaveChanges();
+                        zvsEntityControl.CallDeviceModified(this, "group");
+                    }
                 }
             }
         }

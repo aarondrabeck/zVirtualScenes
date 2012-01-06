@@ -10,7 +10,7 @@ namespace zVirtualScenesCommon.Entity
 {
     public static class zvsEntityControl
     {
-        public static zvsEntities2 zvsContext = new zvsEntities2(GetzvsConnectionString);
+        //public static zvsEntities2 zvsContext = new zvsEntities2(GetzvsConnectionString);
 
         public static string GetDBPath
         {
@@ -37,10 +37,7 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-
-
                 string sqlLiteConnectionString = string.Format("data source=\"{0}\"", GetDBPath);
-
                 EntityConnectionStringBuilder ee = new EntityConnectionStringBuilder
                 {
                     Metadata = @"res://*/Entity.zvsModel.csdl|res://*/Entity.zvsModel.ssdl|res://*/Entity.zvsModel.msl",
@@ -55,7 +52,7 @@ namespace zVirtualScenesCommon.Entity
         {
             get { 
                 
-                string version = "zVirtualScenes v2.5 Beta 10 prerelease 4";
+                string version = "zVirtualScenes v2.6 Beta 1";
 
                 #if (!DEBUG)
                 return version + " DEBUG MODE";
@@ -89,18 +86,37 @@ namespace zVirtualScenesCommon.Entity
                 SceneRunCompleteEvent(scene_id, ErrorCount);
         }
 
-        /// <summary>
-        /// Called after new device has been added to the database.  
-        /// This is needed because Entites does not not handle adding devices well while binding to controls. 
-        /// </summary>
-        public static event DeviceAddedEventHandler DeviceAddedEvent;
-        public delegate void DeviceAddedEventHandler(object sender, EventArgs e);
-
-        public static void DeviceAdded(object sender, EventArgs e)
+        public delegate void SceneModifiedEventHandler(object sender, long? SceneID);
+        public static event SceneModifiedEventHandler SceneModified;
+        public static void CallSceneModified(object sender, long? SceneID)
         {
-            if (DeviceAddedEvent != null)
-                DeviceAddedEvent(sender,  e);
-        } 
+            if (SceneModified != null)
+                SceneModified(sender, SceneID);
+        }
+
+        public delegate void DeviceModifiedEventHandler(object sender, string PropertyModified);
+        public static event DeviceModifiedEventHandler DeviceModified;
+        public static void CallDeviceModified(object sender, string PropertyModified)
+        {
+            if (DeviceModified != null)
+                DeviceModified(sender, PropertyModified);
+        }
+
+        public delegate void ScheduledTaskModifiedEventHandler(object sender, string PropertyModified);
+        public static event ScheduledTaskModifiedEventHandler ScheduledTaskModified;
+        public static void CallScheduledTaskModified(object sender, string PropertyModified)
+        {
+            if (ScheduledTaskModified != null)
+                ScheduledTaskModified(sender, PropertyModified);
+        }
+
+        public delegate void TriggerModifiedEventHandler(object sender, string PropertyModified);
+        public static event TriggerModifiedEventHandler TriggerModified;
+        public static void CallTriggerModified(object sender, string PropertyModified)
+        {
+            if (TriggerModified != null)
+                TriggerModified(sender, PropertyModified);
+        }
 
     }    
 }

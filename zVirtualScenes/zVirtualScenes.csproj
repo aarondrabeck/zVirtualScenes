@@ -114,11 +114,11 @@
     <Compile Include="Forms\ActivateGroup.Designer.cs">
       <DependentUpon>ActivateGroup.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\AddEditTriggers.cs">
+    <Compile Include="Forms\AddEditBasicTriggers.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AddEditTriggers.Designer.cs">
-      <DependentUpon>AddEditTriggers.cs</DependentUpon>
+    <Compile Include="Forms\AddEditBasicTriggers.Designer.cs">
+      <DependentUpon>AddEditBasicTriggers.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\AddEditGroupName.cs">
       <SubType>Form</SubType>
@@ -138,11 +138,11 @@
     <Compile Include="Forms\AddEditSceneDeviceCMD.Designer.cs">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\AdvancedScripting.cs">
+    <Compile Include="Forms\AddEditScriptngTrigger.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\AdvancedScripting.Designer.cs">
-      <DependentUpon>AdvancedScripting.cs</DependentUpon>
+    <Compile Include="Forms\AddEditScriptngTrigger.Designer.cs">
+      <DependentUpon>AddEditScriptngTrigger.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\formPropertiesScene.cs">
       <SubType>Form</SubType>
@@ -238,8 +238,8 @@
     <EmbeddedResource Include="Forms\ActivateGroup.resx">
       <DependentUpon>ActivateGroup.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\AddEditTriggers.resx">
-      <DependentUpon>AddEditTriggers.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AddEditBasicTriggers.resx">
+      <DependentUpon>AddEditBasicTriggers.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\AddEditGroupName.resx">
       <DependentUpon>AddEditGroupName.cs</DependentUpon>
@@ -250,8 +250,8 @@
     <EmbeddedResource Include="Forms\AddEditSceneDeviceCMD.resx">
       <DependentUpon>AddEditSceneDeviceCMD.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\AdvancedScripting.resx">
-      <DependentUpon>AdvancedScripting.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AddEditScriptngTrigger.resx">
+      <DependentUpon>AddEditScriptngTrigger.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\formPropertiesScene.resx">
       <DependentUpon>formPropertiesScene.cs</DependentUpon>

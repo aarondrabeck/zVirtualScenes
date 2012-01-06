@@ -18,8 +18,10 @@ namespace zVirtualScenesApplication.Forms
 
         private void GroupEditor_Load(object sender, EventArgs e)
         {
-            ObjectQuery<group> groupQuery = zvsEntityControl.zvsContext.groups;
-            comboBoxGroups.DataSource = groupQuery.Execute(MergeOption.AppendOnly);
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                comboBoxGroups.DataSource = db.groups.OfType<group>().Execute(MergeOption.AppendOnly);
+            }
             comboBoxGroups.DisplayMember = "name";
 
             //Select the first group if there is one
@@ -38,9 +40,12 @@ namespace zVirtualScenesApplication.Forms
                 group g = (group)comboBoxGroups.SelectedItem;
                 if (g != null)
                 {
-                    builtin_commands group_on_cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "GROUP_ON");
-                    if (group_on_cmd != null)
-                        group_on_cmd.Run(g.id.ToString());
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    {
+                        builtin_commands group_on_cmd = db.builtin_commands.FirstOrDefault(c => c.name == "GROUP_ON");
+                        if (group_on_cmd != null)
+                            group_on_cmd.Run(g.id.ToString());
+                    }
                 }
             }
             else
@@ -54,9 +59,12 @@ namespace zVirtualScenesApplication.Forms
                 group g = (group)comboBoxGroups.SelectedItem;
                 if (g != null)
                 {
-                    builtin_commands group_off_cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "GROUP_OFF");
-                    if(group_off_cmd != null)
-                        group_off_cmd.Run(g.id.ToString());                   
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    {
+                        builtin_commands group_off_cmd = db.builtin_commands.FirstOrDefault(c => c.name == "GROUP_OFF");
+                        if (group_off_cmd != null)
+                            group_off_cmd.Run(g.id.ToString());
+                    }
                 }
             }
             else

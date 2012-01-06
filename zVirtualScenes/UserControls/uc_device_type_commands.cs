@@ -15,89 +15,96 @@ namespace zVirtualScenesApplication.UserControls
 {
     public partial class uc_device_type_commands : UserControl
     {
-        private device _d;
+        private long device_id; 
 
         public uc_device_type_commands()
         {
             InitializeComponent();
         }
 
-        public void UpdateObject(device d)
+        public void UpdateObject(long device_id)
         {
-            _d = d;
+            this.device_id = device_id; 
             pnlSettings.Controls.Clear();
             int top = 0;
 
-            #region Object Commands
-
-            Label CommandLabel = new Label();
-            CommandLabel.Text = "'" + _d.device_types.friendly_name + "' commands:" + (_d.device_types.device_type_commands.Count > 0 ? "" : " NSone.");
-            CommandLabel.AutoSize = true;
-            CommandLabel.Font = new System.Drawing.Font(CommandLabel.Font.Name, CommandLabel.Font.Size, FontStyle.Bold);
-            CommandLabel.Top = top;
-            CommandLabel.Left = 0;
-            CommandLabel.Height = 23;
-            pnlSettings.Controls.Add(CommandLabel);
-            top += 25;
-
-            foreach (device_type_commands d_cmd in _d.device_types.device_type_commands)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                int left = 0;
-                #region Add Input Control Depending on type
-                left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSettings,
-                                                                (Data_Types)d_cmd.arg_data_type,
-                                                                top,
-                                                                left,
-                                                                d_cmd.id.ToString(),
-                                                                d_cmd.friendly_name,
-                                                                d_cmd.device_type_command_options.Select(o => o.option).ToList(),
-                                                                d_cmd.custom_data1, 
-                                                                d_cmd);
-                #endregion
+                device device = db.devices.FirstOrDefault(d => d.id == device_id);
+                if (device == null)
+                    return;
 
-                #region Add Button
-                Button btn = new Button();
-                btn.Name = d_cmd.id.ToString();
-                btn.Text = d_cmd.friendly_name;
-                btn.Click += btnClick;
-                btn.Tag = d_cmd;
-                btn.Top = top;
-                btn.Left = left;
-                toolTip1.SetToolTip(btn, d_cmd.description);
-                
-                pnlSettings.Controls.Add(btn);
+                #region Object Commands
 
-                using (Graphics cg = this.CreateGraphics())
+                Label CommandLabel = new Label();
+                CommandLabel.Text = "'" + device.device_types.friendly_name + "' commands:" + (device.device_types.device_type_commands.Count > 0 ? "" : " NSone.");
+                CommandLabel.AutoSize = true;
+                CommandLabel.Font = new System.Drawing.Font(CommandLabel.Font.Name, CommandLabel.Font.Size, FontStyle.Bold);
+                CommandLabel.Top = top;
+                CommandLabel.Left = 0;
+                CommandLabel.Height = 23;
+                pnlSettings.Controls.Add(CommandLabel);
+                top += 25;
+
+                foreach (device_type_commands d_cmd in device.device_types.device_type_commands)
                 {
-                    SizeF size = cg.MeasureString(btn.Text, btn.Font);
-                    size.Width += 10; //add some padding
-                    btn.Width = (int)size.Width;
-                    left = (int)size.Width + left + 5;
+                    int left = 0;
+                    #region Add Input Control Depending on type
+                    left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSettings,
+                                                                    (Data_Types)d_cmd.arg_data_type,
+                                                                    top,
+                                                                    left,
+                                                                    d_cmd.id.ToString(),
+                                                                    d_cmd.friendly_name,
+                                                                    d_cmd.device_type_command_options.Select(o => o.option).ToList(),
+                                                                    d_cmd.custom_data1,
+                                                                    d_cmd);
+                    #endregion
+
+                    #region Add Button
+                    Button btn = new Button();
+                    btn.Name = d_cmd.id.ToString();
+                    btn.Text = d_cmd.friendly_name;
+                    btn.Click += btnClick;
+                    btn.Tag = d_cmd;
+                    btn.Top = top;
+                    btn.Left = left;
+                    toolTip1.SetToolTip(btn, d_cmd.description);
+
+                    pnlSettings.Controls.Add(btn);
+
+                    using (Graphics cg = this.CreateGraphics())
+                    {
+                        SizeF size = cg.MeasureString(btn.Text, btn.Font);
+                        size.Width += 10; //add some padding
+                        btn.Width = (int)size.Width;
+                        left = (int)size.Width + left + 5;
+                    }
+                    #endregion
+
+                    #region Label
+
+                    Label CmdLabel = new Label();
+                    CmdLabel.Text = d_cmd.help;
+                    CmdLabel.Top = top + 5;
+                    CmdLabel.Left = left;
+                    CmdLabel.Height = 23;
+                    pnlSettings.Controls.Add(CmdLabel);
+
+                    using (Graphics cg = this.CreateGraphics())
+                    {
+                        SizeF size = cg.MeasureString(CmdLabel.Text, CmdLabel.Font);
+                        size.Width += 6; //add some padding
+                        CmdLabel.Width = (int)size.Width;
+                        left += (int)size.Width + 5;
+                    }
+
+                    #endregion
+                    top += 35;
                 }
-                #endregion
-
-                #region Label
-
-                Label CmdLabel = new Label();
-                CmdLabel.Text = d_cmd.help;
-                CmdLabel.Top = top + 5;
-                CmdLabel.Left = left;
-                CmdLabel.Height = 23;
-                pnlSettings.Controls.Add(CmdLabel);
-
-                using (Graphics cg = this.CreateGraphics())
-                {
-                    SizeF size = cg.MeasureString(CmdLabel.Text, CmdLabel.Font);
-                    size.Width += 6; //add some padding
-                    CmdLabel.Width = (int)size.Width;
-                    left += (int)size.Width + 5;
-                }
 
                 #endregion
-                top += 35;
             }
-
-            #endregion
         }
 
         private void btnClick(object sender, EventArgs e)
@@ -133,7 +140,7 @@ namespace zVirtualScenesApplication.UserControls
                     break;
             }
 
-            device_type_command_que cmd = device_type_command_que.Createdevice_type_command_que(0, dc.id, _d.id, arg);
+            device_type_command_que cmd = device_type_command_que.Createdevice_type_command_que(0, dc.id, device_id, arg);
             device_type_command_que.Run(cmd);
         }
     }

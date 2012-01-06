@@ -173,33 +173,38 @@ namespace NOAAPlugin
                 {
                     WriteToLog(Urgency.INFO, "It is now sunrise. Activating sunrise scenes.");
 
-                    foreach (scene scene in zvsEntityControl.zvsContext.scenes)
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                     {
-                        string value = scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "ACTIVATE_SUNRISE");
-                        bool activate = false;
-                        bool.TryParse(value, out activate);
-
-                        if (activate)
+                        foreach (scene scene in db.scenes)
                         {
-                            WriteToLog(Urgency.INFO, "Sunrise: " + scene.RunScene());
+                            string value = scene_property_value.GetPropertyValue(db, scene.id, "ACTIVATE_SUNRISE");
+                            bool activate = false;
+                            bool.TryParse(value, out activate);
+
+                            if (activate)
+                            {
+                                WriteToLog(Urgency.INFO, "Sunrise: " + scene.RunScene());
+                            }
                         }
-                    }       
+                    }
                 }
 
                 Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                 if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                 {
                     WriteToLog(Urgency.INFO, "It is now sunset. Activating sunrise scenes.");
-
-                    foreach (scene scene in zvsEntityControl.zvsContext.scenes)
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                     {
-                        string value = scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "ACTIVATE_SUNSET");
-                        bool activate = false;
-                        bool.TryParse(value, out activate);
-
-                        if (activate)
+                        foreach (scene scene in db.scenes)
                         {
-                            WriteToLog(Urgency.INFO, "Sunset: " + scene.RunScene());
+                            string value = scene_property_value.GetPropertyValue(db, scene.id, "ACTIVATE_SUNSET");
+                            bool activate = false;
+                            bool.TryParse(value, out activate);
+
+                            if (activate)
+                            {
+                                WriteToLog(Urgency.INFO, "Sunset: " + scene.RunScene());
+                            }
                         }
                     }
                 }

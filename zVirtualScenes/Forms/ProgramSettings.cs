@@ -77,13 +77,9 @@ namespace zVirtualScenesApplication
                 HideAllUserControls();
 
                 if (mi.Group.Equals("Plugins"))
-                {
-                    plugin plgin = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == mi.API);
-                    if (plgin != null)
-                    {
-                        uc_plugin_properties_form1.PopulatePluginSettings(plgin, _mainForm);
-                        uc_plugin_properties_form1.Visible = true;
-                    }
+                {                   
+                    uc_plugin_properties_form1.PopulatePluginSettings(mi.API, _mainForm);
+                    uc_plugin_properties_form1.Visible = true;                     
                 }
                 else
                 {
@@ -102,6 +98,7 @@ namespace zVirtualScenesApplication
         {
             this.Close();
         }
+
         private void buttonOK_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -114,6 +111,5 @@ namespace zVirtualScenesApplication
                 this.Close();
             }
         }
-
     }       
 }

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using zVirtualScenesApplication.Structs;
 using zVirtualScenesAPI;
 using zVirtualScenesCommon.Entity;
+using System.Linq;
 
 namespace zVirtualScenesApplication.UserControls
 {
@@ -21,9 +22,15 @@ namespace zVirtualScenesApplication.UserControls
             dataListViewStates.ClearObjects();
         }
 
-        public void UpdateControl(device d)
+        public void UpdateControl(long device_id)
         {
-            dataListViewStates.DataSource = d.device_values; 
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                device device = db.devices.FirstOrDefault(d => d.id == device_id);
+
+                if(device!=null)
+                    dataListViewStates.DataSource = device.device_values.ToList();
+            }
         }
 
         

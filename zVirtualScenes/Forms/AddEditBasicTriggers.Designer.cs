@@ -1,6 +1,6 @@
 ﻿namespace zVirtualScenesApplication.Forms
 {
-    partial class AddEditTriggers
+    partial class AddEditBasicTriggers
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddEditTriggers));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddEditBasicTriggers));
             this.cmbo_devices = new System.Windows.Forms.ComboBox();
             this.cmbo_devicevalues = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -78,7 +78,6 @@
             this.cmbo_devicevalues.Name = "cmbo_devicevalues";
             this.cmbo_devicevalues.Size = new System.Drawing.Size(141, 21);
             this.cmbo_devicevalues.TabIndex = 2;
-            this.cmbo_devicevalues.SelectedIndexChanged += new System.EventHandler(this.cmbo_devicevalues_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -312,7 +311,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AddEditTriggers";
-            this.Text = "Edit Trigger";
+            this.Text = "Basic Triggers";
             this.Load += new System.EventHandler(this.AddEditEvent_Load);
             this.panel1.ResumeLayout(false);
             this.panel3.ResumeLayout(false);

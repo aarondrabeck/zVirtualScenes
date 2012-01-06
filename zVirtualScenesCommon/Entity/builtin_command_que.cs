@@ -44,9 +44,12 @@ namespace zVirtualScenesCommon.Entity
 
         public static void Run(builtin_command_que cmd)
         {
-            zvsEntityControl.zvsContext.builtin_command_que.AddObject(cmd);
-            zvsEntityControl.zvsContext.SaveChanges();
-            BuiltinCommandAddedToQue(cmd.id);
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                db.builtin_command_que.AddObject(cmd);
+                db.SaveChanges();
+                BuiltinCommandAddedToQue(cmd.id);
+            }
         }
     }
 }

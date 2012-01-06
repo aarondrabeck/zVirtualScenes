@@ -45,9 +45,12 @@ namespace zVirtualScenesCommon.Entity
 
         public static void Run(device_command_que cmd)
         {
-            zvsEntityControl.zvsContext.device_command_que.AddObject(cmd);
-            zvsEntityControl.zvsContext.SaveChanges();
-            DeviceCommandAddedToQue(cmd.id);
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                db.device_command_que.AddObject(cmd);
+                db.SaveChanges();
+                DeviceCommandAddedToQue(cmd.id);
+            }
         }
     }
 }

@@ -13,9 +13,10 @@ using System.Data.Objects;
 namespace zVirtualScenesApplication.Forms
 {
     public partial class AddEditSceneBuiltinCMD : Form
-    {        
-        private scene_commands _scene_command;
-        private IBindingList _scenecmdList;
+    {
+        private long? scenecmd_id_to_edit;
+        private long? selected_scene_id;
+        private bool editing; 
 
         private CheckBox cb = new CheckBox();
         private NumericUpDown Numeric = new NumericUpDown();
@@ -27,10 +28,10 @@ namespace zVirtualScenesApplication.Forms
         /// </summary>
         /// <param name="scene_cmd"></param>
         /// <param name="scenecmdList"></param>
-        public AddEditSceneBuiltinCMD(scene_commands scene_cmd, IBindingList scenecmdList = null)
+        public AddEditSceneBuiltinCMD(long? scenecmd_id_to_edit, long? selected_scene_id = null)
         {
-            _scenecmdList = scenecmdList;
-            _scene_command = scene_cmd;
+            this.scenecmd_id_to_edit = scenecmd_id_to_edit;
+            this.selected_scene_id = selected_scene_id;
             InitializeComponent();           
         }
         
@@ -38,151 +39,183 @@ namespace zVirtualScenesApplication.Forms
         {
             ActiveControl = comboBoxCommand;
             comboBoxCommand.Focus();
-
-            comboBoxCommand.DataSource = zvsEntityControl.zvsContext.builtin_commands;
             comboBoxCommand.DisplayMember = "friendly_name";
+            editing = false; 
 
-            //if editing
-            builtin_commands b_cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == _scene_command.command_id);
-            if(b_cmd != null)
-                comboBoxCommand.SelectedItem = b_cmd;           
+             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+             {
+                 comboBoxCommand.DataSource = db.builtin_commands.OfType<builtin_commands>().Execute(MergeOption.AppendOnly);
+
+                 //If we are editing, populate combo box
+                 if (scenecmd_id_to_edit.HasValue)
+                 {
+                     scene_commands scmd = db.scene_commands.FirstOrDefault(c => c.id == scenecmd_id_to_edit.Value);
+                     if (scmd != null)
+                     {
+                         editing = true;
+                         builtin_commands b_cmd = db.builtin_commands.FirstOrDefault(c => c.id == scmd.command_id);
+                         if (b_cmd != null)
+                             comboBoxCommand.SelectedItem = b_cmd;
+                     }
+                 }
+                 else 
+                 {
+                     if (!selected_scene_id.HasValue)
+                     {
+                         //Must pass a scene id if you do not have a scene to edit. 
+                         this.Close();
+                     }
+
+                 }
+             }                      
         }     
 
         private void comboBoxCommand_SelectedIndexChanged(object sender, EventArgs e)
         {
             builtin_commands selected_cmd = (builtin_commands)comboBoxCommand.SelectedItem;
 
-            //Do Custom things for some Builtin Commands
-            switch (selected_cmd.name)
+            scene_commands scmd = null;
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                case "REPOLL_ME":
-                    panelUserInputControls.Controls.Clear();
-                    cmbo.Width = 269;
-                    cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
+                if (editing)
+                {
+                    scmd = db.scene_commands.FirstOrDefault(c => c.id == scenecmd_id_to_edit.Value);
 
-                    cmbo.DataSource = null;                     
-                    ObjectQuery<device> deviceListQuery = zvsEntityControl.zvsContext.devices;            
-                    cmbo.DataSource = deviceListQuery.Execute(MergeOption.AppendOnly);
-                    cmbo.DisplayMember = "friendly_name";
-                                        
-                    if (cmbo.Items.Count > 0)
-                        cmbo.SelectedIndex = 0;
-
-                    if (_scene_command.arg != null)
-                    {
-                        long d_id = 0;
-                        long.TryParse(_scene_command.arg, out d_id);
-                        cmbo.SelectedItem = zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.id == d_id);
-                    }
-
-                    panelUserInputControls.Controls.Add(cmbo);
-                    break;
-                case "GROUP_ON":
-                case "GROUP_OFF":
-                    panelUserInputControls.Controls.Clear();
-                    cmbo.Width = 269;
-                    cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
-
-                    cmbo.DataSource = null;
-                    ObjectQuery<group> dgroupQuery = zvsEntityControl.zvsContext.groups;
-                    cmbo.DataSource = dgroupQuery.Execute(MergeOption.AppendOnly);
-                    cmbo.DisplayMember = "name";
+                    //error
+                    if (scmd == null)
+                        this.Close(); 
+                }
                 
-                    if (cmbo.Items.Count > 0)
-                        cmbo.SelectedIndex = 0;
+                //Do Custom things for some Builtin Commands
+                switch (selected_cmd.name)
+                {
+                    case "REPOLL_ME":
+                        panelUserInputControls.Controls.Clear();
+                        cmbo.Width = 269;
+                        cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
 
-                    if (_scene_command.arg != null)
-                    {
-                        long g_id = 0;
-                        long.TryParse(_scene_command.arg, out g_id);
-                        cmbo.SelectedItem = zvsEntityControl.zvsContext.groups.FirstOrDefault(g => g.id == g_id);
-                    }
+                        cmbo.DataSource = null;
+                        cmbo.DataSource = db.devices.OfType<device>().Execute(MergeOption.AppendOnly);
+                        cmbo.DisplayMember = "friendly_name";
 
-                    panelUserInputControls.Controls.Add(cmbo);
-                    break;
-                default:
-                    switch ((Data_Types)selected_cmd.arg_data_type)
-                    {
-                        case Data_Types.NONE:
-                            panelUserInputControls.Controls.Clear();
-                            break;
-                        case Data_Types.BOOL:
-                            panelUserInputControls.Controls.Clear();
-                            cb.Text = selected_cmd.friendly_name;
-                            panelUserInputControls.Controls.Add(cb);
+                        if (cmbo.Items.Count > 0)
+                            cmbo.SelectedIndex = 0;
 
-                            if (_scene_command.arg != null)
-                            {
-                                bool bvalue = false;
-                                bool.TryParse(_scene_command.arg, out bvalue);
-                                cb.Checked = bvalue;
-                            }
+                        if (editing)
+                        {
+                            long d_id = 0;
+                            long.TryParse(scmd.arg, out d_id);
+                            cmbo.SelectedItem = db.devices.FirstOrDefault(d => d.id == d_id);
+                        }
 
-                            break;
-                        case Data_Types.LIST:
-                            panelUserInputControls.Controls.Clear();
-                            cmbo.Width = 269;
-                            cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
-                            cmbo.DataSource = selected_cmd.builtin_command_options.Select(o => o.name).ToList();                                
-                     
-                            if (cmbo.Items.Count > 0)
-                                cmbo.SelectedIndex = 0;
+                        panelUserInputControls.Controls.Add(cmbo);
+                        break;
+                    case "GROUP_ON":
+                    case "GROUP_OFF":
+                        panelUserInputControls.Controls.Clear();
+                        cmbo.Width = 269;
+                        cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
 
-                            if (_scene_command.arg != null)
-                                    cmbo.SelectedItem = _scene_command.arg ;
-                            
-                            panelUserInputControls.Controls.Add(cmbo);
-                            break;
-                        case Data_Types.STRING:
-                            panelUserInputControls.Controls.Clear();
-                            panelUserInputControls.Controls.Add(tbx);
-                            if (_scene_command.arg != null)
-                            {
-                                tbx.SelectedText = _scene_command.arg;
-                            }
-                            break;
-                        case Data_Types.INTEGER:
-                            panelUserInputControls.Controls.Clear();
-                            Numeric.Maximum = Int64.MaxValue;
-                            Numeric.Minimum = Int64.MinValue;
-                            panelUserInputControls.Controls.Add(Numeric);
+                        cmbo.DataSource = null;
+                        cmbo.DataSource = db.groups.OfType<group>().Execute(MergeOption.AppendOnly);
+                        cmbo.DisplayMember = "name";
 
-                            if (_scene_command.arg != null)
-                            {
-                                int ivalue = 0;
-                                int.TryParse(_scene_command.arg, out ivalue);
-                                Numeric.Value = ivalue;
-                            }
-                            break;
-                        case Data_Types.BYTE:
-                            panelUserInputControls.Controls.Clear();
-                            Numeric.Maximum = Byte.MaxValue;
-                            Numeric.Minimum = Byte.MinValue;
-                            panelUserInputControls.Controls.Add(Numeric);
+                        if (cmbo.Items.Count > 0)
+                            cmbo.SelectedIndex = 0;
 
-                            if (_scene_command.arg != null)
-                            {
-                                byte bvalue = 0;
-                                byte.TryParse(_scene_command.arg, out bvalue);
-                                Numeric.Value = bvalue;
-                            }
-                            break;
-                        case Data_Types.DECIMAL:
-                            panelUserInputControls.Controls.Clear();
-                            Numeric.Maximum = Decimal.MaxValue;
-                            Numeric.Minimum = Decimal.MinValue;
-                            panelUserInputControls.Controls.Add(Numeric);
+                        if (editing)
+                        {
+                            long g_id = 0;
+                            long.TryParse(scmd.arg, out g_id);
+                            cmbo.SelectedItem = db.groups.FirstOrDefault(g => g.id == g_id);
+                        }
 
-                            if (_scene_command.arg != null)
-                            {
-                                decimal dvalue = 0;
-                                decimal.TryParse(_scene_command.arg, out dvalue);
-                                Numeric.Value = dvalue;
-                            }
-                            break;
-                    }
-                    break;
-            }  
+                        panelUserInputControls.Controls.Add(cmbo);
+                        break;
+                    default:
+                        switch ((Data_Types)selected_cmd.arg_data_type)
+                        {
+                            case Data_Types.NONE:
+                                panelUserInputControls.Controls.Clear();
+                                break;
+                            case Data_Types.BOOL:
+                                panelUserInputControls.Controls.Clear();
+                                cb.Text = selected_cmd.friendly_name;
+                                panelUserInputControls.Controls.Add(cb);
+
+                                if (editing)
+                                {
+                                    bool bvalue = false;
+                                    bool.TryParse(scmd.arg, out bvalue);
+                                    cb.Checked = bvalue;
+                                }
+
+                                break;
+                            case Data_Types.LIST:
+                                panelUserInputControls.Controls.Clear();
+                                cmbo.Width = 269;
+                                cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
+                                cmbo.DataSource = selected_cmd.builtin_command_options.Select(o => o.name).ToList();
+
+                                if (cmbo.Items.Count > 0)
+                                    cmbo.SelectedIndex = 0;
+
+                                if (editing)
+                                    cmbo.SelectedItem = scmd.arg;
+
+                                panelUserInputControls.Controls.Add(cmbo);
+                                break;
+                            case Data_Types.STRING:
+                                panelUserInputControls.Controls.Clear();
+                                panelUserInputControls.Controls.Add(tbx);
+                                if (editing)
+                                {
+                                    tbx.SelectedText = scmd.arg;
+                                }
+                                break;
+                            case Data_Types.INTEGER:
+                                panelUserInputControls.Controls.Clear();
+                                Numeric.Maximum = Int64.MaxValue;
+                                Numeric.Minimum = Int64.MinValue;
+                                panelUserInputControls.Controls.Add(Numeric);
+
+                                if (editing)
+                                {
+                                    int ivalue = 0;
+                                    int.TryParse(scmd.arg, out ivalue);
+                                    Numeric.Value = ivalue;
+                                }
+                                break;
+                            case Data_Types.BYTE:
+                                panelUserInputControls.Controls.Clear();
+                                Numeric.Maximum = Byte.MaxValue;
+                                Numeric.Minimum = Byte.MinValue;
+                                panelUserInputControls.Controls.Add(Numeric);
+
+                                if (editing)
+                                {
+                                    byte bvalue = 0;
+                                    byte.TryParse(scmd.arg, out bvalue);
+                                    Numeric.Value = bvalue;
+                                }
+                                break;
+                            case Data_Types.DECIMAL:
+                                panelUserInputControls.Controls.Clear();
+                                Numeric.Maximum = Decimal.MaxValue;
+                                Numeric.Minimum = Decimal.MinValue;
+                                panelUserInputControls.Controls.Add(Numeric);
+
+                                if (editing)
+                                {
+                                    decimal dvalue = 0;
+                                    decimal.TryParse(scmd.arg, out dvalue);
+                                    Numeric.Value = dvalue;
+                                }
+                                break;
+                        }
+                        break;
+                }
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -194,85 +227,95 @@ namespace zVirtualScenesApplication.Forms
         private void btnSave_Click(object sender, EventArgs e)
         {
             builtin_commands selected_cmd = (builtin_commands)comboBoxCommand.SelectedItem;
-                       
-            _scene_command.command_type_id = (int)command_types.builtin;
-            _scene_command.command_id = selected_cmd.id;
 
-            //Do Custom things for some Builtin Commands
-            switch (selected_cmd.name)
+            scene_commands scmd;
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                case "REPOLL_ME":
-                    {
-                        device d = (device)cmbo.SelectedItem;
+                if (editing)
+                    scmd = db.scene_commands.FirstOrDefault(c => c.id == scenecmd_id_to_edit.Value);
+                else
+                {
+                    scmd = new scene_commands();
+                    scmd.scene_id = selected_scene_id.Value;
+                }
+                scmd.command_type_id = (int)command_types.builtin;
+                scmd.command_id = selected_cmd.id;
 
-                        if (d == null)
+                //Do Custom things for some Builtin Commands
+                switch (selected_cmd.name)
+                {
+                    case "REPOLL_ME":
                         {
-                            MessageBox.Show("Please select a deice!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                            return;
-                        }
-                        else
-                            _scene_command.arg = d.id.ToString();
-                        
-                        break;
-                    }
-                case "GROUP_ON":
-                case "GROUP_OFF":
-                    {
-                        group g = (group)cmbo.SelectedItem;
-                        if (g == null)
-                        {
-                            MessageBox.Show("Please select a group!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                            return;
-                        }
-                        else
-                            _scene_command.arg = g.id.ToString();
+                            device d = (device)cmbo.SelectedItem;
 
-                        break;
-                    }
-                default:
-                    switch ((Data_Types) selected_cmd.arg_data_type)
-                    {
-                        case Data_Types.NONE:
-                            _scene_command.arg = string.Empty;
-                            break;
-                        case Data_Types.BOOL:
-                            _scene_command.arg = cb.Checked.ToString();
-                            break;
-                        case Data_Types.LIST:
-                            if (String.IsNullOrEmpty(cmbo.Text))
+                            if (d == null)
                             {
-                                MessageBox.Show("Please select a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                MessageBox.Show("Please select a deice!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return;
                             }
-                            _scene_command.arg = cmbo.Text;
+                            else
+                                scmd.arg = d.id.ToString();
+
                             break;
-                        case Data_Types.STRING:
-                            if (String.IsNullOrEmpty(tbx.Text))
+                        }
+                    case "GROUP_ON":
+                    case "GROUP_OFF":
+                        {
+                            group g = (group)cmbo.SelectedItem;
+                            if (g == null)
                             {
-                                MessageBox.Show("Please enter a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                MessageBox.Show("Please select a group!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                                 return;
                             }
-                            _scene_command.arg = tbx.Text;
+                            else
+                                scmd.arg = g.id.ToString();
+
                             break;
-                        case Data_Types.BYTE:
-                        case Data_Types.DECIMAL:
-                        case Data_Types.INTEGER:
-                        case Data_Types.SHORT:
-                            _scene_command.arg = Numeric.Value.ToString();
-                            break;
-                    }
-                    break;
+                        }
+                    default:
+                        switch ((Data_Types)selected_cmd.arg_data_type)
+                        {
+                            case Data_Types.NONE:
+                                scmd.arg = string.Empty;
+                                break;
+                            case Data_Types.BOOL:
+                                scmd.arg = cb.Checked.ToString();
+                                break;
+                            case Data_Types.LIST:
+                                if (String.IsNullOrEmpty(cmbo.Text))
+                                {
+                                    MessageBox.Show("Please select a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                    return;
+                                }
+                                scmd.arg = cmbo.Text;
+                                break;
+                            case Data_Types.STRING:
+                                if (String.IsNullOrEmpty(tbx.Text))
+                                {
+                                    MessageBox.Show("Please enter a vaule!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                                    return;
+                                }
+                                scmd.arg = tbx.Text;
+                                break;
+                            case Data_Types.BYTE:
+                            case Data_Types.DECIMAL:
+                            case Data_Types.INTEGER:
+                            case Data_Types.SHORT:
+                                scmd.arg = Numeric.Value.ToString();
+                                break;
+                        }
+                        break;
+                }
+
+                if (!editing)
+                    db.scene_commands.AddObject(scmd);
+
+                db.SaveChanges();
             }
-
-            if (_scenecmdList != null)
-                _scenecmdList.Add(_scene_command);
-
-            zvsEntityControl.zvsContext.SaveChanges(); 
+            zvsEntityControl.CallSceneModified(this, null);
 
             this.Close();
-        }
-
-      
+        }     
 
     }
 }

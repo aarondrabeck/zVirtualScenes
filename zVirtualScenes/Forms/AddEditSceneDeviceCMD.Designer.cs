@@ -94,12 +94,10 @@
             // radioBtnDeviceCMD
             // 
             this.radioBtnDeviceCMD.AutoSize = true;
-            this.radioBtnDeviceCMD.Checked = true;
             this.radioBtnDeviceCMD.Location = new System.Drawing.Point(21, 12);
             this.radioBtnDeviceCMD.Name = "radioBtnDeviceCMD";
             this.radioBtnDeviceCMD.Size = new System.Drawing.Size(150, 17);
             this.radioBtnDeviceCMD.TabIndex = 20;
-            this.radioBtnDeviceCMD.TabStop = true;
             this.radioBtnDeviceCMD.Text = "Device Specific Command";
             this.radioBtnDeviceCMD.UseVisualStyleBackColor = true;
             this.radioBtnDeviceCMD.CheckedChanged += new System.EventHandler(this.radioBtnDeviceCMD_CheckedChanged);

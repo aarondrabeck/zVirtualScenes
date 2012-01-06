@@ -5,18 +5,20 @@ using zVirtualScenesAPI;
 using System.ComponentModel;
 using zVirtualScenesCommon.Util;
 using zVirtualScenesCommon.Entity;
+using System.Linq; 
 
 namespace zVirtualScenesApplication.Forms
 {
     public partial class DeviceProperties : Form
     {
         private BindingList<MenuItem> menu = new BindingList<MenuItem>();
-        private device _d;
+        private long device_id; 
+        private zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
 
-        public DeviceProperties(device d)
+        public DeviceProperties(long device_id)
         {
             InitializeComponent();
-            _d = d;
+            this.device_id = device_id;          
 
             this.colSettings.GroupKeyGetter = delegate(object rowObject)
             {
@@ -33,47 +35,50 @@ namespace zVirtualScenesApplication.Forms
 
         private void ObjectProperties_Load(object sender, EventArgs e)
         {
-            if (_d.device_types.plugin.name.Equals("OPENZWAVE"))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                string group = "Open ZWave Device";
-                MenuItem mi = new MenuItem();
-                mi.Name = "Basic";
-                mi.Group = group;
-                menu.Add(mi);
-                
-                mi = new MenuItem();
-                mi.Name = "Values";
-                mi.Group = group;
-                menu.Add(mi);
+                device device = db.devices.FirstOrDefault(d => d.id == device_id);
+                if (device != null && device.device_types.plugin.name.Equals("OPENZWAVE"))
+                {
+                    string group = "Open ZWave Device";
+                    MenuItem mi = new MenuItem();
+                    mi.Name = "Basic";
+                    mi.Group = group;
+                    menu.Add(mi);
 
-                mi = new MenuItem();
-                mi.Name = "Device Specific Commands";
-                mi.Group = group;
-                menu.Add(mi);
+                    mi = new MenuItem();
+                    mi.Name = "Values";
+                    mi.Group = group;
+                    menu.Add(mi);
 
-                mi = new MenuItem();
-                mi.Name = "Generic Commands";
-                mi.Group = group;
-                menu.Add(mi);                
+                    mi = new MenuItem();
+                    mi.Name = "Device Specific Commands";
+                    mi.Group = group;
+                    menu.Add(mi);
 
-                mi = new MenuItem();
-                mi.Name = "Groups";
-                mi.Group = group;
-                menu.Add(mi);
+                    mi = new MenuItem();
+                    mi.Name = "Generic Commands";
+                    mi.Group = group;
+                    menu.Add(mi);
 
-                mi = new MenuItem();
-                mi.Name = "Properties";
-                mi.Group = group;
-                menu.Add(mi);
+                    mi = new MenuItem();
+                    mi.Name = "Groups";
+                    mi.Group = group;
+                    menu.Add(mi);
 
-                dataListViewMenu.DataSource = menu;
+                    mi = new MenuItem();
+                    mi.Name = "Properties";
+                    mi.Group = group;
+                    menu.Add(mi);
 
-                if (dataListViewMenu.Items.Count > 0)
-                    dataListViewMenu.SelectedIndex = 0;
+                    dataListViewMenu.DataSource = menu;
 
-                this.Text = "'" + _d.friendly_name + "' Properties";
-                textBoxObjName.Text = _d.friendly_name;
-                
+                    if (dataListViewMenu.Items.Count > 0)
+                        dataListViewMenu.SelectedIndex = 0;
+
+                    this.Text = "'" + device.friendly_name + "' Properties";
+                    textBoxObjName.Text = device.friendly_name;
+                }
             }
         }
         
@@ -102,32 +107,32 @@ namespace zVirtualScenesApplication.Forms
 
                 if (mi.Name.Equals("Values"))
                 {
-                    uc_device_values_grid2.UpdateControl(_d);
+                    uc_device_values_grid2.UpdateControl(device_id);
                     uc_device_values_grid2.Visible = true;
                 }
                 else if (mi.Name.Equals("Device Specific Commands"))
                 {
-                    uc_device_commands1.UpdateObject(_d);
+                    uc_device_commands1.UpdateObject(device_id);
                     uc_device_commands1.Visible = true;
                 }
                 else if (mi.Name.Equals("Generic Commands"))
                 {
-                    uc_device_type_commands1.UpdateObject(_d);
+                    uc_device_type_commands1.UpdateObject(device_id);
                     uc_device_type_commands1.Visible = true;
                 }
                 else if (mi.Name.Equals("Properties"))
                 {
-                    uc_device_properties1.UpdateObject(_d);
-                    uc_device_properties1.Visible = true;
+                    uc_device_properties1.UpdateObject(device_id);
+                    uc_device_properties1.Visible = true;                    
                 }
                 else if (mi.Name.Equals("Groups"))
                 {
-                    uc_device_groups1.UpdateControl(_d);
+                    uc_device_groups1.UpdateControl(device_id);
                     uc_device_groups1.Visible = true;
                 }
                 else if (mi.Name.Equals("Basic"))
                 {
-                    uc_device_basic1.UpdateControl(_d);
+                    uc_device_basic1.UpdateControl(device_id);
                     uc_device_basic1.Visible = true;
                 }                
             }
@@ -146,7 +151,9 @@ namespace zVirtualScenesApplication.Forms
             }
         }
 
-        
-
+        private void DeviceProperties_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            db.Dispose();
+        }
     }
 }

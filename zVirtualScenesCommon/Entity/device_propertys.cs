@@ -14,29 +14,31 @@ namespace zVirtualScenesCommon.Entity
 
         public static void DefineOrUpdateDeviceProperty(device_propertys dp)
         {
-
-            device_propertys existing_dp = zvsEntityControl.zvsContext.device_propertys.FirstOrDefault(d => d.name == dp.name);
-
-            if (existing_dp == null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                zvsEntityControl.zvsContext.device_propertys.AddObject(dp);
-            }
-            else
-            {
-                existing_dp.friendly_name = dp.friendly_name;
-                existing_dp.value_data_type = dp.value_data_type;
-                existing_dp.default_value = dp.default_value;
+                device_propertys existing_dp = db.device_propertys.FirstOrDefault(d => d.name == dp.name);
 
-                foreach (var option in zvsEntityControl.zvsContext.device_property_options.Where(p => p.device_property_id == existing_dp.id).ToArray())
+                if (existing_dp == null)
                 {
-                    zvsEntityControl.zvsContext.DeleteObject(option);
+                    db.device_propertys.AddObject(dp);
                 }
+                else
+                {
+                    existing_dp.friendly_name = dp.friendly_name;
+                    existing_dp.value_data_type = dp.value_data_type;
+                    existing_dp.default_value = dp.default_value;
 
-                foreach (device_property_options dpo in dp.device_property_options)
-                    existing_dp.device_property_options.Add(new device_property_options { name = dpo.name });
+                    foreach (var option in db.device_property_options.Where(p => p.device_property_id == existing_dp.id).ToArray())
+                    {
+                        db.DeleteObject(option);
+                    }
 
+                    foreach (device_property_options dpo in dp.device_property_options)
+                        existing_dp.device_property_options.Add(new device_property_options { name = dpo.name });
+
+                }
+                db.SaveChanges();
             }
-            zvsEntityControl.zvsContext.SaveChanges();
 
         }
         

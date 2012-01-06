@@ -71,11 +71,14 @@ namespace zVirtualScenesApplication
             }
 
             //Check DB integrity
-            string name = zvsEntityControl.zvsContext.ExecuteStoreQuery<string>(@"SELECT name FROM sqlite_master WHERE name='devices';").SingleOrDefault();
-            if (string.IsNullOrEmpty(name))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                MessageBox.Show(string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                string name = db.ExecuteStoreQuery<string>(@"SELECT name FROM sqlite_master WHERE name='devices';").SingleOrDefault();
+                if (string.IsNullOrEmpty(name))
+                {
+                    MessageBox.Show(string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
             }
 
             //Check DB version
@@ -93,34 +96,37 @@ namespace zVirtualScenesApplication
                     int.TryParse(upgradeScript.Substring(upgradeScript.IndexOf("=") + 1, upgradeScript.IndexOf('\n') - upgradeScript.IndexOf("=")), out new_db_version);
                     try
                     {
-                        string curr_db_version_str = zvsEntityControl.zvsContext.ExecuteStoreQuery<string>(@"SELECT info_value FROM db_info WHERE info_name='Version';").SingleOrDefault();
-                        int curr_db_version;
-                        int.TryParse(curr_db_version_str, out curr_db_version);
-
-                        if (new_db_version > curr_db_version)
+                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                         {
-                            if (new_db_version == curr_db_version + 1)
-                            {
-                                upgradeScript = upgradeScript.Replace(upgradeScript.Substring(0, upgradeScript.IndexOf('\n')), "");
-                                zvsEntityControl.zvsContext.ExecuteStoreCommand(upgradeScript, null);
-                                zvsEntityControl.zvsContext.ExecuteStoreCommand(@"UPDATE db_info SET info_value = '" + new_db_version + "' WHERE info_name='Version';", null);
-                            }
-                            else
-                            {
-                                if (MessageBox.Show("Your database is over 1 version old. Upgrading is not supported. Would you like to replace your database with a new blank one?", "Database too old.", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                                {
-                                    FileInfo blank_database = new FileInfo(zvsEntityControl.GetBlankDBPath);
-                                    if (!database.Exists)
-                                    {
-                                        MessageBox.Show(string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", zvsEntityControl.GetBlankDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                        return;
-                                    }
+                            string curr_db_version_str = db.ExecuteStoreQuery<string>(@"SELECT info_value FROM db_info WHERE info_name='Version';").SingleOrDefault();
+                            int curr_db_version;
+                            int.TryParse(curr_db_version_str, out curr_db_version);
 
-                                    blank_database.CopyTo(zvsEntityControl.GetDBPath);
+                            if (new_db_version > curr_db_version)
+                            {
+                                if (new_db_version == curr_db_version + 1)
+                                {
+                                    upgradeScript = upgradeScript.Replace(upgradeScript.Substring(0, upgradeScript.IndexOf('\n')), "");
+                                    db.ExecuteStoreCommand(upgradeScript, null);
+                                    db.ExecuteStoreCommand(@"UPDATE db_info SET info_value = '" + new_db_version + "' WHERE info_name='Version';", null);
                                 }
                                 else
-                                    return;
+                                {
+                                    if (MessageBox.Show("Your database is over 1 version old. Upgrading is not supported. Would you like to replace your database with a new blank one?", "Database too old.", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                    {
+                                        FileInfo blank_database = new FileInfo(zvsEntityControl.GetBlankDBPath);
+                                        if (!database.Exists)
+                                        {
+                                            MessageBox.Show(string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", zvsEntityControl.GetBlankDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                            return;
+                                        }
 
+                                        blank_database.CopyTo(zvsEntityControl.GetDBPath);
+                                    }
+                                    else
+                                        return;
+
+                                }
                             }
                         }
                     }

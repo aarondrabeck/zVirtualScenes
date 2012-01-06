@@ -104,38 +104,59 @@ namespace zVirtualScenesAPI
 
         public void DefineOrUpdateDeviceValue(device_values dv)
         {
-            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dv.device_id);
-            if (d != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == dv.value_id);
-
-                if (existing_dv == null)
+                device d = db.devices.FirstOrDefault(o => o.id == dv.device_id);
+                if (d != null)
                 {
-                    //TODO: FIX CROSS THREADING 
-                    d.device_values.Add(dv);
+                    device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == dv.value_id);
+                    string prev_value = string.Empty; 
+
+                    if (existing_dv == null)
+                    {
+                        //NEW VALUE
+                        d.device_values.Add(dv);
+                        db.SaveChanges();
+
+                        //Call Event
+                        dv.DeviceValueAdded(new System.EventArgs());
+                    } 
+                    else
+                    {
+                        //CHANGED VALUE
+                        prev_value = existing_dv.value;
+
+                        //values come in blank sometimes.  If they are blank, keep the DB value. 
+                        if (!string.IsNullOrEmpty(dv.value))
+                            existing_dv.value = dv.value;
+
+                        existing_dv.type = dv.type;
+                        existing_dv.label_name = dv.label_name;
+                        existing_dv.index = dv.index;
+                        existing_dv.genre = dv.genre;
+                        existing_dv.commandClassId = dv.commandClassId;
+                        existing_dv.read_only = dv.read_only;
+                        db.SaveChanges();
+
+                        if (!string.IsNullOrEmpty(dv.value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value)))
+                        {
+                            //Call Event
+                            dv.DeviceValueDataChanged(prev_value);
+                        }
+                    }
+
+                    
                 }
                 else
-                {
-                    existing_dv.value = dv.value;
-                    existing_dv.type = dv.type;
-                    existing_dv.label_name = dv.label_name;
-                    existing_dv.index = dv.index;
-                    existing_dv.genre = dv.genre;
-                    existing_dv.commandClassId = dv.commandClassId;
-                    existing_dv.read_only = dv.read_only;
-                }
-                //lock (zvsEntityControl.zvsContext)
-                //{
-                    zvsEntityControl.zvsContext.SaveChanges();
-                //}
-                
+                    WriteToLog(Urgency.WARNING, string.Format("Device value change event on '{0}' occured but could not find a device value with id {1} in database.", dv.label_name, dv.value_id));
             }
         }
         
         public void DefineOrUpdateSetting(plugin_settings ps)
         {
-
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
                 if (pl != null)
                 {
                     plugin_settings existing_ps = pl.plugin_settings.FirstOrDefault(pls => pls.name == ps.name);
@@ -150,40 +171,43 @@ namespace zVirtualScenesAPI
                         existing_ps.name = ps.name;
                         existing_ps.value_data_type = ps.value_data_type;
                     }
-                    zvsEntityControl.zvsContext.SaveChanges();
+                    db.SaveChanges();
                 }
-            
+            }
         }
 
         public void SetSetting(string settingName, string settingValue)
         {
-
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
-            if (pl != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                plugin_settings ps = pl.plugin_settings.FirstOrDefault(p => p.name == settingName);
-                if (ps != null)
+                plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
+                if (pl != null)
                 {
-                    ps.value = settingValue;
-                    zvsEntityControl.zvsContext.SaveChanges();
+                    plugin_settings ps = pl.plugin_settings.FirstOrDefault(p => p.name == settingName);
+                    if (ps != null)
+                    {
+                        ps.value = settingValue;
+                        db.SaveChanges();
+                    }
                 }
             }
-             
          }
 
         public string GetSettingValue(string settingName)
         {
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
-            if (pl != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                plugin_settings ps = pl.plugin_settings.FirstOrDefault(p => p.name == settingName);
-                if (ps != null)
+                plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
+                if (pl != null)
                 {
-                    return ps.value;
+                    plugin_settings ps = pl.plugin_settings.FirstOrDefault(p => p.name == settingName);
+                    if (ps != null)
+                    {
+                        return ps.value;
+                    }
                 }
+                return string.Empty;
             }
-
-            return string.Empty;
         }
 
         //public void DefineDevice(device dt)
@@ -203,132 +227,132 @@ namespace zVirtualScenesAPI
             
         //}               
 
-        public IQueryable<device> GetDevices()
-        {
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
+        public IQueryable<device> GetDevices(zvsEntities2 db)
+        {            
+            plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                return zvsEntityControl.zvsContext.devices.Where(d => d.device_types.plugin.name == pl.name); 
-            }
+                return db.devices.Where(d => d.device_types.plugin.name == pl.name);
+            }            
             return null;
         }        
 
         public void DefineOrUpdateDeviceType(device_types dt)
         {
-
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
-            if (pl != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                //Does device type exist? 
-                device_types existing_dt = pl.device_types.FirstOrDefault(d => d.name == dt.name);
-
-                if (existing_dt == null)
+                plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
+                if (pl != null)
                 {
-                    pl.device_types.Add(dt);
-                }
-                else
-                {
-                    existing_dt.friendly_name = dt.friendly_name;
-                    existing_dt.show_in_list = dt.show_in_list;
+                    //Does device type exist? 
+                    device_types existing_dt = pl.device_types.FirstOrDefault(d => d.name == dt.name);
 
-                    foreach (device_type_commands dtc in dt.device_type_commands)
+                    if (existing_dt == null)
                     {
-                        device_type_commands exsisting_dtc = existing_dt.device_type_commands.FirstOrDefault(d => d.name == dtc.name);
+                        pl.device_types.Add(dt);
+                    }
+                    else
+                    {
+                        existing_dt.friendly_name = dt.friendly_name;
+                        existing_dt.show_in_list = dt.show_in_list;
 
-                        if (exsisting_dtc == null)
+                        foreach (device_type_commands dtc in dt.device_type_commands)
                         {
-                            existing_dt.device_type_commands.Add(dtc);
-                        }
-                        else
-                        {
-                            exsisting_dtc.friendly_name = dtc.friendly_name;
-                            exsisting_dtc.help = dtc.help;
-                            exsisting_dtc.custom_data2 = dtc.custom_data2;
-                            exsisting_dtc.custom_data1 = dtc.custom_data1;
-                            exsisting_dtc.arg_data_type = dtc.arg_data_type;
-                            exsisting_dtc.description = dtc.description;
+                            device_type_commands exsisting_dtc = existing_dt.device_type_commands.FirstOrDefault(d => d.name == dtc.name);
 
-                            foreach (var option in zvsEntityControl.zvsContext.device_type_command_options.Where(o => o.device_type_command_id == exsisting_dtc.id).ToArray())
+                            if (exsisting_dtc == null)
                             {
-                                zvsEntityControl.zvsContext.DeleteObject(option);
+                                existing_dt.device_type_commands.Add(dtc);
                             }
+                            else
+                            {
+                                exsisting_dtc.friendly_name = dtc.friendly_name;
+                                exsisting_dtc.help = dtc.help;
+                                exsisting_dtc.custom_data2 = dtc.custom_data2;
+                                exsisting_dtc.custom_data1 = dtc.custom_data1;
+                                exsisting_dtc.arg_data_type = dtc.arg_data_type;
+                                exsisting_dtc.description = dtc.description;
 
-                            foreach (device_type_command_options dtco in dtc.device_type_command_options)
-                                exsisting_dtc.device_type_command_options.Add(new device_type_command_options { option = dtco.option });
+                                foreach (var option in db.device_type_command_options.Where(o => o.device_type_command_id == exsisting_dtc.id).ToArray())
+                                {
+                                    db.DeleteObject(option);
+                                }
 
+                                foreach (device_type_command_options dtco in dtc.device_type_command_options)
+                                    exsisting_dtc.device_type_command_options.Add(new device_type_command_options { option = dtco.option });
+
+                            }
                         }
                     }
-                }
 
-                zvsEntityControl.zvsContext.SaveChanges();
+                    db.SaveChanges();
+                }
             }
         }
 
-        public IQueryable<device> GetDeviceInGroup(long GroupID)
-        {
-
-
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
+        public IQueryable<device> GetDeviceInGroup(long GroupID, zvsEntities2 db)
+        {           
+            plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
-                group g = zvsEntityControl.zvsContext.groups.FirstOrDefault(gr => gr.id == GroupID);
+                group g = db.groups.FirstOrDefault(gr => gr.id == GroupID);
                 if (g != null)
                 {
-                    return g.group_devices.Where(gd => gd.device.device_types.plugin == pl).Select(d => d.device).AsQueryable(); 
+                    return g.group_devices.Where(gd => gd.device.device_types.plugin == pl).Select(d => d.device).AsQueryable();
                 }
             }
-            return null;
+            return null;            
         }
 
-        public device_types GetDeviceType(string DeviceTypeName)
-        {
-
-            plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
+        public device_types GetDeviceType(string DeviceTypeName, zvsEntities2 db)
+        {            
+            plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
             {
                 return pl.device_types.FirstOrDefault(dt => dt.name == DeviceTypeName);
             }
 
-            return null;
+            return null;            
         }
 
         public void DefineOrUpdateDeviceCommand(device_commands dc)
         {
-
-            device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == dc.device_id);
-            if (d != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                //Does device type exist? 
-                device_commands existing_dc = d.device_commands.FirstOrDefault(c => c.name == dc.name);
-
-                if (existing_dc == null)
+                device d = db.devices.FirstOrDefault(o => o.id == dc.device_id);
+                if (d != null)
                 {
-                    d.device_commands.Add(dc);
-                }
-                else
-                {
-                    existing_dc.help = dc.help;
-                    existing_dc.friendly_name = dc.friendly_name;
-                    existing_dc.description = dc.description;
-                    existing_dc.custom_data2 = dc.custom_data2;
-                    existing_dc.custom_data1 = dc.custom_data1;
-                    existing_dc.arg_data_type = dc.arg_data_type;
+                    //Does device type exist? 
+                    device_commands existing_dc = d.device_commands.FirstOrDefault(c => c.name == dc.name);
 
-                    existing_dc.device_command_options.Clear();
-
-                    foreach (var option in zvsEntityControl.zvsContext.device_command_options.Where(o => o.device_command_id == existing_dc.id).ToArray())
+                    if (existing_dc == null)
                     {
-                        zvsEntityControl.zvsContext.DeleteObject(option);
+                        d.device_commands.Add(dc);
                     }
+                    else
+                    {
+                        existing_dc.help = dc.help;
+                        existing_dc.friendly_name = dc.friendly_name;
+                        existing_dc.description = dc.description;
+                        existing_dc.custom_data2 = dc.custom_data2;
+                        existing_dc.custom_data1 = dc.custom_data1;
+                        existing_dc.arg_data_type = dc.arg_data_type;
 
-                    foreach(device_command_options o in dc.device_command_options)
-                        existing_dc.device_command_options.Add(new device_command_options { name = o.name });
-                    
-                    existing_dc.sort_order = dc.sort_order;
+                        existing_dc.device_command_options.Clear();
+
+                        foreach (var option in db.device_command_options.Where(o => o.device_command_id == existing_dc.id).ToArray())
+                        {
+                            db.DeleteObject(option);
+                        }
+
+                        foreach (device_command_options o in dc.device_command_options)
+                            existing_dc.device_command_options.Add(new device_command_options { name = o.name });
+
+                        existing_dc.sort_order = dc.sort_order;
+                    }
+                    db.SaveChanges();
                 }
-                zvsEntityControl.zvsContext.SaveChanges();
             }
-
         }
         
         public void WriteToLog(Urgency u, string message)

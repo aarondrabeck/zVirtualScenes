@@ -28,15 +28,17 @@ namespace zVirtualScenesCommon.Entity
 
         public void Run()
         {
-            scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == this.Scene_id);
-            if (scene != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                string result = scene.RunScene();
-                Logger.WriteToLog(Urgency.INFO, string.Format("Scheduled task '{0}' {1}", this.friendly_name, result), "TASK");                
+                scene scene = db.scenes.FirstOrDefault(s => s.id == this.Scene_id);
+                if (scene != null)
+                {
+                    string result = scene.RunScene();
+                    Logger.WriteToLog(Urgency.INFO, string.Format("Scheduled task '{0}' {1}", this.friendly_name, result), "TASK");
+                }
+                else
+                    Logger.WriteToLog(Urgency.WARNING, "Scheduled task '" + this.friendly_name + "' Failed to find scene ID '" + this.Scene_id + "'.", "TASK");
             }
-            else
-                Logger.WriteToLog(Urgency.WARNING, "Scheduled task '" + this.friendly_name + "' Failed to find scene ID '" + this.Scene_id + "'.", "TASK");
-                   
         }
     }
 }

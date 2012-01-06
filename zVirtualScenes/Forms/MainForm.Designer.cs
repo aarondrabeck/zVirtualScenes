@@ -155,13 +155,12 @@ namespace zVirtualScenesApplication
             this.LevelCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.GroupsCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.colLastHeardFrom = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.uc_object_values1 = new zVirtualScenesApplication.UserControls.uc_device_values();
+            this.uc_device_values1 = new zVirtualScenesApplication.UserControls.uc_device_values();
             this.MainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.splitContainer4 = new System.Windows.Forms.SplitContainer();
             this.dataListViewScenes = new BrightIdeasSoftware.DataListView();
             this.colScene = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.SceneSortCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.label3 = new System.Windows.Forms.Label();
             this.dataListViewDeviceSmallList = new BrightIdeasSoftware.DataListView();
             this.olvColumn5 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -172,7 +171,6 @@ namespace zVirtualScenesApplication
             this.dataListViewSceneCMDs = new BrightIdeasSoftware.DataListView();
             this.olvColumn2 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.olvColumn3 = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
-            this.SceneCMDOrderCol = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.cmsSceneCMD = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -1412,7 +1410,7 @@ namespace zVirtualScenesApplication
             // 
             // splitContainer3.Panel2
             // 
-            this.splitContainer3.Panel2.Controls.Add(this.uc_object_values1);
+            this.splitContainer3.Panel2.Controls.Add(this.uc_device_values1);
             this.splitContainer3.Panel2MinSize = 200;
             this.splitContainer3.Size = new System.Drawing.Size(770, 432);
             this.splitContainer3.SplitterDistance = 228;
@@ -1521,19 +1519,19 @@ namespace zVirtualScenesApplication
             this.colLastHeardFrom.Text = "Last Heard From";
             this.colLastHeardFrom.Width = 150;
             // 
-            // uc_object_values1
+            // uc_device_values1
             // 
-            this.uc_object_values1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.uc_object_values1.Location = new System.Drawing.Point(0, 0);
-            this.uc_object_values1.Name = "uc_object_values1";
-            this.uc_object_values1.Size = new System.Drawing.Size(768, 198);
-            this.uc_object_values1.TabIndex = 0;
+            this.uc_device_values1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.uc_device_values1.Location = new System.Drawing.Point(0, 0);
+            this.uc_device_values1.Name = "uc_device_values1";
+            this.uc_device_values1.Size = new System.Drawing.Size(768, 198);
+            this.uc_device_values1.TabIndex = 0;
             // 
             // MainTabControl
             // 
-            this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.MainTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.MainTabControl.Controls.Add(this.tabPage5);
             this.MainTabControl.Controls.Add(this.tabPage3);
             this.MainTabControl.Controls.Add(this.tabPage4);
@@ -1581,7 +1579,6 @@ namespace zVirtualScenesApplication
             // dataListViewScenes
             // 
             this.dataListViewScenes.AllColumns.Add(this.colScene);
-            this.dataListViewScenes.AllColumns.Add(this.SceneSortCol);
             this.dataListViewScenes.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewScenes.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colScene});
@@ -1599,7 +1596,6 @@ namespace zVirtualScenesApplication
             this.dataListViewScenes.Size = new System.Drawing.Size(255, 432);
             this.dataListViewScenes.SmallImageList = this.imageList25Icons;
             this.dataListViewScenes.SortGroupItemsByPrimaryColumn = false;
-            this.dataListViewScenes.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.dataListViewScenes.TabIndex = 0;
             this.dataListViewScenes.UnfocusedHighlightBackgroundColor = System.Drawing.SystemColors.GradientActiveCaption;
             this.dataListViewScenes.UnfocusedHighlightForegroundColor = System.Drawing.Color.Black;
@@ -1620,14 +1616,6 @@ namespace zVirtualScenesApplication
             this.colScene.ImageAspectName = "DeviceIcon";
             this.colScene.Text = "Scenes";
             // 
-            // SceneSortCol
-            // 
-            this.SceneSortCol.AspectName = "sort_order";
-            this.SceneSortCol.DisplayIndex = 1;
-            this.SceneSortCol.IsVisible = false;
-            this.SceneSortCol.Text = "Order";
-            this.SceneSortCol.Width = 10;
-            // 
             // label3
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -1636,7 +1624,7 @@ namespace zVirtualScenesApplication
             this.label3.Size = new System.Drawing.Size(117, 100);
             this.label3.TabIndex = 6;
             this.label3.Text = "Drag and drop device to add them to scenes or add a builtin command with the butt" +
-                "on below.";
+    "on below.";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // dataListViewDeviceSmallList
@@ -1645,8 +1633,8 @@ namespace zVirtualScenesApplication
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn5);
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn6);
             this.dataListViewDeviceSmallList.AllColumns.Add(this.olvColumn4);
-            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewDeviceSmallList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewDeviceSmallList.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewDeviceSmallList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn5,
@@ -1709,8 +1697,8 @@ namespace zVirtualScenesApplication
             // 
             // lbl_sceneActions
             // 
-            this.lbl_sceneActions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lbl_sceneActions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lbl_sceneActions.Location = new System.Drawing.Point(3, 6);
             this.lbl_sceneActions.Name = "lbl_sceneActions";
             this.lbl_sceneActions.Size = new System.Drawing.Size(503, 15);
@@ -1721,15 +1709,13 @@ namespace zVirtualScenesApplication
             // 
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn2);
             this.dataListViewSceneCMDs.AllColumns.Add(this.olvColumn3);
-            this.dataListViewSceneCMDs.AllColumns.Add(this.SceneCMDOrderCol);
-            this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataListViewSceneCMDs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dataListViewSceneCMDs.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.dataListViewSceneCMDs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.olvColumn2,
-            this.olvColumn3,
-            this.SceneCMDOrderCol});
+            this.olvColumn3});
             this.dataListViewSceneCMDs.DataSource = null;
             this.dataListViewSceneCMDs.FullRowSelect = true;
             this.dataListViewSceneCMDs.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -1768,14 +1754,6 @@ namespace zVirtualScenesApplication
             this.olvColumn3.FillsFreeSpace = true;
             this.olvColumn3.Text = "";
             this.olvColumn3.Width = 200;
-            // 
-            // SceneCMDOrderCol
-            // 
-            this.SceneCMDOrderCol.AspectName = "sort_order";
-            this.SceneCMDOrderCol.HeaderTextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.SceneCMDOrderCol.Text = "Execution Order";
-            this.SceneCMDOrderCol.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            this.SceneCMDOrderCol.Width = 90;
             // 
             // statusStrip1
             // 
@@ -1957,27 +1935,27 @@ namespace zVirtualScenesApplication
             this.editToolStripMenuItem,
             this.deleteEventToolStripMenuItem});
             this.contextMenuStripTrigger.Name = "contextMenuStripEvent";
-            this.contextMenuStripTrigger.Size = new System.Drawing.Size(141, 70);
+            this.contextMenuStripTrigger.Size = new System.Drawing.Size(150, 70);
             // 
             // addToolStripMenuItem1
             // 
             this.addToolStripMenuItem1.Name = "addToolStripMenuItem1";
-            this.addToolStripMenuItem1.Size = new System.Drawing.Size(140, 22);
-            this.addToolStripMenuItem1.Text = "&Create Event";
+            this.addToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
+            this.addToolStripMenuItem1.Text = "&Create Trigger";
             this.addToolStripMenuItem1.Click += new System.EventHandler(this.addToolStripMenuItem1_Click);
             // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
-            this.editToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
-            this.editToolStripMenuItem.Text = "&Edit Event";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.editToolStripMenuItem.Text = "&Edit Trigger";
             this.editToolStripMenuItem.Click += new System.EventHandler(this.editToolStripMenuItem_Click);
             // 
             // deleteEventToolStripMenuItem
             // 
             this.deleteEventToolStripMenuItem.Name = "deleteEventToolStripMenuItem";
-            this.deleteEventToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
-            this.deleteEventToolStripMenuItem.Text = "&Delete Event";
+            this.deleteEventToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.deleteEventToolStripMenuItem.Text = "&Delete Trigger";
             this.deleteEventToolStripMenuItem.Click += new System.EventHandler(this.deleteEventToolStripMenuItem_Click);
             // 
             // contextMenuStripTriggerNull
@@ -1986,20 +1964,20 @@ namespace zVirtualScenesApplication
             this.toolStripMenuItemEventsNull,
             this.createEventAdvancedToolStripMenuItem});
             this.contextMenuStripTriggerNull.Name = "contextMenuStripEvent";
-            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(197, 70);
+            this.contextMenuStripTriggerNull.Size = new System.Drawing.Size(206, 48);
             // 
             // toolStripMenuItemEventsNull
             // 
             this.toolStripMenuItemEventsNull.Name = "toolStripMenuItemEventsNull";
-            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(152, 22);
-            this.toolStripMenuItemEventsNull.Text = "&Create Event";
+            this.toolStripMenuItemEventsNull.Size = new System.Drawing.Size(205, 22);
+            this.toolStripMenuItemEventsNull.Text = "&Create Basic Trigger";
             this.toolStripMenuItemEventsNull.Click += new System.EventHandler(this.toolStripMenuItemEventsNull_Click);
             // 
             // createEventAdvancedToolStripMenuItem
             // 
             this.createEventAdvancedToolStripMenuItem.Name = "createEventAdvancedToolStripMenuItem";
-            this.createEventAdvancedToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.createEventAdvancedToolStripMenuItem.Text = "Create Event &Advanced";
+            this.createEventAdvancedToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
+            this.createEventAdvancedToolStripMenuItem.Text = "Create &Advanced Trigger";
             this.createEventAdvancedToolStripMenuItem.Click += new System.EventHandler(this.createEventAdvancedToolStripMenuItem_Click);
             // 
             // MainForm
@@ -2116,7 +2094,6 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn nodeID;
         private BrightIdeasSoftware.OLVColumn GroupsCol;
         private BrightIdeasSoftware.OLVColumn colLastHeardFrom;
-        private UserControls.uc_device_values uc_object_values1;
         private TabPage tabPage4;
         private SplitContainer splitContainer2;
         private BrightIdeasSoftware.DataListView dataListTasks;
@@ -2194,8 +2171,6 @@ namespace zVirtualScenesApplication
         private BrightIdeasSoftware.OLVColumn olvColumn5;
         private BrightIdeasSoftware.OLVColumn olvColumn6;
         private Button btnAddBltInCMD;
-        private BrightIdeasSoftware.OLVColumn SceneSortCol;
-        private BrightIdeasSoftware.OLVColumn SceneCMDOrderCol;
         private BrightIdeasSoftware.OLVColumn olvColumn4;
         private Label label3;
         private PictureBox pictureBox1;
@@ -2250,6 +2225,7 @@ namespace zVirtualScenesApplication
         private Button btn_odd;
         private Button btn_clear;
         private ToolStripMenuItem createEventAdvancedToolStripMenuItem;
+        private UserControls.uc_device_values uc_device_values1;
     }
 }
 

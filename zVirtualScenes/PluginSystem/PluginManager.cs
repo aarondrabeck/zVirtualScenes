@@ -109,7 +109,7 @@ namespace zVirtualScenesApplication.PluginSystem
             {
                 device_type_command_que cmd = context.device_type_command_que.FirstOrDefault(c => c.id == device_type_command_que_id);
 
-                if (cmd != null)
+                if (cmd != null && cmd.device != null)
                 {
                     Console.WriteLine("[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
                                                             ", CMD_NAME:" + cmd.device_type_commands.friendly_name +
@@ -160,7 +160,11 @@ namespace zVirtualScenesApplication.PluginSystem
                     }
                 }
                 else
-                    Logger.WriteToLog(Urgency.ERROR, "Could not locate qued device command.", "PLUGIN MANAGER");
+                {
+                    string err_str = "Could not locate qued device command.";
+                    device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
+                    Logger.WriteToLog(Urgency.ERROR, err_str, "PLUGIN MANAGER");
+                }
             }
                     
         }
@@ -229,10 +233,9 @@ namespace zVirtualScenesApplication.PluginSystem
 
         void builtin_command_que_BuiltinCommandAddedToQueEvent(long builtin_command_que_id)
         {
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-
-                builtin_command_que cmd = context.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
+                builtin_command_que cmd = db.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
 
                 if (cmd != null)
                 {
@@ -244,7 +247,7 @@ namespace zVirtualScenesApplication.PluginSystem
                             {
                                 long d_id = 0;
                                 long.TryParse(cmd.arg, out d_id);
-                                device d = device.GetAllDevices(false).FirstOrDefault(o => o.id == d_id);
+                                device d = device.GetAllDevices(db,false).FirstOrDefault(o => o.id == d_id);
 
                                 if (d.device_types.plugin.enabled)
                                 {
@@ -254,7 +257,7 @@ namespace zVirtualScenesApplication.PluginSystem
                             }
                         case "REPOLL_ALL":
                             {
-                                foreach (device d in device.GetAllDevices(false))
+                                foreach (device d in device.GetAllDevices(db, false))
                                 {
                                     if (d.device_types.plugin.enabled)
                                     {
@@ -298,8 +301,8 @@ namespace zVirtualScenesApplication.PluginSystem
                     builtin_command_que.BuiltinCommandRunComplete(cmd, false, "");
 
                     //Remove processed command from que
-                    context.builtin_command_que.DeleteObject(cmd);
-                    context.SaveChanges();
+                    db.builtin_command_que.DeleteObject(cmd);
+                    db.SaveChanges();
                 }
                 else
                     Logger.WriteToLog(Urgency.ERROR, "Could not locate qued builit-in command.", "PLUGIN MANAGER");

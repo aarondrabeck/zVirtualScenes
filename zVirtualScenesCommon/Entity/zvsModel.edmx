@@ -136,11 +136,11 @@
             <End Role="scene_property_option" EntitySet="scene_property_option" />
           </AssociationSet>
           <AssociationSet Name="FK_scene_property_value_0" Association="zvsModel.Store.FK_scene_property_value_0">
-            <End Role="scene_property" EntitySet="scene_property" />
+            <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
           <AssociationSet Name="FK_scene_property_value_1" Association="zvsModel.Store.FK_scene_property_value_1">
-            <End Role="scenes" EntitySet="scenes" />
+            <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
         </EntityContainer>
@@ -415,7 +415,6 @@
           <Property Name="scene_id" Type="integer" Nullable="false" />
           <Property Name="scene_property_id" Type="integer" Nullable="false" />
           <Property Name="value" Type="nvarchar" MaxLength="1024" />
-          <Property Name="trigger_script" Type="nvarchar" />
         </EntityType>
         <EntityType Name="scenes">
           <Key>
@@ -783,18 +782,6 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_scene_property_value_0">
-          <End Role="scene_property" Type="zvsModel.Store.scene_property" Multiplicity="1" />
-          <End Role="scene_property_value" Type="zvsModel.Store.scene_property_value" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="scene_property">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="scene_property_value">
-              <PropertyRef Name="scene_property_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_scene_property_value_1">
           <End Role="scenes" Type="zvsModel.Store.scenes" Multiplicity="1" />
           <End Role="scene_property_value" Type="zvsModel.Store.scene_property_value" Multiplicity="*" />
           <ReferentialConstraint>
@@ -803,6 +790,18 @@
             </Principal>
             <Dependent Role="scene_property_value">
               <PropertyRef Name="scene_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_scene_property_value_1">
+          <End Role="scene_property" Type="zvsModel.Store.scene_property" Multiplicity="1" />
+          <End Role="scene_property_value" Type="zvsModel.Store.scene_property_value" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scene_property">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scene_property_value">
+              <PropertyRef Name="scene_property_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -834,7 +833,6 @@
           <EntitySet Name="scene_commands" EntityType="zvsModel.scene_commands" />
           <EntitySet Name="scene_property" EntityType="zvsModel.scene_property" />
           <EntitySet Name="scene_property_option" EntityType="zvsModel.scene_property_option" />
-          <EntitySet Name="scene_property_value" EntityType="zvsModel.scene_property_value" />
           <EntitySet Name="scenes" EntityType="zvsModel.scene" />
           <AssociationSet Name="FK_builtin_command_options_0" Association="zvsModel.FK_builtin_command_options_0">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
@@ -928,14 +926,6 @@
             <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_option" EntitySet="scene_property_option" />
           </AssociationSet>
-          <AssociationSet Name="FK_scene_property_value_1" Association="zvsModel.FK_scene_property_value_1">
-            <End Role="scene_property" EntitySet="scene_property" />
-            <End Role="scene_property_value" EntitySet="scene_property_value" />
-          </AssociationSet>
-          <AssociationSet Name="FK_scene_property_value_0" Association="zvsModel.FK_scene_property_value_0">
-            <End Role="scene" EntitySet="scenes" />
-            <End Role="scene_property_value" EntitySet="scene_property_value" />
-          </AssociationSet>
           <EntitySet Name="device_value_triggers" EntityType="zvsModel.device_value_triggers" />
           <AssociationSet Name="FK_device_value_triggers_0" Association="zvsModel.FK_device_value_triggers_0">
             <End Role="device_values" EntitySet="device_values" />
@@ -948,7 +938,16 @@
           <EntitySet Name="scheduled_tasks" EntityType="zvsModel.scheduled_tasks" />
           <EntitySet Name="db_info" EntityType="zvsModel.db_info" />
           <EntitySet Name="program_options" EntityType="zvsModel.program_options" />
-        </EntityContainer>
+          <EntitySet Name="scene_property_value" EntityType="zvsModel.scene_property_value" />
+          <AssociationSet Name="FK_scene_property_value_1" Association="zvsModel.FK_scene_property_value_1">
+            <End Role="scene_property" EntitySet="scene_property" />
+            <End Role="scene_property_value" EntitySet="scene_property_value" />
+          </AssociationSet>
+          <AssociationSet Name="FK_scene_property_value_0" Association="zvsModel.FK_scene_property_value_0">
+            <End Role="scene" EntitySet="scenes" />
+            <End Role="scene_property_value" EntitySet="scene_property_value" />
+          </AssociationSet>
+          </EntityContainer>
         <EntityType Name="builtin_command_options">
           <Key>
             <PropertyRef Name="id" />
@@ -1229,18 +1228,6 @@
           <Property Type="String" Name="option" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="scene_property" Relationship="zvsModel.FK_scene_property_option_0" FromRole="scene_property_option" ToRole="scene_property" />
         </EntityType>
-        <EntityType Name="scene_property_value">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Type="Int64" Name="scene_id" Nullable="false" />
-          <Property Type="Int64" Name="scene_property_id" Nullable="false" />
-          <Property Type="String" Name="value" MaxLength="1024" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="scene_property" Relationship="zvsModel.FK_scene_property_value_1" FromRole="scene_property_value" ToRole="scene_property" />
-          <NavigationProperty Name="scene" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene_property_value" ToRole="scene" />
-          <Property Type="String" Name="trigger_script" MaxLength="2147483647" FixedLength="false" Unicode="true" />
-        </EntityType>
         <EntityType Name="scene">
           <Key>
             <PropertyRef Name="id" />
@@ -1250,8 +1237,8 @@
           <Property Type="Int64" Name="sort_order" />
           <Property Type="Boolean" Name="is_running" Nullable="false" />
           <NavigationProperty Name="scene_commands" Relationship="zvsModel.FK_scene_commands_1" FromRole="scene" ToRole="scene_commands" />
-          <NavigationProperty Name="scene_property_value" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene" ToRole="scene_property_value" />
           <NavigationProperty Name="device_value_triggers" Relationship="zvsModel.FK_device_value_triggers_01" FromRole="scene" ToRole="device_value_triggers" />
+          <NavigationProperty Name="scene_property_value" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene" ToRole="scene_property_value" />
         </EntityType>
         <Association Name="FK_builtin_command_options_0">
           <End Type="zvsModel.builtin_commands" Role="builtin_commands" Multiplicity="1" />
@@ -1475,7 +1462,8 @@
           <End Type="zvsModel.device" Role="device" Multiplicity="0..1" >
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="zvsModel.scene_commands" Role="scene_commands" Multiplicity="*" />
+          <End Type="zvsModel.scene_commands" Role="scene_commands" Multiplicity="*" >
+          </End>
           <ReferentialConstraint>
             <Principal Role="device">
               <PropertyRef Name="id" />
@@ -1546,32 +1534,6 @@
             </Principal>
             <Dependent Role="scene_property_option">
               <PropertyRef Name="scene_property_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_scene_property_value_1">
-          <End Type="zvsModel.scene_property" Role="scene_property" Multiplicity="1" />
-          <End Type="zvsModel.scene_property_value" Role="scene_property_value" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="scene_property">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="scene_property_value">
-              <PropertyRef Name="scene_property_id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_scene_property_value_0">
-          <End Type="zvsModel.scene" Role="scene" Multiplicity="1" >
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Type="zvsModel.scene_property_value" Role="scene_property_value" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="scene">
-              <PropertyRef Name="id" />
-            </Principal>
-            <Dependent Role="scene_property_value">
-              <PropertyRef Name="scene_id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -1687,6 +1649,44 @@
           <Property Type="String" Name="name" MaxLength="2147483647" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="value" MaxLength="2147483647" FixedLength="false" Unicode="true" />
         </EntityType>
+        <EntityType Name="scene_property_value">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int64" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int64" Name="scene_id" Nullable="false" />
+          <Property Type="Int64" Name="scene_property_id" Nullable="false" />
+          <Property Type="String" Name="value" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="scene_property" Relationship="zvsModel.FK_scene_property_value_1" FromRole="scene_property_value" ToRole="scene_property" />
+          <NavigationProperty Name="scene" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene_property_value" ToRole="scene" />
+        </EntityType>
+        <Association Name="FK_scene_property_value_1">
+          <End Type="zvsModel.scene_property" Role="scene_property" Multiplicity="1" >
+          </End>
+          <End Type="zvsModel.scene_property_value" Role="scene_property_value" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scene_property">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scene_property_value">
+              <PropertyRef Name="scene_property_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_scene_property_value_0">
+          <End Type="zvsModel.scene" Role="scene" Multiplicity="1" >
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="zvsModel.scene_property_value" Role="scene_property_value" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scene">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scene_property_value">
+              <PropertyRef Name="scene_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1949,17 +1949,6 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="scene_property_value">
-            <EntityTypeMapping TypeName="zvsModel.scene_property_value">
-              <MappingFragment StoreEntitySet="scene_property_value">
-                <ScalarProperty Name="trigger_script" ColumnName="trigger_script" />
-                <ScalarProperty Name="value" ColumnName="value" />
-                <ScalarProperty Name="scene_property_id" ColumnName="scene_property_id" />
-                <ScalarProperty Name="scene_id" ColumnName="scene_id" />
-                <ScalarProperty Name="id" ColumnName="id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="scenes">
             <EntityTypeMapping TypeName="zvsModel.scene">
               <MappingFragment StoreEntitySet="scenes">
@@ -2060,6 +2049,16 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="scene_property_value">
+            <EntityTypeMapping TypeName="zvsModel.scene_property_value">
+              <MappingFragment StoreEntitySet="scene_property_value">
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="scene_property_id" ColumnName="scene_property_id" />
+                <ScalarProperty Name="scene_id" ColumnName="scene_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
@@ -2080,7 +2079,7 @@
     </Options>
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
-      <Diagram Name="Model1" ZoomLevel="52">
+      <Diagram Name="Model1" ZoomLevel="121">
         <EntityTypeShape EntityType="zvsModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_command_que" Width="1.5" PointX="3" PointY="3.625" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_commands" Width="1.5" PointX="5.875" PointY="1.75" Height="3.3263964843750107" />
@@ -2104,7 +2103,6 @@
         <EntityTypeShape EntityType="zvsModel.scene_commands" Width="1.5" PointX="12.5" PointY="11.375" Height="2.7494921874999818" />
         <EntityTypeShape EntityType="zvsModel.scene_property" Width="1.5" PointX="10.25" PointY="5.5" Height="2.5571907552083246" />
         <EntityTypeShape EntityType="zvsModel.scene_property_option" Width="1.875" PointX="12.5" PointY="4.875" Height="1.7879850260416674" />
-        <EntityTypeShape EntityType="zvsModel.scene_property_value" Width="1.5" PointX="12.5" PointY="7.625" Height="2.1725878906249818" />
         <EntityTypeShape EntityType="zvsModel.scene" Width="1.5" PointX="10.25" PointY="9.625" Height="2.1725878906249818" />
         <AssociationConnector Association="zvsModel.FK_builtin_command_options_0" >
           <ConnectorPoint PointX="5.875" PointY="2.2689925130208337" />
@@ -2116,22 +2114,16 @@
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_options_0" >
           <ConnectorPoint PointX="9" PointY="17.768992513020834" />
-          <ConnectorPoint PointX="9.4166666666666661" PointY="17.768992513020834" />
-          <ConnectorPoint PointX="9.5833333333333339" PointY="17.768992513020834" />
           <ConnectorPoint PointX="9.75" PointY="17.768992513020834" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_que_0" >
           <ConnectorPoint PointX="9" PointY="16" />
           <ConnectorPoint PointX="9.375" PointY="15.625" />
           <ConnectorPoint PointX="9.375" PointY="15.79758789062501" />
-          <ConnectorPoint PointX="9.44107443490112" PointY="15.731513455723889" />
-          <ConnectorPoint PointX="9.5589255650988783" PointY="15.613662325526132" />
           <ConnectorPoint PointX="9.75" PointY="15.42258789062501" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_command_que_1" >
           <ConnectorPoint PointX="6.75" PointY="15.180041445312504" />
-          <ConnectorPoint PointX="9.4166666666666661" PointY="15.180041445312504" />
-          <ConnectorPoint PointX="9.5833333333333339" PointY="15.180041445312504" />
           <ConnectorPoint PointX="9.75" PointY="15.180041445312504" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_commands_0" >
@@ -2149,15 +2141,13 @@
           <ConnectorPoint PointX="9.205372721354161" PointY="15.711293945312505" />
           <ConnectorPoint PointX="9.3720393880208288" PointY="15.711293945312505" />
           <ConnectorPoint PointX="9.3779606119791712" PointY="15.711293945312505" />
-          <ConnectorPoint PointX="9.5833333333333339" PointY="15.711293945312505" />
+          <ConnectorPoint PointX="9.544627278645839" PointY="15.711293945312505" />
           <ConnectorPoint PointX="11.65625" PointY="15.711293945312505" />
           <ConnectorPoint PointX="11.65625" PointY="19.625" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_property_values_1" >
           <ConnectorPoint PointX="9.40625" PointY="27.5" />
           <ConnectorPoint PointX="9.40625" PointY="20.711293945312505" />
-          <ConnectorPoint PointX="9.4166666666666661" PointY="20.711293945312505" />
-          <ConnectorPoint PointX="9.5833333333333339" PointY="20.711293945312505" />
           <ConnectorPoint PointX="10.5" PointY="20.711293945312505" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_type_command_options_0" >
@@ -2184,6 +2174,8 @@
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_devices_0" >
           <ConnectorPoint PointX="4.5" PointY="15.466095377604162" />
+          <ConnectorPoint PointX="4.666666666666667" PointY="15.466095377604162" />
+          <ConnectorPoint PointX="4.833333333333333" PointY="15.466095377604162" />
           <ConnectorPoint PointX="5.25" PointY="15.466095377604162" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_values_0" >
@@ -2198,8 +2190,6 @@
           <ConnectorPoint PointX="7.333333333333333" PointY="15.84375" />
           <ConnectorPoint PointX="9.0729166666666661" PointY="15.84375" />
           <ConnectorPoint PointX="9.2395833333333339" PointY="15.84375" />
-          <ConnectorPoint PointX="9.4166666666666661" PointY="15.84375" />
-          <ConnectorPoint PointX="9.5833333333333339" PointY="15.84375" />
           <ConnectorPoint PointX="11.572916666666666" PointY="15.84375" />
           <ConnectorPoint PointX="11.739583333333334" PointY="15.84375" />
           <ConnectorPoint PointX="12.5" PointY="15.84375" />
@@ -2208,7 +2198,7 @@
           <ConnectorPoint PointX="6.75" PointY="16.551549479166667" />
           <ConnectorPoint PointX="7.25" PointY="16.551549479166667" />
           <ConnectorPoint PointX="7.25" PointY="15.625" />
-          <ConnectorPoint PointX="9.4166666666666661" PointY="15.625" />
+          <ConnectorPoint PointX="9.4642545572916763" PointY="15.625" />
           <ConnectorPoint PointX="9.6309212239583442" PointY="15.625" />
           <ConnectorPoint PointX="12.25" PointY="15.625" />
           <ConnectorPoint PointX="12.25" PointY="15.5" />
@@ -2222,6 +2212,8 @@
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_plugin_setting_options_0" >
           <ConnectorPoint PointX="4.5" PointY="22.518992513020834" />
+          <ConnectorPoint PointX="4.666666666666667" PointY="22.518992513020834" />
+          <ConnectorPoint PointX="4.833333333333333" PointY="22.518992513020834" />
           <ConnectorPoint PointX="5.25" PointY="22.518992513020834" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_plugin_settings_0" >
@@ -2237,37 +2229,39 @@
           <ConnectorPoint PointX="11.75" PointY="6.0814925130208337" />
           <ConnectorPoint PointX="12.5" PointY="6.0814925130208337" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_scene_property_value_1" >
-          <ConnectorPoint PointX="11.75" PointY="7.8410953776041623" />
-          <ConnectorPoint PointX="12.5" PointY="7.8410953776041623" />
-        </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_scene_property_value_0" >
-          <ConnectorPoint PointX="11.75" PointY="9.8074446614583337" />
-          <ConnectorPoint PointX="12.5" PointY="9.8074446614583337" />
-        </AssociationConnector>
-        <EntityTypeShape EntityType="zvsModel.device_value_triggers" Width="1.5" PointX="2.875" PointY="28.125" Height="2.3648893229166674" />
+        <EntityTypeShape EntityType="zvsModel.device_value_triggers" Width="2.25" PointX="2.875" PointY="28.125" Height="3.1340950520833353" />
         <AssociationConnector Association="zvsModel.FK_device_value_triggers_0" >
-          <ConnectorPoint PointX="7.84375" PointY="26.576396484375" />
-          <ConnectorPoint PointX="7.84375" PointY="30.400940755208332" />
-          <ConnectorPoint PointX="4.375" PointY="30.400940755208332" />
+          <ConnectorPoint PointX="7.75" PointY="26.576396484375" />
+          <ConnectorPoint PointX="7.75" PointY="30.593242187500003" />
+          <ConnectorPoint PointX="5.125" PointY="30.593242187500003" />
         </AssociationConnector>
         <AssociationConnector Association="zvsModel.FK_device_value_triggers_01" >
-          <ConnectorPoint PointX="11" PointY="11.989889322916666" />
-          <ConnectorPoint PointX="11" PointY="13" />
-          <ConnectorPoint PointX="9.5" PointY="13" />
-          <ConnectorPoint PointX="9.5" PointY="27.25" />
-          <ConnectorPoint PointX="9.4895833333333339" PointY="27.25" />
-          <ConnectorPoint PointX="9.3229166666666661" PointY="27.25" />
-          <ConnectorPoint PointX="8" PointY="27.25" />
-          <ConnectorPoint PointX="8" PointY="29.231718377604174" />
-          <ConnectorPoint PointX="7.927083333333333" PointY="29.231718377604174" />
-          <ConnectorPoint PointX="7.760416666666667" PointY="29.231718377604174" />
-          <ConnectorPoint PointX="4.375" PointY="29.231718377604174" />
+          <ConnectorPoint PointX="10.25" PointY="10.807444661458334" />
+          <ConnectorPoint PointX="9.25" PointY="10.807444661458334" />
+          <ConnectorPoint PointX="9.25" PointY="12" />
+          <ConnectorPoint PointX="6.875" PointY="12" />
+          <ConnectorPoint PointX="6.875" PointY="12.875" />
+          <ConnectorPoint PointX="6.083333333333333" PointY="12.875" />
+          <ConnectorPoint PointX="5.916666666666667" PointY="12.875" />
+          <ConnectorPoint PointX="4.75" PointY="12.875" />
+          <ConnectorPoint PointX="4.75" PointY="27.75" />
+          <ConnectorPoint PointX="4" PointY="27.75" />
+          <ConnectorPoint PointX="4" PointY="28.125" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.scheduled_tasks" Width="1.5" PointX="0.5" PointY="0.875" Height="10.82615234375" />
         <EntityTypeShape EntityType="zvsModel.db_info" Width="1.5" PointX="7.375" PointY="6.75" Height="1.5956835937500102" />
         <EntityTypeShape EntityType="zvsModel.program_options" Width="1.5" PointX="8.375" PointY="0.75" Height="1.5956835937500102" />
-      </Diagram>
+        <EntityTypeShape EntityType="zvsModel.scene_property_value" Width="1.5" PointX="13.625" PointY="7.25" Height="2.1725878906250102" />
+        <AssociationConnector Association="zvsModel.FK_scene_property_value_1" >
+          <ConnectorPoint PointX="11.75" PointY="7.6535953776041667" />
+          <ConnectorPoint PointX="13.625" PointY="7.6535953776041667" />
+        </AssociationConnector>
+        <AssociationConnector Association="zvsModel.FK_scene_property_value_0" >
+          <ConnectorPoint PointX="11.75" PointY="10.46875" />
+          <ConnectorPoint PointX="14.59375" PointY="10.46875" />
+          <ConnectorPoint PointX="14.59375" PointY="9.42258789062501" />
+        </AssociationConnector>
+        </Diagram>
     </Diagrams>
   </Designer>
 </edmx:Edmx>

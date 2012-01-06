@@ -112,70 +112,70 @@
             this.groupBox1.TabIndex = 33;
             this.groupBox1.TabStop = false;
             // 
-            // uc_object_basic1
+            // uc_device_basic1
             // 
             this.uc_device_basic1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uc_device_basic1.AutoScroll = true;
             this.uc_device_basic1.Location = new System.Drawing.Point(238, 13);
-            this.uc_device_basic1.Name = "uc_object_basic1";
+            this.uc_device_basic1.Name = "uc_device_basic1";
             this.uc_device_basic1.Size = new System.Drawing.Size(716, 562);
             this.uc_device_basic1.TabIndex = 32;
             // 
-            // uc_object_values_grid2
+            // uc_device_values_grid2
             // 
             this.uc_device_values_grid2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uc_device_values_grid2.Location = new System.Drawing.Point(238, 13);
-            this.uc_device_values_grid2.Name = "uc_object_values_grid2";
+            this.uc_device_values_grid2.Name = "uc_device_values_grid2";
             this.uc_device_values_grid2.Size = new System.Drawing.Size(716, 561);
             this.uc_device_values_grid2.TabIndex = 0;
             // 
-            // uc_object_commands1
+            // uc_device_commands1
             // 
             this.uc_device_commands1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uc_device_commands1.AutoScroll = true;
             this.uc_device_commands1.Location = new System.Drawing.Point(238, 13);
-            this.uc_device_commands1.Name = "uc_object_commands1";
+            this.uc_device_commands1.Name = "uc_device_commands1";
             this.uc_device_commands1.Size = new System.Drawing.Size(716, 561);
             this.uc_device_commands1.TabIndex = 1;
             // 
-            // uc_object_properties1
+            // uc_device_properties1
             // 
             this.uc_device_properties1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uc_device_properties1.AutoScroll = true;
             this.uc_device_properties1.Location = new System.Drawing.Point(238, 13);
-            this.uc_device_properties1.Name = "uc_object_properties1";
+            this.uc_device_properties1.Name = "uc_device_properties1";
             this.uc_device_properties1.Size = new System.Drawing.Size(716, 561);
             this.uc_device_properties1.TabIndex = 29;
             // 
-            // uc_object_groups1
+            // uc_device_groups1
             // 
             this.uc_device_groups1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uc_device_groups1.Location = new System.Drawing.Point(238, 13);
-            this.uc_device_groups1.Name = "uc_object_groups1";
+            this.uc_device_groups1.Name = "uc_device_groups1";
             this.uc_device_groups1.Size = new System.Drawing.Size(716, 561);
             this.uc_device_groups1.TabIndex = 30;
             // 
-            // uc_object_type_commands1
+            // uc_device_type_commands1
             // 
             this.uc_device_type_commands1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.uc_device_type_commands1.Location = new System.Drawing.Point(238, 13);
-            this.uc_device_type_commands1.Name = "uc_object_type_commands1";
+            this.uc_device_type_commands1.Name = "uc_device_type_commands1";
             this.uc_device_type_commands1.Size = new System.Drawing.Size(716, 558);
             this.uc_device_type_commands1.TabIndex = 34;
             // 
-            // ObjectProperties
+            // DeviceProperties
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -192,9 +192,10 @@
             this.Controls.Add(this.uc_device_groups1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(750, 500);
-            this.Name = "ObjectProperties";
+            this.Name = "DeviceProperties";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Object Properties";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DeviceProperties_FormClosing);
             this.Load += new System.EventHandler(this.ObjectProperties_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ObjectProperties_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.dataListViewMenu)).EndInit();

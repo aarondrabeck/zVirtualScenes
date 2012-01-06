@@ -344,19 +344,22 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
-                foreach (device d in zvsEntityControl.zvsContext.devices.OrderBy(o => o.friendly_name))
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    var device = new
+                    foreach (device d in db.devices.OrderBy(o => o.friendly_name))
                     {
-                        id = d.id,
-                        name = d.friendly_name,
-                        on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
-                        level = d.GetLevelMeter(),
-                        level_txt = d.GetLevelText(),
-                        type = d.device_types.name
-                    };
+                        var device = new
+                        {
+                            id = d.id,
+                            name = d.friendly_name,
+                            on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
+                            level = d.GetLevelMeter(),
+                            level_txt = d.GetLevelText(),
+                            type = d.device_types.name
+                        };
 
-                    devices.Add(device);
+                        devices.Add(device);
+                    }
                 }
                 return new { success = true, devices = devices.ToArray() };
             }
@@ -367,41 +370,44 @@ namespace HttpAPI
                 long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
-
-                    if (d != null)
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                     {
-                        string on_off = string.Empty;
-                        if (d.GetLevelMeter() == 0)
-                            on_off = "OFF";
-                        else if (d.GetLevelMeter() > 98)
-                            on_off = "ON";
-                        else
-                            on_off = "DIM";
+                        device d = db.devices.FirstOrDefault(o => o.id == id);
 
-                        var details = new
+                        if (d != null)
                         {
-                            id = d.id,
-                            name = d.friendly_name,
-                            on_off = on_off,
-                            level = d.GetLevelMeter(),
-                            level_txt = d.GetLevelText(),
-                            type = d.device_types.name,
-                            type_txt = d.device_types.friendly_name,
-                            last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
-                            groups = d.GetGroups,
-                            mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value,
-                            fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value,
-                            op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value,
-                            fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value,
-                            heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1").value,
-                            cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1").value,
-                            esm = d.device_values.FirstOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Basic").value
-                        };
-                        return new { success = true, details = details };
+                            string on_off = string.Empty;
+                            if (d.GetLevelMeter() == 0)
+                                on_off = "OFF";
+                            else if (d.GetLevelMeter() > 98)
+                                on_off = "ON";
+                            else
+                                on_off = "DIM";
+
+                            var details = new
+                            {
+                                id = d.id,
+                                name = d.friendly_name,
+                                on_off = on_off,
+                                level = d.GetLevelMeter(),
+                                level_txt = d.GetLevelText(),
+                                type = d.device_types.name,
+                                type_txt = d.device_types.friendly_name,
+                                last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
+                                groups = d.GetGroups,
+                                mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value,
+                                fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value,
+                                op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value,
+                                fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value,
+                                heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1").value,
+                                cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1").value,
+                                esm = d.device_values.FirstOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Basic").value
+                            };
+                            return new { success = true, details = details };
+                        }
+                        else
+                            return new { success = false, reason = "Device not found." };
                     }
-                    else
-                        return new { success = false, reason = "Device not found." };
                 }
             }
 
@@ -411,45 +417,52 @@ namespace HttpAPI
                 long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
-
-                    if (d != null)
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                     {
-                        List<object> values = new List<object>();
-                        foreach (device_values v in d.device_values)
-                        {
-                            values.Add(new
-                            {
-                                value_id = v.value_id,
-                                value = v.value,
-                                grene = v.genre,
-                                index = v.index,
-                                read_only = v.read_only,
-                                label_name = v.label_name,
-                                type = v.type,
-                                id = v.id
-                            });
-                        }
+                        device d = db.devices.FirstOrDefault(o => o.id == id);
 
-                        return new { success = true, values = values.ToArray() };
+                        if (d != null)
+                        {
+                            List<object> values = new List<object>();
+                            foreach (device_values v in d.device_values)
+                            {
+                                values.Add(new
+                                {
+                                    value_id = v.value_id,
+                                    value = v.value,
+                                    grene = v.genre,
+                                    index = v.index,
+                                    read_only = v.read_only,
+                                    label_name = v.label_name,
+                                    type = v.type,
+                                    id = v.id
+                                });
+                            }
+
+                            return new { success = true, values = values.ToArray() };
+                        }
+                        else
+                            return new { success = false, reason = "Device not found." };
                     }
-                    else
-                        return new { success = false, reason = "Device not found." };
                 }
             }
 
             if (request.Url.Segments.Length == 3 &&  request.Url.Segments[2].ToLower().StartsWith("scenes") && request.HttpMethod == "GET")
             {
-                var q0 = from d in zvsEntityControl.zvsContext.scenes
-                            select new
-                            {
-                                id = d.id,
-                                name = d.friendly_name,
-                                is_running = d.is_running,
-                                cmd_count = d.scene_commands.Count()
-                            };
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    var q0 = from d in db.scenes
+                             select new
+                             {
+                                 id = d.id,
+                                 name = d.friendly_name,
+                                 is_running = d.is_running,
+                                 cmd_count = d.scene_commands.Count()
+                             };
 
-                return new { success = true, scenes = q0.ToArray() };
+
+                    return new { success = true, scenes = q0.ToArray() };
+                }
             }
 
             if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "GET")
@@ -457,32 +470,35 @@ namespace HttpAPI
                 long sID = 0;
                 long.TryParse(request.Url.Segments[3], out sID);
 
-                scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sID);
-
-                if (scene != null)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    List<object> s_cmds = new List<object>();
-                    foreach (scene_commands sc in scene.scene_commands.OrderBy(o => o.sort_order))
+                    scene scene = db.scenes.FirstOrDefault(s => s.id == sID);
+
+                    if (scene != null)
                     {
-                        s_cmds.Add(new
+                        List<object> s_cmds = new List<object>();
+                        foreach (scene_commands sc in scene.scene_commands.OrderBy(o => o.sort_order))
                         {
-                            device = sc.Actionable_Object,
-                            action = sc.Action_Description,
-                            order = (sc.sort_order + 1)
-                        });
+                            s_cmds.Add(new
+                            {
+                                device = sc.Actionable_Object,
+                                action = sc.Action_Description,
+                                order = (sc.sort_order + 1)
+                            });
+                        }
+                        var s = new
+                        {
+                            id = scene.id,
+                            name = scene.friendly_name,
+                            is_running = scene.is_running,
+                            cmd_count = scene.scene_commands.Count(),
+                            cmds = s_cmds.ToArray()
+                        };
+                        return new { success = true, scene = s };
                     }
-                    var s = new
-                    {
-                        id = scene.id,
-                        name = scene.friendly_name,
-                        is_running = scene.is_running,
-                        cmd_count = scene.scene_commands.Count(),
-                        cmds = s_cmds.ToArray()
-                    };
-                    return new { success = true, scene = s };
+                    else
+                        return new { success = false, reason = "Scene not found." };
                 }
-                else
-                    return new { success = false, reason = "Scene not found." };
             }
 
             if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "POST")
@@ -496,40 +512,44 @@ namespace HttpAPI
                 bool.TryParse(postData["is_running"], out is_running);
                 string name = postData["name"];
 
-                scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == sID);
-
-                if (scene != null)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    if (is_running)
+                    scene scene = db.scenes.FirstOrDefault(s => s.id == sID);
+
+                    if (scene != null)
                     {
-                        string r = scene.RunScene();
-                        return new { success = true, desc = r };
+                        if (is_running)
+                        {
+                            string r = scene.RunScene();
+                            return new { success = true, desc = r };
+                        }
+
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            scene.friendly_name = name;
+                            db.SaveChanges();
+                            return new { success = true, desc = "Scene Name Updated." };
+                        }
                     }
-
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        scene.friendly_name = name;
-                        zvsEntityControl.zvsContext.SaveChanges();
-                        return new { success = true, desc = "Scene Name Updated." };
-                    }
-
-
+                    else
+                        return new { success = false, reason = "Scene not found." };
                 }
-                else
-                    return new { success = false, reason = "Scene not found." };
             }
 
             if (request.Url.Segments.Length == 3 &&  request.Url.Segments[2].ToLower().StartsWith("groups") && request.HttpMethod == "GET")
             {
-                var q0 = from g in zvsEntityControl.zvsContext.groups
-                            select new
-                            {
-                                id = g.id,
-                                name = g.name,
-                                count = g.group_devices.Count()
-                            };
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    var q0 = from g in db.groups
+                             select new
+                             {
+                                 id = g.id,
+                                 name = g.name,
+                                 count = g.group_devices.Count()
+                             };
 
-                return new { success = true, groups = q0.ToArray() };
+                    return new { success = true, groups = q0.ToArray() };
+                }
             }
 
             if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("group/") && request.HttpMethod == "GET")
@@ -538,30 +558,33 @@ namespace HttpAPI
                 long gID = 0;
                 long.TryParse(request.Url.Segments[3], out gID);
 
-                group group = zvsEntityControl.zvsContext.groups.FirstOrDefault(g => g.id == gID);
-
-                if (group != null)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    List<object> group_devices = new List<object>();
-                    foreach (group_devices gd in group.group_devices)
+                    group group = db.groups.FirstOrDefault(g => g.id == gID);
+
+                    if (group != null)
                     {
-                        group_devices.Add(new
+                        List<object> group_devices = new List<object>();
+                        foreach (group_devices gd in group.group_devices)
                         {
-                            id = gd.device.id,
-                            name = gd.device.friendly_name,
-                            type = gd.device.device_types.name
-                        });
+                            group_devices.Add(new
+                            {
+                                id = gd.device.id,
+                                name = gd.device.friendly_name,
+                                type = gd.device.device_types.name
+                            });
+                        }
+                        var g = new
+                        {
+                            id = group.id,
+                            name = group.name,
+                            devices = group_devices.ToArray()
+                        };
+                        return new { success = true, group = g };
                     }
-                    var g = new
-                    {
-                        id = group.id,
-                        name = group.name,
-                        devices = group_devices.ToArray()
-                    };
-                    return new { success = true, group = g };
+                    else
+                        return new { success = false, reason = "Group not found." };
                 }
-                else
-                    return new { success = false, reason = "Group not found." };
             }
 
             if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") &&
@@ -571,39 +594,42 @@ namespace HttpAPI
                 long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
-
-                    if (d != null)
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                     {
-                        List<object> device_commands = new List<object>();
-                        foreach (device_commands cmd in d.device_commands)
+                        device d = db.devices.FirstOrDefault(o => o.id == id);
+                        if (d != null)
                         {
-                            device_commands.Add(new
+                            List<object> device_commands = new List<object>();
+                            foreach (device_commands cmd in d.device_commands)
                             {
-                                id = cmd.id,
-                                type = "device",
-                                friendlyname = cmd.friendly_name,
-                                helptext = cmd.help,
-                                name = cmd.name
-                            });
-                        }
+                                device_commands.Add(new
+                                {
+                                    id = cmd.id,
+                                    type = "device",
+                                    friendlyname = cmd.friendly_name,
+                                    helptext = cmd.help,
+                                    name = cmd.name
+                                });
+                            }
 
-                        foreach (device_type_commands cmd in d.device_types.device_type_commands)
-                        {
-                            device_commands.Add(new
+                            foreach (device_type_commands cmd in d.device_types.device_type_commands)
                             {
-                                id = cmd.id,
-                                type = "device_type",
-                                friendlyname = cmd.friendly_name,
-                                helptext = cmd.help,
-                                name = cmd.name
-                            });
-                        }
+                                device_commands.Add(new
+                                {
+                                    id = cmd.id,
+                                    type = "device_type",
+                                    friendlyname = cmd.friendly_name,
+                                    helptext = cmd.help,
+                                    name = cmd.name
+                                });
+                            }
 
-                        return new { success = true, device_commands = device_commands.ToArray() };
+                            return new { success = true, device_commands = device_commands.ToArray() };
+
+                        }
+                        else
+                            return new { success = false, reason = "Device not found." };
                     }
-                    else
-                        return new { success = false, reason = "Device not found." };
                 }
             }
 
@@ -620,72 +646,75 @@ namespace HttpAPI
                 long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    device d = zvsEntityControl.zvsContext.devices.FirstOrDefault(o => o.id == id);
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    {
+                        device d = db.devices.FirstOrDefault(o => o.id == id);
 
-                    if (d != null)
-                    {         
-                        string arg = postData["arg"];
-                        string strtype = postData["type"];
-                        string commandName = postData["name"];
-                        string friendlyname = postData["friendlyname"];
-
-                        switch (strtype)
+                        if (d != null)
                         {
-                            case "device":
-                                {
-                                    //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
-                                    device_commands cmd = null;
-                                    if (!string.IsNullOrEmpty(friendlyname))
-                                        cmd = d.device_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
-                                    else if(!string.IsNullOrEmpty(commandName))
-                                        cmd = d.device_commands.FirstOrDefault(c => c.name.Equals(commandName));
-                                    else if(c_id>0)
-                                        cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
-                                    if (cmd != null)
-                                    {
-                                        device_command_que.Run(new device_command_que
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = cmd.id,
-                                            arg = arg
-                                        });
+                            string arg = postData["arg"];
+                            string strtype = postData["type"];
+                            string commandName = postData["name"];
+                            string friendlyname = postData["friendlyname"];
 
-                                        return new { success = true };
-                                    }
-                                    else
-                                        return new { success = false, reason = "Device command not found." };
-                                }
-                            case "device_type":
-                                {
-                                    //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
-                                    device_type_commands cmd = null;
-                                    if (!string.IsNullOrEmpty(friendlyname))
-                                        cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
-                                    else if (!string.IsNullOrEmpty(commandName))
-                                        cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name.Equals(commandName));
-                                    else if (c_id > 0)
-                                        cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.id == c_id);
-                                   
-                                    if (cmd != null)
+                            switch (strtype)
+                            {
+                                case "device":
                                     {
-                                        device_type_command_que.Run(new device_type_command_que
+                                        //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
+                                        device_commands cmd = null;
+                                        if (!string.IsNullOrEmpty(friendlyname))
+                                            cmd = d.device_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
+                                        else if (!string.IsNullOrEmpty(commandName))
+                                            cmd = d.device_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                                        else if (c_id > 0)
+                                            cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
+                                        if (cmd != null)
                                         {
-                                            device_id = d.id,
-                                            device_type_command_id = cmd.id,
-                                            arg = arg
-                                        });
-                                        return new { success = true };
+                                            device_command_que.Run(new device_command_que
+                                            {
+                                                device_id = d.id,
+                                                device_command_id = cmd.id,
+                                                arg = arg
+                                            });
+
+                                            return new { success = true };
+                                        }
+                                        else
+                                            return new { success = false, reason = "Device command not found." };
                                     }
-                                    return new { success = false, reason = "Device type command not found." };
-                                }
-                            default:
-                                {
-                                    return new { success = false, reason = "Invalid command type." };
-                                }
+                                case "device_type":
+                                    {
+                                        //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
+                                        device_type_commands cmd = null;
+                                        if (!string.IsNullOrEmpty(friendlyname))
+                                            cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
+                                        else if (!string.IsNullOrEmpty(commandName))
+                                            cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                                        else if (c_id > 0)
+                                            cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.id == c_id);
+
+                                        if (cmd != null)
+                                        {
+                                            device_type_command_que.Run(new device_type_command_que
+                                            {
+                                                device_id = d.id,
+                                                device_type_command_id = cmd.id,
+                                                arg = arg
+                                            });
+                                            return new { success = true };
+                                        }
+                                        return new { success = false, reason = "Device type command not found." };
+                                    }
+                                default:
+                                    {
+                                        return new { success = false, reason = "Invalid command type." };
+                                    }
+                            }
                         }
+                        else
+                            return new { success = false, reason = "Device not found." };
                     }
-                    else
-                        return new { success = false, reason = "Device not found." };
                 }
 
             }
@@ -695,17 +724,20 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 3 &&  request.Url.Segments[2].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
             {
                 List<object> bi_commands = new List<object>();
-                foreach (builtin_commands cmd in zvsEntityControl.zvsContext.builtin_commands)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    bi_commands.Add(new
+                    foreach (builtin_commands cmd in db.builtin_commands)
                     {
-                        id = cmd.id,
-                        friendlyname = cmd.friendly_name,
-                        helptext = cmd.help,
-                        name = cmd.name
-                    });
+                        bi_commands.Add(new
+                        {
+                            id = cmd.id,
+                            friendlyname = cmd.friendly_name,
+                            helptext = cmd.help,
+                            name = cmd.name
+                        });
+                    }
+                    return new { success = true, builtin_commands = bi_commands.ToArray() };
                 }
-                return new { success = true, builtin_commands = bi_commands.ToArray() };
             }
 
             if ((request.Url.Segments.Length == 3 || request.Url.Segments.Length == 4) && request.Url.Segments[2].ToLower().StartsWith("command") && request.HttpMethod == "POST")
@@ -718,24 +750,26 @@ namespace HttpAPI
                 long id = 0;
                 if(request.Url.Segments.Length == 4)
                     long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
-
-                builtin_commands cmd = null;
-
-                if (!string.IsNullOrEmpty(friendlyname))
-                    cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
-                else if (!string.IsNullOrEmpty(commandName))
-                    cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name.Equals(commandName));
-                else
-                    cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.id == id);
-                 
-                if (cmd != null)
+                
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    builtin_command_que.Run(new builtin_command_que
+                    builtin_commands cmd = null;
+                    if (!string.IsNullOrEmpty(friendlyname))
+                        cmd = db.builtin_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
+                    else if (!string.IsNullOrEmpty(commandName))
+                        cmd = db.builtin_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                    else
+                        cmd = db.builtin_commands.FirstOrDefault(c => c.id == id);
+
+                    if (cmd != null)
                     {
-                        builtin_command_id = cmd.id,
-                        arg = arg
-                    });
-                    return new { success = true };
+                        builtin_command_que.Run(new builtin_command_que
+                        {
+                            builtin_command_id = cmd.id,
+                            arg = arg
+                        });
+                        return new { success = true };
+                    }
                 }
             }
 

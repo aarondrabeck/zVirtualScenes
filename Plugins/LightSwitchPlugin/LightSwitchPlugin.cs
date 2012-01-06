@@ -195,15 +195,26 @@ namespace LightSwitchPlugin
                 BroadcastMessage("ENDLIST" + Environment.NewLine);
             }
 
-            BroadcastMessage("MSG~" + "'" + dv.device.friendly_name + "' " + dv.label_name + " changed to " + dv.value + Environment.NewLine);
+            string device_name = string.Empty;
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                device device = db.devices.FirstOrDefault(d => d.id == dv.device_id);
+                if (device != null)
+                    device_name = device.friendly_name;
+            }
+
+            BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + dv.value + Environment.NewLine);
         }       
 
         void zvsEntityControl_SceneRunCompleteEvent(long scene_id, int ErrorCount)
         {
-            scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == scene_id);
-            if (scene != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                BroadcastMessage("MSG~" + "Scene '" + scene.friendly_name + "' has completed with " + ErrorCount + " errors." + Environment.NewLine);
+                scene scene = db.scenes.FirstOrDefault(s => s.id == scene_id);
+                if (scene != null)
+                {
+                    BroadcastMessage("MSG~" + "Scene '" + scene.friendly_name + "' has completed with " + ErrorCount + " errors." + Environment.NewLine);
+                }
             }
         }
 
@@ -475,18 +486,20 @@ namespace LightSwitchPlugin
                                     {
                                         long groupId = long.TryParse(values[1], out groupId) ? groupId : 0;
                                         string cmd_name = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
-
-                                        group g = zvsEntityControl.zvsContext.groups.FirstOrDefault(o=> o.id == groupId);
-                                        if (g != null)
+                                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                                         {
-                                            builtin_commands zvs_cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == cmd_name);
-                                            if (zvs_cmd != null)
+                                            group g = db.groups.FirstOrDefault(o => o.id == groupId);
+                                            if (g != null)
                                             {
-                                                string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.friendly_name, g.name);
-                                                WriteToLog(Urgency.INFO, result);
-                                                BroadcastMessage("MSG~" + result + Environment.NewLine);
+                                                builtin_commands zvs_cmd = db.builtin_commands.FirstOrDefault(c => c.name == cmd_name);
+                                                if (zvs_cmd != null)
+                                                {
+                                                    string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.friendly_name, g.name);
+                                                    WriteToLog(Urgency.INFO, result);
+                                                    BroadcastMessage("MSG~" + result + Environment.NewLine);
 
-                                                zvs_cmd.Run(g.id.ToString());                                                
+                                                    zvs_cmd.Run(g.id.ToString());
+                                                }
                                             }
                                         }
                                     }                                    
@@ -543,40 +556,49 @@ namespace LightSwitchPlugin
         }
 
         private void SendSceneList(Socket LightSwitchClientSocket)
-        {            
-            foreach (scene scene in zvsEntityControl.zvsContext.scenes)
+        {
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                bool show = false;
-                bool.TryParse(scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "SHOWSCENEINLSLIST"), out show);
+                foreach (scene scene in db.scenes)
+                {
+                    bool show = false;
+                    bool.TryParse(scene_property_value.GetPropertyValue(db, scene.id, "SHOWSCENEINLSLIST"), out show);
 
-                if (show)
-                    SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.friendly_name + "~" + scene.id + Environment.NewLine);
-            }            
+                    if (show)
+                        SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.friendly_name + "~" + scene.id + Environment.NewLine);
+                }
+            }
         }
 
         private void SendZoneList(Socket LightSwitchClientSocket)
-        {            
-            foreach (group g in zvsEntityControl.zvsContext.groups)
+        {
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.name + "~" + g.id + Environment.NewLine);
-            }                           
+                foreach (group g in db.groups)
+                {
+                    SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.name + "~" + g.id + Environment.NewLine);
+                }
+            }     
         }                       
 
         private void sendDeviceList(Socket LightSwitchClientSocket)
         {
             List<string> LS_devices = new List<string>();
-                        
-            //Get Devices
-            foreach (device d in zvsEntityControl.zvsContext.devices)
-            {
-                bool show = true;
-                bool.TryParse(device_property_values.GetDevicePropertyValue(zvsEntityControl.zvsContext,d.id, "SHOWINLSLIST"), out show);
 
-                if (show)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                //Get Devices
+                foreach (device d in db.devices)
                 {
-                    string device_str = DeviceToString(d);
-                    if (!string.IsNullOrEmpty(device_str))
-                        LS_devices.Add(device_str);
+                    bool show = true;
+                    bool.TryParse(device_property_values.GetDevicePropertyValue(d.id, "SHOWINLSLIST"), out show);
+
+                    if (show)
+                    {
+                        string device_str = DeviceToString(d);
+                        if (!string.IsNullOrEmpty(device_str))
+                            LS_devices.Add(device_str);
+                    }
                 }
             }
 
@@ -589,6 +611,7 @@ namespace LightSwitchPlugin
             //Send to Client
             foreach (string d_str in LS_devices)
                 SendMessagetoClientsSocket(LightSwitchClientSocket, "DEVICE~" + d_str + Environment.NewLine);
+
             
         }
 
@@ -736,12 +759,15 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void ExecuteZVSCommand(long SceneID, Socket Client)
         {
-            scene scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == SceneID);
-            if (scene != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                string result = scene.RunScene();   
-                WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
-                BroadcastMessage("MSG~" + result + Environment.NewLine);
+                scene scene = db.scenes.FirstOrDefault(s => s.id == SceneID);
+                if (scene != null)
+                {
+                    string result = scene.RunScene();
+                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
+                    BroadcastMessage("MSG~" + result + Environment.NewLine);
+                }
             }
         }
 

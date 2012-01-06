@@ -64,7 +64,6 @@
     <Compile Include="Entity\zvsEntityControl.cs" />
     <Compile Include="Entity\scene.cs" />
     <Compile Include="Urgency.cs" />
-    <Compile Include="Entity\zvsEvents.cs" />
     <Compile Include="Entity\zvsModel.Designer.cs">
       <DependentUpon>zvsModel.edmx</DependentUpon>
       <AutoGen>True</AutoGen>

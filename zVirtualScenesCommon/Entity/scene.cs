@@ -29,14 +29,21 @@ namespace zVirtualScenesCommon.Entity
                 return "Failed to start scene '" + this.friendly_name + "' because it is already running!";
             else
             {
-                if (scene_commands.Count < 1)
-                    return "Failed to start scene '" + this.friendly_name + "' because it has no commands!";
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene s = db.scenes.FirstOrDefault(sc => sc.id == this.id);
+                    if (s != null)
+                    {
+                        if (s.scene_commands.Count < 1)
+                            return "Failed to start scene '" + this.friendly_name + "' because it has no commands!";
 
-                ExecuteScene.DoWork += new DoWorkEventHandler(ExecuteScene_DoWork);
-                ExecuteScene.RunWorkerCompleted +=new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
+                        ExecuteScene.DoWork += new DoWorkEventHandler(ExecuteScene_DoWork);
+                        ExecuteScene.RunWorkerCompleted += new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
 
-                this.is_running = true;
-                zvsEntityControl.zvsContext.SaveChanges();
+                        s.is_running = true;
+                        db.SaveChanges();
+                    }               
+                }
 
                 ExecuteScene.RunWorkerAsync(this.id);
 

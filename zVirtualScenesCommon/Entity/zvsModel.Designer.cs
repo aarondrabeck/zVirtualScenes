@@ -41,10 +41,10 @@ using System.Runtime.Serialization;
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_plugin_settings_0", "plugin", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.plugin), "plugin_settings", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.plugin_settings), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_commands_1", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_commands", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_commands), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_option_0", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_option", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_option), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_1", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
-[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_0", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_value_triggers_0", "device_values", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.device_values), "device_value_triggers", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_value_triggers), true)]
 [assembly: EdmRelationshipAttribute("zvsModel", "FK_device_value_triggers_01", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(zVirtualScenesCommon.Entity.scene), "device_value_triggers", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.device_value_triggers), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_1", "scene_property", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene_property), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
+[assembly: EdmRelationshipAttribute("zvsModel", "FK_scene_property_value_0", "scene", System.Data.Metadata.Edm.RelationshipMultiplicity.One, typeof(zVirtualScenesCommon.Entity.scene), "scene_property_value", System.Data.Metadata.Edm.RelationshipMultiplicity.Many, typeof(zVirtualScenesCommon.Entity.scene_property_value), true)]
 
 #endregion
 
@@ -467,22 +467,6 @@ namespace zVirtualScenesCommon.Entity
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        public ObjectSet<scene_property_value> scene_property_value
-        {
-            get
-            {
-                if ((_scene_property_value == null))
-                {
-                    _scene_property_value = base.CreateObjectSet<scene_property_value>("scene_property_value");
-                }
-                return _scene_property_value;
-            }
-        }
-        private ObjectSet<scene_property_value> _scene_property_value;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
         public ObjectSet<scene> scenes
         {
             get
@@ -559,6 +543,22 @@ namespace zVirtualScenesCommon.Entity
             }
         }
         private ObjectSet<program_options> _program_options;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<scene_property_value> scene_property_value
+        {
+            get
+            {
+                if ((_scene_property_value == null))
+                {
+                    _scene_property_value = base.CreateObjectSet<scene_property_value>("scene_property_value");
+                }
+                return _scene_property_value;
+            }
+        }
+        private ObjectSet<scene_property_value> _scene_property_value;
 
         #endregion
         #region AddTo Methods
@@ -748,14 +748,6 @@ namespace zVirtualScenesCommon.Entity
         }
     
         /// <summary>
-        /// Deprecated Method for adding a new object to the scene_property_value EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToscene_property_value(scene_property_value scene_property_value)
-        {
-            base.AddObject("scene_property_value", scene_property_value);
-        }
-    
-        /// <summary>
         /// Deprecated Method for adding a new object to the scenes EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
         /// </summary>
         public void AddToscenes(scene scene)
@@ -793,6 +785,14 @@ namespace zVirtualScenesCommon.Entity
         public void AddToprogram_options(program_options program_options)
         {
             base.AddObject("program_options", program_options);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the scene_property_value EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToscene_property_value(scene_property_value scene_property_value)
+        {
+            base.AddObject("scene_property_value", scene_property_value);
         }
 
         #endregion
@@ -5982,28 +5982,6 @@ namespace zVirtualScenesCommon.Entity
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_property_value_0", "scene_property_value")]
-        public EntityCollection<scene_property_value> scene_property_value
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<scene_property_value>("zvsModel.FK_scene_property_value_0", "scene_property_value");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<scene_property_value>("zvsModel.FK_scene_property_value_0", "scene_property_value", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
         [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_device_value_triggers_01", "device_value_triggers")]
         public EntityCollection<device_value_triggers> device_value_triggers
         {
@@ -6016,6 +5994,28 @@ namespace zVirtualScenesCommon.Entity
                 if ((value != null))
                 {
                     ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<device_value_triggers>("zvsModel.FK_device_value_triggers_01", "device_value_triggers", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("zvsModel", "FK_scene_property_value_0", "scene_property_value")]
+        public EntityCollection<scene_property_value> scene_property_value
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<scene_property_value>("zvsModel.FK_scene_property_value_0", "scene_property_value");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<scene_property_value>("zvsModel.FK_scene_property_value_0", "scene_property_value", value);
                 }
             }
         }
@@ -6811,30 +6811,6 @@ namespace zVirtualScenesCommon.Entity
         private global::System.String _value;
         partial void OnvalueChanging(global::System.String value);
         partial void OnvalueChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public global::System.String trigger_script
-        {
-            get
-            {
-                return _trigger_script;
-            }
-            set
-            {
-                Ontrigger_scriptChanging(value);
-                ReportPropertyChanging("trigger_script");
-                _trigger_script = StructuralObject.SetValidValue(value, true);
-                ReportPropertyChanged("trigger_script");
-                Ontrigger_scriptChanged();
-            }
-        }
-        private global::System.String _trigger_script;
-        partial void Ontrigger_scriptChanging(global::System.String value);
-        partial void Ontrigger_scriptChanged();
 
         #endregion
     

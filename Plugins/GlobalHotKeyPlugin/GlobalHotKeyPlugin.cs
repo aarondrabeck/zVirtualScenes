@@ -139,16 +139,19 @@ namespace GlobalHotKeyPlugin
 
             if (IsReady)
             {
-                foreach (scene scene in zvsEntityControl.zvsContext.scenes)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    string sceneHotKey = scene_property_value.GetPropertyValue(zvsEntityControl.zvsContext, scene.id, "GLOBALHOTKEY");
-
-                    if (!string.IsNullOrEmpty(sceneHotKey))
+                    foreach (scene scene in db.scenes)
                     {
-                        if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                        string sceneHotKey = scene_property_value.GetPropertyValue(db, scene.id, "GLOBALHOTKEY");
+
+                        if (!string.IsNullOrEmpty(sceneHotKey))
                         {
-                            string result = scene.RunScene();
-                            WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                            if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                            {
+                                string result = scene.RunScene();
+                                WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                            }
                         }
                     }
                 }

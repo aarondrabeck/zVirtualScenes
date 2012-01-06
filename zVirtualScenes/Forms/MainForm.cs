@@ -21,17 +21,11 @@ using zVirtualScenesApplication.Scripting;
 namespace zVirtualScenesApplication
 {
     public partial class MainForm : Form
-    {
-       
+    {            
         public string ProgramName = zvsEntityControl.zvsNameAndVersion;
-        private IBindingList deviceList;
-        private ObjectQuery<device> deviceListQuery;
-        private IBindingList sceneList;
-        private ObjectQuery<scene> sceneQuery1;
-        private IBindingList sceneCMDsList;
-        private IBindingList taskList;
 
-        private IBindingList triggerList;
+        //Save tasks in memory for performance reasons.
+        List<scheduled_tasks> task_list;   
 
         //Forms
         private GroupEditor grpEditorForm;
@@ -40,13 +34,11 @@ namespace zVirtualScenesApplication
 
         //Delegates
         public delegate void anonymousEventDelegate(object sender, EventArgs e);
+        public delegate void anonymousStringDelegate(object sender, String s);
         public delegate void anonymousDelegate();
 
         //CORE OBJECTS
         private BindingList<LogItem> _masterlog = new BindingList<LogItem>();
-
-        //TODO: Make an object and finish events
-        //private DataTable _masterEvents;
 
         // Plugin Stuff
         public PluginManager pm;
@@ -63,11 +55,7 @@ namespace zVirtualScenesApplication
         public MainForm()
         {
             InitializeComponent();
-
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(HandlerMethod);
-            
-            zvsEntityControl.zvsContext.Connection.Open();
-            
+            //AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(HandlerMethod);
 
             //Load form size
             GeometryFromString(Properties.Settings.Default.WindowGeometry, this);
@@ -85,8 +73,14 @@ namespace zVirtualScenesApplication
             zvsEntityControl.SceneRunStartedEvent += new zvsEntityControl.SceneRunStartedEventHandler(zvsEntityControl_SceneRunStartedEvent);
             zvsEntityControl.SceneRunCompleteEvent += new zvsEntityControl.SceneRunCompleteEventHandler(zvsEntityControl_SceneRunCompleteEvent);
             device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-            zvsEntityControl.DeviceAddedEvent += new zvsEntityControl.DeviceAddedEventHandler(zvsEntityControl_DeviceAddedEvent);
+            device_values.DeviceValueAddedEvent += new device_values.DeviceValueAddedEventHandler(device_values_DeviceValueAddedEvent);
+            zvsEntityControl.DeviceModified += new zvsEntityControl.DeviceModifiedEventHandler(zvsEntityControl_DeviceModified);
+            device.Added += new device.DeviceAddedEventHandler(device_Added);
+            zvsEntityControl.ScheduledTaskModified += new zvsEntityControl.ScheduledTaskModifiedEventHandler(zvsEntityControl_ScheduledTaskModified);
+            zvsEntityControl.TriggerModified += new zvsEntityControl.TriggerModifiedEventHandler(zvsEntityControl_TriggerModified);
+            zvsEntityControl.SceneModified += new zvsEntityControl.SceneModifiedEventHandler(zvsEntityControl_SceneModified);
         }
+                   
 
         private void zVirtualScenes_Load(object sender, EventArgs e)
         {            
@@ -95,56 +89,37 @@ namespace zVirtualScenesApplication
             dataListViewLog.DataSource = _masterlog;
             Logger.WriteToLog(Urgency.INFO, "STARTED", "MainForm");
 
-            pm = new PluginManager();          
-            
-            //Bind data to GUI elements
-            deviceListQuery = zvsEntityControl.zvsContext.devices;
-            deviceListQuery.MergeOption = MergeOption.AppendOnly;
-            
-            deviceList = ((IListSource)deviceListQuery).GetList() as IBindingList;
-            dataListViewDevices.DataSource = deviceList;
-            dataListViewDeviceSmallList.DataSource = deviceList;
-          
-            //Scenes            
-            sceneQuery1 = zvsEntityControl.zvsContext.scenes;
-            sceneQuery1.MergeOption = MergeOption.AppendOnly;
-            sceneList = ((IListSource)sceneQuery1).GetList() as IBindingList;
-            dataListViewScenes.DataSource = sceneList;
+            pm = new PluginManager();
 
-            //SORT
-            dataListViewScenes.Sort(this.SceneSortCol, SortOrder.Ascending);
+            //Populate Object List Views 
+            SyncdataListViewDevices();
+            SyncdataListViewDeviceSmallList();
+            SyncdataListTriggers();
 
-            // Triggers
-            ObjectQuery<device_value_triggers> triggers = zvsEntityControl.zvsContext.device_value_triggers;
-            triggerList = ((IListSource)triggers).GetList() as IBindingList;
-            dataListTriggers.DataSource = triggerList;
-
+            #region Scenes
+            SyncdataListViewScenes();
             //Scenes (allow rearrage but not drag and drop from other sources)
-            dataListViewScenes.DropSink = new SceneDropSink();            
-            if(dataListViewScenes.Items.Count >0)
+            dataListViewScenes.DropSink = new SceneDropSink();
+            if (dataListViewScenes.Items.Count > 0)
                 dataListViewScenes.SelectedIndex = 0;
-
             // Scene Commands       
-            dataListViewSceneCMDs.DropSink = new SceneCommandDropSink();          
+            dataListViewSceneCMDs.DropSink = new SceneCommandDropSink();
+           
+            #endregion
 
             #region Task Scheduler
+            SyncScheduledTaskList(); 
+            comboBox_FrequencyTask.DataSource = Enum.GetNames(typeof(scheduled_tasks.frequencys));                      
 
-            //Load Tasks            
-            ObjectQuery<scheduled_tasks> taskQuery1 = zvsEntityControl.zvsContext.scheduled_tasks;
-            taskList = ((IListSource)taskQuery1).GetList() as IBindingList;
-            dataListTasks.DataSource = taskList;
-
-            comboBox_FrequencyTask.DataSource = Enum.GetNames(typeof(scheduled_tasks.frequencys));       
-            comboBox_ActionsTask.DataSource = sceneList;
-            comboBox_ActionsTask.DisplayMember = "friendly_name";
-
-            //Add default timer item if list is empty
-            if (taskList.Count < 1)
+            //Add default task item if list is empty
+            if (dataListTasks.Items.Count < 1)
                 AddNewTask();
             else
                 dataListTasks.SelectedIndex = 0;
-            #endregion           
-        }        
+
+            comboBox_ActionsTask.DisplayMember = "friendly_name";
+            #endregion            
+        }
 
         private void zVirtualScenes_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -155,27 +130,86 @@ namespace zVirtualScenesApplication
 
             Logger.SaveLogToFile();  
             Application.Exit();
-        }
+        }              
 
-        #region Subcribed API Events
-
-        void zvsEntityControl_DeviceAddedEvent(object sender, EventArgs e)
+        private void SyncdataListViewDeviceSmallList()
         {
-            if (this.InvokeRequired)
-                this.Invoke(new anonymousEventDelegate(zvsEntityControl_DeviceAddedEvent), new object[] { sender, e });
-            else
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                //REFRESH THE LIST SEE WE CAN ACTUALLY SEE THE NEW DEVICE
-                deviceList = ((IListSource)deviceListQuery).GetList() as IBindingList;
-                dataListViewDevices.DataSource = deviceList;
+                int s_index = dataListViewDeviceSmallList.SelectedIndex;
+                dataListViewDeviceSmallList.DataSource = db.devices.OfType<device>().Execute(MergeOption.AppendOnly);
+
+
+                if (s_index > 0)
+                {
+                    try
+                    {
+                        dataListViewDeviceSmallList.SelectedIndex = s_index;
+                    }
+                    catch { }
+                }
+            }
+        }
+        
+        private void SyncdataListViewDevices()
+        {
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                int s_index = dataListViewDevices.SelectedIndex;
+                dataListViewDevices.DataSource = db.devices.OfType<device>().Execute(MergeOption.AppendOnly);
+                dataListViewDevices.SelectedIndex = s_index;
 
                 int index = dataListViewDevices.SelectedIndex;
                 if (index > 0)
                     dataListViewDevices.EnsureVisible(index);
-
-                dataListViewDeviceSmallList.DataSource = deviceList;                
             }
-        }              
+
+            Console.WriteLine("------>>>>>>> UpdatedataListViewDevices <<<<<<<<<<<---------------------");
+        }
+
+        #region Subcribed API Events
+
+        void zvsEntityControl_DeviceModified(object sender, string PropertyModified)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new anonymousStringDelegate(zvsEntityControl_DeviceModified), new object[] { sender, PropertyModified });
+            else
+            {
+                if (PropertyModified.Equals("friendly_name") ||
+                    PropertyModified.Equals("group") ||
+                    PropertyModified.Equals("last_heard_from")||
+                    PropertyModified.Equals("removed"))
+                {                    
+                    SyncdataListViewDevices();
+                }
+
+                if (PropertyModified.Equals("friendly_name") ||
+                    PropertyModified.Equals("removed"))
+                    SyncdataListViewDeviceSmallList();
+            }
+        }
+
+        void device_Added(object sender, EventArgs e)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new anonymousEventDelegate(device_Added), new object[] { sender, e });
+            else
+            {
+                SyncdataListViewDeviceSmallList();
+                SyncdataListViewDevices();
+            }
+        }        
+ 
+        void device_FriendlyNameChanged(object sender, EventArgs e)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new anonymousEventDelegate(device_FriendlyNameChanged), new object[] { sender, e });
+            else
+            {
+                SyncdataListViewDeviceSmallList();
+                SyncdataListViewDevices();
+            }
+        }
 
         void Logger_LogItemPostAdd(object sender, EventArgs e)
         {
@@ -187,47 +221,20 @@ namespace zVirtualScenesApplication
                 _masterlog.Insert(0, logitem);
                 toolStripStatusLabel1.Text = logitem.Source + " - " + logitem.Description.Replace(Environment.NewLine, " ");
             }
-        }
+        }       
 
-        void zvsEntityControl_SceneRunStartedEvent(scene s, string result)
+        void device_values_DeviceValueAddedEvent(object sender, EventArgs e)
         {
             if (this.InvokeRequired)
-                this.Invoke(new zvsEntityControl.SceneRunStartedEventHandler(zvsEntityControl_SceneRunStartedEvent), new object[] { s, result });
+                this.Invoke(new anonymousEventDelegate(device_values_DeviceValueAddedEvent), new object[] { sender, e });
             else
             {
-                if (s != null)
+                device_values dv = (device_values)sender;
+                //GUI UPDATING
+                if (dv.label_name == "Basic" || dv.label_name == "Temperature")
                 {
-                    Logger.WriteToLog(Urgency.INFO, result, "EVENT");
+                    SyncdataListViewDevices();
                 }
-            }
-        }
-
-        void zvsEntityControl_SceneRunCompleteEvent(long scene_id, int ErrorCount)
-        {
-            if (this.InvokeRequired)
-                this.Invoke(new zvsEntityControl.SceneRunCompleteEventHandler(zvsEntityControl_SceneRunCompleteEvent), new object[] { scene_id, ErrorCount });
-            else
-            {
-                using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                {
-                    scene _scene = context.scenes.FirstOrDefault(s => s.id == scene_id);
-                    if (_scene != null)
-                    {
-                        Logger.WriteToLog(Urgency.INFO, "Scene '" + _scene.friendly_name + "' has completed with " + ErrorCount + " errors.", "EVENT");
-                    }
-                    else
-                        Logger.WriteToLog(Urgency.INFO, "Scene #'" + scene_id + "' has completed with " + ErrorCount + " errors.", "EVENT");                    
-
-                }
-
-                //Since the scene wasn't updated on the the same context, refresh GUI's context. 
-                zvsEntityControl.zvsContext.Refresh(RefreshMode.StoreWins, zvsEntityControl.zvsContext.scenes);
-                //sceneList = ((IListSource)sceneQuery1).GetList() as IBindingList;
-                //dataListViewScenes.DataSource = sceneList;
-
-                //int index = dataListViewScenes.SelectedIndex;
-                //if (index > 0)
-                //    dataListViewScenes.EnsureVisible(index);
             }
         }
 
@@ -237,20 +244,34 @@ namespace zVirtualScenesApplication
                 this.Invoke(new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent), new object[] { sender, PreviousValue });
             else
             {
+
                 device_values dv = (device_values)sender;
+                //GUI UPDATING
+                if (dv.label_name == "Basic" || dv.label_name == "Temperature")
+                {
+                    SyncdataListViewDevices();
+                }
+
                 if (dv != null)
                 {
-                    string device_name;
-                    if (String.IsNullOrEmpty(dv.device.friendly_name))
-                        device_name = "Device #" + dv.device_id;
-                    else
-                        device_name = dv.device.friendly_name;
+                    string device_name = "Unknown";
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    {
+                        device d = db.devices.FirstOrDefault(o => o.id == dv.device_id);
+                        if (d != null)
+                        {
+                            if (String.IsNullOrEmpty(d.friendly_name))
+                                device_name = "Device #" + dv.device_id;
+                            else
+                                device_name = d.friendly_name;
+                        }
+                    }
 
                     if (!String.IsNullOrEmpty(PreviousValue))
-                        Logger.WriteToLog(Urgency.INFO, device_name + " " + dv.label_name + " changed to " + dv.value + " from " + PreviousValue + ".", "EVENT");
+                        Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed from {2} to {3}.", device_name, dv.label_name, PreviousValue, dv.value), "EVENT");
                     else
-                        Logger.WriteToLog(Urgency.INFO, device_name + " " + dv.label_name + " changed to " + dv.value + ".", "EVENT"); 
-          
+                        Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed to {2}.", device_name, dv.label_name, dv.value), "EVENT");
+
                     // Check to see if previous value == new value. If so then the value didn't actually change!
                     if (PreviousValue != dv.value)
                     {
@@ -323,6 +344,7 @@ namespace zVirtualScenesApplication
                             }
                         }
                     }
+
                 }
             }
         }
@@ -361,7 +383,582 @@ namespace zVirtualScenesApplication
         }
 
         #endregion
-      
+
+
+
+
+
+
+        #region Scenes
+
+        private void SyncdataListViewScenes()
+        {
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                int s_index = dataListViewScenes.SelectedIndex;
+                //scene list in task scheduler and main scene window
+                dataListViewScenes.DataSource = comboBox_ActionsTask.DataSource = db.scenes.OrderBy(s=>s.sort_order);
+                dataListViewScenes.SelectedIndex = s_index;
+
+                int index = dataListViewScenes.SelectedIndex;
+                if (index > 0)
+                    dataListViewScenes.EnsureVisible(index);
+            }
+
+            Console.WriteLine("------>>>>>>> SyncdataListViewScenes <<<<<<<<<<<---------------------");
+        }
+
+        private void dataListViewScenes_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            scene selectedscene = (scene)dataListViewScenes.SelectedObject;
+            if (selectedscene != null)
+            {
+                dataListViewSceneCMDs.Visible = true;
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    dataListViewSceneCMDs.DataSource = db.scene_commands.Where(s => s.scene_id == selectedscene.id).OrderBy(s => s.sort_order);
+                }
+                lbl_sceneActions.Text = "Scene " + selectedscene.id.ToString() + " '" + selectedscene.friendly_name + "' Actions";
+            }
+            else
+            {
+                dataListViewSceneCMDs.Visible = false;
+                lbl_sceneActions.Text = "No Scene Selected";
+            }
+        }
+
+        public delegate void zvsEntityControl_SceneModifiedDelegate(object sender, long? SceneID);
+        void zvsEntityControl_SceneModified(object sender, long? SceneID)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new zvsEntityControl_SceneModifiedDelegate(zvsEntityControl_SceneModified), new object[] { sender, SceneID });
+            else
+            {
+                SyncdataListViewScenes();
+            }
+        }
+
+        void zvsEntityControl_SceneRunStartedEvent(scene s, string result)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new zvsEntityControl.SceneRunStartedEventHandler(zvsEntityControl_SceneRunStartedEvent), new object[] { s, result });
+            else
+            {
+                if (s != null)
+                {
+                    Logger.WriteToLog(Urgency.INFO, result, "EVENT");
+                    SyncdataListViewScenes();
+                }
+            }
+        }
+
+        void zvsEntityControl_SceneRunCompleteEvent(long scene_id, int ErrorCount)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new zvsEntityControl.SceneRunCompleteEventHandler(zvsEntityControl_SceneRunCompleteEvent), new object[] { scene_id, ErrorCount });
+            else
+            {
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene _scene = db.scenes.FirstOrDefault(s => s.id == scene_id);
+                    if (_scene != null)
+                    {
+                        Logger.WriteToLog(Urgency.INFO, "Scene '" + _scene.friendly_name + "' has completed with " + ErrorCount + " errors.", "EVENT");
+                    }
+                    else
+                        Logger.WriteToLog(Urgency.INFO, "Scene #'" + scene_id + "' has completed with " + ErrorCount + " errors.", "EVENT");
+                   
+                }
+                SyncdataListViewScenes();
+            }
+        }
+        
+        #region Scene ObjectDataView Handeling
+
+        private void dataListViewScenes_CellRightClick_1(object sender, CellRightClickEventArgs e)
+        {
+            if (e.Item == null)
+                e.MenuStrip = contextMenuStripScenesNull;
+            else
+                e.MenuStrip = contextMenuStripScenes;
+        }
+               
+        private void duplicateSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {            
+            scene selected_scene = (scene)dataListViewScenes.SelectedObject;
+            if (selected_scene != null)
+            {
+                scene new_scene = new scene { friendly_name = selected_scene.friendly_name + " Copy", sort_order = dataListViewScenes.GetItemCount() + 1 };
+
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    selected_scene = db.scenes.FirstOrDefault(s => s.id == selected_scene.id);
+                    if (selected_scene != null)
+                    {
+                        foreach (scene_commands sc in selected_scene.scene_commands)
+                        {
+                            new_scene.scene_commands.Add(new scene_commands
+                            {
+                                arg = sc.arg,
+                                command_id = sc.command_id,
+                                command_type_id = sc.command_type_id,
+                                sort_order = sc.sort_order,
+                                device_id = sc.device_id
+                            });
+                        }
+                    }
+                
+                    db.scenes.AddObject(new_scene);
+                    db.SaveChanges();
+                }
+                zvsEntityControl.CallSceneModified(this, selected_scene.id);
+            }            
+        }
+
+        private void deleteSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            deleteScene();
+        }
+
+        private void dataListViewScenes_KeyDown_1(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                deleteScene();
+            }
+        }
+
+        private void deleteScene()
+        {
+            scene selected_scene = (scene)dataListViewScenes.SelectedObject;
+            if (selected_scene != null)
+            {
+                if (MessageBox.Show("Are you sure you want to delete this scene?", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+                {
+                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    {
+                        selected_scene = db.scenes.FirstOrDefault(s => s.id == selected_scene.id);
+                        if (selected_scene != null)
+                        {
+                            db.scenes.DeleteObject(selected_scene);
+                            db.SaveChanges();
+
+                            foreach (scene s in db.scenes)
+                            {
+                                s.sort_order = dataListViewScenes.IndexOf(s) + 1;
+                            }
+                            db.SaveChanges();
+                        }
+                    }
+                    zvsEntityControl.CallSceneModified(this, null);
+                }
+            }
+            else
+                MessageBox.Show("You must have at least one scene.", ProgramName);
+        }
+
+        private void addSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AddScene();
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            AddScene();
+        }
+
+        private void AddScene()
+        {
+            scene new_s = new scene { friendly_name = "New Scene", sort_order = dataListViewScenes.GetItemCount() + 1 };
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                db.scenes.AddObject(new_s);
+                db.SaveChanges();
+
+                //todo: might case concurency issues
+                zvsEntityControl.CallSceneModified(this, new_s.id);
+            }            
+        }
+
+        public class SceneDropSink : SimpleDropSink
+        {
+            public SceneDropSink()
+            {
+                this.CanDropBetween = true;
+                this.CanDropOnBackground = false;
+                this.CanDropOnItem = false;
+            }
+
+            protected override void OnModelCanDrop(ModelDropEventArgs args)
+            {
+                base.OnModelCanDrop(args);
+
+                if (args.Handled)
+                    return;
+
+                args.Effect = DragDropEffects.Move;
+
+                if (args.SourceListView != this.ListView)
+                {
+                    args.Effect = DragDropEffects.None;
+                    args.DropTargetLocation = DropTargetLocation.None;
+                    args.InfoMessage = "Cannot drop here.";
+                }
+
+                // If we are rearranging a list, don't allow drops on the background
+                if (args.DropTargetLocation == DropTargetLocation.Background && args.SourceListView == this.ListView)
+                {
+                    args.Effect = DragDropEffects.None;
+                    args.DropTargetLocation = DropTargetLocation.None;
+                }
+            }
+
+            protected override void OnModelDropped(ModelDropEventArgs args)
+            {
+                base.OnModelDropped(args);
+            }
+        }
+
+        private void dataListViewScenes_ModelCanDrop_1(object sender, ModelDropEventArgs e)
+        {
+            e.Effect = DragDropEffects.None;
+            e.InfoMessage = "Can not drop this here.";
+
+            if (e.SourceModels[0].GetType().Equals(typeof(scene)) && e.TargetModel != null && e.TargetModel.GetType().Equals(typeof(scene)))
+            {
+                e.Effect = DragDropEffects.Move;
+                e.InfoMessage = "Rearrage Order";
+            }
+            
+        }
+
+        private void dataListViewScenes_ModelDropped_1(object sender, ModelDropEventArgs e)
+        {
+            int TargetIndex = 0;
+
+            //Handle if dropped into empty Action box
+            if (e.TargetModel == null)
+                TargetIndex = 0;
+            else
+                TargetIndex = e.DropTargetIndex;
+
+            if (e.SourceModels[0].GetType().Equals(typeof(scene)))
+            {
+                switch (e.DropTargetLocation)
+                {
+                    case DropTargetLocation.AboveItem:
+                        //offset = 0 
+                        dataListViewScenes.MoveObjects(TargetIndex, e.SourceModels);
+                        dataListViewScenes.SelectedObjects = e.SourceModels;
+                        break;
+                    case DropTargetLocation.BelowItem:
+                        //offset = 1 
+                        dataListViewScenes.MoveObjects(TargetIndex +1, e.SourceModels);
+                        dataListViewScenes.SelectedObjects = e.SourceModels;
+                        break;
+                }
+            }
+
+            //SAve the sort order to the DB
+            foreach (scene scene_in_list in dataListViewScenes.Objects)
+            {
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene scene = db.scenes.FirstOrDefault(s => s.id == scene_in_list.id);
+                    if (scene != null)
+                    {
+                        scene.sort_order = dataListViewScenes.IndexOf(scene_in_list); 
+                    }
+                    db.SaveChanges();
+                }
+            }          
+        }
+
+        private void OpenScenePropertiesWindow()
+        {
+            scene selected_scene = (scene)dataListViewScenes.SelectedObject;
+            if (selected_scene != null)
+            {
+                formSceneProperties = new formPropertiesScene(selected_scene.id);
+                formSceneProperties.ShowDialog();
+            }
+        }
+
+        private void dataListViewScenes_DoubleClick_1(object sender, EventArgs e)
+        {
+            OpenScenePropertiesWindow();
+        }
+
+        private void btn_EditScene_Click(object sender, EventArgs e)
+        {
+            OpenScenePropertiesWindow();
+        }
+
+        private void propertiesToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            OpenScenePropertiesWindow();
+        }
+
+        private void editSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenScenePropertiesWindow();
+        }
+
+        private void runSceneToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            scene selected_scene = (scene)dataListViewScenes.SelectedObject;
+            if (selected_scene != null)
+            {
+                Logger.WriteToLog(Urgency.INFO, selected_scene.RunScene(), "MAIN");
+            }
+            else
+                MessageBox.Show("Please select a scene.", ProgramName);
+        }
+
+        #endregion
+
+        #region Scene Command Handling
+
+        public class SceneCommandDropSink : SimpleDropSink
+        {
+            public SceneCommandDropSink()
+            {
+                this.CanDropBetween = true;
+                this.CanDropOnBackground = true;
+                this.CanDropOnItem = false;
+            }
+
+            protected override void OnModelCanDrop(ModelDropEventArgs args)
+            {
+                base.OnModelCanDrop(args);
+
+                if (args.Handled)
+                    return;
+
+                args.Effect = DragDropEffects.Move;
+
+                // If we are rearranging a list, don't allow drops on the background
+                if (args.DropTargetLocation == DropTargetLocation.Background && args.SourceListView == this.ListView)
+                {
+                    args.Effect = DragDropEffects.None;
+                    args.DropTargetLocation = DropTargetLocation.None;
+                }
+            }
+
+            protected override void OnModelDropped(ModelDropEventArgs args)
+            {
+                base.OnModelDropped(args);
+            }
+        }
+
+        //scene commands 
+        private void dataListViewSceneCMDs_CellRightClick(object sender, CellRightClickEventArgs e)
+        {
+            if (e.Item != null)
+                e.MenuStrip = cmsSceneCMD;
+        }
+
+        private void deleteCommandToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to delete the selected scene command(s)?",
+                                zvsEntityControl.zvsNameAndVersion,
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+            {
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    foreach (scene_commands selected_sceneCMD in dataListViewSceneCMDs.SelectedObjects)
+                    {
+                        scene_commands cmd = db.scene_commands.FirstOrDefault(c => c.id == selected_sceneCMD.id);
+                        if (cmd != null)
+                            db.scene_commands.DeleteObject(cmd);
+                    }
+
+                    db.SaveChanges();
+
+                    zvsEntityControl.CallSceneModified(this, null);
+                }
+            }
+        }
+
+        private void editCommandToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (scene_commands cmd in dataListViewSceneCMDs.SelectedObjects)
+            {
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene_commands selected_sceneCMD = db.scene_commands.FirstOrDefault(c => c.id == cmd.id);
+                    if (selected_sceneCMD != null)
+                    {
+                        if (selected_sceneCMD.scene.is_running)
+                        {
+                            MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                            return;
+                        }
+
+                        switch ((command_types)selected_sceneCMD.command_type_id)
+                        {
+                            case command_types.builtin:
+                                AddEditSceneBuiltinCMD b_cmd_editForm = new AddEditSceneBuiltinCMD(selected_sceneCMD.id);
+                                b_cmd_editForm.ShowDialog();
+                                break;
+                            case command_types.device_command:
+                            case command_types.device_type_command:
+                                {                                    
+                                    AddEditSceneDeviceCMD editCMDform = new AddEditSceneDeviceCMD(selected_sceneCMD.id, selected_sceneCMD.device_id.Value);
+                                    editCMDform.ShowDialog();                                    
+                                    break;
+                                }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void dataListViewSceneCMDs_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                deleteCommandToolStripMenuItem_Click(this, new EventArgs());
+            }
+        }
+
+        private void dataListViewSceneCMDs_DoubleClick(object sender, EventArgs e)
+        {
+            editCommandToolStripMenuItem_Click(this, new EventArgs());
+        }
+
+        private void dataListViewSceneCMDs_ModelCanDrop(object sender, ModelDropEventArgs e)
+        {
+            if (e.SourceModels[0].GetType().Equals(typeof(device)))
+            {
+                e.Effect = DragDropEffects.Copy;
+                e.InfoMessage = "Create new action for this device";
+            }
+            else if (e.SourceModels[0].GetType().Equals(typeof(scene_commands)))
+            {
+                e.Effect = DragDropEffects.Move;
+                e.InfoMessage = "Rearrage Order";
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+                e.InfoMessage = "Can not drop this here.";
+            }
+        }
+
+        private void btnAddBltInCMD_Click(object sender, EventArgs e)
+        {
+            if (dataListViewScenes.SelectedIndex != -1)
+            {
+                scene selected_scene = (scene)dataListViewScenes.SelectedObject;
+                AddEditSceneBuiltinCMD addCMDform = new AddEditSceneBuiltinCMD(null, selected_scene.id);
+                addCMDform.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Please select a scene!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }
+
+        }
+
+        private void dataListViewSceneCMDs_ModelDropped(object sender, ModelDropEventArgs e)
+        {
+            int TargetIndex = 0;
+
+            //Handle if dropped into empty Action box
+            if (e.TargetModel == null)
+                TargetIndex = 0;
+            else
+                TargetIndex = e.DropTargetIndex;
+
+            // Handle Device Drop
+            if (e.SourceModels[0].GetType().Equals(typeof(device)))
+            {
+                scene scene = (scene)dataListViewScenes.SelectedObject;
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene selected_scene = db.scenes.FirstOrDefault(c => c.id == scene.id);
+                    if (selected_scene != null)
+                    {
+                        if (selected_scene.is_running)
+                        {
+                            MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                            return;
+                        }
+
+                        foreach (device selected_device in e.SourceModels)
+                        {
+                            if (selected_device != null)
+                            {
+                                int pos = TargetIndex;
+                                switch (e.DropTargetLocation)
+                                {
+                                    case DropTargetLocation.BelowItem:
+                                        pos += 1; 
+                                        break;
+                                }
+
+                                AddEditSceneDeviceCMD addCMDform = new AddEditSceneDeviceCMD(null, selected_device.id, selected_scene.id, pos);
+                                addCMDform.ShowDialog();
+
+                            }
+                        }
+                    }
+                }
+            }
+            else if (e.SourceModels[0].GetType().Equals(typeof(scene_commands)))
+            {
+                //Rearrage Actions
+                scene scene = (scene)dataListViewScenes.SelectedObject;
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene selected_scene = db.scenes.FirstOrDefault(c => c.id == scene.id);
+                    if (selected_scene != null)
+                    {
+                        if (selected_scene.is_running)
+                        {
+                            MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
+                            return;
+                        }
+
+                        switch (e.DropTargetLocation)
+                        {
+                            case DropTargetLocation.AboveItem:
+                                //offset = 0 
+                                dataListViewSceneCMDs.MoveObjects(TargetIndex, e.SourceModels);
+                                dataListViewSceneCMDs.SelectedObjects = e.SourceModels;
+                                break;
+                            case DropTargetLocation.BelowItem:
+                                //offset = 1 
+                                dataListViewSceneCMDs.MoveObjects(TargetIndex + 1, e.SourceModels);
+                                dataListViewSceneCMDs.SelectedObjects = e.SourceModels;
+                                break;
+                        }
+
+                        //SAve the sort order to the DB
+                        foreach (scene_commands cmd in dataListViewSceneCMDs.Objects)
+                        {
+                            scene_commands scene_cmd = db.scene_commands.FirstOrDefault(s => s.id == cmd.id);
+                            if (scene_cmd != null)
+                            {
+                                scene_cmd.sort_order = dataListViewSceneCMDs.IndexOf(cmd);
+                            }
+                            db.SaveChanges();
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+        #endregion
+
+
+
+
+
+
         #region Saving and Resorting MAIN FORM Sizing
 
         public static void GeometryFromString(string thisWindowGeometry, Form formIn)
@@ -440,487 +1037,8 @@ namespace zVirtualScenesApplication
         }
 
         #endregion     
-                       
-        #region GUI Events
 
-        #region Scene List Box Handeling     
-   
-        private void dataListViewScenes_CellRightClick_1(object sender, CellRightClickEventArgs e)
-        {
-            if (e.Item == null)
-                e.MenuStrip = contextMenuStripScenesNull;
-            else
-                e.MenuStrip = contextMenuStripScenes;
-        }
-
-        private void dataListViewScenes_SelectedIndexChanged_1(object sender, EventArgs e)
-        {
-            scene selectedscene = (scene)dataListViewScenes.SelectedObject;
-            if(selectedscene != null)
-            {
-                dataListViewSceneCMDs.Visible = true;                
-                sceneCMDsList = ((IListSource)selectedscene.scene_commands).GetList() as IBindingList;
-                dataListViewSceneCMDs.DataSource = sceneCMDsList;
-                dataListViewSceneCMDs.Sort(this.SceneCMDOrderCol, SortOrder.Ascending);
-                lbl_sceneActions.Text = "Scene " + selectedscene.id.ToString() + " '" + selectedscene.friendly_name + "' Actions";
-            }
-            else
-            {
-                dataListViewSceneCMDs.Visible = false;
-                lbl_sceneActions.Text = "No Scene Selected";
-            }
-        }
-
-        private void duplicateSceneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (dataListViewScenes.SelectedIndex != -1)
-            {
-                scene selected_scene = (scene)dataListViewScenes.SelectedObject;
-
-                if (selected_scene != null)
-                {
-                    scene new_scene = new scene { friendly_name = selected_scene.friendly_name + " Copy", sort_order = dataListViewScenes.GetItemCount() + 1 };
-                        
-                    foreach(scene_commands sc in selected_scene.scene_commands)
-                    {
-                        new_scene.scene_commands.Add(new scene_commands { arg = sc.arg,
-                                                                          command_id = sc.command_id,
-                                                                          command_type_id = sc.command_type_id,
-                                                                          sort_order = sc.sort_order,
-                                                                          device_id = sc.device_id});                                                                           
-
-                    }
-                    sceneList.Add(new_scene);
-                    zvsEntityControl.zvsContext.SaveChanges();
-                }
-            }
-        }
-
-        private void deleteSceneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            deleteScene();
-        }
-
-        private void dataListViewScenes_KeyDown_1(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-            {
-                deleteScene();
-            }
-        }
-
-        private void deleteScene()
-        {
-            scene selected_scene = (scene)dataListViewScenes.SelectedObject;
-
-            if (selected_scene != null)
-            {
-                if (MessageBox.Show("Are you sure you want to delete this scene?", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
-                {
-                    zvsEntityControl.zvsContext.scenes.DeleteObject(selected_scene);
-                                           
-                    zvsEntityControl.zvsContext.SaveChanges();
-
-                    foreach (scene s in sceneList)
-                    {
-                        s.sort_order = sceneList.IndexOf(s) + 1;     
-                    }
-                    zvsEntityControl.zvsContext.SaveChanges();
-                }
-            }           
-            else
-                MessageBox.Show("You must have at least one scene.", ProgramName);
-        }
-
-        private void addSceneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            AddScene();
-        }
-
-        private void toolStripMenuItem4_Click(object sender, EventArgs e)
-        {
-            AddScene();
-        }
-
-        private void AddScene()
-        {
-            scene new_s = new scene { friendly_name = "New Scene", sort_order = dataListViewScenes.GetItemCount() + 1 };
-            sceneList.Add(new_s);
-            dataListViewScenes.SelectedObject = new_s;
-            zvsEntityControl.zvsContext.SaveChanges();
-        }
-
-        public class SceneDropSink : SimpleDropSink
-        {
-            public SceneDropSink()
-            {
-                this.CanDropBetween = false;
-                this.CanDropOnBackground = false;
-                this.CanDropOnItem = true;
-            }
-
-            protected override void OnModelCanDrop(ModelDropEventArgs args)
-            {
-                base.OnModelCanDrop(args);
-
-                if (args.Handled)
-                    return;
-
-                args.Effect = DragDropEffects.Move;
-
-                if (args.SourceListView != this.ListView)
-                {
-                    args.Effect = DragDropEffects.None;
-                    args.DropTargetLocation = DropTargetLocation.None;
-                    args.InfoMessage = "Cannot drop here.";
-                }
-
-                // If we are rearranging a list, don't allow drops on the background
-                if (args.DropTargetLocation == DropTargetLocation.Background && args.SourceListView == this.ListView)
-                {
-                    args.Effect = DragDropEffects.None;
-                    args.DropTargetLocation = DropTargetLocation.None;
-                }
-            }
-
-            protected override void OnModelDropped(ModelDropEventArgs args)
-            {
-                base.OnModelDropped(args);
-            }
-        }
-
-        private void dataListViewScenes_ModelCanDrop_1(object sender, ModelDropEventArgs e)
-        {
-            if (e.SourceModels[0].GetType().Equals(typeof(scene)))
-            {                   
-                e.Effect = DragDropEffects.Move;
-                e.InfoMessage = "Rearrage Order";
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-                e.InfoMessage = "Can not drop this here.";
-            }
-        }
-
-        private void dataListViewScenes_ModelDropped_1(object sender, ModelDropEventArgs e)
-        {
-            int TargetIndex = 0;
-
-            //Handle if dropped into empty Action box
-            if (e.TargetModel == null)
-                TargetIndex = 0;
-            else
-                TargetIndex = e.DropTargetIndex;
-
-            //Handle Device Drop
-            //REARRAGE
-            if (e.SourceModels[0].GetType().Equals(typeof(scene)))
-            {
-                scene SourceScene = (scene)e.SourceModels[0];
-                int SourceIndex = dataListViewScenes.IndexOf(SourceScene);
-
-                if (SourceIndex != TargetIndex)
-                {
-                    SourceScene.sort_order = TargetIndex;
-
-                    foreach (scene s in sceneList)
-                    {
-                        //moving up
-                        if (SourceIndex > TargetIndex)
-                        {
-                            if (dataListViewScenes.IndexOf(s) >= TargetIndex && dataListViewScenes.IndexOf(s) <= SourceIndex && s != SourceScene)
-                                s.sort_order++;
-                        }
-                        //moving down
-                        else
-                        {
-                            if (dataListViewScenes.IndexOf(s) > SourceIndex && dataListViewScenes.IndexOf(s) <= TargetIndex && s != SourceScene)
-                                s.sort_order--;
-                        }
-                    }
-                }
-
-                dataListViewScenes.SelectedObject = SourceScene;                
-                zvsEntityControl.zvsContext.SaveChanges();
-                e.RefreshObjects();
-                dataListViewScenes.Sort(this.SceneSortCol, SortOrder.Ascending);
-            }           
-        }
-
-        private void OpenScenePropertiesWindow()
-        {
-            if (dataListViewScenes.SelectedIndex != -1)
-            {
-                formSceneProperties = new formPropertiesScene((scene)dataListViewScenes.SelectedObject);         
-                formSceneProperties.ShowDialog();
-            }
-        }
-
-        private void dataListViewScenes_DoubleClick_1(object sender, EventArgs e)
-        {
-            OpenScenePropertiesWindow();
-        }
-
-        private void btn_EditScene_Click(object sender, EventArgs e)
-        {
-            OpenScenePropertiesWindow();
-        }
-
-        private void propertiesToolStripMenuItem1_Click(object sender, EventArgs e)
-        {
-            OpenScenePropertiesWindow();
-        }
-
-        private void editSceneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            OpenScenePropertiesWindow();
-        }
-        
-        private void runSceneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            scene selectedscene = (scene)dataListViewScenes.SelectedObject;
-
-            if (selectedscene != null)
-            {
-                Logger.WriteToLog(Urgency.INFO, selectedscene.RunScene(), "MAIN");
-            }
-            else
-                MessageBox.Show("Please select a scene.", ProgramName);
-        }
-       
-        #endregion
-
-        #region Scene Command Handling
-
-        public class SceneCommandDropSink : SimpleDropSink
-        {
-            public SceneCommandDropSink()
-            {
-                this.CanDropBetween = false;
-                this.CanDropOnBackground = true;
-                this.CanDropOnItem = true;
-            }
-
-            protected override void OnModelCanDrop(ModelDropEventArgs args)
-            {
-                base.OnModelCanDrop(args);
-
-                if (args.Handled)
-                    return;
-
-                args.Effect = DragDropEffects.Move;
-
-                // If we are rearranging a list, don't allow drops on the background
-                if (args.DropTargetLocation == DropTargetLocation.Background && args.SourceListView == this.ListView)
-                {
-                    args.Effect = DragDropEffects.None;
-                    args.DropTargetLocation = DropTargetLocation.None;
-                }
-            }
-
-            protected override void OnModelDropped(ModelDropEventArgs args)
-            {
-                base.OnModelDropped(args);
-            }
-        }
-
-        //scene commands 
-        private void dataListViewSceneCMDs_CellRightClick(object sender, CellRightClickEventArgs e)
-        {
-            if (e.Item != null)
-                e.MenuStrip = cmsSceneCMD;            
-        }
-
-        private void deleteCommandToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Are you sure you want to delete the selected scene command(s)?",
-                                zvsEntityControl.zvsNameAndVersion,
-                                MessageBoxButtons.YesNo,
-                                MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
-            {
-
-                foreach (scene_commands selected_sceneCMD in dataListViewSceneCMDs.SelectedObjects)                
-                    if (selected_sceneCMD != null)                    
-                        zvsEntityControl.zvsContext.scene_commands.DeleteObject(selected_sceneCMD);
-
-                zvsEntityControl.zvsContext.SaveChanges();
-                
-                foreach (scene_commands sc in sceneCMDsList)                
-                    sc.sort_order = sceneCMDsList.IndexOf(sc);
-                
-               zvsEntityControl.zvsContext.SaveChanges();
-
-               dataListViewSceneCMDs.Sort(this.SceneCMDOrderCol, SortOrder.Ascending);
-            }
-        }     
-
-        private void editCommandToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            foreach (scene_commands selected_sceneCMD in dataListViewSceneCMDs.SelectedObjects)
-            {
-                if (selected_sceneCMD != null)
-                {
-                    if (selected_sceneCMD.scene.is_running)
-                    {
-                        MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
-                        return;
-                    }
-
-                    switch ((command_types)selected_sceneCMD.command_type_id)
-                    {
-                        case command_types.builtin:
-                            AddEditSceneBuiltinCMD b_cmd_editForm = new AddEditSceneBuiltinCMD(selected_sceneCMD);
-                            b_cmd_editForm.ShowDialog();
-                            break;
-                        case command_types.device_command:
-                        case command_types.device_type_command:
-                            {
-                                device d = zvsEntityControl.zvsContext.devices.Single(o => o.id == selected_sceneCMD.device_id);
-                                if (d != null)
-                                {
-                                    AddEditSceneDeviceCMD editCMDform = new AddEditSceneDeviceCMD(d, selected_sceneCMD);
-                                    editCMDform.ShowDialog();
-                                }                            
-                            break;
-                            }
-                    }
-
-
-                }
-            }
-        }               
-
-        private void dataListViewSceneCMDs_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Delete)
-            {
-                deleteCommandToolStripMenuItem_Click(this, new EventArgs());
-            }
-        }
-
-        private void dataListViewSceneCMDs_DoubleClick(object sender, EventArgs e)
-        {
-            editCommandToolStripMenuItem_Click(this, new EventArgs());
-        }
-
-        private void dataListViewSceneCMDs_ModelCanDrop(object sender, ModelDropEventArgs e)
-        {
-            if (e.SourceModels[0].GetType().Equals(typeof(device)))
-            {
-                e.Effect = DragDropEffects.Copy;
-                e.InfoMessage = "Create new action for this device";
-            }
-            else if (e.SourceModels[0].GetType().Equals(typeof(scene_commands)))
-            {
-                e.Effect = DragDropEffects.Move;
-                e.InfoMessage = "Rearrage Order";
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-                e.InfoMessage = "Can not drop this here.";
-            }
-        }
-
-        private void btnAddBltInCMD_Click(object sender, EventArgs e)
-        {
-            if (dataListViewScenes.SelectedIndex != -1)
-            {
-                scene selected_scene = (scene)dataListViewScenes.SelectedObject;
-
-                scene_commands scmd = new scene_commands { scene_id  = selected_scene.id, sort_order = selected_scene.scene_commands.Count()};                
-                AddEditSceneBuiltinCMD addCMDform = new AddEditSceneBuiltinCMD(scmd, sceneCMDsList);
-                addCMDform.ShowDialog();
-            }
-            else
-            {
-                MessageBox.Show("Please select a scene!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-            }
-
-        }
-
-        private void dataListViewSceneCMDs_ModelDropped(object sender, ModelDropEventArgs e)
-        {
-            int TargetIndex = 0;
-
-            //Handle if dropped into empty Action box
-            if (e.TargetModel == null)
-                TargetIndex = 0;
-            else
-                TargetIndex = e.DropTargetIndex;
-
-           // Handle Device Drop
-            if (e.SourceModels[0].GetType().Equals(typeof(device)))
-            {
-                scene selected_scene = (scene)dataListViewScenes.SelectedObject;
-                if (selected_scene != null)
-                {
-                    if (selected_scene.is_running)
-                    {
-                        MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
-                        return;
-                    }
-
-                    foreach (device selected_device in e.SourceModels)
-                    {
-                        if (selected_device != null)
-                        {
-                            scene_commands scmd = new scene_commands { scene_id = selected_scene.id, sort_order = selected_scene.scene_commands.Count()};
-                            AddEditSceneDeviceCMD addCMDform = new AddEditSceneDeviceCMD(selected_device, scmd, sceneCMDsList);
-                            addCMDform.ShowDialog();
-                        }                        
-                    }
-                }      
-            }
-            else if (e.SourceModels[0].GetType().Equals(typeof(scene_commands)))
-            {
-                //Rearrage Actions
-                scene selected_scene = (scene)dataListViewScenes.SelectedObject;
-                if (selected_scene != null)
-                {
-                    //DIE if running.
-                    if (selected_scene.is_running)
-                    {
-                        MessageBox.Show("Cannot modify scene when it is running.", ProgramName);
-                        return;
-                    }
-
-                    scene_commands SourceSceneCMD = (scene_commands)e.SourceModels[0];
-                    int SourceIndex = dataListViewSceneCMDs.IndexOf(SourceSceneCMD);
-
-                    if (SourceIndex != TargetIndex)
-                    {
-                        SourceSceneCMD.sort_order = TargetIndex ;
-
-                        foreach (scene_commands sc in sceneCMDsList)
-                        {
-                            //moving up
-                            if (SourceIndex > TargetIndex)
-                            {
-                                if (dataListViewSceneCMDs.IndexOf(sc) >= TargetIndex && dataListViewSceneCMDs.IndexOf(sc) <= SourceIndex && sc != SourceSceneCMD)
-                                    sc.sort_order++;
-                            }
-                            //moving down
-                            else
-                            {
-                                if (dataListViewSceneCMDs.IndexOf(sc) > SourceIndex && dataListViewSceneCMDs.IndexOf(sc) <= TargetIndex && sc != SourceSceneCMD)
-                                    sc.sort_order--;
-                            }
-                        }
-                    }
-
-                    dataListViewSceneCMDs.SelectedObject = SourceSceneCMD;
-                    zvsEntityControl.zvsContext.SaveChanges();
-                    e.RefreshObjects();
-                    dataListViewSceneCMDs.Sort(this.SceneCMDOrderCol, SortOrder.Ascending);
-                }
-            }
-        }    
-
-        #endregion
-
-        #region Object List Box Handling
+        #region Device List Box Handling
 
         private void dataListViewDevices_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -929,15 +1047,16 @@ namespace zVirtualScenesApplication
                 device d = (device)dataListViewDevices.SelectedObjects[0];
                 if (d != null)
                 {
-                    uc_object_values1.UpdateControl(d);
-                    uc_object_values1.Visible = true;
+
+                    uc_device_values1.UpdateControl(d.id);
+                    uc_device_values1.Visible = true;
                 }
                 else
-                    uc_object_values1.UpdateControl(null);
+                    uc_device_values1.UpdateControl(0);
             }
             else
             {
-                uc_object_values1.UpdateControl(null);
+                uc_device_values1.UpdateControl(0);
             }
         }       
         
@@ -947,7 +1066,7 @@ namespace zVirtualScenesApplication
             {
                 foreach (device d in dataListViewDevices.SelectedObjects)
                 {
-                    DeviceProperties properties = new DeviceProperties(d);
+                    DeviceProperties properties = new DeviceProperties(d.id);
                     properties.Show();
                 }
             }
@@ -968,107 +1087,111 @@ namespace zVirtualScenesApplication
             {
                 ContextMenuStrip contextMenuStripDevicesDynamicCMDs = new ContextMenuStrip();
                 contextMenuStripDevicesDynamicCMDs.Items.Clear();
-
-                device d = (device)e.Item.RowObject;
-
-                //Create a new context menu
-                ToolStripMenuItem CMDcontainer = new ToolStripMenuItem();
-                CMDcontainer.Text = d.friendly_name;
-                CMDcontainer.Tag = "dynamic_cmd_menu";
-
-                foreach (device_type_commands c in d.device_types.device_type_commands)
+                
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    switch ((Data_Types)c.arg_data_type)
+                    device d = db.devices.FirstOrDefault(o => o.id == ((device)e.Item.RowObject).id);
+                    if (d != null)
                     {
-                        case Data_Types.NONE:
-                            {
-                                ToolStripMenuItem item = new ToolStripMenuItem();
-                                item.Name = string.Empty;
-                                item.Text = c.friendly_name;
-                                item.ToolTipText = c.description;
-                                item.Tag = c;                                
-                                item.Click += new EventHandler(dynamic_CMD_item_Click);
-                                CMDcontainer.DropDownItems.Add(item);
-                                break;
-                            }
-                        case Data_Types.LIST:
-                            {
-                                //ROOT MENU
-                                ToolStripMenuItem item = new ToolStripMenuItem();
-                                item.Name = string.Empty;
-                                item.Text = c.friendly_name;
-                                item.ToolTipText = c.description;
+                        //Create a new context menu
+                        ToolStripMenuItem CMDcontainer = new ToolStripMenuItem();
+                        CMDcontainer.Text = d.friendly_name;
+                        CMDcontainer.Tag = "dynamic_cmd_menu";
 
-                                foreach (device_type_command_options option in c.device_type_command_options)
-                                {                                   
-                                    ToolStripMenuItem option_item = new ToolStripMenuItem();
-                                    option_item.Name = option.option;
-                                    option_item.Text = option.option;
-                                    option_item.Tag = c;
-                                    option_item.Click += new EventHandler(dynamic_CMD_item_Click);
-                                    item.DropDownItems.Add(option_item);
-                                }
-                                CMDcontainer.DropDownItems.Add(item);
-                                break;
+                        foreach (device_type_commands c in d.device_types.device_type_commands)
+                        {
+                            switch ((Data_Types)c.arg_data_type)
+                            {
+                                case Data_Types.NONE:
+                                    {
+                                        ToolStripMenuItem item = new ToolStripMenuItem();
+                                        item.Name = string.Empty;
+                                        item.Text = c.friendly_name;
+                                        item.ToolTipText = c.description;
+                                        item.Tag = c;
+                                        item.Click += new EventHandler(dynamic_CMD_item_Click);
+                                        CMDcontainer.DropDownItems.Add(item);
+                                        break;
+                                    }
+                                case Data_Types.LIST:
+                                    {
+                                        //ROOT MENU
+                                        ToolStripMenuItem item = new ToolStripMenuItem();
+                                        item.Name = string.Empty;
+                                        item.Text = c.friendly_name;
+                                        item.ToolTipText = c.description;
+
+                                        foreach (device_type_command_options option in c.device_type_command_options)
+                                        {
+                                            ToolStripMenuItem option_item = new ToolStripMenuItem();
+                                            option_item.Name = option.option;
+                                            option_item.Text = option.option;
+                                            option_item.Tag = c;
+                                            option_item.Click += new EventHandler(dynamic_CMD_item_Click);
+                                            item.DropDownItems.Add(option_item);
+                                        }
+                                        CMDcontainer.DropDownItems.Add(item);
+                                        break;
+                                    }
                             }
+                        }
+
+                        foreach (device_commands c in d.device_commands)
+                        {
+                            switch ((Data_Types)c.arg_data_type)
+                            {
+                                case Data_Types.NONE:
+                                    {
+                                        ToolStripMenuItem item = new ToolStripMenuItem();
+                                        item.Name = string.Empty;
+                                        item.Text = c.friendly_name;
+                                        item.ToolTipText = c.description;
+                                        item.Tag = c;
+                                        item.Click += new EventHandler(dynamic_CMD_item_Click);
+                                        CMDcontainer.DropDownItems.Add(item);
+                                        break;
+                                    }
+                                case Data_Types.LIST:
+                                    {
+                                        //ROOT MENU
+                                        ToolStripMenuItem item = new ToolStripMenuItem();
+                                        item.Name = string.Empty;
+                                        item.Text = c.friendly_name;
+                                        item.ToolTipText = c.description;
+
+                                        foreach (device_command_options option in c.device_command_options)
+                                        {
+                                            ToolStripMenuItem option_item = new ToolStripMenuItem();
+                                            option_item.Name = option.name;
+                                            option_item.Text = option.name;
+                                            option_item.Tag = c;
+                                            option_item.Click += new EventHandler(dynamic_CMD_item_Click);
+                                            item.DropDownItems.Add(option_item);
+                                        }
+                                        CMDcontainer.DropDownItems.Add(item);
+                                        break;
+                                    }
+                            }
+                        }
+
+                        e.MenuStrip = contextMenuStripDevicesDynamicCMDs;
+                        if (CMDcontainer.DropDownItems.Count > 0)
+                            contextMenuStripDevicesDynamicCMDs.Items.Insert(0, CMDcontainer);
+
+                        ToolStripMenuItem repoll = new ToolStripMenuItem();
+                        repoll.Text = "Repoll Device";
+                        repoll.Click += new EventHandler(Repoll_Click);
+                        repoll.Tag = d;
+
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(repoll);
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripSeparator());
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Delete Device", null, new EventHandler(DeleteDevice_Click)));
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Activate Groups", null, new EventHandler(ActivateGroups_Click)));
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Edit Groups", null, new EventHandler(EditGroups_Click)));
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripSeparator());
+                        contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Properties", null, new EventHandler(deviceProperties_Click)));
                     }
                 }
-
-                foreach (device_commands c in d.device_commands)
-                {
-                    switch ((Data_Types)c.arg_data_type)
-                    {
-                        case Data_Types.NONE:
-                            {
-                                ToolStripMenuItem item = new ToolStripMenuItem();
-                                item.Name = string.Empty;
-                                item.Text = c.friendly_name;
-                                item.ToolTipText = c.description;
-                                item.Tag = c;
-                                item.Click += new EventHandler(dynamic_CMD_item_Click);
-                                CMDcontainer.DropDownItems.Add(item);
-                                break;
-                            }
-                        case Data_Types.LIST:
-                            {
-                                //ROOT MENU
-                                ToolStripMenuItem item = new ToolStripMenuItem();
-                                item.Name = string.Empty;
-                                item.Text = c.friendly_name;
-                                item.ToolTipText = c.description;
-
-                                foreach (device_command_options option in c.device_command_options)
-                                {
-                                    ToolStripMenuItem option_item = new ToolStripMenuItem();
-                                    option_item.Name = option.name;
-                                    option_item.Text = option.name;
-                                    option_item.Tag = c;
-                                    option_item.Click += new EventHandler(dynamic_CMD_item_Click);
-                                    item.DropDownItems.Add(option_item);
-                                }
-                                CMDcontainer.DropDownItems.Add(item);
-                                break;
-                            }
-                    }
-                }
-
-                e.MenuStrip = contextMenuStripDevicesDynamicCMDs;
-                if (CMDcontainer.DropDownItems.Count > 0)
-                    contextMenuStripDevicesDynamicCMDs.Items.Insert(0, CMDcontainer);
-
-                ToolStripMenuItem repoll = new ToolStripMenuItem();
-                repoll.Text = "Repoll Device";
-                repoll.Click += new EventHandler(Repoll_Click);
-                repoll.Tag = d;
-
-                contextMenuStripDevicesDynamicCMDs.Items.Add(repoll);
-                contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripSeparator());
-                contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Delete Device", null, new EventHandler(DeleteDevice_Click)));
-                contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Activate Groups", null, new EventHandler(ActivateGroups_Click)));
-                contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Edit Groups", null, new EventHandler(EditGroups_Click)));                
-                contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripSeparator());
-                contextMenuStripDevicesDynamicCMDs.Items.Add(new ToolStripMenuItem("Properties", null, new EventHandler(deviceProperties_Click)));
-
             }
         }   
 
@@ -1099,19 +1222,26 @@ namespace zVirtualScenesApplication
             ToolStripMenuItem item = (ToolStripMenuItem)sender;
             device d = (device)item.Tag;
 
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
-            if (cmd != null)                         
-                cmd.Run(d.id.ToString());           
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                builtin_commands cmd = db.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
+                if (cmd != null)
+                    cmd.Run(d.id.ToString());
+            }
         }
 
         private void DeleteDevice_Click(object sender, EventArgs e)
         {
-            device d = (device)dataListViewDevices.SelectedObject;
-            if (d != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                deviceList.Remove(d);
-                zvsEntityControl.zvsContext.SaveChanges();
+                device d = db.devices.FirstOrDefault(o => o.id == ((device)dataListViewDevices.SelectedObject).id); 
+                if (d != null)
+                {
+                    db.devices.DeleteObject(d);
+                    db.SaveChanges();
+                }
             }
+            zvsEntityControl.CallDeviceModified(this, "removed");
         }
 
         private void EditGroups_Click(object sender, EventArgs e)
@@ -1136,19 +1266,25 @@ namespace zVirtualScenesApplication
 
         private void manuallyRepollToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
-            if (cmd != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                foreach (device selecteddevice in dataListViewDevices.SelectedObjects)
-                    cmd.Run(selecteddevice.id.ToString());
+                builtin_commands cmd = db.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
+                if (cmd != null)
+                {
+                    foreach (device selecteddevice in dataListViewDevices.SelectedObjects)
+                        cmd.Run(selecteddevice.id.ToString());
+                }
             }
         }
 
         private void repollAllDevicesToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
-            if (cmd != null)
-                cmd.Run(); 
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                builtin_commands cmd = db.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
+                if (cmd != null)
+                    cmd.Run();
+            }
         }
 
         private void propertiesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1200,98 +1336,104 @@ namespace zVirtualScenesApplication
 
         private void repollAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
-            if (cmd != null)
-                cmd.Run(); 
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                builtin_commands cmd = db.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
+                if (cmd != null)
+                    cmd.Run();
+            }
         }
 
         private void SetNamesDevOnly()
         {
-            foreach (device d in zvsEntityControl.zvsContext.devices)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                switch (d.node_id)
+                foreach (device d in db.devices)
                 {
-                    case 1:
-                        d.friendly_name = "Aeon Labs Z-Stick Series 2";
-                        break;
-                    case 3:
-                        d.friendly_name = "Master Bathtub Light";
-                        break;
-                    case 4:
-                        d.friendly_name = "Masterbath Mirror Light";
-                        break;                    
-                    case 5:
-                        d.friendly_name = "Masterbed Hallway Light";
-                        break;
-                    case 6:
-                        d.friendly_name = "Masterbed East Light";
-                        break;
-                    case 7:
-                        d.friendly_name = "Masterbed Bed Light";
-                        break;
-                    case 8:
-                        d.friendly_name = "Office Light";
-                        break;
-                    case 9:
-                        d.friendly_name = "Family Hallway Light";
-                        break;
-                    case 10:
-                        d.friendly_name = "Outside Entry Light";
-                        break;
-                    case 11:
-                        d.friendly_name = "Entryway Light";
-                        break;
-                    case 12:
-                        d.friendly_name = "Can Lights";
-                        break;
-                    case 13:
-                        d.friendly_name = "Pourch Light";
-                        break;
-                    case 14:
-                        d.friendly_name = "Dining Table Light";
-                        break;
-                    case 15:
-                        d.friendly_name = "Fan Light";
-                        break;
-                    case 16:
-                        d.friendly_name = "Kitchen Light";
-                        break;
-                    case 17:
-                        d.friendly_name = "Rear Garage Light";
-                        break;
-                    case 18:
-                        d.friendly_name = "Driveway Light";
-                        break;
-                    case 19:
-                        d.friendly_name = "TV Backlight";
-                        break;
-                    case 20:
-                        d.friendly_name = "Fireplace Light";
-                        break;                
-                    case 22:
-                        d.friendly_name = "Label Printer";
-                        break;
-                    case 23:
-                        d.friendly_name = "Brother Printer";
-                        break;
-                    case 24:
-                        d.friendly_name = "South Thermostat";
-                        break;
-                    case 25:
-                        d.friendly_name = "Masterbed Window Fan";
-                        break;
-                    case 26:
-                        d.friendly_name = "Masterbed Thermostat";
-                       break;
-                    case 27:
-                       d.friendly_name = "Aeon Labs Z-Stick Series 1 (Secondary)";
-                       break;
-                    case 28:
-                       d.friendly_name = "Xmas Lights";
-                       break;
+                    switch (d.node_id)
+                    {
+                        case 1:
+                            d.friendly_name = "Aeon Labs Z-Stick Series 2";
+                            break;
+                        case 3:
+                            d.friendly_name = "Master Bathtub Light";
+                            break;
+                        case 4:
+                            d.friendly_name = "Masterbath Mirror Light";
+                            break;
+                        case 5:
+                            d.friendly_name = "Masterbed Hallway Light";
+                            break;
+                        case 6:
+                            d.friendly_name = "Masterbed East Light";
+                            break;
+                        case 7:
+                            d.friendly_name = "Masterbed Bed Light";
+                            break;
+                        case 8:
+                            d.friendly_name = "Office Light";
+                            break;
+                        case 9:
+                            d.friendly_name = "Family Hallway Light";
+                            break;
+                        case 10:
+                            d.friendly_name = "Outside Entry Light";
+                            break;
+                        case 11:
+                            d.friendly_name = "Entryway Light";
+                            break;
+                        case 12:
+                            d.friendly_name = "Can Lights";
+                            break;
+                        case 13:
+                            d.friendly_name = "Pourch Light";
+                            break;
+                        case 14:
+                            d.friendly_name = "Dining Table Light";
+                            break;
+                        case 15:
+                            d.friendly_name = "Fan Light";
+                            break;
+                        case 16:
+                            d.friendly_name = "Kitchen Light";
+                            break;
+                        case 17:
+                            d.friendly_name = "Rear Garage Light";
+                            break;
+                        case 18:
+                            d.friendly_name = "Driveway Light";
+                            break;
+                        case 19:
+                            d.friendly_name = "TV Backlight";
+                            break;
+                        case 20:
+                            d.friendly_name = "Fireplace Light";
+                            break;
+                        case 22:
+                            d.friendly_name = "Label Printer";
+                            break;
+                        case 23:
+                            d.friendly_name = "Brother Printer";
+                            break;
+                        case 24:
+                            d.friendly_name = "South Thermostat";
+                            break;
+                        case 25:
+                            d.friendly_name = "Masterbed Window Fan";
+                            break;
+                        case 26:
+                            d.friendly_name = "Masterbed Thermostat";
+                            break;
+                        case 27:
+                            d.friendly_name = "Aeon Labs Z-Stick Series 1 (Secondary)";
+                            break;
+                        case 28:
+                            d.friendly_name = "Xmas Lights";
+                            break;
+                    }
                 }
+                db.SaveChanges();
             }
-            zvsEntityControl.zvsContext.SaveChanges();
         }
         #endregion
 
@@ -1299,9 +1441,12 @@ namespace zVirtualScenesApplication
         {
             if ((e.KeyCode == Keys.F5))
             {
-                builtin_commands cmd = zvsEntityControl.zvsContext.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
-                if (cmd != null)                
-                    cmd.Run();                  
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    builtin_commands cmd = db.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
+                    if (cmd != null)
+                        cmd.Run();
+                }
             }
 
             if ((e.KeyCode == Keys.F6))
@@ -1312,13 +1457,13 @@ namespace zVirtualScenesApplication
 
         }
 
-        #endregion                 
+               
 
         #region Task Scheduler Execution
 
         private void timer_TaskRunner_Tick(object sender, EventArgs e)
-        {            
-            foreach (scheduled_tasks task in taskList)
+        {
+            foreach (scheduled_tasks task in task_list)
             {
                 if (task.Enabled)
                 {
@@ -1341,7 +1486,7 @@ namespace zVirtualScenesApplication
                                     if (task.StartTime.HasValue)
                                     {
                                         //Console.WriteLine("totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
-                                        if ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0)
+                                        if (task.RecurDays > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0))
                                         {
                                             TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                             TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
@@ -1357,7 +1502,7 @@ namespace zVirtualScenesApplication
                                 {
                                     if (task.StartTime.HasValue)
                                     {
-                                        if (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0)  //IF RUN THIS WEEK
+                                        if (task.RecurWeeks > 0 && (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0))  //IF RUN THIS WEEK
                                         {
                                             if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                             {
@@ -1377,7 +1522,7 @@ namespace zVirtualScenesApplication
                                     {
                                         int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
                                         //Console.WriteLine(string.Format("Months Apart: {0}", monthsapart));
-                                        if (monthsapart > -1 && monthsapart % task.RecurMonth == 0)  //IF RUN THIS Month
+                                        if (task.RecurMonth > 0 && monthsapart > -1 && monthsapart % task.RecurMonth == 0)  //IF RUN THIS Month
                                         {
                                             if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
                                             {
@@ -1584,6 +1729,32 @@ namespace zVirtualScenesApplication
 
         #region Task Scheduler GUI
 
+        private void SyncScheduledTaskList()
+        {
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                int s_index = dataListTasks.SelectedIndex;
+                dataListTasks.DataSource = task_list = db.scheduled_tasks.ToList();
+                dataListTasks.SelectedIndex = s_index;
+
+                int index = dataListTasks.SelectedIndex;
+                if (index > 0)
+                    dataListTasks.EnsureVisible(index);
+            }
+
+            Console.WriteLine("------>>>>>>> Syned dataListTasks <<<<<<<<<<<---------------------");
+        }
+
+        void zvsEntityControl_ScheduledTaskModified(object sender, string PropertyModified)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new anonymousStringDelegate(zvsEntityControl_ScheduledTaskModified), new object[] { sender, PropertyModified });
+            else
+            {
+                SyncScheduledTaskList();
+            }
+        }
+
         #region Methods
 
         private void LoadGui(scheduled_tasks Task)
@@ -1716,19 +1887,27 @@ namespace zVirtualScenesApplication
 
             #endregion
 
-            //Look for Scene, if it was deleted then set index to -1
-            scene selected_scene = zvsEntityControl.zvsContext.scenes.FirstOrDefault(s => s.id == Task.Scene_id);
-            if(selected_scene != null)
-                comboBox_ActionsTask.SelectedItem = selected_scene;
-            else
-                comboBox_ActionsTask.SelectedIndex = -1;           
+            foreach (scene s in comboBox_ActionsTask.Items)
+            {
+                if (s.id == Task.Scene_id)
+                {
+                    comboBox_ActionsTask.SelectedItem = s;
+                    break;
+                }
+            }
         }
 
         private void AddNewTask()
         {
-            scheduled_tasks task = new scheduled_tasks { friendly_name = "New Task", Frequency = (int)scheduled_tasks.frequencys.Daily, Scene_id = 0, Enabled = false };
-            taskList.Add(task);
-            zvsEntityControl.zvsContext.SaveChanges();
+            scheduled_tasks task = new scheduled_tasks { friendly_name = "New Task", Frequency = (int)scheduled_tasks.frequencys.Daily, Scene_id = 0, Enabled = false };           
+
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                db.scheduled_tasks.AddObject(task);
+                db.SaveChanges();
+                zvsEntityControl.CallScheduledTaskModified(this, "added");
+            }
+          
         }
 
         #endregion
@@ -1769,101 +1948,106 @@ namespace zVirtualScenesApplication
 
         private void button_SaveTask_Click(object sender, EventArgs e)
         {
-            scheduled_tasks SelectedTask = (scheduled_tasks)dataListTasks.SelectedObject;
-            if (SelectedTask != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                //Action
-                if (comboBox_ActionsTask.SelectedIndex != -1)
+                scheduled_tasks SelectedTask = db.scheduled_tasks.FirstOrDefault(o => o.id == ((scheduled_tasks)dataListTasks.SelectedObject).id);
+                if (SelectedTask != null)
                 {
-                    scene SelectedScene = (scene)comboBox_ActionsTask.SelectedItem;
-                    if (SelectedScene != null)
-                        SelectedTask.Scene_id = SelectedScene.id;
-                }
-                else
-                {
-                    MessageBox.Show("Error Saving\n\nPlease select a scene to activate before saving.", ProgramName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
+                    //Action
+                    if (comboBox_ActionsTask.SelectedIndex != -1)
+                    {
+                        scene SelectedScene = (scene)comboBox_ActionsTask.SelectedItem;
+                        if (SelectedScene != null)
+                            SelectedTask.Scene_id = SelectedScene.id;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error Saving\n\nPlease select a scene to activate before saving.", ProgramName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                //Task Name
-                if (textBox_TaskName.Text != "")
-                    SelectedTask.friendly_name = textBox_TaskName.Text;
-                else
-                {
-                    MessageBox.Show("Error Saving\n\nTask name not vaild.", ProgramName, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    //Task Name
+                    if (textBox_TaskName.Text != "")
+                        SelectedTask.friendly_name = textBox_TaskName.Text;
+                    else
+                    {
+                        MessageBox.Show("Error Saving\n\nTask name not vaild.", ProgramName, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    //Frequency
+                    SelectedTask.Frequency = (int)Enum.Parse(typeof(scheduled_tasks.frequencys), comboBox_FrequencyTask.SelectedItem.ToString());
+
+                    //Endabled 
+                    SelectedTask.Enabled = checkBox_EnabledTask.Checked;
+
+                    //DateTime
+                    SelectedTask.StartTime = dateTimePickerStartTask.Value;
+
+                    //Recur Days 
+                    if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Daily.ToString()))
+                    {
+                        SelectedTask.RecurDays = (int)numericUpDownOccurDays.Value;
+                    }
+                    else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Seconds.ToString()))
+                    {
+                        SelectedTask.RecurSeconds = (int)numericUpDownOccurSeconds.Value;
+                    }
+                    else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Weekly.ToString()))
+                    {
+                        #region Weekly
+                        SelectedTask.RecurWeeks = (int)numericUpDownOccurWeeks.Value;
+                        SelectedTask.RecurMonday = checkBox_RecurMonday.Checked;
+                        SelectedTask.RecurTuesday = checkBox_RecurTuesday.Checked;
+                        SelectedTask.RecurWednesday = checkBox_RecurWednesday.Checked;
+                        SelectedTask.RecurThursday = checkBox_RecurThursday.Checked;
+                        SelectedTask.RecurFriday = checkBox_RecurFriday.Checked;
+                        SelectedTask.RecurSaturday = checkBox_RecurSaturday.Checked;
+                        SelectedTask.RecurSunday = checkBox_RecurSunday.Checked;
+                        #endregion
+                    }
+                    else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Monthly.ToString()))
+                    {
+                        #region Monthly
+                        SelectedTask.RecurMonth = (int)numericUpDownOccurMonths.Value;
+                        SelectedTask.RecurDay01 = checkBoxDay01.Checked;
+                        SelectedTask.RecurDay02 = checkBoxDay02.Checked;
+                        SelectedTask.RecurDay03 = checkBoxDay03.Checked;
+                        SelectedTask.RecurDay04 = checkBoxDay04.Checked;
+                        SelectedTask.RecurDay05 = checkBoxDay05.Checked;
+                        SelectedTask.RecurDay06 = checkBoxDay06.Checked;
+                        SelectedTask.RecurDay07 = checkBoxDay07.Checked;
+                        SelectedTask.RecurDay08 = checkBoxDay08.Checked;
+                        SelectedTask.RecurDay09 = checkBoxDay09.Checked;
+                        SelectedTask.RecurDay10 = checkBoxDay10.Checked;
+                        SelectedTask.RecurDay11 = checkBoxDay11.Checked;
+                        SelectedTask.RecurDay12 = checkBoxDay12.Checked;
+                        SelectedTask.RecurDay13 = checkBoxDay13.Checked;
+                        SelectedTask.RecurDay14 = checkBoxDay14.Checked;
+                        SelectedTask.RecurDay15 = checkBoxDay15.Checked;
+                        SelectedTask.RecurDay16 = checkBoxDay16.Checked;
+                        SelectedTask.RecurDay17 = checkBoxDay17.Checked;
+                        SelectedTask.RecurDay18 = checkBoxDay18.Checked;
+                        SelectedTask.RecurDay19 = checkBoxDay19.Checked;
+                        SelectedTask.RecurDay20 = checkBoxDay20.Checked;
+                        SelectedTask.RecurDay21 = checkBoxDay21.Checked;
+                        SelectedTask.RecurDay22 = checkBoxDay22.Checked;
+                        SelectedTask.RecurDay23 = checkBoxDay23.Checked;
+                        SelectedTask.RecurDay24 = checkBoxDay24.Checked;
+                        SelectedTask.RecurDay25 = checkBoxDay25.Checked;
+                        SelectedTask.RecurDay26 = checkBoxDay26.Checked;
+                        SelectedTask.RecurDay27 = checkBoxDay27.Checked;
+                        SelectedTask.RecurDay28 = checkBoxDay28.Checked;
+                        SelectedTask.RecurDay29 = checkBoxDay29.Checked;
+                        SelectedTask.RecurDay30 = checkBoxDay30.Checked;
+                        SelectedTask.RecurDay31 = checkBoxDay31.Checked;
+                        #endregion
+                    }
+
+                    db.SaveChanges();
+
+                    zvsEntityControl.CallScheduledTaskModified(this, "multiple_properties");
                 }
-
-                //Frequency
-                SelectedTask.Frequency = (int)Enum.Parse(typeof(scheduled_tasks.frequencys), comboBox_FrequencyTask.SelectedItem.ToString());
-
-                //Endabled 
-                SelectedTask.Enabled = checkBox_EnabledTask.Checked;
-
-                //DateTime
-                SelectedTask.StartTime = dateTimePickerStartTask.Value;
-
-                //Recur Days 
-                if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Daily.ToString()))
-                {
-                    SelectedTask.RecurDays = (int)numericUpDownOccurDays.Value;
-                }
-                else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Seconds.ToString()))
-                {
-                    SelectedTask.RecurSeconds = (int)numericUpDownOccurSeconds.Value;
-                }
-                else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Weekly.ToString()))
-                {
-                    #region Weekly
-                    SelectedTask.RecurWeeks = (int)numericUpDownOccurWeeks.Value;
-                    SelectedTask.RecurMonday = checkBox_RecurMonday.Checked;
-                    SelectedTask.RecurTuesday = checkBox_RecurTuesday.Checked;
-                    SelectedTask.RecurWednesday = checkBox_RecurWednesday.Checked;
-                    SelectedTask.RecurThursday = checkBox_RecurThursday.Checked;
-                    SelectedTask.RecurFriday = checkBox_RecurFriday.Checked;
-                    SelectedTask.RecurSaturday = checkBox_RecurSaturday.Checked;
-                    SelectedTask.RecurSunday = checkBox_RecurSunday.Checked;
-                    #endregion
-                }
-                else if (comboBox_FrequencyTask.SelectedValue.ToString().Equals(scheduled_tasks.frequencys.Monthly.ToString()))
-                {
-                    #region Monthly
-                    SelectedTask.RecurMonth = (int)numericUpDownOccurMonths.Value;
-                    SelectedTask.RecurDay01 = checkBoxDay01.Checked;
-                    SelectedTask.RecurDay02 = checkBoxDay02.Checked;
-                    SelectedTask.RecurDay03 = checkBoxDay03.Checked;
-                    SelectedTask.RecurDay04 = checkBoxDay04.Checked;
-                    SelectedTask.RecurDay05 = checkBoxDay05.Checked;
-                    SelectedTask.RecurDay06 = checkBoxDay06.Checked;
-                    SelectedTask.RecurDay07 = checkBoxDay07.Checked;
-                    SelectedTask.RecurDay08 = checkBoxDay08.Checked;
-                    SelectedTask.RecurDay09 = checkBoxDay09.Checked;
-                    SelectedTask.RecurDay10 = checkBoxDay10.Checked;
-                    SelectedTask.RecurDay11 = checkBoxDay11.Checked;
-                    SelectedTask.RecurDay12 = checkBoxDay12.Checked;
-                    SelectedTask.RecurDay13 = checkBoxDay13.Checked;
-                    SelectedTask.RecurDay14 = checkBoxDay14.Checked;
-                    SelectedTask.RecurDay15 = checkBoxDay15.Checked;
-                    SelectedTask.RecurDay16 = checkBoxDay16.Checked;
-                    SelectedTask.RecurDay17 = checkBoxDay17.Checked;
-                    SelectedTask.RecurDay18 = checkBoxDay18.Checked;
-                    SelectedTask.RecurDay19 = checkBoxDay19.Checked;
-                    SelectedTask.RecurDay20 = checkBoxDay20.Checked;
-                    SelectedTask.RecurDay21 = checkBoxDay21.Checked;
-                    SelectedTask.RecurDay22 = checkBoxDay22.Checked;
-                    SelectedTask.RecurDay23 = checkBoxDay23.Checked;
-                    SelectedTask.RecurDay24 = checkBoxDay24.Checked;
-                    SelectedTask.RecurDay25 = checkBoxDay25.Checked;
-                    SelectedTask.RecurDay26 = checkBoxDay26.Checked;
-                    SelectedTask.RecurDay27 = checkBoxDay27.Checked;
-                    SelectedTask.RecurDay28 = checkBoxDay28.Checked;
-                    SelectedTask.RecurDay29 = checkBoxDay29.Checked;
-                    SelectedTask.RecurDay30 = checkBoxDay30.Checked;
-                    SelectedTask.RecurDay31 = checkBoxDay31.Checked;
-                    #endregion
-                } 
-
-                zvsEntityControl.zvsContext.SaveChanges();
             }
         }
 
@@ -1924,24 +2108,26 @@ namespace zVirtualScenesApplication
                 checkBoxDay30.Enabled = false;
                 checkBoxDay31.Enabled = false; 
             }
-
         }
 
         private void deleteTask()
         {
-            scheduled_tasks task = (scheduled_tasks)dataListTasks.SelectedObject;
-
-            if (task != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                if (MessageBox.Show("Are you sure you want to delete the '" + task.friendly_name + "' task?", "Are you sure?",
-                                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                scheduled_tasks task = db.scheduled_tasks.FirstOrDefault(o => o.id == ((scheduled_tasks)dataListTasks.SelectedObject).id);
+                if (task != null)
                 {
-                    taskList.Remove(task);
-                    zvsEntityControl.zvsContext.SaveChanges();
+                    if (MessageBox.Show("Are you sure you want to delete the '" + task.friendly_name + "' task?", "Are you sure?",
+                                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        db.scheduled_tasks.DeleteObject(task);
+                        db.SaveChanges();
+                        zvsEntityControl.CallScheduledTaskModified(this, "removed");
+                    }
                 }
+                else
+                    MessageBox.Show("Please select a task to delete.", ProgramName);
             }
-            else
-                MessageBox.Show("Please select a task to delete.", ProgramName);
         }
 
         private void dataListTasks_CellRightClick_1(object sender, CellRightClickEventArgs e)
@@ -2102,6 +2288,32 @@ namespace zVirtualScenesApplication
 
         #region Triggers
 
+        void zvsEntityControl_TriggerModified(object sender, string PropertyModified)
+        {
+            if (this.InvokeRequired)
+                this.Invoke(new anonymousStringDelegate(zvsEntityControl_TriggerModified), new object[] { sender, PropertyModified });
+            else
+            {
+                SyncdataListTriggers();
+            }
+        }
+
+        private void SyncdataListTriggers()
+        {
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                int s_index = dataListTriggers.SelectedIndex;
+                dataListTriggers.DataSource = db.device_value_triggers.OfType<device_value_triggers>().Execute(MergeOption.AppendOnly);
+                dataListTriggers.SelectedIndex = s_index;
+
+                int index = dataListTriggers.SelectedIndex;
+                if (index > 0)
+                    dataListTriggers.EnsureVisible(index);
+            }
+
+            Console.WriteLine("------>>>>>>> SyncdataListTriggers <<<<<<<<<<<---------------------");
+        }
+
         private void dataListEvents_CellRightClick(object sender, CellRightClickEventArgs e)
         {
             if (e.Item == null)
@@ -2110,18 +2322,24 @@ namespace zVirtualScenesApplication
                 e.MenuStrip = contextMenuStripTrigger;
         }
 
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            dataListEvents_DoubleClick(this, new EventArgs());
+        } 
+
         private void dataListEvents_DoubleClick(object sender, EventArgs e)
         {
             if (dataListTriggers.SelectedObject != null)
             {
+                long trigger_id = ((device_value_triggers)dataListTriggers.SelectedObject).id;
                 if (((device_value_triggers.TRIGGER_TYPE)((device_value_triggers)dataListTriggers.SelectedObject).trigger_type) == device_value_triggers.TRIGGER_TYPE.Basic)
                 {
-                    AddEditTriggers eventform = new AddEditTriggers(triggerList, (device_value_triggers)dataListTriggers.SelectedObject);
+                    AddEditBasicTriggers eventform = new AddEditBasicTriggers(trigger_id);
                     eventform.Show();
                 }
                 else
                 {
-                    AdvancedScripting eventform = new AdvancedScripting(triggerList, (device_value_triggers)dataListTriggers.SelectedObject);
+                    AddEditScriptngTrigger eventform = new AddEditScriptngTrigger(trigger_id);
                     eventform.Show();
                 }
             }
@@ -2129,37 +2347,36 @@ namespace zVirtualScenesApplication
 
         private void addToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            AddEditTriggers eventform = new AddEditTriggers(triggerList, null);
+            AddEditBasicTriggers eventform = new AddEditBasicTriggers(null);
             eventform.Show();
         }
 
         private void toolStripMenuItemEventsNull_Click(object sender, EventArgs e)
         {
-            AddEditTriggers eventform = new AddEditTriggers(triggerList, null);
+            AddEditBasicTriggers eventform = new AddEditBasicTriggers( null);
             eventform.Show();
         }
 
         private void createEventAdvancedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AdvancedScripting eventform = new AdvancedScripting(triggerList, null);
+            AddEditScriptngTrigger eventform = new AddEditScriptngTrigger(null);
             eventform.Show();
-        }
-
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            AddEditTriggers eventform = new AddEditTriggers(triggerList, (device_value_triggers)dataListTriggers.SelectedObject);
-            eventform.Show();
-        }
+        }       
 
         private void deleteEventToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (dataListTriggers.SelectedObject != null)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                if (MessageBox.Show("Are you sure you want to delete this trigger?", "Are you sure?",
-                                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                device_value_triggers selected_trigger = db.device_value_triggers.FirstOrDefault(o => o.id == ((device_value_triggers)dataListTriggers.SelectedObject).id);
+                if (selected_trigger != null)
                 {
-                    triggerList.Remove((device_value_triggers)dataListTriggers.SelectedObject);
-                    zvsEntityControl.zvsContext.SaveChanges(); 
+                    if (MessageBox.Show("Are you sure you want to delete this trigger?", "Are you sure?",
+                                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    {
+                        db.device_value_triggers.DeleteObject(selected_trigger);
+                        db.SaveChanges();
+                        zvsEntityControl.CallTriggerModified(this, "removed");                         
+                    }
                 }
             }
         }
@@ -2199,6 +2416,8 @@ namespace zVirtualScenesApplication
         private void groupBox_Montly_Enter(object sender, EventArgs e)
         {
 
-        }    
+        }
+
+           
     }
 }

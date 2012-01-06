@@ -15,35 +15,41 @@ namespace zVirtualScenesCommon.Entity
         {
             if (opt != null)
             {
-                program_options existing_option = zvsEntityControl.zvsContext.program_options.FirstOrDefault(o => o.name == opt.name);
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    program_options existing_option = db.program_options.FirstOrDefault(o => o.name == opt.name);
 
-                if (existing_option == null)
-                {
-                    zvsEntityControl.zvsContext.program_options.AddObject(opt);
+                    if (existing_option == null)
+                    {
+                        db.program_options.AddObject(opt);
+                    }
+                    else
+                    {
+                        //Update
+                        existing_option.name = opt.name;
+                        existing_option.value = opt.value;
+                    }
+                    db.SaveChanges();
                 }
-                else
-                {
-                    //Update
-                    existing_option.name = opt.name;
-                    existing_option.value = opt.value;
-                }
-                zvsEntityControl.zvsContext.SaveChanges();
             }
         }
 
         public static string GetProgramOption(string optionName)
         {
-            program_options option = zvsEntityControl.zvsContext.program_options.FirstOrDefault(o => o.name == optionName);
-
-            if (option != null)
-                return option.value;
-            else
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                //DEFAULTS
-                if (optionName.Equals("TempAbbreviation"))
-                    return "F";
-               
-                return null;
+                program_options option = db.program_options.FirstOrDefault(o => o.name == optionName);
+
+                if (option != null)
+                    return option.value;
+                else
+                {
+                    //DEFAULTS
+                    if (optionName.Equals("TempAbbreviation"))
+                        return "F";
+
+                    return null;
+                }
             }
         }
     }

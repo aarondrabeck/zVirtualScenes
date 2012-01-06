@@ -16,15 +16,12 @@ namespace zVirtualScenesApplication
 {
     public partial class formPropertiesScene : Form
     {
-        private scene _scene = null;
+        private long Scene_ID = 0;       
 
-        public formPropertiesScene(scene s)
+        public formPropertiesScene(long Scene_ID)
         {
-            InitializeComponent();
-            _scene = s;
-
-            if (s == null)
-                this.Close();
+            this.Scene_ID = Scene_ID;
+            InitializeComponent();            
         }
 
         private void btn_Save_Click(object sender, EventArgs e)
@@ -35,95 +32,110 @@ namespace zVirtualScenesApplication
             }
             else
             {
-                _scene.friendly_name = txtb_sceneName.Text;
-                zvsEntityControl.zvsContext.SaveChanges();
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene scene = db.scenes.FirstOrDefault(s => s.id == Scene_ID);
+                    if (scene != null)
+                    {
+                        scene.friendly_name = txtb_sceneName.Text;
+                        db.SaveChanges();
+                    }
+                }
+                zvsEntityControl.CallSceneModified(this, Scene_ID);
             }   
         }
 
         private void formSceneProperties_Load(object sender, EventArgs e)
         {
-            txtb_sceneName.Text = _scene.friendly_name;
-            ActiveControl = txtb_sceneName;
-            CreateDynamicProperties(); 
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                scene scene = db.scenes.FirstOrDefault(s => s.id == Scene_ID);
+                if (scene != null)
+                {
+                    txtb_sceneName.Text = scene.friendly_name;
+                    ActiveControl = txtb_sceneName;
+                    CreateDynamicProperties(scene,db);
+                }
+                else
+                    this.Close();
+            }
         }
 
-        private void CreateDynamicProperties()
-        {
-            if (_scene != null)
+        private void CreateDynamicProperties(scene scene, zvsEntities2 db)
+        {            
+            pnlSceneProperties.Controls.Clear();
+            int top = 0;
+
+            #region Properties                                
+            top += 10;
+            foreach (scene_property property in db.scene_property)
             {
-                pnlSceneProperties.Controls.Clear();
-                int top = 0;
-
-                #region Properties                                
-                top += 10;
-                foreach (scene_property property in zvsEntityControl.zvsContext.scene_property)
+                int left = 0;
+                    
+                //Get Value
+                string value = string.Empty;
+                if (scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
                 {
-                    int left = 0;
+                    value = scene.scene_property_value.FirstOrDefault(sp => sp.scene_property_id == property.id).value;
+                }
+                else
+                {
+                    value = property.defualt_value;                            
+                }                    
                     
-                    //Get Value
-                    string value = string.Empty;
-                    if (_scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
-                    {
-                        value = _scene.scene_property_value.FirstOrDefault(sp => sp.scene_property_id == property.id).value;
-                    }
-                    else
-                    {
-                        value = property.defualt_value;                            
-                    }                    
-                    
-                    #region Input Boxes                                      
-                    left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSceneProperties, 
-                                                                    (Data_Types)property.value_data_type, 
-                                                                    top, 
-                                                                    left,
-                                                                    property.id + "-proparg",
-                                                                    property.friendly_name,
-                                                                    property.scene_property_option.Select(o=> o.option).ToList(),
-                                                                    value,
-                                                                    "");
+                #region Input Boxes                                      
+                left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSceneProperties, 
+                                                                (Data_Types)property.value_data_type, 
+                                                                top, 
+                                                                left,
+                                                                property.id + "-proparg",
+                                                                property.friendly_name,
+                                                                property.scene_property_option.Select(o=> o.option).ToList(),
+                                                                value,
+                                                                "");
 
-                    #endregion
+                #endregion
 
-                    #region Add Button
-                    Button btn = new Button();
-                    btn.Name = property.friendly_name;
-                    btn.Text = ((Data_Types)property.value_data_type == Data_Types.NONE ? "" : "Save ") + property.friendly_name;
-                    btn.Click += new EventHandler(btn_Click_Property_Set);
-                    btn.Tag = property;
-                    btn.Top = top;
-                    btn.Left = left;
-                    pnlSceneProperties.Controls.Add(btn);
+                #region Add Button
+                Button btn = new Button();
+                btn.Name = property.friendly_name;
+                btn.Text = ((Data_Types)property.value_data_type == Data_Types.NONE ? "" : "Save ") + property.friendly_name;
+                btn.Click += new EventHandler(btn_Click_Property_Set);
+                btn.Tag = property;
+                btn.Top = top;
+                btn.Left = left;
+                pnlSceneProperties.Controls.Add(btn);
 
-                    using (Graphics cg = this.CreateGraphics())
-                    {
-                        SizeF size = cg.MeasureString(btn.Text, btn.Font);
-                        size.Width += 10; //add some padding
-                        btn.Width = (int)size.Width;
-                        left = (int)size.Width + left + 5;
-                    }
-                    #endregion
-
-                    #region Add Description
-                    Label lbl = new Label();
-                    lbl.Text = property.description;
-                    lbl.Top = top +4;
-                    lbl.Left = left;
-                    lbl.AutoSize = false;
-                    pnlSceneProperties.Controls.Add(lbl);
-
-                    using (Graphics cg = this.CreateGraphics())
-                    {
-                        SizeF size = cg.MeasureString(lbl.Text, lbl.Font);
-                        size.Width += 10; //add some padding
-                        lbl.Width = (int)size.Width;
-                        left = (int)size.Width + left + 5;
-                    }
-                    #endregion
-
-                    top += 35;
+                using (Graphics cg = this.CreateGraphics())
+                {
+                    SizeF size = cg.MeasureString(btn.Text, btn.Font);
+                    size.Width += 10; //add some padding
+                    btn.Width = (int)size.Width;
+                    left = (int)size.Width + left + 5;
                 }
                 #endregion
+
+                #region Add Description
+                Label lbl = new Label();
+                lbl.Text = property.description;
+                lbl.Top = top +4;
+                lbl.Left = left;
+                lbl.AutoSize = false;
+                pnlSceneProperties.Controls.Add(lbl);
+
+                using (Graphics cg = this.CreateGraphics())
+                {
+                    SizeF size = cg.MeasureString(lbl.Text, lbl.Font);
+                    size.Width += 10; //add some padding
+                    lbl.Width = (int)size.Width;
+                    left = (int)size.Width + left + 5;
+                }
+                #endregion
+
+                top += 35;
             }
+            #endregion
+            
         }
 
         void btn_Click_Property_Set(object sender, EventArgs e)
@@ -159,16 +171,20 @@ namespace zVirtualScenesApplication
                     break;
             }
 
-
-            if (_scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                _scene.scene_property_value.FirstOrDefault(sp => sp.scene_property_id == property.id).value = arg;
+                scene scene = db.scenes.FirstOrDefault(s => s.id == Scene_ID);
+                if (scene != null)
+                {
+                    if (scene.scene_property_value.Any(sp => sp.scene_property_id == property.id))                    
+                        scene.scene_property_value.FirstOrDefault(sp => sp.scene_property_id == property.id).value = arg;                    
+                    else                    
+                        scene.scene_property_value.Add(new scene_property_value { value = arg, scene_property_id = property.id });
+                    
+                    db.SaveChanges();
+                }
             }
-            else
-            {
-                _scene.scene_property_value.Add(new scene_property_value { value = arg, scene_property_id = property.id });
-            }
-            zvsEntityControl.zvsContext.SaveChanges();
+            zvsEntityControl.CallSceneModified(this, Scene_ID);
         }
 
         private void txtb_sceneName_KeyDown(object sender, KeyEventArgs e)
@@ -182,6 +198,6 @@ namespace zVirtualScenesApplication
         private void button1_Click(object sender, EventArgs e)
         {
             this.Close();
-        }
+        }                
     }       
 }

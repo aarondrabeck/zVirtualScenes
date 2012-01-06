@@ -6,25 +6,38 @@ using System.Data.Objects.DataClasses;
 using zVirtualScenesCommon;
 using System.Runtime.Serialization;
 using System.Data.Objects;
+using zVirtualScenesCommon.Util;
 
 
 namespace zVirtualScenesCommon.Entity
 {   
     public partial class device : EntityObject
-    {        
-        public static IQueryable<device> GetAllDevices(bool forList)
-        {
-            var query = from o in zvsEntityControl.zvsContext.devices
-                        where o.device_types.plugin.name != "BUILTIN"
-                        select o;
+    {       
+        /// <summary>
+        /// This is called when a device or device value 
+        /// </summary>        
+        public delegate void DeviceAddedEventHandler(object sender, EventArgs e);
+        public static event DeviceAddedEventHandler Added;
 
-            if (forList)
-                return query.Where(o => o.device_types.show_in_list == true).AsQueryable();
-            else
-                return query.AsQueryable();
+        public void CallAdded (EventArgs e)
+        {
+            if (Added != null)
+                Added(this, e);
+        } 
+
+        public static IQueryable<device> GetAllDevices(zvsEntities2 db, bool forList)
+        {
+            var query = from o in db.devices
+                            where o.device_types.plugin.name != "BUILTIN"
+                            select o;
+
+                if (forList)
+                    return query.Where(o => o.device_types.show_in_list == true).AsQueryable();
+                else
+                    return query.AsQueryable();           
 
         }
-
+               
         public string GetGroups
         {
             get
@@ -38,7 +51,7 @@ namespace zVirtualScenesCommon.Entity
                 return sb.ToString();
             }
         }
-
+                
         public string DeviceIcon()
         {
             if (this.device_types.name.Equals("THERMOSTAT"))

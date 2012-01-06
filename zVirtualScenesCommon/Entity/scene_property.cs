@@ -15,30 +15,33 @@ namespace zVirtualScenesCommon.Entity
         {
             if (p != null)
             {
-                scene_property existing_property = zvsEntityControl.zvsContext.scene_property.FirstOrDefault(ep => ep.name == p.name);
-
-                if (existing_property == null)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    zvsEntityControl.zvsContext.scene_property.AddObject(p);
-                }
-                else
-                {
-                    //Update
-                    existing_property.friendly_name = p.friendly_name;
-                    existing_property.description = p.description;
-                    existing_property.value_data_type = p.value_data_type;
-                    existing_property.defualt_value = p.defualt_value;
+                    scene_property existing_property = db.scene_property.FirstOrDefault(ep => ep.name == p.name);
 
-                    foreach (var option in zvsEntityControl.zvsContext.scene_property_option.Where(o => o.scene_property_id == existing_property.id).ToArray())
+                    if (existing_property == null)
                     {
-                        zvsEntityControl.zvsContext.DeleteObject(option);
+                        db.scene_property.AddObject(p);
                     }
+                    else
+                    {
+                        //Update
+                        existing_property.friendly_name = p.friendly_name;
+                        existing_property.description = p.description;
+                        existing_property.value_data_type = p.value_data_type;
+                        existing_property.defualt_value = p.defualt_value;
 
-                    foreach (scene_property_option spo in p.scene_property_option)
-                        existing_property.scene_property_option.Add(new scene_property_option { option = spo.option });
+                        foreach (var option in db.scene_property_option.Where(o => o.scene_property_id == existing_property.id).ToArray())
+                        {
+                            db.DeleteObject(option);
+                        }
 
+                        foreach (scene_property_option spo in p.scene_property_option)
+                            existing_property.scene_property_option.Add(new scene_property_option { option = spo.option });
+
+                    }
+                    db.SaveChanges();
                 }
-                zvsEntityControl.zvsContext.SaveChanges();
             }
         }
     }

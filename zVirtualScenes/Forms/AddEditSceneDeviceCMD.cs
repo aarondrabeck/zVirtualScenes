@@ -13,101 +13,133 @@ namespace zVirtualScenesApplication.Forms
 {
     public partial class AddEditSceneDeviceCMD : Form
     {
-        private IBindingList _sceneCMDList; 
-        private device _device;
-        private scene_commands _scene_cmd;
+        private long? scenecmd_id_to_edit;
+        private long device_id;
+        private long? scene_id;
+        private bool editing;
+        private int positionInList; 
 
         private CheckBox cb = new CheckBox();
         private NumericUpDown Numeric = new NumericUpDown();
         private TextBox tbx = new TextBox();
         private ComboBox cmbo = new ComboBox();
 
-        /// <summary>
-        /// Send list if new
-        /// </summary>
-        /// <param name="d"></param>
-        /// <param name="sceneCD"></param>
-        /// <param name="sceneCMDlist"></param>
-        public AddEditSceneDeviceCMD(device d, scene_commands sceneCD, IBindingList sceneCMDlist = null)
+        public AddEditSceneDeviceCMD(long? scenecmd_id_to_edit, long device_id, long? scene_id = null, int? positionInList = 0)
         {
-            _sceneCMDList = sceneCMDlist;
-            _device = d;
-            _scene_cmd = sceneCD;
+            this.scenecmd_id_to_edit = scenecmd_id_to_edit;
+            this.device_id = device_id;
+            this.scene_id = scene_id;
+            this.positionInList = positionInList.Value;
+
             InitializeComponent();
         }
 
         private void AddEditSceneCMD_Load(object sender, EventArgs e)
         {
-            if (_device != null)
-            { 
-                this.Text = "Scene Command for '" + _device.friendly_name + "'";
-                comboBoxCommands.DisplayMember = "friendly_name";
+            comboBoxCommands.DisplayMember = "friendly_name";
 
-                switch ((command_types)_scene_cmd.command_type_id)
-                {
-                    case command_types.device_command:
-                        {
-                            radioBtnDeviceCMD.Checked = true;
-                            comboBoxCommands.DataSource = _device.device_commands;                            
-
-                            device_commands dc = _device.device_commands.FirstOrDefault(c => c.id == _scene_cmd.command_id);
-                            if (dc != null)
-                            {
-                                comboBoxCommands.SelectedItem = dc;
-                            }
-                            break;
-                        }
-                    case command_types.device_type_command:
-                        {
-                            radioBtnTypeCommand.Checked = true;
-                            comboBoxCommands.DataSource = _device.device_types.device_type_commands;                            
-
-                            device_type_commands dtc = _device.device_types.device_type_commands.FirstOrDefault(c => c.id == _scene_cmd.command_id);
-                            if (dtc != null)
-                            {
-                                comboBoxCommands.SelectedItem = dtc;
-                            }
-                            break;
-                        }
-                    default:
-                        //IE NEW COMMANDS
-                        radioBtnTypeCommand.Checked = true;
-                        break;
-                }
+            //determine if editing
+            editing = false;
+            if (scenecmd_id_to_edit.HasValue)
+            {
+                editing = true;
+            }          
+            else
+            {
+                if (!scene_id.HasValue)
+                    this.Close(); 
             }
+
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            {
+                device device = db.devices.FirstOrDefault(d => d.id == device_id);
+                //Populate combo boxes
+                if (device != null)
+                {
+                    this.Text = "Scene Command for '" + device.friendly_name + "'";
+
+                    if (editing)
+                    {
+                        scene_commands scmd = db.scene_commands.FirstOrDefault(c => c.id == scenecmd_id_to_edit.Value);
+                        if (scmd != null)
+                        {
+                            switch ((command_types)scmd.command_type_id)
+                            {
+                                case command_types.device_command:
+                                    {
+                                        radioBtnDeviceCMD.Checked = true;
+                                        comboBoxCommands.DataSource = device.device_commands;
+
+                                        device_commands dc = device.device_commands.FirstOrDefault(c => c.id == scmd.command_id);
+                                        if (dc != null)
+                                            comboBoxCommands.SelectedItem = dc;
+
+                                        break;
+                                    }
+                                case command_types.device_type_command:
+                                    {
+                                        radioBtnTypeCommand.Checked = true;
+                                        comboBoxCommands.DataSource = device.device_types.device_type_commands;
+                                        
+                                        device_type_commands dtc = device.device_types.device_type_commands.FirstOrDefault(c => c.id == scmd.command_id);
+                                        if (dtc != null)
+                                            comboBoxCommands.SelectedItem = dtc;
+
+                                        break;
+                                    }
+                            }
+                        }                        
+                    }
+                    else
+                        radioBtnDeviceCMD.Checked = true;
+                }
+            }            
         }
 
         private void comboBoxTypeCommands_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (radioBtnDeviceCMD.Checked)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device_commands selected_cmd = (device_commands)comboBoxCommands.SelectedItem;
-                if (selected_cmd != null)
+                string prefilledValue = string.Empty; 
+                if (editing)
                 {
-                    AddDynamicInputControl((Data_Types)selected_cmd.arg_data_type,
-                                            selected_cmd.friendly_name,
-                                            selected_cmd.device_command_options.Select(o => o.name).ToList(),
-                                            _scene_cmd.arg);
+                    scene_commands scmd = db.scene_commands.FirstOrDefault(c => c.id == scenecmd_id_to_edit.Value);
+                    if (scmd != null)                    
+                        prefilledValue = scmd.arg; 
+                    
                 }
-                else
-                {
-                    panelUserInputControls.Controls.Clear();
-                }
-            }
-            else
-            {
-                device_type_commands selected_cmd = (device_type_commands)comboBoxCommands.SelectedItem;
 
-                if (selected_cmd != null)
+
+                if (radioBtnDeviceCMD.Checked)
                 {
-                    AddDynamicInputControl((Data_Types)selected_cmd.arg_data_type,
-                                            selected_cmd.friendly_name,
-                                            selected_cmd.device_type_command_options.Select(o => o.option).ToList(),
-                                            _scene_cmd.arg);
+                    device_commands selected_cmd = db.device_commands.FirstOrDefault(c => c.id == ((device_commands)comboBoxCommands.SelectedItem).id);
+                    if (selected_cmd != null)
+                    {
+                        
+                            AddDynamicInputControl((Data_Types)selected_cmd.arg_data_type,
+                                                    selected_cmd.friendly_name,
+                                                    selected_cmd.device_command_options.Select(o => o.name).ToList(),
+                                                    prefilledValue);                       
+                    }
+                    else
+                    {
+                        panelUserInputControls.Controls.Clear();
+                    }
                 }
                 else
                 {
-                    panelUserInputControls.Controls.Clear();
+                    device_type_commands selected_cmd = db.device_type_commands.FirstOrDefault(c => c.id == ((device_type_commands)comboBoxCommands.SelectedItem).id);
+                    if (selected_cmd != null)
+                    {                        
+                            AddDynamicInputControl((Data_Types)selected_cmd.arg_data_type,
+                                                    selected_cmd.friendly_name,
+                                                    selected_cmd.device_type_command_options.Select(o => o.option).ToList(),
+                                                    prefilledValue);                        
+                    }
+                    else
+                    {
+                        panelUserInputControls.Controls.Clear();
+                    }
                 }
             }
         }
@@ -120,52 +152,65 @@ namespace zVirtualScenesApplication.Forms
 
         private void btnSave_Click(object sender, EventArgs e)
         {
-            _scene_cmd.device_id = _device.id;            
+           scene_commands scmd;
+           using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+           {
+               if (editing)
+                   scmd = db.scene_commands.FirstOrDefault(c => c.id == scenecmd_id_to_edit.Value);
+               else
+               {
+                   scmd = new scene_commands();
+                   scmd.device_id = device_id;
+                   scmd.scene_id = scene_id.Value;
+                   scmd.sort_order = positionInList;
+               }
 
-            //Update the command type, command id, and arg
-            if (radioBtnTypeCommand.Checked)
-            {
-                device_type_commands selected_cmd = (device_type_commands)comboBoxCommands.SelectedItem;
-                if (selected_cmd == null)
-                {
-                    MessageBox.Show("Please select a command!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return;
-                }
-                _scene_cmd.command_id = selected_cmd.id;
-                _scene_cmd.command_type_id = (int)command_types.device_type_command;
-                string userInput = GetUserInput((Data_Types)selected_cmd.arg_data_type);
+               //Update the command type, command id, and arg
+               if (radioBtnTypeCommand.Checked)
+               {
+                   device_type_commands selected_cmd = (device_type_commands)comboBoxCommands.SelectedItem;
+                   if (selected_cmd == null)
+                   {
+                       MessageBox.Show("Please select a command!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                       return;
+                   }
+                   scmd.command_id = selected_cmd.id;
+                   scmd.command_type_id = (int)command_types.device_type_command;
+                   string userInput = GetUserInput((Data_Types)selected_cmd.arg_data_type);
 
-                if (userInput == null)
-                    return;
-                else
-                    _scene_cmd.arg = userInput; 
-            }
-            else
-            {
-                device_commands selected_cmd = (device_commands)comboBoxCommands.SelectedItem;
-                if (selected_cmd == null)
-                {
-                    MessageBox.Show("Please select a command!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    return;
-                }
+                   if (userInput == null)
+                       return;
+                   else
+                       scmd.arg = userInput;
+               }
+               else
+               {
+                   device_commands selected_cmd = (device_commands)comboBoxCommands.SelectedItem;
+                   if (selected_cmd == null)
+                   {
+                       MessageBox.Show("Please select a command!", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                       return;
+                   }
 
-                _scene_cmd.command_id = selected_cmd.id;
-                _scene_cmd.command_type_id = (int)command_types.device_command;
+                   scmd.command_id = selected_cmd.id;
+                   scmd.command_type_id = (int)command_types.device_command;
 
-                string userInput = GetUserInput((Data_Types)selected_cmd.arg_data_type);
+                   string userInput = GetUserInput((Data_Types)selected_cmd.arg_data_type);
 
-                if (userInput == null)
-                    return;
-                else
-                    _scene_cmd.arg = userInput; 
-            }
+                   if (userInput == null)
+                       return;
+                   else
+                       scmd.arg = userInput;
+               }
 
-            if (_sceneCMDList != null)
-                _sceneCMDList.Add(_scene_cmd);
+               if (!editing)
+                   db.scene_commands.AddObject(scmd); 
 
-            zvsEntityControl.zvsContext.SaveChanges();            
+               db.SaveChanges();
+           }
+           zvsEntityControl.CallSceneModified(this, null);
 
-            this.Close();
+           this.Close();
         }
 
         private void AddDynamicInputControl(Data_Types d, string FriendlyName, List<string> OptionList, string PrefilledValue = null)
@@ -197,7 +242,7 @@ namespace zVirtualScenesApplication.Forms
                         cmbo.SelectedIndex = 0;
 
                     if (PrefilledValue != null)
-                        cmbo.SelectedItem = OptionList.FirstOrDefault(o=> o.ToString() == PrefilledValue);
+                        cmbo.Text = PrefilledValue;
 
                     panelUserInputControls.Controls.Add(cmbo);
                     break;
@@ -285,8 +330,6 @@ namespace zVirtualScenesApplication.Forms
                     {
                         return string.Empty;
                     }
-                    
-
             }
         }
 
@@ -294,7 +337,15 @@ namespace zVirtualScenesApplication.Forms
         {
             if (radioBtnDeviceCMD.Checked)
             {
-                comboBoxCommands.DataSource = _device.device_commands;
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    device device = db.devices.FirstOrDefault(d => d.id == device_id);
+                    //Populate combo boxes
+                    if (device != null)
+                    {
+                        comboBoxCommands.DataSource = device.device_commands;
+                    }
+                }
             }
         }
 
@@ -302,7 +353,16 @@ namespace zVirtualScenesApplication.Forms
         {
             if (radioBtnTypeCommand.Checked)
             {
-                comboBoxCommands.DataSource = _device.device_types.device_type_commands;
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    device device = db.devices.FirstOrDefault(d => d.id == device_id);
+                    //Populate combo boxes
+                    if (device != null)
+                    {
+                        comboBoxCommands.DataSource = device.device_types.device_type_commands;
+                    }
+                }
+                
             }
 
         }

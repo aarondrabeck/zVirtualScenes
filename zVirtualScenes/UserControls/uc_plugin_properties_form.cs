@@ -16,101 +16,107 @@ namespace zVirtualScenesApplication.UserControls
     public partial class uc_plugin_properties_form : UserControl
     {
         private MainForm mainForm;
-        private plugin _p;
+        private string APIName;
 
         public uc_plugin_properties_form()
-        {
+        {           
             InitializeComponent();
         }
 
-        public void PopulatePluginSettings(plugin p, MainForm f)
+        public void PopulatePluginSettings(string APIName, MainForm f)
         {
-            mainForm = f;
-            if (p != null)
+            labelStatus.Text = "";
+            this.APIName = APIName;
+            this.mainForm = f;
+
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                _p = p;
-                pnlSettings.Controls.Clear();
-                int top = 5;
-
-                #region Populate Builtin Settings
-                Plugin zvsPlugin = this.mainForm.pm.GetPlugins().FirstOrDefault(pl => pl.Name == p.name);
-
-                if (zvsPlugin != null)
+                plugin p = db.plugins.FirstOrDefault(o => o.name.Equals(APIName)); 
+                if (p != null)
                 {
-                    cbEnablePlugin.Checked = zvsPlugin.Enabled;
-                    labelPluginTitle.Text = p.friendly_name + " for zVirtualScenes";
-                    lblPluginDescription.Text = p.description;
-                    cbEnablePlugin.Tag = zvsPlugin;
-                }
-                else
-                    return;
+                    pnlSettings.Controls.Clear();
+                    int top = 5;
 
-                #endregion
+                    #region Populate Builtin Settings
+                    Plugin zvsPlugin = this.mainForm.pm.GetPlugins().FirstOrDefault(pl => pl.Name == p.name);
 
-                #region Populate Dynamic User Input Objects               
-                
-                if (p.plugin_settings != null)
-                {
-                    foreach (plugin_settings ps in p.plugin_settings)
+                    if (zvsPlugin != null)
                     {
-                        int left = 10;
+                        cbEnablePlugin.Checked = zvsPlugin.Enabled;
+                        labelPluginTitle.Text = p.friendly_name + " for zVirtualScenes";
+                        lblPluginDescription.Text = p.description;
+                        cbEnablePlugin.Tag = zvsPlugin;
+                    }
+                    else
+                        return;
 
-                        #region Label Description
-                        if ((Data_Types)ps.value_data_type != Data_Types.BOOL)
+                    #endregion
+
+                    #region Populate Dynamic User Input Objects
+
+                    if (p.plugin_settings != null)
+                    {
+                        foreach (plugin_settings ps in p.plugin_settings)
                         {
-                            Label cntlLabel = new Label();
-                            cntlLabel.Text = ps.friendly_name + ":";
-                            cntlLabel.Top = top + 5;
-                            cntlLabel.Left = left;
-                            cntlLabel.Height = 23;
-                            pnlSettings.Controls.Add(cntlLabel);
+                            int left = 10;
+
+                            #region Label Description
+                            if ((Data_Types)ps.value_data_type != Data_Types.BOOL)
+                            {
+                                Label cntlLabel = new Label();
+                                cntlLabel.Text = ps.friendly_name + ":";
+                                cntlLabel.Top = top + 5;
+                                cntlLabel.Left = left;
+                                cntlLabel.Height = 23;
+                                pnlSettings.Controls.Add(cntlLabel);
+
+                                using (Graphics cg = this.CreateGraphics())
+                                {
+                                    SizeF size = cg.MeasureString(cntlLabel.Text, cntlLabel.Font);
+                                    cntlLabel.Width = (int)size.Width;
+                                    left += (int)size.Width;
+                                }
+                            }
+
+                            #endregion
+
+                            #region Add Input Control Depending on type
+                            left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSettings,
+                                                                            (Data_Types)ps.value_data_type,
+                                                                            top,
+                                                                            left,
+                                                                            ps.id + "-plugin_setting_arg",
+                                                                            ps.friendly_name,
+                                                                            ps.plugin_setting_options.Select(s => s.option).ToList(),
+                                                                            ps.value,
+                                                                            (Data_Types)ps.value_data_type);
+
+                            #endregion
+
+                            #region Label Description
+
+                            Label CmdLabel = new Label();
+                            CmdLabel.Text = ps.description;
+                            CmdLabel.Top = top + 5;
+                            CmdLabel.Left = left;
+                            CmdLabel.Height = 23;
+                            pnlSettings.Controls.Add(CmdLabel);
 
                             using (Graphics cg = this.CreateGraphics())
                             {
-                                SizeF size = cg.MeasureString(cntlLabel.Text, cntlLabel.Font);
-                                cntlLabel.Width = (int)size.Width;
-                                left += (int)size.Width;
+                                SizeF size = cg.MeasureString(CmdLabel.Text, CmdLabel.Font);
+                                size.Width += 6; //add some padding
+                                CmdLabel.Width = (int)size.Width;
+                                left = (int)size.Width + left + 5;
                             }
+
+                            #endregion
+
+                            top += 35;
                         }
-
-                        #endregion
-
-                        #region Add Input Control Depending on type
-                        left = GlobalMethods.DrawDynamicUserInputBoxes(pnlSettings,
-                                                                        (Data_Types)ps.value_data_type,
-                                                                        top,
-                                                                        left,
-                                                                        ps.id + "-plugin_setting_arg",
-                                                                        ps.friendly_name,
-                                                                        ps.plugin_setting_options.Select(s => s.option).ToList(),
-                                                                        ps.value,
-                                                                        (Data_Types)ps.value_data_type);
-
-                        #endregion
-
-                        #region Label Description
-
-                        Label CmdLabel = new Label();
-                        CmdLabel.Text = ps.description;
-                        CmdLabel.Top = top + 5;
-                        CmdLabel.Left = left;
-                        CmdLabel.Height = 23;
-                        pnlSettings.Controls.Add(CmdLabel);
-
-                        using (Graphics cg = this.CreateGraphics())
-                        {
-                            SizeF size = cg.MeasureString(CmdLabel.Text, CmdLabel.Font);
-                            size.Width += 6; //add some padding
-                            CmdLabel.Width = (int)size.Width;
-                            left = (int)size.Width + left + 5;
-                        }
-
-                        #endregion
-
-                        top += 35;
                     }
+                    #endregion
                 }
-                #endregion
             }
         }
 
@@ -118,87 +124,89 @@ namespace zVirtualScenesApplication.UserControls
         {           
             //Save Dynamic Settings
             #region Dynamic Settings
-
-            try
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-
-                if (_p.plugin_settings != null)
+                plugin p = db.plugins.FirstOrDefault(o => o.name.Equals(APIName));
+                if (p != null)
                 {
-                    foreach (plugin_settings ps in _p.plugin_settings)  //For Each Plugin Setting
+                    //SAVE PLUGIN SETTINGS
+                    if (p.plugin_settings != null)
                     {
-                        string Identifer = ps.id + "-plugin_setting_arg";
-                        foreach (Control c in pnlSettings.Controls)  //Find Control
+                        //SAVE SETTIMGS
+                        foreach (plugin_settings ps in p.plugin_settings)  //For Each Plugin Setting
                         {
-                            if (c.Name.Equals(Identifer))
+                            string Identifer = ps.id + "-plugin_setting_arg";
+                            foreach (Control c in pnlSettings.Controls)  //Find Control
                             {
-                                switch ((Data_Types)c.Tag)  //Save entered setting depending on type.
+                                if (c.Name.Equals(Identifer))
                                 {
-                                    case Data_Types.NONE:
-                                        break;
-                                    case Data_Types.DECIMAL:
-                                    case Data_Types.INTEGER:
-                                    case Data_Types.SHORT:
-                                    case Data_Types.BYTE:
-                                    case Data_Types.COMPORT:
-                                        ps.value = ((NumericUpDown)c).Value.ToString();
-                                        break;
-                                    case Data_Types.BOOL:
-                                        ps.value = ((CheckBox)c).Checked.ToString();
-                                        break;
-                                    case Data_Types.STRING:
-                                        ps.value = ((TextBox)c).Text;
-                                        break;
-                                    case Data_Types.LIST:
-                                        ps.value = ((ComboBox)c).Text;
-                                        break;
+                                    switch ((Data_Types)c.Tag)  //Save entered setting depending on type.
+                                    {
+                                        case Data_Types.NONE:
+                                            break;
+                                        case Data_Types.DECIMAL:
+                                        case Data_Types.INTEGER:
+                                        case Data_Types.SHORT:
+                                        case Data_Types.BYTE:
+                                        case Data_Types.COMPORT:
+                                            ps.value = ((NumericUpDown)c).Value.ToString();
+                                            break;
+                                        case Data_Types.BOOL:
+                                            ps.value = ((CheckBox)c).Checked.ToString();
+                                            break;
+                                        case Data_Types.STRING:
+                                            ps.value = ((TextBox)c).Text;
+                                            break;
+                                        case Data_Types.LIST:
+                                            ps.value = ((ComboBox)c).Text;
+                                            break;
+                                    }
                                 }
                             }
                         }
                     }
-                    zvsEntityControl.zvsContext.SaveChanges();
+
+                    //Save Builtin Settings
+                    #region Enable/Disable
+                    Plugin zvsPlugin = (Plugin)cbEnablePlugin.Tag;
+                    if (zvsPlugin != null)
+                    {
+                        if (cbEnablePlugin.Checked)
+                        {
+                            //Enable
+                            if (!zvsPlugin.Enabled)
+                            {
+                                zvsPlugin.Enabled = true;
+                                p.enabled = true;
+                                zvsPlugin.Initialize();
+                                zvsPlugin.Start();
+                            }
+                        }
+                        else
+                        {
+                            //Disable
+                            if (zvsPlugin.Enabled)
+                            {
+                                zvsPlugin.Enabled = false;
+                                p.enabled = false;
+
+
+                                if (zvsPlugin.IsRunning)
+                                    zvsPlugin.Stop();
+                            }
+                        }
+                    }
+                    #endregion
+
+                    db.SaveChanges();
+                    labelStatus.Text = string.Format("{0} - {1} settings saved.", DateTime.Now.ToLongTimeString(),p.friendly_name); 
                 }
-            }
-            catch (Exception ex)
-            {
-                labelStatus.Text = "Save Failed.";
-                MessageBox.Show("Error saving " + _p.friendly_name + " settings." + Environment.NewLine + Environment.NewLine + ex.Message, zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            labelStatus.Text = _p.friendly_name + " Settings Saved!";
+            }                    
+            //labelStatus.Text = "Save Failed.";
+            //MessageBox.Show("Error saving " + _p.friendly_name + " settings." + Environment.NewLine + Environment.NewLine + ex.Message, zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             #endregion
 
-            //Save Builtin Settings
-            #region Enable/Disable
-
-            Plugin zvsPlugin = (Plugin)cbEnablePlugin.Tag;
-            if (zvsPlugin != null)
-            {
-                if (cbEnablePlugin.Checked)
-                {
-                    //Enable
-                    if (!zvsPlugin.Enabled)
-                    {
-                        zvsPlugin.Enabled = true;
-                        _p.enabled = true;
-                        zvsEntityControl.zvsContext.SaveChanges();
-                        zvsPlugin.Initialize();
-                        zvsPlugin.Start();
-                    }
-                }
-                else
-                {
-                    //Disable
-                    if (zvsPlugin.Enabled)
-                    {
-                        zvsPlugin.Enabled = false;
-                        _p.enabled = false;
-                        zvsEntityControl.zvsContext.SaveChanges();
-
-                        if (zvsPlugin.IsRunning)
-                            zvsPlugin.Stop();
-                    }
-                }
-            }
-            #endregion
+           
         }
     }
 }

@@ -19,9 +19,16 @@ namespace zVirtualScenesCommon.Entity
             if (DeviceValueDataChangedEvent != null)
                 DeviceValueDataChangedEvent(this, prevVal);
 
-        }      
+        }
 
-        
-       
+        public static event DeviceValueAddedEventHandler DeviceValueAddedEvent;
+        public delegate void DeviceValueAddedEventHandler(object sender, EventArgs e);
+
+        public void DeviceValueAdded(EventArgs e)
+        {
+            if (DeviceValueAddedEvent != null)
+                DeviceValueAddedEvent(this, e);
+
+        }           
     }
 }
