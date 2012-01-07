@@ -141,7 +141,7 @@ namespace zVirtualScenesAPI
                         if (!string.IsNullOrEmpty(dv.value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value)))
                         {
                             //Call Event
-                            dv.DeviceValueDataChanged(prev_value);
+                            dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = existing_dv.id, previousValue = prev_value });
                         }
                     }
 

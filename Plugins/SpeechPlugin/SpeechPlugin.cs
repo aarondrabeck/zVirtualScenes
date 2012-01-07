@@ -90,7 +90,7 @@ namespace SpeechPlugin
             return true;
         }             
                 
-        void device_values_DeviceValueDataChangedEvent(object sender, string PreviousValue)
+        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
             if (IsReady)
             {

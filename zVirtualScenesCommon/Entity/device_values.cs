@@ -12,13 +12,20 @@ namespace zVirtualScenesCommon.Entity
         /// Called after the Value has been changed in the database
         /// </summary>
         public static event ValueDataChangedEventHandler DeviceValueDataChangedEvent;
-        public delegate void ValueDataChangedEventHandler(object sender, string PreviousValue);
+        
+        public delegate void ValueDataChangedEventHandler(object sender, ValueDataChangedEventArgs args);
 
-        public void DeviceValueDataChanged(string prevVal)
+        public void DeviceValueDataChanged(ValueDataChangedEventArgs args)
         {
             if (DeviceValueDataChangedEvent != null)
-                DeviceValueDataChangedEvent(this, prevVal);
+                DeviceValueDataChangedEvent(this, args);
 
+        }
+
+        public class ValueDataChangedEventArgs : System.EventArgs
+        {
+            public long device_value_id = 0;
+            public string previousValue;
         }
 
         public static event DeviceValueAddedEventHandler DeviceValueAddedEvent;

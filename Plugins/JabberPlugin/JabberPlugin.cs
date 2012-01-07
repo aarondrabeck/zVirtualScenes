@@ -141,7 +141,7 @@ namespace JabberPlugin
 
       
 
-        void device_values_DeviceValueDataChangedEvent(object sender, string PreviousValue)
+        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
             device_values dv = (device_values)sender;
                         

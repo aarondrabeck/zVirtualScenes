@@ -34,8 +34,8 @@ namespace zVirtualScenesApplication.Forms
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 //Load cmb box values                
-                cmbo_devices.DataSource = db.devices.OfType<device>().Execute(MergeOption.AppendOnly);                
-                cmbo_scene.DataSource = db.scenes.OfType<scene>().Execute(MergeOption.AppendOnly);
+                cmbo_devices.DataSource = db.devices.OfType<device>().Execute(MergeOption.AppendOnly);
+                cmbo_scene.DataSource = db.scenes.OrderBy(s=>s.sort_order);
                 cmbo_operator.DataSource = Enum.GetValues(typeof(device_value_triggers.TRIGGER_OPERATORS));
 
                 //prefill if editing
@@ -46,9 +46,9 @@ namespace zVirtualScenesApplication.Forms
                     {
                         if (trigger_to_edit.trigger_operator.HasValue)
                             cmbo_operator.Text = Enum.GetName(typeof(device_value_triggers.TRIGGER_OPERATORS), trigger_to_edit.trigger_operator.Value);
-                        cmbo_devices.SelectedItem = trigger_to_edit.device_values.device;
-                        cmbo_devicevalues.SelectedItem = trigger_to_edit.device_values;
-                        cmbo_scene.SelectedItem = trigger_to_edit.scene;
+                        cmbo_devices.Text = trigger_to_edit.device_values.device.friendly_name;
+                        cmbo_devicevalues.Text = trigger_to_edit.device_values.label_name;
+                        cmbo_scene.Text = trigger_to_edit.scene.friendly_name;
                         txTriggertValue.Text = trigger_to_edit.trigger_value;
                         txt_name.Text = trigger_to_edit.Name;
                         checkBoxEnabled.Checked = trigger_to_edit.enabled;

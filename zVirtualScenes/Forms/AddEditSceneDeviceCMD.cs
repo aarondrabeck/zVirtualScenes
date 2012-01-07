@@ -95,9 +95,9 @@ namespace zVirtualScenesApplication.Forms
                 }
             }            
         }
-
+        
         private void comboBoxTypeCommands_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        {            
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 string prefilledValue = string.Empty; 
@@ -238,8 +238,8 @@ namespace zVirtualScenesApplication.Forms
                     cmbo.DropDownStyle = ComboBoxStyle.DropDownList;
                     cmbo.DataSource = OptionList;
 
-                    if (cmbo.Items.Count > 0)
-                        cmbo.SelectedIndex = 0;
+                   // if (cmbo.Items.Count > 0)
+                      //  cmbo.SelectedIndex = 0;
 
                     if (PrefilledValue != null)
                         cmbo.Text = PrefilledValue;

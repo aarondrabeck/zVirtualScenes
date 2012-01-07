@@ -238,113 +238,109 @@ namespace zVirtualScenesApplication
             }
         }
 
-        void device_values_DeviceValueDataChangedEvent(object sender, string PreviousValue)
+        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
             if (this.InvokeRequired)
-                this.Invoke(new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent), new object[] { sender, PreviousValue });
+                this.Invoke(new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent), new object[] { sender, args });
             else
             {
-
-                device_values dv = (device_values)sender;
-                //GUI UPDATING
-                if (dv.label_name == "Basic" || dv.label_name == "Temperature")
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    SyncdataListViewDevices();
-                }
-
-                if (dv != null)
-                {
-                    string device_name = "Unknown";
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    device_values dv = db.device_values.FirstOrDefault(v=> v.id == args.device_value_id);                  
+                    if (dv != null)
                     {
-                        device d = db.devices.FirstOrDefault(o => o.id == dv.device_id);
-                        if (d != null)
+                        //GUI UPDATING
+                        if (dv.label_name == "Basic" || dv.label_name == "Temperature")
                         {
-                            if (String.IsNullOrEmpty(d.friendly_name))
-                                device_name = "Device #" + dv.device_id;
-                            else
-                                device_name = d.friendly_name;
+                            SyncdataListViewDevices();
                         }
-                    }
 
-                    if (!String.IsNullOrEmpty(PreviousValue))
-                        Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed from {2} to {3}.", device_name, dv.label_name, PreviousValue, dv.value), "EVENT");
-                    else
-                        Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed to {2}.", device_name, dv.label_name, dv.value), "EVENT");
+                        string device_name = "Unknown";
+                       
+                        if (String.IsNullOrEmpty(dv.device.friendly_name))
+                            device_name = "Device #" + dv.device_id;
+                        else
+                            device_name = dv.device.friendly_name;  
 
-                    // Check to see if previous value == new value. If so then the value didn't actually change!
-                    if (PreviousValue != dv.value)
-                    {
-                        //Event Triggering
-                        foreach (device_value_triggers trigger in dv.device_value_triggers.Where(t => t.enabled))
+                        if (!String.IsNullOrEmpty(args.previousValue))
+                            Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed from {2} to {3}.", device_name, dv.label_name, args.previousValue, dv.value), "EVENT");
+                        else
+                            Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed to {2}.", device_name, dv.label_name, dv.value), "EVENT");
+
+                        // Check to see if previous value == new value. If so then the value didn't actually change!
+                        if (args.previousValue != dv.value)
                         {
-                            if (((device_value_triggers.TRIGGER_TYPE)trigger.trigger_type) == device_value_triggers.TRIGGER_TYPE.Basic)
+                            //Event Triggering
+                            foreach (device_value_triggers trigger in dv.device_value_triggers.Where(t => t.enabled))
                             {
-                                switch ((device_value_triggers.TRIGGER_OPERATORS)trigger.trigger_operator)
+                                if (((device_value_triggers.TRIGGER_TYPE)trigger.trigger_type) == device_value_triggers.TRIGGER_TYPE.Basic)
                                 {
-                                    case device_value_triggers.TRIGGER_OPERATORS.EqualTo:
-                                        {
-                                            if (dv.value.Equals(trigger.trigger_value))
+                                    switch ((device_value_triggers.TRIGGER_OPERATORS)trigger.trigger_operator)
+                                    {
+                                        case device_value_triggers.TRIGGER_OPERATORS.EqualTo:
                                             {
-                                                Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
-                                            }
-                                            break;
-                                        }
-                                    case device_value_triggers.TRIGGER_OPERATORS.GreaterThan:
-                                        {
-                                            double deviceValue = 0;
-                                            double triggerValue = 0;
-
-                                            if (double.TryParse(dv.value, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
-                                            {
-                                                if (deviceValue > triggerValue)
+                                                if (dv.value.Equals(trigger.trigger_value))
                                                 {
                                                     Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
                                                     Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
                                                 }
+                                                break;
                                             }
-                                            else
-                                                Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
-
-                                            break;
-                                        }
-                                    case device_value_triggers.TRIGGER_OPERATORS.LessThan:
-                                        {
-                                            double deviceValue = 0;
-                                            double triggerValue = 0;
-
-                                            if (double.TryParse(dv.value, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                        case device_value_triggers.TRIGGER_OPERATORS.GreaterThan:
                                             {
-                                                if (deviceValue < triggerValue)
+                                                double deviceValue = 0;
+                                                double triggerValue = 0;
+
+                                                if (double.TryParse(dv.value, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                                {
+                                                    if (deviceValue > triggerValue)
+                                                    {
+                                                        Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                                    }
+                                                }
+                                                else
+                                                    Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+
+                                                break;
+                                            }
+                                        case device_value_triggers.TRIGGER_OPERATORS.LessThan:
+                                            {
+                                                double deviceValue = 0;
+                                                double triggerValue = 0;
+
+                                                if (double.TryParse(dv.value, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                                {
+                                                    if (deviceValue < triggerValue)
+                                                    {
+                                                        Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                                    }
+                                                }
+                                                else
+                                                    Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+
+                                                break;
+                                            }
+                                        case device_value_triggers.TRIGGER_OPERATORS.NotEqualTo:
+                                            {
+                                                if (!dv.value.Equals(trigger.trigger_value))
                                                 {
                                                     Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
                                                     Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
                                                 }
+                                                break;
                                             }
-                                            else
-                                                Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
-
-                                            break;
-                                        }
-                                    case device_value_triggers.TRIGGER_OPERATORS.NotEqualTo:
-                                        {
-                                            if (!dv.value.Equals(trigger.trigger_value))
-                                            {
-                                                Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
-                                            }
-                                            break;
-                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    ScriptManager.RunScript(trigger);
                                 }
                             }
-                            else
-                            {
-                                ScriptManager.RunScript(trigger);
-                            }
                         }
-                    }
 
+                    }
                 }
             }
         }

@@ -60,7 +60,7 @@ namespace GrowlPlugin
 
        
 
-        void device_values_DeviceValueDataChangedEvent(object sender, string PreviousValue)
+        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
             if (IsReady)
             {
@@ -74,7 +74,7 @@ namespace GrowlPlugin
 
                     if (thisEvent.Equals(deviceTypeValuespair.Trim()))
                     {
-                        Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value + " from " + PreviousValue + ".");
+                        Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value + " from " + args.previousValue + ".");
                         GrowlConnector.Notify(notification);
                     }
                 }
