@@ -11,6 +11,7 @@ using System.Drawing;
 using zVirtualScenesAPI;
 using zVirtualScenesCommon;
 using zVirtualScenesCommon.Entity;
+using System.Linq;
 
 namespace GrowlPlugin
 {
@@ -64,18 +65,24 @@ namespace GrowlPlugin
         {
             if (IsReady)
             {
-                device_values dv = (device_values)sender;
-
-                string[] deviceTypeValuespairs = GetSettingValue("NOTIFICATIONS").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (string deviceTypeValuespair in deviceTypeValuespairs)
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
-
-                    if (thisEvent.Equals(deviceTypeValuespair.Trim()))
+                    device_values dv = db.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                    if (dv != null)
                     {
-                        Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value + " from " + args.previousValue + ".");
-                        GrowlConnector.Notify(notification);
+
+                        string[] deviceTypeValuespairs = GetSettingValue("NOTIFICATIONS").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        foreach (string deviceTypeValuespair in deviceTypeValuespairs)
+                        {
+                            string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+
+                            if (thisEvent.Equals(deviceTypeValuespair.Trim()))
+                            {
+                                Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value + " from " + args.previousValue + ".");
+                                GrowlConnector.Notify(notification);
+                            }
+                        }
                     }
                 }
             }

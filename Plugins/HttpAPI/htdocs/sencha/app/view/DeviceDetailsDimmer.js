@@ -144,7 +144,7 @@ Ext.require(['Ext.Panel', 'Ext.util.JSONP', 'Ext.MessageBox'], function () {
                                     method: 'POST',
                                     params: {
                                         u: Math.random(),
-                                        name: 'DYNAMIC_CMD_LEVEL',
+                                        name: 'DYNAMIC_CMD_BASIC',
                                         arg: sliderValue,
                                         type: 'device'
                                     },

@@ -21,13 +21,13 @@ namespace zVirtualScenesApplication
         static void Main()
         {
             //Check is already running
-            string proc = Process.GetCurrentProcess().ProcessName;
-            Process[] processes = Process.GetProcessesByName(proc);
-            if (processes.Length > 1)
-            {
-                MessageBox.Show("Sorry, zVirtualScenes is already running!", "zVirtualScenes");
-                Environment.Exit(1);
-            }
+            //string proc = Process.GetCurrentProcess().ProcessName;
+            //Process[] processes = Process.GetProcessesByName(proc);
+            //if (processes.Length > 1)
+            //{
+            //    MessageBox.Show("Sorry, zVirtualScenes is already running!", "zVirtualScenes");
+            //    Environment.Exit(1);
+            //}
 
             //#region Handle Embeded DLLs
             //AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>

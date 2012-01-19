@@ -102,7 +102,7 @@ namespace zVirtualScenesAPI
             }
         }
 
-        public void DefineOrUpdateDeviceValue(device_values dv)
+        public void DefineOrUpdateDeviceValue(device_values dv, bool IgnoreValueChange = false)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -110,7 +110,7 @@ namespace zVirtualScenesAPI
                 if (d != null)
                 {
                     device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == dv.value_id);
-                    string prev_value = string.Empty; 
+                    string prev_value = string.Empty;
 
                     if (existing_dv == null)
                     {
@@ -120,14 +120,15 @@ namespace zVirtualScenesAPI
 
                         //Call Event
                         dv.DeviceValueAdded(new System.EventArgs());
-                    } 
+                    }
                     else
                     {
+
                         //CHANGED VALUE
                         prev_value = existing_dv.value;
 
                         //values come in blank sometimes.  If they are blank, keep the DB value. 
-                        if (!string.IsNullOrEmpty(dv.value))
+                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value))
                             existing_dv.value = dv.value;
 
                         existing_dv.type = dv.type;
@@ -138,11 +139,12 @@ namespace zVirtualScenesAPI
                         existing_dv.read_only = dv.read_only;
                         db.SaveChanges();
 
-                        if (!string.IsNullOrEmpty(dv.value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value)))
+                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value)))
                         {
                             //Call Event
                             dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = existing_dv.id, previousValue = prev_value });
                         }
+
                     }
 
                     

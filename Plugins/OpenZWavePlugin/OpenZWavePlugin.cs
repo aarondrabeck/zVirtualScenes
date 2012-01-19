@@ -596,6 +596,7 @@ namespace OpenZWavePlugin
 
                                 Console.WriteLine("OpenZWave Plugin | [ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
 
+                                //Values are 'unknown' at this point so dont report a value change. 
                                 DefineOrUpdateDeviceValue(new device_values
                                 {
                                     device_id = d.id,
@@ -607,7 +608,7 @@ namespace OpenZWavePlugin
                                     commandClassId = value.CommandClassID,
                                     value = data,
                                     read_only = read_only
-                                });
+                                }, true);
 
                                 #region Install Dynamic Commands
 
@@ -782,7 +783,6 @@ namespace OpenZWavePlugin
 
                                                     switch (value.Label)
                                                     {
-                                                        case "Level":
                                                         case "Basic":
                                                             device_values dv_basic = d.device_values.FirstOrDefault(v => v.value_id == vid.GetId().ToString());
                                                             if (dv_basic != null)

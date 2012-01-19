@@ -154,7 +154,7 @@
                 if(this.isSwitch()) {
                     return (this.get("on_off") == "OFF") ? 'TURNOFF' : 'TURNON';
                 } else if(this.isDimmer()) {
-                    return "DYNAMIC_CMD_LEVEL";
+                    return "DYNAMIC_CMD_BASIC";
                 } else if(this.isThermostat()) {
                     return "DYNAMIC_CMD_COOLING 1";
                 }

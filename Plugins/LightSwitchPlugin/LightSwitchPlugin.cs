@@ -186,24 +186,23 @@ namespace LightSwitchPlugin
 
         void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
-            device_values dv = (device_values)sender;
-            string UpdateString = DeviceToString(dv);
-
-            if (!string.IsNullOrEmpty(UpdateString))
-            {
-                BroadcastMessage("UPDATE~" + DeviceToString(dv) + Environment.NewLine);
-                BroadcastMessage("ENDLIST" + Environment.NewLine);
-            }
-
-            string device_name = string.Empty;
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device device = db.devices.FirstOrDefault(d => d.id == dv.device_id);
-                if (device != null)
-                    device_name = device.friendly_name;
-            }
+                device_values dv = db.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                if (dv != null)
+                {
+                    string UpdateString = DeviceToString(dv);
+                    if (!string.IsNullOrEmpty(UpdateString))
+                    {
+                        BroadcastMessage("UPDATE~" + DeviceToString(dv) + Environment.NewLine);
+                        BroadcastMessage("ENDLIST" + Environment.NewLine);
+                    }
 
-            BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + dv.value + Environment.NewLine);
+                    string device_name = string.Empty;
+                    device_name = dv.device.friendly_name;
+                    BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + dv.value + Environment.NewLine);
+                }
+            }
         }       
 
         void zvsEntityControl_SceneRunCompleteEvent(long scene_id, int ErrorCount)
@@ -712,9 +711,9 @@ namespace LightSwitchPlugin
         /// <returns></returns>
         private void ExecuteZVSCommand(long device_id, byte Level, Socket Client)
         {
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device d = context.devices.FirstOrDefault(o => o.id == device_id);
+                device d = db.devices.FirstOrDefault(o => o.id == device_id);
 
                 if (d != null)
                 {
@@ -742,7 +741,7 @@ namespace LightSwitchPlugin
                             }
                         case "DIMMER":
                             {
-                                if(ExecuteDynamicCMD(d, "DYNAMIC_CMD_BASIC", (Level == 255 ? "99" : Level.ToString()), Client))
+                                if( ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_BASIC", (Level == 255 ? "99" : Level.ToString()), Client))
                                     return;                                
                                 break;
                             }
@@ -771,7 +770,7 @@ namespace LightSwitchPlugin
             }
         }
 
-        private bool ExecuteDynamicCMD(device d, string device_cmd_name, string arg, Socket Client)
+        private bool ExecuteDynamicCMD(zvsEntities2 db, device d, string device_cmd_name, string arg, Socket Client)
         {
             device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == device_cmd_name);
             if (cmd != null)
@@ -793,23 +792,22 @@ namespace LightSwitchPlugin
 
         private void ExecuteZVSThermostatCommand(long deviceID, byte Mode, int Temp, Socket Client)
         {
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device d = context.devices.FirstOrDefault(o => o.id == deviceID);
-
+                device d = db.devices.FirstOrDefault(o => o.id == deviceID);
                 if (d != null && d.device_types.name.Equals("THERMOSTAT"))
                 {
                     switch (Mode)
                     {
                         case 2:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_HEATING 1", Temp.ToString(), Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_HEATING 1", Temp.ToString(), Client))
                                     return;    
                                 break;
                             }
                         case 3:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_COOLING 1", Temp.ToString(), Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_COOLING 1", Temp.ToString(), Client))
                                     return;
                                 break;
                             }
@@ -822,47 +820,46 @@ namespace LightSwitchPlugin
         private void ExecuteZVSThermostatCommand(long deviceID, byte Mode, Socket Client)
         {
 
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                device d = context.devices.FirstOrDefault(o => o.id == deviceID);
-
+                device d = db.devices.FirstOrDefault(o => o.id == deviceID);
                 if (d != null && d.device_types.name.Equals("THERMOSTAT"))
                 {
                     switch (Mode)
                     {
                         case 0:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_MODE", "Off", Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_MODE", "Off", Client))
                                     return;
                                 break;
                             }
                         case 1:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_MODE", "Auto", Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_MODE", "Auto", Client))
                                     return;
                                 break;
                             }
                         case 2:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_MODE", "Heat", Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_MODE", "Heat", Client))
                                     return;
                                 break;
                             }
                         case 3:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_MODE", "Cool", Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_MODE", "Cool", Client))
                                     return;
                                 break;
                             }
                         case 4:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_FAN MODE", "On Low", Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_FAN MODE", "On Low", Client))
                                     return;
                                 break;
                             }
                         case 5:
                             {
-                                if (ExecuteDynamicCMD(d, "DYNAMIC_CMD_FAN MODE", "Auto Low", Client))
+                                if (ExecuteDynamicCMD(db, d, "DYNAMIC_CMD_FAN MODE", "Auto Low", Client))
                                     return;
                                 break;
                             }
@@ -890,7 +887,7 @@ namespace LightSwitchPlugin
                                 device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == "SETCONFORTMODE");
                                 if (cmd != null)
                                 {
-                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command" + cmd.friendly_name + " on " + d.friendly_name + ".");
+                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.friendly_name + " on " + d.friendly_name + ".");
                                     
                                     device_type_command_que.Run(new device_type_command_que
                                     {

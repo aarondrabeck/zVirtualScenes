@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using zVirtualScenesAPI;
 using zVirtualScenesCommon.Entity;
 using zVirtualScenesCommon;
+using System.Linq;
 
 namespace SpeechPlugin
 {
@@ -94,47 +95,54 @@ namespace SpeechPlugin
         {
             if (IsReady)
             {
-                device_values dv = (device_values)sender;
-                string user_selected_announce_option = GetSettingValue("ANNOUCEOPTIONS");
-
-                if (user_selected_announce_option == "Switch Level" || user_selected_announce_option == "All of the above")
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
-                    if (dv.device.device_types.name == "SWITCH" && dv.label_name == "Basic")
+                    device_values dv = db.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                    if (dv != null)
                     {
-                        _synth.SpeakAsync(dv.device.friendly_name + " switched " + (dv.value == "255" ? "On" : "Off") + ".");
-                    }
-                }
 
-                if (user_selected_announce_option == "Dimmer Level" || user_selected_announce_option == "All of the above")
-                {
-                    if (dv.device.device_types.name == "DIMMER" && dv.label_name == "Level")
-                    {
-                        _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
-                    }
-                }
+                        string user_selected_announce_option = GetSettingValue("ANNOUCEOPTIONS");
 
-                if (user_selected_announce_option == "Thermostat Operating State and Temp" || user_selected_announce_option == "All of the above")
-                {
-                    if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Temperature")
-                    {
-                        _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
-                    }
+                        if (user_selected_announce_option == "Switch Level" || user_selected_announce_option == "All of the above")
+                        {
+                            if (dv.device.device_types.name == "SWITCH" && dv.label_name == "Basic")
+                            {
+                                _synth.SpeakAsync(dv.device.friendly_name + " switched " + (dv.value == "255" ? "On" : "Off") + ".");
+                            }
+                        }
 
-                    if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Operating State")
-                    {
-                        _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
-                    }
-                }
-                if (user_selected_announce_option == "Custom")
-                {
-                    string[] objTypeValuespairs = GetSettingValue("CUSTOMVALUES").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (user_selected_announce_option == "Dimmer Level" || user_selected_announce_option == "All of the above")
+                        {
+                            if (dv.device.device_types.name == "DIMMER" && dv.label_name == "Level")
+                            {
+                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                            }
+                        }
 
-                    foreach (string objTypeValuespair in objTypeValuespairs)
-                    {
-                        string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+                        if (user_selected_announce_option == "Thermostat Operating State and Temp" || user_selected_announce_option == "All of the above")
+                        {
+                            if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Temperature")
+                            {
+                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                            }
 
-                        if (thisEvent.Equals(objTypeValuespair.Trim()))
-                            _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                            if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Operating State")
+                            {
+                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                            }
+                        }
+                        if (user_selected_announce_option == "Custom")
+                        {
+                            string[] objTypeValuespairs = GetSettingValue("CUSTOMVALUES").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            foreach (string objTypeValuespair in objTypeValuespairs)
+                            {
+                                string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+
+                                if (thisEvent.Equals(objTypeValuespair.Trim()))
+                                    _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                            }
+                        }
                     }
                 }
             }

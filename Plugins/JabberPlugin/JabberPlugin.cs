@@ -10,6 +10,7 @@ using jabber.client;
 using zVirtualScenesAPI;
 using zVirtualScenesCommon;
 using zVirtualScenesCommon.Entity;
+using System.Linq;
 
 namespace JabberPlugin
 {
@@ -143,16 +144,21 @@ namespace JabberPlugin
 
         void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
-            device_values dv = (device_values)sender;
-                        
-            string[] objTypeValuespairs = GetSettingValue("JABBERNOTIFICATIONS").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string objTypeValuespair in objTypeValuespairs)
+            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+                device_values dv = db.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                if (dv != null)
+                {
+                    string[] objTypeValuespairs = GetSettingValue("JABBERNOTIFICATIONS").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
-                if (thisEvent.Equals(objTypeValuespair.Trim()))
-                    SendMessage(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                    foreach (string objTypeValuespair in objTypeValuespairs)
+                    {
+                        string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+
+                        if (thisEvent.Equals(objTypeValuespair.Trim()))
+                            SendMessage(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                    }
+                }
             }
         }
 

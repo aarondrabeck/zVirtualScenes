@@ -1516,7 +1516,7 @@ namespace zVirtualScenesApplication
             // colLastHeardFrom
             // 
             this.colLastHeardFrom.AspectName = "last_heard_from";
-            this.colLastHeardFrom.Text = "Last Heard From";
+            this.colLastHeardFrom.Text = "Last Queried";
             this.colLastHeardFrom.Width = 150;
             // 
             // uc_device_values1
