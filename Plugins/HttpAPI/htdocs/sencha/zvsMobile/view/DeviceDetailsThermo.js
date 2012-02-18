@@ -5,28 +5,29 @@
 
         constructor: function (config) {
             var self = this;
+            
             self.RepollTimer;
             self.deviceID = 0;
             Ext.apply(config || {}, {
+                xtype: 'panel',
+                layout: 'vbox',
+                scrollable: 'vertical',
                 items: [{
-                    xtype: 'panel',
-                    scrollable: 'vertical',
+                    xtype: 'toolbar',
+                    docked: 'top',
+                    title: 'Device Details',
                     items: [{
-                        xtype: 'toolbar',
-                        docked: 'top',
-                        title: 'Device Details',
-                        items: [{
-                            xtype: 'button',
-                            iconMask: true,
-                            ui: 'back',
-                            text: 'Back',
-                            handler: function () {
-                                var DeviceViewPort = self.parent;
-                                DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                                DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
-                            }
-                        }]
-                    },
+                        xtype: 'button',
+                        iconMask: true,
+                        ui: 'back',
+                        text: 'Back',
+                        handler: function () {
+                            var DeviceViewPort = self.parent;
+                            DeviceViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                            DeviceViewPort.setActiveItem(DeviceViewPort.items.items[0]);
+                        }
+                    }]
+                },
                      {
                          xtype: 'panel',
                          tpl: new Ext.XTemplate(
@@ -190,25 +191,26 @@
 
                              Ext.Viewport.add(SetMode);
                              SetMode.show();
-                             var data = self.items.items[0].items.items[1].getData();
-                             SetModeitems.items[0].setValue(data.mode)
+                             var detailsTPL = self.items.items[1];
+                             var data = detailsTPL.getData();
+                             SetMode.items.items[0].setValue(data.mode)
 
                          }
                      },
-                      {
-                          xtype: 'button',
-                          text: 'Change Fan Mode',
-                          ui: 'action',
-                          margin: 5,
-                          flex: 1,
-                          handler: function () {
-                              if (!SetFanMode) {
-                                  var SetFanMode = Ext.create('Ext.ActionSheet', {
-                                      items: [{
-                                          xtype: 'selectfield',
-                                          label: 'Fan Mode',
-                                          margin: '15 5',
-                                          options: [
+                     {
+                         xtype: 'button',
+                         text: 'Change Fan Mode',
+                         ui: 'action',
+                         margin: 5,
+                         flex: 1,
+                         handler: function () {
+                             if (!SetFanMode) {
+                                 var SetFanMode = Ext.create('Ext.ActionSheet', {
+                                     items: [{
+                                         xtype: 'selectfield',
+                                         label: 'Fan Mode',
+                                         margin: '15 5',
+                                         options: [
                                                 {
                                                     text: 'On Low',
                                                     value: 'On Low'
@@ -217,7 +219,7 @@
                                                     text: 'Auto Low',
                                                     value: 'Auto Low'
                                                 }]
-                                      },
+                                     },
                                         {
                                             xtype: 'toolbar',
                                             docked: 'top',
@@ -266,15 +268,16 @@
                                                     }
                                                 }]
                                         }]
-                                  });
-                              }
-                              Ext.Viewport.add(SetFanMode);
-                              SetFanMode.show();
-                              var data = self.items.items[0].items.items[1].getData();
-                              SetFanMode.items.items[0].setValue(data.fan_mode)
+                                 });
+                             }
+                             Ext.Viewport.add(SetFanMode);
+                             SetFanMode.show();
+                             var detailsTPL = self.items.items[1];
+                             var data = detailsTPL.getData();
+                             SetFanMode.items.items[0].setValue(data.fan_mode)
 
-                          }
-                      },
+                         }
+                     },
                      {
                          xtype: 'button',
                          text: 'Change Heat Point',
@@ -321,7 +324,8 @@
 
                              Ext.Viewport.add(picker);
                              picker.show();
-                             var data = self.items.items[0].items.items[1].getData();
+                             var detailsTPL = self.items.items[1];
+                             var data = detailsTPL.getData();
                              picker.setValue({ temperature: data.heat_p }, true)
                          }
                      },
@@ -370,7 +374,8 @@
                              });
                              Ext.Viewport.add(picker);
                              picker.show();
-                             var data = self.items.items[0].items.items[1].getData();
+                             var detailsTPL = self.items.items[1];
+                             var data = detailsTPL.getData();
                              picker.setValue({ temperature: data.cool_p }, true)
                          }
                      },
@@ -403,8 +408,7 @@
                              });
                          }
                      }
-                     ]
-                }],
+                ],
                 listeners: {
                     scope: this,
                     deactivate: function () {
@@ -414,22 +418,19 @@
             });
             this.callOverridden([config]);
         },
-        config:
-	{
-	    layout: 'fit',
-	    scrollable: 'vertical'
-	},
         delayedReload: function () {
             var self = this;
+            var detailsTPL = self.items.items[1];
             if (self.RepollTimer) { clearInterval(self.RepollTimer); }
 
             self.RepollTimer = setTimeout(function () {
-                var id = self.items.items[0].items.items[1].getData().id;
+                var id = detailsTPL.getData().id;
                 self.loadDevice(self.deviceID);
             }, 1500);
         },
         loadDevice: function (deviceId) {
             var self = this;
+            var detailsTPL = self.items.items[1];
             self.deviceID = deviceId;
             //Get Device Details			
             console.log('AJAX: GetDeviceDetails');
@@ -440,9 +441,8 @@
                     u: Math.random()
                 },
                 success: function (result) {
-                    console.log(result);
                     //Send data to panel TPL                            
-                    self.items.items[0].items.items[1].setData(result.details);
+                    detailsTPL.setData(result.details);
 
                     //Update meter levels 
                     self.UpdateLevel(result.details.level);
@@ -451,16 +451,17 @@
         },
         UpdateLevel: function (value) {
             var self = this;
+            var detailsTPL = self.items.items[1];
             //Update panel TPL        
-            var data = Ext.clone(self.items.items[0].items.items[1].getData());
+            var data = Ext.clone(detailsTPL.getData());
             data.level = value;
             data.level_txt = value + 'F';
-            self.items.items[0].items.items[1].setData(data);
+            detailsTPL.setData(data);
 
             //Update the store 
             data = DeviceStore.data.items;
             for (i = 0, len = data.length; i < len; i++) {
-                if (data[i].data.id === self.items.items[0].items.items[1]._data.id) {
+                if (data[i].data.id === detailsTPL._data.id) {
                     data[i].data.level = value;
                     data[i].data.level_txt = value + 'F';
                 }
