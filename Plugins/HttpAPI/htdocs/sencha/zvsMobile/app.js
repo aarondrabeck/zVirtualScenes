@@ -13,7 +13,7 @@ Ext.application({
     name: 'zvsMobile',
     launch: function () {
         Ext.require(['Ext.tab.Panel', 'zvsMobile.view.DeviceViewPort', 'zvsMobile.view.SceneViewPort', 'zvsMobile.view.GroupViewPort', 'zvsMobile.view.SettingsViewPort'], function () {
-            zvsMobile.tabPanel = Ext.create('Ext.tab.Panel', {
+            zvsMobile.tabPanel = Ext.create('Ext.tab.Panel', {                
                 fullscreen: true,
                 tabBar: {
                     docked: 'bottom',
@@ -23,19 +23,23 @@ Ext.application({
                 },
                 items: [{
                     xtype: 'DeviceViewPort',
+                    id: 'DeviceViewPort',
                     title: 'Devices',
                     iconCls: "bulb"
                 }, {
                     xtype: 'SceneViewPort',
+                    id: 'SceneViewPort',
                     title: "Scenes",
                     iconCls: "equalizer2"
 
                 }, {
                     xtype: 'GroupViewPort',
+                    id: 'GroupViewPort',
                     title: "Groups",
                     iconCls: "spaces2"
                 }, {
                     xtype: 'SettingsViewPort',
+                    id: 'SettingsViewPort',
                     title: 'Settings',                    
                     iconCls: 'settings'
                 }]

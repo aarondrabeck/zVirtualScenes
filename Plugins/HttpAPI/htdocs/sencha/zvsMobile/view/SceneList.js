@@ -3,7 +3,7 @@ Ext.require(['Ext.Panel', 'zvsMobile.store.Scenes'], function () {
 
     Ext.define('zvsMobile.view.SceneList', {
         extend: 'Ext.Panel',
-        xtype: 'SceneList',
+        xtype: 'SceneList',        
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {

@@ -22,7 +22,7 @@
                         handler: function () {
                             var SceneViewPort = self.parent;
                             SceneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                            SceneViewPort.setActiveItem(SceneViewPort.items.items[0]);
+                            SceneViewPort.setActiveItem(SceneViewPort.items.items[0]); 
                         }
                     }]
                 }, {

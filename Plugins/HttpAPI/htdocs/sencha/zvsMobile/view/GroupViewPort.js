@@ -2,6 +2,18 @@ Ext.require(['Ext.Panel', 'zvsMobile.view.GroupList', 'zvsMobile.view.GroupDetai
     Ext.define('zvsMobile.view.GroupViewPort', {
         extend: 'Ext.Panel',
         xtype: 'GroupViewPort',
+        initialize: function () {
+            this.callParent(arguments);
+            this.getEventDispatcher().addListener('element', '#GroupViewPort', 'swipe', this.onTouchPadEvent, this);
+        },
+        onTouchPadEvent: function (e, target, options, eventController) {            
+            if (e.direction === 'right' && e.distance > 300) {
+                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(1));
+            }
+            else if (e.direction === 'left' && e.distance > 300) {
+                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
+            }
+        },
         config: {
             layout: {
                 type: 'card',
@@ -11,7 +23,8 @@ Ext.require(['Ext.Panel', 'zvsMobile.view.GroupList', 'zvsMobile.view.GroupDetai
                 }
             },
             items: [{
-                xtype: 'GroupList'
+                xtype: 'GroupList',
+                id: 'GroupList'
             }, {
                 xtype: 'GroupDetails'
             }

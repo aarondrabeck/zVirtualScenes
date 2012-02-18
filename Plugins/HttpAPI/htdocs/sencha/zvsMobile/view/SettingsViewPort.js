@@ -2,10 +2,19 @@
     Ext.define('zvsMobile.view.SettingsViewPort', {
         extend: 'Ext.Panel',
         xtype: 'SettingsViewPort',
+        initialize: function () {
+            this.callParent(arguments);
+            this.getEventDispatcher().addListener('element', '#SettingsViewPort', 'swipe', this.onTouchPadEvent, this);
+        },
+        onTouchPadEvent: function (e, target, options, eventController) {
+            if (e.direction === 'right' && e.distance > 300 && zvsMobile.tabPanel.getTabBar().getComponent(2)._disabled != true) {
+                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(2));
+            }
+        },
 
         constructor: function (config) {
             var self = this;
-            Ext.apply(config || {}, {
+            Ext.apply(config || {}, {            
                 items: [
                     {
                         xtype: 'toolbar',
@@ -26,9 +35,7 @@
                                 zvsMobile.tabPanel.getTabBar().getComponent(2).setDisabled(false);
 
                                 //Change view to the device list
-                                var devices = zvsMobile.tabPanel.items.items[0];
-                                zvsMobile.tabPanel.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                                zvsMobile.tabPanel.setActiveItem(devices);
+                                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(0));
 
                                 //Get data
                                 DeviceStore.load();

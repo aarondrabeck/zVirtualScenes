@@ -2,8 +2,7 @@ Ext.require(['Ext.Panel', 'zvsMobile.store.Groups'], function () {
 
     Ext.define('zvsMobile.view.GroupList', {
         extend: 'Ext.Panel',
-        xtype: 'GroupList',
-
+        xtype: 'GroupList',       
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {

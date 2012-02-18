@@ -5,12 +5,15 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Dev
         alias: 'widget.DeviceList',
         constructor: function (config) {
             var self = this;
+            console.log(self);
             Ext.apply(config || {}, {
+
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
                     title: 'Devices'
                 }],
+
                 listeners:
 			{
 			    scope: this,
