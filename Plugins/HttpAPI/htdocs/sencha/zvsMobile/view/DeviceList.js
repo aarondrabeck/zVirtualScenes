@@ -9,16 +9,7 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Dev
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
-                    title: 'Devices',
-                    scrollable: false,
-                    items: [{
-                        xtype: 'button',
-                        iconMask: true,
-                        iconCls: 'refresh',
-                        handler: function () {
-                            DeviceStore.load();
-                        }
-                    }]
+                    title: 'Devices'
                 }],
                 listeners:
 			{
@@ -60,6 +51,9 @@ Ext.require(['Ext.dataview.List', 'zvsMobile.model.Device', 'zvsMobile.store.Dev
         },
         config:
         {
+            plugins: [
+                    { xclass: 'Ext.plugin.PullRefresh' }
+                ],
             scrollable: 'vertical',
             itemTpl: new Ext.XTemplate(
 		            '<div class="device">',

@@ -1,5 +1,5 @@
 Ext.require(['Ext.Panel', 'zvsMobile.store.Groups'], function () {
-  
+
     Ext.define('zvsMobile.view.GroupList', {
         extend: 'Ext.Panel',
         xtype: 'GroupList',
@@ -7,20 +7,16 @@ Ext.require(['Ext.Panel', 'zvsMobile.store.Groups'], function () {
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {
-                items: [{
+                items: [
+                {
                     xtype: 'toolbar',
                     docked: 'top',
-                    title: 'Groups',
-                    items: [{
-                        xtype: 'button',
-                        iconMask: true,
-                        iconCls: 'refresh',
-                        handler: function () {
-                            GroupsStore.load();
-                        }
-                    }]
+                    title: 'Groups'
                 }, {
                     xtype: 'list',
+                    plugins: [
+                    { xclass: 'Ext.plugin.PullRefresh' }
+                    ],
                     itemTpl: new Ext.XTemplate(
 						    '<div class="group">',
 						        '<div class="imageholder"></div>',
@@ -54,6 +50,7 @@ Ext.require(['Ext.Panel', 'zvsMobile.store.Groups'], function () {
         },
         config:
 	{
+
 	    layout: 'fit'
 	}
     });

@@ -10,17 +10,12 @@ Ext.require(['Ext.Panel', 'zvsMobile.store.Scenes'], function () {
                 items: [{
                     xtype: 'toolbar',
                     docked: 'top',
-                    title: 'Scenes',
-                    items: [{
-                        xtype: 'button',
-                        iconMask: true,
-                        iconCls: 'refresh',
-                        handler: function () {
-                            SceneStore.load();
-                        }
-                    }]
+                    title: 'Scenes'
                 }, {
                     xtype: 'list',
+                    plugins: [
+                    { xclass: 'Ext.plugin.PullRefresh' }
+                ],
                     itemTpl: new Ext.XTemplate(
 						    '<div class="scene">',
 						    '<div class="imageholder running_{is_running}"></div>',
