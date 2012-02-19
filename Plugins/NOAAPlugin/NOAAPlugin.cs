@@ -183,7 +183,7 @@ namespace NOAAPlugin
 
                             if (activate)
                             {
-                                WriteToLog(Urgency.INFO, "Sunrise: " + scene.RunScene());
+                                WriteToLog(Urgency.INFO, "Sunrise: " + scene.RunScene(db));
                             }
                         }
                     }
@@ -203,7 +203,7 @@ namespace NOAAPlugin
 
                             if (activate)
                             {
-                                WriteToLog(Urgency.INFO, "Sunset: " + scene.RunScene());
+                                WriteToLog(Urgency.INFO, "Sunset: " + scene.RunScene(db));
                             }
                         }
                     }

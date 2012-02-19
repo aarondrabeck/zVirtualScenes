@@ -50,7 +50,7 @@ namespace zVirtualScenesApplication.Scripting
                         // Make sure the user specified a correct scene name
                         if (_scene != null)
                         {
-                            _scene.RunScene();
+                            _scene.RunScene(context);
                             Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", "ADVANCEDSCRIPT");
                         }
                         else

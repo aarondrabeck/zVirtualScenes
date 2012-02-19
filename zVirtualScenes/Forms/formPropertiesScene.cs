@@ -198,6 +198,24 @@ namespace zVirtualScenesApplication
         private void button1_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void lblResetSceneRunning_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to reset the isRunning property for this scene?", "Are you sure?",
+                                        MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    scene scene = db.scenes.FirstOrDefault(s => s.id == Scene_ID);
+                    if (scene != null)
+                    {
+                        scene.is_running = false; 
+                        db.SaveChanges();
+                    }
+                }
+                zvsEntityControl.CallSceneModified(this, Scene_ID);
+            }
         }                
     }       
 }

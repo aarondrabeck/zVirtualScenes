@@ -11,9 +11,9 @@ using System.ComponentModel;
 namespace zVirtualScenesCommon.Entity
 {
     public partial class scene : EntityObject
-    {        
+    {
 
-        private BackgroundWorker ExecuteScene = new BackgroundWorker();        
+        private BackgroundWorker ExecuteScene = new BackgroundWorker();
 
         public string DeviceIcon()
         {
@@ -23,31 +23,38 @@ namespace zVirtualScenesCommon.Entity
                 return "SceneRun";
         }
 
-        public string RunScene()
+        public string RunScene(zvsEntities2 db = null)
         {
             if (this.is_running || ExecuteScene.IsBusy)
                 return "Failed to start scene '" + this.friendly_name + "' because it is already running!";
             else
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                bool DisposeDB = false; 
+                if (db == null)
                 {
-                    scene s = db.scenes.FirstOrDefault(sc => sc.id == this.id);
-                    if (s != null)
-                    {
-                        if (s.scene_commands.Count < 1)
-                            return "Failed to start scene '" + this.friendly_name + "' because it has no commands!";
-
-                        ExecuteScene.DoWork += new DoWorkEventHandler(ExecuteScene_DoWork);
-                        ExecuteScene.RunWorkerCompleted += new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
-
-                        s.is_running = true;
-                        db.SaveChanges();
-                    }               
+                    DisposeDB = true; 
+                    db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
                 }
+
+                scene s = db.scenes.FirstOrDefault(sc => sc.id == this.id);
+                if (s != null)
+                {
+                    if (s.scene_commands.Count < 1)
+                        return "Failed to start scene '" + this.friendly_name + "' because it has no commands!";
+
+                    ExecuteScene.DoWork += new DoWorkEventHandler(ExecuteScene_DoWork);
+                    ExecuteScene.RunWorkerCompleted += new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
+
+                    s.is_running = true;
+                    db.SaveChanges();
+                }
+
+                if(DisposeDB)
+                    db.Dispose(); 
 
                 ExecuteScene.RunWorkerAsync(this.id);
 
-                string result = "Scene '" + this.friendly_name + "' started."; 
+                string result = "Scene '" + this.friendly_name + "' started.";
                 zvsEntityControl.SceneRunStarted(this, result);
                 return result;
             }
@@ -79,11 +86,11 @@ namespace zVirtualScenesCommon.Entity
             {
                 //Find Scene
                 scene _scene = context.scenes.FirstOrDefault(s => s.id == (long)e.Argument);
-                if(_scene != null)
+                if (_scene != null)
                 {
                     e.Result = (long)e.Argument;
                     errorCount = 0;
-                    foreach (scene_commands sCMD in _scene.scene_commands.OrderBy(o=> o.sort_order))
+                    foreach (scene_commands sCMD in _scene.scene_commands.OrderBy(o => o.sort_order))
                     {
                         switch ((command_types)sCMD.command_type_id)
                         {

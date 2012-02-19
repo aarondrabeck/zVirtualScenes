@@ -37,6 +37,8 @@
             this.pnlSceneProperties = new System.Windows.Forms.Panel();
             this.toolTipNotificationLevel = new System.Windows.Forms.ToolTip(this.components);
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.lblResetSceneRunning = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
             // 
@@ -103,11 +105,31 @@
             this.pictureBox2.TabIndex = 39;
             this.pictureBox2.TabStop = false;
             // 
+            // lblResetSceneRunning
+            // 
+            this.lblResetSceneRunning.AutoSize = true;
+            this.lblResetSceneRunning.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lblResetSceneRunning.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.lblResetSceneRunning.Location = new System.Drawing.Point(12, 269);
+            this.lblResetSceneRunning.Name = "lblResetSceneRunning";
+            this.lblResetSceneRunning.Size = new System.Drawing.Size(136, 13);
+            this.lblResetSceneRunning.TabIndex = 42;
+            this.lblResetSceneRunning.Text = "Set scene running to false. ";
+            this.toolTip1.SetToolTip(this.lblResetSceneRunning, "Only use this when the app crashed while a scene was running and the isRunning bo" +
+        "ol is falsely set to true. ");
+            this.lblResetSceneRunning.Click += new System.EventHandler(this.lblResetSceneRunning_Click);
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Warning;
+            this.toolTip1.ToolTipTitle = "Only use this if you know what you are doing!";
+            // 
             // formPropertiesScene
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(824, 291);
+            this.Controls.Add(this.lblResetSceneRunning);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.pnlSceneProperties);
             this.Controls.Add(this.pictureBox2);
@@ -138,5 +160,7 @@
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Panel pnlSceneProperties;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label lblResetSceneRunning;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }

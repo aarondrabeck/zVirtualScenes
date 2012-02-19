@@ -763,7 +763,7 @@ namespace LightSwitchPlugin
                 scene scene = db.scenes.FirstOrDefault(s => s.id == SceneID);
                 if (scene != null)
                 {
-                    string result = scene.RunScene();
+                    string result = scene.RunScene(db);
                     WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + result);
                     BroadcastMessage("MSG~" + result + Environment.NewLine);
                 }

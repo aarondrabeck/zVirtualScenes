@@ -520,7 +520,7 @@ namespace HttpAPI
                     {
                         if (is_running)
                         {
-                            string r = scene.RunScene();
+                            string r = scene.RunScene(db);
                             return new { success = true, desc = r };
                         }
 

@@ -33,7 +33,7 @@ namespace zVirtualScenesCommon.Entity
                 scene scene = db.scenes.FirstOrDefault(s => s.id == this.Scene_id);
                 if (scene != null)
                 {
-                    string result = scene.RunScene();
+                    string result = scene.RunScene(db);
                     Logger.WriteToLog(Urgency.INFO, string.Format("Scheduled task '{0}' {1}", this.friendly_name, result), "TASK");
                 }
                 else

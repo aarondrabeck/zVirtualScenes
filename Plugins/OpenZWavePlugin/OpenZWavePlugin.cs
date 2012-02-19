@@ -68,6 +68,7 @@ namespace OpenZWavePlugin
                 }
                 else
                 {
+                    
                     //m_manager.AddHidDriver();
                 }
                 
@@ -1214,8 +1215,25 @@ namespace OpenZWavePlugin
 
                 case ZWNotification.Type.AwakeNodesQueried:
                     {
+                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                        {
+                            foreach (Node n in m_nodeList)
+                            {
+                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == n.ID);
+
+                                if (d != null)
+                                {
+                                    if (device_property_values.GetDevicePropertyValue(d.id, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
+                                        EnablePolling(n.ID);
+                                }
+                            }
+                        }
+
                         WriteToLog(Urgency.INFO, "Ready:  Awake nodes queried (but not some sleeping nodes).");
-                        Console.WriteLine("OpenZWave Plugin | Ready:  Awake nodes queried (but not some sleeping nodes).");
+                        IsReady = true;
+
+                        FinishedInitialPoll = true;
+                      
                         break;
                     }                   
             }

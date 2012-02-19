@@ -283,7 +283,7 @@ namespace zVirtualScenesApplication
             this.toolStripSeparator3,
             this.editSceneToolStripMenuItem});
             this.contextMenuStripScenes.Name = "contextMenuStripScenes";
-            this.contextMenuStripScenes.Size = new System.Drawing.Size(162, 120);
+            this.contextMenuStripScenes.Size = new System.Drawing.Size(162, 142);
             // 
             // runSceneToolStripMenuItem
             // 

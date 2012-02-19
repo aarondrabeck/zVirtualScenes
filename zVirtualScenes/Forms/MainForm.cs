@@ -282,7 +282,7 @@ namespace zVirtualScenesApplication
                                                 if (dv.value.Equals(trigger.trigger_value))
                                                 {
                                                     Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                    Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                                    Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                                 }
                                                 break;
                                             }
@@ -296,7 +296,7 @@ namespace zVirtualScenesApplication
                                                     if (deviceValue > triggerValue)
                                                     {
                                                         Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                                     }
                                                 }
                                                 else
@@ -314,7 +314,7 @@ namespace zVirtualScenesApplication
                                                     if (deviceValue < triggerValue)
                                                     {
                                                         Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                                        Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                                     }
                                                 }
                                                 else
@@ -327,7 +327,7 @@ namespace zVirtualScenesApplication
                                                 if (!dv.value.Equals(trigger.trigger_value))
                                                 {
                                                     Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                    Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                                    Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                                 }
                                                 break;
                                             }
