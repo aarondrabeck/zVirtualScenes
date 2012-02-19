@@ -62,13 +62,13 @@ Ext.application({
                     }
                     else {
                         var settings = zvsMobile.tabPanel.items.items[4];
-                        zvsMobile.tabPanel.setActiveItem(settings);
+                        zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
                         settings.items.items[2].fireEvent('loggedOut');
                     }
                 },
                 failure: function (result, request) {
                     var settings = zvsMobile.tabPanel.items.items[4];
-                    zvsMobile.tabPanel.setActiveItem(settings);
+                    zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
                     settings.items.items[2].fireEvent('loggedOut');
                 }
             });

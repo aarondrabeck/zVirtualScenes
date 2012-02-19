@@ -6,11 +6,11 @@ Ext.require(['Ext.Panel', 'zvsMobile.view.GroupList', 'zvsMobile.view.GroupDetai
             this.callParent(arguments);
             this.getEventDispatcher().addListener('element', '#GroupViewPort', 'swipe', this.onTouchPadEvent, this);
         },
-        onTouchPadEvent: function (e, target, options, eventController) {            
-            if (e.direction === 'right' && e.distance > 300) {
+        onTouchPadEvent: function (e, target, options, eventController) {
+            if (e.direction === 'right' && e.distance > 50) {
                 zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(1));
             }
-            else if (e.direction === 'left' && e.distance > 300) {
+            else if (e.direction === 'left' && e.distance > 50) {
                 zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
             }
         },

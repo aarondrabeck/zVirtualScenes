@@ -11,8 +11,8 @@ Ext.require(['Ext.Panel',
                 this.callParent(arguments);
                 this.getEventDispatcher().addListener('element', '#DeviceViewPort', 'swipe', this.onTouchPadEvent, this);
             },
-            onTouchPadEvent: function (e, target, options, eventController) {               
-                if (e.direction === 'left' && e.distance > 300) {
+            onTouchPadEvent: function (e, target, options, eventController) {
+                if (e.direction === 'left' && e.distance > 50) {
                     zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(1));
                 }
             },
