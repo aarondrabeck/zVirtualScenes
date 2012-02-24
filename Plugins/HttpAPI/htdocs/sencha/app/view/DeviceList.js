@@ -3,7 +3,6 @@ Ext.define('zvsMobile.view.DeviceList', {
     xtype: 'DeviceList',
     constructor: function (config) {
         var self = this;
-        console.log(self);
         Ext.apply(config || {}, {
 
             items: [{
