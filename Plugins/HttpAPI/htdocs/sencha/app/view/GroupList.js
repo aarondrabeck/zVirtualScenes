@@ -10,6 +10,7 @@ Ext.define('zvsMobile.view.GroupList', {
                     docked: 'top',
                     title: 'Groups'
                 }, {
+                    ui: 'round',
                     xtype: 'list',
                     plugins: [
                     { xclass: 'Ext.plugin.PullRefresh' }

@@ -1,5 +1,5 @@
 .pin-screen {
-    /* background: url('/images/z-wave-logo.gif') center center no-repeat; */
+    /* background: url('/sencha/resources/img/z-wave-logo.gif') center center no-repeat; */
 }
 
 .pin-screen .x-button {
@@ -7,15 +7,15 @@
     width: 104px;
     height: 60px;
     font-size: 2em;
-    border-radius: 0;
+    border-radius: 0; 
     border: 1px solid #000;
 }
 
-.x-tab .x-button-icon.bulb,.x-button .x-button-icon.x-icon-mask.bulb { -webkit-mask-image:url('/images/bulb.png'); }
-.x-tab .x-button-icon.doc_list,.x-button .x-button-icon.x-icon-mask.doc_list {-webkit-mask-image:url('/images/doc_list.png'); }
-.x-tab .x-button-icon.equalizer2,.x-button .x-button-icon.x-icon-mask.equalizer2 { -webkit-mask-image:url('/images/equalizer2.png'); }
-.x-tab .x-button-icon.spaces2,.x-button .x-button-icon.x-icon-mask.spaces2 {-webkit-mask-image:url('/images/spaces2.png'); }
-.x-tab .x-button-icon.settings5,.x-button .x-button-icon.x-icon-mask.settings5 {-webkit-mask-image:url('/images/settings5.png'); }
+.x-tab .x-button-icon.bulb,.x-button .x-button-icon.x-icon-mask.bulb { -webkit-mask-image:url('/sencha/resources/img/bulb.png'); }
+.x-tab .x-button-icon.doc_list,.x-button .x-button-icon.x-icon-mask.doc_list {-webkit-mask-image:url('/sencha/resources/img/doc_list.png'); }
+.x-tab .x-button-icon.equalizer2,.x-button .x-button-icon.x-icon-mask.equalizer2 { -webkit-mask-image:url('/sencha/resources/img/equalizer2.png'); }
+.x-tab .x-button-icon.spaces2,.x-button .x-button-icon.x-icon-mask.spaces2 {-webkit-mask-image:url('/sencha/resources/img/spaces2.png'); }
+.x-tab .x-button-icon.settings5,.x-button .x-button-icon.x-icon-mask.settings5 {-webkit-mask-image:url('/sencha/resources/img/settings5.png'); }
 
 html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Helvetica, "BBAlpha Sans", sans-serif }
 /*Device List*/
@@ -68,13 +68,13 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 
 /* Device Images */
 .DeviceListItem .device h2 {font-weight: bold; font-size: 1.1em;padding-top:10px;}
-.THERMOSTAT_ON, .THERMOSTAT_OFF, .THERMOSTAT{ background-image: url('/images/thermostat.png'); }
-.CONTROLLER_ON, .CONTROLLER_OFF{ background-image: url('/images/controler.png'); }
-.DIMMER_ON{ background-image: url('/images/lb_on.png'); }
-.DIMMER_DIM{ background-image: url('/images/lb_dim.png'); }
-.DIMMER_OFF{ background-image: url('/images/lb_off.png'); }
-.SWITCH_ON{ background-image: url('/images/switch_on.png'); }
-.SWITCH_OFF{ background-image: url('/images/switch_off.png'); }
+.THERMOSTAT_ON, .THERMOSTAT_OFF, .THERMOSTAT{ background-image: url('/sencha/resources/img/thermostat.png'); }
+.CONTROLLER_ON, .CONTROLLER_OFF{ background-image: url('/sencha/resources/img/controler.png'); }
+.DIMMER_ON{ background-image: url('/sencha/resources/img/lb_on.png'); }
+.DIMMER_DIM{ background-image: url('/sencha/resources/img/lb_dim.png'); }
+.DIMMER_OFF{ background-image: url('/sencha/resources/img/lb_off.png'); }
+.SWITCH_ON{ background-image: url('/sencha/resources/img/switch_on.png'); }
+.SWITCH_OFF{ background-image: url('/sencha/resources/img/switch_off.png'); }
 
 /* Device Info */
 .device_info { 	position: relative; padding: 5px 70px 5px 5px !important; color: #222; -webkit-box-flex: 1; }
@@ -90,8 +90,8 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 .SceneListItem .x-list-item .x-list-item-label { padding: 0.3em 0.4em; }
 .SceneListItem .scene { position: relative; padding: 0px 0px 0px 74px !important;min-height: 74px !important;}
 .SceneListItem .scene .imageholder {width: 64px;height: 64px;position: absolute;left: 0px;top: 10px;background-position: center center;background-repeat: no-repeat;}
-.SceneListItem .scene .running_true{ background-image: url('/images/scene_run64.png'); }
-.SceneListItem .scene .running_false{ background-image: url('/images/scene64.png'); }
+.SceneListItem .scene .running_true{ background-image: url('/sencha/resources/img/scene_run64.png'); }
+.SceneListItem .scene .running_false{ background-image: url('/sencha/resources/img/scene64.png'); }
 .SceneListItem .scene h2 {font-weight: bold; font-size: 1.1em;padding-top:22px;}
 
 /*Scene Info*/
@@ -99,19 +99,21 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 .scene_info .head { position: relative; padding: 5px 74px 5px 5px !important; color: #222; min-height: 74px !important; }	
 .scene_info .image { width: 64px; height: 64px; position: absolute; right: 5px; top: 5px; }	
 .scene_info h1  {   font-size: 1.2em;  color: #000;}
-.scene_info .s_img_true{ background-image: url('/images/scene_run64.png'); }
-.scene_info .s_img_false{ background-image: url('/images/scene64.png'); }
+.scene_info .s_img_true{ background-image: url('/sencha/resources/img/scene_run64.png'); }
+.scene_info .s_img_false{ background-image: url('/sencha/resources/img/scene64.png'); }
 
-.scene_overview { font-size:.9em ;color: #333;width:100%}/*Group List*/
+.scene_overview { font-size:.9em ;color: #333;width:100%}
+
+/*Group List*/
 .GroupList .x-list-item .x-list-item-label { padding: 0.3em 0.4em; }
 .GroupList .group { position: relative; padding: 0px 0px 0px 74px !important;min-height: 74px !important;}
-.GroupList .group .imageholder {width: 64px;height: 64px;position: absolute;left: 0px;top: 10px;background-position: center center;background-repeat: no-repeat;background-image: url('/images/group64.png')}
+.GroupList .group .imageholder {width: 64px;height: 64px;position: absolute;left: 0px;top: 10px;background-position: center center;background-repeat: no-repeat;background-image: url('/sencha/resources/img/group64.png')}
 .GroupList .group h1 {font-weight: bold; font-size: 1.1em;padding-top:22px;}
 
 /*Group Info*/
 .group_info { position: relative; -webkit-box-flex: 1; }
 .group_info .head { position: relative; padding: 5px 74px 5px 5px !important; color: #222; min-height: 74px !important;}	
-.group_info .image { width: 64px; height: 64px; position: absolute; right: 5px; top: 5px; background-image: url('/images/group64.png')}	
+.group_info .image { width: 64px; height: 64px; position: absolute; right: 5px; top: 5px; background-image: url('/sencha/resources/img/group64.png')}	
 .group_info h1  {   font-size: 1.3em;  color: #000;}
 .group_overview { font-size:.9em ;color: #333;width:100%}
 
@@ -119,8 +121,12 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 /*info table */
   table.info , .info th, .info td{ border:1px solid #666; border-collapse:collapse; }
   table.info  {	border:none; border-top:1px solid #000; margin: 5px auto; width:95%}
- .info thead th{padding:5px 10px;	font-size:.8em;	text-transform:uppercase;	color:#333; } .info tbody td, .info tbody th{	font-size:85%;	padding:5px 10px;	background:#eee;}
- .info tbody th{	color:#333; } .info tbody tr.odd td{background:#ddd;} .info tbody tr.odd th{    color:#333;} /*info table end */
+ .info thead th{padding:5px 10px;	font-size:.8em;	text-transform:uppercase;	color:#333; }
+ .info tbody td, .info tbody th{	font-size:85%;	padding:5px 10px;	background:#eee;}
+ .info tbody th{	color:#333; }
+ .info tbody tr.odd td{background:#ddd;}
+ .info tbody tr.odd th{    color:#333;}
+ /*info table end */
 
 
 /* iostoggle */

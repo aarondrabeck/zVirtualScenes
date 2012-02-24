@@ -9,6 +9,7 @@ Ext.define('zvsMobile.view.SceneList', {
                     docked: 'top',
                     title: 'Scenes'
                 }, {
+                    ui: 'round',
                     xtype: 'list',
                     plugins: [
                     { xclass: 'Ext.plugin.PullRefresh' }

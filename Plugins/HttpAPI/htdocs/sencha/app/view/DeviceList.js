@@ -12,6 +12,7 @@ Ext.define('zvsMobile.view.DeviceList', {
                 title: 'Devices'
             }],
             ui: 'round',
+            xtype: 'list',
             listeners:
 		{
 			scope: this,
