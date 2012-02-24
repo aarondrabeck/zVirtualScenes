@@ -77,13 +77,13 @@ namespace zVirtualScenesCommon.Entity
         {
             if (this.device_types.name.Equals("THERMOSTAT"))
             {
-                int temp = 0;
+                float temp = 0;
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
-                if (dv != null)                
-                    int.TryParse(dv.value, out temp);
+                if (dv != null)
+                    float.TryParse(dv.value, out temp);
 
-                return temp;
+                return (int)temp;
             }
             else if (this.device_types.name.Equals("SWITCH"))
             {
@@ -109,16 +109,15 @@ namespace zVirtualScenesCommon.Entity
 
         public string GetLevelText()
         {
-
             if (this.device_types.name.Equals("THERMOSTAT"))
             {
-                int temp = 0;
+                float temp = 0;
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
                 if (dv != null)
-                    int.TryParse(dv.value, out temp);
+                    float.TryParse(dv.value, out temp);
 
-                return temp + " " + program_options.GetProgramOption("TempAbbreviation");
+                return string.Format("{0} {1}", temp, program_options.GetProgramOption("TempAbbreviation"));
             }
             else if (this.device_types.name.Equals("SWITCH"))
             {

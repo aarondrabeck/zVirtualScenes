@@ -933,6 +933,7 @@ namespace OpenZWavePlugin
                                     case "Setback Schedule Thermostat":
                                     case "Setpoint Thermostat":
                                     case "Setback Thermostat":
+                                    case "Thermostat":
                                         deviceName = "OpenZWave Thermostat " + node.ID;
                                         device_type = GetDeviceType("THERMOSTAT", db);
                                         break;
