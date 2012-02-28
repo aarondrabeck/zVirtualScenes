@@ -1,23 +1,20 @@
-Ext.define('zvsMobile.profile.Phone', {
+Ext.define('zvsMobile.profile.Tablet', {
     extend: 'Ext.app.Profile',
 
     config: {
-        views: ['Main',
-                'DevicePhoneViewPort',
-                'ScenePhoneViewPort',
-                'GroupPhoneViewPort']
+        views: ['Main', 
+            'DeviceTabletViewPort',
+            'SceneTabletViewPort', 
+            'GroupTabletViewPort']
     },
 
     isActive: function () {
-       // return true;
-        return  Ext.os.is.Phone;
+        return !Ext.os.is.Phone;
     },
 
+    launch: function () {
 
-
-    launch: function () {       
-        
-        zvsMobile.tabPanel = Ext.create('zvsMobile.view.phone.Main');
+        zvsMobile.tabPanel = Ext.create('zvsMobile.view.tablet.Main');
         //see if they are logged in 
         Ext.Ajax.request({
             url: zvsMobile.app.APIURL + '/login',

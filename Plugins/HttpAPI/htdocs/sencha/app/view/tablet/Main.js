@@ -1,4 +1,4 @@
-Ext.define('zvsMobile.view.phone.Main', {
+Ext.define('zvsMobile.view.tablet.Main', {
     extend: 'zvsMobile.view.Main',
     xtype: 'mainview',
 
@@ -11,19 +11,19 @@ Ext.define('zvsMobile.view.phone.Main', {
             }
         },
         items: [{
-            xtype: 'DevicePhoneViewPort',
-            id: 'DevicePhoneViewPort',
+            xtype: 'DeviceTabletViewPort',
+            id: 'DeviceTabletViewPort',
             title: 'Devices',
             iconCls: "bulb"
         }, {
-            xtype: 'ScenePhoneViewPort',
-            id: 'ScenePhoneViewPort',
+            xtype: 'SceneTabletViewPort',
+            id: 'SceneTabletViewPort',
             title: "Scenes",
             iconCls: "equalizer2"
 
         }, {
-            xtype: 'GroupPhoneViewPort',
-            id: 'GroupPhoneViewPort',
+            xtype: 'GroupTabletViewPort',
+            id: 'GroupTabletViewPort',
             title: "Groups",
             iconCls: "spaces2"
         }, {

@@ -5,7 +5,7 @@
 		model: 'zvsMobile.model.Group',
 		proxy: {
 			type: 'scripttag',
-			url: '/API/Groups/',
+			url: zvsMobile.app.APIURL + '/Groups/',
 			extraParams: {
 				u: Math.random()
 			},
@@ -20,7 +20,9 @@
 	}
 });
 
-GroupsStore = Ext.create('zvsMobile.store.Groups', {
- requires: ['zvsMobile.store.Groups']
+
+var GroupStore = Ext.create('zvsMobile.store.Groups', {
+    id: 'GroupStore',
+    requires: ['zvsMobile.store.Groups']
 });
 

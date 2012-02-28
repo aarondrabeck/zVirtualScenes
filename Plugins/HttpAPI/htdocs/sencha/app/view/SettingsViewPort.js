@@ -38,7 +38,7 @@
                                 //Get data
                                 DeviceStore.load();
                                 SceneStore.load();
-                                GroupsStore.load();
+                                GroupStore.load();
 
 
                                 //Change view to the device list
@@ -71,7 +71,7 @@
                     activate: function () {
 
                         Ext.Ajax.request({
-                            url: '/API/login',
+                            url: zvsMobile.app.APIURL + '/login',
                             method: 'GET',
                             params: {
                                 u: Math.random()

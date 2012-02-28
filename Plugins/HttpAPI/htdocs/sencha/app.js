@@ -10,6 +10,8 @@ Ext.Loader.setPath({
 
 Ext.application({
     name: 'zvsMobile',
+    APIURL:'http://10.1.0.61/API', 
+    
 
     // Setup the icons and startup images for the example
     icon: '/sencha/resources/img/icon.png',
@@ -17,10 +19,15 @@ Ext.application({
     phoneStartupScreen: '/sencha/resources/img/phone_startup.png',
     glossOnIcon: false,
 
-    profiles: ['Phone'],
+    profiles: ['Phone', 'Tablet'],
     stores: ['Devices', 'Groups', 'Scenes'],
-    views: ['DeviceViewPort', 'SceneViewPort', 'GroupViewPort', 'SettingsViewPort']   
+    views: ['SettingsViewPort']
+
+
+
 });
+
+
 
 
  

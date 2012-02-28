@@ -5,7 +5,7 @@
 		model: 'zvsMobile.model.Device',
 		proxy: {
 			type: 'jsonp',
-			url: '/API/Devices/',
+			url: zvsMobile.app.APIURL + '/Devices/',
 			extraParams: {
 				u: Math.random()
 			},
@@ -21,8 +21,10 @@
 		}
 });
 
-DeviceStore = Ext.create('zvsMobile.store.Devices', {
- requires: ['zvsMobile.store.Devices']
+var DeviceStore = Ext.create('zvsMobile.store.Devices', {
+    id: 'DeviceStore',
+    requires: ['zvsMobile.store.Devices']
 });
+
 
 

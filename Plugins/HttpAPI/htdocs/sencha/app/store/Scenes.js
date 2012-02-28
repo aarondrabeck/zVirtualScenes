@@ -5,7 +5,7 @@
 		model: 'zvsMobile.model.Scene',
 		proxy: {
 			type: 'scripttag',
-			url: '/API/Scenes/',
+			url: zvsMobile.app.APIURL + '/Scenes/',
 			extraParams: {
 				u: Math.random()
 			},
@@ -22,5 +22,9 @@
 });
 
 SceneStore = Ext.create('zvsMobile.store.Scenes', {
- requires: ['zvsMobile.store.Scenes']
+    id: 'SceneStore',
+    requires: ['zvsMobile.store.Scenes']
 });
+
+
+

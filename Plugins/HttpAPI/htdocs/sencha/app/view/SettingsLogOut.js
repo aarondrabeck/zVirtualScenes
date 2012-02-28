@@ -22,7 +22,7 @@
                         style: 'margin:10px auto;',
                         handler: function (b) {
                             Ext.Ajax.request({
-                                url: '/API/logout',
+                                url: zvsMobile.app.APIURL + '/logout',
                                 method: 'POST',
                                 params: {
                                     u: Math.random()
