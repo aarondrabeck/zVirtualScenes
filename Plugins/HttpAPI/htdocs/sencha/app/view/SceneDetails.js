@@ -32,7 +32,7 @@
                     console.log('AJAX: ActivateScene');
 
                     Ext.Ajax.request({
-                        url: zvsMobile.app.APIURL + '/scene/' + self.sceneId,
+                        url: zvsMobile.app.BaseURL() + '/scene/' + self.sceneId,
                         method: 'POST',
                         params: {
                             is_running: true
@@ -124,7 +124,7 @@
         //Get Device Details			
         console.log('AJAX: GetSceneDetails');
         Ext.data.JsonP.request({
-            url: zvsMobile.app.APIURL + '/scene/' + sceneId,
+            url: zvsMobile.app.BaseURL() + '/scene/' + sceneId,
             callbackKey: 'callback',
             params: {
                 u: Math.random()

@@ -1,5 +1,6 @@
 Ext.define('zvsMobile.view.DeviceList', {
     extend: 'Ext.dataview.List',
+    requires: ['Ext.plugin.PullRefresh'],
     xtype: 'DeviceList',
     config: {
         cls: 'DeviceListItem',

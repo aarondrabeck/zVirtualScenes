@@ -27,7 +27,7 @@
                 handler: function () {
                     console.log('AJAX: ActivateGroup' + self.groupId);
                     Ext.Ajax.request({
-                        url: zvsMobile.app.APIURL + '/commands/',
+                        url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
                         params: {
                             u: Math.random(),
@@ -53,7 +53,7 @@
                 handler: function () {
                     console.log('AJAX: DeactivateGroup' + self.groupId);
                     Ext.Ajax.request({
-                        url: zvsMobile.app.APIURL + '/commands/',
+                        url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
                         params: {
                             u: Math.random(),
@@ -119,7 +119,7 @@
         console.log('AJAX: GetgroupDetails');
 
         Ext.data.JsonP.request({
-            url: zvsMobile.app.APIURL + '/group/' + self.groupId,
+            url: zvsMobile.app.BaseURL() + '/group/' + self.groupId,
             callbackKey: 'callback',
             params: {
                 u: Math.random()

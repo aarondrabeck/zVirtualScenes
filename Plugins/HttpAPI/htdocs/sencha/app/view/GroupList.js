@@ -1,5 +1,6 @@
 Ext.define('zvsMobile.view.GroupList', {
     extend: 'Ext.dataview.List',
+    requires: ['Ext.plugin.PullRefresh'],
     xtype: 'GroupList',
     config: {
         cls: 'GroupList',

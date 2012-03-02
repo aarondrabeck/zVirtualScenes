@@ -6,23 +6,19 @@
             var self = this;
             Ext.apply(config || {}, {
                 items: [{
+                        xtype: 'panel',
+                        html: '<div class="logout_info"><p> Logged in to: ' + zvsMobile.app.BaseURL() + '</p></div>'
+                    },{
                     xtype: 'fieldset',
                     style: 'padding:10px;',
-                    items: [{
-                        xtype: 'textfield',
-                        tpl: new Ext.XTemplate(
-                '<div class="x-form-label">',
-                    '<span>Currently logged in.</span>',
-                '</div>',
-                '<div class="x-form-field-container" style="padding:0.6em;">{name}</div>')
-                    }, {
+                    items: [ {
                         xtype: 'button',
                         text: 'Logout',
                         width: '90%',
                         style: 'margin:10px auto;',
                         handler: function (b) {
                             Ext.Ajax.request({
-                                url: zvsMobile.app.APIURL + '/logout',
+                                url: zvsMobile.app.BaseURL() + '/logout',
                                 method: 'POST',
                                 params: {
                                     u: Math.random()
@@ -48,7 +44,8 @@
         },
         config:
         {
-            scrollable: 'vertical',
-            layout: 'fit'
+            xtype: 'panel',
+            layout: 'vbox',
+            scrollable: 'vertical'
         }
     });

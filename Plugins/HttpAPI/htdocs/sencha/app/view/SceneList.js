@@ -1,5 +1,6 @@
 Ext.define('zvsMobile.view.SceneList', {
     extend: 'Ext.dataview.List',
+    requires: ['Ext.plugin.PullRefresh'],
     xtype: 'SceneList',
     config: {
         cls: 'SceneListItem',

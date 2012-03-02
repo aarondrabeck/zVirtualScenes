@@ -49,7 +49,7 @@
                 handler: function () {
                     console.log('AJAX: SendCmd ESM');
                     Ext.Ajax.request({
-                        url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                        url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                         method: 'POST',
                         params: {
                             u: Math.random(),
@@ -61,7 +61,7 @@
                             var result = JSON.parse(response.responseText);
                             if (result.success) {
                                 self.delayedReload();
-                                Ext.Msg.alert('Thermostat Command', 'Thermostat set to Energy Savings Mode');
+                                //Ext.Msg.alert('Thermostat Command', 'Thermostat set to Energy Savings Mode');
                             }
                             else {
                                 Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -77,7 +77,7 @@
                 handler: function () {
                     console.log('AJAX: SendCmd Confort');
                     Ext.Ajax.request({
-                        url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                        url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                         method: 'POST',
                         params: {
                             u: Math.random(),
@@ -89,7 +89,7 @@
                             var result = JSON.parse(response.responseText);
                             if (result.success) {
                                 self.delayedReload();
-                                Ext.Msg.alert('Thermostat Command', 'Thermostat set to Comfort Mode');
+                                //Ext.Msg.alert('Thermostat Command', 'Thermostat set to Comfort Mode');
                             }
                             else {
                                 Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -144,7 +144,7 @@
                                         console.log('AJAX DYNAMIC_CMD_MODE ' + mode);
 
                                         Ext.Ajax.request({
-                                            url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                                            url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),
@@ -156,7 +156,7 @@
                                                 var result = JSON.parse(response.responseText);
                                                 if (result.success) {
                                                     self.delayedReload();
-                                                    Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
+                                                   // Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
                                                 }
                                                 else {
                                                     Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -219,7 +219,7 @@
 
 
                                         Ext.Ajax.request({
-                                            url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                                            url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),
@@ -231,7 +231,7 @@
                                                 var result = JSON.parse(response.responseText);
                                                 if (result.success) {
                                                     self.delayedReload();
-                                                    Ext.Msg.alert('Thermostat Command', 'Fan mode set to ' + mode);
+                                                    //Ext.Msg.alert('Thermostat Command', 'Fan mode set to ' + mode);
                                                 }
                                                 else {
                                                     Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -273,7 +273,7 @@
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_HEATING 1' + selected_temp);
                                                 Ext.Ajax.request({
-                                                    url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
@@ -285,7 +285,7 @@
                                                         var result = JSON.parse(response.responseText);
                                                         if (result.success) {
                                                             self.delayedReload();
-                                                            Ext.Msg.alert('Thermostat Command', 'Heat Point set to ' + selected_temp + '&deg; F');
+                                                            //Ext.Msg.alert('Thermostat Command', 'Heat Point set to ' + selected_temp + '&deg; F');
                                                         }
                                                         else {
                                                             Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -324,7 +324,7 @@
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
                                                 console.log('AJAX DYNAMIC_CMD_COOLING 1 :' + selected_temp);
                                                 Ext.Ajax.request({
-                                                    url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
@@ -336,7 +336,7 @@
                                                         var result = JSON.parse(response.responseText);
                                                         if (result.success) {
                                                             self.delayedReload();
-                                                            Ext.Msg.alert('Thermostat Command', 'Cool Point set to ' + selected_temp + '&deg; F');
+                                                            //Ext.Msg.alert('Thermostat Command', 'Cool Point set to ' + selected_temp + '&deg; F');
                                                         }
                                                         else {
                                                             Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -363,7 +363,7 @@
                              console.log('AJAX: SendCmd REPOLL_ME');
 
                              Ext.Ajax.request({
-                                 url: zvsMobile.app.APIURL + '/commands/',
+                                 url: zvsMobile.app.BaseURL() + '/commands/',
                                  method: 'POST',
                                  params: {
                                      u: Math.random(),
@@ -408,7 +408,7 @@
         //Get Device Details			
         console.log('AJAX: GetDeviceDetails');
         Ext.data.JsonP.request({
-            url: zvsMobile.app.APIURL + '/device/' + deviceId,
+            url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
             callbackKey: 'callback',
             params: {
                 u: Math.random()

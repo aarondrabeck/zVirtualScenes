@@ -1,5 +1,6 @@
 Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
     extend: 'Ext.Panel',
+    requires: ['Ext.field.Toggle', 'Ext.data.proxy.JsonP'],
     xtype: 'DeviceDetailsSwitch',
 
     constructor: function (config) {
@@ -40,7 +41,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                                 var toggleValue = switchToggle.getValue();
                                 console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
                                 Ext.Ajax.request({
-                                    url: zvsMobile.app.APIURL + '/device/' + self.deviceID + '/command/',
+                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                     method: 'POST',
                                     params: {
                                         u: Math.random(),
@@ -73,7 +74,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                     console.log('AJAX: SendCmd REPOLL_ME');
 
                     Ext.Ajax.request({
-                        url: zvsMobile.app.APIURL + '/commands/',
+                        url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
                         params: {
                             u: Math.random(),
@@ -119,7 +120,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
         //Get Device Details			
         console.log('AJAX: GetDeviceDetails');
         Ext.data.JsonP.request({
-            url: zvsMobile.app.APIURL + '/device/' + deviceId,
+            url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
             callbackKey: 'callback',
             params: {
                 u: Math.random()

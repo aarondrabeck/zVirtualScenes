@@ -2,21 +2,7 @@
     extend: 'Ext.data.Store',        
     requires: ['zvsMobile.model.Group'],		
 	config: {
-		model: 'zvsMobile.model.Group',
-		proxy: {
-			type: 'scripttag',
-			url: zvsMobile.app.APIURL + '/Groups/',
-			extraParams: {
-				u: Math.random()
-			},
-			reader: {
-				type: 'json',
-				rootProperty: 'groups',
-				idProperty: 'id',
-				successProperty: 'success'
-			},
-			callbackParam: 'callback'
-		}
+		model: 'zvsMobile.model.Group'
 	}
 });
 

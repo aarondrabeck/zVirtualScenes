@@ -2,22 +2,7 @@
     extend: 'Ext.data.Store',        
     requires: ['zvsMobile.model.Scene'],
 	config: {
-		model: 'zvsMobile.model.Scene',
-		proxy: {
-			type: 'scripttag',
-			url: zvsMobile.app.APIURL + '/Scenes/',
-			extraParams: {
-				u: Math.random()
-			},
-			reader: {
-				type: 'json',
-				rootProperty: 'scenes',
-				idProperty: 'id',
-				successProperty: 'success'
-			},
-
-			callbackParam: 'callback'
-		}
+		model: 'zvsMobile.model.Scene'		
 	}
 });
 

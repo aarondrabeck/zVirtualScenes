@@ -1,22 +1,22 @@
 ﻿Ext.define('zvsMobile.view.SettingsViewPort', {
-        extend: 'Ext.Panel',
-        xtype: 'SettingsViewPort',
-        requires: ['zvsMobile.view.SettingsLogIn',
+    extend: 'Ext.Panel',
+    xtype: 'SettingsViewPort',
+    requires: ['zvsMobile.view.SettingsLogIn',
                    'zvsMobile.view.SettingsLogOut'],
-        initialize: function () {
-            this.callParent(arguments);
-            this.getEventDispatcher().addListener('element', '#SettingsViewPort', 'swipe', this.onTouchPadEvent, this);
-        },
-        onTouchPadEvent: function (e, target, options, eventController) {
-            if (e.direction === 'right' && e.distance > 50 && zvsMobile.tabPanel.getTabBar().getComponent(2)._disabled != true) {
-                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(2));
-            }
-        },
+    initialize: function () {
+        this.callParent(arguments);
+        this.getEventDispatcher().addListener('element', '#SettingsViewPort', 'swipe', this.onTouchPadEvent, this);
+    },
+    onTouchPadEvent: function (e, target, options, eventController) {
+        if (e.direction === 'right' && e.distance > 50 && zvsMobile.tabPanel.getTabBar().getComponent(2)._disabled != true) {
+            zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(2));
+        }
+    },
 
-        constructor: function (config) {
-            var self = this;
-            Ext.apply(config || {}, {
-                items: [
+    constructor: function (config) {
+        var self = this;
+        Ext.apply(config || {}, {
+            items: [
                     {
                         xtype: 'toolbar',
                         docked: 'top',
@@ -43,12 +43,12 @@
 
                                 //Change view to the device list
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(0));
-//                                var task = Ext.create('Ext.util.DelayedTask', function () {
-//                                    zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(0));
-//                                    console.log('setDevicePaneAcgtives');
-//                                });
+                                //                                var task = Ext.create('Ext.util.DelayedTask', function () {
+                                //                                    zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(0));
+                                //                                    console.log('setDevicePaneAcgtives');
+                                //                                });
 
-//                                task.delay(500);
+                                //                                task.delay(500);
 
                             }
                         }
@@ -63,24 +63,33 @@
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).setDisabled(true);
                                 zvsMobile.tabPanel.getTabBar().getComponent(1).setDisabled(true);
                                 zvsMobile.tabPanel.getTabBar().getComponent(2).setDisabled(true);
+
+                                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
                             }
                         }
                     }
                     ],
-                listeners: {
-                    activate: function () {
-
+            listeners: {
+                activate: function () {
+                    if (zvsMobile.app.BaseURL() != '') {
                         Ext.Ajax.request({
-                            url: zvsMobile.app.APIURL + '/login',
+                            url: zvsMobile.app.BaseURL() + '/login',
                             method: 'GET',
                             params: {
                                 u: Math.random()
                             },
                             success: function (response, opts) {
-                                var result = JSON.parse(response.responseText);
-                                if (result.success && result.isLoggedIn) {
-                                    var logoutPanel = self.items.items[2];
-                                    self.setActiveItem(logoutPanel);
+
+                                if (response.responseText != '') {
+
+                                    var result = JSON.parse(response.responseText);
+                                    if (result.success && result.isLoggedIn) {
+                                        var logoutPanel = self.items.items[2];
+                                        self.setActiveItem(logoutPanel);
+                                    }
+                                    else {
+                                        self.items.items[2].fireEvent('loggedOut');
+                                    }
                                 }
                                 else {
                                     self.items.items[2].fireEvent('loggedOut');
@@ -92,11 +101,12 @@
                         });
                     }
                 }
-            });
-            this.callParent([config]);
-        },
-        config:
+            }
+        });
+        this.callParent([config]);
+    },
+    config:
             {
                 layout: 'card'
             }
-    });
+});
