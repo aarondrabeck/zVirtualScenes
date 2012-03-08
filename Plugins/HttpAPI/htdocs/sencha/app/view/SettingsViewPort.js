@@ -30,6 +30,7 @@
 
                                 //activate the logout screen and enable all the tabs...
                                 var logoutPanel = self.items.items[2];
+								logoutPanel.UpdateLogoutHTML();
                                 self.setActiveItem(logoutPanel);
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).setDisabled(false);
                                 zvsMobile.tabPanel.getTabBar().getComponent(1).setDisabled(false);

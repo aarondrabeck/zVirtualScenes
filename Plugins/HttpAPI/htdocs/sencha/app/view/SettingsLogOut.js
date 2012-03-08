@@ -5,9 +5,14 @@
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {
+			    UpdateLogoutHTML: function() 
+				{
+				console.log(self.items.items[0]);
+					self.items.items[0].updateHtml('<div class="logout_info"><p> Logged in to: ' + zvsMobile.app.BaseURL() + '</p></div>')
+				},
                 items: [{
                         xtype: 'panel',
-                        html: '<div class="logout_info"><p> Logged in to: ' + zvsMobile.app.BaseURL() + '</p></div>'
+                        html: ''
                     },{
                     xtype: 'fieldset',
                     style: 'padding:10px;',
