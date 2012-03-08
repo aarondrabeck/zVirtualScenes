@@ -58,10 +58,12 @@
  *
  *      Ext.define('ListItem', {
  *          extend: 'Ext.data.Model',
- *          fields: [{
- *              name: 'text',
- *              type: 'string'
- *          }]
+ *          config: {
+ *              fields: [{
+ *                  name: 'text',
+ *                  type: 'string'
+ *              }]
+ *          }
  *      });
  *
  *      var store = Ext.create('Ext.data.TreeStore', {
@@ -94,30 +96,35 @@ Ext.define('Ext.dataview.NestedList', {
     ],
 
     config: {
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         cls: Ext.baseCSSPrefix + 'nested-list',
 
         /**
          * @cfg {String/Object/Boolean} cardSwitchAnimation
+         * Animation to be used during transitions of cards.
          * @removed 2.0.0 please use {@link Ext.layout.Card#animation}
          */
 
         /**
          * @cfg {String} backText
-         * The label to display for the back button. Defaults to "Back".
+         * The label to display for the back button.
          * @accessor
          */
         backText: 'Back',
 
         /**
          * @cfg {Boolean} useTitleAsBackText
+         * True to use title as a label for back button.
          * @accessor
          */
         useTitleAsBackText: true,
 
         /**
          * @cfg {Boolean} updateTitleText
-         * Update the title with the currently selected category. Defaults to true.
+         * Update the title with the currently selected category.
          * @accessor
          */
         updateTitleText: true,
@@ -126,7 +133,7 @@ Ext.define('Ext.dataview.NestedList', {
          * @cfg {String} displayField
          * Display field to use when setting item text and title.
          * This configuration is ignored when overriding getItemTextTpl or
-         * getTitleTextTpl for the item text or title. (Defaults to 'text')
+         * getTitleTextTpl for the item text or title.
          * @accessor
          */
         displayField: 'text',
@@ -427,9 +434,10 @@ Ext.define('Ext.dataview.NestedList', {
         this.fireEvent('beforeload', [this, Array.prototype.slice.call(arguments)]);
     },
 
-    onStoreLoad: function() {
+    onStoreLoad: function(store) {
         this.setMasked(false);
         this.fireEvent('load', [this, Array.prototype.slice.call(arguments)]);
+        this.goToNode(store.getRoot());
     },
 
     /**
@@ -474,15 +482,8 @@ Ext.define('Ext.dataview.NestedList', {
         if (store) {
             store = Ext.data.StoreManager.lookup(store);
 
-            if (store && Ext.isObject(store) && store.isStore) {
-                store.on({
-                    scope: this,
-                    load: 'onStoreLoad',
-                    beforeload: 'onStoreBeforeLoad'
-                });
-            }
-            //<debug warn>
-            else if (!store)  {
+            // <debug>
+            if (!store)  {
                 Ext.Logger.warn("The specified Store cannot be found", this);
             }
             //</debug>
@@ -491,24 +492,28 @@ Ext.define('Ext.dataview.NestedList', {
         return store;
     },
 
+    storeListeners: {
+        rootchange: 'onStoreRootChange',
+        load: 'onStoreLoad',
+        beforeload: 'onStoreBeforeLoad'
+    },
+
     updateStore: function(newStore, oldStore) {
-        var me = this;
+        var me = this,
+            listeners = this.storeListeners;
+
+        listeners.scope = me;
+
         if (oldStore && Ext.isObject(oldStore) && oldStore.isStore) {
             if (oldStore.autoDestroy) {
                 oldStore.destroy();
             }
-            oldStore.un({
-                rootchange: 'onStoreRootChange',
-                scope: this
-            });
+            oldStore.un(listeners);
         }
 
         if (newStore) {
             me.goToNode(newStore.getRoot());
-            newStore.on({
-                rootchange: 'onStoreRootChange',
-                scope: this
-            });
+            newStore.on(listeners);
         }
     },
 
@@ -800,6 +805,7 @@ Ext.define('Ext.dataview.NestedList', {
     /**
      * @member Ext.dataview.NestedList
      * @method getSubList
+     * Returns the subList for a specified node.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(this, 'getSubList', null, "Ext.dataview.NestedList.getSubList() has been removed");
@@ -807,6 +813,7 @@ Ext.define('Ext.dataview.NestedList', {
     /**
      * @member Ext.dataview.NestedList
      * @cfg {Number} clearSelectionDelay
+     * Number of milliseconds to show the highlight when going back in a list.
      * @removed 2.0.0
      */
     Ext.deprecateProperty(this, 'clearSelectionDelay', null, "Ext.dataview.NestedList.clearSelectionDelay has been removed");

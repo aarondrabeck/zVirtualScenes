@@ -466,10 +466,10 @@ Ext.dom.Element.addMembers({
     hide: function() {
         var dom = this.dom,
             domStyle = dom.style,
-            needsRedraw = Ext.os.is.iOS5;
+            needsRedraw = Ext.os.is.iOS;
 
         if (domStyle.getPropertyValue('display') !== 'none') {
-            // iOS5 sometimes has a long delay before redrawing elements with their CSS 'display' set to 'none'
+            // iOS sometimes has a long delay before redrawing elements with their CSS 'display' set to 'none'
             // This force a redraw to make sure the element is hidden instantly
             if (needsRedraw) {
                 domStyle.setProperty('display', 'none', 'important');

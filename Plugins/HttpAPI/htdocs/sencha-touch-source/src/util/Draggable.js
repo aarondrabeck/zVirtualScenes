@@ -59,6 +59,16 @@ Ext.define('Ext.util.Draggable', {
          */
         direction: 'both',
 
+        /**
+         * @cfg {Object/Number} initialOffset
+         * The initial draggable offset.  When specified as Number,
+         * both x and y will be set to that value.
+         */
+        initialOffset: {
+            x: 0,
+            y: 0
+        },
+
         translatable: {}
     },
 
@@ -68,6 +78,10 @@ Ext.define('Ext.util.Draggable', {
 
     DIRECTION_HORIZONTAL: 'horizontal',
 
+    defaultConstraint: {
+        min: { x: -Infinity, y: -Infinity },
+        max: { x: Infinity, y: Infinity }
+    },
     /**
      * Creates new Draggable.
      * @param {Object} config The configuration object for this Draggable.
@@ -124,6 +138,23 @@ Ext.define('Ext.util.Draggable', {
         this.initConfig(this.initialConfig);
     },
 
+    updateInitialOffset: function(initialOffset) {
+        if (typeof initialOffset == 'number') {
+            initialOffset = {
+                x: initialOffset,
+                y: initialOffset
+            };
+        }
+
+        var offset = this.offset,
+            x, y;
+
+        offset.x = x = initialOffset.x;
+        offset.y = y = initialOffset.y;
+
+        this.getTranslatable().doTranslate(x, y);
+    },
+
     updateCls: function(cls) {
         this.getElement().addCls(cls);
     },
@@ -151,8 +182,12 @@ Ext.define('Ext.util.Draggable', {
         return this;
     },
 
-    applyConstraint: function(newConstraint, currentConstraint) {
+    applyConstraint: function(newConstraint) {
         this.currentConstraint = newConstraint;
+
+        if (!newConstraint) {
+            newConstraint = this.defaultConstraint;
+        }
 
         if (newConstraint === 'container') {
             return Ext.merge(this.getContainerConstraint(), this.extraConstraint);
@@ -166,16 +201,14 @@ Ext.define('Ext.util.Draggable', {
     },
 
     getContainerConstraint: function() {
-        var container = this.getContainer();
+        var container = this.getContainer(),
+            element = this.getElement();
 
-        if (!container) {
-            return {
-                min: { x: -Infinity, y: -Infinity },
-                max: { x: Infinity, y: Infinity }
-            };
+        if (!container || !element.dom) {
+            return this.defaultConstraint;
         }
 
-        var dom = this.getElement().dom,
+        var dom = element.dom,
             containerDom = container.dom,
             width = dom.offsetWidth,
             height = dom.offsetHeight,

@@ -81,6 +81,7 @@ Ext.EventManager = {
     },
 
     /**
+     * Adds a listener to be notified when the document is ready (before onload and before images are loaded).
      * @removed 2.0.0 Please use {@link Ext#onReady onReady}
      */
     onDocumentReady: function() {

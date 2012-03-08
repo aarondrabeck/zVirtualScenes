@@ -1,4 +1,6 @@
 /**
+ * @aside guide proxies
+ *
  * This class is used to send requests to the server using {@link Ext.direct.Manager Ext.Direct}. When a
  * request is made, the transport mechanism is handed off to the appropriate
  * {@link Ext.direct.RemotingProvider Provider} to complete the call.
@@ -95,7 +97,7 @@ Ext.define('Ext.data.proxy.Direct', {
     },
 
     applyDirectFn: function(directFn) {
-        return Ext.direct.Manager.parseMethod(fn);
+        return Ext.direct.Manager.parseMethod(directFn);
     },
 
     applyApi: function(api) {
@@ -160,7 +162,7 @@ Ext.define('Ext.data.proxy.Direct', {
         var me = this;
 
         return function(data, event) {
-            me.processResponse(event.getStatus(), operation, request, event, callback, scope);
+            me.processResponse(event.getStatus(), operation, request, event.getResult(), callback, scope);
         };
     },
 

@@ -118,6 +118,9 @@ Ext.define('Ext.util.translatable.Abstract', {
     },
 
     translate: function(x, y, animation) {
+        if (!this.getElement().dom) {
+            return;
+        }
         if (Ext.isObject(x)) {
             throw new Error();
         }
@@ -183,13 +186,14 @@ Ext.define('Ext.util.translatable.Abstract', {
     },
 
     doAnimationFrame: function() {
-        if (!this.isAnimating) {
-            return;
-        }
-
         var easingX = this.activeEasingX,
             easingY = this.activeEasingY,
+            element = this.getElement(),
             x, y;
+
+        if (!this.isAnimating || !element.dom) {
+            return;
+        }
 
         if (easingX === null && easingY === null) {
             this.stopAnimation();

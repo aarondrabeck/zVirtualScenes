@@ -30,10 +30,13 @@ Ext.define('Ext.fx.runner.CssTransition', {
     onAnimationEnd: function(element, data, animation, isInterrupted, isReplaced) {
         var id = element.getId(),
             runningData = this.runningAnimationsData[id],
-            runningNameMap = runningData.nameMap,
             endRules = {},
             endData = {},
-            toPropertyNames, i, ln, name;
+            runningNameMap, toPropertyNames, i, ln, name;
+
+        if (runningData) {
+            runningNameMap = runningData.nameMap;
+        }
 
         endRules[id] = endData;
 

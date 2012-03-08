@@ -362,6 +362,7 @@ Ext.define('Ext.data.reader.Reader', {
         }
 
         code.push(';\n\n    return function(source) {\n        var dest = {};\n');
+
         code.push('        if (idPropertyIsFn) {\n');
         code.push('            idField.setMapping(idProperty);\n');
         code.push('        }\n');
@@ -370,11 +371,16 @@ Ext.define('Ext.data.reader.Reader', {
             field = fields[i];
             varName = fieldVarName[i];
             fieldName = field.getName();
-            if (fieldName === model.getIdProperty() && field.getMapping() === null) {
+            if (fieldName === model.getIdProperty() && field.getMapping() === null && model.getIdProperty() !== this.getIdProperty()) {
                 field.setMapping(this.getIdProperty());
             }
             // createFieldAccessExpression must be implemented in subclasses to extract data from the source object in the correct way.
-            code.push('        dest["' + field.getName() + '"]', ' = ', me.createFieldAccessExpression(field, varName, 'source'), ';\n');
+            code.push('        try {\n');
+            code.push('            value = ', me.createFieldAccessExpression(field, varName, 'source'), ';\n');
+            code.push('            if (value !== undefined) {\n');
+            code.push('                dest["' + field.getName() + '"] = value;\n');
+            code.push('            }\n');
+            code.push('        } catch(e){}\n');
         }
 
         // set the client id as the internalId of the record.
@@ -580,7 +586,15 @@ Ext.define('Ext.data.reader.Reader', {
             id = null;
 
             node = root[i];
-            data = me.extractRecordData(node);
+
+            // When you use a Memory proxy, and you set data: [] to contain record instances
+            // this node will already be a record. In this case we should not try to extract
+            // the record data from the object, but just use the record data attribute.
+            if (node.isModel) {
+                data = node.data;
+            } else {
+                data = me.extractRecordData(node);
+            }
 
             if (data._clientId !== undefined) {
                 clientId = data._clientId;
@@ -734,7 +748,7 @@ Ext.define('Ext.data.reader.Reader', {
             total  : 0,
             count  : 0,
             records: [],
-            success: true
+            success: false
         })
     });
 

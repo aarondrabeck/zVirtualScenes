@@ -144,13 +144,9 @@ Ext.define('Ext.mixin.Selectable', {
      */
     deselectAll: function(supress) {
         var me = this,
-            selections = me.getStore().getRange(),
-            ln = selections.length,
-            i = 0;
+            selections = me.getStore().getRange();
 
-        for (; i < ln; i++) {
-            me.deselect(selections, supress);
-        }
+        me.deselect(selections, supress);
 
         me.selected.clear();
         me.setLastSelected(null);
@@ -374,9 +370,10 @@ Ext.define('Ext.mixin.Selectable', {
     },
 
     /**
-     * @param {Ext.data.Record} record
-     * Set a record as the last focused record. This does NOT mean
+     * Sets a record as the last focused record. This does NOT mean
      * that the record has been selected.
+     * @param {Ext.data.Record} newRecord
+     * @param {Ext.data.Record} oldRecord
      */
     updateLastFocused: function(newRecord, oldRecord) {
         this.onLastFocusChanged(oldRecord, newRecord);
@@ -551,6 +548,7 @@ Ext.define('Ext.mixin.Selectable', {
 
     /**
      * @cfg {Boolean} locked
+     * @inheritdoc Ext.mixin.Selectable#disableSelection
      * @deprecated 2.0.0 Please use {@link #disableSelection} instead.
      */
 

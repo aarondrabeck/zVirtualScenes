@@ -1,4 +1,7 @@
 /**
+ * @aside guide tabs
+ * @aside video tabs-toolbars
+ *
  * Tab Panels are a great way to allow the user to switch between several pages that are all full screen. Each
  * Component in the Tab Panel gets its own Tab, which shows the Component when tapped on. Tabs can be positioned at
  * the top or the bottom of the Tab Panel, and can optionally accept title and icon configurations.
@@ -61,10 +64,6 @@ Ext.define('Ext.tab.Panel', {
 
     requires: ['Ext.tab.Bar'],
 
-    /**
-     * @cfg {Object} layout
-     * @hide
-     */
     config: {
         /**
          * @cfg {String} ui
@@ -89,7 +88,10 @@ Ext.define('Ext.tab.Panel', {
          */
         tabBarPosition: 'top',
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         layout: {
             type: 'card',
             animation: {
@@ -98,7 +100,10 @@ Ext.define('Ext.tab.Panel', {
             }
         },
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         cls: Ext.baseCSSPrefix + 'tabpanel'
 
         /**
@@ -130,6 +135,13 @@ Ext.define('Ext.tab.Panel', {
             delegate: '> tabbar',
             scope   : this
         });
+
+        //<debug>
+        var layout = this.getLayout();
+        if (layout && !layout.isCard) {
+            Ext.Logger.error('The base layout for a TabPanel must always be a Card Layout');
+        }
+        //</debug>
     },
 
     /**
@@ -234,7 +246,6 @@ Ext.define('Ext.tab.Panel', {
         }
     },
 
-    // @inherit
     onItemAdd: function(card) {
         var me = this;
 
@@ -315,9 +326,9 @@ Ext.define('Ext.tab.Panel', {
 }, function() {
     //<deprecated product=touch since=2.0>
     /**
-     * @member Ext.tab.Panel
      * @cfg {Boolean} tabBarDock
-     * @deprecated 2.0.0 please use tabBarPosition
+     * @inheritdoc Ext.tab.Panel#tabBarPosition
+     * @deprecated 2.0.0 Please use {@link #tabBarPosition} instead.
      */
     Ext.deprecateProperty(this, 'tabBarDock', 'tabBarPosition');
     //</deprecated>

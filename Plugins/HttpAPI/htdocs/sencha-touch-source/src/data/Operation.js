@@ -355,12 +355,18 @@ Ext.define('Ext.data.Operation', {
 
     processCreate: function(resultSet) {
         var updatedRecords = resultSet.getRecords(),
+            currentRecords = this.getRecords(),
             ln = updatedRecords.length,
             i, currentRecord, updatedRecord;
 
         for (i = 0; i < ln; i++) {
             updatedRecord = updatedRecords[i];
-            currentRecord = this.findCurrentRecord(updatedRecord.clientId);
+
+            if (updatedRecord.clientId === null && currentRecords.length == 1 && updatedRecords.length == 1) {
+                currentRecord = currentRecords[i];
+            } else {
+                currentRecord = this.findCurrentRecord(updatedRecord.clientId);
+            }
 
             if (currentRecord) {
                 this.updateRecord(currentRecord, updatedRecord);
@@ -454,6 +460,7 @@ Ext.define('Ext.data.Operation', {
     /**
      * @member Ext.data.Operation
      * @cfg {Boolean} group
+     * @inheritdoc Ext.data.Operation#grouper
      * @deprecated 2.0.0 Please use {@link #grouper} instead.
      */
     Ext.deprecateProperty(this, 'group', 'grouper');

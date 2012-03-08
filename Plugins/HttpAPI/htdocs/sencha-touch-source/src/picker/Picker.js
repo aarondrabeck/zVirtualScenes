@@ -96,9 +96,9 @@ Ext.define('Ext.picker.Picker', {
 
     /**
      * @event change
-     * Fired when the picked value has changed
-     * @param {Ext.Picker} this This Picker
-     * @param {Object} The values of this picker's slots, in {name:'value'} format
+     * Fired when the value of this picker has changed the Done button has been pressed.
+     * @param {Ext.picker.Picker} this This Picker
+     * @param {Object} value The values of this picker's slots, in {name:'value'} format
      */
 
     /**
@@ -109,7 +109,10 @@ Ext.define('Ext.picker.Picker', {
      */
 
     config: {
-        // @inherited
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         cls: Ext.baseCSSPrefix + 'picker',
 
         /**
@@ -165,7 +168,10 @@ Ext.define('Ext.picker.Picker', {
          */
         height: 220,
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         layout: {
             type : 'hbox',
             align: 'stretch'
@@ -177,13 +183,22 @@ Ext.define('Ext.picker.Picker', {
          */
         centered: false,
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         left : 0,
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         right: 0,
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         bottom: 0,
 
         // @private
@@ -361,7 +376,7 @@ Ext.define('Ext.picker.Picker', {
     },
 
     /**
-     *
+     * @private
      */
     updateUseTitles: function(useTitles) {
         var innerItems = this.getInnerItems(),
@@ -405,10 +420,19 @@ Ext.define('Ext.picker.Picker', {
      * @private
      */
     updateSlots: function(newSlots) {
+        var bcss = Ext.baseCSSPrefix,
+            innerItems;
+
         this.removeAll();
 
         if (newSlots) {
             this.add(newSlots);
+        }
+
+        innerItems = this.getInnerItems();
+        if (innerItems.length > 0) {
+            innerItems[0].addCls(bcss + 'first');
+            innerItems[innerItems.length - 1].addCls(bcss + 'last');
         }
 
         this.updateUseTitles(this.getUseTitles());
@@ -419,14 +443,13 @@ Ext.define('Ext.picker.Picker', {
      * Called when the done button has been tapped.
      */
     onDoneButtonTap: function() {
-        // var anim = this.animSheet('exit');
-        // Ext.apply(anim, {
-        //     after: function() {
-        //
-        //     },
-        //     scope: this
-        // });
-        this.fireEvent('change', this, this.getValue());
+        var oldValue = this._value,
+            newValue = this.getValue();
+
+        if (newValue != oldValue) {
+            this.fireEvent('change', this, newValue);
+        }
+
         this.hide();
     },
 
@@ -435,15 +458,6 @@ Ext.define('Ext.picker.Picker', {
      * Called when the cancel button has been tapped.
      */
     onCancelButtonTap: function() {
-        // var anim = this.animSheet('exit');
-        // Ext.apply(anim, {
-        //     after: function() {
-        //         // Set the value back to what it was previously
-        //         this.setValue(this.values);
-        //         this.fireEvent('cancel', this);
-        //     },
-        //     scope: this
-        // });
         this.fireEvent('cancel', this);
         this.hide();
     },
@@ -501,8 +515,8 @@ Ext.define('Ext.picker.Picker', {
             }
         }
 
-        me._value = values;
-        me._values = values;
+        me._value = this.getValue();
+        me._values = me._value;
 
         return me;
     },
@@ -516,22 +530,19 @@ Ext.define('Ext.picker.Picker', {
      * @return {Object} The values of the pickers slots
      */
     getValue: function() {
-        var parent = this.getParent(),
-            values = {},
+        var values = {},
             items = this.getItems().items,
             ln = items.length,
             item, i;
 
-        if (parent) {
-            for (i = 0; i < ln; i++) {
-                item = items[i];
-                if (item && item.isSlot) {
-                    values[item.getName()] = item.getValue();
-                }
+        for (i = 0; i < ln; i++) {
+            item = items[i];
+            if (item && item.isSlot) {
+                values[item.getName()] = item.getValue();
             }
-
-            this._values = values;
         }
+
+        this._values = values;
 
         return this._values;
     },
@@ -553,18 +564,21 @@ Ext.define('Ext.picker.Picker', {
     /**
      * @member Ext.picker.Picker
      * @cfg {String} activeCls
+     * CSS class to be applied to individual list items when they have been chosen.
      * @removed 2.0.0
      */
-    Ext.deprecateProperty(this, 'activeCls', null, "Ext.picker.Picker.activeClas has been removed");
+    Ext.deprecateProperty(this, 'activeCls', null, "Ext.picker.Picker.activeCls has been removed");
 
     /**
      * @method getCard
+     * @inheritdoc Ext.picker.Picker#getActiveItem
      * @deprecated 2.0.0 Please use {@link #getActiveItem} instead
      */
     Ext.deprecateClassMethod(this, 'getCard', 'getActiveItem');
 
     /**
      * @method setCard
+     * @inheritdoc Ext.picker.Picker#setActiveItem
      * @deprecated 2.0.0 Please use {@link #setActiveItem} instead
      */
     Ext.deprecateClassMethod(this, 'setCard', 'setActiveItem');

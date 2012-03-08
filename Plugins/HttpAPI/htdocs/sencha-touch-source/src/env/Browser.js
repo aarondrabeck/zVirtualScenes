@@ -1,4 +1,6 @@
 /**
+ * @aside guide environment_package
+ *
  * Provides useful information about the current browser. Should not be manually instantiated unless for unit-testing;
  * access the global instance stored in Ext.browser instead. Example:
  *
@@ -179,6 +181,13 @@ Ext.define('Ext.env.Browser', {
         if (engineMatch) {
             engineName = engineNames[Ext.Object.getKey(statics.enginePrefixes, engineMatch[1])];
             engineVersion = new Ext.Version(engineMatch[2]);
+        }
+
+        // Facebook changes the userAgent when you view a website within their iOS app. For some reason, the strip out information
+        // about the browser, so we have to detect that and fake it...
+        if (userAgent.match(/FB/) && browserName == "Other") {
+            browserName = browserNames.safari;
+            engineName = engineNames.webkit;
         }
 
         Ext.apply(this, {

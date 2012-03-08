@@ -94,10 +94,16 @@ Ext.define('Ext.TitleBar', {
     isToolbar: true,
 
     config: {
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         baseCls: Ext.baseCSSPrefix + 'toolbar',
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         cls: Ext.baseCSSPrefix + 'navigation-bar',
 
         /**
@@ -303,7 +309,9 @@ Ext.define('Ext.TitleBar', {
             leftBoxWidth, maxButtonWidth;
 
         if (leftButton) {
-            leftButton.renderElement.setWidth('auto');
+            if (leftButton.getWidth() == null) {
+                leftButton.renderElement.setWidth('auto');
+            }
 
             leftBoxWidth = leftBox.renderElement.getWidth();
             maxButtonWidth = this.getMaxButtonWidth();

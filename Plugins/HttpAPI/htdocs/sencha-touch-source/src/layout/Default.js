@@ -1,6 +1,8 @@
 (function(clsPrefix) {
 
 /**
+ * @aside guide layouts
+ *
  * The Default Layout is the layout that all other layouts inherit from. The main capability it provides is docking,
  * which means that every other layout can also provide docking support. It's unusual to use Default layout directly,
  * instead it's much more common to use one of the sub classes:
@@ -196,9 +198,15 @@ Ext.define('Ext.layout.Default', {
             this.uncenterItem(item);
         }
 
+        if (item.getTranslatable()) {
+            item.setTranslatable(false);
+        }
+
         Ext.Array.remove(this.innerItems, item);
 
-        this.container.innerElement.dom.removeChild(item.renderElement.dom);
+        try {
+            this.container.innerElement.dom.removeChild(item.renderElement.dom);
+        } catch(e) {}
     },
 
     /**

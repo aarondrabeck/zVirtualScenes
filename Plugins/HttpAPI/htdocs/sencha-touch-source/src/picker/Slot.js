@@ -360,6 +360,10 @@ Ext.define('Ext.picker.Slot', {
             return;
         }
 
+        if (!this.rendered) {
+            return this._value;
+        }
+
         //if the value is ever false, that means we do not want to return anything
         if (this._value === false) {
             return null;

@@ -1,4 +1,6 @@
 /**
+ * @aside video tabs-toolbars
+ *
  * {@link Ext.Toolbar}s are most commonly used as docked items as within a {@link Ext.Container}. They can be docked either `top` or `bottom` using the {@link #docked} configuration.
  *
  * They allow you to insert items (normally {@link Ext.Button buttons}) and also add a {@link #title}.
@@ -94,7 +96,10 @@ Ext.define('Ext.Toolbar', {
     isToolbar: true,
 
     config: {
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         baseCls: Ext.baseCSSPrefix + 'toolbar',
 
         /**
@@ -239,6 +244,7 @@ Ext.define('Ext.Toolbar', {
     /**
      * @member Ext.Toolbar
      * @cfg {Boolean} titleCls
+     * The CSS class to apply to the titleEl.
      * @removed 2.0.0 Title class is now a config option of the title
      */
     Ext.deprecateProperty(this, 'titleCls', null, "Ext.Toolbar.titleCls has been removed. Use #cls config of title instead.");

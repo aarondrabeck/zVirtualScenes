@@ -1,7 +1,6 @@
 /**
  * @author Ed Spencer
- * @class Ext.data.association.BelongsTo
- * @extends Ext.data.association.Association
+ * @aside guide models
  *
  * Represents a many to one association with another model. The owner model is expected to have
  * a foreign key which references the primary key of the associated model:
@@ -110,7 +109,7 @@
  *         config: {
  *             fields: [ // ...
  *             ],
- * 
+ *
  *             associations: [
  *                 { type: 'belongsTo', model: 'Category', primaryKey: 'unique_id', foreignKey: 'cat_id' }
  *             ]
@@ -212,14 +211,16 @@ Ext.define('Ext.data.association.BelongsTo', {
 
     applyGetterName: function(getterName) {
         if (!getterName) {
-            getterName = 'get' + this.getAssociatedName();
+            var associatedName = this.getAssociatedName();
+            getterName = 'get' + associatedName[0].toUpperCase() + associatedName.slice(1);
         }
         return getterName;
     },
 
     applySetterName: function(setterName) {
         if (!setterName) {
-            setterName = 'set' + this.getAssociatedName();
+            var associatedName = this.getAssociatedName();
+            setterName = 'set' + associatedName[0].toUpperCase() + associatedName.slice(1);
         }
         return setterName;
     },
@@ -255,6 +256,8 @@ Ext.define('Ext.data.association.BelongsTo', {
 
         //'this' refers to the Model instance inside this function
         return function(value, options, scope) {
+            var inverse = me.getInverseAssociation();
+
             // If we pass in an instance, pull the id out
             if (value && value.isModel) {
                 value = value.getId();
@@ -266,6 +269,18 @@ Ext.define('Ext.data.association.BelongsTo', {
                     callback: options,
                     scope: scope || this
                 };
+            }
+
+            if (inverse) {
+                value = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(inverse.getOwnerModel().modelName, value));
+                if (value) {
+                    if (inverse.getType().toLowerCase() === 'hasmany') {
+                        var store = value[inverse.getName()]();
+                        store.add(this);
+                    } else {
+                        value[inverse.getInstanceName()] = this;
+                    }
+                }
             }
 
             if (Ext.isObject(options)) {
@@ -296,7 +311,15 @@ Ext.define('Ext.data.association.BelongsTo', {
                 instance,
                 args;
 
-            if (options.reload === true || model[instanceName] === undefined) {
+            instance = model[instanceName];
+            if (!instance) {
+                instance = Ext.data.Model.cache.get(Ext.data.Model.generateCacheId(associatedModel.modelName, foreignKeyId));
+                if (instance) {
+                    model[instanceName] = instance;
+                }
+            }
+
+            if (options.reload === true || instance === undefined) {
                 if (typeof options == 'function') {
                     options = {
                         callback: options,
@@ -315,7 +338,6 @@ Ext.define('Ext.data.association.BelongsTo', {
 
                 associatedModel.load(foreignKeyId, options);
             } else {
-                instance = model[instanceName];
                 args = [instance];
                 scope = scope || model;
 
@@ -338,5 +360,15 @@ Ext.define('Ext.data.association.BelongsTo', {
      */
     read: function(record, reader, associationData){
         record[this.getInstanceName()] = reader.read([associationData]).getRecords()[0];
+    },
+
+    getInverseAssociation: function() {
+        var ownerName = this.getOwnerModel().modelName,
+            foreignKey = this.getForeignKey();
+
+        return this.getAssociatedModel().associations.findBy(function(assoc) {
+            var type = assoc.getType().toLowerCase();
+            return (type === 'hasmany' || type === 'hasone') && assoc.getAssociatedModel().modelName === ownerName && assoc.getForeignKey() === foreignKey;
+        });
     }
 });

@@ -100,6 +100,12 @@ Ext.define('Ext.slider.Slider', {
 
         /**
          * @cfg {Boolean/Object} animation
+         * The animation to use when moving the slider. Possible properties are:
+         *
+         * - duration
+         * - easingX
+         * - easingY
+         *
          * @accessor
          */
         animation: true
@@ -187,7 +193,10 @@ Ext.define('Ext.slider.Slider', {
 
     refreshElementWidth: function() {
         this.elementWidth = this.element.dom.offsetWidth;
-        this.thumbWidth = this.getThumb(0).getElementWidth();
+        var thumb = this.getThumb(0);
+        if (thumb) {
+            this.thumbWidth = thumb.getElementWidth();
+        }
     },
 
     refresh: function() {
@@ -518,9 +527,9 @@ Ext.define('Ext.slider.Slider', {
 }, function() {
     //<deprecated product=touch since=2.0>
     /**
-     * @member Ext.slider.Slider
      * @cfg {Boolean} animationDuration
-     * @deprecated 2.0.0 please use set the duration property on the animation config
+     * Animation duration in ms.
+     * @removed 2.0.0 Use the duration property on the animation config instead.
      */
     Ext.deprecateProperty(this, 'animationDuration', null, "Ext.slider.Slider.animationDuration has been removed");
     //</deprecated>

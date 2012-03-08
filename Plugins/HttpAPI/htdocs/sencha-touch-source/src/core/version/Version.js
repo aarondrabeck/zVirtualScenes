@@ -33,6 +33,7 @@ var version = '4.1.0', Version;
     Ext.Version = Version = Ext.extend(Object, {
 
         /**
+         * Creates new Version object.
          * @param {String/Number} version The version number in the follow standard format: major[.minor[.patch[.build[release]]]]
          * Examples: 1.0 or 1.2.3beta or 1.2.3.4RC
          * @return {Ext.Version} this

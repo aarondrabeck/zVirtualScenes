@@ -62,11 +62,13 @@ Ext.define('Ext.data.ModelManager', {
 
     /**
      * @property defaultProxyType
+     * The string type of the default Model Proxy.
      * @removed 2.0.0
      */
 
     /**
      * @property associationStack
+     * Private stack of associations that must be created once their associated model has been defined.
      * @removed 2.0.0
      */
 

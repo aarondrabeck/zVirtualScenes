@@ -17,7 +17,7 @@ Ext.define('Ext.direct.Provider', {
     alias: 'direct.provider',
 
     mixins: {
-        observable: 'Ext.util.Observable'
+        observable: 'Ext.mixin.Observable'
     },
 
     config: {

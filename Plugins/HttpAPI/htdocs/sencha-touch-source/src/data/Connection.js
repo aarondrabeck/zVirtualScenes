@@ -31,7 +31,7 @@
  */
 Ext.define('Ext.data.Connection', {
     mixins: {
-        observable: 'Ext.util.Observable'
+        observable: 'Ext.mixin.Observable'
     },
 
     statics: {
@@ -706,7 +706,7 @@ Ext.define('Ext.data.Connection', {
             }
         }
     },
-    
+
     /**
      * Aborts all outstanding requests
      */
@@ -762,7 +762,7 @@ Ext.define('Ext.data.Connection', {
 
         try {
             result = me.parseStatus(request.xhr.status);
-            
+
             if (request.timedout) {
                 result.success = false;
             }

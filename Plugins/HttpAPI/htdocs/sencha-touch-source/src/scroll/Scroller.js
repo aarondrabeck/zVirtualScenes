@@ -218,8 +218,9 @@ Ext.define('Ext.scroll.Scroller', {
         autoRefresh: true,
 
         /**
-         * @cfg {Object} initialOffset
-         *
+         * @cfg {Object/Number} initialOffset
+         * The initial scroller position.  When specified as Number,
+         * both x and y will be set to that value.
          */
         initialOffset: {
             x: 0,
@@ -561,13 +562,16 @@ Ext.define('Ext.scroll.Scroller', {
      * @private
      */
     applyContainerSize: function(size) {
-        var containerDom, x, y;
+        var containerDom = this.getContainer().dom,
+            x, y;
+
+        if (!containerDom) {
+            return;
+        }
 
         this.givenContainerSize = size;
 
         if (size === 'auto') {
-            containerDom = this.getContainer().dom;
-
             x = containerDom.offsetWidth;
             y = containerDom.offsetHeight;
         }
@@ -586,13 +590,16 @@ Ext.define('Ext.scroll.Scroller', {
      * @private
      */
     applySize: function(size) {
-        var dom, x, y;
+        var dom = this.getElement().dom,
+            x, y;
+
+        if (!dom) {
+            return;
+        }
 
         this.givenSize = size;
 
         if (size === 'auto') {
-            dom = this.getElement().dom;
-
             x = dom.offsetWidth;
             y = dom.offsetHeight;
         }
@@ -611,13 +618,16 @@ Ext.define('Ext.scroll.Scroller', {
      * @private
      */
     applyContainerScrollSize: function(size) {
-        var containerDom, x, y;
+        var containerDom = this.getContainer().dom,
+            x, y;
+
+        if (!containerDom) {
+            return;
+        }
 
         this.givenContainerScrollSize = size;
 
         if (size === 'auto') {
-            containerDom = this.getContainer().dom;
-
             x = containerDom.scrollWidth;
             y = containerDom.scrollHeight;
         }

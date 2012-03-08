@@ -46,6 +46,13 @@ Ext.define('Ext.picker.Date', {
     alternateClassName: 'Ext.DatePicker',
     requires: ['Ext.DateExtras'],
 
+    /**
+     * @event change
+     * Fired when the value of this picker has changed and the done button is pressed.
+     * @param {Ext.picker.Date} this This Picker
+     * @param {Date} value The date value
+     */
+
     config: {
         /**
          * @cfg {Number} yearFrom
@@ -409,5 +416,16 @@ Ext.define('Ext.picker.Date', {
     // @private
     isLeapYear: function(year) {
         return !!((year & 3) === 0 && (year % 100 || (year % 400 === 0 && year)));
+    },
+
+    onDoneButtonTap: function() {
+        var oldValue = this._value,
+            newValue = this.getValue();
+
+        if (newValue.toDateString() != oldValue.toDateString()) {
+            this.fireEvent('change', this, newValue);
+        }
+
+        this.hide();
     }
 });

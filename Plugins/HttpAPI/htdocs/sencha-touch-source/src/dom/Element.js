@@ -342,7 +342,8 @@ Ext.define('Ext.dom.Element', {
     },
 
     isPainted: function() {
-        return Boolean(this.dom.offsetParent);
+        var dom = this.dom;
+        return Boolean(dom && dom.offsetParent);
     },
 
     /**
@@ -463,7 +464,8 @@ Ext.define('Ext.dom.Element', {
          */
         fly: function(element, named) {
             var fly = null,
-                flyweights = Element._flyweights;
+                flyweights = Element._flyweights,
+                cachedElement;
 
             named = named || '_global';
 
@@ -473,6 +475,10 @@ Ext.define('Ext.dom.Element', {
                 fly = flyweights[named] || (flyweights[named] = new Element.Fly());
                 fly.dom = element;
                 fly.isSynchronized = false;
+                cachedElement = Ext.cache[element.id];
+                if (cachedElement && cachedElement.isElement) {
+                    cachedElement.isSynchronized = false;
+                }
             }
 
             return fly;
@@ -550,6 +556,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method cssTranslate
+     * Translates an element using CSS 3 in 2D.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'cssTranslate', null, "Ext.dom.Element.cssTranslate() has been removed");
@@ -557,6 +564,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method getOuterHeight
+     * Retrieves the height of the element account for the top and bottom margins.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'getOuterHeight', null, "Ext.dom.Element.getOuterHeight() has been removed");
@@ -564,6 +572,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method getOuterWidth
+     * Retrieves the width of the element accounting for the left and right margins.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'getOuterWidth', null, "Ext.dom.Element.getOuterWidth() has been removed");
@@ -571,6 +580,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method getScrollParent
+     * Gets the Scroller instance of the first parent that has one.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'getScrollParent', null, "Ext.dom.Element.getScrollParent() has been removed");
@@ -578,6 +588,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method isDescendent
+     * Determines if this element is a descendent of the passed in Element.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'isDescendent', null, "Ext.dom.Element.isDescendent() has been removed");
@@ -585,6 +596,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method mask
+     * Puts a mask over this element to disable user interaction.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'mask', null, "Ext.dom.Element.mask() has been removed");
@@ -592,6 +604,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method setTopLeft
+     * Sets the element's top and left positions directly using CSS style.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'setTopLeft', null, "Ext.dom.Element.setTopLeft() has been removed");
@@ -599,6 +612,7 @@ Ext.define('Ext.dom.Element', {
     /**
      * @member Ext.dom.Element
      * @method unmask
+     * Removes a previously applied mask.
      * @removed 2.0.0
      */
     Ext.deprecateMethod(Ext.dom.Element, 'unmask', null, "Ext.dom.Element.unmask() has been removed");

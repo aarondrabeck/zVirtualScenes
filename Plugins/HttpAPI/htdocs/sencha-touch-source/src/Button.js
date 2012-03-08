@@ -12,7 +12,7 @@
  *     var button = Ext.create('Ext.Button', {
  *         text: 'Button'
  *     });
- *     Ext.Viewport.add(button);
+ *     Ext.Viewport.add({ xtype: 'container', padding: 10, items: [button] });
  *
  * ## Icons
  *
@@ -24,7 +24,7 @@
  *         iconCls: 'refresh',
  *         iconMask: true
  *     });
- *     Ext.Viewport.add(button);
+ *     Ext.Viewport.add({ xtype: 'container', padding: 10, items: [button] });
  *
  * Note that the {@link #iconMask} configuration is required when you want to use any of the
  * bundled Pictos icons.
@@ -60,6 +60,7 @@
  *     @example
  *     Ext.create('Ext.Container', {
  *         fullscreen: true,
+ *         padding: 10,
  *         items: {
  *             xtype: 'button',
  *             text: 'My Button',
@@ -297,7 +298,7 @@ Ext.define('Ext.Button', {
 
         /**
          * @cfg {String} iconAlign
-         * The position within the Button to render the icon Options are: `top`, `right`, `botom`, `left` and `center` (when you have
+         * The position within the Button to render the icon Options are: `top`, `right`, `bottom`, `left` and `center` (when you have
          * no {@link #text} set).
          * @accessor
          */
@@ -353,7 +354,10 @@ Ext.define('Ext.Button', {
          * If you want to just add text, please use the {@link #text} configuration
          */
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         baseCls: Ext.baseCSSPrefix + 'button'
     },
 
@@ -383,7 +387,6 @@ Ext.define('Ext.Button', {
             scope      : this,
             tap        : 'onTap',
             touchstart : 'onPress',
-            touchmove  : 'onTouchMove',
             touchend   : 'onRelease'
         });
     },
@@ -668,10 +671,6 @@ Ext.define('Ext.Button', {
                 element.addCls(pressedCls);
             }
         }
-    },
-
-    onTouchMove: function(e) {
-        return;
     },
 
     // @private

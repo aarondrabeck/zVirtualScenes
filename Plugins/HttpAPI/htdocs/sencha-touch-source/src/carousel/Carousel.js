@@ -863,30 +863,28 @@ Ext.define('Ext.carousel.Carousel', {
         }
     });
 
-    /**
-     * @member Ext.carousel.Carousel
-     * @method isVertical
-     * @deprecated 2.0.0 Ext.carousel.Carousel.isVertical() is deprecated, you should use getDirection() === 'vertical'
-     */
-
-    /**
-     * @member Ext.carousel.Carousel
-     * @method isHorizontal
-     * @deprecated 2.0.0 Ext.carousel.Carousel.isVertical() is deprecated, you should use getDirection() === 'horizontal'
-     */
-
-    /**
-     * @member Ext.carousel.Carousel
-     * @method prev
-     * @deprecated 2.0.0 Ext.carousel.Carousel.prev() is deprecated, you should use Ext.carousel.Carousel.previous()
-     */
     Ext.deprecateClassMethod(this, {
+        /**
+         * Returns true when direction is vertical.
+         * @return {Boolean}
+         * @deprecated 2.0.0 Use getDirection() === 'vertical' instead.
+         */
         isVertical: function getDirection() {
             return this.getDirection() === 'vertical';
         },
+        /**
+         * Returns true when direction is horizontal.
+         * @return {Boolean}
+         * @deprecated 2.0.0 Use getDirection() === 'horizontal' instead.
+         */
         isHorizontal: function getDirection() {
             return this.getDirection() === 'horizontal';
         },
+        /**
+         * @method
+         * @inheritdoc Ext.carousel.Carousel#previous
+         * @deprecated 2.0.0 Use {@link Ext.carousel.Carousel#previous} instead.
+         */
         prev: 'previous'
     });
     //</deprecated>

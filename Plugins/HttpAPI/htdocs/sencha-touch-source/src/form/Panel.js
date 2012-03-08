@@ -152,7 +152,10 @@ Ext.define('Ext.form.Panel', {
      */
 
     config: {
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         baseCls: Ext.baseCSSPrefix + 'form',
 
         /**
@@ -197,7 +200,10 @@ Ext.define('Ext.form.Panel', {
          */
         method: 'post',
 
-        // @inherit
+        /**
+         * @cfg
+         * @inheritdoc
+         */
         scrollable: {
             translationMethod: 'scrollposition'
         }
@@ -490,67 +496,80 @@ Ext.define('Ext.form.Panel', {
 
     /**
      * Returns an object containing the value of each field in the form, keyed to the field's name.
-     * For groups of checkbox fields with the same name, it will be arrays of values. For examples:
-
-     <pre><code>
-     {
-         name: "Jacky Nguyen", // From a TextField
-         favorites: [
-             'pizza',
-             'noodle',
-             'cake'
-         ]
-     }
-     </code></pre>
-
+     * For groups of checkbox fields with the same name, it will be arrays of values. For example:
+     *
+     *     {
+     *         name: "Jacky Nguyen", // From a TextField
+     *         favorites: [
+     *             'pizza',
+     *             'noodle',
+     *             'cake'
+     *         ]
+     *     }
+     *
      * @param {Boolean} enabled <tt>true</tt> to return only enabled fields
      * @return {Object} Object mapping field name to its value
      */
     getValues: function(enabled) {
         var fields = this.getFields(),
             values = {},
-            field, name, ln, i;
+            isArray = Ext.isArray,
+            field, value, addValue, bucket, name, ln, i;
 
-        for (name in fields) {
-            if (fields.hasOwnProperty(name)) {
-                if (Ext.isArray(fields[name])) {
-                    values[name] = [];
-
-                    ln = fields[name].length;
-
-                    for (i = 0; i < ln; i++) {
-                        field = fields[name][i];
-
-                        if (!field.getChecked) {
-                            values[name] = field.getValue();
-
-                            //<debug>
-                            throw new Error("Ext.form.Panel: [getValues] You have multiple fields with the same 'name' configuration of '" + name + "' in your form panel (#" + this.id + ").");
-                            //</debug>
-
-                            break;
-                        }
-
-                        if (!(enabled && field.getDisabled())) {
-                            if (field.isRadio) {
-                                values[name] = field.getGroupValue();
-                            } else {
-                                values[name].push(field.getValue());
-                            }
-                        }
+        // Function which you give a field and a name, and it will add it into the values
+        // object accordingly
+        addValue = function(field, name) {
+            if (field.isCheckbox) {
+                value = field.getSubmitValue();
+            } else {
+                value = field.getValue();
+            }
 
 
+            if (!(enabled && field.getDisabled())) {
+                // RadioField is a special case where the value returned is the fields valUE
+                // ONLY if it is checked
+                if (field.isRadio) {
+                    if (field.isChecked()) {
+                        values[name] = value;
                     }
                 } else {
-                    field = fields[name];
-
-                    if (!(enabled && field.getDisabled())) {
-                        if (field.isCheckbox) {
-                            values[name] = (field.getChecked()) ? field.getValue() : null;
-                        } else {
-                            values[name] = field.getValue();
+                    // Check if the value already exists
+                    bucket = values[name];
+                    if (bucket) {
+                        // if it does and it isn't an array, we need to make it into an array
+                        // so we can push more
+                        if (!isArray(bucket)) {
+                            bucket = values[name] = [bucket];
                         }
+
+                        // Check if it is an array
+                        if (isArray(bucket)) {
+                            // Concat it into the other values
+                            bucket = values[name] = bucket.concat(value);
+                        } else {
+                            // If it isn't an array, just pushed more values
+                            bucket.push(value);
+                        }
+                    } else {
+                        values[name] = value;
                     }
+                }
+            }
+        };
+
+        // Loop through each of the fields, and add the values for those fields.
+        for (name in fields) {
+            if (fields.hasOwnProperty(name)) {
+                field = fields[name];
+
+                if (isArray(field)) {
+                    ln = field.length;
+                    for (i = 0; i < ln; i++) {
+                        addValue(field[i], name);
+                    }
+                } else {
+                    addValue(field, name);
                 }
             }
         }
@@ -815,27 +834,25 @@ Ext.define('Ext.form.Panel', {
     }
 }, function() {
 
-    /**
-     * @member Ext.form.Panel
-     * @method loadRecord
-     * @deprecated 2.0.0 please use #setRecord
-     */
-
-    /**
-     * @member Ext.form.Panel
-     * @method loadModel
-     * @deprecated 2.0.0 please use #setRecord
-     */
-
-    /**
-     * @member Ext.form.Panel
-     * @method load
-     * @deprecated 2.0.0 please use #setRecord
-     */
     //<deprecated product=touch since=2.0>
     Ext.deprecateClassMethod(this, {
+        /**
+         * @method
+         * @inheritdoc Ext.form.Panel#setRecord
+         * @deprecated 2.0.0 Please use #setRecord instead.
+         */
         loadRecord: 'setRecord',
+        /**
+         * @method
+         * @inheritdoc Ext.form.Panel#setRecord
+         * @deprecated 2.0.0 Please use #setRecord instead.
+         */
         loadModel: 'setRecord',
+        /**
+         * @method
+         * @inheritdoc Ext.form.Panel#setRecord
+         * @deprecated 2.0.0 Please use #setRecord instead.
+         */
         load: 'setRecord'
     });
 

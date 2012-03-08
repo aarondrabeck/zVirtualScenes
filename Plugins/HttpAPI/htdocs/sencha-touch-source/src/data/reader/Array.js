@@ -47,10 +47,6 @@ Ext.define('Ext.data.reader.Array', {
         successProperty: undefined
     },
 
-    getResponseData: function(data) {
-        return data;
-    },
-
     /**
      * @private
      * Returns an accessor expression for the passed Field from an Array using either the Field's mapping, or

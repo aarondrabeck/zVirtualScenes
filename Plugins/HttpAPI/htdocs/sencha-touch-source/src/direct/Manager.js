@@ -48,20 +48,18 @@ Ext.define('Ext.direct.Manager', {
     singleton: true,
 
     mixins: {
-        observable: 'Ext.util.Observable'
+        observable: 'Ext.mixin.Observable'
     },
 
     requires: ['Ext.util.Collection'],
 
     alternateClassName: 'Ext.Direct',
 
-    statics: {
-        exceptions: {
-            TRANSPORT: 'xhr',
-            PARSE: 'parse',
-            LOGIN: 'login',
-            SERVER: 'exception'
-        }
+    exceptions: {
+        TRANSPORT: 'xhr',
+        PARSE: 'parse',
+        LOGIN: 'login',
+        SERVER: 'exception'
     },
 
     /**

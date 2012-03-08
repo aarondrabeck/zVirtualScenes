@@ -93,7 +93,7 @@ reader: {
 }
 </code></pre>
  *
- * <p>Note that XmlReader doesn't care whether your {@link #rootProperty} and {@link #record} elements are nested deep 
+ * <p>Note that XmlReader doesn't care whether your {@link #rootProperty} and {@link #record} elements are nested deep
  * inside a larger structure, so a response like this will still work:
  *
 <pre><code>
@@ -210,7 +210,7 @@ Ext.define('Ext.data.reader.Xml', {
     //inherit docs
     getResponseData: function(response) {
         // Check to see if the response is already an xml node.
-        if (response.nodeType === 1) {
+        if (response.nodeType === 1 || response.nodeType === 9) {
             return response;
         }
 
