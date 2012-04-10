@@ -9,9 +9,11 @@ namespace zVirtualScenesApplication.Scripting
 {
     public class ScriptManager
     {
+        private const string _FriendlyName = "ADVANCEDSCRIPT";
+
         public static void RunScript(device_value_triggers trigger)
         {
-            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Running Advanced Script - " + trigger.FriendlyName, "ADVANCEDSCRIPT");
+            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Running Advanced Script - " + trigger.FriendlyName, _FriendlyName);
 
             // Step 1: Split up the lines of the script
             String[] splitScript = trigger.trigger_script.ToLower().Split('\n');
@@ -26,7 +28,7 @@ namespace zVirtualScenesApplication.Scripting
                 {
                     if (!scriptLine.StartsWith("{"))
                     {
-                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " started 'if' statement without the { on the next line", "ADVANCEDSCRIPT");
+                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " started 'if' statement without the { on the next line", _FriendlyName);
                         throw new Exception();
                     }
 
@@ -51,11 +53,11 @@ namespace zVirtualScenesApplication.Scripting
                         if (_scene != null)
                         {
                             _scene.RunScene(context);
-                            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", "ADVANCEDSCRIPT");
+                            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", _FriendlyName);
                         }
                         else
                         {
-                            Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " specified a invalid scene name '" + scene_name + "'", "ADVANCEDSCRIPT");
+                            Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " specified a invalid scene name '" + scene_name + "'", _FriendlyName);
                             return;
                         }
                     }
@@ -97,7 +99,7 @@ namespace zVirtualScenesApplication.Scripting
                         else
                         {
                             // ??
-                            Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " unkown operator in '" + parameters + "'", "ADVANCEDSCRIPT");
+                            Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " unkown operator in '" + parameters + "'", _FriendlyName);
                             return;
                         }
 
@@ -139,15 +141,15 @@ namespace zVirtualScenesApplication.Scripting
                     }
                     catch (ArgumentOutOfRangeException e)
                     {
-                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " - Unable to get parameters for if statement from line", "ADVANCEDSCRIPT");
-                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "'" + scriptLine + "'.", "ADVANCEDSCRIPT");
-                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Did you include both ( and )?", "ADVANCEDSCRIPT");
+                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + trigger.FriendlyName + " - Unable to get parameters for if statement from line", _FriendlyName);
+                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "'" + scriptLine + "'.", _FriendlyName);
+                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Did you include both ( and )?", _FriendlyName);
                         return;
                     }
                 }
             }
 
-            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Finished Running Advanced Script - " + trigger.FriendlyName, "ADVANCEDSCRIPT");
+            Logger.WriteToLog(zVirtualScenesCommon.Urgency.INFO, "Finished Running Advanced Script - " + trigger.FriendlyName, _FriendlyName);
         }
 
         private static int GetValue(String triggerName, String strValue)
@@ -178,13 +180,13 @@ namespace zVirtualScenesApplication.Scripting
                     }
                     else
                     {
-                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + triggerName + " specified a invalid device value name name '" + strValue + "'", "ADVANCEDSCRIPT");
+                        Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + triggerName + " specified a invalid device value name name '" + strValue + "'", _FriendlyName);
                         throw new Exception();
                     }
                 }
                 else
                 {
-                    Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + triggerName + " specified a invalid device name '" + device_name + "'", "ADVANCEDSCRIPT");
+                    Logger.WriteToLog(zVirtualScenesCommon.Urgency.ERROR, "Script " + triggerName + " specified a invalid device name '" + device_name + "'", _FriendlyName);
                     throw new Exception();
                 }
             }

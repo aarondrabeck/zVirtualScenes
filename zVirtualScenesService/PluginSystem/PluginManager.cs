@@ -11,7 +11,7 @@ using System;
 using zVirtualScenesCommon;
 using zVirtualScenesCommon.Entity;
 
-namespace zVirtualScenesApplication.PluginSystem
+namespace zVirtualScenesService.PluginSystem
 {
     public class PluginManager
     {
@@ -112,9 +112,9 @@ namespace zVirtualScenesApplication.PluginSystem
 
                 if (cmd != null && cmd.device != null)
                 {
-                    Logger.WriteToLog(Urgency.INFO,"[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
+                    Console.WriteLine("[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
                                                             ", CMD_NAME:" + cmd.device_type_commands.friendly_name +
-                                                            ", ARG:" + cmd.arg, _FriendlyName);
+                                                            ", ARG:" + cmd.arg);
 
                     foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
                     {
@@ -178,9 +178,9 @@ namespace zVirtualScenesApplication.PluginSystem
 
                 if (cmd != null && cmd.device != null)
                 {
-                    Logger.WriteToLog(Urgency.INFO,"[Processing Device CMD] API:" + cmd.device.device_types.plugin.name +
+                    Console.WriteLine("[Processing Device CMD] API:" + cmd.device.device_types.plugin.name +
                                                             ", CMD_NAME:" + cmd.device_commands.friendly_name +
-                                                            ", ARG:" + cmd.arg, _FriendlyName);
+                                                            ", ARG:" + cmd.arg);
 
                     foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
                     {
@@ -240,7 +240,7 @@ namespace zVirtualScenesApplication.PluginSystem
 
                 if (cmd != null)
                 {
-                    Logger.WriteToLog(Urgency.INFO,"[PROCESSING BUILTIN CMD] CMD_NAME:" + cmd.builtin_commands.friendly_name + ", ARG:" + cmd.arg,"MainForm");
+                    Console.WriteLine("[PROCESSING BUILTIN CMD] CMD_NAME:" + cmd.builtin_commands.friendly_name + ", ARG:" + cmd.arg);
 
                     switch (cmd.builtin_commands.name)
                     {

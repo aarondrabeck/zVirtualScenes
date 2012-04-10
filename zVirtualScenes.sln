@@ -63,6 +63,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", 
 		..\wiki\ZVS_Plugins.wiki = ..\wiki\ZVS_Plugins.wiki
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenesService", "zVirtualScenesService\zVirtualScenesService.csproj", "{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -183,6 +185,16 @@ Global
 		{F8B3CD45-0712-4388-B576-EBA5267E636C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{F8B3CD45-0712-4388-B576-EBA5267E636C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{F8B3CD45-0712-4388-B576-EBA5267E636C}.Release|x86.ActiveCfg = Release|Any CPU
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|x86.ActiveCfg = Debug|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|x86.Build.0 = Debug|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|Any CPU.ActiveCfg = Release|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|Mixed Platforms.Build.0 = Release|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|x86.ActiveCfg = Release|x86
+		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

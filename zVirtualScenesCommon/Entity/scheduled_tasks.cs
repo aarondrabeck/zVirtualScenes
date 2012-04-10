@@ -13,6 +13,8 @@ namespace zVirtualScenesCommon.Entity
 {
     public partial class scheduled_tasks : EntityObject
     {
+        private const string _FriendlyName = "TASK";
+
         public string IconName { get { return "Task"; } }
         public string isEnabledString { get  { return (this.Enabled ? "Yes" : "No");} }
         public string FrequencyString { get { return Enum.GetName(typeof(frequencys), this.Frequency); }  }
@@ -34,10 +36,10 @@ namespace zVirtualScenesCommon.Entity
                 if (scene != null)
                 {
                     string result = scene.RunScene(db);
-                    Logger.WriteToLog(Urgency.INFO, string.Format("Scheduled task '{0}' {1}", this.friendly_name, result), "TASK");
+                    Logger.WriteToLog(Urgency.INFO, string.Format("Scheduled task '{0}' {1}", this.friendly_name, result), _FriendlyName);
                 }
                 else
-                    Logger.WriteToLog(Urgency.WARNING, "Scheduled task '" + this.friendly_name + "' Failed to find scene ID '" + this.Scene_id + "'.", "TASK");
+                    Logger.WriteToLog(Urgency.WARNING, "Scheduled task '" + this.friendly_name + "' Failed to find scene ID '" + this.Scene_id + "'.", _FriendlyName);
             }
         }
     }

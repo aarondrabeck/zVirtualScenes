@@ -87,7 +87,7 @@ namespace zVirtualScenesApplication
             this.Text = ProgramName;
             notifyIcon1.Text = ProgramName;
             dataListViewLog.DataSource = _masterlog;
-            Logger.WriteToLog(Urgency.INFO, "STARTED", "MainForm");
+            Logger.WriteToLog(Urgency.INFO, "STARTED", "Load");
 
             pm = new PluginManager();
 
@@ -164,7 +164,7 @@ namespace zVirtualScenesApplication
                     dataListViewDevices.EnsureVisible(index);
             }
 
-            Console.WriteLine("------>>>>>>> UpdatedataListViewDevices <<<<<<<<<<<---------------------");
+            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> UpdatedataListViewDevices <<<<<<<<<<<---------------------", "ListViewDevices");
         }
 
         #region Subcribed API Events
@@ -401,7 +401,7 @@ namespace zVirtualScenesApplication
                     dataListViewScenes.EnsureVisible(index);
             }
 
-            Console.WriteLine("------>>>>>>> SyncdataListViewScenes <<<<<<<<<<<---------------------");
+            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> SyncdataListViewScenes <<<<<<<<<<<---------------------", "ListViewScenes");
         }
 
         private void dataListViewScenes_SelectedIndexChanged_1(object sender, EventArgs e)
@@ -1481,13 +1481,13 @@ namespace zVirtualScenesApplication
                                 {
                                     if (task.StartTime.HasValue)
                                     {
-                                        //Console.WriteLine("totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
+                                        //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
                                         if (task.RecurDays > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0))
                                         {
                                             TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                             TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
                                             
-                                            //Console.WriteLine(string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
+                                            //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
                                             if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))                                            
                                                 task.Run();                                            
                                         }
@@ -1517,7 +1517,7 @@ namespace zVirtualScenesApplication
                                     if (task.StartTime.HasValue)
                                     {
                                         int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
-                                        //Console.WriteLine(string.Format("Months Apart: {0}", monthsapart));
+                                        //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
                                         if (task.RecurMonth > 0 && monthsapart > -1 && monthsapart % task.RecurMonth == 0)  //IF RUN THIS Month
                                         {
                                             if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
@@ -1738,7 +1738,7 @@ namespace zVirtualScenesApplication
                     dataListTasks.EnsureVisible(index);
             }
 
-            Console.WriteLine("------>>>>>>> Syned dataListTasks <<<<<<<<<<<---------------------");
+            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> Syned dataListTasks <<<<<<<<<<<---------------------", "ScheduledTaskList");
         }
 
         void zvsEntityControl_ScheduledTaskModified(object sender, string PropertyModified)
@@ -2307,7 +2307,7 @@ namespace zVirtualScenesApplication
                     dataListTriggers.EnsureVisible(index);
             }
 
-            Console.WriteLine("------>>>>>>> SyncdataListTriggers <<<<<<<<<<<---------------------");
+            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> SyncdataListTriggers <<<<<<<<<<<---------------------", "ListTriggers");
         }
 
         private void dataListEvents_CellRightClick(object sender, CellRightClickEventArgs e)

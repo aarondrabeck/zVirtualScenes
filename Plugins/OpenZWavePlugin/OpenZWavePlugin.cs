@@ -45,11 +45,13 @@ namespace OpenZWavePlugin
             try
             {
                 WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
-                
+
+                // Environment.CurrentDirectory returns wrong directory in Service env. so we have to make a trick
+                string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
                 // Create the Options                
                 m_options = new ZWOptions();
-                m_options.Create(Environment.CurrentDirectory + @"\plugins\config\", 
-                                 Environment.CurrentDirectory + @"\plugins\", @"");
+                m_options.Create(directoryName + @"\config\",
+                                 directoryName + @"\", @"");
                 m_options.Lock();
                 m_manager = new ZWManager();
                 m_manager.Create();
@@ -595,7 +597,7 @@ namespace OpenZWavePlugin
                                 bool b = m_manager.GetValueAsString(vid, out data);
 
 
-                                Console.WriteLine("OpenZWave Plugin | [ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
+                                WriteToLog(Urgency.INFO, "[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
 
                                 //Values are 'unknown' at this point so dont report a value change. 
                                 DefineOrUpdateDeviceValue(new device_values
@@ -695,9 +697,9 @@ namespace OpenZWavePlugin
                         {
                             Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());     
                             ZWValueID vid = m_notification.GetValueID();
-                            Value val = node.GetValue(vid);                            
+                            Value val = node.GetValue(vid);
 
-                            Console.WriteLine("OpenZWave Plugin | [ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
+                            WriteToLog(Urgency.INFO, "[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
 
                             node.RemoveValue(val);
                             //TODO: Remove from values and command table
@@ -728,7 +730,7 @@ namespace OpenZWavePlugin
                             string data = GetValue(vid);
                             //m_manager.GetValueAsString(vid, out data);                          
 
-                            Console.WriteLine("OpenZWave Plugin | [ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
+                            WriteToLog(Urgency.INFO,"[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
                             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                             {
                                 device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
@@ -838,7 +840,7 @@ namespace OpenZWavePlugin
 
                 case ZWNotification.Type.Group:
                     {
-                        Console.WriteLine("OpenZWave Plugin | [Group]"); ;
+                        WriteToLog(Urgency.INFO, "[Group]"); ;
                         break;
                     }
 
@@ -853,7 +855,7 @@ namespace OpenZWavePlugin
                             node.HomeID = m_notification.GetHomeId();
                             m_nodeList.Add(node);
 
-                            Console.WriteLine("OpenZWave Plugin | [NodeAdded] ID:" + node.ID.ToString() + " Added");
+                            WriteToLog(Urgency.INFO, "[NodeAdded] ID:" + node.ID.ToString() + " Added");
                         //}
                         break;
                     }
@@ -866,7 +868,7 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                        Console.WriteLine("OpenZWave Plugin | [NodeNew] ID:" + node.ID.ToString() + " Added");                        
+                        WriteToLog(Urgency.INFO, "[NodeNew] ID:" + node.ID.ToString() + " Added");                        
                         break;
                     }
 
@@ -876,7 +878,7 @@ namespace OpenZWavePlugin
                         {
                             if (node.ID == m_notification.GetNodeId())
                             {
-                                Console.WriteLine("OpenZWave Plugin | [NodeRemoved] ID:" + node.ID.ToString());
+                                WriteToLog(Urgency.INFO, "[NodeRemoved] ID:" + node.ID.ToString());
                                 m_nodeList.Remove(node);
                                 break;
                             }
@@ -898,7 +900,7 @@ namespace OpenZWavePlugin
 
                             if (node != null)
                             {
-                                WriteToLog(Urgency.INFO, "OpenZWave Plugin | [Node Protocol Info] " + node.Label);
+                                WriteToLog(Urgency.INFO, "[Node Protocol Info] " + node.Label);
 
                                 switch (node.Label)
                                 {
@@ -971,7 +973,7 @@ namespace OpenZWavePlugin
                                         break;
                                     default:
                                         {
-                                            Console.WriteLine("OpenZWave Plugin | [Node Label] " + node.Label);
+                                            WriteToLog(Urgency.INFO, "[Node Label] " + node.Label);
                                             break;
                                         }
                                 }
@@ -1095,7 +1097,7 @@ namespace OpenZWavePlugin
                                 });
                             }
                         }
-                            Console.WriteLine("OpenZWave Plugin | [NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
+                        WriteToLog(Urgency.INFO, "[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
                         }
                         break;
                     }                  
@@ -1140,7 +1142,7 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            Console.WriteLine("OpenZWave Plugin | [PollingDisabled] Node:" + node.ID);
+                            WriteToLog(Urgency.INFO, "[PollingDisabled] Node:" + node.ID);
                         }
 
                         break;
@@ -1152,7 +1154,7 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            Console.WriteLine("OpenZWave Plugin | [PollingEnabled] Node:" + node.ID);
+                            WriteToLog(Urgency.INFO, "[PollingEnabled] Node:" + node.ID);
                         }
                         break;
                     }
@@ -1161,7 +1163,7 @@ namespace OpenZWavePlugin
                     {
                         m_homeId = m_notification.GetHomeId();
                         WriteToLog(Urgency.INFO, "Initializing: Driver with Home ID 0x" + m_homeId);
-                        Console.WriteLine("OpenZWave Plugin | [DriverReady] Initializing...driver with Home ID 0x" + m_homeId);                        
+                        WriteToLog(Urgency.INFO, "[DriverReady] Initializing...driver with Home ID 0x" + m_homeId);                        
                         break;
                     }           
 
@@ -1185,7 +1187,7 @@ namespace OpenZWavePlugin
                             }
                                                         
                             WriteToLog(Urgency.INFO, "Initializing: Node " + node.ID + " query complete.");
-                            Console.WriteLine("OpenZWave Plugin | [NodeQueriesComplete] Initializing...node " + node.ID + " query complete.");
+                            WriteToLog(Urgency.INFO, "[NodeQueriesComplete] Initializing...node " + node.ID + " query complete.");
                         }
 
                         break;

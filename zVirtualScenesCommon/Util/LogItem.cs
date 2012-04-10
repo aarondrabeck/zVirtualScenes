@@ -35,7 +35,7 @@ namespace zVirtualScenesCommon.Util
 
         public override string ToString()
         {
-            return Datetime.ToString("s") + " | " + Urgency + " | " + Source + ":" + Description + Environment.NewLine;
+            return String.Format("{0:yyyy-MM-dd-hh:mm:ss:fff}|{1,6}|{2,-20}|{3}", Datetime, Urgency, Source, Description);
         }
     }
 }
