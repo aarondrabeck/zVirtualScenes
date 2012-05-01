@@ -164,7 +164,6 @@ namespace zVirtualScenesApplication
                     dataListViewDevices.EnsureVisible(index);
             }
 
-            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> UpdatedataListViewDevices <<<<<<<<<<<---------------------", "ListViewDevices");
         }
 
         #region Subcribed API Events
@@ -401,7 +400,6 @@ namespace zVirtualScenesApplication
                     dataListViewScenes.EnsureVisible(index);
             }
 
-            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> SyncdataListViewScenes <<<<<<<<<<<---------------------", "ListViewScenes");
         }
 
         private void dataListViewScenes_SelectedIndexChanged_1(object sender, EventArgs e)
@@ -1738,7 +1736,6 @@ namespace zVirtualScenesApplication
                     dataListTasks.EnsureVisible(index);
             }
 
-            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> Syned dataListTasks <<<<<<<<<<<---------------------", "ScheduledTaskList");
         }
 
         void zvsEntityControl_ScheduledTaskModified(object sender, string PropertyModified)
@@ -2307,7 +2304,6 @@ namespace zVirtualScenesApplication
                     dataListTriggers.EnsureVisible(index);
             }
 
-            Logger.WriteToLog(Urgency.INFO, "------>>>>>>> SyncdataListTriggers <<<<<<<<<<<---------------------", "ListTriggers");
         }
 
         private void dataListEvents_CellRightClick(object sender, CellRightClickEventArgs e)
