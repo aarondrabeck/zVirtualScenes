@@ -22,8 +22,21 @@ namespace zVirtualScenesCommon.Util
         private static int _maxFileSize = 100;
         // Number of log files to keep
         private static int _maxFileCount = 5;
-        
-        private static string _logPath = null;
+
+        private static string _logPath
+        {
+            get
+            {
+                string path = Path.Combine(Paths.AppDataPath, @"logs\");
+                if (!Directory.Exists(path))
+                {
+                    try { Directory.CreateDirectory(path); }
+                    catch { }
+                }
+                return path + "\\";
+            }
+        }
+
         #endregion local Variables
 
         public delegate void LogItemAddEventHandler(object sender, EventArgs e);
@@ -159,10 +172,11 @@ namespace zVirtualScenesCommon.Util
             lock (_logFileName)
             {
                 // Environment.CurrentDirectory returns wrong directory in Service env. so we have to make a trick
-                if (_logPath == null)
-                {
-                    _logPath = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
-                }
+                //if (_logPath == null)
+                //{
+                   // _logPath = Paths.AppDataPath;
+                        //System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+               // }
 
                 string logFile = Path.Combine(_logPath, _logFileName);
                 if (File.Exists(logFile) == true)

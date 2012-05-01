@@ -17,9 +17,9 @@ namespace zVirtualScenesCommon.Entity
             get
             {
                 #if !DEBUG
-                    return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs-debug.db");
+                    return Path.Combine(Paths.AppDataPath, @"\zvs-debug.db");
                 #else
-                    return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs.db");
+                    return Path.Combine(Paths.AppDataPath, @"zvs.db");
                 #endif
             }
         }
@@ -52,7 +52,7 @@ namespace zVirtualScenesCommon.Entity
         {
             get { 
                 
-                string version = "zVirtualScenes v2.6 Beta 2";
+                string version = "zVirtualScenes v2.6";
 
                 #if (!DEBUG)
                 return version + " DEBUG MODE";

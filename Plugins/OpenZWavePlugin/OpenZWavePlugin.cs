@@ -32,7 +32,7 @@ namespace OpenZWavePlugin
         List<Node> m_nodeList = new List<Node>();
         private bool FinishedInitialPoll = false;
         private string LaastEventNameValueId = "9999058723211334119";
-        private int verbosity = 0;
+        private int verbosity = 1;
 
         public OpenZWavePlugin()
             : base("OPENZWAVE",
@@ -49,10 +49,11 @@ namespace OpenZWavePlugin
 
                 // Environment.CurrentDirectory returns wrong directory in Service env. so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+
                 // Create the Options                
                 m_options = new ZWOptions();
                 m_options.Create(directoryName + @"\config\",
-                                 directoryName + @"\", @"");
+                                 Paths.AppDataPath + @"\openzwave\", @"");
                 m_options.Lock();
                 m_manager = new ZWManager();
                 m_manager.Create();
@@ -1200,8 +1201,8 @@ namespace OpenZWavePlugin
                                 zvsEntityControl.CallDeviceModified(d, "last_heard_from");
                             }
 
-                            if (verbosity > 4)
-                            WriteToLog(Urgency.INFO, "[NodeQueriesComplete] Initializing...node " + node.ID + " query complete.");
+                            if (verbosity > 0)
+                            WriteToLog(Urgency.INFO, "[NodeQueriesComplete] node " + node.ID + " query complete.");
                         }
 
                         break;

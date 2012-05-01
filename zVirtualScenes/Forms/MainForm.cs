@@ -2410,6 +2410,18 @@ namespace zVirtualScenesApplication
 
         }
 
+        private void viewLogsAndDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(Paths.AppDataPath);
+            }
+            catch
+            {
+                MessageBox.Show("Unable to launch Windows Explorer.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);                
+            }
+        }
+
            
     }
 }
