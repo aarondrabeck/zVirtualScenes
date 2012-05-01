@@ -1685,7 +1685,8 @@ namespace zVirtualScenesApplication
                     break;
 
                 case DayOfWeek.Sunday:
-                    if (task.RecurTuesday.HasValue && task.RecurTuesday.Value)
+                    //BUG FIX 48:  Sunday not working as directed
+                    if (task.RecurSunday.HasValue && task.RecurSunday.Value) 
                         return true;
                     break;
             }
