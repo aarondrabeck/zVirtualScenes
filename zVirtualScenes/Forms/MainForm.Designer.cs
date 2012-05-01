@@ -179,6 +179,7 @@ namespace zVirtualScenesApplication
             this.deleteCommandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewLogsAndDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.builtInCommandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -201,7 +202,7 @@ namespace zVirtualScenesApplication
             this.contextMenuStripTriggerNull = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemEventsNull = new System.Windows.Forms.ToolStripMenuItem();
             this.createEventAdvancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.viewLogsAndDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStripScenes.SuspendLayout();
             this.contextMenuStripScenesNull.SuspendLayout();
             this.contextMenuStripActions.SuspendLayout();
@@ -1816,6 +1817,7 @@ namespace zVirtualScenesApplication
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.viewDatabaseToolStripMenuItem,
             this.viewLogsAndDatabaseToolStripMenuItem,
             this.toolStripSeparator2,
             this.exitToolStripMenuItem});
@@ -1823,15 +1825,22 @@ namespace zVirtualScenesApplication
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
+            // viewLogsAndDatabaseToolStripMenuItem
+            // 
+            this.viewLogsAndDatabaseToolStripMenuItem.Name = "viewLogsAndDatabaseToolStripMenuItem";
+            this.viewLogsAndDatabaseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.viewLogsAndDatabaseToolStripMenuItem.Text = "View &Logs";
+            this.viewLogsAndDatabaseToolStripMenuItem.Click += new System.EventHandler(this.viewLogsAndDatabaseToolStripMenuItem_Click);
+            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(188, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -1982,12 +1991,12 @@ namespace zVirtualScenesApplication
             this.createEventAdvancedToolStripMenuItem.Text = "Create &Advanced Trigger";
             this.createEventAdvancedToolStripMenuItem.Click += new System.EventHandler(this.createEventAdvancedToolStripMenuItem_Click);
             // 
-            // viewLogsAndDatabaseToolStripMenuItem
+            // viewDatabaseToolStripMenuItem
             // 
-            this.viewLogsAndDatabaseToolStripMenuItem.Name = "viewLogsAndDatabaseToolStripMenuItem";
-            this.viewLogsAndDatabaseToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.viewLogsAndDatabaseToolStripMenuItem.Text = "&View Logs && Database";
-            this.viewLogsAndDatabaseToolStripMenuItem.Click += new System.EventHandler(this.viewLogsAndDatabaseToolStripMenuItem_Click);
+            this.viewDatabaseToolStripMenuItem.Name = "viewDatabaseToolStripMenuItem";
+            this.viewDatabaseToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.viewDatabaseToolStripMenuItem.Text = "View &Database";
+            this.viewDatabaseToolStripMenuItem.Click += new System.EventHandler(this.viewDatabaseToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -2236,6 +2245,7 @@ namespace zVirtualScenesApplication
         private ToolStripMenuItem createEventAdvancedToolStripMenuItem;
         private UserControls.uc_device_values uc_device_values1;
         private ToolStripMenuItem viewLogsAndDatabaseToolStripMenuItem;
+        private ToolStripMenuItem viewDatabaseToolStripMenuItem;
     }
 }
 

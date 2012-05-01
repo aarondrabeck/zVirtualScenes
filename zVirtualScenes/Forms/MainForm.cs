@@ -2415,14 +2415,24 @@ namespace zVirtualScenesApplication
         {
             try
             {
+                System.Diagnostics.Process.Start(Logger.LogPath);
+            }
+            catch
+            {
+                MessageBox.Show("Unable to launch Windows Explorer.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }
+        }
+
+        private void viewDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
                 System.Diagnostics.Process.Start(Paths.AppDataPath);
             }
             catch
             {
-                MessageBox.Show("Unable to launch Windows Explorer.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);                
-            }
-        }
-
-           
+                MessageBox.Show("Unable to launch Windows Explorer.", zvsEntityControl.zvsNameAndVersion, MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+            }            
+        }           
     }
 }

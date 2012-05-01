@@ -23,7 +23,7 @@ namespace zVirtualScenesCommon.Util
         // Number of log files to keep
         private static int _maxFileCount = 5;
 
-        private static string _logPath
+        public static string LogPath
         {
             get
             {
@@ -178,7 +178,7 @@ namespace zVirtualScenesCommon.Util
                         //System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
                // }
 
-                string logFile = Path.Combine(_logPath, _logFileName);
+                string logFile = Path.Combine(LogPath, _logFileName);
                 if (File.Exists(logFile) == true)
                 {
                     // Check file size.
@@ -187,7 +187,7 @@ namespace zVirtualScenesCommon.Util
                         // move file
                         File.Move(logFile, logFile.Replace(".log", String.Format("_{0:yyyy-MM-dd-hhmmssfff}.log", DateTime.Now)));
                         // now check how much logfiles we have and delete the oldest
-                        var fileList = from files in new DirectoryInfo(_logPath).GetFiles(_logFileName.Replace(".log", "_*.log"))
+                        var fileList = from files in new DirectoryInfo(LogPath).GetFiles(_logFileName.Replace(".log", "_*.log"))
                                        orderby files.Name ascending
                                        select files;
                         if (fileList.Count() > MaxFileCount)
