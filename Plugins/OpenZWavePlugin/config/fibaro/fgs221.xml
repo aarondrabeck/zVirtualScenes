@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<Product>
+<Product xmlns='http://code.google.com/p/open-zwave/'>
   <!-- Configuration -->
   <CommandClass id="112">
     <Value type="list" genre="config" instance="1" index="1" label="1. Enable/Disable ALL ON/OFF" value="255">
@@ -140,9 +140,9 @@
   <!-- Association Groups -->
   <CommandClass id="133">
     <Associations num_groups="3">
-      <Group index="1" max_associations="16" label="Group 1" auto="true"/>
+      <Group index="1" max_associations="16" label="Group 1" auto="false"/>
       <Group index="2" max_associations="16" label="Group 2" auto="false" />
-      <Group index="3" max_associations="1" label="Send updates" auto="false"/>
+      <Group index="3" max_associations="1" label="Send updates" auto="true"/>
     </Associations>
   </CommandClass>
 

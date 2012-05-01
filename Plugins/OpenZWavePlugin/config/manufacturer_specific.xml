@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ManufacturerSpecificData>
+<ManufacturerSpecificData xmlns='http://code.google.com/p/open-zwave/'>
 	<Manufacturer id="0040" name="2B Electronics">
 	</Manufacturer>
 	<Manufacturer id="0098" name="2GIG Technologies">
@@ -17,7 +17,7 @@
 		<Product type="4450" id="3030" name="ZDP100 Plugin Lamp Module"/>
 		<Product type="4457" id="3033" name="ZDW103 Wall Dimmer Module" config="act/zdw103.xml"/>
 		<Product type="4457" id="3330" name="ZDW230 Wall Dimmer Module"/>
-		<Product type="4457" id="3332" name="ZDW232 Wall Dimmer Module"/>
+		<Product type="4457" id="3332" name="ZDW232 Wall Dimmer Module" config="act/zdw232.xml"/>
 		<Product type="444d" id="3330" name="ZDM230 Wall Dimmer Module" config="act/zdm230.xml"/>
 		<Product type="5250" id="3030" name="ZRP100 Plugin Appliance Module"/>
 		<Product type="5250" id="3130" name="ZRP110 Exterior Appliance Module" config="act/zrp110.xml"/>
@@ -51,6 +51,7 @@
 	<Manufacturer id="0029" name="Asia Heading">
 	</Manufacturer>
 	<Manufacturer id="005d" name="Aspalis">
+		<Product type="0202" id="0511" name="Plugin Lamp Module"/>
 	</Manufacturer>
 	<Manufacturer id="002b" name="Atech">
 	</Manufacturer>
@@ -108,6 +109,7 @@
 	</Manufacturer>
 	<Manufacturer id="0060" name="Everspring">
 		<Product type="0104" id="0001" name="AN145 Lamp Screw In Module" config="everspring/an145.xml"/>
+		<Product type="0004" id="0002" name="AN158 Plug-in Meter Appliance Module" config="everspring/an158.xml"/>
 		<Product type="0004" id="0001" name="AN157 Plug-in Appliance Module"/>
 		<Product type="000C" id="0001" name="SE812 Siren"/>
 		<Product type="000D" id="0001" name="SF812 Smoke Alarm" config="everspring/sf812.xml"/>
@@ -190,6 +192,7 @@
 		<Product type="0003" id="0003" name="HA-03WD Lamp Module"/>
 		<Product type="0004" id="0003" name="HA-04C Outdoor Module"/>
 		<Product type="0005" id="0003" name="HA-05C Lamp Screw In Module"/>
+		<Product type="4341" id="0600" name="CA600 Wall Dimmer"/>
 		<Product type="4341" id="3500" name="CA3560 Split-Duplex Receptacle"/>
 		<Product type="4341" id="8900" name="CA8900 Digital Thermostat" config="intermatic/ca8900.xml"/>
 		<Product type="4341" id="9000" name="CA9000 PIR Occupancy Sensor"/>
@@ -197,12 +200,12 @@
 	<Manufacturer id="0013" name="Internet Dom">
 	</Manufacturer>
 	<Manufacturer id="0063" name="GE">
-		<Product type="4450" id="3030" name="GE 45602 Lamp Dimmer Module" config="ge/dimmer_module.xml"/>
-		<Product type="4457" id="3230" name="GE 45606 2-Way Dimmer Switch" config="ge/dimmer.xml"/>
-		<Product type="5250" id="3030" name="GE 45603 Plugin Appliance Module"/>
-		<Product type="5250" id="3130" name="GE 45604 Outdoor Module"/>
-		<Product type="5257" id="3533" name="GE 45609 On/Off Relay Switch" config="ge/relay.xml"/>
-		<Product type="4457" id="3033" name="GE 45613 3-Way Dimmer Switch" config="ge/dimmer.xml"/>
+		<Product type="4450" id="3030" name="45602 Lamp Dimmer Module" config="ge/dimmer_module.xml"/>
+		<Product type="4457" id="3230" name="45606 2-Way Dimmer Switch" config="ge/dimmer.xml"/>
+		<Product type="5250" id="3030" name="45603 Plugin Appliance Module"/>
+		<Product type="5250" id="3130" name="45604 Outdoor Module"/>
+		<Product type="5257" id="3533" name="45609 On/Off Relay Switch" config="ge/relay.xml"/>
+		<Product type="4457" id="3033" name="45613 3-Way Dimmer Switch" config="ge/dimmer.xml"/>
 	</Manufacturer>
 	<Manufacturer id="0091" name="Kamstrup">
 	</Manufacturer>
@@ -263,7 +266,7 @@
 	</Manufacturer>
 	<Manufacturer id="0041" name="OpenPeak Inc.">
 	</Manufacturer>
-	<Manufacturer id="0064" name="Popp / Düwi">
+	<Manufacturer id="0064" name="Popp / Duwi">
 	  <Product type="3001" id="0000" name="Plugin Switch" />
 	</Manufacturer>
 	<Manufacturer id="0016" name="PowerLynx">
@@ -333,6 +336,8 @@
 	</Manufacturer>
 	<Manufacturer id="0008" name="Wayne Dalton">
 		<Product type="0007" id="0020" name="WDTC-20 Thermostat" config="waynedalton/WDTC-20.xml"/>
+	</Manufacturer>
+	<Manufacturer id="0118" name="Wenzhou TKB Control System">
 	</Manufacturer>
 	<Manufacturer id="004c" name="Woodward Labs">
 	</Manufacturer>

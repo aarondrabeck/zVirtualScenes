@@ -1990,3 +1990,1490 @@ if(records[0].data.type==='SWITCH'){var SWITCHDetails=deviceDetailsPane.items.it
 if(records[0].data.type==='THERMOSTAT'){var ThermoDetails=deviceDetailsPane.items.items[3];ThermoDetails.loadDevice(records[0].data.id);deviceDetailsPane.getLayout().setAnimation({type:'slide',direction:'up'});deviceDetailsPane.setActiveItem(ThermoDetails);}}}},flex:1},{flex:2,id:'deviceDetailsPane',layout:{type:'card',animation:{type:'slide',direction:'left'}},items:[{cls:'emptyDetail',html:"Select a device to see more details."},{xtype:'DeviceDetailsDimmer',id:'DeviceDetailsDimmer'},{xtype:'DeviceDetailsSwitch',id:'DeviceDetailsSwitch'},{xtype:'DeviceDetailsThermo',id:'DeviceDetailsThermo'},{xtype:'toolbar',docked:'top',title:'Device Details',scrollable:false}]}]}});Ext.define('zvsMobile.view.SceneList',{extend:'Ext.dataview.List',requires:['Ext.plugin.PullRefresh'],xtype:'SceneList',config:{cls:'SceneListItem',store:SceneStore,scrollable:'vertical',ui:'round',scrollToTopOnRefresh:false,plugins:[{xclass:'Ext.plugin.PullRefresh'}],itemTpl:new Ext.XTemplate('<div class="scene">','<div class="imageholder running_{is_running}"></div>','<h2>{name} ({cmd_count})</h2>','</div>'),items:{xtype:'toolbar',docked:'top',title:'Scenes'}}});Ext.define('zvsMobile.view.phone.ScenePhoneViewPort',{extend:'Ext.Panel',xtype:'ScenePhoneViewPort',requires:['zvsMobile.view.SceneList','zvsMobile.view.SceneDetails'],initialize:function(){this.callParent(arguments);},config:{layout:{type:'card',animation:{type:'slide',direction:'left'}},items:[{xtype:'SceneList',id:'SceneList',listeners:{scope:this,selectionchange:function(list,records){if(records[0]!==undefined){var SceneDetails=Ext.getCmp('SceneDetails');SceneDetails.loadScene(records[0].data.id);var ScenePhoneViewPort=Ext.getCmp('ScenePhoneViewPort');ScenePhoneViewPort.getLayout().setAnimation({type:'slide',direction:'left'});ScenePhoneViewPort.setActiveItem(Ext.getCmp('SceneDetailContainer'));}},activate:function(){Ext.getCmp('DeviceList').deselectAll();}}},{id:'SceneDetailContainer',layout:'card',items:[{xtype:'SceneDetails',id:'SceneDetails'},{xtype:'toolbar',docked:'top',title:'Scene Details',scrollable:false,items:[{xtype:'button',iconMask:true,ui:'back',text:'Back',handler:function(){var ScenePhoneViewPort=Ext.getCmp('ScenePhoneViewPort');ScenePhoneViewPort.getLayout().setAnimation({type:'slide',direction:'right'});ScenePhoneViewPort.setActiveItem(Ext.getCmp('SceneList'));}}]}]}]}});Ext.define('zvsMobile.view.tablet.SceneTabletViewPort',{extend:'Ext.Panel',xtype:'SceneTabletViewPort',requires:['zvsMobile.view.SceneList','zvsMobile.view.SceneDetails'],config:{layout:'hbox',items:[{xtype:'SceneList',id:'SceneList',flex:1,listeners:{scope:this,selectionchange:function(list,records){if(records[0]!==undefined){var SceneDetails=Ext.getCmp('SceneDetails');SceneDetails.loadScene(records[0].data.id);var sceneDetailsPane=Ext.getCmp('sceneDetailsPane');sceneDetailsPane.getLayout().setAnimation({type:'slide',direction:'up'});sceneDetailsPane.setActiveItem(SceneDetails);}}}},{flex:2,id:'sceneDetailsPane',layout:{type:'card',animation:{type:'slide',direction:'left'}},items:[{cls:'emptyDetail',html:"Select a scene to see more details."},{xtype:'SceneDetails',id:'SceneDetails'},{xtype:'toolbar',docked:'top',title:'Scene Details'}]}]}});Ext.define('zvsMobile.view.GroupList',{extend:'Ext.dataview.List',requires:['Ext.plugin.PullRefresh'],xtype:'GroupList',config:{cls:'GroupList',store:GroupStore,scrollable:'vertical',ui:'round',scrollToTopOnRefresh:false,plugins:[{xclass:'Ext.plugin.PullRefresh'}],itemTpl:new Ext.XTemplate('<div class="group">','<div class="imageholder"></div>','<h1>{name} ({count})</h1>','</div>'),items:{xtype:'toolbar',docked:'top',title:'Groups'}}});Ext.define('zvsMobile.view.phone.GroupPhoneViewPort',{extend:'Ext.Panel',xtype:'GroupPhoneViewPort',requires:['zvsMobile.view.DeviceList','zvsMobile.view.GroupList','zvsMobile.view.GroupDetails'],config:{layout:{type:'card',animation:{type:'slide',direction:'left'}},items:[{xtype:'GroupList',id:'GroupList',listeners:{scope:this,selectionchange:function(list,records){if(records[0]!==undefined){var GroupDetails=Ext.getCmp('GroupDetails');GroupDetails.loadGroup(records[0].data.id);var GroupPhoneViewPort=Ext.getCmp('GroupPhoneViewPort');GroupPhoneViewPort.getLayout().setAnimation({type:'slide',direction:'left'});GroupPhoneViewPort.setActiveItem(Ext.getCmp('GroupDetailContainer'));}},activate:function(){Ext.getCmp('GroupList').deselectAll();}}},{id:'GroupDetailContainer',layout:'card',items:[{xtype:'GroupDetails',id:'GroupDetails'},{xtype:'toolbar',docked:'top',title:'Group Details',scrollable:false,items:[{xtype:'button',iconMask:true,ui:'back',text:'Back',handler:function(){var GroupPhoneViewPort=Ext.getCmp('GroupPhoneViewPort');GroupPhoneViewPort.getLayout().setAnimation({type:'slide',direction:'right'});GroupPhoneViewPort.setActiveItem(Ext.getCmp('GroupList'));}}]}]}]}});Ext.define('zvsMobile.view.tablet.GroupTabletViewPort',{extend:'Ext.Panel',xtype:'GroupTabletViewPort',requires:['zvsMobile.view.DeviceList','zvsMobile.view.GroupList','zvsMobile.view.GroupDetails'],config:{layout:'hbox',items:[{xtype:'GroupList',id:'GroupList',flex:1,listeners:{scope:this,selectionchange:function(list,records){if(records[0]!==undefined){var GroupDetails=Ext.getCmp('GroupDetails');GroupDetails.loadGroup(records[0].data.id);var groupDetailsPane=Ext.getCmp('groupDetailsPane');groupDetailsPane.getLayout().setAnimation({type:'slide',direction:'up'});groupDetailsPane.setActiveItem(GroupDetails);}}}},{flex:2,id:'groupDetailsPane',layout:{type:'card',animation:{type:'slide',direction:'left'}},items:[{cls:'emptyDetail',html:"Select a group to see more details."},{xtype:'GroupDetails',id:'GroupDetails'},{xtype:'toolbar',docked:'top',title:'Group Details'}]}]}});Ext.define('Ext.data.ArrayStore',{extend:'Ext.data.Store',alias:'store.array',uses:['Ext.data.reader.Array'],config:{proxy:{type:'memory',reader:'array'}},loadData:function(data,append){this.callParent([data,append]);}},function(){Ext.data.SimpleStore=Ext.data.ArrayStore;});Ext.define('Ext.data.reader.Array',{extend:'Ext.data.reader.Json',alternateClassName:'Ext.data.ArrayReader',alias:'reader.array',config:{totalProperty:undefined,successProperty:undefined},createFieldAccessExpression:function(field,fieldVarName,dataName){var me=this,mapping=field.getMapping(),index=(mapping==null)?me.getModel().getFields().indexOf(field):mapping,result;if(typeof index==='function'){result=fieldVarName+'.getMapping()('+dataName+', this)';}else{if(isNaN(index)){index='"'+index+'"';}
 result=dataName+"["+index+"]";}
 return result;}});
+/**
+ * @private
+ *
+ * A general {@link Ext.picker.Picker} slot class.  Slots are used to organize multiple scrollable slots into
+ * a single {@link Ext.picker.Picker}.
+ *
+ *     {
+ *         name : 'limit_speed',
+ *         title: 'Speed Limit',
+ *         data : [
+ *             {text: '50 KB/s', value: 50},
+ *             {text: '100 KB/s', value: 100},
+ *             {text: '200 KB/s', value: 200},
+ *             {text: '300 KB/s', value: 300}
+ *         ]
+ *     }
+ *
+ * See the {@link Ext.picker.Picker} documentation on how to use slots.
+ */
+Ext.define('Ext.picker.Slot', {
+    extend: 'Ext.DataView',
+    xtype : 'pickerslot',
+    alternateClassName: 'Ext.Picker.Slot',
+    requires: [
+        'Ext.XTemplate',
+        'Ext.data.Store',
+        'Ext.Component',
+        'Ext.data.StoreManager'
+    ],
+
+    /**
+     * @event slotpick
+     * Fires whenever an slot is picked
+     * @param {Ext.picker.Slot} this
+     * @param {Mixed} value The value of the pick
+     * @param {HTMLElement} node The node element of the pick
+     */
+
+    isSlot: true,
+
+    config: {
+        /**
+         * @cfg {String} title
+         * The title to use for this slot. Null for no title
+         * @accessor
+         */
+        title: null,
+
+        /**
+         * @private
+         * @cfg {Boolean} showTitle
+         * @accessor
+         */
+        showTitle: true,
+
+        /**
+         * @private
+         * @cfg {String} cls
+         * The main component class
+         * @accessor
+         */
+        cls: Ext.baseCSSPrefix + 'picker-slot',
+
+        /**
+         * @cfg {String} name
+         * The name of this slot. This config option is required.
+         * @accessor
+         */
+        name: null,
+
+        /**
+         * @cfg {Number} value The value of this slot
+         * @accessor
+         */
+        value: null,
+
+        /**
+         * @cfg {Number} flex
+         * @accessor
+         * @hide
+         */
+        flex: 1,
+
+        /**
+         * @cfg {String} align
+         * The horizontal alignment of the slot's contents. Valid values are "left", "center",
+         * and "right". Defaults to "left".
+         * @accessor
+         */
+        align: 'left',
+
+        /**
+         * @cfg {String} displayField
+         * The display field in the store.
+         * Defaults to 'text'.
+         * @accessor
+         */
+        displayField: 'text',
+
+        /**
+         * @cfg {String} valueField
+         * The value field in the store.
+         * Defaults to 'value'.
+         * @accessor
+         */
+        valueField: 'value',
+
+        /**
+         * @cfg {Object} scrollable
+         * @accessor
+         * @hide
+         */
+        scrollable: {
+            direction: 'vertical',
+            indicators: false,
+            momentumEasing: {
+                minVelocity: 2
+            },
+            slotSnapEasing: {
+                duration: 100
+            }
+        }
+    },
+
+    constructor: function() {
+        /**
+         * @property selectedIndex
+         * @type Number
+         * The current selectedIndex of the picker slot
+         * @private
+         */
+        this.selectedIndex = 0;
+
+        /**
+         * @property picker
+         * @type Ext.picker.Picker
+         * A reference to the owner Picker
+         * @private
+         */
+
+        this.callParent(arguments);
+    },
+
+    /**
+     * Sets the title for this dataview by creating element
+     */
+    applyTitle: function(title) {
+        //check if the title isnt defined
+        if (title) {
+            //create a new title element
+            title = Ext.create('Ext.Component', {
+                cls: Ext.baseCSSPrefix + 'picker-slot-title',
+                docked      : 'top',
+                html        : title
+            });
+        }
+
+        return title;
+    },
+
+    updateTitle: function(newTitle, oldTitle) {
+        if (newTitle) {
+            this.add(newTitle);
+            this.setupBar();
+        }
+
+        if (oldTitle) {
+            this.remove(oldTitle);
+        }
+    },
+
+    updateShowTitle: function(showTitle) {
+        var title = this.getTitle();
+        if (title) {
+            title[showTitle ? 'show' : 'hide']();
+
+            this.setupBar();
+        }
+    },
+
+    updateDisplayField: function(newDisplayField) {
+        this.setItemTpl('<div class="' + Ext.baseCSSPrefix + 'picker-item {cls} <tpl if="extra">' + Ext.baseCSSPrefix + 'picker-invalid</tpl>">{' + newDisplayField + '}</div>');
+    },
+
+    /**
+     * Updates the {@link #align} configuration
+     */
+    updateAlign: function(newAlign, oldAlign) {
+        var element = this.element;
+        element.addCls(Ext.baseCSSPrefix + 'picker-' + newAlign);
+        element.removeCls(Ext.baseCSSPrefix + 'picker-' + oldAlign);
+    },
+
+    /**
+     * Looks at the {@link #data} configuration and turns it into {@link #store}
+     */
+    applyData: function(data) {
+        var parsedData = [],
+            ln = data && data.length,
+            i, item, obj;
+
+        if (data && Ext.isArray(data) && ln) {
+            for (i = 0; i < ln; i++) {
+                item = data[i];
+                obj = {};
+                if (Ext.isArray(item)) {
+                    obj[this.valueField] = item[0];
+                    obj[this.displayField] = item[1];
+                }
+                else if (Ext.isString(item)) {
+                    obj[this.valueField] = item;
+                    obj[this.displayField] = item;
+                }
+                else if (Ext.isObject(item)) {
+                    obj = item;
+                }
+                parsedData.push(obj);
+            }
+        }
+
+        return data;
+    },
+
+    updateData: function(data) {
+        this.setStore(Ext.create('Ext.data.Store', {
+            model: 'x-textvalue',
+            data : data
+        }));
+    },
+
+    // @private
+    initialize: function() {
+        this.callParent();
+
+        var scroller = this.getScrollable().getScroller();
+
+        this.on({
+            scope: this,
+            painted: 'onPainted',
+            itemtap: 'doItemTap'
+        });
+
+        scroller.on({
+            scope: this,
+            scrollend: 'onScrollEnd'
+        });
+    },
+
+    // @private
+    onPainted: function() {
+        this.setupBar();
+    },
+
+    /**
+     * Returns an instance of the owner picker
+     * @private
+     */
+    getPicker: function() {
+        if (!this.picker) {
+            this.picker = this.getParent();
+        }
+
+        return this.picker;
+    },
+
+    // @private
+    setupBar: function() {
+        if (!this.rendered) {
+            //if the component isnt rendered yet, there is no point in calculating the padding just eyt
+            return;
+        }
+
+        var element = this.element,
+            innerElement = this.innerElement,
+            picker = this.getPicker(),
+            bar = picker.bar,
+            value = this.getValue(),
+            showTitle = this.getShowTitle(),
+            title = this.getTitle(),
+            scrollable = this.getScrollable(),
+            scroller = scrollable.getScroller(),
+            titleHeight = 0,
+            barY, elY, barHeight, padding, paddingBottom;
+
+        barY = bar.getY();
+        elY = element.getY();
+
+        if (showTitle && title) {
+            elY += title.element.getHeight();
+        }
+
+        barHeight = bar.getHeight();
+
+        if (showTitle && title) {
+            titleHeight = title.element.getHeight();
+        }
+
+        padding = Math.ceil((element.getHeight() - titleHeight - barHeight) / 2);
+        this.slotPadding = padding;
+
+        innerElement.setStyle({
+            padding: padding + 'px 0 ' + (padding) + 'px'
+        });
+
+        scroller.refresh();
+        scroller.setSlotSnapSize(barHeight);
+
+        this.setValue(value);
+    },
+
+    // @private
+    doItemTap: function(list, index, item, e) {
+        var me = this;
+        me.selectedIndex = index;
+        me.selectedNode = item;
+        me.scrollToItem(item, true);
+
+        me.fireEvent('slotpick', me, me.getValue(), me.selectedNode);
+    },
+
+    // @private
+    scrollToItem: function(item, animated) {
+        var y = item.getY(),
+            parentEl = item.parent(),
+            parentY = parentEl.getY(),
+            // padding = this.slotPadding,
+            scrollView = this.getScrollable(),
+            scroller = scrollView.getScroller(),
+            difference;
+
+        difference = y - parentY;
+
+        scroller.scrollTo(0, difference, animated);
+    },
+
+    // @private
+    onScrollEnd: function(scroller, x, y) {
+        var me = this,
+            index = Math.round(y / me.picker.bar.getHeight()),
+            viewItems = me.getViewItems(),
+            item = viewItems[index];
+
+        if (item) {
+            me.selectedIndex = index;
+            me.selectedNode = item;
+
+            me.fireEvent('slotpick', me, me.getValue(), me.selectedNode);
+        }
+    },
+
+    /**
+     * Returns the vlaue of this slot
+     * @private
+     */
+    getValue: function() {
+        var store = this.getStore(),
+            record, value;
+
+        if (!store) {
+            return;
+        }
+
+        if (!this.rendered) {
+            return this._value;
+        }
+
+        //if the value is ever false, that means we do not want to return anything
+        if (this._value === false) {
+            return null;
+        }
+
+        record = store.getAt(this.selectedIndex);
+
+        value = record ? record.get(this.getValueField()) : null;
+        this._value = value;
+
+        return value;
+    },
+
+    /**
+     * Sets the value of this slot
+     * @private
+     */
+    setValue: function(value) {
+        if (!Ext.isDefined(value)) {
+            return;
+        }
+
+        if (!this.rendered || !value) {
+            //we don't want to call this until the slot has been rendered
+            this._value = value;
+            return;
+        }
+
+        var store = this.getStore(),
+            viewItems = this.getViewItems(),
+            valueField = this.getValueField(),
+            index, item;
+
+        index = store.find(valueField, value);
+        if (index != -1) {
+            item = Ext.get(viewItems[index]);
+
+            this.selectedIndex = index;
+            this.scrollToItem(item);
+
+            this._value = value;
+        }
+    },
+
+    /**
+     * Sets the value of this slot
+     * @private
+     */
+    setValueAnimated: function(value) {
+        if (!value) {
+            return;
+        }
+
+        if (!this.rendered) {
+            //we don't want to call this until the slot has been rendered
+            this._value = value;
+            return;
+        }
+
+        var store = this.getStore(),
+            viewItems = this.getViewItems(),
+            valueField = this.getValueField(),
+            index, item;
+
+        index = store.find(valueField, value);
+        if (index != -1) {
+            item = Ext.get(viewItems[index]);
+
+            this.selectedIndex = index;
+            this.scrollToItem(item, {
+                duration: 100
+            });
+
+            this._value = value;
+        }
+    }
+});
+/**
+A general picker class. {@link Ext.picker.Slot}s are used to organize multiple scrollable slots into a single picker. {@link #slots} is
+the only necessary configuration.
+
+The {@link #slots} configuration with a few key values:
+
+ - **name:** The name of the slot (will be the key when using {@link #getValues} in this {@link Ext.picker.Picker})
+ - **title:** The title of this slot (if {@link #useTitles} is set to true)
+ - **data/store:** The data or store to use for this slot.
+
+Remember, {@link Ext.picker.Slot} class extends from {@link Ext.dataview.DataView}.
+
+## Examples
+
+    @example miniphone preview
+    var picker = Ext.create('Ext.Picker', {
+        slots: [
+            {
+                name : 'limit_speed',
+                title: 'Speed',
+                data : [
+                    {text: '50 KB/s', value: 50},
+                    {text: '100 KB/s', value: 100},
+                    {text: '200 KB/s', value: 200},
+                    {text: '300 KB/s', value: 300}
+                ]
+            }
+        ]
+    });
+    Ext.Viewport.add(picker);
+    picker.show();
+
+You can also customize the top toolbar on the {@link Ext.picker.Picker} by changing the {@link #doneButton} and {@link #cancelButton} configurations:
+
+    @example miniphone preview
+    var picker = Ext.create('Ext.Picker', {
+        doneButton: 'I\'m done!',
+        cancelButton: false,
+        slots: [
+            {
+                name : 'limit_speed',
+                title: 'Speed',
+                data : [
+                    {text: '50 KB/s', value: 50},
+                    {text: '100 KB/s', value: 100},
+                    {text: '200 KB/s', value: 200},
+                    {text: '300 KB/s', value: 300}
+                ]
+            }
+        ]
+    });
+    Ext.Viewport.add(picker);
+    picker.show();
+
+Or by passing a custom {@link #toolbar} configuration:
+
+    @example miniphone preview
+    var picker = Ext.create('Ext.Picker', {
+        doneButton: false,
+        cancelButton: false,
+        toolbar: {
+            ui: 'light',
+            title: 'My Picker!'
+        },
+        slots: [
+            {
+                name : 'limit_speed',
+                title: 'Speed',
+                data : [
+                    {text: '50 KB/s', value: 50},
+                    {text: '100 KB/s', value: 100},
+                    {text: '200 KB/s', value: 200},
+                    {text: '300 KB/s', value: 300}
+                ]
+            }
+        ]
+    });
+    Ext.Viewport.add(picker);
+    picker.show();
+ */
+Ext.define('Ext.picker.Picker', {
+    extend: 'Ext.Sheet',
+    alias : 'widget.picker',
+    alternateClassName: 'Ext.Picker',
+    requires: ['Ext.picker.Slot', 'Ext.Toolbar', 'Ext.data.Model'],
+
+    isPicker: true,
+
+    /**
+     * @event pick
+     * Fired when a slot has been picked
+     * @param {Ext.Picker} this This Picker
+     * @param {Object} The values of this picker's slots, in {name:'value'} format
+     * @param {Ext.Picker.Slot} slot An instance of Ext.Picker.Slot that has been picked
+     */
+
+    /**
+     * @event change
+     * Fired when the value of this picker has changed the Done button has been pressed.
+     * @param {Ext.picker.Picker} this This Picker
+     * @param {Object} value The values of this picker's slots, in {name:'value'} format
+     */
+
+    /**
+     * @event cancel
+     * Fired when the cancel button is tapped and the values are reverted back to
+     * what they were
+     * @param {Ext.Picker} this This Picker
+     */
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        cls: Ext.baseCSSPrefix + 'picker',
+
+        /**
+         * @cfg {String/Mixed} doneButton
+         * Can be either:<ul>
+         * <li>A {String} text to be used on the Done button</li>
+         * <li>An {Object} as config for {@link Ext.Button}</li>
+         * <li>false or null to hide it</li></ul>
+         * @accessor
+         */
+        doneButton: true,
+
+        /**
+         * @cfg {String/Mixed} cancelButton
+         * Can be either:<ul>
+         * <li>A {String} text to be used on the Cancel button</li>
+         * <li>An {Object} as config for {@link Ext.Button}</li>
+         * <li>false or null to hide it</li></ul>
+         * @accessor
+         */
+        cancelButton: true,
+
+        /**
+         * @cfg {Boolean} useTitles
+         * Generate a title header for each individual slot and use
+         * the title configuration of the slot.
+         * @accessor
+         */
+        useTitles: false,
+
+        /**
+         * @cfg {Array} slots
+         * An array of slot configurations.
+         * <ul>
+         *  <li>name - {String} - Name of the slot</li>
+         *  <li>data - {Array} - An array of text/value pairs in the format {text: 'myKey', value: 'myValue'}</li>
+         *  <li>title - {String} - Title of the slot. This is used in conjunction with useTitles: true.</li>
+         * </ul>
+         * @accessor
+         */
+        slots: null,
+
+        /**
+         * @cfg {String/Number} value The value to initialize the picker with
+         * @accessor
+         */
+        value: null,
+
+        /**
+         * @cfg {Number} height
+         * The height of the picker.
+         * @accessor
+         */
+        height: 220,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        layout: {
+            type : 'hbox',
+            align: 'stretch'
+        },
+
+        /**
+         * @cfg
+         * @hide
+         */
+        centered: false,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        left : 0,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        right: 0,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        bottom: 0,
+
+        // @private
+        defaultType: 'pickerslot',
+
+        /**
+         * @cfg {Ext.TitleBar/Ext.Toolbar/Object} toolbar
+         * The toolbar which contains the {@link #doneButton} and {@link #cancelButton} buttons.
+         * You can override this if you wish, and add your own configurations. Just ensure that you take into account
+         * the {@link #doneButton} and {@link #cancelButton} configurations.
+         *
+         * The default xtype is a {@link Ext.TitleBar}:
+         *
+         *     toolbar: {
+         *         items: [
+         *             {
+         *                 xtype: 'button',
+         *                 text: 'Left',
+         *                 align: 'left'
+         *             },
+         *             {
+         *                 xtype: 'button',
+         *                 text: 'Right',
+         *                 align: 'left'
+         *             }
+         *         ]
+         *     }
+         *
+         * Or to use a {@link Ext.Toolbar instead}:
+         *
+         *     toolbar: {
+         *         xtype: 'toolbar',
+         *         items: [
+         *             {
+         *                 xtype: 'button',
+         *                 text: 'Left'
+         *             },
+         *             {
+         *                 xtype: 'button',
+         *                 text: 'Left Two'
+         *             }
+         *         ]
+         *     }
+         *
+         * @accessor
+         */
+        toolbar: true
+    },
+
+    initElement: function() {
+        this.callParent(arguments);
+
+        var me = this,
+            clsPrefix = Ext.baseCSSPrefix,
+            innerElement = this.innerElement;
+
+        //insert the mask, and the picker bar
+        this.mask = innerElement.createChild({
+            cls: clsPrefix + 'picker-mask'
+        });
+
+        this.bar = this.mask.createChild({
+            cls: clsPrefix + 'picker-bar'
+        });
+
+        me.on({
+            scope   : this,
+            delegate: 'pickerslot',
+            slotpick: 'onSlotPick'
+        });
+
+        me.on({
+            scope: this,
+            show: 'onShow'
+        });
+    },
+
+    /**
+     * @private
+     */
+    applyToolbar: function(config) {
+        if (config === true) {
+            config = {};
+        }
+
+        Ext.applyIf(config, {
+            docked: 'top'
+        });
+
+        return Ext.factory(config, 'Ext.TitleBar', this.getToolbar());
+    },
+
+    /**
+     * @private
+     */
+    updateToolbar: function(newToolbar, oldToolbar) {
+        if (newToolbar) {
+            this.add(newToolbar);
+        }
+
+        if (oldToolbar) {
+            this.remove(oldToolbar);
+        }
+    },
+
+    /**
+     * Updates the {@link #doneButton} configuration. Will change it into a button when appropriate, or just update the text if needed.
+     */
+    applyDoneButton: function(config) {
+        if (config) {
+            if (Ext.isBoolean(config)) {
+                config = {};
+            }
+
+            if (typeof config == "string") {
+                config = {
+                    text: config
+                };
+            }
+
+            Ext.applyIf(config, {
+                ui: 'action',
+                align: 'right',
+                text: 'Done'
+            });
+        }
+
+        return Ext.factory(config, 'Ext.Button', this.getDoneButton());
+    },
+
+    updateDoneButton: function(newDoneButton, oldDoneButton) {
+        var toolbar = this.getToolbar();
+
+        if (newDoneButton) {
+            toolbar.add(newDoneButton);
+            newDoneButton.on('tap', this.onDoneButtonTap, this);
+        } else if (oldDoneButton) {
+            toolbar.remove(oldDoneButton);
+        }
+    },
+
+    /**
+     * Updates the {@link #cancelButton} configuration. Will change it into a button when appropriate, or just update the text if needed.
+     */
+    applyCancelButton: function(config) {
+        if (config) {
+            if (Ext.isBoolean(config)) {
+                config = {};
+            }
+
+            if (typeof config == "string") {
+                config = {
+                    text: config
+                };
+            }
+
+            Ext.applyIf(config, {
+                align: 'left',
+                text: 'Cancel'
+            });
+        }
+
+        return Ext.factory(config, 'Ext.Button', this.getCancelButton());
+    },
+
+    updateCancelButton: function(newCancelButton, oldCancelButton) {
+        var toolbar = this.getToolbar();
+
+        if (newCancelButton) {
+            toolbar.add(newCancelButton);
+            newCancelButton.on('tap', this.onCancelButtonTap, this);
+        } else if (oldCancelButton) {
+            toolbar.remove(oldCancelButton);
+        }
+    },
+
+    /**
+     * @private
+     */
+    updateUseTitles: function(useTitles) {
+        var innerItems = this.getInnerItems(),
+            ln = innerItems.length,
+            cls = Ext.baseCSSPrefix + 'use-titles',
+            i, innerItem;
+
+        //add a cls onto the picker
+        if (useTitles) {
+            this.addCls(cls);
+        } else {
+            this.removeCls(cls);
+        }
+
+        //show the titme on each of the slots
+        for (i = 0; i < ln; i++) {
+            innerItem = innerItems[i];
+
+            if (innerItem.isSlot) {
+                innerItem.setShowTitle(useTitles);
+            }
+        }
+    },
+
+    applySlots: function(slots) {
+        //loop through each of the slots and add a referece to this picker
+        if (slots) {
+            var ln = slots.length,
+                i;
+
+            for (i = 0; i < ln; i++) {
+                slots[i].picker = this;
+            }
+        }
+
+        return slots;
+    },
+
+    /**
+     * Adds any new {@link #slots} to this picker, and removes existing {@link #slots}
+     * @private
+     */
+    updateSlots: function(newSlots) {
+        var bcss = Ext.baseCSSPrefix,
+            innerItems;
+
+        this.removeAll();
+
+        if (newSlots) {
+            this.add(newSlots);
+        }
+
+        innerItems = this.getInnerItems();
+        if (innerItems.length > 0) {
+            innerItems[0].addCls(bcss + 'first');
+            innerItems[innerItems.length - 1].addCls(bcss + 'last');
+        }
+
+        this.updateUseTitles(this.getUseTitles());
+    },
+
+    /**
+     * @private
+     * Called when the done button has been tapped.
+     */
+    onDoneButtonTap: function() {
+        var oldValue = this._value,
+            newValue = this.getValue();
+
+        if (newValue != oldValue) {
+            this.fireEvent('change', this, newValue);
+        }
+
+        this.hide();
+    },
+
+    /**
+     * @private
+     * Called when the cancel button has been tapped.
+     */
+    onCancelButtonTap: function() {
+        this.fireEvent('cancel', this);
+        this.hide();
+    },
+
+    /**
+     * @private
+     * Called when a slot has been picked.
+     */
+    onSlotPick: function(slot, value, node) {
+        this.fireEvent('pick', this, this.getValue(), slot);
+    },
+
+    onShow: function() {
+        if (!this.isHidden()) {
+            this.setValue(this._value);
+        }
+    },
+
+    /**
+     * Sets the values of the pickers slots
+     * @param {Object} values The values in a {name:'value'} format
+     * @param {Boolean} animated True to animate setting the values
+     * @return {Ext.Picker} this This picker
+     */
+    setValue: function(values, animated) {
+        var me = this,
+            slots = me.getInnerItems(),
+            ln = slots.length,
+            key, slot, loopSlot, i;
+
+        if (!values) {
+            values = {};
+            for (i = 0; i < ln; i++) {
+                //set the value to false so the slot will return null when getValue is set
+                values[slots[i].config.name] = false;
+            }
+        }
+
+        for (key in values) {
+            value = values[key];
+            for (i = 0; i < slots.length; i++) {
+                loopSlot = slots[i];
+                if (loopSlot.config.name == key) {
+                    slot = loopSlot;
+                    break;
+                }
+            }
+
+            if (slot) {
+                if (animated) {
+                    slot.setValueAnimated(value);
+                } else {
+                    slot.setValue(value);
+                }
+            }
+        }
+
+        me._value = this.getValue();
+        me._values = me._value;
+
+        return me;
+    },
+
+    setValueAnimated: function(values) {
+        this.setValue(values, true);
+    },
+
+    /**
+     * Returns the values of each of the pickers slots
+     * @return {Object} The values of the pickers slots
+     */
+    getValue: function() {
+        var values = {},
+            items = this.getItems().items,
+            ln = items.length,
+            item, i;
+
+        for (i = 0; i < ln; i++) {
+            item = items[i];
+            if (item && item.isSlot) {
+                values[item.getName()] = item.getValue();
+            }
+        }
+
+        this._values = values;
+
+        return this._values;
+    },
+
+    /**
+     * Returns the values of eaach of the pickers slots
+     * @return {Object} The values of the pickers slots
+     */
+    getValues: function() {
+        return this.getValue();
+    },
+
+    destroy: function() {
+        this.callParent();
+        Ext.destroy(this.mask, this.bar);
+    }
+}, function() {
+    //<deprecated product=touch since=2.0>
+    /**
+     * @member Ext.picker.Picker
+     * @cfg {String} activeCls
+     * CSS class to be applied to individual list items when they have been chosen.
+     * @removed 2.0.0
+     */
+    Ext.deprecateProperty(this, 'activeCls', null, "Ext.picker.Picker.activeCls has been removed");
+
+    /**
+     * @method getCard
+     * @inheritdoc Ext.picker.Picker#getActiveItem
+     * @deprecated 2.0.0 Please use {@link #getActiveItem} instead
+     */
+    Ext.deprecateClassMethod(this, 'getCard', 'getActiveItem');
+
+    /**
+     * @method setCard
+     * @inheritdoc Ext.picker.Picker#setActiveItem
+     * @deprecated 2.0.0 Please use {@link #setActiveItem} instead
+     */
+    Ext.deprecateClassMethod(this, 'setCard', 'setActiveItem');
+
+    //</deprecated>
+
+    Ext.define('x-textvalue', {
+        extend: 'Ext.data.Model',
+        config: {
+            fields: ['text', 'value']
+        }
+    });
+});
+
+/**
+ * {@link Ext.ActionSheet ActionSheets} are used to display a list of {@link Ext.Button buttons} in a popup dialog.
+ *
+ * The key difference between ActionSheet and {@link Ext.Sheet} is that ActionSheets are docked at the bottom of the
+ * screen, and the {@link #defaultType} is set to {@link Ext.Button button}.
+ *
+ * ## Example
+ *
+ *     @example preview miniphone
+ *     var actionSheet = Ext.create('Ext.ActionSheet', {
+ *         items: [
+ *             {
+ *                 text: 'Delete draft',
+ *                 ui  : 'decline'
+ *             },
+ *             {
+ *                 text: 'Save draft'
+ *             },
+ *             {
+ *                 text: 'Cancel',
+ *                 ui  : 'confirm'
+ *             }
+ *         ]
+ *     });
+ *
+ *     Ext.Viewport.add(actionSheet);
+ *     actionSheet.show();
+ *
+ * As you can see from the code above, you no longer have to specify a `xtype` when creating buttons within a {@link Ext.ActionSheet ActionSheet},
+ * because the {@link #defaultType} is set to {@link Ext.Button button}.
+ *
+ */
+Ext.define('Ext.ActionSheet', {
+    extend: 'Ext.Sheet',
+    alias : 'widget.actionsheet',
+    requires: ['Ext.Button'],
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        baseCls: Ext.baseCSSPrefix + 'sheet-action',
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        left: 0,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        right: 0,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        bottom: 0,
+
+        // @hide
+        centered: false,
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        height: 'auto',
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        defaultType: 'button'
+    }
+});
+/**
+ * {@link Ext.TitleBar}'s are most commonly used as a docked item within an {@link Ext.Container}.
+ *
+ * The main difference between a {@link Ext.TitleBar} and an {@link Ext.Toolbar} is that
+ * the {@link #title} configuration is **always** centered horiztonally in a {@link Ext.TitleBar} between
+ * any items aligned left or right.
+ *
+ * You can also give items of a {@link Ext.TitleBar} an `align` configuration of `left` or `right`
+ * which will dock them to the `left` or `right` of the bar.
+ *
+ * ## Examples
+ *
+ *     @example preview
+ *     Ext.Viewport.add({
+ *         xtype: 'titlebar',
+ *         docked: 'top',
+ *         title: 'Navigation',
+ *         items: [
+ *             {
+ *                 iconCls: 'add',
+ *                 iconMask: true,
+ *                 align: 'left'
+ *             },
+ *             {
+ *                 iconCls: 'home',
+ *                 iconMask: true,
+ *                 align: 'right'
+ *             }
+ *         ]
+ *     });
+ *
+ *     Ext.Viewport.setStyleHtmlContent(true);
+ *     Ext.Viewport.setHtml('This shows the title being centered and buttons using align <i>left</i> and <i>right</i>.');
+ *
+ * <br />
+ *
+ *     @example preview
+ *     Ext.Viewport.add({
+ *         xtype: 'titlebar',
+ *         docked: 'top',
+ *         title: 'Navigation',
+ *         items: [
+ *             {
+ *                 align: 'left',
+ *                 text: 'This button has a super long title'
+ *             },
+ *             {
+ *                 iconCls: 'home',
+ *                 iconMask: true,
+ *                 align: 'right'
+ *             }
+ *         ]
+ *     });
+ *
+ *     Ext.Viewport.setStyleHtmlContent(true);
+ *     Ext.Viewport.setHtml('This shows how the title is automatically moved to the right when one of the aligned buttons is very wide.');
+ *
+ * <br />
+ *
+ *     @example preview
+ *     Ext.Viewport.add({
+ *         xtype: 'titlebar',
+ *         docked: 'top',
+ *         title: 'A very long title',
+ *         items: [
+ *             {
+ *                 align: 'left',
+ *                 text: 'This button has a super long title'
+ *             },
+ *             {
+ *                 align: 'right',
+ *                 text: 'Another button'
+ *             },
+ *         ]
+ *     });
+ *
+ *     Ext.Viewport.setStyleHtmlContent(true);
+ *     Ext.Viewport.setHtml('This shows how the title and buttons will automatically adjust their size when the width of the items are too wide..');
+ *
+ * The {@link #defaultType} of Toolbar's is {@link Ext.Button button}.
+ */
+Ext.define('Ext.TitleBar', {
+    extend: 'Ext.Container',
+    xtype: 'titlebar',
+
+    requires: [
+        'Ext.Button',
+        'Ext.Title',
+        'Ext.Spacer',
+        'Ext.util.SizeMonitor'
+    ],
+
+    // private
+    isToolbar: true,
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        baseCls: Ext.baseCSSPrefix + 'toolbar',
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        cls: Ext.baseCSSPrefix + 'navigation-bar',
+
+        /**
+         * @cfg {String} ui
+         * Style options for Toolbar. Either 'light' or 'dark'.
+         * @accessor
+         */
+        ui: 'dark',
+
+        /**
+         * @cfg {String} title
+         * The title of the toolbar.
+         * @accessor
+         */
+        title: null,
+
+        /**
+         * @cfg {String} defaultType
+         * The default xtype to create.
+         * @accessor
+         */
+        defaultType: 'button',
+
+        /**
+         * @cfg
+         * @hide
+         */
+        layout: {
+            type: 'hbox'
+        },
+
+        /**
+         * @cfg {Array/Object} items The child items to add to this TitleBar. The {@link #defaultType} of
+         * a TitleBar is {@link Ext.Button}, so you do not need to specify an `xtype` if you are adding
+         * buttons.
+         *
+         * You can also give items a `align` configuration which will align the item to the `left` or `right` of
+         * the TitleBar.
+         * @accessor
+         */
+        items: []
+    },
+
+    /**
+     * The max button width in this toolbar
+     * @private
+     */
+    maxButtonWidth: '40%',
+
+    constructor: function() {
+        this.refreshTitlePosition = Ext.Function.createThrottled(this.refreshTitlePosition, 50, this);
+
+        this.callParent(arguments);
+    },
+
+    beforeInitialize: function() {
+        this.applyItems = this.applyInitialItems;
+    },
+
+    initialize: function() {
+        delete this.applyItems;
+
+        this.doAdd = this.doBoxAdd;
+        this.remove = this.doBoxRemove;
+        this.doInsert = this.doBoxInsert;
+
+        this.add(this.initialItems);
+        delete this.initialItems;
+
+        this.on({
+            painted: 'onPainted',
+            erased: 'onErased'
+        });
+    },
+
+    applyInitialItems: function(items) {
+        var SizeMonitor = Ext.util.SizeMonitor,
+            defaults = this.getDefaults() || {},
+            leftBox, rightBox, spacer;
+
+        this.initialItems = items;
+
+        this.leftBox = leftBox = this.add({
+            xtype: 'container',
+            style: 'position: relative',
+            layout: {
+                type: 'hbox',
+                align: 'center'
+            }
+        });
+
+        this.spacer = spacer = this.add({
+            xtype: 'component',
+            style: 'position: relative',
+            flex: 1
+        });
+
+        this.rightBox = rightBox = this.add({
+            xtype: 'container',
+            style: 'position: relative',
+            layout: {
+                type: 'hbox',
+                align: 'center'
+            }
+        });
+
+        this.titleComponent = this.add({
+            xtype: 'title',
+            hidden: defaults.hidden,
+            centered: true
+        });
+
+        this.sizeMonitors = {
+            leftBox: new SizeMonitor({
+                element: leftBox.renderElement,
+                callback: this.refreshTitlePosition,
+                scope: this
+            }),
+            spacer: new SizeMonitor({
+                element: spacer.renderElement,
+                callback: this.refreshTitlePosition,
+                scope: this
+            }),
+            rightBox: new SizeMonitor({
+                element: rightBox.renderElement,
+                callback: this.refreshTitlePosition,
+                scope: this
+            })
+        };
+    },
+
+    doBoxAdd: function(item) {
+        if (item.config.align == 'right') {
+            this.rightBox.add(item);
+        }
+        else {
+            this.leftBox.add(item);
+        }
+
+        if (this.painted) {
+            this.refreshTitlePosition();
+        }
+    },
+
+    doBoxRemove: function(item) {
+        if (item.config.align == 'right') {
+            this.rightBox.remove(item);
+        }
+        else {
+            this.leftBox.remove(item);
+        }
+
+        if (this.painted) {
+            this.refreshTitlePosition();
+        }
+    },
+
+    doBoxInsert: function(index, item) {
+        if (item.config.align == 'right') {
+            this.rightBox.add(item);
+        }
+        else {
+            this.leftBox.add(item);
+        }
+    },
+
+    onPainted: function() {
+        var sizeMonitors = this.sizeMonitors;
+
+        this.painted = true;
+        this.refreshTitlePosition();
+
+        sizeMonitors.leftBox.refresh();
+        sizeMonitors.spacer.refresh();
+        sizeMonitors.rightBox.refresh();
+    },
+
+    onErased: function() {
+        this.painted = false;
+    },
+
+    getMaxButtonWidth: function() {
+        var value = this.maxButtonWidth;
+
+        //check if it is a percentage
+        if (Ext.isString(this.maxButtonWidth)) {
+            value = parseInt(value.replace('%', ''), 10);
+            value = Math.round((this.element.getWidth() / 100) * value);
+        }
+
+        return value;
+    },
+
+    refreshTitlePosition: function() {
+        var titleElement = this.titleComponent.renderElement;
+
+        titleElement.setWidth(null);
+        titleElement.setLeft(null);
+
+        //set the min/max width of the left button
+        var leftBox = this.leftBox,
+            leftButton = leftBox.down('button'),
+            leftBoxWidth, maxButtonWidth;
+
+        if (leftButton) {
+            if (leftButton.getWidth() == null) {
+                leftButton.renderElement.setWidth('auto');
+            }
+
+            leftBoxWidth = leftBox.renderElement.getWidth();
+            maxButtonWidth = this.getMaxButtonWidth();
+
+            if (leftBoxWidth > maxButtonWidth) {
+                leftButton.renderElement.setWidth(maxButtonWidth);
+            }
+        }
+
+        var spacerBox = this.spacer.renderElement.getPageBox(),
+            titleBox = titleElement.getPageBox(),
+            widthDiff = titleBox.width - spacerBox.width,
+            titleLeft = titleBox.left,
+            titleRight = titleBox.right,
+            halfWidthDiff, leftDiff, rightDiff;
+
+        if (widthDiff > 0) {
+            titleElement.setWidth(spacerBox.width);
+            halfWidthDiff = widthDiff / 2;
+            titleLeft += halfWidthDiff;
+            titleRight -= halfWidthDiff;
+        }
+
+        leftDiff = spacerBox.left - titleLeft;
+        rightDiff = titleRight - spacerBox.right;
+
+        if (leftDiff > 0) {
+            titleElement.setLeft(leftDiff);
+        }
+        else if (rightDiff > 0) {
+            titleElement.setLeft(-rightDiff);
+        }
+
+        titleElement.repaint();
+    },
+
+    // @private
+    updateTitle: function(newTitle) {
+        this.titleComponent.setTitle(newTitle);
+
+        this.titleBox = null;
+
+        if (this.painted) {
+            this.refreshTitlePosition();
+        }
+    },
+
+    destroy: function() {
+        this.callParent();
+
+        var sizeMonitors = this.sizeMonitors;
+
+        sizeMonitors.leftBox.destroy();
+        sizeMonitors.spacer.destroy();
+        sizeMonitors.rightBox.destroy();
+    }
+});
