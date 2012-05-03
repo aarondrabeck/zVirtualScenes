@@ -19,6 +19,7 @@ using System.Text;
 using zVirtualScenesCommon.Util;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
+using System.IO;
 
 namespace OpenZWavePlugin
 {
@@ -33,6 +34,20 @@ namespace OpenZWavePlugin
         private bool FinishedInitialPoll = false;
         private string LaastEventNameValueId = "9999058723211334119";
         private int verbosity = 1;
+
+        public static string LogPath
+        {
+            get
+            {
+                string path = Path.Combine(Paths.AppDataPath, @"openzwave\");
+                if (!Directory.Exists(path))
+                {
+                    try { Directory.CreateDirectory(path); }
+                    catch { }
+                }
+                return path + "\\";
+            }
+        }
 
         public OpenZWavePlugin()
             : base("OPENZWAVE",
@@ -53,7 +68,8 @@ namespace OpenZWavePlugin
                 // Create the Options                
                 m_options = new ZWOptions();
                 m_options.Create(directoryName + @"\config\",
-                                 Paths.AppDataPath + @"\openzwave\", @"");
+                                 LogPath,
+                                 @"");
                 m_options.Lock();
                 m_manager = new ZWManager();
                 m_manager.Create();
