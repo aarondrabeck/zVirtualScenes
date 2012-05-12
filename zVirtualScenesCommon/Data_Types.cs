@@ -3,7 +3,7 @@
     public enum Data_Types
     {
         NONE = 0,
-        INTEGER,
+        intEGER,
         DECIMAL,
         STRING,
         BYTE,

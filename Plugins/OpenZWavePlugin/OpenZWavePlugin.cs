@@ -20,12 +20,13 @@ using zVirtualScenesCommon.Util;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace OpenZWavePlugin
 {
     [Export(typeof(Plugin))]
     public class OpenZWavePlugin : Plugin
-    {               
+    {
         private ZWManager m_manager = null;
         private ZWOptions m_options = null;
         ZWNotification m_notification = null;
@@ -54,10 +55,10 @@ namespace OpenZWavePlugin
                "Open ZWave Plugin",
                 "This plug-in interfaces zVirtualScenes with OpenZWave using the OpenZWave open-source project."
                 ) { }
-       
+
         protected override bool StartPlugin()
-        {           
-            
+        {
+
             try
             {
                 WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
@@ -74,7 +75,7 @@ namespace OpenZWavePlugin
                 m_manager = new ZWManager();
                 m_manager.Create();
                 m_manager.OnNotification += NotificationHandler;
-                
+
                 bool useHID = false;
                 //bool.TryParse(GetSettingValue("HID"), out useHID);
 
@@ -88,16 +89,16 @@ namespace OpenZWavePlugin
                 }
                 else
                 {
-                    
+
                     //m_manager.AddHidDriver();
                 }
-                
+
                 int pollint = 0;
-                int.TryParse(GetSettingValue("POLLINT"), out pollint);
+                int.TryParse(GetSettingValue("POLLint"), out pollint);
                 if (pollint != 0)
-                {                    
+                {
                     m_manager.SetPollInterval(pollint, true);
-                }                
+                }
             }
             catch (Exception e)
             {
@@ -107,19 +108,19 @@ namespace OpenZWavePlugin
 
             return true;
         }
-        
+
         protected override bool StopPlugin()
         {
-            WriteToLog(Urgency.INFO, Friendly_Name + " plugin stopped.");            
+            WriteToLog(Urgency.INFO, Friendly_Name + " plug-in stopped.");
             m_manager.OnNotification -= NotificationHandler;
-            string comPort = GetSettingValue("COMPORT");                   
+            string comPort = GetSettingValue("COMPORT");
             m_manager.RemoveDriver(@"\\.\COM" + comPort);
-            m_manager.Destroy();            
+            m_manager.Destroy();
             m_options.Destroy();
             m_options = null;
             m_manager = null;
             IsReady = false;
-            return true;            
+            return true;
         }
 
         protected override void SettingChanged(string settingName, string settingValue)
@@ -129,14 +130,14 @@ namespace OpenZWavePlugin
                 case "Com Port":
                     // Set the port here
                     break;
-                case "Polling Interval":
+                case "Polling interval":
                     // Set the polling interval here
                     break;
             }
-        }              
+        }
 
         public override void Initialize()
-        {            
+        {
             DefineOrUpdateSetting(new plugin_settings
             {
                 name = "COMPORT",
@@ -157,15 +158,15 @@ namespace OpenZWavePlugin
 
             DefineOrUpdateSetting(new plugin_settings
             {
-                name = "POLLINT",
-                friendly_name = "Polling Interval",
+                name = "POLLint",
+                friendly_name = "Polling interval",
                 value = (360).ToString(),
-                value_data_type = (int)Data_Types.INTEGER,
+                value_data_type = (int)Data_Types.intEGER,
                 description = "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. "
             });
 
             //Controller Type Devices
-            device_types controller_dt = new device_types  { name = "CONTROLLER", friendly_name = "OpenZWave Controller", show_in_list = true };
+            device_types controller_dt = new device_types { name = "CONTROLLER", friendly_name = "OpenZWave Controller", show_in_list = true };
             controller_dt.device_type_commands.Add(new device_type_commands { name = "RESET", friendly_name = "Reset Controller", arg_data_type = (int)Data_Types.NONE, description = "Erases all Z-Wave network settings from your controller." });
             controller_dt.device_type_commands.Add(new device_type_commands { name = "ADDDEVICE", friendly_name = "Add Device to Network", arg_data_type = (int)Data_Types.NONE, description = "Adds a ZWave Device to your network." });
             controller_dt.device_type_commands.Add(new device_type_commands { name = "AddController", friendly_name = "Add Controller to Network", arg_data_type = (int)Data_Types.NONE, description = "Adds a ZWave Controller to your network." });
@@ -183,34 +184,34 @@ namespace OpenZWavePlugin
             device_types switch_dt = new device_types { name = "SWITCH", friendly_name = "OpenZWave Binary", show_in_list = true };
             switch_dt.device_type_commands.Add(new device_type_commands { name = "TURNON", friendly_name = "Turn On", arg_data_type = (int)Data_Types.NONE, description = "Activates a switch." });
             switch_dt.device_type_commands.Add(new device_type_commands { name = "TURNOFF", friendly_name = "Turn Off", arg_data_type = (int)Data_Types.NONE, description = "Deactivates a switch." });
-            switch_dt.device_type_commands.Add(new device_type_commands { name = "MOMENTARY", friendly_name = "Turn On for X milliseconds", arg_data_type = (int)Data_Types.INTEGER, description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
+            switch_dt.device_type_commands.Add(new device_type_commands { name = "MOMENTARY", friendly_name = "Turn On for X milliseconds", arg_data_type = (int)Data_Types.intEGER, description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
             DefineOrUpdateDeviceType(switch_dt);
 
             //Dimmer Type Devices
             device_types dimmer_dt = new device_types { name = "DIMMER", friendly_name = "OpenZWave Dimmer", show_in_list = true };
             dimmer_dt.device_type_commands.Add(new device_type_commands { name = "TURNON", friendly_name = "Turn On", arg_data_type = (int)Data_Types.NONE, description = "Activates a dimmer." });
             dimmer_dt.device_type_commands.Add(new device_type_commands { name = "TURNOFF", friendly_name = "Turn Off", arg_data_type = (int)Data_Types.NONE, description = "Deactivates a dimmer." });
-            
-            device_type_commands dimmer_preset_cmd =  new device_type_commands { name = "SETPRESETLEVEL", friendly_name = "Set Level", arg_data_type = (int)Data_Types.LIST, description = "Sets a dimmer to a preset level." };
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "0%" } );
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "20%" } );
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "40%" } );
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "60%" } );
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "80%" } );
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "100%" } );
-            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { option = "255" } );
-            dimmer_dt.device_type_commands.Add(dimmer_preset_cmd);           
+
+            device_type_commands dimmer_preset_cmd = new device_type_commands { name = "SETPRESETLEVEL", friendly_name = "Set Level", arg_data_type = (int)Data_Types.LIST, description = "Sets a dimmer to a preset level." };
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "0%" });
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "20%" });
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "40%" });
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "60%" });
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "80%" });
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "100%" });
+            dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "255" });
+            dimmer_dt.device_type_commands.Add(dimmer_preset_cmd);
 
             DefineOrUpdateDeviceType(dimmer_dt);
 
             //Thermostat Type Devices
             device_types thermo_dt = new device_types { name = "THERMOSTAT", friendly_name = "OpenZWave Thermostat", show_in_list = true };
             thermo_dt.device_type_commands.Add(new device_type_commands { name = "SETENERGYMODE", friendly_name = "Set Energy Mode", arg_data_type = (int)Data_Types.NONE, description = "Set thermosat to Energy Mode." });
-            thermo_dt.device_type_commands.Add(new device_type_commands { name = "SETCONFORTMODE", friendly_name = "Set Confort Mode", arg_data_type = (int)Data_Types.NONE, description = "Set thermosat to Confort Mode. (Run)" });
+            thermo_dt.device_type_commands.Add(new device_type_commands { name = "SETCONFORTMODE", friendly_name = "Set Comfort Mode", arg_data_type = (int)Data_Types.NONE, description = "Set thermosat to Confort Mode. (Run)" });
             DefineOrUpdateDeviceType(thermo_dt);
 
             //Door Lock Type Devices
-            device_types lock_dt = new device_types { name = "DOORLOCK", friendly_name = "OpenZWave Doorlock", show_in_list = true };
+            device_types lock_dt = new device_types { name = "DOORLOCK", friendly_name = "OpenZWave Door lock", show_in_list = true };
             DefineOrUpdateDeviceType(lock_dt);
 
             //Sensors
@@ -233,8 +234,8 @@ namespace OpenZWavePlugin
                 value_data_type = (int)Data_Types.BOOL
             });
 
-            
-                        
+
+
             //TODO: Make a new DeviceAPIProperty that is API specific for types of settings that applies OpenZWave Devices           
 
             ////TEMP 
@@ -243,7 +244,7 @@ namespace OpenZWavePlugin
 
             //int i = 2;
             //System.Timers.Timer t = new System.Timers.Timer();
-            //t.Interval = 5000;
+            //t.interval = 5000;
             //t.Elapsed += (sender, e) =>
             //{
             //    i++;
@@ -269,12 +270,12 @@ namespace OpenZWavePlugin
             //t.Enabled = true;
 
 
-            
+
         }
 
         public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
         {
-            if(cmd.device.device_types.name == "CONTROLLER")
+            if (cmd.device.device_types.name == "CONTROLLER")
             {
                 switch (cmd.device_type_commands.name)
                 {
@@ -375,7 +376,7 @@ namespace OpenZWavePlugin
                             };
                             t.Enabled = true;
                             return true;
-                            
+
                         }
                     case "TURNON":
                         {
@@ -448,7 +449,7 @@ namespace OpenZWavePlugin
                         {
                             m_manager.SetNodeOn(m_homeId, (byte)cmd.device.node_id);
                             return true;
-                        }                  
+                        }
                 }
             }
 
@@ -501,7 +502,7 @@ namespace OpenZWavePlugin
                                     m_manager.SetValue(v.ValueID, cmd.arg);
                             return true;
                         }
-                    case Data_Types.INTEGER:
+                    case Data_Types.intEGER:
                         {
                             int i = 0;
                             int.TryParse(cmd.arg, out i);
@@ -522,11 +523,11 @@ namespace OpenZWavePlugin
             return true;
         }
 
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                IQueryable<device> devices = GetDeviceInGroup(groupID,db);
+                IQueryable<device> devices = GetDeviceInGroup(groupID, db);
 
                 if (devices != null)
                 {
@@ -550,11 +551,11 @@ namespace OpenZWavePlugin
             return true;
         }
 
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                IQueryable<device> devices = GetDeviceInGroup(groupID,db);
+                IQueryable<device> devices = GetDeviceInGroup(groupID, db);
 
                 if (devices != null)
                 {
@@ -576,8 +577,8 @@ namespace OpenZWavePlugin
                 return true;
             }
         }
-        
-        #region OpenZWave Interface
+
+        #region OpenZWave interface
 
         public void NotificationHandler(ZWNotification notification)
         {
@@ -586,6 +587,7 @@ namespace OpenZWavePlugin
             m_notification = null;
         }
 
+        private HybridDictionary timers = new HybridDictionary();
         private void NotificationHandler()
         {
             //osae.AddToLog("Notification: " + m_notification.GetType().ToString(), false);
@@ -614,8 +616,8 @@ namespace OpenZWavePlugin
                                 string data = "";
                                 bool b = m_manager.GetValueAsString(vid, out data);
 
-                                if(verbosity > 4)
-                                WriteToLog(Urgency.INFO, "[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
+                                if (verbosity > 4)
+                                    WriteToLog(Urgency.INFO, "[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
 
                                 //Values are 'unknown' at this point so dont report a value change. 
                                 DefineOrUpdateDeviceValue(new device_values
@@ -624,10 +626,10 @@ namespace OpenZWavePlugin
                                     value_id = vid.GetId().ToString(),
                                     label_name = value.Label,
                                     genre = value.Genre,
-                                    index = value.Index,
+                                    index2 = value.Index,
                                     type = value.Type,
                                     commandClassId = value.CommandClassID,
-                                    value = data,
+                                    value2 = data,
                                     read_only = read_only
                                 }, true);
 
@@ -650,7 +652,7 @@ namespace OpenZWavePlugin
                                             pType = Data_Types.DECIMAL;
                                             break;
                                         case ZWValueID.ValueType.Int:
-                                            pType = Data_Types.INTEGER;
+                                            pType = Data_Types.intEGER;
                                             break;
                                         case ZWValueID.ValueType.String:
                                             pType = Data_Types.STRING;
@@ -713,12 +715,12 @@ namespace OpenZWavePlugin
                     {
                         try
                         {
-                            Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());     
+                            Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                             ZWValueID vid = m_notification.GetValueID();
                             Value val = node.GetValue(vid);
 
                             if (verbosity > 4)
-                            WriteToLog(Urgency.INFO, "[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
+                                WriteToLog(Urgency.INFO, "[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
 
                             node.RemoveValue(val);
                             //TODO: Remove from values and command table
@@ -734,122 +736,133 @@ namespace OpenZWavePlugin
                     {
                         //try
                         //{
-                            Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
-                            ZWValueID vid = m_notification.GetValueID();
-                            Value value = new Value();
-                            value.ValueID = vid;
-                            value.Label = m_manager.GetValueLabel(vid);
-                            value.Genre = vid.GetGenre().ToString();
-                            value.Index = vid.GetIndex().ToString();
-                            value.Type = vid.GetType().ToString();
-                            value.CommandClassID = vid.GetCommandClassId().ToString();
-                            value.Help = m_manager.GetValueHelp(vid);
-                            bool read_only = m_manager.IsValueReadOnly(vid); 
+                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
+                        ZWValueID vid = m_notification.GetValueID();
+                        Value value = new Value();
+                        value.ValueID = vid;
+                        value.Label = m_manager.GetValueLabel(vid);
+                        value.Genre = vid.GetGenre().ToString();
+                        value.Index = vid.GetIndex().ToString();
+                        value.Type = vid.GetType().ToString();
+                        value.CommandClassID = vid.GetCommandClassId().ToString();
+                        value.Help = m_manager.GetValueHelp(vid);
+                        bool read_only = m_manager.IsValueReadOnly(vid);
 
-                            string data = GetValue(vid);
-                            //m_manager.GetValueAsString(vid, out data);                          
+                        string data = GetValue(vid);
+                        //m_manager.GetValueAsString(vid, out data);                          
 
-                            if (verbosity > 4)
-                            WriteToLog(Urgency.INFO,"[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
-                            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                        if (verbosity > 4)
+                            WriteToLog(Urgency.INFO, "[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
+                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                        {
+                            device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+
+                            if (d != null)
                             {
-                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+                                // d.last_heard_from = DateTime.Now;
+                                //db.SaveChanges();
 
-                                if (d != null)
+                                //Update Device Commands
+                                if (!read_only)
                                 {
-                                   // d.last_heard_from = DateTime.Now;
-                                    //db.SaveChanges();
-
-                                    //Update Device Commands
-                                   if (!read_only)
+                                    //User commands are more important so lets see them first in the GUIs
+                                    int order;
+                                    switch (value.Genre)
                                     {
-                                        //User commands are more important so lets see them first in the GUIs
-                                        int order;
-                                        switch (value.Genre)
-                                        {
-                                            case "User":
-                                                order = 1;
-                                                break;
-                                            case "Config":
-                                                order = 2;
-                                                break;
-                                            default:
-                                                order = 99;
-                                                break;
-                                        }
-
-                                        device_commands dc = d.device_commands.FirstOrDefault(c => c.custom_data2 == vid.GetId().ToString());
-
-                                        if (dc != null)
-                                        {
-                                            //After Value is Added, Value Name other value properties can change so update.
-                                            dc.friendly_name = "Set " + value.Label;
-                                            dc.help = value.Help;
-                                            dc.custom_data1 = value.Label;
-                                            dc.sort_order = order;
-                                        }
+                                        case "User":
+                                            order = 1;
+                                            break;
+                                        case "Config":
+                                            order = 2;
+                                            break;
+                                        default:
+                                            order = 99;
+                                            break;
                                     }
 
-                                    //Some dimmers take x number of seconds to dim to desired level.  Therefor the level recieved here initially is a 
-                                    //level between old level and new level. (if going from 0 to 100 we get 84 here).
-                                    //To get the real level repoll the device a second or two after a level change was recieved.     
-                                    bool EnableDimmerRepoll = false;
-                                    bool.TryParse(device_property_values.GetDevicePropertyValue(d.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+                                    device_commands dc = d.device_commands.FirstOrDefault(c => c.custom_data2 == vid.GetId().ToString());
 
-                                    if (FinishedInitialPoll && EnableDimmerRepoll)
+                                    if (dc != null)
                                     {
-                                        switch (node.Label)
+                                        //After Value is Added, Value Name other value properties can change so update.
+                                        dc.friendly_name = "Set " + value.Label;
+                                        dc.help = value.Help;
+                                        dc.custom_data1 = value.Label;
+                                        dc.sort_order = order;
+                                    }
+                                }
+
+                                //Some dimmers take x number of seconds to dim to desired level.  Therefor the level recieved here initially is a 
+                                //level between old level and new level. (if going from 0 to 100 we get 84 here).
+                                //To get the real level repoll the device a second or two after a level change was recieved.     
+                                bool EnableDimmerRepoll = false;
+                                bool.TryParse(device_property_values.GetDevicePropertyValue(d.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+
+                                if (FinishedInitialPoll && EnableDimmerRepoll)
+                                {
+                                    if (d.device_types != null && d.device_types == GetDeviceType("DIMMER", db))
+                                    {
+                                        switch (value.Label)
                                         {
-                                            case "Multilevel Switch":
-                                            case "Multilevel Power Switch":
+                                            case "Basic":
+                                                device_values dv_basic = d.device_values.FirstOrDefault(v => v.value_id == vid.GetId().ToString());
+                                                if (dv_basic != null)
                                                 {
-
-                                                    switch (value.Label)
+                                                    string prevVal = dv_basic.value2;
+                                                    //If it is truly new
+                                                    if (!prevVal.Equals(data))
                                                     {
-                                                        case "Basic":
-                                                            device_values dv_basic = d.device_values.FirstOrDefault(v => v.value_id == vid.GetId().ToString());
-                                                            if (dv_basic != null)
+                                                        //only allow each device to re-poll 1 time.
+                                                        if (timers.Contains(d.node_id))
+                                                        {
+                                                            System.Timers.Timer t = (System.Timers.Timer)timers[d.node_id];
+                                                            t.Stop();
+                                                            t.Start();
+                                                            Logger.WriteToLog(Urgency.INFO, "Timer restarted.", this.Friendly_Name);
+                                                        }
+                                                        else
+                                                        {
+                                                            System.Timers.Timer t = new System.Timers.Timer();
+                                                            timers.Add(d.node_id, t);
+                                                            t.Interval = 3000;
+                                                            t.Elapsed += (sender, e) =>
                                                             {
-                                                                string prevVal = dv_basic.value;
-                                                                //If it is truely new
-                                                                if (!prevVal.Equals(data))
-                                                                {
-                                                                    System.Timers.Timer t = new System.Timers.Timer();
-                                                                    t.Interval = 5000;
-                                                                    t.Elapsed += (sender, e) =>
-                                                                    {
-                                                                        m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);
-                                                                        t.Enabled = false;
-                                                                    };
-                                                                    t.Enabled = true;
-                                                                }
-                                                            }
-                                                            break;
+                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);                                                                
+                                                                Logger.WriteToLog(Urgency.INFO, "Timer stopped", this.Friendly_Name);
+
+                                                                t.Stop();
+                                                                timers.Remove(d.node_id);
+                                                        
+                                                            };
+                                                            t.Start();
+                                                            Logger.WriteToLog(Urgency.INFO, "Timer started", this.Friendly_Name);
+                                                        }                                                        
                                                     }
-                                                    break;
                                                 }
+                                                break;
                                         }
                                     }
-                                    
-                                    DefineOrUpdateDeviceValue(new device_values
-                                    {
-                                        device_id = d.id,
-                                        value_id = vid.GetId().ToString(),
-                                        label_name = value.Label,
-                                        genre = value.Genre,
-                                        index = value.Index,
-                                        type = value.Type,
-                                        commandClassId = value.CommandClassID,
-                                        value = data,
-                                        read_only = read_only
-                                    });
-                                }
-                                else
-                                {
-                                    WriteToLog(Urgency.WARNING, "Getting changes on an unknown device!");
                                 }
 
+                                DefineOrUpdateDeviceValue(new device_values
+                                {
+                                    device_id = d.id,
+                                    value_id = vid.GetId().ToString(),
+                                    label_name = value.Label,
+                                    genre = value.Genre,
+                                    index2 = value.Index,
+                                    type = value.Type,
+                                    commandClassId = value.CommandClassID,
+                                    value2 = data,
+                                    read_only = read_only
+                                });
                             }
+                            else
+                            {
+                                WriteToLog(Urgency.WARNING, "Getting changes on an unknown device!");
+                            }
+
+                        }
                         //}
                         //catch (Exception ex)
                         //{
@@ -861,7 +874,7 @@ namespace OpenZWavePlugin
                 case ZWNotification.Type.Group:
                     {
                         if (verbosity > 4)
-                        WriteToLog(Urgency.INFO, "[Group]"); ;
+                            WriteToLog(Urgency.INFO, "[Group]"); ;
                         break;
                     }
 
@@ -871,17 +884,17 @@ namespace OpenZWavePlugin
                         // if not, the NodeNew notification should already have been received
                         //if (GetNode(m_notification.GetHomeId(), m_notification.GetNodeId()) == null)
                         //{
-                            Node node = new Node();
-                            node.ID = m_notification.GetNodeId();
-                            node.HomeID = m_notification.GetHomeId();
-                            m_nodeList.Add(node);
+                        Node node = new Node();
+                        node.ID = m_notification.GetNodeId();
+                        node.HomeID = m_notification.GetHomeId();
+                        m_nodeList.Add(node);
 
-                            if (verbosity > 4)
+                        if (verbosity > 4)
                             WriteToLog(Urgency.INFO, "[NodeAdded] ID:" + node.ID.ToString() + " Added");
                         //}
                         break;
                     }
-                  
+
                 case ZWNotification.Type.NodeNew:
                     {
                         // Add the new node to our list (and flag as uninitialized)
@@ -891,7 +904,7 @@ namespace OpenZWavePlugin
                         m_nodeList.Add(node);
 
                         if (verbosity > 4)
-                        WriteToLog(Urgency.INFO, "[NodeNew] ID:" + node.ID.ToString() + " Added");                        
+                            WriteToLog(Urgency.INFO, "[NodeNew] ID:" + node.ID.ToString() + " Added");
                         break;
                     }
 
@@ -902,13 +915,13 @@ namespace OpenZWavePlugin
                             if (node.ID == m_notification.GetNodeId())
                             {
                                 if (verbosity > 4)
-                                WriteToLog(Urgency.INFO, "[NodeRemoved] ID:" + node.ID.ToString());
+                                    WriteToLog(Urgency.INFO, "[NodeRemoved] ID:" + node.ID.ToString());
                                 m_nodeList.Remove(node);
                                 break;
                             }
                         }
                         break;
-                    }                  
+                    }
 
                 case ZWNotification.Type.NodeProtocolInfo:
                     {
@@ -925,7 +938,7 @@ namespace OpenZWavePlugin
                             if (node != null)
                             {
                                 if (verbosity > 4)
-                                WriteToLog(Urgency.INFO, "[Node Protocol Info] " + node.Label);
+                                    WriteToLog(Urgency.INFO, "[Node Protocol Info] " + node.Label);
 
                                 switch (node.Label)
                                 {
@@ -999,7 +1012,7 @@ namespace OpenZWavePlugin
                                     default:
                                         {
                                             if (verbosity > 2)
-                                            WriteToLog(Urgency.INFO, "[Node Label] " + node.Label);
+                                                WriteToLog(Urgency.INFO, "[Node Label] " + node.Label);
                                             break;
                                         }
                                 }
@@ -1020,7 +1033,7 @@ namespace OpenZWavePlugin
                                         db.devices.AddObject(ozw_device);
                                         db.SaveChanges();
 
-                                        ozw_device.CallAdded(new EventArgs());
+                                        ozw_device.CallAdded(ozw_device.id);
                                     }
 
 
@@ -1032,10 +1045,10 @@ namespace OpenZWavePlugin
                                         value_id = LaastEventNameValueId,
                                         label_name = "Last Node Event Value",
                                         genre = "Custom",
-                                        index = "0",
+                                        index2 = "0",
                                         type = "Byte",
                                         commandClassId = "0",
-                                        value = "0",
+                                        value2 = "0",
                                         read_only = true
                                     });
 
@@ -1058,86 +1071,86 @@ namespace OpenZWavePlugin
                         string NodeNameValueId = "9999058723211334123";
 
                         using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                {
-
-                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
-                        if (node != null)
                         {
-                            node.Manufacturer = m_manager.GetNodeManufacturerName(m_homeId, node.ID);
-                            node.Product = m_manager.GetNodeProductName(m_homeId, node.ID);
-                            node.Location = m_manager.GetNodeLocation(m_homeId, node.ID);
-                            node.Name = m_manager.GetNodeName(m_homeId, node.ID);
 
-                            device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
-                            if (d != null)
+                            Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
+                            if (node != null)
                             {
-                                //lets store the manufacturer name and product name in the values table.   
-                                //Giving ManufacturerName a random value_id 9999058723211334120                                                           
-                                DefineOrUpdateDeviceValue(new device_values
+                                node.Manufacturer = m_manager.GetNodeManufacturerName(m_homeId, node.ID);
+                                node.Product = m_manager.GetNodeProductName(m_homeId, node.ID);
+                                node.Location = m_manager.GetNodeLocation(m_homeId, node.ID);
+                                node.Name = m_manager.GetNodeName(m_homeId, node.ID);
+
+                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+                                if (d != null)
                                 {
-                                    device_id = d.id,
-                                    value_id = ManufacturerNameValueId,
-                                    label_name = "Manufacturer Name",
-                                    genre = "Custom",
-                                    index = "0",
-                                    type = "String",
-                                    commandClassId = "0",
-                                    value = node.Manufacturer,
-                                    read_only = true
-                                });
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = ProductNameValueId,
-                                    label_name = "Product Name",
-                                    genre = "Custom",
-                                    index = "0",
-                                    type = "String",
-                                    commandClassId = "0",
-                                    value = node.Product,
-                                    read_only = true
-                                });
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = NodeLocationValueId,
-                                    label_name = "Node Location",
-                                    genre = "Custom",
-                                    index = "0",
-                                    type = "String",
-                                    commandClassId = "0",
-                                    value = node.Location,
-                                    read_only = true
-                                });
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = NodeNameValueId,
-                                    label_name = "Node Name",
-                                    genre = "Custom",
-                                    index = "0",
-                                    type = "String",
-                                    commandClassId = "0",
-                                    value = node.Name,
-                                    read_only = true
-                                });
+                                    //lets store the manufacturer name and product name in the values table.   
+                                    //Giving ManufacturerName a random value_id 9999058723211334120                                                           
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = ManufacturerNameValueId,
+                                        label_name = "Manufacturer Name",
+                                        genre = "Custom",
+                                        index2 = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value2 = node.Manufacturer,
+                                        read_only = true
+                                    });
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = ProductNameValueId,
+                                        label_name = "Product Name",
+                                        genre = "Custom",
+                                        index2 = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value2 = node.Product,
+                                        read_only = true
+                                    });
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = NodeLocationValueId,
+                                        label_name = "Node Location",
+                                        genre = "Custom",
+                                        index2 = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value2 = node.Location,
+                                        read_only = true
+                                    });
+                                    DefineOrUpdateDeviceValue(new device_values
+                                    {
+                                        device_id = d.id,
+                                        value_id = NodeNameValueId,
+                                        label_name = "Node Name",
+                                        genre = "Custom",
+                                        index2 = "0",
+                                        type = "String",
+                                        commandClassId = "0",
+                                        value2 = node.Name,
+                                        read_only = true
+                                    });
+                                }
                             }
-                        }
-                        if(verbosity > 3)
-                            WriteToLog(Urgency.INFO, "[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
+                            if (verbosity > 3)
+                                WriteToLog(Urgency.INFO, "[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
                         }
                         break;
-                    }                  
+                    }
 
                 case ZWNotification.Type.NodeEvent:
                     {
-                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId()); 
+                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         byte gevent = m_notification.GetEvent();
 
                         if (node != null)
                         {
                             if (verbosity > 4)
-                            WriteToLog(Urgency.INFO, string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
+                                WriteToLog(Urgency.INFO, string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
 
                             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                             {
@@ -1149,19 +1162,19 @@ namespace OpenZWavePlugin
                                     device_values dv = d.device_values.FirstOrDefault(v => v.value_id == LaastEventNameValueId);
                                     if (dv != null)
                                     {
-                                        dv.value = gevent.ToString();
+                                        dv.value2 = gevent.ToString();
                                         db.SaveChanges();
 
                                         //Since events are differently than values fire the value change event every time we recieve the event regardless if 
                                         //it is the same value or not.
-                                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id  = dv.id, previousValue = string.Empty});
+                                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = dv.id, previousValue = string.Empty });
                                     }
                                 }
                                 #endregion
                             }
                         }
                         break;
-                        
+
                     }
 
                 case ZWNotification.Type.PollingDisabled:
@@ -1171,7 +1184,7 @@ namespace OpenZWavePlugin
                         if (node != null)
                         {
                             if (verbosity > 4)
-                            WriteToLog(Urgency.INFO, "[PollingDisabled] Node:" + node.ID);
+                                WriteToLog(Urgency.INFO, "[PollingDisabled] Node:" + node.ID);
                         }
 
                         break;
@@ -1184,7 +1197,7 @@ namespace OpenZWavePlugin
                         if (node != null)
                         {
                             if (verbosity > 4)
-                            WriteToLog(Urgency.INFO, "[PollingEnabled] Node:" + node.ID);
+                                WriteToLog(Urgency.INFO, "[PollingEnabled] Node:" + node.ID);
                         }
                         break;
                     }
@@ -1193,15 +1206,14 @@ namespace OpenZWavePlugin
                     {
                         m_homeId = m_notification.GetHomeId();
 
-                        if (verbosity > 4)
-                        WriteToLog(Urgency.INFO, "[DriverReady] Initializing...driver with Home ID 0x" + m_homeId);                        
+                        WriteToLog(Urgency.INFO, "Initializing...driver with Home ID 0x" + m_homeId);
                         break;
-                    }           
+                    }
 
                 case ZWNotification.Type.NodeQueriesComplete:
                     {
 
-                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());                                               
+                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
 
                         if (node != null)
                         {
@@ -1214,15 +1226,15 @@ namespace OpenZWavePlugin
                                 }
                                 db.SaveChanges();
 
-                                zvsEntityControl.CallDeviceModified(d, "last_heard_from");
+                                zvsEntityControl.CallDeviceModified(d.id, "last_heard_from");
                             }
 
                             if (verbosity > 0)
-                            WriteToLog(Urgency.INFO, "[NodeQueriesComplete] node " + node.ID + " query complete.");
+                                WriteToLog(Urgency.INFO, "[NodeQueriesComplete] node " + node.ID + " query complete.");
                         }
 
                         break;
-                    }                    
+                    }
 
                 case ZWNotification.Type.AllNodesQueried:
                     {
@@ -1242,7 +1254,7 @@ namespace OpenZWavePlugin
 
                         WriteToLog(Urgency.INFO, "Ready:  All nodes queried. Plug-in now ready.");
                         IsReady = true;
-                        
+
                         FinishedInitialPoll = true;
                         break;
                     }
@@ -1267,9 +1279,9 @@ namespace OpenZWavePlugin
                         IsReady = true;
 
                         FinishedInitialPoll = true;
-                      
+
                         break;
-                    }                   
+                    }
             }
         }
 
@@ -1290,16 +1302,16 @@ namespace OpenZWavePlugin
                     m_manager.GetValueAsDecimal(v, out r3);
                     return r3.ToString();
                 case ZWValueID.ValueType.Int:
-                    Int32 r4;
+                    int r4;
                     m_manager.GetValueAsInt(v, out r4);
                     return r4.ToString();
                 case ZWValueID.ValueType.List:
-                   // string[] r5;
-                  //  m_manager.GetValueListSelection(v, out r5);
+                    // string[] r5;
+                    //  m_manager.GetValueListSelection(v, out r5);
                     //string r6 = "";
                     //foreach (string s in r5)
-                   // {
-                   //     r6 += s;
+                    // {
+                    //     r6 += s;
                     //    r6 += "/";
                     //}
                     string r6 = string.Empty;
@@ -1346,7 +1358,7 @@ namespace OpenZWavePlugin
                     case "Binary Power Switch":
                     case "Binary Scene Switch":
                     case "Binary Toggle Remote Switch":
-                         foreach (Value v in n.Values)
+                        foreach (Value v in n.Values)
                         {
                             if (v.Label == "Switch")
                                 zv = v.ValueID;
@@ -1409,7 +1421,7 @@ namespace OpenZWavePlugin
                     case "Zensor Smoke Sensor":
                     case "Advanced Zensor Smoke Sensor":
                     case "Routing Binary Sensor":
-                         foreach (Value v in n.Values)
+                        foreach (Value v in n.Values)
                         {
                             if (v.Genre == "User" && v.Label == "Basic")
                                 zv = v.ValueID;
@@ -1417,7 +1429,7 @@ namespace OpenZWavePlugin
                         break;
                 }
                 if (zv != null)
-                 m_manager.EnablePoll(zv);
+                    m_manager.EnablePoll(zv);
             }
             catch (Exception ex)
             {

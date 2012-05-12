@@ -84,8 +84,8 @@ namespace zVirtualScenesCommon.Entity
                                     {
                                         case "REPOLL_ME":
                                             {
-                                                long d_id = 0;
-                                                long.TryParse(this.arg, out d_id);
+                                                int d_id = 0;
+                                                int.TryParse(this.arg, out d_id);
 
                                                 device device_to_repoll = db.devices.FirstOrDefault(d => d.id == d_id);
                                                 if (device_to_repoll != null && d_id > 0)
@@ -100,8 +100,8 @@ namespace zVirtualScenesCommon.Entity
                                         case "GROUP_ON":
                                         case "GROUP_OFF":
                                             {
-                                                long g_id = 0;
-                                                long.TryParse(this.arg, out g_id);
+                                                int g_id = 0;
+                                                int.TryParse(this.arg, out g_id);
                                                 group g = db.groups.FirstOrDefault(gr => gr.id == g_id);
 
                                                 if (g != null)
@@ -126,7 +126,7 @@ namespace zVirtualScenesCommon.Entity
                                         case Data_Types.SHORT:
                                         case Data_Types.STRING:
                                         case Data_Types.LIST:
-                                        case Data_Types.INTEGER:
+                                        case Data_Types.intEGER:
                                         case Data_Types.DECIMAL:
                                         case Data_Types.BYTE:
                                         case Data_Types.BOOL:
@@ -147,7 +147,7 @@ namespace zVirtualScenesCommon.Entity
                                         case Data_Types.SHORT:
                                         case Data_Types.STRING:
                                         case Data_Types.LIST:
-                                        case Data_Types.INTEGER:
+                                        case Data_Types.intEGER:
                                         case Data_Types.DECIMAL:
                                         case Data_Types.BYTE:
                                         case Data_Types.BOOL:

@@ -16,9 +16,9 @@ namespace zVirtualScenesCommon.Entity
         /// Called when a Builtin command is added to the que
         /// </summary>
         public static event BuiltinCommandAddedEventHandler BuiltinCommandAddedToQueEvent;
-        public delegate void BuiltinCommandAddedEventHandler(long builtin_command_que_id);
+        public delegate void BuiltinCommandAddedEventHandler(int builtin_command_que_id);
 
-        public static void BuiltinCommandAddedToQue(long id)
+        public static void BuiltinCommandAddedToQue(int id)
         {
             if (BuiltinCommandAddedToQueEvent != null)
                 BuiltinCommandAddedToQueEvent(id);

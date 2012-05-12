@@ -1,0 +1,6 @@
+D:\Hobby\zvirtualscenes\trunk\output_release\zvsProcessor.dll
+D:\Hobby\zvirtualscenes\trunk\output_release\zvsProcessor.pdb
+D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Release\ResolveAssemblyReference.cache
+D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Release\zvsProcessor.dll
+D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Release\zvsProcessor.pdb
+D:\Hobby\zvirtualscenes\trunk\output_release\zvsDatabase.sdf

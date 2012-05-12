@@ -78,7 +78,7 @@ internal sealed class SunTimes
         }
     }
 
-    public class LongitudeCoords : Coords
+    public class intitudeCoords : Coords
     {
         public enum Direction
         {
@@ -88,7 +88,7 @@ internal sealed class SunTimes
 
         internal protected Direction mDirection = Direction.East;
 
-        public LongitudeCoords(int degrees, int minutes, int seconds, Direction direction)
+        public intitudeCoords(int degrees, int minutes, int seconds, Direction direction)
         {
             mDegrees = degrees;
             mMinutes = minutes;
@@ -103,16 +103,16 @@ internal sealed class SunTimes
     }
 
     /// <summary>
-    /// Calculate sunrise and sunset times. Returns false if time zone and longitude are incompatible.
+    /// Calculate sunrise and sunset times. Returns false if time zone and intitude are incompatible.
     /// </summary>
     /// <param name="lat">Latitude coordinates.</param>
-    /// <param name="lon">Longitude coordinates.</param>
+    /// <param name="lon">intitude coordinates.</param>
     /// <param name="date">Date for which to calculate.</param>
     /// <param name="riseTime">Sunrise time (output)</param>
     /// <param name="setTime">Sunset time (output)</param>
     /// <param name="isSunrise">Whether or not the sun rises at that day</param>
     /// <param name="isSunset">Whether or not the sun sets at that day</param>
-    public bool CalculateSunRiseSetTimes(LatitudeCoords lat, LongitudeCoords lon, DateTime date,
+    public bool CalculateSunRiseSetTimes(LatitudeCoords lat, intitudeCoords lon, DateTime date,
                                             ref DateTime riseTime, ref DateTime setTime,
                                             ref bool isSunrise, ref bool isSunset)
     {
@@ -120,10 +120,10 @@ internal sealed class SunTimes
     }
 
     /// <summary>
-    /// Calculate sunrise and sunset times. Returns false if time zone and longitude are incompatible.
+    /// Calculate sunrise and sunset times. Returns false if time zone and intitude are incompatible.
     /// </summary>
     /// <param name="lat">Latitude in decimal notation.</param>
-    /// <param name="lon">Longitude in decimal notation.</param>
+    /// <param name="lon">intitude in decimal notation.</param>
     /// <param name="date">Date for which to calculate.</param>
     /// <param name="riseTime">Sunrise time (output)</param>
     /// <param name="setTime">Sunset time (output)</param>
@@ -140,7 +140,7 @@ internal sealed class SunTimes
 
             if ((Sign(zone) == Sign(lon)) && (zone != 0))
             {
-                Debug.Print("WARNING: time zone and longitude are incompatible!");
+                Debug.Print("WARNING: time zone and intitude are incompatible!");
                 return false;
             }
 

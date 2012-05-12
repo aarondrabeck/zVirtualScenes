@@ -16,9 +16,9 @@ namespace zVirtualScenesCommon.Entity
         /// Called when a Builtin command is added to the que
         /// </summary>
         public static event DeviceTypeCommandAddedEventHandler DeviceTypeCommandAddedToQueEvent;
-        public delegate void DeviceTypeCommandAddedEventHandler(long device_type_command_que_id);
+        public delegate void DeviceTypeCommandAddedEventHandler(int device_type_command_que_id);
 
-        public static void DeviceTypeCommandAddedToQue(long id)
+        public static void DeviceTypeCommandAddedToQue(int id)
         {
             if (DeviceTypeCommandAddedToQueEvent != null)
                 DeviceTypeCommandAddedToQueEvent(id);

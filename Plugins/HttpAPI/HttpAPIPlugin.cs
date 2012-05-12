@@ -47,7 +47,7 @@ namespace HttpAPI
                 name = "PORT",
                 friendly_name = "HTTP Port",
                 value = "80",
-                value_data_type = (int)Data_Types.INTEGER,
+                value_data_type = (int)Data_Types.intEGER,
                 description = "The port that HTTP will listen for commands on."
             });
 
@@ -143,11 +143,11 @@ namespace HttpAPI
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }     
@@ -366,8 +366,8 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("device/") && request.HttpMethod == "GET")
             {
-                long id = 0;
-                long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int id = 0;
+                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
@@ -395,13 +395,13 @@ namespace HttpAPI
                                 type_txt = d.device_types.friendly_name,
                                 last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
                                 groups = d.GetGroups,
-                                mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value,
-                                fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value,
-                                op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value,
-                                fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value,
-                                heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1").value,
-                                cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1").value,
-                                esm = d.device_values.FirstOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Basic").value
+                                mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value2,
+                                fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value2,
+                                op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value2,
+                                fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value2,
+                                heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1").value2,
+                                cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1").value2,
+                                esm = d.device_values.FirstOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Basic").value2
                             };
                             return new { success = true, details = details };
                         }
@@ -413,8 +413,8 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments[4].ToLower().StartsWith("values")  && request.HttpMethod == "GET")
             {
-                long id = 0;
-                long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int id = 0;
+                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
@@ -429,9 +429,9 @@ namespace HttpAPI
                                 values.Add(new
                                 {
                                     value_id = v.value_id,
-                                    value = v.value,
+                                    value = v.value2,
                                     grene = v.genre,
-                                    index = v.index,
+                                    index2 = v.index2,
                                     read_only = v.read_only,
                                     label_name = v.label_name,
                                     type = v.type,
@@ -467,8 +467,8 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "GET")
             {
-                long sID = 0;
-                long.TryParse(request.Url.Segments[3], out sID);
+                int sID = 0;
+                int.TryParse(request.Url.Segments[3], out sID);
 
                 using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
@@ -505,8 +505,8 @@ namespace HttpAPI
             {
                 NameValueCollection postData = GetPostData(request);
 
-                long sID = 0;
-                long.TryParse(request.Url.Segments[3], out sID);
+                int sID = 0;
+                int.TryParse(request.Url.Segments[3], out sID);
 
                 bool is_running = false;
                 bool.TryParse(postData["is_running"], out is_running);
@@ -555,8 +555,8 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("group/") && request.HttpMethod == "GET")
             {
 
-                long gID = 0;
-                long.TryParse(request.Url.Segments[3], out gID);
+                int gID = 0;
+                int.TryParse(request.Url.Segments[3], out gID);
 
                 using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {
@@ -590,8 +590,8 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") &&
                 request.Url.Segments[4].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
             {
-                long id = 0;
-                long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int id = 0;
+                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
@@ -638,12 +638,12 @@ namespace HttpAPI
             {
                 NameValueCollection postData = GetPostData(request);
 
-                long c_id = 0;
+                int c_id = 0;
                 if (request.Url.Segments.Length == 6)
-                    long.TryParse(request.Url.Segments[5].Replace("/", ""), out c_id);
+                    int.TryParse(request.Url.Segments[5].Replace("/", ""), out c_id);
 
-                long id = 0;
-                long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int id = 0;
+                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
@@ -747,9 +747,9 @@ namespace HttpAPI
                 string commandName = postData["name"];
                 string friendlyname = postData["friendlyname"];
 
-                long id = 0;
+                int id = 0;
                 if(request.Url.Segments.Length == 4)
-                    long.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                    int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 
                 using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                 {

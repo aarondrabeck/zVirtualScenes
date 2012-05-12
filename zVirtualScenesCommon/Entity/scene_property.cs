@@ -37,7 +37,7 @@ namespace zVirtualScenesCommon.Entity
                         }
 
                         foreach (scene_property_option spo in p.scene_property_option)
-                            existing_property.scene_property_option.Add(new scene_property_option { option = spo.option });
+                            existing_property.scene_property_option.Add(new scene_property_option { options = spo.options });
 
                     }
                     db.SaveChanges();

@@ -72,7 +72,9 @@
     <Content Include="config\everspring\sp103.xml" />
     <Content Include="config\everspring\st814.xml" />
     <Content Include="config\express_controls\ezmotion.xml" />
-    <Content Include="config\homeseer\hsm100.xml" />
+    <Content Include="config\homeseer\hsm100.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="config\homeseer\ztroller.xml" />
     <Content Include="config\manufacturer_specific.xml" />
     <Content Include="config\options.xml" />

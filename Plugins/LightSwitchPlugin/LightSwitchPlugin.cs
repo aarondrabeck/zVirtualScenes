@@ -40,7 +40,7 @@ namespace LightSwitchPlugin
                 name = "PORT",
                 friendly_name = "Port",
                 value = (1337).ToString(),
-                value_data_type = (int)Data_Types.INTEGER,
+                value_data_type = (int)Data_Types.intEGER,
                 description = "LightSwitch will listen for connections on this port."
             });
 
@@ -49,7 +49,7 @@ namespace LightSwitchPlugin
                 name = "MAXCONN",
                 friendly_name = "Max Conn.",
                 value = (200).ToString(),
-                value_data_type = (int)Data_Types.INTEGER,
+                value_data_type = (int)Data_Types.intEGER,
                 description = "The maximum number of connections allowed."
             });
 
@@ -175,11 +175,11 @@ namespace LightSwitchPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }     
@@ -200,12 +200,12 @@ namespace LightSwitchPlugin
 
                     string device_name = string.Empty;
                     device_name = dv.device.friendly_name;
-                    BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + dv.value + Environment.NewLine);
+                    BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + dv.value2 + Environment.NewLine);
                 }
             }
         }       
 
-        void zvsEntityControl_SceneRunCompleteEvent(long scene_id, int ErrorCount)
+        void zvsEntityControl_SceneRunCompleteEvent(int scene_id, int ErrorCount)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -470,20 +470,20 @@ namespace LightSwitchPlugin
                                 {
                                     string[] values = cmd.Split('~');
                                     //NOTIFY ALL CLIENTS
-                                    ExecuteZVSCommand(Convert.ToInt64(values[1]), Convert.ToByte(values[2]), LightSwitchClientSocket);
+                                    ExecuteZVSCommand(Convert.ToInt32(values[1]), Convert.ToByte(values[2]), LightSwitchClientSocket);
                                 }
                                 else if (cmd.StartsWith("SCENE"))
                                 {
                                     string[] values = cmd.Split('~');
                                     //NOTIFY ALL CLIENTS
-                                    ExecuteZVSCommand(Convert.ToInt64(values[1]), LightSwitchClientSocket);
+                                    ExecuteZVSCommand(Convert.ToInt32(values[1]), LightSwitchClientSocket);
                                 }
                                 else if (cmd.StartsWith("ZONE"))
                                 {
                                     string[] values = cmd.Split('~');
                                     if(values.Length > 1) 
                                     {
-                                        long groupId = long.TryParse(values[1], out groupId) ? groupId : 0;
+                                        int groupId = int.TryParse(values[1], out groupId) ? groupId : 0;
                                         string cmd_name = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
                                         using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                                         {
@@ -508,13 +508,13 @@ namespace LightSwitchPlugin
                                 {
                                     string[] values = cmd.Split('~');
                                     //NOTIFY ALL CLIENTS
-                                    ExecuteZVSThermostatCommand(Convert.ToInt64(values[1]), Convert.ToByte(values[2]), LightSwitchClientSocket);
+                                    ExecuteZVSThermostatCommand(Convert.ToInt32(values[1]), Convert.ToByte(values[2]), LightSwitchClientSocket);
                                 }
                                 else if (cmd.StartsWith("THERMTEMP"))
                                 {
                                     string[] values = cmd.Split('~');
                                     //NOTIFY ALL CLIENTS
-                                    ExecuteZVSThermostatCommand(Convert.ToInt64(values[1]), Convert.ToByte(values[2]), Convert.ToInt32(values[3]), LightSwitchClientSocket);
+                                    ExecuteZVSThermostatCommand(Convert.ToInt32(values[1]), Convert.ToByte(values[2]), Convert.ToInt32(values[3]), LightSwitchClientSocket);
                                 }
                                 else
                                 {
@@ -623,7 +623,7 @@ namespace LightSwitchPlugin
                         int level = 0;
                         device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
-                            int.TryParse(dv.value, out level);
+                            int.TryParse(dv.value2, out level);
 
                         return d.friendly_name + "~" + d.id + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
                     }
@@ -632,7 +632,7 @@ namespace LightSwitchPlugin
                         int level = 0;
                         device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
-                            int.TryParse(dv.value, out level);
+                            int.TryParse(dv.value2, out level);
 
                         return d.friendly_name + "~" + d.id + "~" + level + "~" + "MultiLevelSwitch";
                     }
@@ -641,7 +641,7 @@ namespace LightSwitchPlugin
                         int temp = 0;
                         device_values dv_temp = d.device_values.FirstOrDefault(v => v.label_name == "Temperature");
                         if (dv_temp != null)
-                            int.TryParse(dv_temp.value, out temp);
+                            int.TryParse(dv_temp.value2, out temp);
 
                         return d.friendly_name + "~" + d.id + "~" + temp + "~" + "Thermostat";
                     }
@@ -650,7 +650,7 @@ namespace LightSwitchPlugin
                         int level = 0;
                         device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
                         if (dv != null)
-                            int.TryParse(dv.value, out level);
+                            int.TryParse(dv.value2, out level);
 
                         return d.friendly_name + "~" + d.id + "~" + level + "~" + "Sensor";
                     }
@@ -664,7 +664,7 @@ namespace LightSwitchPlugin
             if (dv.label_name == "Basic")
             {
                 int level = 0;
-                int.TryParse(dv.value, out level);
+                int.TryParse(dv.value2, out level);
 
                 switch (dv.device.device_types.name)
                 {
@@ -681,7 +681,7 @@ namespace LightSwitchPlugin
                 if (dv.device.device_types.name.Equals("THERMOSTAT"))
                 {
                     int temp = 0;
-                    int.TryParse(dv.value, out temp);
+                    int.TryParse(dv.value2, out temp);
                     return dv.device.friendly_name + "~" + dv.device.id + "~" + temp + "~" + "Thermostat";
                 }
             }
@@ -709,7 +709,7 @@ namespace LightSwitchPlugin
         /// <param name="Level"></param>
         /// <param name="Client"></param>
         /// <returns></returns>
-        private void ExecuteZVSCommand(long device_id, byte Level, Socket Client)
+        private void ExecuteZVSCommand(int device_id, byte Level, Socket Client)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -756,7 +756,7 @@ namespace LightSwitchPlugin
         /// </summary>
         /// <param name="SceneID">Scene ID</param>
         /// <param name="Client">Clients Socket.</param>
-        private void ExecuteZVSCommand(long SceneID, Socket Client)
+        private void ExecuteZVSCommand(int SceneID, Socket Client)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -790,7 +790,7 @@ namespace LightSwitchPlugin
             return false;
         }
 
-        private void ExecuteZVSThermostatCommand(long deviceID, byte Mode, int Temp, Socket Client)
+        private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, int Temp, Socket Client)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -817,7 +817,7 @@ namespace LightSwitchPlugin
             BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Agian");
         }
 
-        private void ExecuteZVSThermostatCommand(long deviceID, byte Mode, Socket Client)
+        private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, Socket Client)
         {
 
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))

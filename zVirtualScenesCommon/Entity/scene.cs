@@ -64,20 +64,20 @@ namespace zVirtualScenesCommon.Entity
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
-                scene _scene = context.scenes.FirstOrDefault(s => s.id == (long)e.Result);
+                scene _scene = context.scenes.FirstOrDefault(s => s.id == (int)e.Result);
                 if (_scene != null)
                 {
                     _scene.is_running = false;
                     context.SaveChanges();
                 }
             }
-            zvsEntityControl.SceneRunComplete((long)e.Result, errorCount);
+            zvsEntityControl.SceneRunComplete((int)e.Result, errorCount);
             ExecuteScene.DoWork -= new DoWorkEventHandler(ExecuteScene_DoWork);
             ExecuteScene.RunWorkerCompleted -= new RunWorkerCompletedEventHandler(ExecuteScene_RunWorkerCompleted);
         }
 
         public static bool Waiting;
-        public static long CmdWaitingForProcessingQueID;
+        public static int CmdWaitingForProcessingQueID;
         public static int errorCount;
         void ExecuteScene_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -85,10 +85,10 @@ namespace zVirtualScenesCommon.Entity
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
                 //Find Scene
-                scene _scene = context.scenes.FirstOrDefault(s => s.id == (long)e.Argument);
+                scene _scene = context.scenes.FirstOrDefault(s => s.id == (int)e.Argument);
                 if (_scene != null)
                 {
-                    e.Result = (long)e.Argument;
+                    e.Result = (int)e.Argument;
                     errorCount = 0;
                     foreach (scene_commands sCMD in _scene.scene_commands.OrderBy(o => o.sort_order))
                     {

@@ -11,7 +11,7 @@ namespace zVirtualScenesCommon.Entity
 {
     public partial class device_property_values : EntityObject
     {
-        public static string GetDevicePropertyValue(long DeviceId, string SettingName)
+        public static string GetDevicePropertyValue(int DeviceId, string SettingName)
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {

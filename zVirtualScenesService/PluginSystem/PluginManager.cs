@@ -32,7 +32,7 @@ namespace zVirtualScenesService.PluginSystem
             {
                 name = "REPOLL_ME",
                 friendly_name = "Repoll Device",
-                arg_data_type = (int)Data_Types.INTEGER,
+                arg_data_type = (int)Data_Types.intEGER,
                 show_on_dynamic_obj_list = false,
                 description = "This will force a repoll on an object."
             });
@@ -68,7 +68,7 @@ namespace zVirtualScenesService.PluginSystem
             {
                 name = "TIMEDELAY",
                 friendly_name = "Scene Time Delay (sec)",
-                arg_data_type = (int)Data_Types.INTEGER,
+                arg_data_type = (int)Data_Types.intEGER,
                 show_on_dynamic_obj_list = false,
                 description = "Pauses a scene execution for x seconds."
             });
@@ -104,7 +104,7 @@ namespace zVirtualScenesService.PluginSystem
             device_command_que.DeviceCommandAddedToQueEvent += new device_command_que.DeviceCommandAddedEventHandler(device_command_que_DeviceCommandAddedToQueEvent);            
         }
 
-        void device_type_command_que_DeviceTypeCommandAddedToQueEvent(long device_type_command_que_id)
+        void device_type_command_que_DeviceTypeCommandAddedToQueEvent(int device_type_command_que_id)
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -170,7 +170,7 @@ namespace zVirtualScenesService.PluginSystem
                     
         }
 
-        void device_command_que_DeviceCommandAddedToQueEvent(long device_command_que_id)
+        void device_command_que_DeviceCommandAddedToQueEvent(int device_command_que_id)
         {
             using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -232,7 +232,7 @@ namespace zVirtualScenesService.PluginSystem
                    
         }
 
-        void builtin_command_que_BuiltinCommandAddedToQueEvent(long builtin_command_que_id)
+        void builtin_command_que_BuiltinCommandAddedToQueEvent(int builtin_command_que_id)
         {
             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
             {
@@ -246,8 +246,8 @@ namespace zVirtualScenesService.PluginSystem
                     {
                         case "REPOLL_ME":
                             {
-                                long d_id = 0;
-                                long.TryParse(cmd.arg, out d_id);
+                                int d_id = 0;
+                                int.TryParse(cmd.arg, out d_id);
                                 device d = device.GetAllDevices(db,false).FirstOrDefault(o => o.id == d_id);
 
                                 if (d.device_types.plugin.enabled)
@@ -269,8 +269,8 @@ namespace zVirtualScenesService.PluginSystem
                             }
                         case "GROUP_ON":
                             {
-                                long g_id = 0;
-                                long.TryParse(cmd.arg, out g_id);
+                                int g_id = 0;
+                                int.TryParse(cmd.arg, out g_id);
                                 //EXECUTE ON ALL API's
                                 if (g_id > 0)
                                 {
@@ -284,8 +284,8 @@ namespace zVirtualScenesService.PluginSystem
                             }
                         case "GROUP_OFF":
                             {
-                                long g_id = 0;
-                                long.TryParse(cmd.arg, out g_id);
+                                int g_id = 0;
+                                int.TryParse(cmd.arg, out g_id);
                                 //EXECUTE ON ALL API's
                                 if (g_id > 0)
                                 {

@@ -36,7 +36,7 @@ namespace GlobalHotKeyPlugin
             
             foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
             {
-                hotkeypropert.scene_property_option.Add(new scene_property_option { option = option.Replace('_', '+') });
+                hotkeypropert.scene_property_option.Add(new scene_property_option { options = option.Replace('_', '+') });
             }
 
             scene_property.DefineOrUpdateProperty(hotkeypropert);
@@ -122,12 +122,12 @@ namespace GlobalHotKeyPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
 
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }     

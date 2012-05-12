@@ -21,7 +21,7 @@ namespace NOAAPlugin
         public volatile bool isActive;
         private System.Timers.Timer timerNOAA = new System.Timers.Timer();
         private Double Lat = 30.6772222222222;
-        private Double Long = -100.061666666667;
+        private Double Log = -100.061666666667;
 
         public NOAAPlugin()
             : base("NOAA",
@@ -42,7 +42,7 @@ namespace NOAAPlugin
 
             DefineOrUpdateSetting(new plugin_settings
             {
-                name = "LONG",
+                name = "LOG",
                 friendly_name = "Longitude",
                 value = "-113.061666666667",
                 value_data_type = (int)Data_Types.DECIMAL,
@@ -70,7 +70,7 @@ namespace NOAAPlugin
 
         protected override bool StartPlugin()
         {
-            LoadLatLong();
+            LoadLatint();
 
             DateTime date = DateTime.Today;
             bool isSunrise = false;
@@ -78,7 +78,7 @@ namespace NOAAPlugin
             DateTime sunrise = DateTime.Now;
             DateTime sunset = DateTime.Now;
 
-            SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Long, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+            SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
            
             WriteToLog(Urgency.INFO, this.FriendlyName + " plugin started." + "(Today's Sunrise: " + sunrise.ToString("T") + ", Sunset: " + sunset.ToString("T") + ")");
                         
@@ -116,11 +116,11 @@ namespace NOAAPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }     
@@ -129,7 +129,7 @@ namespace NOAAPlugin
 
         public bool isDark()
         {
-            LoadLatLong();
+            LoadLatint();
 
             DateTime date = DateTime.Today;
             bool isSunrise = false;
@@ -137,7 +137,7 @@ namespace NOAAPlugin
             DateTime sunrise = DateTime.Now;
             DateTime sunset = DateTime.Now;
 
-            SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Long, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+            SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
 
             if (DateTime.Now.TimeOfDay < sunrise.TimeOfDay || DateTime.Now.TimeOfDay > sunset.TimeOfDay)
                 return true;
@@ -145,20 +145,20 @@ namespace NOAAPlugin
             return false;
         }
 
-        private void LoadLatLong()
+        private void LoadLatint()
         {
             Lat = 30.6772222222222;
             Double.TryParse(GetSettingValue("LAT"), out Lat);
 
-            Long = -100.061666666667;
-            Double.TryParse(GetSettingValue("LONG"), out Long);
+            Log = -100.061666666667;
+            Double.TryParse(GetSettingValue("LOG"), out Log);
         }
 
         void timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                LoadLatLong();
+                LoadLatint();
 
                 DateTime date = DateTime.Today;
                 bool isSunrise = false;
@@ -166,7 +166,7 @@ namespace NOAAPlugin
                 DateTime sunrise = DateTime.Now;
                 DateTime sunset = DateTime.Now;
 
-                SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Long, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+                SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
 
                 Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                 if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)

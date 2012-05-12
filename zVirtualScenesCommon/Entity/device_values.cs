@@ -24,7 +24,7 @@ namespace zVirtualScenesCommon.Entity
 
         public class ValueDataChangedEventArgs : System.EventArgs
         {
-            public long device_value_id = 0;
+            public int device_value_id = 0;
             public string previousValue;
         }
 

@@ -156,7 +156,7 @@ namespace JabberPlugin
                         string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
 
                         if (thisEvent.Equals(objTypeValuespair.Trim()))
-                            SendMessage(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                            SendMessage(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
                     }
                 }
             }
@@ -177,11 +177,11 @@ namespace JabberPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }           

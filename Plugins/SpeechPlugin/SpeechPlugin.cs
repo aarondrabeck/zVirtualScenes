@@ -32,11 +32,11 @@ namespace SpeechPlugin
                 value_data_type = (int)Data_Types.LIST,
                 description = "Select the values you would like announced."
             };
-            ps.plugin_setting_options.Add(new plugin_setting_options { option = "Switch Level" } );
-            ps.plugin_setting_options.Add(new plugin_setting_options { option = "Dimmer Level" } );
-            ps.plugin_setting_options.Add(new plugin_setting_options { option = "Thermostat Operating State and Temp" } );
-            ps.plugin_setting_options.Add(new plugin_setting_options { option = "All of the above" } );
-            ps.plugin_setting_options.Add(new plugin_setting_options { option = "Custom" } );
+            ps.plugin_setting_options.Add(new plugin_setting_options { options = "Switch Level" } );
+            ps.plugin_setting_options.Add(new plugin_setting_options { options = "Dimmer Level" });
+            ps.plugin_setting_options.Add(new plugin_setting_options { options = "Thermostat Operating State and Temp" });
+            ps.plugin_setting_options.Add(new plugin_setting_options { options = "All of the above" });
+            ps.plugin_setting_options.Add(new plugin_setting_options { options = "Custom" });
             DefineOrUpdateSetting(ps);
 
             DefineOrUpdateSetting(new plugin_settings
@@ -82,11 +82,11 @@ namespace SpeechPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }             
@@ -107,7 +107,7 @@ namespace SpeechPlugin
                         {
                             if (dv.device.device_types.name == "SWITCH" && dv.label_name == "Basic")
                             {
-                                _synth.SpeakAsync(dv.device.friendly_name + " switched " + (dv.value == "255" ? "On" : "Off") + ".");
+                                _synth.SpeakAsync(dv.device.friendly_name + " switched " + (dv.value2 == "255" ? "On" : "Off") + ".");
                             }
                         }
 
@@ -115,7 +115,7 @@ namespace SpeechPlugin
                         {
                             if (dv.device.device_types.name == "DIMMER" && dv.label_name == "Level")
                             {
-                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
                             }
                         }
 
@@ -123,12 +123,12 @@ namespace SpeechPlugin
                         {
                             if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Temperature")
                             {
-                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
                             }
 
                             if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Operating State")
                             {
-                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                                _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
                             }
                         }
                         if (user_selected_announce_option == "Custom")
@@ -140,7 +140,7 @@ namespace SpeechPlugin
                                 string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
 
                                 if (thisEvent.Equals(objTypeValuespair.Trim()))
-                                    _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value + ".");
+                                    _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
                             }
                         }
                     }

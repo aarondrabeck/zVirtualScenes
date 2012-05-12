@@ -19,7 +19,7 @@ namespace zVirtualScenesCommon.Entity
                 #if !DEBUG
                     return Path.Combine(Paths.AppDataPath, @"\zvs-debug.db");
                 #else
-                    return Path.Combine(Paths.AppDataPath, @"zvs.db");
+                    return Path.Combine(Paths.AppDataPath, @"zvsDatabase.sdf");
                 #endif
             }
         }
@@ -28,7 +28,7 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"database\zvs-blank.db");
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"zvsDatabase.sdf");
             }
         }
 
@@ -37,12 +37,12 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                string sqlLiteConnectionString = string.Format("data source=\"{0}\"", GetDBPath);
+                string ConnectionString = string.Format("data source=\"{0}\"", GetDBPath);
                 EntityConnectionStringBuilder ee = new EntityConnectionStringBuilder
                 {
                     Metadata = @"res://*/Entity.zvsModel.csdl|res://*/Entity.zvsModel.ssdl|res://*/Entity.zvsModel.msl",
-                    Provider = @"System.Data.SQLite",
-                    ProviderConnectionString = sqlLiteConnectionString,
+                    Provider = @"System.Data.SqlServerCe.4.0",
+                    ProviderConnectionString = ConnectionString,
                 };
                 return ee.ToString();
             }
@@ -78,28 +78,28 @@ namespace zVirtualScenesCommon.Entity
         /// Called when a scene is finished.
         /// </summary>
         public static event SceneRunCompleteEventHandler SceneRunCompleteEvent;
-        public delegate void SceneRunCompleteEventHandler(long scene_id, int ErrorCount);
+        public delegate void SceneRunCompleteEventHandler(int scene_id, int ErrorCount);
 
-        public static void SceneRunComplete(long scene_id, int ErrorCount)
+        public static void SceneRunComplete(int scene_id, int ErrorCount)
         {
             if (SceneRunCompleteEvent != null)
                 SceneRunCompleteEvent(scene_id, ErrorCount);
         }
 
-        public delegate void SceneModifiedEventHandler(object sender, long? SceneID);
+        public delegate void SceneModifiedEventHandler(object sender, int? SceneID);
         public static event SceneModifiedEventHandler SceneModified;
-        public static void CallSceneModified(object sender, long? SceneID)
+        public static void CallSceneModified(object sender, int? SceneID)
         {
             if (SceneModified != null)
                 SceneModified(sender, SceneID);
         }
 
-        public delegate void DeviceModifiedEventHandler(object sender, string PropertyModified);
+        public delegate void DeviceModifiedEventHandler(int device_id, string PropertyModified);
         public static event DeviceModifiedEventHandler DeviceModified;
-        public static void CallDeviceModified(object sender, string PropertyModified)
+        public static void CallDeviceModified(int device_id, string PropertyModified)
         {
             if (DeviceModified != null)
-                DeviceModified(sender, PropertyModified);
+                DeviceModified(device_id, PropertyModified);
         }
 
         public delegate void ScheduledTaskModifiedEventHandler(object sender, string PropertyModified);

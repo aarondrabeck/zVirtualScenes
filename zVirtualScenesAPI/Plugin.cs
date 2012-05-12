@@ -4,6 +4,7 @@ using zVirtualScenesCommon.Util;
 using zVirtualScenesCommon.Entity;
 using System.Data.Objects;
 using zVirtualScenesCommon;
+using System;
 
 namespace zVirtualScenesAPI
 {
@@ -116,33 +117,47 @@ namespace zVirtualScenesAPI
                     {
                         //NEW VALUE
                         d.device_values.Add(dv);
-                        db.SaveChanges();
+                        db.SaveChanges();                        
 
                         //Call Event
-                        dv.DeviceValueAdded(new System.EventArgs());
+                        dv.DeviceValueAdded(new System.EventArgs());                       
                     }
                     else
                     {
 
                         //CHANGED VALUE
-                        prev_value = existing_dv.value;
+                        prev_value = existing_dv.value2;
 
                         //values come in blank sometimes.  If they are blank, keep the DB value. 
-                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value))
-                            existing_dv.value = dv.value;
+                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value2))
+                            existing_dv.value2 = dv.value2;
 
                         existing_dv.type = dv.type;
                         existing_dv.label_name = dv.label_name;
-                        existing_dv.index = dv.index;
+                        existing_dv.index2 = dv.index2;
                         existing_dv.genre = dv.genre;
                         existing_dv.commandClassId = dv.commandClassId;
                         existing_dv.read_only = dv.read_only;
                         db.SaveChanges();
 
-                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value)))
+                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value2) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value2)))
                         {
+                            //LOG IT
+                            string device_name = "Unknown";
+                            if (String.IsNullOrEmpty(d.friendly_name))
+                                device_name = "Device #" + d.id;
+                            else
+                                device_name = d.friendly_name;
+
+                            if (!String.IsNullOrEmpty(prev_value))
+                                Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed from {2} to {3}.", device_name, dv.label_name, prev_value, dv.value2), "EVENT");
+                            else
+                                Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed to {2}.", device_name, dv.label_name, dv.value2), "EVENT");
+                            
                             //Call Event
                             dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = existing_dv.id, previousValue = prev_value });
+
+
                         }
 
                     }
@@ -281,7 +296,7 @@ namespace zVirtualScenesAPI
                                 }
 
                                 foreach (device_type_command_options dtco in dtc.device_type_command_options)
-                                    exsisting_dtc.device_type_command_options.Add(new device_type_command_options { option = dtco.option });
+                                    exsisting_dtc.device_type_command_options.Add(new device_type_command_options { options = dtco.options });
 
                             }
                         }
@@ -292,7 +307,7 @@ namespace zVirtualScenesAPI
             }
         }
 
-        public IQueryable<device> GetDeviceInGroup(long GroupID, zvsEntities2 db)
+        public IQueryable<device> GetDeviceInGroup(int GroupID, zvsEntities2 db)
         {           
             plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)
@@ -370,8 +385,8 @@ namespace zVirtualScenesAPI
         public abstract bool ProcessDeviceCommand(device_command_que cmd);
         public abstract bool ProcessDeviceTypeCommand(device_type_command_que cmd);
         public abstract bool Repoll(device device);
-        public abstract bool ActivateGroup(long groupID);
-        public abstract bool DeactivateGroup(long groupID); 
+        public abstract bool ActivateGroup(int groupID);
+        public abstract bool DeactivateGroup(int groupID); 
 
             }
 }

@@ -3,21 +3,22 @@ using System.ComponentModel;
 using System.Threading;
 using System.IO;
 using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace zVirtualScenesCommon.Util
 {
     public static class Logger
     {
         #region private Variables
-        private static BindingList<LogItem> _log;
+        public static ObservableCollection<LogItem> LOG = new ObservableCollection<LogItem>();
         // Flag to switch on/off console logging
         private static bool _logConsole = true;
         // default Log file name
         private static string _logFileName = "zVirtualScenes.log";
         // Max log lines we cache in our internal log
-        private static int _cacheMaxLogLines = 2;
+        private static int _cacheMaxLogLines = 1000;
         // Min of logs we keep in our internal log after we wrote to the file
-        private static int _cacheMinLogLines = 1;
+        private static int _cacheMinLogLines = 50;
         // Max file size in KB
         private static int _maxFileSize = 100;
         // Number of log files to keep
@@ -39,8 +40,8 @@ namespace zVirtualScenesCommon.Util
 
         #endregion local Variables
 
-        public delegate void LogItemAddEventHandler(object sender, EventArgs e);
-        public static event LogItemAddEventHandler LogItemPostAdd;
+       // public delegate void LogItemAddEventHandler(object sender, EventArgs e);
+       // public static event LogItemAddEventHandler LogItemPostAdd;
 
         #region Properties 
         public static bool LogConsole
@@ -96,10 +97,10 @@ namespace zVirtualScenesCommon.Util
         {
             get
             {
-                LogItem[] result = new LogItem[_log.Count];
+                LogItem[] result = new LogItem[LOG.Count];
                 // we wont give full access to our internal log list
-                lock (_log)
-                    _log.CopyTo(result, 0);
+                lock (LOG)
+                    LOG.CopyTo(result, 0);
 
                 return result;
             }
@@ -112,24 +113,20 @@ namespace zVirtualScenesCommon.Util
             if (LogConsole)
                 Console.WriteLine(log);
 
-            LogItem item = new LogItem(urgency, log, source);
+            LogItem item = new LogItem(urgency, log, source);            
+            ObservableCollection<LogItem> copyLog = new ObservableCollection<LogItem>();
 
-            if (_log == null)
-                _log = new BindingList<LogItem>();
-
-            BindingList<LogItem> copyLog = new BindingList<LogItem>();
-
-            lock (_log)
+            lock (LOG)
             {
-                _log.Add(item);
+                LOG.Add(item);
                 // check if we reached upper level .. 
-                if (_log.Count >= CacheMaxLogLines)
+                if (LOG.Count >= CacheMaxLogLines)
                 {
                     // yes .. then take all until the lover level
                     for (int index = 0; index < CacheMaxLogLines - CacheMinLogLines; index++)
                     {
-                        copyLog.Add(_log[0]);
-                        _log.RemoveAt(0);
+                        copyLog.Add(LOG[0]);
+                        LOG.RemoveAt(0);
                     }
                 }
             }
@@ -148,25 +145,22 @@ namespace zVirtualScenesCommon.Util
                         }).Start();
                 }
             }
-            // Call delegate in case we have a subscriber
-            if (LogItemPostAdd != null)
-                LogItemPostAdd("Logger", new EventArgs());
         }
 
         public static LogItem GetLastEntry()
         {
-            return _log[_log.Count - 1];
+            return LOG[LOG.Count - 1];
         }
 
         public static void SaveLogToFile()
         {
-            SaveLogToFile(_log);
-            _log.Clear();
+            SaveLogToFile(LOG);
+            LOG.Clear();
         }
         #endregion public methods
 
         #region private methods
-        private static void SaveLogToFile(BindingList<LogItem> logs)
+        private static void SaveLogToFile(ObservableCollection<LogItem> logs)
         {
             // use filename to ensure just one thread at a time can access that region
             lock (_logFileName)

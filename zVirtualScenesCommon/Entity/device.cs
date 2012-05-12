@@ -16,14 +16,21 @@ namespace zVirtualScenesCommon.Entity
         /// <summary>
         /// This is called when a device or device value 
         /// </summary>        
-        public delegate void DeviceAddedEventHandler(object sender, EventArgs e);
-        public static event DeviceAddedEventHandler Added;
+        public delegate void DeviceAddRemoveEventHandler(int DeviceID);
+        public static event DeviceAddRemoveEventHandler DeviceAdded;
+        public static event DeviceAddRemoveEventHandler DeviceRemoved;
 
-        public void CallAdded (EventArgs e)
+        public void CallAdded(int DeviceID)
         {
-            if (Added != null)
-                Added(this, e);
-        } 
+            if (DeviceAdded != null)
+                DeviceAdded(DeviceID);
+        }
+        
+        public void CallRemoved(int DeviceID)
+        {
+            if (DeviceRemoved != null)
+                DeviceRemoved(DeviceID);
+        }
 
         public static IQueryable<device> GetAllDevices(zvsEntities2 db, bool forList)
         {
@@ -81,7 +88,7 @@ namespace zVirtualScenesCommon.Entity
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
                 if (dv != null)
-                    float.TryParse(dv.value, out temp);
+                    float.TryParse(dv.value2, out temp);
 
                 return (int)temp;
             }
@@ -91,7 +98,7 @@ namespace zVirtualScenesCommon.Entity
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)  
-                    int.TryParse(dv.value, out level);
+                    int.TryParse(dv.value2, out level);
 
                 return (level > 0 ? 100 : 0);
             }
@@ -101,7 +108,7 @@ namespace zVirtualScenesCommon.Entity
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)
-                    int.TryParse(dv.value, out level);
+                    int.TryParse(dv.value2, out level);
 
                 return level;
             }
@@ -115,7 +122,7 @@ namespace zVirtualScenesCommon.Entity
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
                 if (dv != null)
-                    float.TryParse(dv.value, out temp);
+                    float.TryParse(dv.value2, out temp);
 
                 return string.Format("{0} {1}", temp, program_options.GetProgramOption("TempAbbreviation"));
             }
@@ -125,7 +132,7 @@ namespace zVirtualScenesCommon.Entity
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)
-                    int.TryParse(dv.value, out level);
+                    int.TryParse(dv.value2, out level);
 
                 return (level  > 0 ? "ON" : "OFF");
             }
@@ -135,7 +142,7 @@ namespace zVirtualScenesCommon.Entity
                 device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
 
                 if (dv != null)
-                    int.TryParse(dv.value, out level);
+                    int.TryParse(dv.value2, out level);
 
                 return level+ "%";
             }            

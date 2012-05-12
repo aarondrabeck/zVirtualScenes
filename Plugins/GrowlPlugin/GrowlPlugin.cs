@@ -79,7 +79,7 @@ namespace GrowlPlugin
 
                             if (thisEvent.Equals(deviceTypeValuespair.Trim()))
                             {
-                                Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value + " from " + args.previousValue + ".");
+                                Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + dv.value2 + " from " + args.previousValue + ".");
                                 GrowlConnector.Notify(notification);
                             }
                         }
@@ -103,11 +103,11 @@ namespace GrowlPlugin
         {
             return true;
         }
-        public override bool ActivateGroup(long groupID)
+        public override bool ActivateGroup(int groupID)
         {
             return true;
         }
-        public override bool DeactivateGroup(long groupID)
+        public override bool DeactivateGroup(int groupID)
         {
             return true;
         }     
@@ -131,7 +131,7 @@ namespace GrowlPlugin
 
                
                 GrowlConnector.Register(application, new NotificationType[] { DeviceValueChange });
-                WriteToLog(Urgency.INFO, "Registered Growl Interface.");
+                WriteToLog(Urgency.INFO, "Registered Growl interface.");
             }
             catch (Exception ex)
             {

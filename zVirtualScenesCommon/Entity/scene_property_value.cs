@@ -11,7 +11,7 @@ namespace zVirtualScenesCommon.Entity
 {
     public partial class scene_property_value : EntityObject
     {
-        public static string GetPropertyValue(zvsEntities2 db, long sceneID, string property_value_name)
+        public static string GetPropertyValue(zvsEntities2 db, int sceneID, string property_value_name)
         {
             //Find the property
             scene_property property = db.scene_property.FirstOrDefault(p => p.name == property_value_name);
