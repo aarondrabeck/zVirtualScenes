@@ -18,6 +18,7 @@ using System.ComponentModel;
 using zvsProcessor;
 using zVirtualScenesCommon.Entity;
 using zVirtualScenes_WPF.DeviceControls;
+using zVirtualScenes_WPF.Groups;
 
 namespace zVirtualScenes_WPF
 {
@@ -126,7 +127,7 @@ namespace zVirtualScenes_WPF
                             d.friendly_name = "Can Lights";
                             break;
                         case 13:
-                            d.friendly_name = "Pourch Light";
+                            d.friendly_name = "Porch Light";
                             break;
                         case 14:
                             d.friendly_name = "Dining Table Light";
@@ -176,6 +177,22 @@ namespace zVirtualScenes_WPF
                 }
                 
             }
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.GetType() == typeof(GroupEditor))
+                {
+                    window.Activate();
+                    return;
+                }
+            }
+
+            GroupEditor groupEditor = new GroupEditor();
+            groupEditor.Owner = this;
+            groupEditor.Show();
         }
 
 

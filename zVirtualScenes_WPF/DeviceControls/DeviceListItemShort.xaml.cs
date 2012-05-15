@@ -19,14 +19,14 @@ namespace zVirtualScenes_WPF.DeviceControls
     /// <summary>
     /// interaction logic for BaseDeviceControl.xaml
     /// </summary>
-    public partial class DeviceListItem : UserControl
+    public partial class DeviceListItemShort : UserControl
     {
-        private device device;
-
-        public DeviceListItem()
+        public DeviceListItemShort()
         {
             InitializeComponent();
-        }
+        }       
+
+        public device device;
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -48,17 +48,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                     device d = db.devices.FirstOrDefault(o => o.id == this.device.id);
                     if (d != null)
                     {
-                        Update(d);
-
-                        Dispatcher.Invoke(new Action(() =>
-                        {
-                            //Animate updates
-                            this.Background = new SolidColorBrush(Colors.LightGreen);
-                            ColorAnimation animation = new ColorAnimation();
-                            animation.To = Colors.Transparent;
-                            animation.Duration = new Duration(TimeSpan.FromSeconds(2));
-                            this.Background.BeginAnimation(SolidColorBrush.ColorProperty, animation);
-                        }));
+                        Update(d);                        
                     }
                 }
             }
@@ -73,23 +63,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                 Dispatcher.Invoke(new Action(() =>
                 {
                     NodeIDtxt.Text = device.node_id.ToString();
-                    Nametxt.Text = device.friendly_name;
-                    Typetxt.Text = device.device_types.friendly_name;
-                    Leveltxt.Text = device.LevelText;
-                    LevelBar.Value = device.LevelMeter;
-                    Groupstxt.Text = device.GroupNames;
-
-                    if (device.last_heard_from.HasValue)
-                        DateUpdatedtxt.Text = device.last_heard_from.Value.ToString();
-
-                    if (device.device_types.name.Equals("THERMOSTAT"))
-                    {
-                        byte red = (byte)(0 * 2.55);
-                        byte bluegreen = (byte)(255 - (0 * 2.55));
-                        LevelBar.Foreground = new SolidColorBrush(Color.FromArgb(255, red, bluegreen, bluegreen));
-                    }
-                    else
-                        LevelBar.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 202, 0));
+                    Nametxt.Text = device.friendly_name;                                      
 
                     //Images
                     if (device.device_types.name.Equals("THERMOSTAT"))
@@ -110,60 +84,66 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         }
 
-        public void Delete()
-        {
-            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-            {
-                device d = db.devices.FirstOrDefault(o => o.id == device.id);
-                if (d != null)
-                {
-                    db.devices.DeleteObject(d);
-                    db.SaveChanges();
+        //This prevent unwanted behavior #1
 
-                    device.CallRemoved(device.id);
-                }
-            }
+        protected override void OnMouseEnter(MouseEventArgs e)
+        {
+
+            //base.OnMouseEnter(e);
+
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+
+
+        //This prevent unwanted behavior #2 (part 1 of 2)
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            Delete();
+
+            if (!IsSelected
+
+            || Keyboard.IsKeyDown(Key.LeftShift)
+
+            || Keyboard.IsKeyDown(Key.LeftCtrl)
+
+            || Keyboard.IsKeyDown(Key.RightShift)
+
+            || Keyboard.IsKeyDown(Key.RightCtrl))
+            {
+
+                base.OnMouseLeftButtonDown(e);
+
+            }
+
         }
 
-        protected override void OnMouseMove(MouseEventArgs e)
+        //This prevent unwanted behavior #2 (part 2 of 2)
+        bool IsSelected = true;
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            base.OnMouseMove(e);
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                // Package the data.
-                DataObject data = new DataObject();
-                data.SetData("deviceID", device.id);
-                data.SetData("device", device);
 
-                // Initiate the drag-and-drop operation.
-                DragDrop.DoDragDrop(this, data, DragDropEffects.Copy | DragDropEffects.Move);
-            }
-        }
+            if (!IsSelected
 
-        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
-        {
-            base.OnGiveFeedback(e);
-            // These Effects values are set in the drop target's
-            // DragOver event handler.
-            if (e.Effects.HasFlag(DragDropEffects.Copy))
+            || Keyboard.IsKeyDown(Key.LeftShift)
+
+            || Keyboard.IsKeyDown(Key.LeftCtrl)
+
+            || Keyboard.IsKeyDown(Key.RightShift)
+
+            || Keyboard.IsKeyDown(Key.RightCtrl))
             {
-                Mouse.SetCursor(Cursors.Cross);
+
+                base.OnMouseLeftButtonUp(e);
+
             }
-            else if (e.Effects.HasFlag(DragDropEffects.Move))
-            {
-                Mouse.SetCursor(Cursors.Pen);
-            }
+
             else
             {
-                Mouse.SetCursor(Cursors.No);
-            }
-            e.Handled = true;
-        }
 
+                base.OnMouseLeftButtonDown(e);
+
+            }
+
+        }
     }
 }

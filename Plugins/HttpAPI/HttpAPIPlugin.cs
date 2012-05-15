@@ -352,9 +352,9 @@ namespace HttpAPI
                         {
                             id = d.id,
                             name = d.friendly_name,
-                            on_off = d.GetLevelMeter() > 0 ? "ON" : "OFF",
-                            level = d.GetLevelMeter(),
-                            level_txt = d.GetLevelText(),
+                            on_off = d.LevelMeter > 0 ? "ON" : "OFF",
+                            level = d.LevelMeter,
+                            level_txt = d.LevelText,
                             type = d.device_types.name
                         };
 
@@ -377,9 +377,9 @@ namespace HttpAPI
                         if (d != null)
                         {
                             string on_off = string.Empty;
-                            if (d.GetLevelMeter() == 0)
+                            if (d.LevelMeter == 0)
                                 on_off = "OFF";
-                            else if (d.GetLevelMeter() > 98)
+                            else if (d.LevelMeter > 98)
                                 on_off = "ON";
                             else
                                 on_off = "DIM";
@@ -389,12 +389,12 @@ namespace HttpAPI
                                 id = d.id,
                                 name = d.friendly_name,
                                 on_off = on_off,
-                                level = d.GetLevelMeter(),
-                                level_txt = d.GetLevelText(),
+                                level = d.LevelMeter,
+                                level_txt = d.LevelText,
                                 type = d.device_types.name,
                                 type_txt = d.device_types.friendly_name,
                                 last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
-                                groups = d.GetGroups,
+                                groups = d.GroupNames,
                                 mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value2,
                                 fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value2,
                                 op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value2,

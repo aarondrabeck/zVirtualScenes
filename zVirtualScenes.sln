@@ -41,13 +41,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpAPI", "Plugins\HttpAPI\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", "{70C1BD75-B8D8-4296-99BC-12E162C43D04}"
 	ProjectSection(SolutionItems) = preProject
-		..\wiki\CommandFusion.wiki = ..\wiki\CommandFusion.wiki
-		..\wiki\EventGhost.wiki = ..\wiki\EventGhost.wiki
-		..\wiki\GettingStarted.wiki = ..\wiki\GettingStarted.wiki
-		..\wiki\HTTP_Control_Wiki.wiki = ..\wiki\HTTP_Control_Wiki.wiki
-		..\wiki\HTTP_INTERFACE.wiki = ..\wiki\HTTP_INTERFACE.wiki
-		..\wiki\HttpAPIPlugin.wiki = ..\wiki\HttpAPIPlugin.wiki
-		..\wiki\LightSwitch.wiki = ..\wiki\LightSwitch.wiki
 		..\wiki\Requirements1x.wiki = ..\wiki\Requirements1x.wiki
 		..\wiki\Requirements2x.wiki = ..\wiki\Requirements2x.wiki
 		..\wiki\ScreenShot20.wiki = ..\wiki\ScreenShot20.wiki
@@ -56,7 +49,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", 
 		..\wiki\ScreenShotsv1400.wiki = ..\wiki\ScreenShotsv1400.wiki
 		..\wiki\v2ToDo.wiki = ..\wiki\v2ToDo.wiki
 		..\wiki\XML_Socket_Interface.wiki = ..\wiki\XML_Socket_Interface.wiki
-		..\wiki\zVirtualScenes1xReleaseNotes.wiki = ..\wiki\zVirtualScenes1xReleaseNotes.wiki
 		..\wiki\zVirtualScenes2xReleaseNotes.wiki = ..\wiki\zVirtualScenes2xReleaseNotes.wiki
 		..\wiki\ZVS_Plugins.wiki = ..\wiki\ZVS_Plugins.wiki
 	EndProjectSection

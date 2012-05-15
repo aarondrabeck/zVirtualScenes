@@ -8,19 +8,28 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
     </Window.Resources>
-    <TabControl>
-        <TabItem Header="Devices">
-            <DeviceControls:DeviceList></DeviceControls:DeviceList>
-        </TabItem>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
+            <MenuItem Header="File" />
+            <MenuItem Header="Groups">
+                <MenuItem Header="Group Editor" Click="MenuItem_Click" />
+            </MenuItem>
+        </Menu>
+        <TabControl>
+            <TabItem Header="Devices">
+                <DeviceControls:DeviceList></DeviceControls:DeviceList>
+            </TabItem>
             <TabItem Header="Log">
-        <DataGrid  Name="logListView" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" Background="#00000000">
-            <DataGrid.Columns>
-                <DataGridTextColumn Width="140" Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" />
-                <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
-                <DataGridTextColumn Width="100" Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
-                <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
-            </DataGrid.Columns>
-        </DataGrid>
-</TabItem>
-    </TabControl>
+                <DataGrid  Name="logListView" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" Background="#00000000">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Width="140" Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" />
+                        <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
+                        <DataGridTextColumn Width="100" Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
+                        <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>
