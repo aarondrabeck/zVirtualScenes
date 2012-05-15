@@ -977,6 +977,7 @@ namespace OpenZWavePlugin
                                         deviceName = "OpenZWave Thermostat " + node.ID;
                                         device_type = GetDeviceType("THERMOSTAT", db);
                                         break;
+                                    case "Remote Controller":
                                     case "Static PC Controller":
                                     case "Static Controller":
                                     case "Portable Remote Controller":
