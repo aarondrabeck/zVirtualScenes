@@ -20,10 +20,13 @@
         </Style>
 
     </UserControl.Resources>
-
-    <DataGrid Name="DevicesLstVw" CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" MouseMove="DevicesLstVw_MouseMove" RowHeight="35">
-
-        <DataGrid.Columns>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DataGrid Name="DevicesLstVw" CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" MouseMove="DevicesLstVw_MouseMove" RowHeight="35">
+            
+            <DataGrid.Columns>
             <DataGridTemplateColumn Header="">
                 <DataGridTemplateColumn.CellTemplate >
                     <DataTemplate>
@@ -72,4 +75,5 @@
 
         </DataGrid.Columns>
     </DataGrid>
+    </Grid>
 </UserControl>
