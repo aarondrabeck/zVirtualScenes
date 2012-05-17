@@ -24,8 +24,7 @@ namespace zVirtualScenesCommon.Entity
                {
                    db.group_devices.DeleteObject(gd);
                    db.SaveChanges();
-
-                   zvsEntityControl.CallDeviceModified(gd.device.id, "group");
+                   zvsEntityControl.CallonSaveChanges(null, new List<zVirtualScenesCommon.Entity.zvsEntityControl.Tables>() { zvsEntityControl.Tables.group });
                }
                db.groups.DeleteObject(g);
                db.SaveChanges();
@@ -39,10 +38,7 @@ namespace zVirtualScenesCommon.Entity
                db.groups.Attach(g);
                g.name = NewName;
                db.SaveChanges();
-
-               //Notify Each device
-               foreach (group_devices gd in g.group_devices)
-                   zvsEntityControl.CallDeviceModified(gd.device.id, "group");
+               zvsEntityControl.CallonSaveChanges(null, new List<zVirtualScenesCommon.Entity.zvsEntityControl.Tables>() { zvsEntityControl.Tables.group });
            }  
        }
     

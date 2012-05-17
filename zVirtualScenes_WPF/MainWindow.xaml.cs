@@ -46,8 +46,11 @@ namespace zVirtualScenes_WPF
             //start the processor
             BackgroundWorker managerWorker = new BackgroundWorker();
             managerWorker.DoWork += new DoWorkEventHandler(processorWorker_DoWork);
-            managerWorker.RunWorkerAsync();          
-            
+            managerWorker.RunWorkerAsync();
+
+            System.Windows.Data.CollectionViewSource zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2ViewSource")));
+            // Load data by setting the CollectionViewSource.Source property:
+            // zvsEntities2ViewSource.Source = [generic data source]
         }
 
         private void processorWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -173,7 +176,7 @@ namespace zVirtualScenes_WPF
                             break;
                     }
                     db.SaveChanges();
-                    zvsEntityControl.CallDeviceModified(d.id, "friendly_name");
+                    d.CallChanged("friendly_name");
                 }
                 
             }

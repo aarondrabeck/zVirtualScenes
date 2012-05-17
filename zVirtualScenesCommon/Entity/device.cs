@@ -16,20 +16,49 @@ namespace zVirtualScenesCommon.Entity
         /// <summary>
         /// This is called when a device or device value 
         /// </summary>        
-        public delegate void DeviceAddRemoveEventHandler(int DeviceID);
-        public static event DeviceAddRemoveEventHandler DeviceAdded;
-        public static event DeviceAddRemoveEventHandler DeviceRemoved;
 
-        public void CallAdded(int DeviceID)
+        public delegate void DeviceModifiedEventHandler(int device_id, string PropertyModified);
+        public delegate void DeviceAddRemoveEventHandler(int DeviceID);
+
+        public static event DeviceAddRemoveEventHandler Added;
+        public static event DeviceAddRemoveEventHandler Removed;
+        public static event DeviceModifiedEventHandler Changed;
+
+        public static void CallChanged(int device_id, string PropertyModified)
         {
-            if (DeviceAdded != null)
-                DeviceAdded(DeviceID);
+            if (Changed != null)
+                Changed(device_id, PropertyModified);
         }
 
-        public void CallRemoved(int DeviceID)
+
+        public void CallChanged(string PropertyModified)
         {
-            if (DeviceRemoved != null)
-                DeviceRemoved(DeviceID);
+            if (Changed != null)
+                Changed(this.id, PropertyModified);
+        }
+
+        public static void CallAdded(int DeviceID)
+        {
+            if (Added != null)
+                Added(DeviceID);
+        }
+
+        public void CallAdded()
+        {
+            if (Added != null)
+                Added(this.id);
+        }
+
+        public static void CallRemoved(int DeviceID)
+        {
+            if (Removed != null)
+                Removed(DeviceID);
+        }
+
+        public void CallRemoved()
+        {
+            if (Removed != null)
+                Removed(this.id);
         }
 
         public static IQueryable<device> GetAllDevices(zvsEntities2 db, bool forList)
@@ -45,38 +74,49 @@ namespace zVirtualScenesCommon.Entity
 
         }
 
+        public static void RemoveByID(int ID, zvsEntities2 db = null)
+        {
+            if (db == null)
+            {
+                using (db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                {
+                    device d = db.devices.FirstOrDefault(o => o.id == ID);
+                    if (d != null)
+                    {
+                        db.devices.DeleteObject(d);
+                        db.SaveChanges();
+
+                        device.CallRemoved(ID);
+                    }
+                }
+            }
+            else
+            {
+                device d = db.devices.FirstOrDefault(o => o.id == ID);
+                if (d != null)
+                {
+                    db.devices.DeleteObject(d);
+                    db.SaveChanges();
+
+                    device.CallRemoved(ID);
+                }
+            }
+        }
+
+
         public string GroupNames
-        {    
+        {
             get
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                {
-                    db.devices.Attach(this);
-                    StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 foreach (group_devices gd in this.group_devices)
                 {
                     if (gd.group != null)
                         sb.Append(gd.group.name + (this.group_devices.Last() == gd ? "" : ", "));
                 }
                 return sb.ToString();
-                }
-            }
-        }
 
-        public string DeviceIcon()
-        {
-            if (this.device_types.name.Equals("THERMOSTAT"))
-                return "20zwave-thermostat.png";
-            else if (this.device_types.name.Equals("DIMMER"))
-                return "20bulb.png";
-            else if (this.device_types.name.Equals("SWITCH"))
-                return "20switch.png";
-            else if (this.device_types.name.Equals("CONTROLLER"))
-                return "controler320.png";
-            else if (this.device_types.name.Equals("DOORLOCK"))
-                return "doorlock20";
-            else
-                return "20radio2.png";
+            }
         }
 
         public override string ToString()
@@ -88,26 +128,20 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                {                                           
-                    db.devices.Attach(this);
-                  // db.AttachToOrGet<device>("device", ref this);
-                    return this.device_types.name;
-                }
+
+                return this.device_types.name;
+
             }
         }
 
-       
+
 
         public string DeviceTypeFriendlyName
         {
             get
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                {
-                    db.devices.Attach(this);
-                    return this.device_types.friendly_name;
-                }
+                return this.device_types.friendly_name;
+
             }
         }
 
@@ -116,41 +150,39 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+
+
+                if (this.device_types.name.Equals("THERMOSTAT"))
                 {
-                    db.devices.Attach(this);
+                    float temp = 0;
+                    device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
-                    if (this.device_types.name.Equals("THERMOSTAT"))
-                    {
-                        float temp = 0;
-                        device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
+                    if (dv != null)
+                        float.TryParse(dv.value2, out temp);
 
-                        if (dv != null)
-                            float.TryParse(dv.value2, out temp);
-
-                        return (int)temp;
-                    }
-                    else if (this.device_types.name.Equals("SWITCH"))
-                    {
-                        int level = 0;
-                        device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
-
-                        if (dv != null)
-                            int.TryParse(dv.value2, out level);
-
-                        return (level > 0 ? 100 : 0);
-                    }
-                    else
-                    {
-                        int level = 0;
-                        device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
-
-                        if (dv != null)
-                            int.TryParse(dv.value2, out level);
-
-                        return level;
-                    }
+                    return (int)temp;
                 }
+                else if (this.device_types.name.Equals("SWITCH"))
+                {
+                    int level = 0;
+                    device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
+
+                    if (dv != null)
+                        int.TryParse(dv.value2, out level);
+
+                    return (level > 0 ? 100 : 0);
+                }
+                else
+                {
+                    int level = 0;
+                    device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
+
+                    if (dv != null)
+                        int.TryParse(dv.value2, out level);
+
+                    return level;
+                }
+
             }
         }
 
@@ -158,40 +190,37 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                if (this.device_types.name.Equals("THERMOSTAT"))
                 {
-                    db.devices.Attach(this);
-                    if (this.device_types.name.Equals("THERMOSTAT"))
-                    {
-                        float temp = 0;
-                        device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
+                    float temp = 0;
+                    device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Temperature");
 
-                        if (dv != null)
-                            float.TryParse(dv.value2, out temp);
+                    if (dv != null)
+                        float.TryParse(dv.value2, out temp);
 
-                        return string.Format("{0} {1}", temp, program_options.GetProgramOption("TempAbbreviation"));
-                    }
-                    else if (this.device_types.name.Equals("SWITCH"))
-                    {
-                        int level = 0;
-                        device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
-
-                        if (dv != null)
-                            int.TryParse(dv.value2, out level);
-
-                        return (level > 0 ? "ON" : "OFF");
-                    }
-                    else
-                    {
-                        int level = 0;
-                        device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
-
-                        if (dv != null)
-                            int.TryParse(dv.value2, out level);
-
-                        return level + "%";
-                    }
+                    return string.Format("{0} {1}", temp, program_options.GetProgramOption("TempAbbreviation"));
                 }
+                else if (this.device_types.name.Equals("SWITCH"))
+                {
+                    int level = 0;
+                    device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
+
+                    if (dv != null)
+                        int.TryParse(dv.value2, out level);
+
+                    return (level > 0 ? "ON" : "OFF");
+                }
+                else
+                {
+                    int level = 0;
+                    device_values dv = this.device_values.LastOrDefault(v => v.label_name == "Basic");
+
+                    if (dv != null)
+                        int.TryParse(dv.value2, out level);
+
+                    return level + "%";
+                }
+
             }
         }
     }

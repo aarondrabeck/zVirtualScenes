@@ -16,6 +16,6 @@
             </Grid>
             
         </GroupBox>
-        <DeviceControls:DeviceListViewDragSource Margin="12,0,27,24" x:Name="DeviceShortDragSourceListUC" Height="141" VerticalAlignment="Bottom" />
+        <ListView Margin="12,0,27,24" x:Name="DeviceShortDragSourceListUC" Height="141" VerticalAlignment="Bottom" />
     </Grid>
 </Window>

@@ -15,8 +15,10 @@ namespace zVirtualScenes_WPF
     /// </summary>
     public partial class App : Application
     {
+        public static zvsEntities2 UIContext = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
+
         protected override void OnStartup(StartupEventArgs e)
-        {
+        {            
             //Check for VCRedist
             if (!DetectVCRedist.IsVCRedistInstalled())
             {

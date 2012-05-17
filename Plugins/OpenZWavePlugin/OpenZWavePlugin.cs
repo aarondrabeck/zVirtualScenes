@@ -1034,7 +1034,7 @@ namespace OpenZWavePlugin
                                         db.devices.AddObject(ozw_device);
                                         db.SaveChanges();
 
-                                        ozw_device.CallAdded(ozw_device.id);
+                                        ozw_device.CallAdded();
                                     }
 
 
@@ -1227,7 +1227,7 @@ namespace OpenZWavePlugin
                                 }
                                 db.SaveChanges();
 
-                                zvsEntityControl.CallDeviceModified(d.id, "last_heard_from");
+                                d.CallChanged("last_heard_from");
                             }
 
                             if (verbosity > 0)

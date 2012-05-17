@@ -61,6 +61,7 @@ namespace zVirtualScenes_WPF.Groups
                 {
                     db.groups.AddObject(new_g);
                     db.SaveChanges();
+                    zvsEntityControl.CallonSaveChanges(this, new List<zVirtualScenesCommon.Entity.zvsEntityControl.Tables>() { zvsEntityControl.Tables.group });
                 }
                 LoadComboBox();
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
@@ -108,7 +109,7 @@ namespace zVirtualScenes_WPF.Groups
         private void LoadDevices()
         {
             groupsDevicesLstVw.Items.Clear();
-            DeviceShortDragSourceListUC.ClearList();
+            //DeviceShortDragSourceListUC.ClearList();
 
             group g = (group)GroupCmbBx.SelectedItem;
             if (g != null)
@@ -117,9 +118,9 @@ namespace zVirtualScenes_WPF.Groups
                 {
                     foreach (device d in db.group_devices.Where(dg => dg.group_id == g.id).Select(d => d.device).OrderBy(d=>d.friendly_name).ToList())
                     {
-                        DeviceListItemShort item = new DeviceListItemShort();
-                        item.Update(d);
-                        groupsDevicesLstVw.Items.Add(item);
+                       // DeviceListItemShort item = new DeviceListItemShort();
+                      //  item.Update(d);
+                      //  groupsDevicesLstVw.Items.Add(item);
                     }
 
                     if (groupsDevicesLstVw.Items.Count > 0)
@@ -131,7 +132,7 @@ namespace zVirtualScenes_WPF.Groups
 
                     foreach (device d in device_query.OrderBy(d => d.friendly_name).ToList())
                     {
-                        DeviceShortDragSourceListUC.AddDevice(d);
+                       // DeviceShortDragSourceListUC.AddDevice(d);
                     }
                 }
             }
@@ -146,18 +147,18 @@ namespace zVirtualScenes_WPF.Groups
                     group selected_group = db.groups.FirstOrDefault(g => g.id == ((group)GroupCmbBx.SelectedItem).id);
                     if (selected_group != null)
                     {
-                        foreach (DeviceListItemShort item in groupsDevicesLstVw.SelectedItems)
-                        {
-                            group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == item.device.id);
+                       //// foreach (DeviceListItemShort item in groupsDevicesLstVw.SelectedItems)
+                       // {
+                       //     group_devices device = selected_group.group_devices.FirstOrDefault(gd => gd.device_id == item.device.id);
 
-                            if (device != null)
-                            {
-                                db.group_devices.DeleteObject(device);
-                                db.SaveChanges();
+                       //     if (device != null)
+                       //     {
+                       //         db.group_devices.DeleteObject(device);
+                       //         db.SaveChanges();
 
-                                zvsEntityControl.CallDeviceModified(item.device.id, "group");
-                            }
-                        }
+                       //         zvsEntityControl.CallDeviceModified(item.device.id, "group");
+                       //     }
+                       // }
                     }
                 }
                 LoadDevices();
@@ -190,6 +191,7 @@ namespace zVirtualScenes_WPF.Groups
                             {
                                 db.group_devices.AddObject(new group_devices { device_id = device.id, group_id = selected_group.id });
                                 db.SaveChanges();
+                                
                             }
                             else
                             {
@@ -199,17 +201,17 @@ namespace zVirtualScenes_WPF.Groups
                                                 MessageBoxImage.Error);
                             }
                         }
-                        zvsEntityControl.CallDeviceModified(device.id, "group");
+                        zvsEntityControl.CallonSaveChanges(null, new List<zVirtualScenesCommon.Entity.zvsEntityControl.Tables>() { zvsEntityControl.Tables.group_device });
                     }
                     LoadDevices();
 
                     //Select all the items
                     groupsDevicesLstVw.SelectedItems.Clear();
-                    foreach (DeviceListItemShort item in groupsDevicesLstVw.Items)
-                    {
-                        if (devices.Any(o => o.id == item.device.id))
-                            groupsDevicesLstVw.SelectedItems.Add(item);
-                    }
+                    //foreach (DeviceListItemShort item in groupsDevicesLstVw.Items)
+                    //{
+                    //    if (devices.Any(o => o.id == item.device.id))
+                    //        groupsDevicesLstVw.SelectedItems.Add(item);
+                    //}
                     groupsDevicesLstVw.Focus();
                 }
 

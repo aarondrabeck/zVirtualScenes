@@ -27,8 +27,8 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         void DeviceListViewDragSource_Unloaded(object sender, RoutedEventArgs e)
         {
-            device.DeviceAdded -= new device.DeviceAddRemoveEventHandler(device_DeviceAdded);
-            device.DeviceRemoved -= new device.DeviceAddRemoveEventHandler(device_DeviceRemoved);
+            device.Added -= new device.DeviceAddRemoveEventHandler(device_DeviceAdded);
+            device.Removed -= new device.DeviceAddRemoveEventHandler(device_DeviceRemoved);
 
             DevicesListViewItems.Clear();
             this.Items.Clear();
@@ -36,8 +36,8 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         void DeviceListViewDragSource_Loaded(object sender, RoutedEventArgs e)
         {
-            device.DeviceAdded += new device.DeviceAddRemoveEventHandler(device_DeviceAdded);
-            device.DeviceRemoved += new device.DeviceAddRemoveEventHandler(device_DeviceRemoved);              
+            device.Added += new device.DeviceAddRemoveEventHandler(device_DeviceAdded);
+            device.Removed += new device.DeviceAddRemoveEventHandler(device_DeviceRemoved);              
         }
                
         private void device_DeviceRemoved(int DeviceID)

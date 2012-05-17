@@ -10,17 +10,16 @@ namespace zVirtualScenesCommon.Entity
 {
     public static class zvsEntityControl
     {
-        //public static zvsEntities2 zvsContext = new zvsEntities2(GetzvsConnectionString);
 
         public static string GetDBPath
         {
             get
             {
-                #if !DEBUG
-                    return Path.Combine(Paths.AppDataPath, @"\zvs-debug.db");
-                #else
-                    return Path.Combine(Paths.AppDataPath, @"zvsDatabase.sdf");
-                #endif
+#if !DEBUG
+                return Path.Combine(Paths.AppDataPath, @"zvsDatabase-debug.sdf");
+#else
+                return Path.Combine(Paths.AppDataPath, @"zvsDatabase.sdf");
+#endif
             }
         }
 
@@ -50,17 +49,57 @@ namespace zVirtualScenesCommon.Entity
 
         public static string zvsNameAndVersion
         {
-            get { 
-                
-                string version = "zVirtualScenes v2.6";
+            get
+            {
 
-                #if (!DEBUG)
+                string version = "zVirtualScenes v3.0";
+
+#if (!DEBUG)
                 return version + " DEBUG MODE";
-                #else
+#else
                 return version;
-                #endif
+#endif
             }
         }
+
+        #region Table SaveChanges Event
+
+        public enum Tables
+        {
+            builtin_command_que,
+            builtin_commands,
+            device,
+            group_device,
+            device_command_que,
+            device_commands,
+            device_property_values,
+            device_propertys,
+            device_type_command_que,
+            device_type_commands,
+            device_value_triggers,
+            device_values,
+            group,
+            program_options,
+            scene,
+            scene_commands,
+            scene_property,
+            scene_property_value,
+            scheduled_tasks
+        }
+
+        public delegate void onSaveChangesEventHandler(onSaveChangesEventArgs args);
+        public static event onSaveChangesEventHandler onSaveChanges;
+        public class onSaveChangesEventArgs : EventArgs
+        {
+            public List<Tables> TablesChanged = new List<Tables>();
+        }
+
+        public static void CallonSaveChanges(object sender, List<Tables> TablesChanged)
+        {
+            if (onSaveChanges != null)
+                onSaveChanges(new onSaveChangesEventArgs() { TablesChanged = TablesChanged });
+        }
+        #endregion
 
         /// <summary>
         /// Called when a scene has been called to be executed.
@@ -94,14 +133,6 @@ namespace zVirtualScenesCommon.Entity
                 SceneModified(sender, SceneID);
         }
 
-        public delegate void DeviceModifiedEventHandler(int device_id, string PropertyModified);
-        public static event DeviceModifiedEventHandler DeviceModified;
-        public static void CallDeviceModified(int device_id, string PropertyModified)
-        {
-            if (DeviceModified != null)
-                DeviceModified(device_id, PropertyModified);
-        }
-
         public delegate void ScheduledTaskModifiedEventHandler(object sender, string PropertyModified);
         public static event ScheduledTaskModifiedEventHandler ScheduledTaskModified;
         public static void CallScheduledTaskModified(object sender, string PropertyModified)
@@ -118,5 +149,5 @@ namespace zVirtualScenesCommon.Entity
                 TriggerModified(sender, PropertyModified);
         }
 
-    }    
+    }
 }
