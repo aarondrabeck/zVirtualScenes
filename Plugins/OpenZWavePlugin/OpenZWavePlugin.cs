@@ -827,16 +827,16 @@ namespace OpenZWavePlugin
                                                             t.Interval = 3000;
                                                             t.Elapsed += (sender, e) =>
                                                             {
-                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);                                                                
+                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);
                                                                 Logger.WriteToLog(Urgency.INFO, "Timer stopped", this.Friendly_Name);
 
                                                                 t.Stop();
                                                                 timers.Remove(d.node_id);
-                                                        
+
                                                             };
                                                             t.Start();
                                                             Logger.WriteToLog(Urgency.INFO, "Timer started", this.Friendly_Name);
-                                                        }                                                        
+                                                        }
                                                     }
                                                 }
                                                 break;
@@ -1034,7 +1034,12 @@ namespace OpenZWavePlugin
                                         db.devices.AddObject(ozw_device);
                                         db.SaveChanges();
 
-                                        ozw_device.CallAdded();
+                                        zvsEntityControl.CallonSaveChanges(null,
+                      new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
+                       { 
+                           zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
+                       },
+                      zvsEntityControl.onSaveChangesEventArgs.ChangeType.AddRemove);
                                     }
 
 
@@ -1227,7 +1232,13 @@ namespace OpenZWavePlugin
                                 }
                                 db.SaveChanges();
 
-                                d.CallChanged("last_heard_from");
+                                zvsEntityControl.CallonSaveChanges(null,
+                      new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
+                       { 
+                           zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
+                       },
+                      zvsEntityControl.onSaveChangesEventArgs.ChangeType.Modified);
+
                             }
 
                             if (verbosity > 0)

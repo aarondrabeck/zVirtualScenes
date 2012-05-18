@@ -21,7 +21,7 @@ using zVirtualScenes_WPF.DeviceControls;
 using zVirtualScenes_WPF.Groups;
 
 namespace zVirtualScenes_WPF
-{
+{    
     /// <summary>
     /// interaction logic for MainWindow.xaml
     /// </summary>
@@ -30,6 +30,7 @@ namespace zVirtualScenes_WPF
         public ObservableCollection<LogItem> Log = new ObservableCollection<LogItem>();
         public int MaxLogLines = 1000;
         public zvsManager manager;
+        private zvsEntities2 context = zvsEntityControl.SharedContext;  
 
         public MainWindow()
         {
@@ -47,10 +48,6 @@ namespace zVirtualScenes_WPF
             BackgroundWorker managerWorker = new BackgroundWorker();
             managerWorker.DoWork += new DoWorkEventHandler(processorWorker_DoWork);
             managerWorker.RunWorkerAsync();
-
-            System.Windows.Data.CollectionViewSource zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2ViewSource")));
-            // Load data by setting the CollectionViewSource.Source property:
-            // zvsEntities2ViewSource.Source = [generic data source]
         }
 
         private void processorWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -82,6 +79,29 @@ namespace zVirtualScenes_WPF
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.F11)
+            {
+                device ozw_device = new device
+                {
+                    node_id = 50,
+                    device_type_id = 1,
+                    friendly_name = "NEW DEVICE"
+                };
+
+                lock(context)
+                {
+                    context.devices.AddObject(ozw_device);
+                    context.SaveChanges();
+
+                    //zvsEntityControl.CallonSaveChanges(null,
+                    //  new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
+                    //   { 
+                    //       zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
+                    //   },
+                    //  zvsEntityControl.onSaveChangesEventArgs.ChangeType.AddRemove);
+                }
+            }
+
             if (e.Key == Key.F12)
             {
                 SetNamesDevOnly();
@@ -90,9 +110,9 @@ namespace zVirtualScenes_WPF
 
         private void SetNamesDevOnly()
         {
-            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            lock (context)
             {
-                foreach (device d in db.devices)
+                foreach (device d in context.devices)
                 {
                     switch (d.node_id)
                     {
@@ -175,8 +195,14 @@ namespace zVirtualScenes_WPF
                             d.friendly_name = "Xmas Lights";
                             break;
                     }
-                    db.SaveChanges();
-                    d.CallChanged("friendly_name");
+                    context.SaveChanges();                    
+
+                    //zvsEntityControl.CallonSaveChanges(null,
+                    //  new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
+                    //   { 
+                    //       zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
+                    //   },
+                    //  zvsEntityControl.onSaveChangesEventArgs.ChangeType.Modified);
                 }
                 
             }

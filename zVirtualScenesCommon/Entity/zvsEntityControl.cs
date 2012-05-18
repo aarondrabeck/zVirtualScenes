@@ -10,6 +10,9 @@ namespace zVirtualScenesCommon.Entity
 {
     public static class zvsEntityControl
     {
+        //Until EF5 is released this is the only decent way to use the built-in observables and inotify interfaces
+        //without doing your own context syncing
+        public static zvsEntities2 SharedContext = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
 
         public static string GetDBPath
         {
@@ -64,40 +67,50 @@ namespace zVirtualScenesCommon.Entity
 
         #region Table SaveChanges Event
 
-        public enum Tables
-        {
-            builtin_command_que,
-            builtin_commands,
-            device,
-            group_device,
-            device_command_que,
-            device_commands,
-            device_property_values,
-            device_propertys,
-            device_type_command_que,
-            device_type_commands,
-            device_value_triggers,
-            device_values,
-            group,
-            program_options,
-            scene,
-            scene_commands,
-            scene_property,
-            scene_property_value,
-            scheduled_tasks
-        }
+        
 
         public delegate void onSaveChangesEventHandler(onSaveChangesEventArgs args);
         public static event onSaveChangesEventHandler onSaveChanges;
         public class onSaveChangesEventArgs : EventArgs
         {
-            public List<Tables> TablesChanged = new List<Tables>();
+            public enum Tables
+            {
+                builtin_command_que,
+                builtin_commands,
+                device,
+                group_device,
+                device_command_que,
+                device_commands,
+                device_property_values,
+                device_propertys,
+                device_type_command_que,
+                device_type_commands,
+                device_value_triggers,
+                device_values,
+                group,
+                program_options,
+                scene,
+                scene_commands,
+                scene_property,
+                scene_property_value,
+                scheduled_tasks
+            }
+
+            public enum ChangeType
+            {
+                None,
+                AddRemove,
+                Modified
+            }
+
+            public List<Tables> tablesChanged = new List<Tables>();
+            public ChangeType changeType = ChangeType.None;
         }
 
-        public static void CallonSaveChanges(object sender, List<Tables> TablesChanged)
+        public static void CallonSaveChanges(object sender, List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables> TablesChanged, zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.ChangeType changeType)
         {
             if (onSaveChanges != null)
-                onSaveChanges(new onSaveChangesEventArgs() { TablesChanged = TablesChanged });
+                onSaveChanges(new onSaveChangesEventArgs() { tablesChanged = TablesChanged, changeType = changeType });
         }
         #endregion
 

@@ -15,51 +15,7 @@ namespace zVirtualScenesCommon.Entity
     {
         /// <summary>
         /// This is called when a device or device value 
-        /// </summary>        
-
-        public delegate void DeviceModifiedEventHandler(int device_id, string PropertyModified);
-        public delegate void DeviceAddRemoveEventHandler(int DeviceID);
-
-        public static event DeviceAddRemoveEventHandler Added;
-        public static event DeviceAddRemoveEventHandler Removed;
-        public static event DeviceModifiedEventHandler Changed;
-
-        public static void CallChanged(int device_id, string PropertyModified)
-        {
-            if (Changed != null)
-                Changed(device_id, PropertyModified);
-        }
-
-
-        public void CallChanged(string PropertyModified)
-        {
-            if (Changed != null)
-                Changed(this.id, PropertyModified);
-        }
-
-        public static void CallAdded(int DeviceID)
-        {
-            if (Added != null)
-                Added(DeviceID);
-        }
-
-        public void CallAdded()
-        {
-            if (Added != null)
-                Added(this.id);
-        }
-
-        public static void CallRemoved(int DeviceID)
-        {
-            if (Removed != null)
-                Removed(DeviceID);
-        }
-
-        public void CallRemoved()
-        {
-            if (Removed != null)
-                Removed(this.id);
-        }
+        /// </summary> 
 
         public static IQueryable<device> GetAllDevices(zvsEntities2 db, bool forList)
         {
@@ -73,36 +29,6 @@ namespace zVirtualScenesCommon.Entity
                 return query.AsQueryable();
 
         }
-
-        public static void RemoveByID(int ID, zvsEntities2 db = null)
-        {
-            if (db == null)
-            {
-                using (db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                {
-                    device d = db.devices.FirstOrDefault(o => o.id == ID);
-                    if (d != null)
-                    {
-                        db.devices.DeleteObject(d);
-                        db.SaveChanges();
-
-                        device.CallRemoved(ID);
-                    }
-                }
-            }
-            else
-            {
-                device d = db.devices.FirstOrDefault(o => o.id == ID);
-                if (d != null)
-                {
-                    db.devices.DeleteObject(d);
-                    db.SaveChanges();
-
-                    device.CallRemoved(ID);
-                }
-            }
-        }
-
 
         public string GroupNames
         {

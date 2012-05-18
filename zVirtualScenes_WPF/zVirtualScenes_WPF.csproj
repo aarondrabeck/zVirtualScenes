@@ -48,6 +48,8 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -88,7 +90,7 @@
     <Compile Include="DeviceControls\DeviceList.xaml.cs">
       <DependentUpon>DeviceList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DragableListViewItem.cs" />
+    <Compile Include="CustomControls\DragandDropDataGrid.cs" />
     <Compile Include="Groups\GroupEditor.xaml.cs">
       <DependentUpon>GroupEditor.xaml</DependentUpon>
     </Compile>
@@ -126,6 +128,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities2.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
