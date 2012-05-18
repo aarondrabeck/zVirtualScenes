@@ -18,8 +18,8 @@
         <TabControl>
             <TabItem Header="Devices">
                 <StackPanel Orientation="Vertical">
-                    <DeviceControls:DeviceList Height="200"></DeviceControls:DeviceList>
-                    <DeviceControls:DeviceList Height="200"></DeviceControls:DeviceList>
+                    <DeviceControls:DeviceDataGridUC Height="200"></DeviceControls:DeviceDataGridUC>
+                    <DeviceControls:DeviceDataGridUC Height="200"></DeviceControls:DeviceDataGridUC>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Log">

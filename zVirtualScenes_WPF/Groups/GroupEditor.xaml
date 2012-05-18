@@ -20,6 +20,6 @@
             </Grid>
             
         </GroupBox>
-        <DeviceControls:DeviceList Margin="12,0,27,24" x:Name="DeviceLst" Height="141" VerticalAlignment="Bottom" />
+        <DeviceControls:DeviceDataGridUC Margin="12,0,27,24" x:Name="DeviceLst" Height="141" VerticalAlignment="Bottom" />
     </Grid>
 </Window>
