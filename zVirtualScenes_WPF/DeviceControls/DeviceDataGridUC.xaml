@@ -21,12 +21,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">
-            <CollectionViewSource.SortDescriptions>
-                <scm:SortDescription PropertyName="friendly_name" />
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
-        
+        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">           
+        </CollectionViewSource>        
     </UserControl.Resources>
     
     <Grid DataContext="{StaticResource devicesViewSource}">
@@ -69,9 +65,9 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn x:Name="NodeID"  MinWidth="50"  Width="25" Header="ID" Binding="{Binding node_id}" IsReadOnly="True" 
-                                    CanUserResize="False" CanUserReorder="False" CanUserSort="True" FontSize="14" />
+                                    CanUserResize="False" CanUserReorder="False"  FontSize="14" />
 
-                <DataGridTextColumn MinWidth="200" Width="*" Header="Name" Binding="{Binding friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" CanUserSort="True"  />
+                <DataGridTextColumn MinWidth="200" Width="*" Header="Name" Binding="{Binding friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   />
 
                 <DataGridTemplateColumn x:Name="group2" MinWidth="100" Header="GROUPS" CanUserResize="True">
                     <DataGridTemplateColumn.CellTemplate >
