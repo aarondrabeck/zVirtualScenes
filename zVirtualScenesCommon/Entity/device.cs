@@ -27,7 +27,6 @@ namespace zVirtualScenesCommon.Entity
                 return query.Where(o => o.device_types.show_in_list == true).AsQueryable();
             else
                 return query.AsQueryable();
-
         }
 
         public string GroupNames
@@ -41,7 +40,6 @@ namespace zVirtualScenesCommon.Entity
                         sb.Append(gd.group.name + (this.group_devices.Last() == gd ? "" : ", "));
                 }
                 return sb.ToString();
-
             }
         }
 
@@ -60,8 +58,6 @@ namespace zVirtualScenesCommon.Entity
             }
         }
 
-
-
         public string DeviceTypeFriendlyName
         {
             get
@@ -76,8 +72,6 @@ namespace zVirtualScenesCommon.Entity
         {
             get
             {
-
-
                 if (this.device_types.name.Equals("THERMOSTAT"))
                 {
                     float temp = 0;

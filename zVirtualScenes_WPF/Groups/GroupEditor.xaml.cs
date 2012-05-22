@@ -30,12 +30,35 @@ namespace zVirtualScenes_WPF.Groups
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            BindCmbBox();
+            DeviceLst.AdvancedDisplay = false;
+
+
+            EvaluateRemoveBtnUsability();
+            EvaluateAddEditBtnsUsability();
+        }
+
+        private void BindCmbBox()
+        {
             // Load data into groups. You can modify this code as needed.
             System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
-            System.Data.Objects.ObjectQuery<zVirtualScenesCommon.Entity.group> groupsQuery = this.GetgroupsQuery(context);
-            groupsViewSource.Source = groupsQuery.Execute(System.Data.Objects.MergeOption.AppendOnly);
+            groupsViewSource.Source = this.GetgroupsQuery(context).Execute(System.Data.Objects.MergeOption.AppendOnly);
 
-            DeviceLst.AdvancedDisplay = false;
+            EvaluateAddEditBtnsUsability();
+        }
+
+        private void EvaluateAddEditBtnsUsability()
+        {
+            if (this.GroupCmbBx.Items.Count > 0)
+            {
+                this.RemoveBtn.IsEnabled = true;
+                this.EditBtn.IsEnabled = true;
+            }
+            else
+            {
+                this.RemoveBtn.IsEnabled = false;
+                this.EditBtn.IsEnabled = false;
+            }
         }
 
         private ObjectQuery<group> GetgroupsQuery(zvsEntities2 zvsEntities2)
@@ -67,6 +90,10 @@ namespace zVirtualScenes_WPF.Groups
                     context.SaveChanges();
                 }
 
+                //if group box didn't have any items rebind
+                if (GroupCmbBx.Items.Count < 1)
+                    BindCmbBox();                
+
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
             }
         }
@@ -87,6 +114,7 @@ namespace zVirtualScenes_WPF.Groups
                     }
                 }
             }
+            EvaluateAddEditBtnsUsability();
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
@@ -103,32 +131,6 @@ namespace zVirtualScenes_WPF.Groups
                     {
                         g.name = nameWindow.GroupName;
                         context.SaveChanges();
-                    }
-                }
-            }
-        }
-
-        private void groupsDevicesLstVw_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete)
-            {
-                group selected_group = (group)GroupCmbBx.SelectedItem;
-                if (selected_group != null && groupsDevicesLstVw.SelectedItems.Count > 0)
-                {
-                    group_devices[] SelectedItemsCopy = new group_devices[groupsDevicesLstVw.SelectedItems.Count];
-                    groupsDevicesLstVw.SelectedItems.CopyTo(SelectedItemsCopy, 0);
-
-                    if (MessageBox.Show(string.Format("Are you sure you want to remove the {0} selected devices from this group?", groupsDevicesLstVw.SelectedItems.Count),
-                                             "Remove Devices?",
-                                             MessageBoxButton.YesNo,
-                                             MessageBoxImage.Error) == MessageBoxResult.Yes)
-                    {
-                        lock (context)
-                        {
-                            foreach (group_devices gd in SelectedItemsCopy)
-                                context.group_devices.DeleteObject(gd);
-                            context.SaveChanges();
-                        }
                     }
                 }
             }
@@ -153,16 +155,17 @@ namespace zVirtualScenes_WPF.Groups
                 if (selected_group != null)
                 {
                     groupsDevicesLstVw.SelectedItems.Clear();
-                    
+
                     lock (context)
                     {
                         foreach (device device in devices)
                         {
                             if (!selected_group.group_devices.Any(o => o.device_id == device.id && o.group_id == selected_group.id))
                             {
-                                group_devices gd = new group_devices { 
-                                    device_id = device.id, 
-                                    group_id = selected_group.id 
+                                group_devices gd = new group_devices
+                                {
+                                    device_id = device.id,
+                                    group_id = selected_group.id
                                 };
 
                                 context.group_devices.AddObject(gd);
@@ -178,7 +181,7 @@ namespace zVirtualScenes_WPF.Groups
                             }
                         }
                         context.SaveChanges();
-                    }                    
+                    }
                     groupsDevicesLstVw.Focus();
                 }
 
@@ -189,6 +192,60 @@ namespace zVirtualScenes_WPF.Groups
             e.Handled = true;
         }
 
+        private void groupsDevicesLstVw_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EvaluateRemoveBtnUsability();
+        }
 
+        private void EvaluateRemoveBtnUsability()
+        {
+            if (this.groupsDevicesLstVw.SelectedItems.Count > 0)
+                this.RemoveSelected.IsEnabled = true;
+            else
+                this.RemoveSelected.IsEnabled = false;
+        }
+
+        private void RemoveSelectedGroupDevices()
+        {
+            group selected_group = (group)GroupCmbBx.SelectedItem;
+            if (selected_group != null && groupsDevicesLstVw.SelectedItems.Count > 0)
+            {
+                group_devices[] SelectedItemsCopy = new group_devices[groupsDevicesLstVw.SelectedItems.Count];
+                groupsDevicesLstVw.SelectedItems.CopyTo(SelectedItemsCopy, 0);
+
+                if (MessageBox.Show(string.Format("Are you sure you want to remove the {0} selected devices from this group?", groupsDevicesLstVw.SelectedItems.Count),
+                                         "Remove Devices?",
+                                         MessageBoxButton.YesNo,
+                                         MessageBoxImage.Error) == MessageBoxResult.Yes)
+                {
+                    lock (context)
+                    {
+                        foreach (group_devices gd in SelectedItemsCopy)
+                            context.group_devices.DeleteObject(gd);
+                        context.SaveChanges();
+                    }
+                }                
+            }
+
+
+        }
+
+        private void groupsDevicesLstVw_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                RemoveSelectedGroupDevices();
+            }
+        }
+
+        private void RemoveSelected_Click(object sender, RoutedEventArgs e)
+        {
+            RemoveSelectedGroupDevices();
+        }
+
+        private void GroupCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+        }
     }
 }

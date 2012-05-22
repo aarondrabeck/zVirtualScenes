@@ -27,14 +27,14 @@
     
     <Grid DataContext="{StaticResource devicesViewSource}">
         <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" 
-                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="35" AutoGenerateColumns="False" 
-                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding">
+                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
+                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding" RowHeaderWidth="0" AllowDrop="True">
             <DataGrid.Columns>
 
-                <DataGridTemplateColumn MaxWidth="30" MinWidth="30" Width="30"  Header="" CanUserResize="False" CanUserReorder="False">
+                <DataGridTemplateColumn MaxWidth="9" MinWidth="9" Width="9"  Header="" CanUserResize="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Image Name="DragImage" Cursor="Hand" Width="30" Height="20" Source="/zVirtualScenes_WPF;component/Images/drag_icon.png"/>
+                            <Image Name="DragImage" Cursor="Hand" Width="9" Height="28" Source="/zVirtualScenes_WPF;component/Images/drag_icon.png" Margin="0,0,0,0" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -72,7 +72,7 @@
                 <DataGridTemplateColumn x:Name="group2" MinWidth="100" Header="GROUPS" CanUserResize="True">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <ComboBox ItemsSource="{Binding Path=group_devices}" DisplayMemberPath="name" SelectedIndex="0" Margin="3,0">
+                            <ComboBox ItemsSource="{Binding Path=group_devices}" SelectedIndex="0" Margin="3,0">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Path=group.name}"/>
