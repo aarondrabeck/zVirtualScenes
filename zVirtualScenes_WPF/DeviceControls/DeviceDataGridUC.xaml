@@ -21,10 +21,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">           
-        </CollectionViewSource>        
+        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">
+        </CollectionViewSource>
     </UserControl.Resources>
-    
+
     <Grid DataContext="{StaticResource devicesViewSource}">
         <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
@@ -69,7 +69,7 @@
 
                 <DataGridTextColumn MinWidth="200" Width="*" Header="Name" Binding="{Binding friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   />
 
-                <DataGridTemplateColumn x:Name="group2" MinWidth="100" Header="GROUPS" CanUserResize="True">
+                <DataGridTemplateColumn x:Name="GroupCol" MinWidth="100" Header="GROUPS" CanUserResize="True">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <ComboBox ItemsSource="{Binding Path=group_devices}" SelectedIndex="0" Margin="3,0">
@@ -83,24 +83,47 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="devicetype" Width="150" MinWidth="50" Header="Type" Binding="{Binding DeviceTypeFriendlyName}" IsReadOnly="True" />
+                <DataGridTextColumn x:Name="DeviceTypeCol" Width="150" MinWidth="50" Header="Type" Binding="{Binding DeviceTypeFriendlyName}" IsReadOnly="True" />
 
-                <DataGridTemplateColumn x:Name="LevelBar" Header="" CanUserResize="False" Width="66" MinWidth="66" MaxWidth="66">
+                <DataGridTemplateColumn x:Name="LevelCol" Header="Status" Width="120" MinWidth="120" MaxWidth="120" CanUserResize="False" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <ProgressBar Name="LevelBar" Value="{Binding LevelMeter, Mode=OneWay}"   Width="60" Height="25" Margin="3,0"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="55"></ColumnDefinition>
+                                    <ColumnDefinition Width="60"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>                                
+                                <TextBlock Name="LevelTxtBlock" Text="" VerticalAlignment="Center"></TextBlock>
+                                <ProgressBar Grid.Column="1" Name="LevelBar" Width="60" Height="25" Margin="5,0,0,0"/>
+                            </Grid>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding DeviceTypeName}" Value="THERMOSTAT">
+                                    <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status, StringFormat={}{0}F}"/>
                                     <Setter TargetName="LevelBar" Property="Foreground" Value="#FF0088DE"/>
+                                    <Setter TargetName="LevelBar" Property="Value" Value="{Binding current_status}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="DIMMER">
+                                    <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status, StringFormat={}{0}%}"/>
+                                    <Setter TargetName="LevelBar" Property="Value" Value="{Binding current_status}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="SWITCH">
+                                    <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
+                                    <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="CONTROLLER">
+                                    <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
+                                    <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="DOORLOCK">
+                                    <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
+                                    <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="LevelTxt" Header="Level" Width="40" MinWidth="40" MaxWidth="40" CanUserResize="False" Binding="{Binding LevelText}" IsReadOnly="True"/>
-
-                <DataGridTextColumn x:Name="Date" Header="Last Repoll" Width="120" MinWidth="120" MaxWidth="120" Binding="{Binding last_heard_from}" IsReadOnly="True" FontSize="10" />
+                <DataGridTextColumn x:Name="DateCol" Header="Last Repoll" Width="120" MinWidth="120" MaxWidth="120" Binding="{Binding last_heard_from}" IsReadOnly="True" FontSize="10" />
 
             </DataGrid.Columns>
         </DataGrid>

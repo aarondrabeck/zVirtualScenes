@@ -13,6 +13,7 @@ using System.Windows.Shapes;
 using zVirtualScenesCommon.Entity;
 using zVirtualScenes_WPF.DeviceControls;
 using System.Data.Objects;
+using System.ComponentModel;
 
 namespace zVirtualScenes_WPF.Groups
 {
@@ -22,6 +23,7 @@ namespace zVirtualScenes_WPF.Groups
     public partial class GroupEditor : Window
     {
         private zvsEntities2 context = zvsEntityControl.SharedContext;
+        public static IBindingList GroupList; 
 
         public GroupEditor()
         {
@@ -30,26 +32,23 @@ namespace zVirtualScenes_WPF.Groups
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            BindCmbBox();
-            DeviceLst.AdvancedDisplay = false;
+            // Do not load your data at design time.
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                GroupList = ((IListSource)context.groups).GetList() as IBindingList;
+                System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
+                groupsViewSource.Source = GroupList;
+            }
 
+            DeviceLst.AdvancedDisplay = false;
 
             EvaluateRemoveBtnUsability();
             EvaluateAddEditBtnsUsability();
         }
 
-        private void BindCmbBox()
-        {
-            // Load data into groups. You can modify this code as needed.
-            System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
-            groupsViewSource.Source = this.GetgroupsQuery(context).Execute(System.Data.Objects.MergeOption.AppendOnly);
-
-            EvaluateAddEditBtnsUsability();
-        }
-
         private void EvaluateAddEditBtnsUsability()
         {
-            if (this.GroupCmbBx.Items.Count > 0)
+            if (GroupList.Count > 0)
             {
                 this.RemoveBtn.IsEnabled = true;
                 this.EditBtn.IsEnabled = true;
@@ -59,15 +58,6 @@ namespace zVirtualScenes_WPF.Groups
                 this.RemoveBtn.IsEnabled = false;
                 this.EditBtn.IsEnabled = false;
             }
-        }
-
-        private ObjectQuery<group> GetgroupsQuery(zvsEntities2 zvsEntities2)
-        {
-            System.Data.Objects.ObjectQuery<zVirtualScenesCommon.Entity.group> groupsQuery = zvsEntities2.groups;
-            // Update the query to include group_devices data in groups. You can modify this code as needed.
-            groupsQuery = groupsQuery.Include("group_devices");
-            // Returns an ObjectQuery.
-            return groupsQuery;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -86,15 +76,12 @@ namespace zVirtualScenes_WPF.Groups
 
                 lock (context)
                 {
-                    context.groups.AddObject(new_g);
+                    GroupList.Add(new_g);
                     context.SaveChanges();
-                }
-
-                //if group box didn't have any items rebind
-                if (GroupCmbBx.Items.Count < 1)
-                    BindCmbBox();                
+                }               
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
+        
             }
         }
 
@@ -114,7 +101,7 @@ namespace zVirtualScenes_WPF.Groups
                     }
                 }
             }
-            EvaluateAddEditBtnsUsability();
+            
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
@@ -245,7 +232,7 @@ namespace zVirtualScenes_WPF.Groups
 
         private void GroupCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+            EvaluateAddEditBtnsUsability();
         }
     }
 }

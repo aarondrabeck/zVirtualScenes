@@ -14,6 +14,9 @@
             <MenuItem Header="Groups">
                 <MenuItem Header="Group Editor" Click="MenuItem_Click" />
             </MenuItem>
+            <MenuItem Header="Tools">
+                <MenuItem Header="Plugin Manager" Click="MenuItem_Click_1" />
+            </MenuItem>
         </Menu>
         <TabControl>
             <TabItem Header="Devices">

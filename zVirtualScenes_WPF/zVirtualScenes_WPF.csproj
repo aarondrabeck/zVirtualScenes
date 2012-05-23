@@ -71,6 +71,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DynamicSettingsControls\StringSettingsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DynamicSettingsControls\NumericSettingsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Groups\GroupEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -90,6 +98,13 @@
     <Compile Include="DeviceControls\DeviceDataGridUC.xaml.cs">
       <DependentUpon>DeviceDataGridUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DynamicSettingsControls\StringSettingsControl.xaml.cs">
+      <DependentUpon>StringSettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicSettingsControls\NumericSettingsControl.xaml.cs">
+      <DependentUpon>NumericSettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicSettingsControls\DynamicSettingsInterface.cs" />
     <Compile Include="Groups\GroupEditor.xaml.cs">
       <DependentUpon>GroupEditor.xaml</DependentUpon>
     </Compile>
@@ -100,12 +115,26 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="DynamicSettingsControls\BoolSettingsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PluginManager\PluginManagerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\GridViewStyles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DynamicSettingsControls\BoolSettingsControl.xaml.cs">
+      <DependentUpon>BoolSettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
+      <DependentUpon>PluginManagerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -176,7 +205,7 @@
     <Resource Include="Images\drag_icon.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="CustomControls\" />
+    <Resource Include="Images\Plugin.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\drag_arrow.png" />

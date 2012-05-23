@@ -47,7 +47,7 @@ namespace HttpAPI
                 name = "PORT",
                 friendly_name = "HTTP Port",
                 value = "80",
-                value_data_type = (int)Data_Types.intEGER,
+                value_data_type = (int)Data_Types.INTEGER,
                 description = "The port that HTTP will listen for commands on."
             });
 
@@ -352,9 +352,9 @@ namespace HttpAPI
                         {
                             id = d.id,
                             name = d.friendly_name,
-                            on_off = d.LevelMeter > 0 ? "ON" : "OFF",
-                            level = d.LevelMeter,
-                            level_txt = d.LevelText,
+                            on_off = d.current_status.ToUpper(),
+                            level = d.current_status,
+                            level_txt = d.current_status,
                             type = d.device_types.name
                         };
 
@@ -376,10 +376,13 @@ namespace HttpAPI
 
                         if (d != null)
                         {
+                             int level = 0;
+                             int.TryParse(d.current_status, out level);
+
                             string on_off = string.Empty;
-                            if (d.LevelMeter == 0)
+                            if (level == 0)
                                 on_off = "OFF";
-                            else if (d.LevelMeter > 98)
+                            else if (level > 98)
                                 on_off = "ON";
                             else
                                 on_off = "DIM";
@@ -389,8 +392,8 @@ namespace HttpAPI
                                 id = d.id,
                                 name = d.friendly_name,
                                 on_off = on_off,
-                                level = d.LevelMeter,
-                                level_txt = d.LevelText,
+                                level = d.current_status,
+                                level_txt = d.current_status,
                                 type = d.device_types.name,
                                 type_txt = d.device_types.friendly_name,
                                 last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",

@@ -19,6 +19,7 @@ using zvsProcessor;
 using zVirtualScenesCommon.Entity;
 using zVirtualScenes_WPF.DeviceControls;
 using zVirtualScenes_WPF.Groups;
+using zVirtualScenes_WPF.PluginManager;
 
 namespace zVirtualScenes_WPF
 {    
@@ -83,22 +84,53 @@ namespace zVirtualScenes_WPF
             {
                 device ozw_device = new device
                 {
-                    node_id = 50,
+                    node_id = 1,
                     device_type_id = 1,
-                    friendly_name = "NEW DEVICE"
+                    current_status = "Active",
+                    friendly_name = "Sample Controller"
+                };
+
+                device ozw_device1 = new device
+                {
+                    node_id = 2,
+                    device_type_id = 2,
+                    current_status = "On",
+                    friendly_name = "Switch Sample"
+                };
+
+                device ozw_device2 = new device
+                {
+                    node_id = 3,
+                    device_type_id = 3,
+                    current_status = "25",
+                    friendly_name = "Dimmer Sample"
+                };
+
+
+                device ozw_device3 = new device
+                {
+                    node_id = 99,
+                    device_type_id = 4,
+                    current_status = "75",
+                    friendly_name = "Thermo Sample"
+                };
+
+                device ozw_device4 = new device
+                {
+                    node_id = 4,
+                    device_type_id = 5,
+                    current_status = "Unlocked",
+                    friendly_name = "Doorlock Sample"
                 };
 
                 lock(context)
                 {
-                    context.devices.AddObject(ozw_device);
+                    zvsEntityControl.DeviceList.Add(ozw_device);
+                    zvsEntityControl.DeviceList.Add(ozw_device1);
+                    zvsEntityControl.DeviceList.Add(ozw_device2);
+                    zvsEntityControl.DeviceList.Add(ozw_device3);
+                    zvsEntityControl.DeviceList.Add(ozw_device4);
                     context.SaveChanges();
-
-                    //zvsEntityControl.CallonSaveChanges(null,
-                    //  new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
-                    //   { 
-                    //       zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
-                    //   },
-                    //  zvsEntityControl.onSaveChangesEventArgs.ChangeType.AddRemove);
                 }
             }
 
@@ -222,6 +254,22 @@ namespace zVirtualScenes_WPF
             GroupEditor groupEditor = new GroupEditor();
             groupEditor.Owner = this;
             groupEditor.Show();
+        }
+
+        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.GetType() == typeof(PluginManagerWindow))
+                {
+                    window.Activate();
+                    return;
+                }
+            }
+
+            PluginManagerWindow new_window = new PluginManagerWindow();
+            new_window.Owner = this;
+            new_window.Show();
         }
 
 

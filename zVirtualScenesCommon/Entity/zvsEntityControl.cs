@@ -5,6 +5,7 @@ using System.Text;
 using zVirtualScenesCommon.Util;
 using System.Data.EntityClient;
 using System.IO;
+using System.ComponentModel;
 
 namespace zVirtualScenesCommon.Entity
 {
@@ -13,6 +14,7 @@ namespace zVirtualScenesCommon.Entity
         //Until EF5 is released this is the only decent way to use the built-in observables and inotify interfaces
         //without doing your own context syncing
         public static zvsEntities2 SharedContext = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
+        public static IBindingList DeviceList = ((IListSource)SharedContext.devices).GetList() as IBindingList;
 
         public static string GetDBPath
         {

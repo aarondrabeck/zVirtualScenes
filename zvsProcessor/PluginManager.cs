@@ -33,7 +33,7 @@ namespace zvsProcessor
             {
                 name = "REPOLL_ME",
                 friendly_name = "Re-poll Device",
-                arg_data_type = (int)Data_Types.intEGER,
+                arg_data_type = (int)Data_Types.INTEGER,
                 show_on_dynamic_obj_list = false,
                 description = "This will force a re-poll on an object."
             });
@@ -69,7 +69,7 @@ namespace zvsProcessor
             {
                 name = "TIMEDELAY",
                 friendly_name = "Scene Time Delay (sec)",
-                arg_data_type = (int)Data_Types.intEGER,
+                arg_data_type = (int)Data_Types.INTEGER,
                 show_on_dynamic_obj_list = false,
                 description = "Pauses a scene execution for x seconds."
             });

@@ -40,7 +40,7 @@ namespace LightSwitchPlugin
                 name = "PORT",
                 friendly_name = "Port",
                 value = (1337).ToString(),
-                value_data_type = (int)Data_Types.intEGER,
+                value_data_type = (int)Data_Types.INTEGER,
                 description = "LightSwitch will listen for connections on this port."
             });
 
@@ -49,7 +49,7 @@ namespace LightSwitchPlugin
                 name = "MAXCONN",
                 friendly_name = "Max Conn.",
                 value = (200).ToString(),
-                value_data_type = (int)Data_Types.intEGER,
+                value_data_type = (int)Data_Types.INTEGER,
                 description = "The maximum number of connections allowed."
             });
 

@@ -126,7 +126,7 @@ namespace zVirtualScenesCommon.Entity
                                         case Data_Types.SHORT:
                                         case Data_Types.STRING:
                                         case Data_Types.LIST:
-                                        case Data_Types.intEGER:
+                                        case Data_Types.INTEGER:
                                         case Data_Types.DECIMAL:
                                         case Data_Types.BYTE:
                                         case Data_Types.BOOL:
@@ -147,7 +147,7 @@ namespace zVirtualScenesCommon.Entity
                                         case Data_Types.SHORT:
                                         case Data_Types.STRING:
                                         case Data_Types.LIST:
-                                        case Data_Types.intEGER:
+                                        case Data_Types.INTEGER:
                                         case Data_Types.DECIMAL:
                                         case Data_Types.BYTE:
                                         case Data_Types.BOOL:

@@ -165,7 +165,7 @@ namespace zVirtualScenesAPI
                     
                 }
                 else
-                    WriteToLog(Urgency.WARNING, string.Format("Device value change event on '{0}' occured but could not find a device value with id {1} in database.", dv.label_name, dv.value_id));
+                    WriteToLog(Urgency.WARNING, string.Format("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", dv.label_name, dv.value_id));
             }
         }
         
@@ -227,24 +227,7 @@ namespace zVirtualScenesAPI
             }
         }
 
-        //public void DefineDevice(device dt)
-        //{
-        //    plugin pl = zvsEntityControl.zvsContext.plugins.FirstOrDefault(p => p.name == this._name);
-            
-        //    if (pl != null)
-        //    {
-        //        device existing_device = zvsEntityControl.zvsContext.devices.FirstOrDefault(d => d.node_id == dt.node_id && d.device_types.plugin.name == pl.name);
-
-        //        if (existing_device == null)
-        //        {
-        //            zvsEntityControl.zvsContext.devices.AddObject(dt);
-        //            zvsEntityControl.zvsContext.SaveChanges();                    
-        //        }                    
-        //    }
-            
-        //}               
-
-        public IQueryable<device> GetDevices(zvsEntities2 db)
+        public IQueryable<device> GetMyPluginsDevices(zvsEntities2 db)
         {            
             plugin pl = db.plugins.FirstOrDefault(p => p.name == this._name);
             if (pl != null)

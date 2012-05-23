@@ -87,10 +87,10 @@
     </Compile>
     <Compile Include="Entity\zvsEntityControl.cs" />
     <Compile Include="Entity\scene.cs" />
-    <Compile Include="Entity\zvsModel1.Designer.cs">
-      <DependentUpon>zvsModel.edmx</DependentUpon>
-      <DesignTime>True</DesignTime>
+    <Compile Include="Entity\zvsModel.Designer.cs">
       <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>zvsModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="Urgency.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -107,6 +107,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
+    <EntityDeploy Include="Entity\zvsModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>zvsModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities2.datasource" />
     <None Include="Properties\DataSources\zvsEntities.datasource" />
     <None Include="Properties\Settings.settings">
@@ -140,12 +144,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <EntityDeploy Include="Entity\zvsModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>zvsModel1.Designer.cs</LastGenOutput>
-    </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
     <Content Include="zvsDatabase.sdf">

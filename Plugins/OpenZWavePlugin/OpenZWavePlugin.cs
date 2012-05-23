@@ -27,6 +27,7 @@ namespace OpenZWavePlugin
     [Export(typeof(Plugin))]
     public class OpenZWavePlugin : Plugin
     {
+        private zvsEntities2 context = zvsEntityControl.SharedContext;
         private ZWManager m_manager = null;
         private ZWOptions m_options = null;
         ZWNotification m_notification = null;
@@ -161,7 +162,7 @@ namespace OpenZWavePlugin
                 name = "POLLint",
                 friendly_name = "Polling interval",
                 value = (360).ToString(),
-                value_data_type = (int)Data_Types.intEGER,
+                value_data_type = (int)Data_Types.INTEGER,
                 description = "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. "
             });
 
@@ -184,7 +185,7 @@ namespace OpenZWavePlugin
             device_types switch_dt = new device_types { name = "SWITCH", friendly_name = "OpenZWave Binary", show_in_list = true };
             switch_dt.device_type_commands.Add(new device_type_commands { name = "TURNON", friendly_name = "Turn On", arg_data_type = (int)Data_Types.NONE, description = "Activates a switch." });
             switch_dt.device_type_commands.Add(new device_type_commands { name = "TURNOFF", friendly_name = "Turn Off", arg_data_type = (int)Data_Types.NONE, description = "Deactivates a switch." });
-            switch_dt.device_type_commands.Add(new device_type_commands { name = "MOMENTARY", friendly_name = "Turn On for X milliseconds", arg_data_type = (int)Data_Types.intEGER, description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
+            switch_dt.device_type_commands.Add(new device_type_commands { name = "MOMENTARY", friendly_name = "Turn On for X milliseconds", arg_data_type = (int)Data_Types.INTEGER, description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
             DefineOrUpdateDeviceType(switch_dt);
 
             //Dimmer Type Devices
@@ -502,7 +503,7 @@ namespace OpenZWavePlugin
                                     m_manager.SetValue(v.ValueID, cmd.arg);
                             return true;
                         }
-                    case Data_Types.intEGER:
+                    case Data_Types.INTEGER:
                         {
                             int i = 0;
                             int.TryParse(cmd.arg, out i);
@@ -598,7 +599,7 @@ namespace OpenZWavePlugin
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                         {
-                            device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+                            device d = GetMyPluginsDevices(db).FirstOrDefault(o => o.node_id == node.ID);
                             if (d != null)
                             {
                                 ZWValueID vid = m_notification.GetValueID();
@@ -652,7 +653,7 @@ namespace OpenZWavePlugin
                                             pType = Data_Types.DECIMAL;
                                             break;
                                         case ZWValueID.ValueType.Int:
-                                            pType = Data_Types.intEGER;
+                                            pType = Data_Types.INTEGER;
                                             break;
                                         case ZWValueID.ValueType.String:
                                             pType = Data_Types.STRING;
@@ -753,10 +754,9 @@ namespace OpenZWavePlugin
 
                         if (verbosity > 4)
                             WriteToLog(Urgency.INFO, "[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
-                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                        lock (context)
                         {
-                            device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
-
+                            device d = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == node.ID);
                             if (d != null)
                             {
                                 // d.last_heard_from = DateTime.Now;
@@ -800,7 +800,7 @@ namespace OpenZWavePlugin
 
                                 if (FinishedInitialPoll && EnableDimmerRepoll)
                                 {
-                                    if (d.device_types != null && d.device_types == GetDeviceType("DIMMER", db))
+                                    if (d.device_types != null && d.device_types == GetDeviceType("DIMMER", context))
                                     {
                                         switch (value.Label)
                                         {
@@ -841,6 +841,35 @@ namespace OpenZWavePlugin
                                                 }
                                                 break;
                                         }
+                                    }
+                                }
+
+                                //Update Current Status Field
+                                if (d.device_types != null && d.device_types == GetDeviceType("THERMOSTAT", context))
+                                {
+                                    if (value.Label == "Temperature")
+                                        d.current_status = data;
+
+                                    context.SaveChanges();
+                                }
+                                else if (d.device_types != null && d.device_types == GetDeviceType("SWITCH", context))
+                                {
+                                    if (value.Label == "Basic")
+                                    {
+                                        int level = 0;
+                                        if (int.TryParse(data, out level))
+                                        {
+                                            d.current_status = level > 0 ? "On" : "Off";
+                                            context.SaveChanges();
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    if (value.Label == "Basic")
+                                    {
+                                        d.current_status = data;
+                                        context.SaveChanges();
                                     }
                                 }
 
@@ -925,7 +954,7 @@ namespace OpenZWavePlugin
 
                 case ZWNotification.Type.NodeProtocolInfo:
                     {
-                        using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                        lock (context)
                         {
                             Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                             if (node != null)
@@ -949,7 +978,7 @@ namespace OpenZWavePlugin
                                     case "Binary Scene Switch":
                                     case "Binary Toggle Remote Switch":
                                         deviceName = "OpenZWave Switch " + node.ID;
-                                        device_type = GetDeviceType("SWITCH", db);
+                                        device_type = GetDeviceType("SWITCH", context);
                                         break;
                                     case "Multilevel Toggle Remote Switch":
                                     case "Multilevel Remote Switch":
@@ -958,14 +987,14 @@ namespace OpenZWavePlugin
                                     case "Multilevel Power Switch":
                                     case "Multilevel Scene Switch":
                                         deviceName = "OpenZWave Dimmer " + node.ID;
-                                        device_type = GetDeviceType("DIMMER", db);
+                                        device_type = GetDeviceType("DIMMER", context);
                                         break;
                                     case "Multiposition Motor":
                                     case "Motor Control Class A":
                                     case "Motor Control Class B":
                                     case "Motor Control Class C":
                                         deviceName = "Variable Motor Control " + node.ID;
-                                        device_type = GetDeviceType("DIMMER", db);
+                                        device_type = GetDeviceType("DIMMER", context);
                                         break;
                                     case "General Thermostat V2":
                                     case "Heating Thermostat":
@@ -975,7 +1004,7 @@ namespace OpenZWavePlugin
                                     case "Setback Thermostat":
                                     case "Thermostat":
                                         deviceName = "OpenZWave Thermostat " + node.ID;
-                                        device_type = GetDeviceType("THERMOSTAT", db);
+                                        device_type = GetDeviceType("THERMOSTAT", context);
                                         break;
                                     case "Remote Controller":
                                     case "Static PC Controller":
@@ -985,14 +1014,14 @@ namespace OpenZWavePlugin
                                     case "Static Scene Controller":
                                     case "Static Installer Tool":
                                         deviceName = "OpenZWave Controller " + node.ID;
-                                        device_type = GetDeviceType("CONTROLLER", db);
+                                        device_type = GetDeviceType("CONTROLLER", context);
                                         break;
                                     case "Secure Keypad Door Lock":
                                     case "Advanced Door Lock":
                                     case "Door Lock":
                                     case "Entry Control":
                                         deviceName = "OpenZWave Door Lock " + node.ID;
-                                        device_type = GetDeviceType("DOORLOCK", db);
+                                        device_type = GetDeviceType("DOORLOCK", context);
                                         break;
                                     case "Alarm Sensor":
                                     case "Basic Routing Alarm Sensor":
@@ -1008,7 +1037,7 @@ namespace OpenZWavePlugin
                                     case "Routing Binary Sensor":
                                     case "Routing Multilevel Sensor":
                                         deviceName = "OpenZWave Sensor " + node.ID;
-                                        device_type = GetDeviceType("SENSOR", db);
+                                        device_type = GetDeviceType("SENSOR", context);
                                         break;
                                     default:
                                         {
@@ -1020,8 +1049,8 @@ namespace OpenZWavePlugin
                                 if (device_type != null)
                                 {
 
-                                    device ozw_device = GetDevices(db).FirstOrDefault(d => d.node_id == node.ID);
-                                    //If we dont already have the device
+                                    device ozw_device = GetMyPluginsDevices(context).FirstOrDefault(d => d.node_id == node.ID);
+                                    //If we don't already have the device
                                     if (ozw_device == null)
                                     {
                                         ozw_device = new device
@@ -1031,17 +1060,9 @@ namespace OpenZWavePlugin
                                             friendly_name = deviceName
                                         };
 
-                                        db.devices.AddObject(ozw_device);
-                                        db.SaveChanges();
-
-                                        zvsEntityControl.CallonSaveChanges(null,
-                      new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
-                       { 
-                           zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
-                       },
-                      zvsEntityControl.onSaveChangesEventArgs.ChangeType.AddRemove);
+                                        zvsEntityControl.DeviceList.Add(ozw_device);
+                                        context.SaveChanges();                                        
                                     }
-
 
                                     #region Last Event Value Storeage
                                     //Node event value placeholder                               
@@ -1087,7 +1108,7 @@ namespace OpenZWavePlugin
                                 node.Location = m_manager.GetNodeLocation(m_homeId, node.ID);
                                 node.Name = m_manager.GetNodeName(m_homeId, node.ID);
 
-                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+                                device d = GetMyPluginsDevices(db).FirstOrDefault(o => o.node_id == node.ID);
                                 if (d != null)
                                 {
                                     //lets store the manufacturer name and product name in the values table.   
@@ -1161,7 +1182,7 @@ namespace OpenZWavePlugin
                             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                             {
                                 #region Last Event Value Storeage
-                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+                                device d = GetMyPluginsDevices(db).FirstOrDefault(o => o.node_id == node.ID);
                                 if (d != null)
                                 {
                                     //Node event value placeholder
@@ -1225,7 +1246,7 @@ namespace OpenZWavePlugin
                         {
                             using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
                             {
-                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == node.ID);
+                                device d = GetMyPluginsDevices(db).FirstOrDefault(o => o.node_id == node.ID);
                                 if (d != null)
                                 {
                                     d.last_heard_from = DateTime.Now;
@@ -1254,7 +1275,7 @@ namespace OpenZWavePlugin
                         {
                             foreach (Node n in m_nodeList)
                             {
-                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == n.ID);
+                                device d = GetMyPluginsDevices(db).FirstOrDefault(o => o.node_id == n.ID);
 
                                 if (d != null)
                                 {
@@ -1277,7 +1298,7 @@ namespace OpenZWavePlugin
                         {
                             foreach (Node n in m_nodeList)
                             {
-                                device d = GetDevices(db).FirstOrDefault(o => o.node_id == n.ID);
+                                device d = GetMyPluginsDevices(db).FirstOrDefault(o => o.node_id == n.ID);
 
                                 if (d != null)
                                 {
