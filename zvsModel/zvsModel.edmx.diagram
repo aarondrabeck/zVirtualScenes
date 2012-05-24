@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="1f30fa8945c94820833b507f154b5012" Name="Diagram1">
+        <EntityTypeShape EntityType="zvsLocalDBModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.builtin_command_que" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.builtin_commands" Width="1.5" PointX="0.75" PointY="1.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.db_info" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_command_options" Width="1.5" PointX="9.75" PointY="17" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_command_que" Width="1.5" PointX="9.75" PointY="13.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_commands" Width="1.5" PointX="7.5" PointY="16.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_property_options" Width="1.5" PointX="10.5" PointY="28" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_property_values" Width="1.5" PointX="10.5" PointY="19.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_propertys" Width="1.5" PointX="8.25" PointY="27.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_type_command_options" Width="1.5" PointX="7.5" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_type_command_que" Width="1.5" PointX="7.5" PointY="12.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_type_commands" Width="1.5" PointX="5.25" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_types" Width="1.5" PointX="3" PointY="13.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_value_triggers" Width="1.5" PointX="9.75" PointY="23.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_values" Width="1.5" PointX="7.5" PointY="23.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device" Width="1.5" PointX="5.25" PointY="15.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.group_devices" Width="1.5" PointX="12.5" PointY="16" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.group" Width="1.5" PointX="10.25" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.plugin_setting_options" Width="1.5" PointX="5.25" PointY="22" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.plugin_settings" Width="1.5" PointX="3" PointY="21.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.plugin" Width="1.5" PointX="0.75" PointY="15.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.program_options" Width="1.5" PointX="5.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.scene_commands" Width="1.5" PointX="12.5" PointY="11.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.scene_property" Width="1.5" PointX="10.25" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.scene_property_option" Width="1.5" PointX="12.5" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.scene_property_value" Width="1.5" PointX="12.5" PointY="7.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.scene" Width="1.5" PointX="10.25" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.scheduled_tasks" Width="1.5" PointX="14.75" PointY="0.75" IsExpanded="true" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__builtin_command_options__0000000000000150" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__builtin_command_que__0000000000000140" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_command_options__00000000000001DF" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_command_que__00000000000001F1" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_command_que__00000000000001F5" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_commands__00000000000001CF" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_property_options__0000000000000215" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_property_values__0000000000000227" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_property_values__000000000000022B" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_type_command_options__0000000000000262" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_type_command_que__0000000000000274" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_type_command_que__0000000000000278" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_type_commands__0000000000000252" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_types__0000000000000189" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__devices__00000000000001A5" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_value_triggers__00000000000002CD" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_value_triggers__00000000000002D1" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__device_values__00000000000002AE" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__group_devices__00000000000002EF" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__scene_commands__0000000000000345" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__group_devices__00000000000002EB" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__plugin_setting_options__000000000000031A" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__plugin_settings__000000000000030A" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__scene_commands__0000000000000341" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__scene_property_option__000000000000036A" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__scene_property_value__000000000000037F" ManuallyRouted="false" />
+        <AssociationConnector Association="zvsLocalDBModel.FK__scene_property_value__0000000000000383" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

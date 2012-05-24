@@ -45,9 +45,14 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Addin.Contract" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Runtime.Serialization" />
@@ -154,9 +159,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
+    <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities2.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\Settings.settings">
@@ -173,6 +177,10 @@
     <ProjectReference Include="..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
       <Project>{FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00}</Project>
       <Name>zVirtualScenesCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\zvsModel\zvsModel.csproj">
+      <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
+      <Name>zvsModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\zvsProcessor\zvsProcessor.csproj">
       <Project>{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}</Project>

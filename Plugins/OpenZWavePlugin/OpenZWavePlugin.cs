@@ -8,12 +8,11 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Linq;
 using zVirtualScenesAPI;
-
 using OpenZWavePlugin.Forms;
+
 using zVirtualScenesCommon.Entity;
+
 using zVirtualScenesCommon;
-
-
 using System.Drawing;
 using System.Text;
 using zVirtualScenesCommon.Util;

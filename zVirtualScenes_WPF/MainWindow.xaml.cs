@@ -16,10 +16,10 @@ using zVirtualScenesCommon;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using zvsProcessor;
-using zVirtualScenesCommon.Entity;
 using zVirtualScenes_WPF.DeviceControls;
 using zVirtualScenes_WPF.Groups;
 using zVirtualScenes_WPF.PluginManager;
+using zvsModel;
 
 namespace zVirtualScenes_WPF
 {    
@@ -31,7 +31,7 @@ namespace zVirtualScenes_WPF
         public ObservableCollection<LogItem> Log = new ObservableCollection<LogItem>();
         public int MaxLogLines = 1000;
         public zvsManager manager;
-        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;  
+        private zvsLocalDBEntities context = new zvsLocalDBEntities();
         public MainWindow()
         {
             InitializeComponent();
@@ -81,55 +81,67 @@ namespace zVirtualScenes_WPF
         {
             if (e.Key == Key.F11)
             {
+                plugin p = new plugin { name = "TEST", friendly_name = "Test plugin", description = "None" };
+                context.plugins.Add(p);
+
+                device_types controller_dt = new device_types { plugin = p,  name = "CONTROLLER", friendly_name = "OpenZWave Controller", show_in_list = true };
+                context.device_types.Add(controller_dt);
+
                 device ozw_device = new device
                 {
                     node_id = 1,
-                    device_type_id = 1,
+                    device_types = controller_dt,
                     current_status = "Active",
                     friendly_name = "Sample Controller"
                 };
+                context.devices.Add(ozw_device);
 
-                device ozw_device1 = new device
-                {
-                    node_id = 2,
-                    device_type_id = 2,
-                    current_status = "On",
-                    friendly_name = "Switch Sample"
-                };
+                context.SaveChanges();
+                //device ozw_device1 = new device
+                //{
+                //    node_id = 2,
+                //    device_type_id = 2,
+                //    current_status = "On",
+                //    friendly_name = "Switch Sample"
+                //};
 
-                device ozw_device2 = new device
-                {
-                    node_id = 3,
-                    device_type_id = 3,
-                    current_status = "25",
-                    friendly_name = "Dimmer Sample"
-                };
+                //device ozw_device2 = new device
+                //{
+                //    node_id = 3,
+                //    device_type_id = 3,
+                //    current_status = "25",
+                //    friendly_name = "Dimmer Sample"
+                //};
 
 
-                device ozw_device3 = new device
-                {
-                    node_id = 99,
-                    device_type_id = 4,
-                    current_status = "75",
-                    friendly_name = "Thermo Sample"
-                };
+                //device ozw_device3 = new device
+                //{
+                //    node_id = 99,
+                //    device_type_id = 4,
+                //    current_status = "75",
+                //    friendly_name = "Thermo Sample"
+                //};
 
-                device ozw_device4 = new device
-                {
-                    node_id = 4,
-                    device_type_id = 5,
-                    current_status = "Unlocked",
-                    friendly_name = "Doorlock Sample"
-                };
+                //device ozw_device4 = new device
+                //{
+                //    node_id = 4,
+                //    device_type_id = 5,
+                //    current_status = "Unlocked",
+                //    friendly_name = "Doorlock Sample"
+                //};
 
                 lock(context)
                 {
-                    zvsEntityControl.Objects.DeviceList.Add(ozw_device);
-                    zvsEntityControl.Objects.DeviceList.Add(ozw_device1);
-                    zvsEntityControl.Objects.DeviceList.Add(ozw_device2);
-                    zvsEntityControl.Objects.DeviceList.Add(ozw_device3);
-                    zvsEntityControl.Objects.DeviceList.Add(ozw_device4);
-                    context.SaveChanges();
+                   
+                    
+
+                   
+                    
+                    //context.devices.Add(ozw_device1);
+                    //context.devices.Add(ozw_device2);
+                    //context.devices.Add(ozw_device3);
+                    //context.devices.Add(ozw_device4);
+                   
                 }
             }
 

@@ -1,0 +1,6 @@
+D:\SVN Local\other\zvirtualscenes\output\zvsLocalDB.sdf
+D:\SVN Local\other\zvirtualscenes\output\zvsModel.dll.config
+D:\SVN Local\other\zvirtualscenes\output\zvsModel.dll
+D:\SVN Local\other\zvirtualscenes\output\zvsModel.pdb
+D:\SVN Local\other\zvirtualscenes\zvsModel\obj\Debug\zvsModel.dll
+D:\SVN Local\other\zvirtualscenes\zvsModel\obj\Debug\zvsModel.pdb

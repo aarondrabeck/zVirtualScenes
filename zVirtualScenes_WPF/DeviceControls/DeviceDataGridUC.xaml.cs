@@ -11,10 +11,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesCommon.Entity;
-using System.Data.Objects;
+using zVirtualScenesCommon;
 using System.Windows.Media.Media3D;
 using System.ComponentModel;
+using zvsModel;
+
 
 namespace zVirtualScenes_WPF.DeviceControls
 {
@@ -29,8 +30,10 @@ namespace zVirtualScenes_WPF.DeviceControls
             InitializeComponent();
         }
 
-        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
-        private IBindingList MasterDeviceList = zvsEntityControl.Objects.DeviceList;
+        private zvsLocalDBEntities context = new zvsLocalDBEntities();
+
+        //private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
+       // private IBindingList MasterDeviceList = zvsEntityControl.Objects.DeviceList;
 
         private bool _AdvancedDisplay = true;
         public bool AdvancedDisplay
@@ -67,7 +70,8 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                myCollectionViewSource.Source = MasterDeviceList; 
+
+                myCollectionViewSource.Source = context.devices.Local;
             }
         }
 
@@ -115,7 +119,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                                 {
                                     device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
                                     if (d != null)
-                                        context.devices.DeleteObject(d);
+                                        context.devices.Remove(d);
                                 }
 
                                 context.SaveChanges();
@@ -144,7 +148,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                     {
                         device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
                         if (d != null)
-                            context.devices.DeleteObject(d);
+                            context.devices.Remove(d);
                     }
                     context.SaveChanges();
                 }
