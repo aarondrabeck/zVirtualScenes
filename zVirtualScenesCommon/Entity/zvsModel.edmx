@@ -1,40 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
   <!-- EF Runtime content -->
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="zvsModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.4.0" ProviderManifestToken="4.0" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+    <Schema Namespace="zvsModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.4.0" ProviderManifestToken="4.0" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityContainer Name="zvsModelStoreContainer">
-          <EntitySet Name="builtin_command_options" EntityType="zvsModel.Store.builtin_command_options" store:Type="Tables" />
-          <EntitySet Name="builtin_command_que" EntityType="zvsModel.Store.builtin_command_que" store:Type="Tables" />
-          <EntitySet Name="builtin_commands" EntityType="zvsModel.Store.builtin_commands" store:Type="Tables" />
-          <EntitySet Name="db_info" EntityType="zvsModel.Store.db_info" store:Type="Tables" />
-          <EntitySet Name="device_command_options" EntityType="zvsModel.Store.device_command_options" store:Type="Tables" />
-          <EntitySet Name="device_command_que" EntityType="zvsModel.Store.device_command_que" store:Type="Tables" />
-          <EntitySet Name="device_commands" EntityType="zvsModel.Store.device_commands" store:Type="Tables" />
-          <EntitySet Name="device_property_options" EntityType="zvsModel.Store.device_property_options" store:Type="Tables" />
-          <EntitySet Name="device_property_values" EntityType="zvsModel.Store.device_property_values" store:Type="Tables" />
-          <EntitySet Name="device_propertys" EntityType="zvsModel.Store.device_propertys" store:Type="Tables" />
-          <EntitySet Name="device_type_command_options" EntityType="zvsModel.Store.device_type_command_options" store:Type="Tables" />
-          <EntitySet Name="device_type_command_que" EntityType="zvsModel.Store.device_type_command_que" store:Type="Tables" />
-          <EntitySet Name="device_type_commands" EntityType="zvsModel.Store.device_type_commands" store:Type="Tables" />
-          <EntitySet Name="device_types" EntityType="zvsModel.Store.device_types" store:Type="Tables" />
-          <EntitySet Name="device_value_triggers" EntityType="zvsModel.Store.device_value_triggers" store:Type="Tables" />
-          <EntitySet Name="device_values" EntityType="zvsModel.Store.device_values" store:Type="Tables" />
-          <EntitySet Name="devices" EntityType="zvsModel.Store.devices" store:Type="Tables" />
-          <EntitySet Name="group_devices" EntityType="zvsModel.Store.group_devices" store:Type="Tables" />
-          <EntitySet Name="groups" EntityType="zvsModel.Store.groups" store:Type="Tables" />
-          <EntitySet Name="plugin_setting_options" EntityType="zvsModel.Store.plugin_setting_options" store:Type="Tables" />
-          <EntitySet Name="plugin_settings" EntityType="zvsModel.Store.plugin_settings" store:Type="Tables" />
-          <EntitySet Name="plugins" EntityType="zvsModel.Store.plugins" store:Type="Tables" />
-          <EntitySet Name="program_options" EntityType="zvsModel.Store.program_options" store:Type="Tables" />
-          <EntitySet Name="scene_commands" EntityType="zvsModel.Store.scene_commands" store:Type="Tables" />
-          <EntitySet Name="scene_property" EntityType="zvsModel.Store.scene_property" store:Type="Tables" />
-          <EntitySet Name="scene_property_option" EntityType="zvsModel.Store.scene_property_option" store:Type="Tables" />
-          <EntitySet Name="scene_property_value" EntityType="zvsModel.Store.scene_property_value" store:Type="Tables" />
-          <EntitySet Name="scenes" EntityType="zvsModel.Store.scenes" store:Type="Tables" />
-          <EntitySet Name="scheduled_tasks" EntityType="zvsModel.Store.scheduled_tasks" store:Type="Tables" />
+          <EntitySet Name="builtin_command_options" EntityType="zvsModel.Store.builtin_command_options" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="builtin_command_que" EntityType="zvsModel.Store.builtin_command_que" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="builtin_commands" EntityType="zvsModel.Store.builtin_commands" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="db_info" EntityType="zvsModel.Store.db_info" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_command_options" EntityType="zvsModel.Store.device_command_options" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_command_que" EntityType="zvsModel.Store.device_command_que" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_commands" EntityType="zvsModel.Store.device_commands" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_property_options" EntityType="zvsModel.Store.device_property_options" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_property_values" EntityType="zvsModel.Store.device_property_values" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_propertys" EntityType="zvsModel.Store.device_propertys" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_type_command_options" EntityType="zvsModel.Store.device_type_command_options" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_type_command_que" EntityType="zvsModel.Store.device_type_command_que" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_type_commands" EntityType="zvsModel.Store.device_type_commands" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_types" EntityType="zvsModel.Store.device_types" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_value_triggers" EntityType="zvsModel.Store.device_value_triggers" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="device_values" EntityType="zvsModel.Store.device_values" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="devices" EntityType="zvsModel.Store.devices" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="group_devices" EntityType="zvsModel.Store.group_devices" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="groups" EntityType="zvsModel.Store.groups" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="plugin_setting_options" EntityType="zvsModel.Store.plugin_setting_options" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="plugin_settings" EntityType="zvsModel.Store.plugin_settings" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="plugins" EntityType="zvsModel.Store.plugins" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="program_options" EntityType="zvsModel.Store.program_options" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="scene_commands" EntityType="zvsModel.Store.scene_commands" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="scene_property" EntityType="zvsModel.Store.scene_property" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="scene_property_option" EntityType="zvsModel.Store.scene_property_option" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="scene_property_value" EntityType="zvsModel.Store.scene_property_value" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="scenes" EntityType="zvsModel.Store.scenes" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
+          <EntitySet Name="scheduled_tasks" EntityType="zvsModel.Store.scheduled_tasks" store:Type="Tables" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" />
           <AssociationSet Name="FK__builtin_command_options__00000000000002A5" Association="zvsModel.Store.FK__builtin_command_options__00000000000002A5">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_options" EntitySet="builtin_command_options" />
@@ -849,8 +849,8 @@
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
-      <Schema Namespace="zvsModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
-        <EntityContainer Name="zvsEntities2" annotation:LazyLoadingEnabled="true">
+      <Schema Namespace="zvsModel" Alias="Self" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="zvsEntities2" annotation:LazyLoadingEnabled="true" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
           <EntitySet Name="builtin_command_options" EntityType="zvsModel.builtin_command_options" />
           <EntitySet Name="builtin_commands" EntityType="zvsModel.builtin_commands" />
           <EntitySet Name="device_command_options" EntityType="zvsModel.device_command_options" />
@@ -993,7 +993,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="builtin_command_id" Nullable="false" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="builtin_commands" Relationship="zvsModel.FK_builtin_command_options_0" FromRole="builtin_command_options" ToRole="builtin_commands" />
@@ -1002,7 +1002,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="arg_data_type" Nullable="false" />
@@ -1019,7 +1019,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_command_id" Nullable="false" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="device_commands" Relationship="zvsModel.FK_device_command_options_0" FromRole="device_command_options" ToRole="device_commands" />
@@ -1028,7 +1028,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_id" Nullable="false" />
           <Property Type="Int32" Name="device_command_id" Nullable="false" />
           <Property Type="String" Name="arg" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1039,7 +1039,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_id" Nullable="false" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1057,7 +1057,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_property_id" Nullable="false" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="device_propertys" Relationship="zvsModel.FK_device_property_options_0" FromRole="device_property_options" ToRole="device_propertys" />
@@ -1066,7 +1066,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_id" Nullable="false" />
           <Property Type="Int32" Name="device_property_id" Nullable="false" />
           <Property Type="String" Name="value" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1077,7 +1077,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="default_value" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1089,7 +1089,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_type_command_id" Nullable="false" />
           <Property Type="Int32" Name="device_id" Nullable="false" />
           <Property Type="String" Name="arg" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1100,7 +1100,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_type_id" Nullable="false" />
           <Property Type="String" Name="description" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1118,7 +1118,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="plugin_id" Nullable="false" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="Boolean" Name="show_in_list" Nullable="false" />
@@ -1131,7 +1131,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_id" Nullable="false" />
           <Property Type="String" Name="value_id" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="label_name" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1148,7 +1148,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_type_id" Nullable="false" />
           <Property Type="Int32" Name="node_id" Nullable="false" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1168,7 +1168,7 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Type="Int32" Name="device_id" Nullable="false" />
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="group_id" Nullable="false" />
           <NavigationProperty Name="device" Relationship="zvsModel.FK_group_devices_0" FromRole="group_devices" ToRole="device" />
           <NavigationProperty Name="group" Relationship="zvsModel.FK_group_devices_1" FromRole="group_devices" ToRole="group" />
@@ -1177,7 +1177,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="group_devices" Relationship="zvsModel.FK_group_devices_1" FromRole="group" ToRole="group_devices" />
         </EntityType>
@@ -1185,7 +1185,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="plugin_id" Nullable="false" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="value" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
@@ -1199,7 +1199,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="Boolean" Name="enabled" Nullable="false" />
@@ -1211,7 +1211,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="scene_id" Nullable="false" />
           <Property Type="Int32" Name="device_id" />
           <Property Type="Int32" Name="command_type_id" Nullable="false" />
@@ -1225,7 +1225,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="defualt_value" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="value_data_type" Nullable="false" />
@@ -1238,7 +1238,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="friendly_name" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="sort_order" />
           <Property Type="Boolean" Name="is_running" Nullable="false" />
@@ -1283,10 +1283,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_command_que_1">
-          <End Type="zvsModel.device" Role="device" Multiplicity="1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="zvsModel.device_command_que" Role="device_command_que" Multiplicity="*" >
+          <End Type="zvsModel.device_command_que" Role="device_command_que" Multiplicity="*">
           </End>
           <ReferentialConstraint>
             <Principal Role="device">
@@ -1298,7 +1298,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_commands_0">
-          <End Type="zvsModel.device" Role="device" Multiplicity="1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.device_commands" Role="device_commands" Multiplicity="*" />
@@ -1324,7 +1324,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_property_values_0">
-          <End Type="zvsModel.device" Role="device" Multiplicity="1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.device_property_values" Role="device_property_values" Multiplicity="*" />
@@ -1350,10 +1350,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_type_command_que_0">
-          <End Type="zvsModel.device" Role="device" Multiplicity="1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="zvsModel.device_type_command_que" Role="device_type_command_que" Multiplicity="*" >
+          <End Type="zvsModel.device_type_command_que" Role="device_type_command_que" Multiplicity="*">
           </End>
           <ReferentialConstraint>
             <Principal Role="device">
@@ -1413,7 +1413,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_device_values_0">
-          <End Type="zvsModel.device" Role="device" Multiplicity="1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.device_values" Role="device_values" Multiplicity="*" />
@@ -1427,7 +1427,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_group_devices_0">
-          <End Type="zvsModel.device" Role="device" Multiplicity="1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.group_devices" Role="group_devices" Multiplicity="*" />
@@ -1441,10 +1441,10 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_scene_commands_0">
-          <End Type="zvsModel.device" Role="device" Multiplicity="0..1" >
+          <End Type="zvsModel.device" Role="device" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
-          <End Type="zvsModel.scene_commands" Role="scene_commands" Multiplicity="*" >
+          <End Type="zvsModel.scene_commands" Role="scene_commands" Multiplicity="*">
           </End>
           <ReferentialConstraint>
             <Principal Role="device">
@@ -1456,7 +1456,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_group_devices_1">
-          <End Type="zvsModel.group" Role="group" Multiplicity="1" >
+          <End Type="zvsModel.group" Role="group" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.group_devices" Role="group_devices" Multiplicity="*" />
@@ -1482,7 +1482,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_scene_commands_1">
-          <End Type="zvsModel.scene" Role="scene" Multiplicity="1" >
+          <End Type="zvsModel.scene" Role="scene" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.scene_commands" Role="scene_commands" Multiplicity="*" />
@@ -1499,7 +1499,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_value_id" Nullable="false" />
           <Property Type="Int32" Name="trigger_operator" />
           <Property Type="String" Name="trigger_value" MaxLength="255" FixedLength="false" Unicode="true" />
@@ -1539,7 +1539,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Type="Boolean" Name="Enabled" Nullable="false" />
           <Property Type="Int32" Name="Scene_id" Nullable="false" />
@@ -1595,7 +1595,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="info_name" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="info_value" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
@@ -1603,7 +1603,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="name" MaxLength="2147483647" FixedLength="false" Unicode="true" />
           <Property Type="String" Name="value" MaxLength="2147483647" FixedLength="false" Unicode="true" />
         </EntityType>
@@ -1611,7 +1611,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="scene_id" Nullable="false" />
           <Property Type="Int32" Name="scene_property_id" Nullable="false" />
           <Property Type="String" Name="value" MaxLength="1024" FixedLength="false" Unicode="true" />
@@ -1619,7 +1619,7 @@
           <NavigationProperty Name="scene" Relationship="zvsModel.FK_scene_property_value_0" FromRole="scene_property_value" ToRole="scene" />
         </EntityType>
         <Association Name="FK_scene_property_value_1">
-          <End Type="zvsModel.scene_property" Role="scene_property" Multiplicity="1" >
+          <End Type="zvsModel.scene_property" Role="scene_property" Multiplicity="1">
           </End>
           <End Type="zvsModel.scene_property_value" Role="scene_property_value" Multiplicity="*" />
           <ReferentialConstraint>
@@ -1632,7 +1632,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_scene_property_value_0">
-          <End Type="zvsModel.scene" Role="scene" Multiplicity="1" >
+          <End Type="zvsModel.scene" Role="scene" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Type="zvsModel.scene_property_value" Role="scene_property_value" Multiplicity="*" />
@@ -1649,7 +1649,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="scene_property_id" Nullable="false" />
           <Property Type="String" Name="options" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="scene_property" Relationship="zvsModel.FK__scene_property_option__0000000000000441" FromRole="scene_property_option1" ToRole="scene_property" />
@@ -1670,7 +1670,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="plugin_settings_id" Nullable="false" />
           <NavigationProperty Name="plugin_settings" Relationship="zvsModel.FK__plugin_setting_options__00000000000003D8" FromRole="plugin_setting_options" ToRole="plugin_settings" />
           <Property Type="String" Name="options" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
@@ -1691,7 +1691,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="Int32" Name="device_type_command_id" Nullable="false" />
           <Property Type="String" Name="options" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="device_type_commands" Relationship="zvsModel.FK__device_type_command_options__00000000000002A5" FromRole="device_type_command_options" ToRole="device_type_commands" />
@@ -1712,7 +1712,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" />
           <Property Type="String" Name="arg" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Type="Int32" Name="builtin_command_id" Nullable="false" />
           <NavigationProperty Name="builtin_commands" Relationship="zvsModel.FK__builtin_command_que__0000000000000140" FromRole="builtin_command_que" ToRole="builtin_commands" />
@@ -1733,7 +1733,7 @@
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
-      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="zvsModelStoreContainer" CdmEntityContainer="zvsEntities2">
           <EntitySetMapping Name="builtin_command_options">
             <EntityTypeMapping TypeName="zvsModel.builtin_command_options">
@@ -2107,7 +2107,7 @@
     </edmx:Mappings>
   </edmx:Runtime>
   <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
-  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <Connection>
       <DesignerInfoPropertySet>
         <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
@@ -2143,31 +2143,31 @@
         <EntityTypeShape EntityType="zvsModel.scene_commands" Width="1.5" PointX="12.5" PointY="11.375" Height="2.7494921874999818" />
         <EntityTypeShape EntityType="zvsModel.scene_property" Width="1.5" PointX="10.25" PointY="5.5" Height="2.5571907552083246" />
         <EntityTypeShape EntityType="zvsModel.scene" Width="1.5" PointX="10.25" PointY="9.625" Height="2.1725878906249818" />
-        <AssociationConnector Association="zvsModel.FK_builtin_command_options_0" >
+        <AssociationConnector Association="zvsModel.FK_builtin_command_options_0">
           <ConnectorPoint PointX="5.5" PointY="1.8939925130208337" />
           <ConnectorPoint PointX="4.5" PointY="1.8939925130208337" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_command_options_0" >
+        <AssociationConnector Association="zvsModel.FK_device_command_options_0">
           <ConnectorPoint PointX="9" PointY="17.768992513020834" />
           <ConnectorPoint PointX="9.3541666666666661" PointY="17.768992513020834" />
           <ConnectorPoint PointX="9.5208333333333339" PointY="17.768992513020834" />
           <ConnectorPoint PointX="9.75" PointY="17.768992513020834" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_command_que_0" >
+        <AssociationConnector Association="zvsModel.FK_device_command_que_0">
           <ConnectorPoint PointX="9" PointY="16" />
           <ConnectorPoint PointX="9.37857443490112" PointY="15.625" />
           <ConnectorPoint PointX="9.37857443490112" PointY="15.794013455723889" />
           <ConnectorPoint PointX="9.75" PointY="15.42258789062501" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_command_que_1" >
+        <AssociationConnector Association="zvsModel.FK_device_command_que_1">
           <ConnectorPoint PointX="6.75" PointY="15.259369303385412" />
           <ConnectorPoint PointX="9.75" PointY="15.259369303385412" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_commands_0" >
+        <AssociationConnector Association="zvsModel.FK_device_commands_0">
           <ConnectorPoint PointX="6.75" PointY="16.700814828534913" />
           <ConnectorPoint PointX="7.5" PointY="16.700814828534913" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_property_options_0" >
+        <AssociationConnector Association="zvsModel.FK_device_property_options_0">
           <ConnectorPoint PointX="8.625" PointY="7.4324446614583337" />
           <ConnectorPoint PointX="10" PointY="7.4324446614583337" />
           <ConnectorPoint PointX="10" PointY="12.75" />
@@ -2180,7 +2180,7 @@
           <ConnectorPoint PointX="11.25" PointY="27.5" />
           <ConnectorPoint PointX="11.25" PointY="27.875" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_property_values_0" >
+        <AssociationConnector Association="zvsModel.FK_device_property_values_0">
           <ConnectorPoint PointX="6.75" PointY="15.664418945312505" />
           <ConnectorPoint PointX="9.4248356119791712" PointY="15.664418945312505" />
           <ConnectorPoint PointX="9.591502278645839" PointY="15.664418945312505" />
@@ -2189,46 +2189,46 @@
           <ConnectorPoint PointX="11.6718725" PointY="15.664418945312505" />
           <ConnectorPoint PointX="11.6718725" PointY="19.625" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_property_values_1" >
+        <AssociationConnector Association="zvsModel.FK_device_property_values_1">
           <ConnectorPoint PointX="8.625" PointY="8.367290039062496" />
           <ConnectorPoint PointX="9.9166666666666661" PointY="8.367290039062496" />
           <ConnectorPoint PointX="10.083333333333334" PointY="8.367290039062496" />
           <ConnectorPoint PointX="11.90625" PointY="8.367290039062496" />
           <ConnectorPoint PointX="11.90625" PointY="19.625" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_type_command_que_0" >
+        <AssociationConnector Association="zvsModel.FK_device_type_command_que_0">
           <ConnectorPoint PointX="6.75" PointY="15" />
           <ConnectorPoint PointX="7.125" PointY="14.42258789062501" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_type_command_que_1" >
+        <AssociationConnector Association="zvsModel.FK_device_type_command_que_1">
           <ConnectorPoint PointX="5.125" PointY="10.374999500000001" />
           <ConnectorPoint PointX="5.875" PointY="10.374999500000001" />
           <ConnectorPoint PointX="5.875" PointY="10.912985026041667" />
           <ConnectorPoint PointX="8.0625" PointY="10.912985026041667" />
           <ConnectorPoint PointX="8.0625" PointY="12.25" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_type_commands_0" >
+        <AssociationConnector Association="zvsModel.FK_device_type_commands_0">
           <ConnectorPoint PointX="4.0625" PointY="13.375" />
           <ConnectorPoint PointX="4.0625" PointY="12.518697916666666" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_types_0" >
+        <AssociationConnector Association="zvsModel.FK_device_types_0">
           <ConnectorPoint PointX="2.25" PointY="15.528595377604162" />
           <ConnectorPoint PointX="3" PointY="15.528595377604162" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_devices_0" >
+        <AssociationConnector Association="zvsModel.FK_devices_0">
           <ConnectorPoint PointX="4.5" PointY="15.466095377604162" />
           <ConnectorPoint PointX="4.666666666666667" PointY="15.466095377604162" />
           <ConnectorPoint PointX="4.833333333333333" PointY="15.466095377604162" />
           <ConnectorPoint PointX="5.25" PointY="15.466095377604162" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_values_0" >
+        <AssociationConnector Association="zvsModel.FK_device_values_0">
           <ConnectorPoint PointX="6.75" PointY="17.737159088746619" />
           <ConnectorPoint PointX="7.25" PointY="17.737159088746619" />
           <ConnectorPoint PointX="7.25" PointY="19.768697916666667" />
           <ConnectorPoint PointX="8.3437495000000013" PointY="19.768697916666667" />
           <ConnectorPoint PointX="8.3437495000000013" PointY="23.25" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_group_devices_0" >
+        <AssociationConnector Association="zvsModel.FK_group_devices_0">
           <ConnectorPoint PointX="6.75" PointY="15.84375" />
           <ConnectorPoint PointX="9.0744060145421326" PointY="15.84375" />
           <ConnectorPoint PointX="9.2410726812088" PointY="15.84375" />
@@ -2240,7 +2240,7 @@
           <ConnectorPoint PointX="11.989583333333334" PointY="15.84375" />
           <ConnectorPoint PointX="12.5" PointY="15.84375" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_scene_commands_0" >
+        <AssociationConnector Association="zvsModel.FK_scene_commands_0">
           <ConnectorPoint PointX="5.9687475" PointY="15" />
           <ConnectorPoint PointX="5.9687475" PointY="12.119944661458334" />
           <ConnectorPoint PointX="7.979166666666667" PointY="12.119944661458334" />
@@ -2251,31 +2251,31 @@
           <ConnectorPoint PointX="11.989583333333334" PointY="12.119944661458334" />
           <ConnectorPoint PointX="12.5" PointY="12.119944661458334" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_group_devices_1" >
+        <AssociationConnector Association="zvsModel.FK_group_devices_1">
           <ConnectorPoint PointX="11.75" PointY="23.797841796874998" />
           <ConnectorPoint PointX="11.916666666666666" PointY="23.797841796874998" />
           <ConnectorPoint PointX="12.083333333333334" PointY="23.797841796874998" />
           <ConnectorPoint PointX="13.25" PointY="23.797841796874998" />
           <ConnectorPoint PointX="13.25" PointY="17.730286458333339" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_plugin_settings_0" >
+        <AssociationConnector Association="zvsModel.FK_plugin_settings_0">
           <ConnectorPoint PointX="1.5" PointY="17.489889322916667" />
           <ConnectorPoint PointX="1.5" PointY="22.499746093749998" />
           <ConnectorPoint PointX="3" PointY="22.499746093749998" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_scene_commands_1" >
+        <AssociationConnector Association="zvsModel.FK_scene_commands_1">
           <ConnectorPoint PointX="11.75" PointY="11.682444661458334" />
           <ConnectorPoint PointX="11.822916666666666" PointY="11.682444661458332" />
           <ConnectorPoint PointX="12.083333333333334" PointY="11.682444661458334" />
           <ConnectorPoint PointX="12.5" PointY="11.682444661458334" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.device_value_triggers" Width="2.25" PointX="2.875" PointY="28.125" Height="3.1340950520833353" />
-        <AssociationConnector Association="zvsModel.FK_device_value_triggers_0" >
+        <AssociationConnector Association="zvsModel.FK_device_value_triggers_0">
           <ConnectorPoint PointX="7.84375" PointY="26.576396484375" />
           <ConnectorPoint PointX="7.84375" PointY="30.014043282552088" />
           <ConnectorPoint PointX="5.125" PointY="30.014043282552088" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_device_value_triggers_01" >
+        <AssociationConnector Association="zvsModel.FK_device_value_triggers_01">
           <ConnectorPoint PointX="10.25" PointY="11.451436674479169" />
           <ConnectorPoint PointX="10.083333333333334" PointY="11.451436674479169" />
           <ConnectorPoint PointX="9.9166666666666661" PointY="11.451436674479169" />
@@ -2292,11 +2292,11 @@
         <EntityTypeShape EntityType="zvsModel.db_info" Width="1.5" PointX="10.5" PointY="0.5" Height="1.5956835937500102" />
         <EntityTypeShape EntityType="zvsModel.program_options" Width="1.5" PointX="8.375" PointY="0.75" Height="1.5956835937500102" />
         <EntityTypeShape EntityType="zvsModel.scene_property_value" Width="1.5" PointX="13.625" PointY="7.25" Height="2.1725878906250102" />
-        <AssociationConnector Association="zvsModel.FK_scene_property_value_1" >
+        <AssociationConnector Association="zvsModel.FK_scene_property_value_1">
           <ConnectorPoint PointX="11.75" PointY="7.6535953776041667" />
           <ConnectorPoint PointX="13.625" PointY="7.6535953776041667" />
         </AssociationConnector>
-        <AssociationConnector Association="zvsModel.FK_scene_property_value_0" >
+        <AssociationConnector Association="zvsModel.FK_scene_property_value_0">
           <ConnectorPoint PointX="11.75" PointY="10.46875" />
           <ConnectorPoint PointX="11.822916666666666" PointY="10.468749999999998" />
           <ConnectorPoint PointX="12.083333333333334" PointY="10.46875" />
@@ -2304,25 +2304,25 @@
           <ConnectorPoint PointX="14.59375" PointY="9.42258789062501" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.scene_property_option" Width="3.375" PointX="12.5" PointY="1.875" Height="1.7879850260416674" />
-        <AssociationConnector Association="zvsModel.FK__scene_property_option__0000000000000441" >
+        <AssociationConnector Association="zvsModel.FK__scene_property_option__0000000000000441">
           <ConnectorPoint PointX="10.53125" PointY="5.5" />
           <ConnectorPoint PointX="10.53125" PointY="2.9105843098958388" />
           <ConnectorPoint PointX="12.5" PointY="2.9105843098958388" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.plugin_setting_options" Width="2.375" PointX="5.25" PointY="21.625" Height="1.787985026041671" />
-        <AssociationConnector Association="zvsModel.FK__plugin_setting_options__00000000000003D8" >
+        <AssociationConnector Association="zvsModel.FK__plugin_setting_options__00000000000003D8">
           <ConnectorPoint PointX="4.5" PointY="22.518992513020834" />
           <ConnectorPoint PointX="4.666666666666667" PointY="22.518992513020834" />
           <ConnectorPoint PointX="4.833333333333333" PointY="22.518992513020834" />
           <ConnectorPoint PointX="5.25" PointY="22.518992513020834" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.device_type_command_options" Width="3.125" PointX="6.125" PointY="8.875" Height="1.7879850260416674" />
-        <AssociationConnector Association="zvsModel.FK__device_type_command_options__00000000000002A5" >
+        <AssociationConnector Association="zvsModel.FK__device_type_command_options__00000000000002A5">
           <ConnectorPoint PointX="5.125" PointY="9.8314925130208337" />
           <ConnectorPoint PointX="6.125" PointY="9.8314925130208337" />
         </AssociationConnector>
         <EntityTypeShape EntityType="zvsModel.builtin_command_que" Width="2.75" PointX="3.125" PointY="4.125" Height="1.7879850260416674" />
-        <AssociationConnector Association="zvsModel.FK__builtin_command_que__0000000000000140" >
+        <AssociationConnector Association="zvsModel.FK__builtin_command_que__0000000000000140">
           <ConnectorPoint PointX="5.6875" PointY="3.8263964843749996" />
           <ConnectorPoint PointX="5.6875" PointY="4.125" />
         </AssociationConnector>

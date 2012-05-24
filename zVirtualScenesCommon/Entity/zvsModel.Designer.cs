@@ -8,12 +8,13 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.ComponentModel;
+using System.Data.EntityClient;
 using System.Data.Objects;
 using System.Data.Objects.DataClasses;
-using System.Data.EntityClient;
-using System.ComponentModel;
-using System.Xml.Serialization;
+using System.Linq;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 [assembly: EdmSchemaAttribute()]
 #region EDM Relationship Metadata
@@ -561,6 +562,7 @@ namespace zVirtualScenesCommon.Entity
         private ObjectSet<builtin_command_que> _builtin_command_que;
 
         #endregion
+
         #region AddTo Methods
     
         /// <summary>
@@ -796,11 +798,11 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
-    
 
     #endregion
-    
+
     #region Entities
     
     /// <summary>
@@ -829,7 +831,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -848,7 +851,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -873,7 +876,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onbuiltin_command_idChanging(value);
                 ReportPropertyChanging("builtin_command_id");
-                _builtin_command_id = StructuralObject.SetValidValue(value);
+                _builtin_command_id = StructuralObject.SetValidValue(value, "builtin_command_id");
                 ReportPropertyChanged("builtin_command_id");
                 Onbuiltin_command_idChanged();
             }
@@ -897,7 +900,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -907,7 +910,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnnameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -949,6 +952,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -977,7 +981,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -996,7 +1001,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -1021,7 +1026,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnargChanging(value);
                 ReportPropertyChanging("arg");
-                _arg = StructuralObject.SetValidValue(value, false);
+                _arg = StructuralObject.SetValidValue(value, false, "arg");
                 ReportPropertyChanged("arg");
                 OnargChanged();
             }
@@ -1045,7 +1050,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onbuiltin_command_idChanging(value);
                 ReportPropertyChanging("builtin_command_id");
-                _builtin_command_id = StructuralObject.SetValidValue(value);
+                _builtin_command_id = StructuralObject.SetValidValue(value, "builtin_command_id");
                 ReportPropertyChanged("builtin_command_id");
                 Onbuiltin_command_idChanged();
             }
@@ -1055,7 +1060,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onbuiltin_command_idChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -1097,6 +1102,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -1129,7 +1135,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1148,7 +1155,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -1173,7 +1180,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -1197,7 +1204,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -1221,7 +1228,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onarg_data_typeChanging(value);
                 ReportPropertyChanging("arg_data_type");
-                _arg_data_type = StructuralObject.SetValidValue(value);
+                _arg_data_type = StructuralObject.SetValidValue(value, "arg_data_type");
                 ReportPropertyChanged("arg_data_type");
                 Onarg_data_typeChanged();
             }
@@ -1245,7 +1252,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncustom_data1Changing(value);
                 ReportPropertyChanging("custom_data1");
-                _custom_data1 = StructuralObject.SetValidValue(value, true);
+                _custom_data1 = StructuralObject.SetValidValue(value, true, "custom_data1");
                 ReportPropertyChanged("custom_data1");
                 Oncustom_data1Changed();
             }
@@ -1269,7 +1276,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncustom_data2Changing(value);
                 ReportPropertyChanging("custom_data2");
-                _custom_data2 = StructuralObject.SetValidValue(value, true);
+                _custom_data2 = StructuralObject.SetValidValue(value, true, "custom_data2");
                 ReportPropertyChanged("custom_data2");
                 Oncustom_data2Changed();
             }
@@ -1293,7 +1300,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OndescriptionChanging(value);
                 ReportPropertyChanging("description");
-                _description = StructuralObject.SetValidValue(value, true);
+                _description = StructuralObject.SetValidValue(value, true, "description");
                 ReportPropertyChanged("description");
                 OndescriptionChanged();
             }
@@ -1317,7 +1324,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onshow_on_dynamic_obj_listChanging(value);
                 ReportPropertyChanging("show_on_dynamic_obj_list");
-                _show_on_dynamic_obj_list = StructuralObject.SetValidValue(value);
+                _show_on_dynamic_obj_list = StructuralObject.SetValidValue(value, "show_on_dynamic_obj_list");
                 ReportPropertyChanged("show_on_dynamic_obj_list");
                 Onshow_on_dynamic_obj_listChanged();
             }
@@ -1341,7 +1348,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnhelpChanging(value);
                 ReportPropertyChanging("help");
-                _help = StructuralObject.SetValidValue(value, true);
+                _help = StructuralObject.SetValidValue(value, true, "help");
                 ReportPropertyChanged("help");
                 OnhelpChanged();
             }
@@ -1365,7 +1372,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onsort_orderChanging(value);
                 ReportPropertyChanging("sort_order");
-                _sort_order = StructuralObject.SetValidValue(value);
+                _sort_order = StructuralObject.SetValidValue(value, "sort_order");
                 ReportPropertyChanged("sort_order");
                 Onsort_orderChanged();
             }
@@ -1375,7 +1382,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onsort_orderChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -1423,6 +1430,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -1451,7 +1459,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1470,7 +1479,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -1495,7 +1504,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oninfo_nameChanging(value);
                 ReportPropertyChanging("info_name");
-                _info_name = StructuralObject.SetValidValue(value, false);
+                _info_name = StructuralObject.SetValidValue(value, false, "info_name");
                 ReportPropertyChanged("info_name");
                 Oninfo_nameChanged();
             }
@@ -1519,7 +1528,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oninfo_valueChanging(value);
                 ReportPropertyChanging("info_value");
-                _info_value = StructuralObject.SetValidValue(value, false);
+                _info_value = StructuralObject.SetValidValue(value, false, "info_value");
                 ReportPropertyChanged("info_value");
                 Oninfo_valueChanged();
             }
@@ -1529,7 +1538,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Oninfo_valueChanged();
 
         #endregion
-    
+
     }
     
     /// <summary>
@@ -1560,7 +1569,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1579,7 +1589,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -1604,7 +1614,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_type_idChanging(value);
                 ReportPropertyChanging("device_type_id");
-                _device_type_id = StructuralObject.SetValidValue(value);
+                _device_type_id = StructuralObject.SetValidValue(value, "device_type_id");
                 ReportPropertyChanged("device_type_id");
                 Ondevice_type_idChanged();
             }
@@ -1628,7 +1638,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onnode_idChanging(value);
                 ReportPropertyChanging("node_id");
-                _node_id = StructuralObject.SetValidValue(value);
+                _node_id = StructuralObject.SetValidValue(value, "node_id");
                 ReportPropertyChanged("node_id");
                 Onnode_idChanged();
             }
@@ -1652,7 +1662,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -1676,7 +1686,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onlast_heard_fromChanging(value);
                 ReportPropertyChanging("last_heard_from");
-                _last_heard_from = StructuralObject.SetValidValue(value);
+                _last_heard_from = StructuralObject.SetValidValue(value, "last_heard_from");
                 ReportPropertyChanged("last_heard_from");
                 Onlast_heard_fromChanged();
             }
@@ -1700,7 +1710,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncurrent_statusChanging(value);
                 ReportPropertyChanging("current_status");
-                _current_status = StructuralObject.SetValidValue(value, true);
+                _current_status = StructuralObject.SetValidValue(value, true, "current_status");
                 ReportPropertyChanged("current_status");
                 Oncurrent_statusChanged();
             }
@@ -1710,7 +1720,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Oncurrent_statusChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -1906,6 +1916,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -1934,7 +1945,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -1953,7 +1965,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -1978,7 +1990,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_command_idChanging(value);
                 ReportPropertyChanging("device_command_id");
-                _device_command_id = StructuralObject.SetValidValue(value);
+                _device_command_id = StructuralObject.SetValidValue(value, "device_command_id");
                 ReportPropertyChanged("device_command_id");
                 Ondevice_command_idChanged();
             }
@@ -2002,7 +2014,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -2012,7 +2024,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnnameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -2054,6 +2066,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -2084,7 +2097,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -2103,7 +2117,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -2128,7 +2142,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -2152,7 +2166,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_command_idChanging(value);
                 ReportPropertyChanging("device_command_id");
-                _device_command_id = StructuralObject.SetValidValue(value);
+                _device_command_id = StructuralObject.SetValidValue(value, "device_command_id");
                 ReportPropertyChanged("device_command_id");
                 Ondevice_command_idChanged();
             }
@@ -2176,7 +2190,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnargChanging(value);
                 ReportPropertyChanging("arg");
-                _arg = StructuralObject.SetValidValue(value, false);
+                _arg = StructuralObject.SetValidValue(value, false, "arg");
                 ReportPropertyChanged("arg");
                 OnargChanged();
             }
@@ -2186,7 +2200,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnargChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -2266,6 +2280,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -2298,7 +2313,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -2317,7 +2333,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -2342,7 +2358,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -2366,7 +2382,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -2390,7 +2406,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -2414,7 +2430,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onarg_data_typeChanging(value);
                 ReportPropertyChanging("arg_data_type");
-                _arg_data_type = StructuralObject.SetValidValue(value);
+                _arg_data_type = StructuralObject.SetValidValue(value, "arg_data_type");
                 ReportPropertyChanged("arg_data_type");
                 Onarg_data_typeChanged();
             }
@@ -2438,7 +2454,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncustom_data1Changing(value);
                 ReportPropertyChanging("custom_data1");
-                _custom_data1 = StructuralObject.SetValidValue(value, true);
+                _custom_data1 = StructuralObject.SetValidValue(value, true, "custom_data1");
                 ReportPropertyChanged("custom_data1");
                 Oncustom_data1Changed();
             }
@@ -2462,7 +2478,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncustom_data2Changing(value);
                 ReportPropertyChanging("custom_data2");
-                _custom_data2 = StructuralObject.SetValidValue(value, true);
+                _custom_data2 = StructuralObject.SetValidValue(value, true, "custom_data2");
                 ReportPropertyChanged("custom_data2");
                 Oncustom_data2Changed();
             }
@@ -2486,7 +2502,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OndescriptionChanging(value);
                 ReportPropertyChanging("description");
-                _description = StructuralObject.SetValidValue(value, true);
+                _description = StructuralObject.SetValidValue(value, true, "description");
                 ReportPropertyChanged("description");
                 OndescriptionChanged();
             }
@@ -2510,7 +2526,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onsort_orderChanging(value);
                 ReportPropertyChanging("sort_order");
-                _sort_order = StructuralObject.SetValidValue(value);
+                _sort_order = StructuralObject.SetValidValue(value, "sort_order");
                 ReportPropertyChanged("sort_order");
                 Onsort_orderChanged();
             }
@@ -2534,7 +2550,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnhelpChanging(value);
                 ReportPropertyChanging("help");
-                _help = StructuralObject.SetValidValue(value, true);
+                _help = StructuralObject.SetValidValue(value, true, "help");
                 ReportPropertyChanged("help");
                 OnhelpChanged();
             }
@@ -2544,7 +2560,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnhelpChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -2630,6 +2646,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -2658,7 +2675,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -2677,7 +2695,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -2702,7 +2720,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_property_idChanging(value);
                 ReportPropertyChanging("device_property_id");
-                _device_property_id = StructuralObject.SetValidValue(value);
+                _device_property_id = StructuralObject.SetValidValue(value, "device_property_id");
                 ReportPropertyChanged("device_property_id");
                 Ondevice_property_idChanged();
             }
@@ -2726,7 +2744,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -2736,7 +2754,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnnameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -2778,6 +2796,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -2808,7 +2827,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -2827,7 +2847,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -2852,7 +2872,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -2876,7 +2896,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_property_idChanging(value);
                 ReportPropertyChanging("device_property_id");
-                _device_property_id = StructuralObject.SetValidValue(value);
+                _device_property_id = StructuralObject.SetValidValue(value, "device_property_id");
                 ReportPropertyChanged("device_property_id");
                 Ondevice_property_idChanged();
             }
@@ -2900,7 +2920,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnvalueChanging(value);
                 ReportPropertyChanging("value");
-                _value = StructuralObject.SetValidValue(value, false);
+                _value = StructuralObject.SetValidValue(value, false, "value");
                 ReportPropertyChanged("value");
                 OnvalueChanged();
             }
@@ -2910,7 +2930,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnvalueChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -2990,6 +3010,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3022,7 +3043,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -3041,7 +3063,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -3066,7 +3088,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -3090,7 +3112,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -3114,7 +3136,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondefault_valueChanging(value);
                 ReportPropertyChanging("default_value");
-                _default_value = StructuralObject.SetValidValue(value, false);
+                _default_value = StructuralObject.SetValidValue(value, false, "default_value");
                 ReportPropertyChanged("default_value");
                 Ondefault_valueChanged();
             }
@@ -3138,7 +3160,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onvalue_data_typeChanging(value);
                 ReportPropertyChanging("value_data_type");
-                _value_data_type = StructuralObject.SetValidValue(value);
+                _value_data_type = StructuralObject.SetValidValue(value, "value_data_type");
                 ReportPropertyChanged("value_data_type");
                 Onvalue_data_typeChanged();
             }
@@ -3148,7 +3170,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onvalue_data_typeChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -3196,6 +3218,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3224,7 +3247,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -3243,7 +3267,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -3268,7 +3292,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_type_command_idChanging(value);
                 ReportPropertyChanging("device_type_command_id");
-                _device_type_command_id = StructuralObject.SetValidValue(value);
+                _device_type_command_id = StructuralObject.SetValidValue(value, "device_type_command_id");
                 ReportPropertyChanged("device_type_command_id");
                 Ondevice_type_command_idChanged();
             }
@@ -3292,7 +3316,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnoptionsChanging(value);
                 ReportPropertyChanging("options");
-                _options = StructuralObject.SetValidValue(value, false);
+                _options = StructuralObject.SetValidValue(value, false, "options");
                 ReportPropertyChanged("options");
                 OnoptionsChanged();
             }
@@ -3302,7 +3326,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnoptionsChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -3344,6 +3368,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3374,7 +3399,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -3393,7 +3419,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -3418,7 +3444,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_type_command_idChanging(value);
                 ReportPropertyChanging("device_type_command_id");
-                _device_type_command_id = StructuralObject.SetValidValue(value);
+                _device_type_command_id = StructuralObject.SetValidValue(value, "device_type_command_id");
                 ReportPropertyChanged("device_type_command_id");
                 Ondevice_type_command_idChanged();
             }
@@ -3442,7 +3468,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -3466,7 +3492,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnargChanging(value);
                 ReportPropertyChanging("arg");
-                _arg = StructuralObject.SetValidValue(value, false);
+                _arg = StructuralObject.SetValidValue(value, false, "arg");
                 ReportPropertyChanged("arg");
                 OnargChanged();
             }
@@ -3476,7 +3502,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnargChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -3556,6 +3582,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3588,7 +3615,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -3607,7 +3635,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -3632,7 +3660,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_type_idChanging(value);
                 ReportPropertyChanging("device_type_id");
-                _device_type_id = StructuralObject.SetValidValue(value);
+                _device_type_id = StructuralObject.SetValidValue(value, "device_type_id");
                 ReportPropertyChanged("device_type_id");
                 Ondevice_type_idChanged();
             }
@@ -3656,7 +3684,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OndescriptionChanging(value);
                 ReportPropertyChanging("description");
-                _description = StructuralObject.SetValidValue(value, false);
+                _description = StructuralObject.SetValidValue(value, false, "description");
                 ReportPropertyChanged("description");
                 OndescriptionChanged();
             }
@@ -3680,7 +3708,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -3704,7 +3732,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onarg_data_typeChanging(value);
                 ReportPropertyChanging("arg_data_type");
-                _arg_data_type = StructuralObject.SetValidValue(value);
+                _arg_data_type = StructuralObject.SetValidValue(value, "arg_data_type");
                 ReportPropertyChanged("arg_data_type");
                 Onarg_data_typeChanged();
             }
@@ -3728,7 +3756,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncustom_data1Changing(value);
                 ReportPropertyChanging("custom_data1");
-                _custom_data1 = StructuralObject.SetValidValue(value, true);
+                _custom_data1 = StructuralObject.SetValidValue(value, true, "custom_data1");
                 ReportPropertyChanged("custom_data1");
                 Oncustom_data1Changed();
             }
@@ -3752,7 +3780,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncustom_data2Changing(value);
                 ReportPropertyChanging("custom_data2");
-                _custom_data2 = StructuralObject.SetValidValue(value, true);
+                _custom_data2 = StructuralObject.SetValidValue(value, true, "custom_data2");
                 ReportPropertyChanged("custom_data2");
                 Oncustom_data2Changed();
             }
@@ -3776,7 +3804,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnhelpChanging(value);
                 ReportPropertyChanging("help");
-                _help = StructuralObject.SetValidValue(value, true);
+                _help = StructuralObject.SetValidValue(value, true, "help");
                 ReportPropertyChanged("help");
                 OnhelpChanged();
             }
@@ -3800,7 +3828,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, true);
+                _name = StructuralObject.SetValidValue(value, true, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -3824,7 +3852,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onsort_orderChanging(value);
                 ReportPropertyChanging("sort_order");
-                _sort_order = StructuralObject.SetValidValue(value);
+                _sort_order = StructuralObject.SetValidValue(value, "sort_order");
                 ReportPropertyChanged("sort_order");
                 Onsort_orderChanged();
             }
@@ -3834,7 +3862,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onsort_orderChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -3920,6 +3948,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -3950,7 +3979,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -3969,7 +3999,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -3994,7 +4024,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onplugin_idChanging(value);
                 ReportPropertyChanging("plugin_id");
-                _plugin_id = StructuralObject.SetValidValue(value);
+                _plugin_id = StructuralObject.SetValidValue(value, "plugin_id");
                 ReportPropertyChanged("plugin_id");
                 Onplugin_idChanged();
             }
@@ -4018,7 +4048,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -4042,7 +4072,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onshow_in_listChanging(value);
                 ReportPropertyChanging("show_in_list");
-                _show_in_list = StructuralObject.SetValidValue(value);
+                _show_in_list = StructuralObject.SetValidValue(value, "show_in_list");
                 ReportPropertyChanged("show_in_list");
                 Onshow_in_listChanged();
             }
@@ -4066,7 +4096,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, true);
+                _friendly_name = StructuralObject.SetValidValue(value, true, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -4076,7 +4106,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onfriendly_nameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -4162,6 +4192,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -4190,7 +4221,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -4209,7 +4241,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -4234,7 +4266,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_value_idChanging(value);
                 ReportPropertyChanging("device_value_id");
-                _device_value_id = StructuralObject.SetValidValue(value);
+                _device_value_id = StructuralObject.SetValidValue(value, "device_value_id");
                 ReportPropertyChanged("device_value_id");
                 Ondevice_value_idChanged();
             }
@@ -4258,7 +4290,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ontrigger_operatorChanging(value);
                 ReportPropertyChanging("trigger_operator");
-                _trigger_operator = StructuralObject.SetValidValue(value);
+                _trigger_operator = StructuralObject.SetValidValue(value, "trigger_operator");
                 ReportPropertyChanged("trigger_operator");
                 Ontrigger_operatorChanged();
             }
@@ -4282,7 +4314,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ontrigger_valueChanging(value);
                 ReportPropertyChanging("trigger_value");
-                _trigger_value = StructuralObject.SetValidValue(value, true);
+                _trigger_value = StructuralObject.SetValidValue(value, true, "trigger_value");
                 ReportPropertyChanged("trigger_value");
                 Ontrigger_valueChanged();
             }
@@ -4306,7 +4338,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnenabledChanging(value);
                 ReportPropertyChanging("enabled");
-                _enabled = StructuralObject.SetValidValue(value);
+                _enabled = StructuralObject.SetValidValue(value, "enabled");
                 ReportPropertyChanged("enabled");
                 OnenabledChanged();
             }
@@ -4330,7 +4362,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnNameChanging(value);
                 ReportPropertyChanging("Name");
-                _Name = StructuralObject.SetValidValue(value, true);
+                _Name = StructuralObject.SetValidValue(value, true, "Name");
                 ReportPropertyChanged("Name");
                 OnNameChanged();
             }
@@ -4354,7 +4386,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onscene_idChanging(value);
                 ReportPropertyChanging("scene_id");
-                _scene_id = StructuralObject.SetValidValue(value);
+                _scene_id = StructuralObject.SetValidValue(value, "scene_id");
                 ReportPropertyChanged("scene_id");
                 Onscene_idChanged();
             }
@@ -4378,7 +4410,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ontrigger_typeChanging(value);
                 ReportPropertyChanging("trigger_type");
-                _trigger_type = StructuralObject.SetValidValue(value);
+                _trigger_type = StructuralObject.SetValidValue(value, "trigger_type");
                 ReportPropertyChanged("trigger_type");
                 Ontrigger_typeChanged();
             }
@@ -4402,7 +4434,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ontrigger_scriptChanging(value);
                 ReportPropertyChanging("trigger_script");
-                _trigger_script = StructuralObject.SetValidValue(value, true);
+                _trigger_script = StructuralObject.SetValidValue(value, true, "trigger_script");
                 ReportPropertyChanged("trigger_script");
                 Ontrigger_scriptChanged();
             }
@@ -4412,7 +4444,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Ontrigger_scriptChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -4492,6 +4524,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -4520,7 +4553,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -4539,7 +4573,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -4564,7 +4598,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -4588,7 +4622,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onvalue_idChanging(value);
                 ReportPropertyChanging("value_id");
-                _value_id = StructuralObject.SetValidValue(value, true);
+                _value_id = StructuralObject.SetValidValue(value, true, "value_id");
                 ReportPropertyChanged("value_id");
                 Onvalue_idChanged();
             }
@@ -4612,7 +4646,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onlabel_nameChanging(value);
                 ReportPropertyChanging("label_name");
-                _label_name = StructuralObject.SetValidValue(value, true);
+                _label_name = StructuralObject.SetValidValue(value, true, "label_name");
                 ReportPropertyChanged("label_name");
                 Onlabel_nameChanged();
             }
@@ -4636,7 +4670,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OngenreChanging(value);
                 ReportPropertyChanging("genre");
-                _genre = StructuralObject.SetValidValue(value, true);
+                _genre = StructuralObject.SetValidValue(value, true, "genre");
                 ReportPropertyChanged("genre");
                 OngenreChanged();
             }
@@ -4660,7 +4694,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onindex2Changing(value);
                 ReportPropertyChanging("index2");
-                _index2 = StructuralObject.SetValidValue(value, true);
+                _index2 = StructuralObject.SetValidValue(value, true, "index2");
                 ReportPropertyChanged("index2");
                 Onindex2Changed();
             }
@@ -4684,7 +4718,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OntypeChanging(value);
                 ReportPropertyChanging("type");
-                _type = StructuralObject.SetValidValue(value, true);
+                _type = StructuralObject.SetValidValue(value, true, "type");
                 ReportPropertyChanged("type");
                 OntypeChanged();
             }
@@ -4708,7 +4742,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OncommandClassIdChanging(value);
                 ReportPropertyChanging("commandClassId");
-                _commandClassId = StructuralObject.SetValidValue(value, true);
+                _commandClassId = StructuralObject.SetValidValue(value, true, "commandClassId");
                 ReportPropertyChanged("commandClassId");
                 OncommandClassIdChanged();
             }
@@ -4732,7 +4766,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onread_onlyChanging(value);
                 ReportPropertyChanging("read_only");
-                _read_only = StructuralObject.SetValidValue(value);
+                _read_only = StructuralObject.SetValidValue(value, "read_only");
                 ReportPropertyChanged("read_only");
                 Onread_onlyChanged();
             }
@@ -4756,7 +4790,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onvalue2Changing(value);
                 ReportPropertyChanging("value2");
-                _value2 = StructuralObject.SetValidValue(value, true);
+                _value2 = StructuralObject.SetValidValue(value, true, "value2");
                 ReportPropertyChanged("value2");
                 Onvalue2Changed();
             }
@@ -4766,7 +4800,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onvalue2Changed();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -4830,6 +4864,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -4856,7 +4891,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -4875,7 +4911,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -4900,7 +4936,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -4910,7 +4946,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnnameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -4936,6 +4972,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -4964,7 +5001,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -4981,7 +5019,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -5007,7 +5045,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -5032,7 +5070,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ongroup_idChanging(value);
                 ReportPropertyChanging("group_id");
-                _group_id = StructuralObject.SetValidValue(value);
+                _group_id = StructuralObject.SetValidValue(value, "group_id");
                 ReportPropertyChanged("group_id");
                 Ongroup_idChanged();
             }
@@ -5042,7 +5080,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Ongroup_idChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -5122,6 +5160,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5152,7 +5191,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -5171,7 +5211,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -5196,7 +5236,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -5220,7 +5260,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, false);
+                _name = StructuralObject.SetValidValue(value, false, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -5244,7 +5284,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnenabledChanging(value);
                 ReportPropertyChanging("enabled");
-                _enabled = StructuralObject.SetValidValue(value);
+                _enabled = StructuralObject.SetValidValue(value, "enabled");
                 ReportPropertyChanged("enabled");
                 OnenabledChanged();
             }
@@ -5268,7 +5308,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OndescriptionChanging(value);
                 ReportPropertyChanging("description");
-                _description = StructuralObject.SetValidValue(value, true);
+                _description = StructuralObject.SetValidValue(value, true, "description");
                 ReportPropertyChanged("description");
                 OndescriptionChanged();
             }
@@ -5278,7 +5318,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OndescriptionChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -5326,6 +5366,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5354,7 +5395,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -5373,7 +5415,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -5398,7 +5440,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onplugin_settings_idChanging(value);
                 ReportPropertyChanging("plugin_settings_id");
-                _plugin_settings_id = StructuralObject.SetValidValue(value);
+                _plugin_settings_id = StructuralObject.SetValidValue(value, "plugin_settings_id");
                 ReportPropertyChanged("plugin_settings_id");
                 Onplugin_settings_idChanged();
             }
@@ -5422,7 +5464,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnoptionsChanging(value);
                 ReportPropertyChanging("options");
-                _options = StructuralObject.SetValidValue(value, false);
+                _options = StructuralObject.SetValidValue(value, false, "options");
                 ReportPropertyChanged("options");
                 OnoptionsChanged();
             }
@@ -5432,7 +5474,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnoptionsChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -5474,6 +5516,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5506,7 +5549,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -5525,7 +5569,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -5550,7 +5594,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onplugin_idChanging(value);
                 ReportPropertyChanging("plugin_id");
-                _plugin_id = StructuralObject.SetValidValue(value);
+                _plugin_id = StructuralObject.SetValidValue(value, "plugin_id");
                 ReportPropertyChanged("plugin_id");
                 Onplugin_idChanged();
             }
@@ -5574,7 +5618,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -5598,7 +5642,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnvalueChanging(value);
                 ReportPropertyChanging("value");
-                _value = StructuralObject.SetValidValue(value, false);
+                _value = StructuralObject.SetValidValue(value, false, "value");
                 ReportPropertyChanged("value");
                 OnvalueChanged();
             }
@@ -5622,7 +5666,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onvalue_data_typeChanging(value);
                 ReportPropertyChanging("value_data_type");
-                _value_data_type = StructuralObject.SetValidValue(value);
+                _value_data_type = StructuralObject.SetValidValue(value, "value_data_type");
                 ReportPropertyChanged("value_data_type");
                 Onvalue_data_typeChanged();
             }
@@ -5646,7 +5690,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OndescriptionChanging(value);
                 ReportPropertyChanging("description");
-                _description = StructuralObject.SetValidValue(value, true);
+                _description = StructuralObject.SetValidValue(value, true, "description");
                 ReportPropertyChanged("description");
                 OndescriptionChanged();
             }
@@ -5670,7 +5714,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, true);
+                _name = StructuralObject.SetValidValue(value, true, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -5680,7 +5724,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnnameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -5744,6 +5788,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -5768,7 +5813,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -5787,7 +5833,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -5812,7 +5858,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, true);
+                _name = StructuralObject.SetValidValue(value, true, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -5836,7 +5882,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnvalueChanging(value);
                 ReportPropertyChanging("value");
-                _value = StructuralObject.SetValidValue(value, true);
+                _value = StructuralObject.SetValidValue(value, true, "value");
                 ReportPropertyChanged("value");
                 OnvalueChanged();
             }
@@ -5846,7 +5892,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnvalueChanged();
 
         #endregion
-    
+
     }
     
     /// <summary>
@@ -5873,7 +5919,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -5892,7 +5939,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -5917,7 +5964,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, true);
+                _friendly_name = StructuralObject.SetValidValue(value, true, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -5941,7 +5988,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onsort_orderChanging(value);
                 ReportPropertyChanging("sort_order");
-                _sort_order = StructuralObject.SetValidValue(value);
+                _sort_order = StructuralObject.SetValidValue(value, "sort_order");
                 ReportPropertyChanged("sort_order");
                 Onsort_orderChanged();
             }
@@ -5965,7 +6012,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onis_runningChanging(value);
                 ReportPropertyChanging("is_running");
-                _is_running = StructuralObject.SetValidValue(value);
+                _is_running = StructuralObject.SetValidValue(value, "is_running");
                 ReportPropertyChanged("is_running");
                 Onis_runningChanged();
             }
@@ -5975,7 +6022,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onis_runningChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -6045,6 +6092,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6077,7 +6125,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -6096,7 +6145,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -6121,7 +6170,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onscene_idChanging(value);
                 ReportPropertyChanging("scene_id");
-                _scene_id = StructuralObject.SetValidValue(value);
+                _scene_id = StructuralObject.SetValidValue(value, "scene_id");
                 ReportPropertyChanged("scene_id");
                 Onscene_idChanged();
             }
@@ -6145,7 +6194,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondevice_idChanging(value);
                 ReportPropertyChanging("device_id");
-                _device_id = StructuralObject.SetValidValue(value);
+                _device_id = StructuralObject.SetValidValue(value, "device_id");
                 ReportPropertyChanged("device_id");
                 Ondevice_idChanged();
             }
@@ -6169,7 +6218,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncommand_type_idChanging(value);
                 ReportPropertyChanging("command_type_id");
-                _command_type_id = StructuralObject.SetValidValue(value);
+                _command_type_id = StructuralObject.SetValidValue(value, "command_type_id");
                 ReportPropertyChanged("command_type_id");
                 Oncommand_type_idChanged();
             }
@@ -6193,7 +6242,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Oncommand_idChanging(value);
                 ReportPropertyChanging("command_id");
-                _command_id = StructuralObject.SetValidValue(value);
+                _command_id = StructuralObject.SetValidValue(value, "command_id");
                 ReportPropertyChanged("command_id");
                 Oncommand_idChanged();
             }
@@ -6217,7 +6266,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnargChanging(value);
                 ReportPropertyChanging("arg");
-                _arg = StructuralObject.SetValidValue(value, false);
+                _arg = StructuralObject.SetValidValue(value, false, "arg");
                 ReportPropertyChanged("arg");
                 OnargChanged();
             }
@@ -6241,7 +6290,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onsort_orderChanging(value);
                 ReportPropertyChanging("sort_order");
-                _sort_order = StructuralObject.SetValidValue(value);
+                _sort_order = StructuralObject.SetValidValue(value, "sort_order");
                 ReportPropertyChanged("sort_order");
                 Onsort_orderChanged();
             }
@@ -6251,7 +6300,7 @@ namespace zVirtualScenesCommon.Entity
         partial void Onsort_orderChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -6331,6 +6380,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6361,7 +6411,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -6380,7 +6431,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -6405,7 +6456,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -6429,7 +6480,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Ondefualt_valueChanging(value);
                 ReportPropertyChanging("defualt_value");
-                _defualt_value = StructuralObject.SetValidValue(value, false);
+                _defualt_value = StructuralObject.SetValidValue(value, false, "defualt_value");
                 ReportPropertyChanged("defualt_value");
                 Ondefualt_valueChanged();
             }
@@ -6453,7 +6504,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onvalue_data_typeChanging(value);
                 ReportPropertyChanging("value_data_type");
-                _value_data_type = StructuralObject.SetValidValue(value);
+                _value_data_type = StructuralObject.SetValidValue(value, "value_data_type");
                 ReportPropertyChanged("value_data_type");
                 Onvalue_data_typeChanged();
             }
@@ -6477,7 +6528,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OndescriptionChanging(value);
                 ReportPropertyChanging("description");
-                _description = StructuralObject.SetValidValue(value, true);
+                _description = StructuralObject.SetValidValue(value, true, "description");
                 ReportPropertyChanged("description");
                 OndescriptionChanged();
             }
@@ -6501,7 +6552,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnnameChanging(value);
                 ReportPropertyChanging("name");
-                _name = StructuralObject.SetValidValue(value, true);
+                _name = StructuralObject.SetValidValue(value, true, "name");
                 ReportPropertyChanged("name");
                 OnnameChanged();
             }
@@ -6511,7 +6562,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnnameChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -6559,6 +6610,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6587,7 +6639,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -6606,7 +6659,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -6631,7 +6684,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onscene_property_idChanging(value);
                 ReportPropertyChanging("scene_property_id");
-                _scene_property_id = StructuralObject.SetValidValue(value);
+                _scene_property_id = StructuralObject.SetValidValue(value, "scene_property_id");
                 ReportPropertyChanged("scene_property_id");
                 Onscene_property_idChanged();
             }
@@ -6655,7 +6708,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnoptionsChanging(value);
                 ReportPropertyChanging("options");
-                _options = StructuralObject.SetValidValue(value, false);
+                _options = StructuralObject.SetValidValue(value, false, "options");
                 ReportPropertyChanged("options");
                 OnoptionsChanged();
             }
@@ -6665,7 +6718,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnoptionsChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -6707,6 +6760,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6735,7 +6789,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -6754,7 +6809,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -6779,7 +6834,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onscene_idChanging(value);
                 ReportPropertyChanging("scene_id");
-                _scene_id = StructuralObject.SetValidValue(value);
+                _scene_id = StructuralObject.SetValidValue(value, "scene_id");
                 ReportPropertyChanged("scene_id");
                 Onscene_idChanged();
             }
@@ -6803,7 +6858,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onscene_property_idChanging(value);
                 ReportPropertyChanging("scene_property_id");
-                _scene_property_id = StructuralObject.SetValidValue(value);
+                _scene_property_id = StructuralObject.SetValidValue(value, "scene_property_id");
                 ReportPropertyChanged("scene_property_id");
                 Onscene_property_idChanged();
             }
@@ -6827,7 +6882,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnvalueChanging(value);
                 ReportPropertyChanging("value");
-                _value = StructuralObject.SetValidValue(value, true);
+                _value = StructuralObject.SetValidValue(value, true, "value");
                 ReportPropertyChanged("value");
                 OnvalueChanged();
             }
@@ -6837,7 +6892,7 @@ namespace zVirtualScenesCommon.Entity
         partial void OnvalueChanged();
 
         #endregion
-    
+
         #region Navigation Properties
     
         /// <summary>
@@ -6917,6 +6972,7 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
+
     }
     
     /// <summary>
@@ -6947,7 +7003,8 @@ namespace zVirtualScenesCommon.Entity
         }
 
         #endregion
-        #region Primitive Properties
+
+        #region Simple Properties
     
         /// <summary>
         /// No Metadata Documentation available.
@@ -6966,7 +7023,7 @@ namespace zVirtualScenesCommon.Entity
                 {
                     OnidChanging(value);
                     ReportPropertyChanging("id");
-                    _id = StructuralObject.SetValidValue(value);
+                    _id = StructuralObject.SetValidValue(value, "id");
                     ReportPropertyChanged("id");
                     OnidChanged();
                 }
@@ -6991,7 +7048,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onfriendly_nameChanging(value);
                 ReportPropertyChanging("friendly_name");
-                _friendly_name = StructuralObject.SetValidValue(value, false);
+                _friendly_name = StructuralObject.SetValidValue(value, false, "friendly_name");
                 ReportPropertyChanged("friendly_name");
                 Onfriendly_nameChanged();
             }
@@ -7015,7 +7072,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnEnabledChanging(value);
                 ReportPropertyChanging("Enabled");
-                _Enabled = StructuralObject.SetValidValue(value);
+                _Enabled = StructuralObject.SetValidValue(value, "Enabled");
                 ReportPropertyChanged("Enabled");
                 OnEnabledChanged();
             }
@@ -7039,7 +7096,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnScene_idChanging(value);
                 ReportPropertyChanging("Scene_id");
-                _Scene_id = StructuralObject.SetValidValue(value);
+                _Scene_id = StructuralObject.SetValidValue(value, "Scene_id");
                 ReportPropertyChanged("Scene_id");
                 OnScene_idChanged();
             }
@@ -7063,7 +7120,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnFrequencyChanging(value);
                 ReportPropertyChanging("Frequency");
-                _Frequency = StructuralObject.SetValidValue(value);
+                _Frequency = StructuralObject.SetValidValue(value, "Frequency");
                 ReportPropertyChanged("Frequency");
                 OnFrequencyChanged();
             }
@@ -7087,7 +7144,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurMondayChanging(value);
                 ReportPropertyChanging("RecurMonday");
-                _RecurMonday = StructuralObject.SetValidValue(value);
+                _RecurMonday = StructuralObject.SetValidValue(value, "RecurMonday");
                 ReportPropertyChanged("RecurMonday");
                 OnRecurMondayChanged();
             }
@@ -7111,7 +7168,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurTuesdayChanging(value);
                 ReportPropertyChanging("RecurTuesday");
-                _RecurTuesday = StructuralObject.SetValidValue(value);
+                _RecurTuesday = StructuralObject.SetValidValue(value, "RecurTuesday");
                 ReportPropertyChanged("RecurTuesday");
                 OnRecurTuesdayChanged();
             }
@@ -7135,7 +7192,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurWednesdayChanging(value);
                 ReportPropertyChanging("RecurWednesday");
-                _RecurWednesday = StructuralObject.SetValidValue(value);
+                _RecurWednesday = StructuralObject.SetValidValue(value, "RecurWednesday");
                 ReportPropertyChanged("RecurWednesday");
                 OnRecurWednesdayChanged();
             }
@@ -7159,7 +7216,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurThursdayChanging(value);
                 ReportPropertyChanging("RecurThursday");
-                _RecurThursday = StructuralObject.SetValidValue(value);
+                _RecurThursday = StructuralObject.SetValidValue(value, "RecurThursday");
                 ReportPropertyChanged("RecurThursday");
                 OnRecurThursdayChanged();
             }
@@ -7183,7 +7240,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurFridayChanging(value);
                 ReportPropertyChanging("RecurFriday");
-                _RecurFriday = StructuralObject.SetValidValue(value);
+                _RecurFriday = StructuralObject.SetValidValue(value, "RecurFriday");
                 ReportPropertyChanged("RecurFriday");
                 OnRecurFridayChanged();
             }
@@ -7207,7 +7264,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurSaturdayChanging(value);
                 ReportPropertyChanging("RecurSaturday");
-                _RecurSaturday = StructuralObject.SetValidValue(value);
+                _RecurSaturday = StructuralObject.SetValidValue(value, "RecurSaturday");
                 ReportPropertyChanged("RecurSaturday");
                 OnRecurSaturdayChanged();
             }
@@ -7231,7 +7288,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurSundayChanging(value);
                 ReportPropertyChanging("RecurSunday");
-                _RecurSunday = StructuralObject.SetValidValue(value);
+                _RecurSunday = StructuralObject.SetValidValue(value, "RecurSunday");
                 ReportPropertyChanged("RecurSunday");
                 OnRecurSundayChanged();
             }
@@ -7255,7 +7312,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDaysChanging(value);
                 ReportPropertyChanging("RecurDays");
-                _RecurDays = StructuralObject.SetValidValue(value);
+                _RecurDays = StructuralObject.SetValidValue(value, "RecurDays");
                 ReportPropertyChanged("RecurDays");
                 OnRecurDaysChanged();
             }
@@ -7279,7 +7336,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurWeeksChanging(value);
                 ReportPropertyChanging("RecurWeeks");
-                _RecurWeeks = StructuralObject.SetValidValue(value);
+                _RecurWeeks = StructuralObject.SetValidValue(value, "RecurWeeks");
                 ReportPropertyChanged("RecurWeeks");
                 OnRecurWeeksChanged();
             }
@@ -7303,7 +7360,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurMonthChanging(value);
                 ReportPropertyChanging("RecurMonth");
-                _RecurMonth = StructuralObject.SetValidValue(value);
+                _RecurMonth = StructuralObject.SetValidValue(value, "RecurMonth");
                 ReportPropertyChanged("RecurMonth");
                 OnRecurMonthChanged();
             }
@@ -7327,7 +7384,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDayofMonthChanging(value);
                 ReportPropertyChanging("RecurDayofMonth");
-                _RecurDayofMonth = StructuralObject.SetValidValue(value);
+                _RecurDayofMonth = StructuralObject.SetValidValue(value, "RecurDayofMonth");
                 ReportPropertyChanged("RecurDayofMonth");
                 OnRecurDayofMonthChanged();
             }
@@ -7351,7 +7408,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurSecondsChanging(value);
                 ReportPropertyChanging("RecurSeconds");
-                _RecurSeconds = StructuralObject.SetValidValue(value);
+                _RecurSeconds = StructuralObject.SetValidValue(value, "RecurSeconds");
                 ReportPropertyChanged("RecurSeconds");
                 OnRecurSecondsChanged();
             }
@@ -7375,7 +7432,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnStartTimeChanging(value);
                 ReportPropertyChanging("StartTime");
-                _StartTime = StructuralObject.SetValidValue(value);
+                _StartTime = StructuralObject.SetValidValue(value, "StartTime");
                 ReportPropertyChanged("StartTime");
                 OnStartTimeChanged();
             }
@@ -7399,7 +7456,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 Onsort_orderChanging(value);
                 ReportPropertyChanging("sort_order");
-                _sort_order = StructuralObject.SetValidValue(value);
+                _sort_order = StructuralObject.SetValidValue(value, "sort_order");
                 ReportPropertyChanged("sort_order");
                 Onsort_orderChanged();
             }
@@ -7423,7 +7480,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurEvenChanging(value);
                 ReportPropertyChanging("RecurEven");
-                _RecurEven = StructuralObject.SetValidValue(value);
+                _RecurEven = StructuralObject.SetValidValue(value, "RecurEven");
                 ReportPropertyChanged("RecurEven");
                 OnRecurEvenChanged();
             }
@@ -7447,7 +7504,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay01Changing(value);
                 ReportPropertyChanging("RecurDay01");
-                _RecurDay01 = StructuralObject.SetValidValue(value);
+                _RecurDay01 = StructuralObject.SetValidValue(value, "RecurDay01");
                 ReportPropertyChanged("RecurDay01");
                 OnRecurDay01Changed();
             }
@@ -7471,7 +7528,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay02Changing(value);
                 ReportPropertyChanging("RecurDay02");
-                _RecurDay02 = StructuralObject.SetValidValue(value);
+                _RecurDay02 = StructuralObject.SetValidValue(value, "RecurDay02");
                 ReportPropertyChanged("RecurDay02");
                 OnRecurDay02Changed();
             }
@@ -7495,7 +7552,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay03Changing(value);
                 ReportPropertyChanging("RecurDay03");
-                _RecurDay03 = StructuralObject.SetValidValue(value);
+                _RecurDay03 = StructuralObject.SetValidValue(value, "RecurDay03");
                 ReportPropertyChanged("RecurDay03");
                 OnRecurDay03Changed();
             }
@@ -7519,7 +7576,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay04Changing(value);
                 ReportPropertyChanging("RecurDay04");
-                _RecurDay04 = StructuralObject.SetValidValue(value);
+                _RecurDay04 = StructuralObject.SetValidValue(value, "RecurDay04");
                 ReportPropertyChanged("RecurDay04");
                 OnRecurDay04Changed();
             }
@@ -7543,7 +7600,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay05Changing(value);
                 ReportPropertyChanging("RecurDay05");
-                _RecurDay05 = StructuralObject.SetValidValue(value);
+                _RecurDay05 = StructuralObject.SetValidValue(value, "RecurDay05");
                 ReportPropertyChanged("RecurDay05");
                 OnRecurDay05Changed();
             }
@@ -7567,7 +7624,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay06Changing(value);
                 ReportPropertyChanging("RecurDay06");
-                _RecurDay06 = StructuralObject.SetValidValue(value);
+                _RecurDay06 = StructuralObject.SetValidValue(value, "RecurDay06");
                 ReportPropertyChanged("RecurDay06");
                 OnRecurDay06Changed();
             }
@@ -7591,7 +7648,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay07Changing(value);
                 ReportPropertyChanging("RecurDay07");
-                _RecurDay07 = StructuralObject.SetValidValue(value);
+                _RecurDay07 = StructuralObject.SetValidValue(value, "RecurDay07");
                 ReportPropertyChanged("RecurDay07");
                 OnRecurDay07Changed();
             }
@@ -7615,7 +7672,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay08Changing(value);
                 ReportPropertyChanging("RecurDay08");
-                _RecurDay08 = StructuralObject.SetValidValue(value);
+                _RecurDay08 = StructuralObject.SetValidValue(value, "RecurDay08");
                 ReportPropertyChanged("RecurDay08");
                 OnRecurDay08Changed();
             }
@@ -7639,7 +7696,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay09Changing(value);
                 ReportPropertyChanging("RecurDay09");
-                _RecurDay09 = StructuralObject.SetValidValue(value);
+                _RecurDay09 = StructuralObject.SetValidValue(value, "RecurDay09");
                 ReportPropertyChanged("RecurDay09");
                 OnRecurDay09Changed();
             }
@@ -7663,7 +7720,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay10Changing(value);
                 ReportPropertyChanging("RecurDay10");
-                _RecurDay10 = StructuralObject.SetValidValue(value);
+                _RecurDay10 = StructuralObject.SetValidValue(value, "RecurDay10");
                 ReportPropertyChanged("RecurDay10");
                 OnRecurDay10Changed();
             }
@@ -7687,7 +7744,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay11Changing(value);
                 ReportPropertyChanging("RecurDay11");
-                _RecurDay11 = StructuralObject.SetValidValue(value);
+                _RecurDay11 = StructuralObject.SetValidValue(value, "RecurDay11");
                 ReportPropertyChanged("RecurDay11");
                 OnRecurDay11Changed();
             }
@@ -7711,7 +7768,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay12Changing(value);
                 ReportPropertyChanging("RecurDay12");
-                _RecurDay12 = StructuralObject.SetValidValue(value);
+                _RecurDay12 = StructuralObject.SetValidValue(value, "RecurDay12");
                 ReportPropertyChanged("RecurDay12");
                 OnRecurDay12Changed();
             }
@@ -7735,7 +7792,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay13Changing(value);
                 ReportPropertyChanging("RecurDay13");
-                _RecurDay13 = StructuralObject.SetValidValue(value);
+                _RecurDay13 = StructuralObject.SetValidValue(value, "RecurDay13");
                 ReportPropertyChanged("RecurDay13");
                 OnRecurDay13Changed();
             }
@@ -7759,7 +7816,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay14Changing(value);
                 ReportPropertyChanging("RecurDay14");
-                _RecurDay14 = StructuralObject.SetValidValue(value);
+                _RecurDay14 = StructuralObject.SetValidValue(value, "RecurDay14");
                 ReportPropertyChanged("RecurDay14");
                 OnRecurDay14Changed();
             }
@@ -7783,7 +7840,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay15Changing(value);
                 ReportPropertyChanging("RecurDay15");
-                _RecurDay15 = StructuralObject.SetValidValue(value);
+                _RecurDay15 = StructuralObject.SetValidValue(value, "RecurDay15");
                 ReportPropertyChanged("RecurDay15");
                 OnRecurDay15Changed();
             }
@@ -7807,7 +7864,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay16Changing(value);
                 ReportPropertyChanging("RecurDay16");
-                _RecurDay16 = StructuralObject.SetValidValue(value);
+                _RecurDay16 = StructuralObject.SetValidValue(value, "RecurDay16");
                 ReportPropertyChanged("RecurDay16");
                 OnRecurDay16Changed();
             }
@@ -7831,7 +7888,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay17Changing(value);
                 ReportPropertyChanging("RecurDay17");
-                _RecurDay17 = StructuralObject.SetValidValue(value);
+                _RecurDay17 = StructuralObject.SetValidValue(value, "RecurDay17");
                 ReportPropertyChanged("RecurDay17");
                 OnRecurDay17Changed();
             }
@@ -7855,7 +7912,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay18Changing(value);
                 ReportPropertyChanging("RecurDay18");
-                _RecurDay18 = StructuralObject.SetValidValue(value);
+                _RecurDay18 = StructuralObject.SetValidValue(value, "RecurDay18");
                 ReportPropertyChanged("RecurDay18");
                 OnRecurDay18Changed();
             }
@@ -7879,7 +7936,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay19Changing(value);
                 ReportPropertyChanging("RecurDay19");
-                _RecurDay19 = StructuralObject.SetValidValue(value);
+                _RecurDay19 = StructuralObject.SetValidValue(value, "RecurDay19");
                 ReportPropertyChanged("RecurDay19");
                 OnRecurDay19Changed();
             }
@@ -7903,7 +7960,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay20Changing(value);
                 ReportPropertyChanging("RecurDay20");
-                _RecurDay20 = StructuralObject.SetValidValue(value);
+                _RecurDay20 = StructuralObject.SetValidValue(value, "RecurDay20");
                 ReportPropertyChanged("RecurDay20");
                 OnRecurDay20Changed();
             }
@@ -7927,7 +7984,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay21Changing(value);
                 ReportPropertyChanging("RecurDay21");
-                _RecurDay21 = StructuralObject.SetValidValue(value);
+                _RecurDay21 = StructuralObject.SetValidValue(value, "RecurDay21");
                 ReportPropertyChanged("RecurDay21");
                 OnRecurDay21Changed();
             }
@@ -7951,7 +8008,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay22Changing(value);
                 ReportPropertyChanging("RecurDay22");
-                _RecurDay22 = StructuralObject.SetValidValue(value);
+                _RecurDay22 = StructuralObject.SetValidValue(value, "RecurDay22");
                 ReportPropertyChanged("RecurDay22");
                 OnRecurDay22Changed();
             }
@@ -7975,7 +8032,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay23Changing(value);
                 ReportPropertyChanging("RecurDay23");
-                _RecurDay23 = StructuralObject.SetValidValue(value);
+                _RecurDay23 = StructuralObject.SetValidValue(value, "RecurDay23");
                 ReportPropertyChanged("RecurDay23");
                 OnRecurDay23Changed();
             }
@@ -7999,7 +8056,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay24Changing(value);
                 ReportPropertyChanging("RecurDay24");
-                _RecurDay24 = StructuralObject.SetValidValue(value);
+                _RecurDay24 = StructuralObject.SetValidValue(value, "RecurDay24");
                 ReportPropertyChanged("RecurDay24");
                 OnRecurDay24Changed();
             }
@@ -8023,7 +8080,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay25Changing(value);
                 ReportPropertyChanging("RecurDay25");
-                _RecurDay25 = StructuralObject.SetValidValue(value);
+                _RecurDay25 = StructuralObject.SetValidValue(value, "RecurDay25");
                 ReportPropertyChanged("RecurDay25");
                 OnRecurDay25Changed();
             }
@@ -8047,7 +8104,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay26Changing(value);
                 ReportPropertyChanging("RecurDay26");
-                _RecurDay26 = StructuralObject.SetValidValue(value);
+                _RecurDay26 = StructuralObject.SetValidValue(value, "RecurDay26");
                 ReportPropertyChanged("RecurDay26");
                 OnRecurDay26Changed();
             }
@@ -8071,7 +8128,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay27Changing(value);
                 ReportPropertyChanging("RecurDay27");
-                _RecurDay27 = StructuralObject.SetValidValue(value);
+                _RecurDay27 = StructuralObject.SetValidValue(value, "RecurDay27");
                 ReportPropertyChanged("RecurDay27");
                 OnRecurDay27Changed();
             }
@@ -8095,7 +8152,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay28Changing(value);
                 ReportPropertyChanging("RecurDay28");
-                _RecurDay28 = StructuralObject.SetValidValue(value);
+                _RecurDay28 = StructuralObject.SetValidValue(value, "RecurDay28");
                 ReportPropertyChanged("RecurDay28");
                 OnRecurDay28Changed();
             }
@@ -8119,7 +8176,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay29Changing(value);
                 ReportPropertyChanging("RecurDay29");
-                _RecurDay29 = StructuralObject.SetValidValue(value);
+                _RecurDay29 = StructuralObject.SetValidValue(value, "RecurDay29");
                 ReportPropertyChanged("RecurDay29");
                 OnRecurDay29Changed();
             }
@@ -8143,7 +8200,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay30Changing(value);
                 ReportPropertyChanging("RecurDay30");
-                _RecurDay30 = StructuralObject.SetValidValue(value);
+                _RecurDay30 = StructuralObject.SetValidValue(value, "RecurDay30");
                 ReportPropertyChanged("RecurDay30");
                 OnRecurDay30Changed();
             }
@@ -8167,7 +8224,7 @@ namespace zVirtualScenesCommon.Entity
             {
                 OnRecurDay31Changing(value);
                 ReportPropertyChanging("RecurDay31");
-                _RecurDay31 = StructuralObject.SetValidValue(value);
+                _RecurDay31 = StructuralObject.SetValidValue(value, "RecurDay31");
                 ReportPropertyChanged("RecurDay31");
                 OnRecurDay31Changed();
             }
@@ -8177,9 +8234,9 @@ namespace zVirtualScenesCommon.Entity
         partial void OnRecurDay31Changed();
 
         #endregion
-    
+
     }
 
     #endregion
-    
+
 }

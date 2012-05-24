@@ -32,7 +32,6 @@ namespace zVirtualScenes_WPF
         public int MaxLogLines = 1000;
         public zvsManager manager;
         private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;  
-
         public MainWindow()
         {
             InitializeComponent();
