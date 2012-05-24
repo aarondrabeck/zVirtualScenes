@@ -2122,7 +2122,7 @@
     </Options>
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
-      <Diagram Name="Model1" ZoomLevel="82">
+      <Diagram Name="Model1" ZoomLevel="58">
         <EntityTypeShape EntityType="zvsModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" Height="1.7879850260416674" />
         <EntityTypeShape EntityType="zvsModel.builtin_commands" Width="1.5" PointX="5.5" PointY="0.5" Height="3.3263964843749996" />
         <EntityTypeShape EntityType="zvsModel.device_command_options" Width="1.5" PointX="9.75" PointY="16.875" Height="1.7879850260416674" />

@@ -22,7 +22,7 @@ namespace zVirtualScenes_WPF.Groups
     /// </summary>
     public partial class GroupEditor : Window
     {
-        private zvsEntities2 context = zvsEntityControl.SharedContext;
+        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
         public static IBindingList GroupList; 
 
         public GroupEditor()

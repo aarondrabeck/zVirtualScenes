@@ -13,7 +13,7 @@
             <StackPanel Name="ControlsStkPnl" Orientation="Vertical"></StackPanel>
         </ScrollViewer>
         <Button Content="Done" Height="23" HorizontalAlignment="Right" Margin="0,0,12,12" Name="CancelBtn" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click" />
-        <CheckBox IsChecked="{Binding Path=enabled}" Height="16" Name="EnabledChkBx" Margin="240,81,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="103" >
+        <CheckBox IsChecked="{Binding Path=enabled}" Height="16" Name="EnabledChkBx" Margin="240,81,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="103" Checked="EnabledChkBx_Checked" Unchecked="EnabledChkBx_Unchecked">
             <CheckBox.Content>
                 <TextBlock Text="Enabled" FontWeight="Bold"></TextBlock>
             </CheckBox.Content>

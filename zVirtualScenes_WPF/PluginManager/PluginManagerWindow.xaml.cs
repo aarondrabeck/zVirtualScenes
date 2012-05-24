@@ -150,5 +150,31 @@ namespace zVirtualScenes_WPF.PluginManager
                 }
             }
         }
+
+        private void EnabledChkBx_Checked(object sender, RoutedEventArgs e)
+        {
+            context.SaveChanges();
+
+            plugin p = (plugin)PluginLstVw.SelectedItem;
+            if (p != null)
+            {
+                var Plugin = mainWindow.manager.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                if(Plugin != null)
+                    Plugin.Start();
+            }
+        }
+
+        private void EnabledChkBx_Unchecked(object sender, RoutedEventArgs e)
+        {
+            context.SaveChanges();
+
+            plugin p = (plugin)PluginLstVw.SelectedItem;
+            if (p != null)
+            {
+                var Plugin = mainWindow.manager.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                if (Plugin != null)
+                    Plugin.Stop();
+            }
+        }
     }
 }

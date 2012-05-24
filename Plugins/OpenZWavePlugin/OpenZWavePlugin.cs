@@ -27,7 +27,7 @@ namespace OpenZWavePlugin
     [Export(typeof(Plugin))]
     public class OpenZWavePlugin : Plugin
     {
-        private zvsEntities2 context = zvsEntityControl.SharedContext;
+        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
         private ZWManager m_manager = null;
         private ZWOptions m_options = null;
         ZWNotification m_notification = null;
@@ -1060,7 +1060,8 @@ namespace OpenZWavePlugin
                                             friendly_name = deviceName
                                         };
 
-                                        zvsEntityControl.DeviceList.Add(ozw_device);
+                                        
+                                        zvsEntityControl.Objects.DeviceList.Add(ozw_device);
                                         context.SaveChanges();                                        
                                     }
 

@@ -15,10 +15,8 @@ namespace zVirtualScenes_WPF
     /// </summary>
     public partial class App : Application
     {
-        public static zvsEntities2 UIContext = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
-
         protected override void OnStartup(StartupEventArgs e)
-        {            
+        {  
             //Check for VCRedist
             if (!DetectVCRedist.IsVCRedistInstalled())
             {
@@ -58,7 +56,6 @@ WHERE        (TABLE_NAME = 'devices');").SingleOrDefault();
                     MessageBox.Show(string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButton.OK, MessageBoxImage.Error);
                     Environment.Exit(0);
                 }
-
             }
 
             //Check DB version

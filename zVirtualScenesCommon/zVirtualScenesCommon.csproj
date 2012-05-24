@@ -63,6 +63,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MTObservableCollection.cs" />
     <Compile Include="command_types.cs" />
     <Compile Include="Data_Types.cs" />
     <Compile Include="Entity\builtin_commands.cs" />

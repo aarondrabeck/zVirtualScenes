@@ -11,10 +11,13 @@ namespace zVirtualScenesCommon.Entity
 {
     public static class zvsEntityControl
     {
-        //Until EF5 is released this is the only decent way to use the built-in observables and inotify interfaces
-        //without doing your own context syncing
-        public static zvsEntities2 SharedContext = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
-        public static IBindingList DeviceList = ((IListSource)SharedContext.devices).GetList() as IBindingList;
+        public static class Objects
+        {
+            //Until EF5 is released this is the only decent way to use the built-in observables and inotify interfaces
+            //without doing your own context syncing
+            public static zvsEntities2 SharedContext = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
+            public static MTIBindingList DeviceList = ((IListSource)SharedContext.devices).GetList() as MTIBindingList;
+        }
 
         public static string GetDBPath
         {

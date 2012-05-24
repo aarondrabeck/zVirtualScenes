@@ -29,8 +29,8 @@ namespace zVirtualScenes_WPF.DeviceControls
             InitializeComponent();
         }
 
-        private zvsEntities2 context = zvsEntityControl.SharedContext;
-        private IBindingList MasterDeviceList = zvsEntityControl.DeviceList;
+        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
+        private IBindingList MasterDeviceList = zvsEntityControl.Objects.DeviceList;
 
         private bool _AdvancedDisplay = true;
         public bool AdvancedDisplay

@@ -31,7 +31,7 @@ namespace zVirtualScenes_WPF
         public ObservableCollection<LogItem> Log = new ObservableCollection<LogItem>();
         public int MaxLogLines = 1000;
         public zvsManager manager;
-        private zvsEntities2 context = zvsEntityControl.SharedContext;  
+        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;  
 
         public MainWindow()
         {
@@ -125,11 +125,11 @@ namespace zVirtualScenes_WPF
 
                 lock(context)
                 {
-                    zvsEntityControl.DeviceList.Add(ozw_device);
-                    zvsEntityControl.DeviceList.Add(ozw_device1);
-                    zvsEntityControl.DeviceList.Add(ozw_device2);
-                    zvsEntityControl.DeviceList.Add(ozw_device3);
-                    zvsEntityControl.DeviceList.Add(ozw_device4);
+                    zvsEntityControl.Objects.DeviceList.Add(ozw_device);
+                    zvsEntityControl.Objects.DeviceList.Add(ozw_device1);
+                    zvsEntityControl.Objects.DeviceList.Add(ozw_device2);
+                    zvsEntityControl.Objects.DeviceList.Add(ozw_device3);
+                    zvsEntityControl.Objects.DeviceList.Add(ozw_device4);
                     context.SaveChanges();
                 }
             }
