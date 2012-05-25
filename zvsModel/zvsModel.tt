@@ -65,7 +65,7 @@ using System.Collections.Generic;
         foreach (var navigationProperty in collectionNavigationProperties)
         {
 #>
-        this.<#=code.Escape(navigationProperty)#> = new HashSet<<#=code.GetTypeName(navigationProperty.ToEndMember.GetEntityType())#>>();
+        this.<#=code.Escape(navigationProperty)#> = new ObservableCollection<<#=code.GetTypeName(navigationProperty.ToEndMember.GetEntityType())#>>();
 <#
         }
 
@@ -273,7 +273,7 @@ void WriteNavigationProperty(CodeGenerationTools code, NavigationProperty naviga
 {
     var endType = code.GetTypeName(navigationProperty.ToEndMember.GetEntityType());
     WriteProperty(PropertyVirtualModifier(Accessibility.ForProperty(navigationProperty)),
-                  navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many ? ("ICollection<" + endType + ">") : endType,
+                  navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many ? ("ObservableCollection<" + endType + ">") : endType,
                   code.Escape(navigationProperty),
                   code.SpaceAfter(Accessibility.ForGetter(navigationProperty)),
                   code.SpaceAfter(Accessibility.ForSetter(navigationProperty)));

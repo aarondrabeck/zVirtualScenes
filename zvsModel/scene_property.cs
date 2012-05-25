@@ -11,13 +11,14 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class scene_property
     {
         public scene_property()
         {
-            this.scene_property_option = new HashSet<scene_property_option>();
-            this.scene_property_value = new HashSet<scene_property_value>();
+            this.scene_property_option = new ObservableCollection<scene_property_option>();
+            this.scene_property_value = new ObservableCollection<scene_property_value>();
         }
     
         public int id { get; set; }
@@ -27,7 +28,7 @@ namespace zvsModel
         public string description { get; set; }
         public string name { get; set; }
     
-        public virtual ICollection<scene_property_option> scene_property_option { get; set; }
-        public virtual ICollection<scene_property_value> scene_property_value { get; set; }
+        public virtual ObservableCollection<scene_property_option> scene_property_option { get; set; }
+        public virtual ObservableCollection<scene_property_value> scene_property_value { get; set; }
     }
 }

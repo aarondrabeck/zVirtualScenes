@@ -11,17 +11,18 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class group
     {
         public group()
         {
-            this.group_devices = new HashSet<group_devices>();
+            this.group_devices = new ObservableCollection<group_devices>();
         }
     
         public int id { get; set; }
         public string name { get; set; }
     
-        public virtual ICollection<group_devices> group_devices { get; set; }
+        public virtual ObservableCollection<group_devices> group_devices { get; set; }
     }
 }

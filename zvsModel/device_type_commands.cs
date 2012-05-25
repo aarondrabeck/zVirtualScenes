@@ -11,13 +11,14 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class device_type_commands
     {
         public device_type_commands()
         {
-            this.device_type_command_options = new HashSet<device_type_command_options>();
-            this.device_type_command_que = new HashSet<device_type_command_que>();
+            this.device_type_command_options = new ObservableCollection<device_type_command_options>();
+            this.device_type_command_que = new ObservableCollection<device_type_command_que>();
         }
     
         public int id { get; set; }
@@ -31,8 +32,8 @@ namespace zvsModel
         public string name { get; set; }
         public Nullable<int> sort_order { get; set; }
     
-        public virtual ICollection<device_type_command_options> device_type_command_options { get; set; }
-        public virtual ICollection<device_type_command_que> device_type_command_que { get; set; }
+        public virtual ObservableCollection<device_type_command_options> device_type_command_options { get; set; }
+        public virtual ObservableCollection<device_type_command_que> device_type_command_que { get; set; }
         public virtual device_types device_types { get; set; }
     }
 }

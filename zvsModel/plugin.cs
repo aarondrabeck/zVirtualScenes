@@ -11,13 +11,14 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class plugin
     {
         public plugin()
         {
-            this.device_types = new HashSet<device_types>();
-            this.plugin_settings = new HashSet<plugin_settings>();
+            this.device_types = new ObservableCollection<device_types>();
+            this.plugin_settings = new ObservableCollection<plugin_settings>();
         }
     
         public int id { get; set; }
@@ -26,7 +27,7 @@ namespace zvsModel
         public bool enabled { get; set; }
         public string description { get; set; }
     
-        public virtual ICollection<device_types> device_types { get; set; }
-        public virtual ICollection<plugin_settings> plugin_settings { get; set; }
+        public virtual ObservableCollection<device_types> device_types { get; set; }
+        public virtual ObservableCollection<plugin_settings> plugin_settings { get; set; }
     }
 }

@@ -11,18 +11,19 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class device
     {
         public device()
         {
-            this.device_command_que = new HashSet<device_command_que>();
-            this.device_commands = new HashSet<device_commands>();
-            this.device_property_values = new HashSet<device_property_values>();
-            this.device_type_command_que = new HashSet<device_type_command_que>();
-            this.device_values = new HashSet<device_values>();
-            this.group_devices = new HashSet<group_devices>();
-            this.scene_commands = new HashSet<scene_commands>();
+            this.device_command_que = new ObservableCollection<device_command_que>();
+            this.device_commands = new ObservableCollection<device_commands>();
+            this.device_property_values = new ObservableCollection<device_property_values>();
+            this.device_type_command_que = new ObservableCollection<device_type_command_que>();
+            this.device_values = new ObservableCollection<device_values>();
+            this.group_devices = new ObservableCollection<group_devices>();
+            this.scene_commands = new ObservableCollection<scene_commands>();
         }
     
         public int id { get; set; }
@@ -32,13 +33,13 @@ namespace zvsModel
         public string friendly_name { get; set; }
         public Nullable<System.DateTime> last_heard_from { get; set; }
     
-        public virtual ICollection<device_command_que> device_command_que { get; set; }
-        public virtual ICollection<device_commands> device_commands { get; set; }
-        public virtual ICollection<device_property_values> device_property_values { get; set; }
-        public virtual ICollection<device_type_command_que> device_type_command_que { get; set; }
+        public virtual ObservableCollection<device_command_que> device_command_que { get; set; }
+        public virtual ObservableCollection<device_commands> device_commands { get; set; }
+        public virtual ObservableCollection<device_property_values> device_property_values { get; set; }
+        public virtual ObservableCollection<device_type_command_que> device_type_command_que { get; set; }
         public virtual device_types device_types { get; set; }
-        public virtual ICollection<device_values> device_values { get; set; }
-        public virtual ICollection<group_devices> group_devices { get; set; }
-        public virtual ICollection<scene_commands> scene_commands { get; set; }
+        public virtual ObservableCollection<device_values> device_values { get; set; }
+        public virtual ObservableCollection<group_devices> group_devices { get; set; }
+        public virtual ObservableCollection<scene_commands> scene_commands { get; set; }
     }
 }

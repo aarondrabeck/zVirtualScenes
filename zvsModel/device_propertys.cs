@@ -11,13 +11,14 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class device_propertys
     {
         public device_propertys()
         {
-            this.device_property_options = new HashSet<device_property_options>();
-            this.device_property_values = new HashSet<device_property_values>();
+            this.device_property_options = new ObservableCollection<device_property_options>();
+            this.device_property_values = new ObservableCollection<device_property_values>();
         }
     
         public int id { get; set; }
@@ -26,7 +27,7 @@ namespace zvsModel
         public string default_value { get; set; }
         public int value_data_type { get; set; }
     
-        public virtual ICollection<device_property_options> device_property_options { get; set; }
-        public virtual ICollection<device_property_values> device_property_values { get; set; }
+        public virtual ObservableCollection<device_property_options> device_property_options { get; set; }
+        public virtual ObservableCollection<device_property_values> device_property_values { get; set; }
     }
 }

@@ -11,14 +11,15 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class scene
     {
         public scene()
         {
-            this.device_value_triggers = new HashSet<device_value_triggers>();
-            this.scene_commands = new HashSet<scene_commands>();
-            this.scene_property_value = new HashSet<scene_property_value>();
+            this.device_value_triggers = new ObservableCollection<device_value_triggers>();
+            this.scene_commands = new ObservableCollection<scene_commands>();
+            this.scene_property_value = new ObservableCollection<scene_property_value>();
         }
     
         public int id { get; set; }
@@ -26,8 +27,8 @@ namespace zvsModel
         public Nullable<int> sort_order { get; set; }
         public bool is_running { get; set; }
     
-        public virtual ICollection<device_value_triggers> device_value_triggers { get; set; }
-        public virtual ICollection<scene_commands> scene_commands { get; set; }
-        public virtual ICollection<scene_property_value> scene_property_value { get; set; }
+        public virtual ObservableCollection<device_value_triggers> device_value_triggers { get; set; }
+        public virtual ObservableCollection<scene_commands> scene_commands { get; set; }
+        public virtual ObservableCollection<scene_property_value> scene_property_value { get; set; }
     }
 }

@@ -15,6 +15,7 @@ using zVirtualScenesCommon;
 using System.Windows.Media.Media3D;
 using System.ComponentModel;
 using zvsModel;
+using System.Collections.ObjectModel;
 
 
 namespace zVirtualScenes_WPF.DeviceControls
@@ -24,7 +25,7 @@ namespace zVirtualScenes_WPF.DeviceControls
     /// </summary>
     public partial class DeviceDataGridUC : UserControl
     {
-        
+
         public DeviceDataGridUC()
         {
             InitializeComponent();
@@ -33,7 +34,7 @@ namespace zVirtualScenes_WPF.DeviceControls
         private zvsLocalDBEntities context = new zvsLocalDBEntities();
 
         //private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
-       // private IBindingList MasterDeviceList = zvsEntityControl.Objects.DeviceList;
+        // private IBindingList MasterDeviceList = zvsEntityControl.Objects.DeviceList;
 
         private bool _AdvancedDisplay = true;
         public bool AdvancedDisplay
@@ -70,8 +71,12 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-
+               //context.devices.Load();
                 myCollectionViewSource.Source = context.devices.Local;
+
+                //this.DeviceGrid.ItemsSource = context.devices.Local;
+                //ObservableCollection<device> collection = new ObservableCollection<device>();
+               // collection.Load();
             }
         }
 

@@ -11,12 +11,13 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class plugin_settings
     {
         public plugin_settings()
         {
-            this.plugin_setting_options = new HashSet<plugin_setting_options>();
+            this.plugin_setting_options = new ObservableCollection<plugin_setting_options>();
         }
     
         public int id { get; set; }
@@ -27,7 +28,7 @@ namespace zvsModel
         public string description { get; set; }
         public string name { get; set; }
     
-        public virtual ICollection<plugin_setting_options> plugin_setting_options { get; set; }
+        public virtual ObservableCollection<plugin_setting_options> plugin_setting_options { get; set; }
         public virtual plugin plugin { get; set; }
     }
 }

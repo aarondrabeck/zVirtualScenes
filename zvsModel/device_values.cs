@@ -11,12 +11,13 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class device_values
     {
         public device_values()
         {
-            this.device_value_triggers = new HashSet<device_value_triggers>();
+            this.device_value_triggers = new ObservableCollection<device_value_triggers>();
         }
     
         public int id { get; set; }
@@ -30,7 +31,7 @@ namespace zvsModel
         public string value2 { get; set; }
         public bool read_only { get; set; }
     
-        public virtual ICollection<device_value_triggers> device_value_triggers { get; set; }
+        public virtual ObservableCollection<device_value_triggers> device_value_triggers { get; set; }
         public virtual device device { get; set; }
     }
 }

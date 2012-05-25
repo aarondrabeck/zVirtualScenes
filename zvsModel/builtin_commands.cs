@@ -11,13 +11,14 @@ namespace zvsModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     
     public partial class builtin_commands
     {
         public builtin_commands()
         {
-            this.builtin_command_options = new HashSet<builtin_command_options>();
-            this.builtin_command_que = new HashSet<builtin_command_que>();
+            this.builtin_command_options = new ObservableCollection<builtin_command_options>();
+            this.builtin_command_que = new ObservableCollection<builtin_command_que>();
         }
     
         public int id { get; set; }
@@ -31,7 +32,7 @@ namespace zvsModel
         public string help { get; set; }
         public Nullable<int> sort_order { get; set; }
     
-        public virtual ICollection<builtin_command_options> builtin_command_options { get; set; }
-        public virtual ICollection<builtin_command_que> builtin_command_que { get; set; }
+        public virtual ObservableCollection<builtin_command_options> builtin_command_options { get; set; }
+        public virtual ObservableCollection<builtin_command_que> builtin_command_que { get; set; }
     }
 }
