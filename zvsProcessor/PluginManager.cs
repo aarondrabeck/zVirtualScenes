@@ -11,20 +11,22 @@ using zVirtualScenesCommon.Util;
 using zVirtualScenesAPI;
 using zVirtualScenesCommon;
 
-namespace zvsProcessor
+namespace zVirtualScenes
 {
     public class PluginManager
     {
         private const int verbose = 1;
         private const string _FriendlyName = "Plug-in Manager";
+        private Core Core;
 
         [ImportMany]
         #pragma warning disable 649
         private IEnumerable<Plugin> _plugins;
         #pragma warning restore 649
 
-        public PluginManager()
+        public PluginManager(Core Core)
         {
+            this.Core = Core;
             DirectoryCatalog catalog = new DirectoryCatalog("plugins");
             CompositionContainer compositionContainer = new CompositionContainer(catalog);
             compositionContainer.ComposeParts(this);
@@ -83,7 +85,7 @@ namespace zvsProcessor
             });
 
             // Iterate the plug-in
-            foreach (Plugin p in _plugins)
+            foreach (Plugin p in s)
             {
                 //keeps this plug-in in scope 
                 var p2 = p;
@@ -101,15 +103,17 @@ namespace zvsProcessor
                     }
                 }
 
-                //initialize each plug-in on a separate thread.
-                BackgroundWorker pluginInitializer = new BackgroundWorker();
-                pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>
-                {
-                    Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), _FriendlyName);
-                    p2.Initialize();
-                    p2.Start();
-                };
-                pluginInitializer.RunWorkerAsync();
+                Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), _FriendlyName);
+                p2.Initialize();
+                p2.Start();
+
+                ////initialize each plug-in on a separate thread.
+                //BackgroundWorker pluginInitializer = new BackgroundWorker();
+                //pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>
+                //{
+                    
+                //};
+                //pluginInitializer.RunWorkerAsync();
             }
 
             builtin_command_que.BuiltinCommandAddedToQueEvent += new builtin_command_que.BuiltinCommandAddedEventHandler(builtin_command_que_BuiltinCommandAddedToQueEvent);
@@ -127,7 +131,7 @@ namespace zvsProcessor
                 {
                     if (verbose > 1)
                     {
-                        Logger.WriteToLog(Urgency.INFO, "[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
+                        Core.Logger.WriteToLog(Urgency.INFO, "[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
                                                                ", CMD_NAME:" + cmd.device_type_commands.friendly_name +
                                                                ", ARG:" + cmd.arg, _FriendlyName);
                     }
@@ -144,7 +148,7 @@ namespace zvsProcessor
                                 {
                                     err = true;
                                     string err_str = "Timed-out while trying to process " + cmd.device_type_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plug-in Not Ready.";
-                                    Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
+                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
                                     context.device_type_command_que.DeleteObject(cmd);
@@ -167,7 +171,7 @@ namespace zvsProcessor
                         else
                         {
                             string err_str = "Attempted command " + cmd.device_type_commands.friendly_name + " on '" + cmd.device.friendly_name + "' on a disabled plug-in. Removing command from queue...";
-                            Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
+                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
                             context.device_type_command_que.DeleteObject(cmd);
@@ -180,7 +184,7 @@ namespace zvsProcessor
                 {
                     string err_str = "Could not locate queued device command.";
                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                    Logger.WriteToLog(Urgency.ERROR, err_str, _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, _FriendlyName);
                 }
             }
 
@@ -196,7 +200,7 @@ namespace zvsProcessor
                 {
                     if (verbose > 1)
                     {
-                        Logger.WriteToLog(Urgency.INFO, "[Processing Device CMD] API:" + cmd.device.device_types.plugin.name +
+                        Core.Logger.WriteToLog(Urgency.INFO, "[Processing Device CMD] API:" + cmd.device.device_types.plugin.name +
                                                                 ", CMD_NAME:" + cmd.device_commands.friendly_name +
                                                                 ", ARG:" + cmd.arg, _FriendlyName);
                     }
@@ -213,7 +217,7 @@ namespace zvsProcessor
                                 {
                                     err = true;
                                     string err_str = "Timed-out while trying to process " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plug-in Not Ready.";
-                                    Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
+                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
                                     context.device_command_que.DeleteObject(cmd);
@@ -236,7 +240,7 @@ namespace zvsProcessor
                         else
                         {
                             string err_str = "Attempted command " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "' on a disabled plug-in. Removing command from queue...";
-                            Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
+                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
                             context.device_command_que.DeleteObject(cmd);
@@ -246,7 +250,7 @@ namespace zvsProcessor
                     }
                 }
                 else
-                    Logger.WriteToLog(Urgency.ERROR, "Could not locate queued device command.", _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued device command.", _FriendlyName);
             }
 
         }
@@ -261,7 +265,7 @@ namespace zvsProcessor
                 {
                     if (verbose > 1)
                     {
-                        Logger.WriteToLog(Urgency.INFO, "[PROCESSING BUILTIN CMD] CMD_NAME:" + cmd.builtin_commands.friendly_name + ", ARG:" + cmd.arg, "MainForm");
+                        Core.Logger.WriteToLog(Urgency.INFO, "[PROCESSING BUILTIN CMD] CMD_NAME:" + cmd.builtin_commands.friendly_name + ", ARG:" + cmd.arg, "MainForm");
                     }
 
                     switch (cmd.builtin_commands.name)
@@ -328,7 +332,7 @@ namespace zvsProcessor
                     db.SaveChanges();
                 }
                 else
-                    Logger.WriteToLog(Urgency.ERROR, "Could not locate queued built-in command.", _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued built-in command.", _FriendlyName);
             }
 
         }

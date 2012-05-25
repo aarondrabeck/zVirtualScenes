@@ -163,6 +163,7 @@
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities2.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesCommon.Util.Logger.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -182,9 +183,9 @@
       <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
       <Name>zvsModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\zvsProcessor\zvsProcessor.csproj">
+    <ProjectReference Include="..\zvsProcessor\zVirtualScenes.csproj">
       <Project>{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}</Project>
-      <Name>zvsProcessor</Name>
+      <Name>zVirtualScenes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -6,16 +6,19 @@ using zVirtualScenesCommon.Entity;
 using System.Windows.Threading;
 using System.Timers;
 
-namespace zvsProcessor
+namespace zVirtualScenes
 {
     public class ScheduledTaskManager
     {
         private List<scheduled_tasks> tasks = new List<scheduled_tasks>();
         private bool isRunning = false;
         private Timer timer = new Timer();
+        private Core Core;
 
-        public ScheduledTaskManager(bool autoStart = true)
+        public ScheduledTaskManager(Core Core, bool autoStart = true)
         {
+            this.Core = Core;
+
             if (autoStart)
                 Start();
         }

@@ -25,16 +25,12 @@ namespace zVirtualScenes_WPF.DeviceControls
     /// </summary>
     public partial class DeviceDataGridUC : UserControl
     {
-
         public DeviceDataGridUC()
         {
             InitializeComponent();
         }
-
-        private zvsLocalDBEntities context = new zvsLocalDBEntities();
-
-        //private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
-        // private IBindingList MasterDeviceList = zvsEntityControl.Objects.DeviceList;
+      
+        private zvsLocalDBEntities context = ((App)Application.Current).zvsCore.context;
 
         private bool _AdvancedDisplay = true;
         public bool AdvancedDisplay
@@ -71,7 +67,8 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-               //context.devices.Load();
+
+                //context.devices.Load()
                 myCollectionViewSource.Source = context.devices.Local;
 
                 //this.DeviceGrid.ItemsSource = context.devices.Local;
@@ -215,9 +212,6 @@ namespace zVirtualScenes_WPF.DeviceControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
                 context.SaveChanges();
             }
-
-
-
         }
     }
 }

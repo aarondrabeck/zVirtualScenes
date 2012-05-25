@@ -12,9 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections;
-using zVirtualScenesCommon.Entity;
-using zVirtualScenesCommon;
 using zVirtualScenes_WPF.DynamicSettingsControls;
+using zvsModel;
 
 namespace zVirtualScenes_WPF.PluginManager
 {
@@ -23,11 +22,14 @@ namespace zVirtualScenes_WPF.PluginManager
     /// </summary>
     public partial class PluginManagerWindow : Window
     {
-        private zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString);
-        private MainWindow mainWindow = (MainWindow)Application.Current.MainWindow;
+
+        private App application = (App)Application.Current;
+        private zvsLocalDBEntities context;   
 
         public PluginManagerWindow()
         {
+            context = application.zvsCore.context;
+
             InitializeComponent();
         }
 
@@ -58,7 +60,7 @@ namespace zVirtualScenes_WPF.PluginManager
         }
 
         private void PromptSaveNowIfChanged()
-        {
+        {           
             foreach (DynamicSettingsInterface setting in this.ControlsStkPnl.Children.OfType<DynamicSettingsInterface>())
             {
                 if (setting.hasChanged)
@@ -89,64 +91,64 @@ namespace zVirtualScenes_WPF.PluginManager
             {
                 foreach (plugin_settings ps in p.plugin_settings)
                 {
-                    switch ((Data_Types)ps.value_data_type)
-                    {
-                        case Data_Types.BOOL:
-                            {
-                                this.ControlsStkPnl.Children.Add(new BoolSettingsControl(context, ps));
+                    //switch ((Data_Types)ps.value_data_type)
+                    //{
+                    //    case Data_Types.BOOL:
+                    //        {
+                    //            this.ControlsStkPnl.Children.Add(new BoolSettingsControl(context, ps));
 
-                                break;
-                            }
-                        case Data_Types.DECIMAL:
-                            {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = Decimal.MaxValue;
-                                control.MinValue = Decimal.MinValue;
-                                this.ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case Data_Types.BYTE:
-                            {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = Byte.MaxValue;
-                                control.MinValue = Byte.MinValue;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case Data_Types.INTEGER:
-                            {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = Int64.MaxValue;
-                                control.MinValue = Int64.MinValue;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case Data_Types.SHORT:
-                            {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = short.MaxValue;
-                                control.MinValue = short.MinValue;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case Data_Types.STRING:
-                            {
-                                this.ControlsStkPnl.Children.Add(new StringSettingsControl(context, ps));
-                                break;
-                            }
-                        case Data_Types.COMPORT:
-                            {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = 0;
-                                control.MinValue = 99;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                    }
+                    //            break;
+                    //        }
+                    //    case Data_Types.DECIMAL:
+                    //        {
+                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                    //            control.MaxValue = Decimal.MaxValue;
+                    //            control.MinValue = Decimal.MinValue;
+                    //            this.ControlsStkPnl.Children.Add(control);
+                    //            break;
+                    //        }
+                    //    case Data_Types.BYTE:
+                    //        {
+                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                    //            control.MaxValue = Byte.MaxValue;
+                    //            control.MinValue = Byte.MinValue;
+                    //            control.ForceWholeNumber = true;
+                    //            this.ControlsStkPnl.Children.Add(control);
+                    //            break;
+                    //        }
+                    //    case Data_Types.INTEGER:
+                    //        {
+                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                    //            control.MaxValue = Int64.MaxValue;
+                    //            control.MinValue = Int64.MinValue;
+                    //            control.ForceWholeNumber = true;
+                    //            this.ControlsStkPnl.Children.Add(control);
+                    //            break;
+                    //        }
+                    //    case Data_Types.SHORT:
+                    //        {
+                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                    //            control.MaxValue = short.MaxValue;
+                    //            control.MinValue = short.MinValue;
+                    //            control.ForceWholeNumber = true;
+                    //            this.ControlsStkPnl.Children.Add(control);
+                    //            break;
+                    //        }
+                    //    case Data_Types.STRING:
+                    //        {
+                    //            this.ControlsStkPnl.Children.Add(new StringSettingsControl(context, ps));
+                    //            break;
+                    //        }
+                    //    case Data_Types.COMPORT:
+                    //        {
+                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                    //            control.MaxValue = 0;
+                    //            control.MinValue = 99;
+                    //            control.ForceWholeNumber = true;
+                    //            this.ControlsStkPnl.Children.Add(control);
+                    //            break;
+                    //        }
+                    //}
                 }
             }
         }
@@ -158,7 +160,7 @@ namespace zVirtualScenes_WPF.PluginManager
             plugin p = (plugin)PluginLstVw.SelectedItem;
             if (p != null)
             {
-                var Plugin = mainWindow.manager.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
                 if(Plugin != null)
                     Plugin.Start();
             }
@@ -171,7 +173,7 @@ namespace zVirtualScenes_WPF.PluginManager
             plugin p = (plugin)PluginLstVw.SelectedItem;
             if (p != null)
             {
-                var Plugin = mainWindow.manager.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
                 if (Plugin != null)
                     Plugin.Stop();
             }

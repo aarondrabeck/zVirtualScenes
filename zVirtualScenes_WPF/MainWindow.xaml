@@ -7,7 +7,10 @@
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
+        <CollectionViewSource x:Key="ListViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">
+        </CollectionViewSource>
     </Window.Resources>
+
     <DockPanel>
         <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
             <MenuItem Header="File" />
@@ -26,14 +29,16 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="Log">
-                <DataGrid  Name="logListView" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" Background="#00000000">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" />
-                        <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
-                        <DataGridTextColumn Width="100"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
-                        <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Grid DataContext="{StaticResource ListViewSource}">
+                    <DataGrid  Name="logListView" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" Background="#00000000" ItemsSource="{Binding}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" />
+                            <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
+                            <DataGridTextColumn Width="100"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
+                            <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
             </TabItem>
         </TabControl>
     </DockPanel>

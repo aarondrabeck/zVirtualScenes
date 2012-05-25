@@ -6,15 +6,18 @@ using zVirtualScenesCommon.Entity;
 using zVirtualScenesCommon.Util;
 using zVirtualScenesCommon;
 
-namespace zvsProcessor.Triggers
+namespace zVirtualScenes.Triggers
 {
     public class TriggerManager
     {
+        private Core Core;
         private List<device_value_triggers> triggers = new List<device_value_triggers>();
         private bool isRunning = false;
 
-        public TriggerManager(bool autoStart = true)
+        public TriggerManager(Core Core, bool autoStart = true)
         {
+            this.Core = Core;
+
             if (autoStart)
                 Start();
         }
@@ -76,8 +79,8 @@ namespace zvsProcessor.Triggers
                                     {
                                         if (dv.value2.Equals(trigger.trigger_value))
                                         {
-                                            Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                            Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                         }
                                         break;
                                     }
@@ -90,12 +93,12 @@ namespace zvsProcessor.Triggers
                                         {
                                             if (deviceValue > triggerValue)
                                             {
-                                                Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
+                                                Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                                Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                             }
                                         }
                                         else
-                                            Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
 
                                         break;
                                     }
@@ -108,12 +111,12 @@ namespace zvsProcessor.Triggers
                                         {
                                             if (deviceValue < triggerValue)
                                             {
-                                                Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                                Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
+                                                Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                                Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                             }
                                         }
                                         else
-                                            Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
 
                                         break;
                                     }
@@ -121,8 +124,8 @@ namespace zvsProcessor.Triggers
                                     {
                                         if (!dv.value2.Equals(trigger.trigger_value))
                                         {
-                                            Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                            Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(db), "TRIGGER");
                                         }
                                         break;
                                     }
@@ -130,7 +133,7 @@ namespace zvsProcessor.Triggers
                         }
                         else
                         {
-                            ScriptManager.RunScript(trigger);
+                            //Core.triggerManager.RunScript(trigger);
                         }
                     }
                 }

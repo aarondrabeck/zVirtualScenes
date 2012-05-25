@@ -46,6 +46,7 @@ namespace OpenZWavePlugin
                     try { Directory.CreateDirectory(path); }
                     catch { }
                 }
+
                 return path + "\\";
             }
         }

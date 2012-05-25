@@ -57,7 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenesService", "zV
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenes_WPF", "zVirtualScenes_WPF\zVirtualScenes_WPF.csproj", "{CC1028B3-3975-4BA4-BF79-42043BCADBFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvsProcessor", "zvsProcessor\zvsProcessor.csproj", "{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenes", "zvsProcessor\zVirtualScenes.csproj", "{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvsModel", "zvsModel\zvsModel.csproj", "{796E1087-65E8-4CDA-BDD6-6661BD843A7D}"
 EndProject
