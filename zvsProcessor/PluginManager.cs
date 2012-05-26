@@ -85,7 +85,7 @@ namespace zVirtualScenes
             });
 
             // Iterate the plug-in
-            foreach (Plugin p in s)
+            foreach (Plugin p in _plugins)
             {
                 //keeps this plug-in in scope 
                 var p2 = p;
