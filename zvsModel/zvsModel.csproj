@@ -76,6 +76,7 @@
     <Compile Include="builtin_command_que.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Custom\builtin_commands.cs" />
     <Compile Include="Data_Types.cs" />
     <Compile Include="db_info.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>

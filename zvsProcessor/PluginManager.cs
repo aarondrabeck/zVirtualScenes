@@ -6,16 +6,17 @@ using System.Linq;
 using System.Threading;
 using System;
 using System.ComponentModel;
-using zVirtualScenesCommon.Entity;
 using zVirtualScenesCommon.Util;
 using zVirtualScenesAPI;
 using zVirtualScenesCommon;
+using zvsModel;
+
 
 namespace zVirtualScenes
 {
     public class PluginManager
     {
-        private const int verbose = 1;
+        private const int verbose = 10;
         private const string _FriendlyName = "Plug-in Manager";
         private Core Core;
 
@@ -31,7 +32,7 @@ namespace zVirtualScenes
             CompositionContainer compositionContainer = new CompositionContainer(catalog);
             compositionContainer.ComposeParts(this);
 
-            builtin_commands.InstallBuiltInCommand(new builtin_commands
+            builtin_commands.AddOrEdit(new builtin_commands
             {
                 name = "REPOLL_ME",
                 friendly_name = "Re-poll Device",
@@ -40,7 +41,7 @@ namespace zVirtualScenes
                 description = "This will force a re-poll on an object."
             });
 
-            builtin_commands.InstallBuiltInCommand(new builtin_commands
+            builtin_commands.AddOrEdit(new builtin_commands
             {
                 name = "REPOLL_ALL",
                 friendly_name = "Re-poll all Devices",
@@ -49,7 +50,7 @@ namespace zVirtualScenes
                 description = "This will force a re-poll on all objects."
             });
 
-            builtin_commands.InstallBuiltInCommand(new builtin_commands
+            builtin_commands.AddOrEdit(new builtin_commands
             {
                 name = "GROUP_ON",
                 friendly_name = "Turn Group On",
@@ -58,7 +59,7 @@ namespace zVirtualScenes
                 description = "Activates a group."
             });
 
-            builtin_commands.InstallBuiltInCommand(new builtin_commands
+            builtin_commands.AddOrEdit(new builtin_commands
             {
                 name = "GROUP_OFF",
                 friendly_name = "Turn Group Off",
@@ -67,7 +68,7 @@ namespace zVirtualScenes
                 description = "Deactivates a group."
             });
 
-            builtin_commands.InstallBuiltInCommand(new builtin_commands
+            builtin_commands.AddOrEdit(new builtin_commands
             {
                 name = "TIMEDELAY",
                 friendly_name = "Scene Time Delay (sec)",
