@@ -9,7 +9,7 @@ using OpenZWaveDotNet;
 //using zVirtualScenesAPI;
 //using zVirtualScenesCommon;
 //using zVirtualScenesCommon.Util;
-//using zVirtualScenesCommon.Entity; <-- causing the SQL LITE ERRORS
+//using zvsModel; <-- causing the SQL LITE ERRORS
 
 namespace OpenZWavePlugin.Forms
 {

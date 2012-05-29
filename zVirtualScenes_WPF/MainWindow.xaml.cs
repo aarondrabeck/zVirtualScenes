@@ -17,7 +17,7 @@ using zVirtualScenes;
 using zVirtualScenes_WPF.DeviceControls;
 using zVirtualScenes_WPF.Groups;
 using zVirtualScenes_WPF.PluginManager;
-using zvsModel;
+using zVirtualScenesModel;
 using System.Threading;
 
 namespace zVirtualScenes_WPF

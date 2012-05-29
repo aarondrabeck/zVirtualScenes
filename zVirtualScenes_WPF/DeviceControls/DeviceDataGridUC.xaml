@@ -5,7 +5,7 @@
               xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zVirtualScenesCommon.Entity;assembly=zVirtualScenesCommon" 
+             d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zvsModel" 
              Loaded="UserControl_Loaded" PreviewKeyDown="UserControl_PreviewKeyDown" 
              PreviewMouseRightButtonDown="UserControl_PreviewMouseRightButtonDown" >
     <UserControl.Resources>

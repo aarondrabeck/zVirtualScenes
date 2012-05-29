@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesCommon.Entity;
+using zVirtualScenesModel;
 
 namespace zVirtualScenes_WPF.DynamicSettingsControls
 {
@@ -20,7 +20,7 @@ namespace zVirtualScenes_WPF.DynamicSettingsControls
     /// </summary>
     public partial class NumericSettingsControl : UserControl, DynamicSettingsInterface
     {
-        zvsEntities2 context;
+        zvsLocalDBEntities context;
         plugin_settings plugin_setting;
         public decimal MinValue = -99999;
         public decimal MaxValue = 99999;
@@ -33,7 +33,7 @@ namespace zVirtualScenes_WPF.DynamicSettingsControls
         }
 
         bool hasLoaded = false;
-        public NumericSettingsControl(zvsEntities2 context, plugin_settings plugin_setting)
+        public NumericSettingsControl(zvsLocalDBEntities context, plugin_settings plugin_setting)
         {
             InitializeComponent();
 

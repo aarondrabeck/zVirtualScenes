@@ -7,9 +7,6 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using zVirtualScenesService.PluginSystem;
-using zVirtualScenesCommon.Util;
-using zVirtualScenesCommon;
-using zVirtualScenesAPI;
 
 namespace zVirtualScenesService
 {

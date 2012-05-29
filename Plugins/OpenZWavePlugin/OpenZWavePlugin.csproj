@@ -34,11 +34,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework">
+      <HintPath>..\..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
     <Reference Include="OpenZWaveDotNet">
       <HintPath>..\..\OpenZWaveDotNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
@@ -92,14 +96,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
-      <Project>{90E854D0-AB37-4928-BF33-93B3553F33A9}</Project>
-      <Name>zVirtualScenesAPI</Name>
+    <ProjectReference Include="..\..\zvsModel\zvsModel.csproj">
+      <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
+      <Name>zvsModel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
-      <Project>{FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00}</Project>
-      <Name>zVirtualScenesCommon</Name>
+    <ProjectReference Include="..\..\zvsProcessor\zVirtualScenes.csproj">
+      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
+      <Name>zVirtualScenes</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

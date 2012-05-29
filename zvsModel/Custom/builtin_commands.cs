@@ -1,10 +1,10 @@
-﻿namespace zvsModel
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
+namespace zVirtualScenesModel
+{
     public partial class builtin_commands
     {
         public static void AddOrEdit(builtin_commands c, zvsLocalDBEntities context)

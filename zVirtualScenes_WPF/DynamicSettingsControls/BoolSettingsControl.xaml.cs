@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesCommon.Entity;
+using zVirtualScenesModel;
 
 namespace zVirtualScenes_WPF.DynamicSettingsControls
 {
@@ -20,7 +20,7 @@ namespace zVirtualScenes_WPF.DynamicSettingsControls
     /// </summary>
     public partial class BoolSettingsControl : UserControl, DynamicSettingsInterface
     {
-        zvsEntities2 context;
+        zvsLocalDBEntities context;
         plugin_settings plugin_setting;
 
         public BoolSettingsControl()
@@ -29,7 +29,7 @@ namespace zVirtualScenes_WPF.DynamicSettingsControls
         }
 
         bool hasLoaded = false;
-        public BoolSettingsControl(zvsEntities2 context, plugin_settings plugin_setting)
+        public BoolSettingsControl(zvsLocalDBEntities context, plugin_settings plugin_setting)
         {
             InitializeComponent();
 

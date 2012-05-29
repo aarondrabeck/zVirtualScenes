@@ -7,12 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace zvsModel
+namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
     
     public partial class builtin_commands
     {
@@ -35,8 +34,5 @@ namespace zvsModel
     
         public virtual ObservableCollection<builtin_command_options> builtin_command_options { get; set; }
         public virtual ObservableCollection<builtin_command_que> builtin_command_que { get; set; }
-        }
-
-
     }
 }

@@ -6,11 +6,7 @@ using System.Linq;
 using System.Threading;
 using System;
 using System.ComponentModel;
-using zVirtualScenesCommon.Util;
-using zVirtualScenesAPI;
-using zVirtualScenesCommon;
-using zvsModel;
-
+using zVirtualScenesModel;
 
 namespace zVirtualScenes
 {
@@ -32,89 +28,85 @@ namespace zVirtualScenes
             CompositionContainer compositionContainer = new CompositionContainer(catalog);
             compositionContainer.ComposeParts(this);
 
-            builtin_commands.AddOrEdit(new builtin_commands
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
-                name = "REPOLL_ME",
-                friendly_name = "Re-poll Device",
-                arg_data_type = (int)Data_Types.INTEGER,
-                show_on_dynamic_obj_list = false,
-                description = "This will force a re-poll on an object."
-            });
-
-            builtin_commands.AddOrEdit(new builtin_commands
-            {
-                name = "REPOLL_ALL",
-                friendly_name = "Re-poll all Devices",
-                arg_data_type = (int)Data_Types.NONE,
-                show_on_dynamic_obj_list = false,
-                description = "This will force a re-poll on all objects."
-            });
-
-            builtin_commands.AddOrEdit(new builtin_commands
-            {
-                name = "GROUP_ON",
-                friendly_name = "Turn Group On",
-                arg_data_type = (int)Data_Types.STRING,
-                show_on_dynamic_obj_list = false,
-                description = "Activates a group."
-            });
-
-            builtin_commands.AddOrEdit(new builtin_commands
-            {
-                name = "GROUP_OFF",
-                friendly_name = "Turn Group Off",
-                arg_data_type = (int)Data_Types.STRING,
-                show_on_dynamic_obj_list = false,
-                description = "Deactivates a group."
-            });
-
-            builtin_commands.AddOrEdit(new builtin_commands
-            {
-                name = "TIMEDELAY",
-                friendly_name = "Scene Time Delay (sec)",
-                arg_data_type = (int)Data_Types.INTEGER,
-                show_on_dynamic_obj_list = false,
-                description = "Pauses a scene execution for x seconds."
-            });
-
-            device_propertys.DefineOrUpdateDeviceProperty(new device_propertys
-            {
-                name = "ENABLEPOLLING",
-                friendly_name = "Enable polling for this device.",
-                default_value = "false",
-                value_data_type = (int)Data_Types.BOOL
-            });
-
-            // Iterate the plug-in
-            foreach (Plugin p in _plugins)
-            {
-                //keeps this plug-in in scope 
-                var p2 = p;
-
-                using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                builtin_commands.AddOrEdit(new builtin_commands
                 {
+                    name = "REPOLL_ME",
+                    friendly_name = "Re-poll Device",
+                    arg_data_type = (int)Data_Types.INTEGER,
+                    show_on_dynamic_obj_list = false,
+                    description = "This will force a re-poll on an object."
+                }, context);
+
+                builtin_commands.AddOrEdit(new builtin_commands
+                {
+                    name = "REPOLL_ALL",
+                    friendly_name = "Re-poll all Devices",
+                    arg_data_type = (int)Data_Types.NONE,
+                    show_on_dynamic_obj_list = false,
+                    description = "This will force a re-poll on all objects."
+                }, context);
+
+                builtin_commands.AddOrEdit(new builtin_commands
+                {
+                    name = "GROUP_ON",
+                    friendly_name = "Turn Group On",
+                    arg_data_type = (int)Data_Types.STRING,
+                    show_on_dynamic_obj_list = false,
+                    description = "Activates a group."
+                }, context);
+
+                builtin_commands.AddOrEdit(new builtin_commands
+                {
+                    name = "GROUP_OFF",
+                    friendly_name = "Turn Group Off",
+                    arg_data_type = (int)Data_Types.STRING,
+                    show_on_dynamic_obj_list = false,
+                    description = "Deactivates a group."
+                }, context);
+
+                builtin_commands.AddOrEdit(new builtin_commands
+                {
+                    name = "TIMEDELAY",
+                    friendly_name = "Scene Time Delay (sec)",
+                    arg_data_type = (int)Data_Types.INTEGER,
+                    show_on_dynamic_obj_list = false,
+                    description = "Pauses a scene execution for x seconds."
+                }, context);
+
+                device_propertys.AddOrEdit(new device_propertys
+                {
+                    name = "ENABLEPOLLING",
+                    friendly_name = "Enable polling for this device.",
+                    default_value = "false",
+                    value_data_type = (int)Data_Types.BOOL
+                }, context);
+
+
+                // Iterate the plug-in
+                foreach (Plugin p in _plugins)
+                {
+                    //keeps this plug-in in scope 
+                    var p2 = p;
+
+                    //Plugin need access to the core in order to use the Logger
+                    p2.Core = this.Core;
+                    
                     //make sure none of them are new...
                     plugin ent_p = context.plugins.FirstOrDefault(pl => pl.name == p2.Name);
                     if (ent_p == null)
                     {
                         //if it is a new plug-in save it to the database.
                         ent_p = new plugin { name = p2.Name, friendly_name = p2.ToString() };
-                        context.plugins.AddObject(ent_p);
+                        context.plugins.Add(ent_p);
                         context.SaveChanges();
                     }
+
+                    Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), _FriendlyName);
+                    p2.Initialize();
+                    p2.Start();
                 }
-
-                Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), _FriendlyName);
-                p2.Initialize();
-                p2.Start();
-
-                ////initialize each plug-in on a separate thread.
-                //BackgroundWorker pluginInitializer = new BackgroundWorker();
-                //pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>
-                //{
-                    
-                //};
-                //pluginInitializer.RunWorkerAsync();
             }
 
             builtin_command_que.BuiltinCommandAddedToQueEvent += new builtin_command_que.BuiltinCommandAddedEventHandler(builtin_command_que_BuiltinCommandAddedToQueEvent);
@@ -124,7 +116,7 @@ namespace zVirtualScenes
 
         void device_type_command_que_DeviceTypeCommandAddedToQueEvent(int device_type_command_que_id)
         {
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
                 device_type_command_que cmd = context.device_type_command_que.FirstOrDefault(c => c.id == device_type_command_que_id);
 
@@ -152,7 +144,7 @@ namespace zVirtualScenes
                                     Core.Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                                    context.device_type_command_que.DeleteObject(cmd);
+                                    context.device_type_command_que.Remove(cmd);
                                     context.SaveChanges();
                                     return;
                                 }
@@ -164,7 +156,7 @@ namespace zVirtualScenes
                             {
                                 p.ProcessDeviceTypeCommand(cmd);
                                 device_type_command_que.DeviceTypeCommandRunComplete(cmd, false, string.Empty);
-                                context.device_type_command_que.DeleteObject(cmd);
+                                context.device_type_command_que.Remove(cmd);
                                 context.SaveChanges();
                                 return;
                             }
@@ -175,7 +167,7 @@ namespace zVirtualScenes
                             Core.Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                            context.device_type_command_que.DeleteObject(cmd);
+                            context.device_type_command_que.Remove(cmd);
                             context.SaveChanges();
                             return;
                         }
@@ -193,7 +185,7 @@ namespace zVirtualScenes
 
         void device_command_que_DeviceCommandAddedToQueEvent(int device_command_que_id)
         {
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
                 device_command_que cmd = context.device_command_que.FirstOrDefault(c => c.id == device_command_que_id);
 
@@ -221,7 +213,7 @@ namespace zVirtualScenes
                                     Core.Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
 
                                     device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                                    context.device_command_que.DeleteObject(cmd);
+                                    context.device_command_que.Remove(cmd);
                                     context.SaveChanges();
                                     return;
                                 }
@@ -233,7 +225,7 @@ namespace zVirtualScenes
                             {
                                 p.ProcessDeviceCommand(cmd);
                                 device_command_que.DeviceCommandRunComplete(cmd, false, string.Empty);
-                                context.device_command_que.DeleteObject(cmd);
+                                context.device_command_que.Remove(cmd);
                                 context.SaveChanges();
                                 return;
                             }
@@ -244,7 +236,7 @@ namespace zVirtualScenes
                             Core.Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
 
                             device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                            context.device_command_que.DeleteObject(cmd);
+                            context.device_command_que.Remove(cmd);
                             context.SaveChanges();
                             return;
                         }
@@ -258,9 +250,9 @@ namespace zVirtualScenes
 
         void builtin_command_que_BuiltinCommandAddedToQueEvent(int builtin_command_que_id)
         {
-            using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
-                builtin_command_que cmd = db.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
+                builtin_command_que cmd = context.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
 
                 if (cmd != null)
                 {
@@ -275,7 +267,7 @@ namespace zVirtualScenes
                             {
                                 int d_id = 0;
                                 int.TryParse(cmd.arg, out d_id);
-                                device d = device.GetAllDevices(db, false).FirstOrDefault(o => o.id == d_id);
+                                device d = device.GetAllDevices(context, false).FirstOrDefault(o => o.id == d_id);
 
                                 if (d.device_types.plugin.enabled)
                                 {
@@ -285,7 +277,7 @@ namespace zVirtualScenes
                             }
                         case "REPOLL_ALL":
                             {
-                                foreach (device d in device.GetAllDevices(db, false))
+                                foreach (device d in device.GetAllDevices(context, false))
                                 {
                                     if (d.device_types.plugin.enabled)
                                     {
@@ -329,13 +321,12 @@ namespace zVirtualScenes
                     builtin_command_que.BuiltinCommandRunComplete(cmd, false, "");
 
                     //Remove processed command from que
-                    db.builtin_command_que.DeleteObject(cmd);
-                    db.SaveChanges();
+                    context.builtin_command_que.Remove(cmd);
+                    context.SaveChanges();
                 }
                 else
                     Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued built-in command.", _FriendlyName);
             }
-
         }
 
         public IEnumerable<Plugin> GetPlugins()

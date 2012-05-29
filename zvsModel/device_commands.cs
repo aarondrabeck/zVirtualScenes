@@ -7,13 +7,12 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace zvsModel
+namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
-
+    
     public partial class device_commands
     {
         public device_commands()
@@ -21,7 +20,7 @@ namespace zvsModel
             this.device_command_options = new ObservableCollection<device_command_options>();
             this.device_command_que = new ObservableCollection<device_command_que>();
         }
-
+    
         public int id { get; set; }
         public int device_id { get; set; }
         public string name { get; set; }
@@ -32,11 +31,9 @@ namespace zvsModel
         public string description { get; set; }
         public Nullable<int> sort_order { get; set; }
         public string help { get; set; }
-
+    
         public virtual ObservableCollection<device_command_options> device_command_options { get; set; }
         public virtual ObservableCollection<device_command_que> device_command_que { get; set; }
         public virtual device device { get; set; }
-
-        v
     }
 }

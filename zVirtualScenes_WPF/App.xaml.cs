@@ -4,10 +4,8 @@ using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Windows;
-using zVirtualScenesCommon.Util;
 using System.IO;
-using zVirtualScenesCommon.Entity;
-using zvsModel;
+using zVirtualScenesModel;
 using zVirtualScenes;
 using System.ComponentModel;
 

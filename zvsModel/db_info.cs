@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace zvsModel
+namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;

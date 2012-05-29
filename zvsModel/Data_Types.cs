@@ -1,4 +1,4 @@
-﻿namespace zvsModel
+﻿namespace zVirtualScenesModel
 {    
     public enum Data_Types
     {

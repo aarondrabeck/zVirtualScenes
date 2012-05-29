@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using zVirtualScenesCommon;
 using System.ComponentModel;
 using zVirtualScenes.Triggers;
 using System.Windows.Threading;
-using zvsModel;
+using zVirtualScenesModel;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace zVirtualScenes
 {
@@ -140,7 +140,37 @@ namespace zVirtualScenes
             //Create a instace of the logger
             Logger = new Logger();
 
-            pluginManager = new PluginManager(this);
+            //Create the Plugin Manager thereby loading the plugins
+            try
+            {
+                pluginManager = new PluginManager(this);
+            }
+            catch (System.Reflection.ReflectionTypeLoadException reflectionEx)
+            {
+                string error = "Cannot load one or more plug-ins.";
+                Exception ex = reflectionEx.LoaderExceptions.FirstOrDefault();
+                if (ex != null)
+                {
+                    error = ex.ToString() + 
+                        Environment.NewLine + 
+                        Environment.NewLine +
+                        string.Format("This plug-in might not be compatible with {0}. Try removing the plugin and re-launching the application. ", Utils.ApplicationNameAndVersion);
+                }
+                if (MessageBox.Show(error, "Fatal plug-in load error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
+                {
+                    Environment.Exit(1);
+                    return;
+                }
+            }
+            catch (Exception e)
+            {                
+                if (MessageBox.Show(e.Message, "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
+                {
+                    Environment.Exit(1);
+                    return;
+                }
+            }            
+            
             triggerManager = new TriggerManager(this);
             scheduledTaskManager = new ScheduledTaskManager(this);
 

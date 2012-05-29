@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections;
 using zVirtualScenes_WPF.DynamicSettingsControls;
-using zvsModel;
+using zVirtualScenesModel;
 
 namespace zVirtualScenes_WPF.PluginManager
 {
@@ -24,7 +24,8 @@ namespace zVirtualScenes_WPF.PluginManager
     {
 
         private App application = (App)Application.Current;
-        private zvsLocalDBEntities context;   
+        private zvsLocalDBEntities context;
+        private bool isLoaded = false; 
 
         public PluginManagerWindow()
         {
@@ -36,21 +37,25 @@ namespace zVirtualScenes_WPF.PluginManager
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Do not load your data at design time.
-            //if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            //{
-            //Load your data here and assign the result to the CollectionViewSource.
-            System.Windows.Data.CollectionViewSource zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2pluginsViewSource")));
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2pluginsViewSource")));
 
-            //Get plug-ins from database where currently loaded plug-ins match plug-ins from the db.  
-            //This will prevent plug-ins that are in the DB but not loaded from being configurable.
-            //zvsEntities2ViewSource.Source = context.plugins.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
-            zvsEntities2ViewSource.Source = context.plugins;
-            //}           
+                //Get plug-ins from database where currently loaded plug-ins match plug-ins from the db.  
+                //This will prevent plug-ins that are in the DB but not loaded from being configurable.
+                //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
+
+                context.plugins.Local.ToList();
+                zvsEntities2ViewSource.Source = context.plugins.Local;               
+            }
+
+            isLoaded = true;
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            context.Dispose();
+            //context.Dispose();
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -60,7 +65,7 @@ namespace zVirtualScenes_WPF.PluginManager
         }
 
         private void PromptSaveNowIfChanged()
-        {           
+        {
             foreach (DynamicSettingsInterface setting in this.ControlsStkPnl.Children.OfType<DynamicSettingsInterface>())
             {
                 if (setting.hasChanged)
@@ -91,91 +96,99 @@ namespace zVirtualScenes_WPF.PluginManager
             {
                 foreach (plugin_settings ps in p.plugin_settings)
                 {
-                    //switch ((Data_Types)ps.value_data_type)
-                    //{
-                    //    case Data_Types.BOOL:
-                    //        {
-                    //            this.ControlsStkPnl.Children.Add(new BoolSettingsControl(context, ps));
+                    switch ((Data_Types)ps.value_data_type)
+                    {
+                        case Data_Types.BOOL:
+                            {
+                                this.ControlsStkPnl.Children.Add(new BoolSettingsControl(context, ps));
 
-                    //            break;
-                    //        }
-                    //    case Data_Types.DECIMAL:
-                    //        {
-                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                    //            control.MaxValue = Decimal.MaxValue;
-                    //            control.MinValue = Decimal.MinValue;
-                    //            this.ControlsStkPnl.Children.Add(control);
-                    //            break;
-                    //        }
-                    //    case Data_Types.BYTE:
-                    //        {
-                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                    //            control.MaxValue = Byte.MaxValue;
-                    //            control.MinValue = Byte.MinValue;
-                    //            control.ForceWholeNumber = true;
-                    //            this.ControlsStkPnl.Children.Add(control);
-                    //            break;
-                    //        }
-                    //    case Data_Types.INTEGER:
-                    //        {
-                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                    //            control.MaxValue = Int64.MaxValue;
-                    //            control.MinValue = Int64.MinValue;
-                    //            control.ForceWholeNumber = true;
-                    //            this.ControlsStkPnl.Children.Add(control);
-                    //            break;
-                    //        }
-                    //    case Data_Types.SHORT:
-                    //        {
-                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                    //            control.MaxValue = short.MaxValue;
-                    //            control.MinValue = short.MinValue;
-                    //            control.ForceWholeNumber = true;
-                    //            this.ControlsStkPnl.Children.Add(control);
-                    //            break;
-                    //        }
-                    //    case Data_Types.STRING:
-                    //        {
-                    //            this.ControlsStkPnl.Children.Add(new StringSettingsControl(context, ps));
-                    //            break;
-                    //        }
-                    //    case Data_Types.COMPORT:
-                    //        {
-                    //            NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                    //            control.MaxValue = 0;
-                    //            control.MinValue = 99;
-                    //            control.ForceWholeNumber = true;
-                    //            this.ControlsStkPnl.Children.Add(control);
-                    //            break;
-                    //        }
-                    //}
+                                break;
+                            }
+                        case Data_Types.DECIMAL:
+                            {
+                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                                control.MaxValue = Decimal.MaxValue;
+                                control.MinValue = Decimal.MinValue;
+                                this.ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                        case Data_Types.BYTE:
+                            {
+                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                                control.MaxValue = Byte.MaxValue;
+                                control.MinValue = Byte.MinValue;
+                                control.ForceWholeNumber = true;
+                                this.ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                        case Data_Types.INTEGER:
+                            {
+                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                                control.MaxValue = Int64.MaxValue;
+                                control.MinValue = Int64.MinValue;
+                                control.ForceWholeNumber = true;
+                                this.ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                        case Data_Types.SHORT:
+                            {
+                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                                control.MaxValue = short.MaxValue;
+                                control.MinValue = short.MinValue;
+                                control.ForceWholeNumber = true;
+                                this.ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                        case Data_Types.STRING:
+                            {
+                                this.ControlsStkPnl.Children.Add(new StringSettingsControl(context, ps));
+                                break;
+                            }
+                        case Data_Types.COMPORT:
+                            {
+                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
+                                control.MaxValue = 0;
+                                control.MinValue = 99;
+                                control.ForceWholeNumber = true;
+                                this.ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                    }
                 }
             }
         }
 
         private void EnabledChkBx_Checked(object sender, RoutedEventArgs e)
         {
-            context.SaveChanges();
-
-            plugin p = (plugin)PluginLstVw.SelectedItem;
-            if (p != null)
+            //Prevent this from triggering as the UI loads and sets the checkbox
+            if (isLoaded)
             {
-                var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
-                if(Plugin != null)
-                    Plugin.Start();
+                context.SaveChanges();
+
+                plugin p = (plugin)PluginLstVw.SelectedItem;
+                if (p != null)
+                {
+                    var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                    if (Plugin != null)
+                        Plugin.Start();
+                }
             }
         }
 
         private void EnabledChkBx_Unchecked(object sender, RoutedEventArgs e)
         {
-            context.SaveChanges();
-
-            plugin p = (plugin)PluginLstVw.SelectedItem;
-            if (p != null)
+            //Prevent this from triggering as the UI loads and sets the checkbox
+            if (isLoaded)
             {
-                var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
-                if (Plugin != null)
-                    Plugin.Stop();
+                context.SaveChanges();
+
+                plugin p = (plugin)PluginLstVw.SelectedItem;
+                if (p != null)
+                {
+                    var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                    if (Plugin != null)
+                        Plugin.Stop();
+                }
             }
         }
     }

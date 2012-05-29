@@ -49,7 +49,7 @@ namespace zVirtualScenes
         {
             get
             {
-                string path = Path.Combine(Paths.AppDataPath, @"logs\");
+                string path = Path.Combine(Utils.AppDataPath, @"logs\");
                 if (!Directory.Exists(path))
                 {
                     try { Directory.CreateDirectory(path); }

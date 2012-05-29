@@ -2,25 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using zVirtualScenesCommon.Entity;
-using zVirtualScenesCommon.Util;
+using zVirtualScenesModel;
 
 namespace zVirtualScenes.Triggers
 {
-    public class ScriptManager
+    public class Scripting
     {
         private Core Core;
         private const string _FriendlyName = "ADVANCEDSCRIPT";
 
-
-        public ScriptManager(Core Core)
+        public Scripting(Core Core)
         {
             this.Core = Core;
         }
 
-        public void RunScript(device_value_triggers trigger)
+        public void RunScript(zvsLocalDBEntities context, device_value_triggers trigger)
         {
-
             Core.Logger.WriteToLog(Urgency.INFO, "Running Advanced Script - " + trigger.FriendlyName, _FriendlyName);
 
             // Step 1: Split up the lines of the script
@@ -52,23 +49,21 @@ namespace zVirtualScenes.Triggers
                 else if (scriptLine.StartsWith("runscene"))
                 {
                     // Run this scene!
-                    using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
-                    {
-                        String scene_name = scriptLine.Substring(scriptLine.IndexOf(" ") + 1);
-                        scene _scene = context.scenes.FirstOrDefault(s => s.friendly_name.ToLower() == scene_name);
+                    String scene_name = scriptLine.Substring(scriptLine.IndexOf(" ") + 1);
+                    scene _scene = context.scenes.FirstOrDefault(s => s.friendly_name.ToLower() == scene_name);
 
-                        // Make sure the user specified a correct scene name
-                        if (_scene != null)
-                        {
-                            _scene.RunScene(context);
-                            Core.Logger.WriteToLog(Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", _FriendlyName);
-                        }
-                        else
-                        {
-                            Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.FriendlyName + " specified a invalid scene name '" + scene_name + "'", _FriendlyName);
-                            return;
-                        }
+                    // Make sure the user specified a correct scene name
+                    if (_scene != null)
+                    {
+                        _scene.RunScene(context);
+                        Core.Logger.WriteToLog(Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", _FriendlyName);
                     }
+                    else
+                    {
+                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.FriendlyName + " specified a invalid scene name '" + scene_name + "'", _FriendlyName);
+                        return;
+                    }
+
                 }
                 else if (scriptLine.StartsWith("if"))
                 {
@@ -114,8 +109,8 @@ namespace zVirtualScenes.Triggers
                         strValues[0] = parameters.Substring(0, parameters.IndexOf(strOperator));
                         strValues[1] = parameters.Substring(parameters.IndexOf(strOperator) + strOperator.Length);
 
-                        intValues[0] = GetValue(trigger.FriendlyName, strValues[0]);
-                        intValues[1] = GetValue(trigger.FriendlyName, strValues[1]);
+                        intValues[0] = GetValue(context, trigger.FriendlyName, strValues[0]);
+                        intValues[1] = GetValue(context, trigger.FriendlyName, strValues[1]);
 
                         switch (operatorType)
                         {
@@ -160,7 +155,7 @@ namespace zVirtualScenes.Triggers
             Core.Logger.WriteToLog(Urgency.INFO, "Finished Running Advanced Script - " + trigger.FriendlyName, _FriendlyName);
         }
 
-        private int GetValue(String triggerName, String strValue)
+        private int GetValue(zvsLocalDBEntities context, String triggerName, String strValue)
         {
             int intValue;
 
@@ -169,34 +164,31 @@ namespace zVirtualScenes.Triggers
             if (isint)
                 return intValue;
 
-            using (zvsEntities2 context = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+            // Step 1: Get Device
+            String device_name = strValue.Substring(0, strValue.IndexOf(".")).Trim();
+            String value_name = strValue.Substring(strValue.IndexOf(".") + 1).Trim();
+            device _device = context.devices.FirstOrDefault(d => d.friendly_name.ToLower() == device_name);
+
+            if (_device != null)
             {
-                // Step 1: Get Device
-                String device_name = strValue.Substring(0, strValue.IndexOf(".")).Trim();
-                String value_name = strValue.Substring(strValue.IndexOf(".") + 1).Trim();
-                device _device = context.devices.FirstOrDefault(d => d.friendly_name.ToLower() == device_name);
+                // Step 2: Get device value
+                device_values device_value = _device.device_values.FirstOrDefault(dv => dv.label_name.ToLower() == value_name);
 
-                if (_device != null)
+                if (device_value != null)
                 {
-                    // Step 2: Get device value
-                    device_values device_value = _device.device_values.FirstOrDefault(dv => dv.label_name.ToLower() == value_name);
-
-                    if (device_value != null)
-                    {
-                        int.TryParse(device_value.value2, out intValue);
-                        return intValue;
-                    }
-                    else
-                    {
-                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + triggerName + " specified a invalid device value name name '" + strValue + "'", _FriendlyName);
-                        throw new Exception();
-                    }
+                    int.TryParse(device_value.value2, out intValue);
+                    return intValue;
                 }
                 else
                 {
-                    Core.Logger.WriteToLog(Urgency.ERROR, "Script " + triggerName + " specified a invalid device name '" + device_name + "'", _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, "Script " + triggerName + " specified a invalid device value name name '" + strValue + "'", _FriendlyName);
                     throw new Exception();
                 }
+            }
+            else
+            {
+                Core.Logger.WriteToLog(Urgency.ERROR, "Script " + triggerName + " specified a invalid device name '" + device_name + "'", _FriendlyName);
+                throw new Exception();
             }
         }
     }

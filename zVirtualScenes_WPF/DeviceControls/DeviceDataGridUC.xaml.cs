@@ -11,10 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesCommon;
 using System.Windows.Media.Media3D;
 using System.ComponentModel;
-using zvsModel;
+using zVirtualScenesModel;
 using System.Collections.ObjectModel;
 
 

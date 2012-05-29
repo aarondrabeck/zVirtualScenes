@@ -16,7 +16,7 @@
         <EntityTypeShape EntityType="zvsLocalDBModel.device_property_values" Width="1.5" PointX="10.5" PointY="19.875" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.device_propertys" Width="1.5" PointX="8.25" PointY="27.75" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.device_type_command_options" Width="1.5" PointX="7.5" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="zvsLocalDBModel.device_type_command_que" Width="1.5" PointX="7.5" PointY="12.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.device_type_command_que" Width="2.625" PointX="6.375" PointY="12.75" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.device_type_commands" Width="1.5" PointX="5.25" PointY="8.875" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.device_types" Width="1.5" PointX="3" PointY="13.5" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.device_value_triggers" Width="1.5" PointX="9.75" PointY="23.375" IsExpanded="true" />

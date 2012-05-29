@@ -7,8 +7,8 @@
     <ProjectGuid>{796E1087-65E8-4CDA-BDD6-6661BD843A7D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>zvsModel</RootNamespace>
-    <AssemblyName>zvsModel</AssemblyName>
+    <RootNamespace>zVirtualScenesModel</RootNamespace>
+    <AssemblyName>zVirtualScenesModel</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
@@ -76,7 +76,25 @@
     <Compile Include="builtin_command_que.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Command_Types.cs" />
     <Compile Include="Custom\builtin_commands.cs" />
+    <Compile Include="Custom\builtin_command_que.cs" />
+    <Compile Include="Custom\device.cs" />
+    <Compile Include="Custom\device_commands.cs" />
+    <Compile Include="Custom\device_command_que.cs" />
+    <Compile Include="Custom\device_propertys.cs" />
+    <Compile Include="Custom\device_property_values.cs" />
+    <Compile Include="Custom\device_type_commands.cs" />
+    <Compile Include="Custom\device_type_command_que.cs" />
+    <Compile Include="Custom\device_values.cs" />
+    <Compile Include="Custom\device_value_triggers.cs" />
+    <Compile Include="Custom\group.cs" />
+    <Compile Include="Custom\program_options.cs" />
+    <Compile Include="Custom\scene.cs" />
+    <Compile Include="Custom\scene_commands.cs" />
+    <Compile Include="Custom\scene_property.cs" />
+    <Compile Include="Custom\scene_property_value.cs" />
+    <Compile Include="Custom\scheduled_tasks.cs" />
     <Compile Include="Data_Types.cs" />
     <Compile Include="db_info.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>

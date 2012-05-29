@@ -11,7 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesCommon.Entity;
+using zVirtualScenesModel;
 
 namespace zVirtualScenes_WPF.DynamicSettingsControls
 {
@@ -20,7 +20,7 @@ namespace zVirtualScenes_WPF.DynamicSettingsControls
     /// </summary>
     public partial class StringSettingsControl : UserControl, DynamicSettingsInterface
     {
-        zvsEntities2 context;
+        zvsLocalDBEntities context;
         plugin_settings plugin_setting;
         private bool _haschanged = false;
 
@@ -30,7 +30,7 @@ namespace zVirtualScenes_WPF.DynamicSettingsControls
         }
 
         bool hasLoaded = false;
-        public StringSettingsControl(zvsEntities2 context, plugin_settings plugin_setting)
+        public StringSettingsControl(zvsLocalDBEntities context, plugin_settings plugin_setting)
         {
             InitializeComponent();
 

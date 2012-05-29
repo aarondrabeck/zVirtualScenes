@@ -38,11 +38,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,23 +58,16 @@
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\LogItem.cs" />
     <Compile Include="Logger\Urgency.cs" />
-    <Compile Include="Paths.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="ScheduledTaskManager.cs" />
     <Compile Include="Triggers\TriggerManager.cs" />
-    <Compile Include="Triggers\ScriptManager.cs" />
+    <Compile Include="Triggers\Scripting.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="PluginManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\zVirtualScenesAPI\zVirtualScenesAPI.csproj">
-      <Project>{90E854D0-AB37-4928-BF33-93B3553F33A9}</Project>
-      <Name>zVirtualScenesAPI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\zVirtualScenesCommon\zVirtualScenesCommon.csproj">
-      <Project>{FAB9DCA3-2FDC-4C44-B6D5-0B0105D66E00}</Project>
-      <Name>zVirtualScenesCommon</Name>
-    </ProjectReference>
     <ProjectReference Include="..\zvsModel\zvsModel.csproj">
       <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
       <Name>zvsModel</Name>

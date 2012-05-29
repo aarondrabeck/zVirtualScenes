@@ -10,10 +10,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenesCommon.Entity;
 using zVirtualScenes_WPF.DeviceControls;
 using System.Data.Objects;
 using System.ComponentModel;
+using zVirtualScenesModel;
 
 namespace zVirtualScenes_WPF.Groups
 {
@@ -22,11 +22,13 @@ namespace zVirtualScenes_WPF.Groups
     /// </summary>
     public partial class GroupEditor : Window
     {
-        private zvsEntities2 context = zvsEntityControl.Objects.SharedContext;
-        public static IBindingList GroupList; 
+        private App application = (App)Application.Current;
+        private zvsLocalDBEntities context;
 
         public GroupEditor()
         {
+            context = application.zvsCore.context;
+
             InitializeComponent();
         }
 
@@ -35,9 +37,8 @@ namespace zVirtualScenes_WPF.Groups
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                GroupList = ((IListSource)context.groups).GetList() as IBindingList;
                 System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
-                groupsViewSource.Source = GroupList;
+                groupsViewSource.Source = context.groups.Local;
             }
 
             DeviceLst.AdvancedDisplay = false;
@@ -48,7 +49,7 @@ namespace zVirtualScenes_WPF.Groups
 
         private void EvaluateAddEditBtnsUsability()
         {
-            if (GroupList.Count > 0)
+            if (GroupCmbBx.Items.Count > 0)
             {
                 this.RemoveBtn.IsEnabled = true;
                 this.EditBtn.IsEnabled = true;
@@ -72,16 +73,17 @@ namespace zVirtualScenes_WPF.Groups
 
             if (nameWindow.ShowDialog() ?? false)
             {
-                group new_g = group.Creategroup(0, nameWindow.GroupName);
-
-                lock (context)
+                group new_g = new group()
                 {
-                    GroupList.Add(new_g);
-                    context.SaveChanges();
-                }               
+                    name = nameWindow.GroupName
+                };
+
+                context.groups.Local.Add(new_g);
+                context.SaveChanges();
+
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
-        
+
             }
         }
 
@@ -94,14 +96,13 @@ namespace zVirtualScenes_WPF.Groups
                     MessageBox.Show("Are you sure you want to delete the '" + g.name + "' group?",
                                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    lock (context)
-                    {
-                        context.groups.DeleteObject(g);
-                        context.SaveChanges();
-                    }
+
+                    context.groups.Local.Remove(g);
+                    context.SaveChanges();
+
                 }
             }
-            
+
         }
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
@@ -114,11 +115,8 @@ namespace zVirtualScenes_WPF.Groups
 
                 if (nameWindow.ShowDialog() ?? false)
                 {
-                    lock (context)
-                    {
-                        g.name = nameWindow.GroupName;
-                        context.SaveChanges();
-                    }
+                    g.name = nameWindow.GroupName;
+                    context.SaveChanges();
                 }
             }
         }
@@ -143,32 +141,30 @@ namespace zVirtualScenes_WPF.Groups
                 {
                     groupsDevicesLstVw.SelectedItems.Clear();
 
-                    lock (context)
+                    foreach (device device in devices)
                     {
-                        foreach (device device in devices)
+                        if (!selected_group.group_devices.Any(o => o.device_id == device.id && o.group_id == selected_group.id))
                         {
-                            if (!selected_group.group_devices.Any(o => o.device_id == device.id && o.group_id == selected_group.id))
+                            group_devices gd = new group_devices
                             {
-                                group_devices gd = new group_devices
-                                {
-                                    device_id = device.id,
-                                    group_id = selected_group.id
-                                };
+                                device_id = device.id,
+                                group_id = selected_group.id
+                            };
 
-                                context.group_devices.AddObject(gd);
-                                groupsDevicesLstVw.SelectedItems.Add(gd);
-                                DeviceLst.DeviceGrid.SelectedItems.Clear();
-                            }
-                            else
-                            {
-                                MessageBox.Show(string.Format("{0} is already a member of the '{1}' group.", device.friendly_name, selected_group.name),
-                                                "Already a member",
-                                                MessageBoxButton.OK,
-                                                MessageBoxImage.Error);
-                            }
+                            context.group_devices.Local.Add(gd);
+                            groupsDevicesLstVw.SelectedItems.Add(gd);
+                            DeviceLst.DeviceGrid.SelectedItems.Clear();
                         }
-                        context.SaveChanges();
+                        else
+                        {
+                            MessageBox.Show(string.Format("{0} is already a member of the '{1}' group.", device.friendly_name, selected_group.name),
+                                            "Already a member",
+                                            MessageBoxButton.OK,
+                                            MessageBoxImage.Error);
+                        }
                     }
+                    context.SaveChanges();
+
                     groupsDevicesLstVw.Focus();
                 }
 
@@ -205,13 +201,11 @@ namespace zVirtualScenes_WPF.Groups
                                          MessageBoxButton.YesNo,
                                          MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
-                    lock (context)
-                    {
-                        foreach (group_devices gd in SelectedItemsCopy)
-                            context.group_devices.DeleteObject(gd);
-                        context.SaveChanges();
-                    }
-                }                
+
+                    foreach (group_devices gd in SelectedItemsCopy)
+                        context.group_devices.Remove(gd);
+                    context.SaveChanges();
+                }
             }
 
 
