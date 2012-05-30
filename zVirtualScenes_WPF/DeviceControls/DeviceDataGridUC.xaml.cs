@@ -24,12 +24,12 @@ namespace zVirtualScenes_WPF.DeviceControls
     /// </summary>
     public partial class DeviceDataGridUC : UserControl
     {
+        private zvsLocalDBEntities context;
+
         public DeviceDataGridUC()
         {
             InitializeComponent();
         }
-      
-        private zvsLocalDBEntities context = ((App)Application.Current).zvsCore.context;
 
         private bool _AdvancedDisplay = true;
         public bool AdvancedDisplay
@@ -61,19 +61,43 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            context = new zvsLocalDBEntities();
+
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-
-                //context.devices.Load()
+                LoadContext();
                 myCollectionViewSource.Source = context.devices.Local;
-
-                //this.DeviceGrid.ItemsSource = context.devices.Local;
-                //ObservableCollection<device> collection = new ObservableCollection<device>();
-               // collection.Load();
             }
+
+            device.onContextUpdated += group_devices_onContextUpdated;
+            group_devices.onContextUpdated += group_devices_onContextUpdated;
+        }
+
+        private void LoadContext()
+        {
+            context.Dispose();
+            context = new zvsLocalDBEntities();
+            context.devices.ToList();
+            System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+            myCollectionViewSource.Source = context.devices.Local;
+        }
+
+        void group_devices_onContextUpdated(object sender, EventArgs args)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                LoadContext();
+            }));
+        }
+
+        private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
+        {
+            context.Dispose();
+            device.onContextUpdated -= group_devices_onContextUpdated;
+            group_devices.onContextUpdated -= group_devices_onContextUpdated;
         }
 
         ////User Events
@@ -114,17 +138,15 @@ namespace zVirtualScenes_WPF.DeviceControls
                        MessageBox.Show("Are you sure you want to delete the selected devices?",
                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
-                            lock (context)
+                            foreach (device selectedDevice in SelectedItemsCopy)
                             {
-                                foreach (device selectedDevice in SelectedItemsCopy)
-                                {
-                                    device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
-                                    if (d != null)
-                                        context.devices.Remove(d);
-                                }
-
-                                context.SaveChanges();
+                                device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
+                                if (d != null)
+                                    context.devices.Remove(d);
                             }
+
+                            context.SaveChanges();
+                            device.CallOnContextUpdated();
                         }
                     };
 
@@ -143,16 +165,14 @@ namespace zVirtualScenes_WPF.DeviceControls
                 device[] SelectedItemsCopy = new device[DeviceGrid.SelectedItems.Count];
                 DeviceGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
-                lock (context)
+                foreach (device selectedDevice in SelectedItemsCopy)
                 {
-                    foreach (device selectedDevice in SelectedItemsCopy)
-                    {
-                        device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
-                        if (d != null)
-                            context.devices.Remove(d);
-                    }
-                    context.SaveChanges();
+                    device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
+                    if (d != null)
+                        context.devices.Remove(d);
                 }
+                context.SaveChanges();
+                device.CallOnContextUpdated();
             }
         }
 
@@ -210,7 +230,10 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
                 context.SaveChanges();
+                device.CallOnContextUpdated();
             }
         }
+
+
     }
 }

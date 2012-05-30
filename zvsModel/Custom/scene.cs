@@ -49,20 +49,20 @@ namespace zVirtualScenesModel
         List<scene_commands> CommandsToExecute = new List<scene_commands>();
 
         //Methods
-        public string RunScene(zvsLocalDBEntities context)
+        public string RunScene()
         {
-            this.context = context;
-
             if (this.is_running)
                 return "Failed to start scene '" + this.friendly_name + "' because it is already running!";
             else
             {
+                context = new zvsLocalDBEntities();
+
                 if (this.scene_commands.Count < 1)
                     return "Failed to start scene '" + this.friendly_name + "' because it has no commands!";
 
                 this.is_running = true;
                 context.SaveChanges();
-
+                CallOnContextUpdated();
 
                 string result = "Scene '" + this.friendly_name + "' started.";
                 SceneRunStarted(this, result);
@@ -185,6 +185,7 @@ namespace zVirtualScenesModel
                             context.SaveChanges();
 
 
+
                             device_type_command_que.DeviceTypeCommandRunCompleteEventHandler handler = null;
                             handler = (command, withErrors, txtError) =>
                             {
@@ -212,9 +213,17 @@ namespace zVirtualScenesModel
             {
                 this.is_running = false;
                 context.SaveChanges();
+                CallOnContextUpdated();
 
                 SceneRunComplete(this.id, ExecutionErrors);
             }
+        }
+
+        public static event onContextUpdatedEventHandler onContextUpdated;
+        public static void CallOnContextUpdated()
+        {
+            if (onContextUpdated != null)
+                onContextUpdated(null, new EventArgs());
         }
     }
 }

@@ -36,5 +36,12 @@ namespace zVirtualScenesModel
             if (DeviceValueAddedEvent != null)
                 DeviceValueAddedEvent(this, e);
         }
+
+        //public static event onContextUpdatedEventHandler onContextUpdated;
+        //public static void CallOnContextUpdated()
+        //{
+        //    if (onContextUpdated != null)
+        //        onContextUpdated(null, new EventArgs());
+        //}
     }
 }

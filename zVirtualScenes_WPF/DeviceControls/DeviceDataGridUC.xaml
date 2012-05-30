@@ -1,13 +1,12 @@
 ﻿<UserControl x:Class="zVirtualScenes_WPF.DeviceControls.DeviceDataGridUC"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zvsModel" 
+             d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
              Loaded="UserControl_Loaded" PreviewKeyDown="UserControl_PreviewKeyDown" 
-             PreviewMouseRightButtonDown="UserControl_PreviewMouseRightButtonDown" >
+             PreviewMouseRightButtonDown="UserControl_PreviewMouseRightButtonDown" Unloaded="UserControl_Unloaded_1" >
     <UserControl.Resources>
         <Style x:Key="Body_Content_DataGrid_Centering"
         TargetType="{x:Type DataGridCell}">
@@ -44,19 +43,19 @@
                         <DataTemplate>
                             <Image Name="img" Width="30" Height="20" Source="/zVirtualScenes_WPF;component/Images/20radio.png" />
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="THERMOSTAT">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="THERMOSTAT">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/20thermostat.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="DIMMER">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DIMMER">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/20bulb.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="SWITCH">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="SWITCH">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/20switch.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="CONTROLLER">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="CONTROLLER">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/20controller.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="DOORLOCK">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DOORLOCK">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/20doorlock.png"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -83,7 +82,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="DeviceTypeCol" Width="150" MinWidth="50" Header="Type" Binding="{Binding DeviceTypeFriendlyName}" IsReadOnly="True" />
+                <DataGridTextColumn x:Name="DeviceTypeCol" Width="150" MinWidth="50" Header="Type" Binding="{Binding Path=device_types.friendly_name}" IsReadOnly="True" />
 
                 <DataGridTemplateColumn x:Name="LevelCol" Header="Status" Width="120" MinWidth="120" MaxWidth="120" CanUserResize="False" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate >
@@ -97,24 +96,24 @@
                                 <ProgressBar Grid.Column="1" Name="LevelBar" Width="60" Height="25" Margin="5,0,0,0"/>
                             </Grid>
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="THERMOSTAT">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="THERMOSTAT">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status, StringFormat={}{0}F}"/>
                                     <Setter TargetName="LevelBar" Property="Foreground" Value="#FF0088DE"/>
                                     <Setter TargetName="LevelBar" Property="Value" Value="{Binding current_status}"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="DIMMER">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DIMMER">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status, StringFormat={}{0}%}"/>
                                     <Setter TargetName="LevelBar" Property="Value" Value="{Binding current_status}"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="SWITCH">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="SWITCH">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
                                     <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="CONTROLLER">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="CONTROLLER">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
                                     <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding DeviceTypeName}" Value="DOORLOCK">
+                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DOORLOCK">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
                                     <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>

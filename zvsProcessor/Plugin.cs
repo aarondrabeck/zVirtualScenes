@@ -45,14 +45,14 @@ namespace zVirtualScenes
             if (Enabled)
             {
                 StartPlugin();
-                IsRunning = true;                
+                IsRunning = true;
             }
         }
 
         public void Stop()
         {
             StopPlugin();
-            IsRunning = false;            
+            IsRunning = false;
         }
 
         public bool Enabled
@@ -105,64 +105,72 @@ namespace zVirtualScenes
             }
         }
 
-        public void DefineOrUpdateDeviceValue(device_values dv,zvsLocalDBEntities context, bool IgnoreValueChange = false)
+        public void DefineOrUpdateDeviceValue(device_values dv, zvsLocalDBEntities context, bool IgnoreValueChange = false)
         {
 
             device d = context.devices.FirstOrDefault(o => o.id == dv.device_id);
-                if (d != null)
+            if (d != null)
+            {
+                device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == dv.value_id);
+                string prev_value = string.Empty;
+
+                if (existing_dv == null)
                 {
-                    device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == dv.value_id);
-                    string prev_value = string.Empty;
+                    //NEW VALUE
+                    d.device_values.Add(dv);
+                    context.SaveChanges();
 
-                    if (existing_dv == null)
+                    //Call Event
+                    dv.DeviceValueAdded(new System.EventArgs());
+                }
+                else
+                {
+
+                    //CHANGED VALUE
+                    prev_value = existing_dv.value2;
+
+                    //values come in blank sometimes.  If they are blank, keep the DB value. 
+                    if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value2))
+                        existing_dv.value2 = dv.value2;
+
+                    existing_dv.type = dv.type;
+                    existing_dv.label_name = dv.label_name;
+                    existing_dv.index2 = dv.index2;
+                    existing_dv.genre = dv.genre;
+                    existing_dv.commandClassId = dv.commandClassId;
+                    existing_dv.read_only = dv.read_only;
+                    context.SaveChanges();
+
+                    if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value2) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value2)))
                     {
-                        //NEW VALUE
-                        d.device_values.Add(dv);
-                        context.SaveChanges();                        
+                        //LOG IT
+                        string device_name = "Unknown";
+                        if (String.IsNullOrEmpty(d.friendly_name))
+                            device_name = "Device #" + d.id;
+                        else
+                            device_name = d.friendly_name;
 
-                        //Call Event
-                        dv.DeviceValueAdded(new System.EventArgs());                       
-                    }
-                    else
-                    {
-
-                        //CHANGED VALUE
-                        prev_value = existing_dv.value2;
-
-                        //values come in blank sometimes.  If they are blank, keep the DB value. 
-                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value2))
-                            existing_dv.value2 = dv.value2;
-
-                        existing_dv.type = dv.type;
-                        existing_dv.label_name = dv.label_name;
-                        existing_dv.index2 = dv.index2;
-                        existing_dv.genre = dv.genre;
-                        existing_dv.commandClassId = dv.commandClassId;
-                        existing_dv.read_only = dv.read_only;
-                        context.SaveChanges();
-
-                        if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.value2) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.value2)))
+                        this.Core.Dispatcher.Invoke(new Action(() =>
                         {
-                            //LOG IT
-                            string device_name = "Unknown";
-                            if (String.IsNullOrEmpty(d.friendly_name))
-                                device_name = "Device #" + d.id;
-                            else
-                                device_name = d.friendly_name;
-
                             if (!String.IsNullOrEmpty(prev_value))
                                 Core.Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed from {2} to {3}.", device_name, dv.label_name, prev_value, dv.value2), "EVENT");
                             else
                                 Core.Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed to {2}.", device_name, dv.label_name, dv.value2), "EVENT");
-                            
-                            //Call Event
-                            dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = existing_dv.id, previousValue = prev_value });
-                        }
-                    }                    
+                        }));
+
+                        //Call Event
+                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = existing_dv.id, previousValue = prev_value });
+                    }
                 }
-                else
+            }
+            else
+            {
+                this.Core.Dispatcher.Invoke(new Action(() =>
+                {
                     Core.Logger.WriteToLog(Urgency.WARNING, string.Format("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", dv.label_name, dv.value_id), "EVENT");
-            
+                }));
+            }
+
         }
 
         public void DefineOrUpdateSetting(plugin_settings ps, zvsLocalDBEntities context)
@@ -288,55 +296,60 @@ namespace zVirtualScenes
 
         public device_types GetDeviceType(string DeviceTypeName, zvsLocalDBEntities context)
         {
-            plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
-            if (pl != null)
+            lock (context)
             {
-                return pl.device_types.FirstOrDefault(dt => dt.name == DeviceTypeName);
+                plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
+                if (pl != null)
+                {
+                    return pl.device_types.FirstOrDefault(dt => dt.name == DeviceTypeName);
+                }
+                return null;
             }
-
-            return null;
         }
 
         public void DefineOrUpdateDeviceCommand(device_commands dc, zvsLocalDBEntities context)
         {
             device d = context.devices.FirstOrDefault(o => o.id == dc.device_id);
-                if (d != null)
+            if (d != null)
+            {
+                //Does device type exist? 
+                device_commands existing_dc = d.device_commands.FirstOrDefault(c => c.name == dc.name);
+
+                if (existing_dc == null)
                 {
-                    //Does device type exist? 
-                    device_commands existing_dc = d.device_commands.FirstOrDefault(c => c.name == dc.name);
+                    d.device_commands.Add(dc);
+                }
+                else
+                {
+                    existing_dc.help = dc.help;
+                    existing_dc.friendly_name = dc.friendly_name;
+                    existing_dc.description = dc.description;
+                    existing_dc.custom_data2 = dc.custom_data2;
+                    existing_dc.custom_data1 = dc.custom_data1;
+                    existing_dc.arg_data_type = dc.arg_data_type;
 
-                    if (existing_dc == null)
+                    existing_dc.device_command_options.Clear();
+
+                    foreach (var option in context.device_command_options.Where(o => o.device_command_id == existing_dc.id).ToArray())
                     {
-                        d.device_commands.Add(dc);
+                        context.device_command_options.Remove(option);
                     }
-                    else
-                    {
-                        existing_dc.help = dc.help;
-                        existing_dc.friendly_name = dc.friendly_name;
-                        existing_dc.description = dc.description;
-                        existing_dc.custom_data2 = dc.custom_data2;
-                        existing_dc.custom_data1 = dc.custom_data1;
-                        existing_dc.arg_data_type = dc.arg_data_type;
 
-                        existing_dc.device_command_options.Clear();
+                    foreach (device_command_options o in dc.device_command_options)
+                        existing_dc.device_command_options.Add(new device_command_options { name = o.name });
 
-                        foreach (var option in context.device_command_options.Where(o => o.device_command_id == existing_dc.id).ToArray())
-                        {
-                            context.device_command_options.Remove(option);
-                        }
-
-                        foreach (device_command_options o in dc.device_command_options)
-                            existing_dc.device_command_options.Add(new device_command_options { name = o.name });
-
-                        existing_dc.sort_order = dc.sort_order;
-                    }
-                    context.SaveChanges();
-                }            
+                    existing_dc.sort_order = dc.sort_order;
+                }
+                context.SaveChanges();
+            }
         }
 
         public void WriteToLog(Urgency u, string message)
         {
-            Core.Logger.WriteToLog((Urgency)u, message, this.Friendly_Name);
+            this.Core.Dispatcher.Invoke(new Action(() =>
+            {
+                Core.Logger.WriteToLog((Urgency)u, message, this.Friendly_Name);
+            }));
         }
 
         // Abstract functions

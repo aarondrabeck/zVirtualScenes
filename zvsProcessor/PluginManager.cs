@@ -82,8 +82,7 @@ namespace zVirtualScenes
                     default_value = "false",
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
-
-
+                                
                 // Iterate the plug-in
                 foreach (Plugin p in _plugins)
                 {
@@ -101,6 +100,7 @@ namespace zVirtualScenes
                         ent_p = new plugin { name = p2.Name, friendly_name = p2.ToString() };
                         context.plugins.Add(ent_p);
                         context.SaveChanges();
+                        plugin.CallOnContextUpdated();
                     }
 
                     Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), _FriendlyName);

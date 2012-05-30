@@ -39,5 +39,12 @@ namespace zVirtualScenesModel
                     return "Advanced Trigger!"; // Temp fix to show something in the list for now till I figure out exactly what I should show.
             }
         }
+
+        public static event onContextUpdatedEventHandler onContextUpdated;
+        public static void CallOnContextUpdated()
+        {
+            if (onContextUpdated != null)
+                onContextUpdated(null, new EventArgs());
+        }
     }
 }

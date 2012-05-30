@@ -31,13 +31,13 @@ namespace zVirtualScenes_WPF
         private zvsLocalDBEntities context;
         
         public MainWindow()
-        {
-            context = application.zvsCore.context;
+        {           
             InitializeComponent();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            context = new zvsLocalDBEntities();
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -50,89 +50,13 @@ namespace zVirtualScenes_WPF
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-           
+            context.Dispose();
         }
 
-        private void AddSampleData()
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                plugin p = new plugin { name = "TEST", friendly_name = "Test plugin", description = "None" };
-                context.plugins.Add(p);
-
-                device_types controller_dt = new device_types { plugin = p, name = "CONTROLLER", friendly_name = "OpenZWave Controller", show_in_list = true };
-                context.device_types.Add(controller_dt);
-
-                device ozw_device = new device
-                {
-                    node_id = 1,
-                    device_types = controller_dt,
-                    current_status = "Active",
-                    friendly_name = "Sample Controller"
-                };
-
-                context.devices.Add(ozw_device);
-                context.SaveChanges();               
-            }));
-        }
+       
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.F11)
-            {
-                Thread thread = new Thread(new ThreadStart(AddSampleData));
-                thread.Start();
-
-                //AddSampleData();
-
-                //device ozw_device1 = new device
-                //{
-                //    node_id = 2,
-                //    device_type_id = 2,
-                //    current_status = "On",
-                //    friendly_name = "Switch Sample"
-                //};
-
-                //device ozw_device2 = new device
-                //{
-                //    node_id = 3,
-                //    device_type_id = 3,
-                //    current_status = "25",
-                //    friendly_name = "Dimmer Sample"
-                //};
-
-
-                //device ozw_device3 = new device
-                //{
-                //    node_id = 99,
-                //    device_type_id = 4,
-                //    current_status = "75",
-                //    friendly_name = "Thermo Sample"
-                //};
-
-                //device ozw_device4 = new device
-                //{
-                //    node_id = 4,
-                //    device_type_id = 5,
-                //    current_status = "Unlocked",
-                //    friendly_name = "Doorlock Sample"
-                //};
-
-                lock (context)
-                {
-
-
-
-
-
-                    //context.devices.Add(ozw_device1);
-                    //context.devices.Add(ozw_device2);
-                    //context.devices.Add(ozw_device3);
-                    //context.devices.Add(ozw_device4);
-
-                }
-            }
-
+        {                
             if (e.Key == Key.F12)
             {
                 SetNamesDevOnly();
@@ -141,8 +65,6 @@ namespace zVirtualScenes_WPF
 
         private void SetNamesDevOnly()
         {
-            lock (context)
-            {
                 foreach (device d in context.devices)
                 {
                     switch (d.node_id)
@@ -227,15 +149,7 @@ namespace zVirtualScenes_WPF
                             break;
                     }
                     context.SaveChanges();
-
-                    //zvsEntityControl.CallonSaveChanges(null,
-                    //  new List<zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables>() 
-                    //   { 
-                    //       zVirtualScenesCommon.Entity.zvsEntityControl.onSaveChangesEventArgs.Tables.device 
-                    //   },
-                    //  zvsEntityControl.onSaveChangesEventArgs.ChangeType.Modified);
-                }
-
+                    device.CallOnContextUpdated();
             }
         }
 

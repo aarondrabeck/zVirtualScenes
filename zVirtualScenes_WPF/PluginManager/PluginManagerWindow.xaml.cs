@@ -29,13 +29,13 @@ namespace zVirtualScenes_WPF.PluginManager
 
         public PluginManagerWindow()
         {
-            context = application.zvsCore.context;
-
             InitializeComponent();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            context = new zvsLocalDBEntities();
+
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -46,16 +46,27 @@ namespace zVirtualScenes_WPF.PluginManager
                 //This will prevent plug-ins that are in the DB but not loaded from being configurable.
                 //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
 
-                context.plugins.Local.ToList();
+                context.plugins.ToList();
                 zvsEntities2ViewSource.Source = context.plugins.Local;               
             }
+
+            plugin.onContextUpdated += plugin_onContextUpdated;
 
             isLoaded = true;
         }
 
+        void plugin_onContextUpdated(object sender, EventArgs args)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                context.plugins.ToList();
+            }));            
+        }
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            //context.Dispose();
+            plugin.onContextUpdated -= plugin_onContextUpdated;
+            context.Dispose();
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)

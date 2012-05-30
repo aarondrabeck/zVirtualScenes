@@ -12,16 +12,16 @@ using System.Windows;
 namespace zVirtualScenes
 {
     public class Core
-    {
-        public zvsLocalDBEntities context;
-
+    {        
         public PluginManager pluginManager;
         public TriggerManager triggerManager;
         public ScheduledTaskManager scheduledTaskManager;
         public Logger Logger;
+        public Dispatcher Dispatcher;
 
-        public Core()
+        public Core(Dispatcher Dispatcher)
         {
+            this.Dispatcher = Dispatcher;
             //TODO: THESE SHOULD BE FUNCTIONS SYNCRONOUS
             #region temp
             //Check for VCRedist
@@ -133,9 +133,7 @@ namespace zVirtualScenes
             //    }
             //}
             #endregion
-
-            //Create our context
-            context = new zvsLocalDBEntities();
+                       
 
             //Create a instace of the logger
             Logger = new Logger();

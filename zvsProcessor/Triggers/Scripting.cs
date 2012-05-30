@@ -55,7 +55,7 @@ namespace zVirtualScenes.Triggers
                     // Make sure the user specified a correct scene name
                     if (_scene != null)
                     {
-                        _scene.RunScene(context);
+                        _scene.RunScene();
                         Core.Logger.WriteToLog(Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", _FriendlyName);
                     }
                     else
@@ -142,7 +142,7 @@ namespace zVirtualScenes.Triggers
 
                         waitingForOpen = true;
                     }
-                    catch (ArgumentOutOfRangeException e)
+                    catch
                     {
                         Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.FriendlyName + " - Unable to get parameters for if statement from line", _FriendlyName);
                         Core.Logger.WriteToLog(Urgency.ERROR, "'" + scriptLine + "'.", _FriendlyName);

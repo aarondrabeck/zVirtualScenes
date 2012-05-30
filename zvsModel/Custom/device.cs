@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace zVirtualScenesModel
 {
+    public delegate void onContextUpdatedEventHandler(object sender, EventArgs args);
+
     public partial class device 
     {
         /// <summary>
@@ -26,6 +28,13 @@ namespace zVirtualScenesModel
         public override string ToString()
         {
             return this.friendly_name;
+        }
+
+        public static event onContextUpdatedEventHandler onContextUpdated;
+        public static void CallOnContextUpdated()
+        {
+            if (onContextUpdated != null)
+                onContextUpdated(null, new EventArgs());
         }
     }
 }

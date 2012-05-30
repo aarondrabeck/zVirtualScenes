@@ -44,6 +44,6 @@ namespace zVirtualScenesModel
             context.device_command_que.Add(cmd);
             context.SaveChanges();
             DeviceCommandAddedToQue(cmd.id);
-        }
+        }                
     }
 }

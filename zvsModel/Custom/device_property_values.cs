@@ -30,5 +30,12 @@ namespace zVirtualScenesModel
             }
             return string.Empty;
         }
+
+        public static event onContextUpdatedEventHandler onContextUpdated;
+        public static void CallOnContextUpdated()
+        {
+            if (onContextUpdated != null)
+                onContextUpdated(null, new EventArgs());
+        }
     }
 }

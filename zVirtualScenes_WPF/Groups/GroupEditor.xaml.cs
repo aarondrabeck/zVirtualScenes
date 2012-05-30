@@ -22,18 +22,17 @@ namespace zVirtualScenes_WPF.Groups
     /// </summary>
     public partial class GroupEditor : Window
     {
-        private App application = (App)Application.Current;
         private zvsLocalDBEntities context;
 
         public GroupEditor()
         {
-            context = application.zvsCore.context;
-
             InitializeComponent();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            context = new zvsLocalDBEntities();  
+
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -45,6 +44,12 @@ namespace zVirtualScenes_WPF.Groups
 
             EvaluateRemoveBtnUsability();
             EvaluateAddEditBtnsUsability();
+        }
+
+
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            context.Dispose();
         }
 
         private void EvaluateAddEditBtnsUsability()
@@ -61,10 +66,6 @@ namespace zVirtualScenes_WPF.Groups
             }
         }
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -80,7 +81,7 @@ namespace zVirtualScenes_WPF.Groups
 
                 context.groups.Local.Add(new_g);
                 context.SaveChanges();
-
+                group.CallOnContextUpdated();
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
 
@@ -99,7 +100,7 @@ namespace zVirtualScenes_WPF.Groups
 
                     context.groups.Local.Remove(g);
                     context.SaveChanges();
-
+                    group.CallOnContextUpdated();
                 }
             }
 
@@ -117,6 +118,7 @@ namespace zVirtualScenes_WPF.Groups
                 {
                     g.name = nameWindow.GroupName;
                     context.SaveChanges();
+                    group.CallOnContextUpdated();
                 }
             }
         }
@@ -164,6 +166,7 @@ namespace zVirtualScenes_WPF.Groups
                         }
                     }
                     context.SaveChanges();
+                    group_devices.CallOnContextUpdated();
 
                     groupsDevicesLstVw.Focus();
                 }
@@ -205,6 +208,7 @@ namespace zVirtualScenes_WPF.Groups
                     foreach (group_devices gd in SelectedItemsCopy)
                         context.group_devices.Remove(gd);
                     context.SaveChanges();
+                    group_devices.CallOnContextUpdated();
                 }
             }
 

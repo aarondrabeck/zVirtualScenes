@@ -129,7 +129,7 @@ namespace zVirtualScenes
         {
             if (LogConsole)
                 Console.WriteLine(log);
-
+          
             LogItem item = new LogItem(urgency, log, source);
             List<LogItem> copyLog = new List<LogItem>();
 

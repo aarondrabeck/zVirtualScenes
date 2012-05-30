@@ -79,6 +79,8 @@
     <Compile Include="Command_Types.cs" />
     <Compile Include="Custom\builtin_commands.cs" />
     <Compile Include="Custom\builtin_command_que.cs" />
+    <Compile Include="Custom\plugin.cs" />
+    <Compile Include="Custom\group_devices.cs" />
     <Compile Include="Custom\device.cs" />
     <Compile Include="Custom\device_commands.cs" />
     <Compile Include="Custom\device_command_que.cs" />

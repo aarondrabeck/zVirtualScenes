@@ -43,6 +43,6 @@ namespace zVirtualScenesModel
             context.builtin_command_que.Add(cmd);
             context.SaveChanges();
             BuiltinCommandAddedToQue(cmd.id);
-        }
+        }        
     }
 }

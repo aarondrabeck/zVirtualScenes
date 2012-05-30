@@ -6,40 +6,26 @@ using zVirtualScenesModel;
 
 namespace zVirtualScenes.Triggers
 {
-    public class TriggerManager
+    public class TriggerManager : IDisposable
     {
         private Core Core;
-        private bool isRunning = false;
+        private zvsLocalDBEntities context;
 
-        public TriggerManager(Core Core, bool autoStart = true)
+        public TriggerManager(Core Core)
         {
             this.Core = Core;
-
-            if (autoStart)
-                Start();
+            context = new zvsLocalDBEntities();
+            device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
         }
 
-        public void Start()
+        public void Dispose()
         {
-            if (!isRunning)
-            {
-                device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-                isRunning = true;
-            }
-        }
-
-        public void Stop()
-        {
-            if (isRunning)
-            {
-                device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-                isRunning = false;
-            }
+            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);                
         }
 
         private void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
-            device_values dv = Core.context.device_values.Local.FirstOrDefault(v => v.id == args.device_value_id);
+            device_values dv = context.device_values.Local.FirstOrDefault(v => v.id == args.device_value_id);
             if (dv != null)
             {
                 //Event Triggering
@@ -54,7 +40,7 @@ namespace zVirtualScenes.Triggers
                                     if (dv.value2.Equals(trigger.trigger_value))
                                     {
                                         Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                        Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(Core.context), "TRIGGER");
+                                        Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
                                     }
                                     break;
                                 }
@@ -68,7 +54,7 @@ namespace zVirtualScenes.Triggers
                                         if (deviceValue > triggerValue)
                                         {
                                             Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(Core.context), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
                                         }
                                     }
                                     else
@@ -86,7 +72,7 @@ namespace zVirtualScenes.Triggers
                                         if (deviceValue < triggerValue)
                                         {
                                             Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(Core.context), "TRIGGER");
+                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
                                         }
                                     }
                                     else
@@ -99,7 +85,7 @@ namespace zVirtualScenes.Triggers
                                     if (!dv.value2.Equals(trigger.trigger_value))
                                     {
                                         Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                        Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(Core.context), "TRIGGER");
+                                        Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
                                     }
                                     break;
                                 }
@@ -111,6 +97,6 @@ namespace zVirtualScenes.Triggers
                     }
                 }
             }
-        }
+        }        
     }
 }

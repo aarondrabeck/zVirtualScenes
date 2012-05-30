@@ -21,7 +21,7 @@ namespace zVirtualScenes_WPF
         protected override void OnStartup(StartupEventArgs e)
         {  
             //Initilize the core
-            zvsCore = new Core();
+            zvsCore = new Core(this.Dispatcher);
 
 
                         

@@ -7,8 +7,8 @@ using System.Threading;
 
 namespace zVirtualScenesModel
 {
-    public partial class scene_property 
-    {     
+    public partial class scene_property
+    {
         public static void AddOrEdit(zvsLocalDBEntities context, scene_property p)
         {
             if (p != null)
@@ -36,8 +36,16 @@ namespace zVirtualScenesModel
                             existing_property.scene_property_option.Add(new scene_property_option { options = spo.options });
 
                     }
-                    context.SaveChanges();                
+                    context.SaveChanges();
+                    CallOnContextUpdated();
             }
+        }
+
+        public static event onContextUpdatedEventHandler onContextUpdated;
+        public static void CallOnContextUpdated()
+        {
+            if (onContextUpdated != null)
+                onContextUpdated(null, new EventArgs());
         }
     }
 }
