@@ -49,13 +49,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", 
 		..\wiki\zVirtualScenes2xReleaseNotes.wiki = ..\wiki\zVirtualScenes2xReleaseNotes.wiki
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenesService", "zVirtualScenesService\zVirtualScenesService.csproj", "{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenes_WPF", "zVirtualScenes_WPF\zVirtualScenes_WPF.csproj", "{CC1028B3-3975-4BA4-BF79-42043BCADBFE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenes", "zvsProcessor\zVirtualScenes.csproj", "{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvsModel", "zvsModel\zvsModel.csproj", "{796E1087-65E8-4CDA-BDD6-6661BD843A7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenes", "zVirtualScenes\zVirtualScenes.csproj", "{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -157,16 +155,6 @@ Global
 		{CC1028B3-3975-4BA4-BF79-42043BCADBFE}.Release|Mixed Platforms.Build.0 = Release|x86
 		{CC1028B3-3975-4BA4-BF79-42043BCADBFE}.Release|x86.ActiveCfg = Release|x86
 		{CC1028B3-3975-4BA4-BF79-42043BCADBFE}.Release|x86.Build.0 = Release|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|x86.ActiveCfg = Debug|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Debug|x86.Build.0 = Debug|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|Any CPU.ActiveCfg = Release|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|Mixed Platforms.Build.0 = Release|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|x86.ActiveCfg = Release|x86
-		{D8B4B986-B0DD-4A59-8E32-A7253637BAC2}.Release|x86.Build.0 = Release|x86
 		{F8B3CD45-0712-4388-B576-EBA5267E636C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F8B3CD45-0712-4388-B576-EBA5267E636C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8B3CD45-0712-4388-B576-EBA5267E636C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

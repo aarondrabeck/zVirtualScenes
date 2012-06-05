@@ -99,7 +99,7 @@
                                 <DataTrigger Binding="{Binding Path=device_types.name}" Value="THERMOSTAT">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status, StringFormat={}{0}F}"/>
                                     <Setter TargetName="LevelBar" Property="Foreground" Value="#FF0088DE"/>
-                                    <Setter TargetName="LevelBar" Property="Value" Value="{Binding current_status}"/>
+                                    <!--<Setter TargetName="LevelBar" Property="Value" Value="{Binding current_status}"/>-->
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Path=device_types.name}" Value="DIMMER">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status, StringFormat={}{0}%}"/>
@@ -108,14 +108,17 @@
                                 <DataTrigger Binding="{Binding Path=device_types.name}" Value="SWITCH">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
                                     <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
+                                   <Setter TargetName="LevelBar" Property="Value" Value="0"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Path=device_types.name}" Value="CONTROLLER">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
                                     <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
+                                    <Setter TargetName="LevelBar" Property="Value" Value="0"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Path=device_types.name}" Value="DOORLOCK">
                                     <Setter TargetName="LevelTxtBlock" Property="Text" Value="{Binding current_status}"/>
                                     <Setter Property="ProgressBar.Visibility" Value="Collapsed"></Setter>
+                                    <Setter TargetName="LevelBar" Property="Value" Value="0"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>

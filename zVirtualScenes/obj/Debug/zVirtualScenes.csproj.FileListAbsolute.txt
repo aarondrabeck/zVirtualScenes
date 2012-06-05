@@ -1,0 +1,9 @@
+D:\Hobby\zvirtualscenes\trunk\output\zvsLocalDB.sdf
+D:\Hobby\zvirtualscenes\trunk\output\zVirtualScenes.dll
+D:\Hobby\zvirtualscenes\trunk\output\zVirtualScenes.pdb
+D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Debug\zVirtualScenes.csprojResolveAssemblyReference.cache
+D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Debug\zVirtualScenes.dll
+D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Debug\zVirtualScenes.pdb
+D:\Hobby\zvirtualscenes\trunk\zVirtualScenes\obj\Debug\zVirtualScenes.csprojResolveAssemblyReference.cache
+D:\Hobby\zvirtualscenes\trunk\zVirtualScenes\obj\Debug\zVirtualScenes.dll
+D:\Hobby\zvirtualscenes\trunk\zVirtualScenes\obj\Debug\zVirtualScenes.pdb

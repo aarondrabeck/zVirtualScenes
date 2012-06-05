@@ -12,13 +12,6 @@ namespace zVirtualScenesModel
             device_command_que cmd = new device_command_que { device_command_id = this.id, arg = argument, device_id = this.device.id };
             cmd.Run(context);
         }
-
-        public static event onContextUpdatedEventHandler onContextUpdated;
-        public static void CallOnContextUpdated()
-        {
-            if (onContextUpdated != null)
-                onContextUpdated(null, new EventArgs());
-        }
         
     }
 }

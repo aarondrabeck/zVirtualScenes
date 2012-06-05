@@ -50,22 +50,21 @@ namespace zVirtualScenes_WPF.PluginManager
                 zvsEntities2ViewSource.Source = context.plugins.Local;               
             }
 
-            plugin.onContextUpdated += plugin_onContextUpdated;
-
+            zvsLocalDBEntities.onPluginsChanged+=zvsLocalDBEntities_onPluginsChanged; 
             isLoaded = true;
         }
 
-        void plugin_onContextUpdated(object sender, EventArgs args)
+        void zvsLocalDBEntities_onPluginsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
                 context.plugins.ToList();
-            }));            
+            })); 
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            plugin.onContextUpdated -= plugin_onContextUpdated;
+            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged; 
             context.Dispose();
         }
 

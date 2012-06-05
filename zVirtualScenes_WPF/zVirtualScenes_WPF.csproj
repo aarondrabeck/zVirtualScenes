@@ -74,7 +74,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="DeviceControls\DeviceCommands.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DeviceControls\DeviceDataGridUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDetails.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DynamicActionControls\ButtonControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -102,8 +114,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DeviceControls\DeviceCommands.xaml.cs">
+      <DependentUpon>DeviceCommands.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DeviceControls\DeviceDataGridUC.xaml.cs">
       <DependentUpon>DeviceDataGridUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceDetails.xaml.cs">
+      <DependentUpon>DeviceDetails.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\ButtonControl.xaml.cs">
+      <DependentUpon>ButtonControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DynamicSettingsControls\StringSettingsControl.xaml.cs">
       <DependentUpon>StringSettingsControl.xaml</DependentUpon>
@@ -214,13 +235,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\zVirtualScenes\zVirtualScenes.csproj">
+      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
+      <Name>zVirtualScenes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\zvsModel\zvsModel.csproj">
       <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
       <Name>zvsModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\zvsProcessor\zVirtualScenes.csproj">
-      <Project>{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}</Project>
-      <Name>zVirtualScenes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +277,15 @@
   <ItemGroup>
     <Resource Include="Images\drag_arrow.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\bulb.png" />
+    <Resource Include="Images\controler.png" />
+    <Resource Include="Images\doorlock.png" />
+    <Resource Include="Images\radio.png" />
+    <Resource Include="Images\switch.png" />
+    <Resource Include="Images\thermometer.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

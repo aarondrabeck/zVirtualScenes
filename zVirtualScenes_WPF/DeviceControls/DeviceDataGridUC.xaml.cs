@@ -68,53 +68,121 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                LoadContext();
+                context.devices.ToList();
                 myCollectionViewSource.Source = context.devices.Local;
             }
 
-            device.onContextUpdated += group_devices_onContextUpdated;
-            group_devices.onContextUpdated += group_devices_onContextUpdated;
+            zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
+            zvsLocalDBEntities.onGroup_DevicesChanged += zvsLocalDBEntities_onGroup_DevicesChanged;
+            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;
         }
 
-        private void LoadContext()
+        void zvsLocalDBEntities_onGroupsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
-            context.Dispose();
-            context = new zvsLocalDBEntities();
-            context.devices.ToList();
-            System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-            myCollectionViewSource.Source = context.devices.Local;
+            if (AdvancedDisplay)
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.groups.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<group>())
+                            ent.Reload();
+
+                        DeviceGrid.CancelEdit();
+                        DeviceGrid.Items.Refresh();
+                    }
+                }));
+            }
         }
 
-        void group_devices_onContextUpdated(object sender, EventArgs args)
+        void zvsLocalDBEntities_onGroup_DevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        {
+            if (AdvancedDisplay)
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.group_devices.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<group_devices>())
+                            ent.Reload();
+
+                        DeviceGrid.CancelEdit();
+                        DeviceGrid.Items.Refresh();
+                    }
+                }));
+            }
+        }
+
+        void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                LoadContext();
+                if (args.ChangeType == System.Data.EntityState.Added)
+                {
+                    //Gets new devices
+                    context.devices.ToList();
+                }
+                else
+                {
+                    //Reloads context from DB when modifcations happen
+                    foreach (var ent in context.ChangeTracker.Entries<device>())
+                        ent.Reload();
+
+                    DeviceGrid.CancelEdit();
+                    DeviceGrid.Items.Refresh();
+                }
             }));
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
             context.Dispose();
-            device.onContextUpdated -= group_devices_onContextUpdated;
-            group_devices.onContextUpdated -= group_devices_onContextUpdated;
+            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
+            zvsLocalDBEntities.onGroup_DevicesChanged -= zvsLocalDBEntities_onGroup_DevicesChanged;
+            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
         }
 
         ////User Events
         private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (_AdvancedDisplay)
+            if (e.Key == Key.Delete)
             {
-                if (e.Key == Key.Delete)
+                if (_AdvancedDisplay)
                 {
-                    if (
-                        MessageBox.Show("Are you sure you want to delete the selected devices?",
+
+                    if (MessageBox.Show("Are you sure you want to delete the selected devices?",
                                         "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         DeleteSelectedItems();
                     }
-                    e.Handled = true;
                 }
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Enter)
+            {
+                OpenDeviceDetails();
+            }
+        }
+
+        private void OpenDeviceDetails()
+        {
+            device d = (device)DeviceGrid.SelectedItem;
+            if (d != null)
+            {
+                DeviceDetails deviceDetailsWindow = new DeviceDetails(d.id);
+                deviceDetailsWindow.Show();
             }
         }
 
@@ -146,7 +214,6 @@ namespace zVirtualScenes_WPF.DeviceControls
                             }
 
                             context.SaveChanges();
-                            device.CallOnContextUpdated();
                         }
                     };
 
@@ -172,7 +239,6 @@ namespace zVirtualScenes_WPF.DeviceControls
                         context.devices.Remove(d);
                 }
                 context.SaveChanges();
-                device.CallOnContextUpdated();
             }
         }
 
@@ -230,7 +296,7 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
                 context.SaveChanges();
-                device.CallOnContextUpdated();
+                ////device.CallOnContextUpdated();
             }
         }
 

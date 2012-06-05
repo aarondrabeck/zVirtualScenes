@@ -880,7 +880,6 @@ namespace OpenZWavePlugin
                                     {
                                         d.current_status = data;
                                         Context.SaveChanges();
-                                        device.CallOnContextUpdated();
                                     }
                                 }
                                 else if (d.device_types != null && d.device_types == GetDeviceType("SWITCH", Context))
@@ -892,7 +891,6 @@ namespace OpenZWavePlugin
                                         {
                                             d.current_status = level > 0 ? "On" : "Off";
                                             Context.SaveChanges();
-                                            device.CallOnContextUpdated();
                                         }
                                     }
                                 }
@@ -902,7 +900,6 @@ namespace OpenZWavePlugin
                                     {
                                         d.current_status = data;
                                         Context.SaveChanges();
-                                        device.CallOnContextUpdated();
                                     }
                                 }
 
@@ -1089,13 +1086,14 @@ namespace OpenZWavePlugin
                                         ozw_device = new device
                                         {
                                             node_id = node.ID,
+                                            current_status = "0",
                                             device_types = device_type,
                                             friendly_name = deviceName
                                         };
 
                                         Context.devices.Add(ozw_device);
                                         Context.SaveChanges();
-                                        device.CallOnContextUpdated();
+
                                     }
 
                                     #region Last Event Value Storeage

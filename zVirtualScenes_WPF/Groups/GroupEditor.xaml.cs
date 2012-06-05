@@ -31,24 +31,45 @@ namespace zVirtualScenes_WPF.Groups
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();  
+            context = new zvsLocalDBEntities();
+            zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
 
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
+                context.groups.ToList();
+                context.devices.ToList();
                 groupsViewSource.Source = context.groups.Local;
-            }
+            }            
 
             DeviceLst.AdvancedDisplay = false;
 
             EvaluateRemoveBtnUsability();
             EvaluateAddEditBtnsUsability();
+            EvaluategroupsDevicesLstVwEnable();
+
+            
         }
 
+        void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                if (args.ChangeType != System.Data.EntityState.Added)
+                {                   
+                    //Reloads context from DB when modifcations happen
+                    foreach (var ent in context.ChangeTracker.Entries<device>())
+                        ent.Reload();
+
+                    groupsDevicesLstVw.Items.Refresh();
+                }
+            }));
+        }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
+            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
             context.Dispose();
         }
 
@@ -66,7 +87,6 @@ namespace zVirtualScenes_WPF.Groups
             }
         }
 
-
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             GroupNameEditor nameWindow = new GroupNameEditor(null);
@@ -81,7 +101,6 @@ namespace zVirtualScenes_WPF.Groups
 
                 context.groups.Local.Add(new_g);
                 context.SaveChanges();
-                group.CallOnContextUpdated();
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
 
@@ -100,7 +119,6 @@ namespace zVirtualScenes_WPF.Groups
 
                     context.groups.Local.Remove(g);
                     context.SaveChanges();
-                    group.CallOnContextUpdated();
                 }
             }
 
@@ -118,7 +136,6 @@ namespace zVirtualScenes_WPF.Groups
                 {
                     g.name = nameWindow.GroupName;
                     context.SaveChanges();
-                    group.CallOnContextUpdated();
                 }
             }
         }
@@ -145,6 +162,7 @@ namespace zVirtualScenes_WPF.Groups
 
                     foreach (device device in devices)
                     {
+                        //If not already in the group...
                         if (!selected_group.group_devices.Any(o => o.device_id == device.id && o.group_id == selected_group.id))
                         {
                             group_devices gd = new group_devices
@@ -166,14 +184,10 @@ namespace zVirtualScenes_WPF.Groups
                         }
                     }
                     context.SaveChanges();
-                    group_devices.CallOnContextUpdated();
 
                     groupsDevicesLstVw.Focus();
                 }
-
                 e.Effects = DragDropEffects.Move;
-
-
             }
             e.Handled = true;
         }
@@ -208,7 +222,6 @@ namespace zVirtualScenes_WPF.Groups
                     foreach (group_devices gd in SelectedItemsCopy)
                         context.group_devices.Remove(gd);
                     context.SaveChanges();
-                    group_devices.CallOnContextUpdated();
                 }
             }
 
@@ -231,6 +244,15 @@ namespace zVirtualScenes_WPF.Groups
         private void GroupCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EvaluateAddEditBtnsUsability();
+            EvaluategroupsDevicesLstVwEnable();
+        }
+
+        private void EvaluategroupsDevicesLstVwEnable()
+        {
+            if (GroupCmbBx.SelectedItem == null)
+                groupsDevicesLstVw.IsEnabled = false;
+            else
+                groupsDevicesLstVw.IsEnabled = true;
         }
     }
 }

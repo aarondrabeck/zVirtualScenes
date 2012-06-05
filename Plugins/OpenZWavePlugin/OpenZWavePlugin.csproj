@@ -99,13 +99,13 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\zVirtualScenes\zVirtualScenes.csproj">
+      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
+      <Name>zVirtualScenes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\zvsModel\zvsModel.csproj">
       <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
       <Name>zvsModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\zvsProcessor\zVirtualScenes.csproj">
-      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
-      <Name>zVirtualScenes</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -7,7 +7,7 @@
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
-        <CollectionViewSource x:Key="ListViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">
+        <CollectionViewSource x:Key="ListViewSource" ><!--d:DesignSource="{d:DesignInstance my:device, CreateList=True}"-->
         </CollectionViewSource>
     </Window.Resources>
 
@@ -23,10 +23,7 @@
         </Menu>
         <TabControl>
             <TabItem Header="Devices">
-                <StackPanel Orientation="Vertical">
-                    <DeviceControls:DeviceDataGridUC Height="200"></DeviceControls:DeviceDataGridUC>
-                    <DeviceControls:DeviceDataGridUC Height="200"></DeviceControls:DeviceDataGridUC>
-                </StackPanel>
+                    <DeviceControls:DeviceDataGridUC x:Name="dList1"></DeviceControls:DeviceDataGridUC>                
             </TabItem>
             <TabItem Header="Log">
                 <Grid DataContext="{StaticResource ListViewSource}">

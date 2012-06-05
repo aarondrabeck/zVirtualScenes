@@ -31,13 +31,6 @@ namespace zVirtualScenesModel
                 return string.Format("Scheduled task '{0}' {1}", this.friendly_name, scene.RunScene());
             else
                 return string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", this.friendly_name, this.Scene_id);
-        }
-
-        public static event onContextUpdatedEventHandler onContextUpdated;
-        public static void CallOnContextUpdated()
-        {
-            if (onContextUpdated != null)
-                onContextUpdated(null, new EventArgs());
-        }
+        }        
     }
 }

@@ -97,6 +97,7 @@
     <Compile Include="Custom\scene_property.cs" />
     <Compile Include="Custom\scene_property_value.cs" />
     <Compile Include="Custom\scheduled_tasks.cs" />
+    <Compile Include="Custom\zvsModel.cs" />
     <Compile Include="Data_Types.cs" />
     <Compile Include="db_info.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>

@@ -24,7 +24,6 @@ namespace zVirtualScenesModel
                     existing_option.value = opt.value;
                 }
                 context.SaveChanges();
-                CallOnContextUpdated();
             }
         }
 
@@ -44,11 +43,5 @@ namespace zVirtualScenesModel
             }
         }
 
-        public static event onContextUpdatedEventHandler onContextUpdated;
-        public static void CallOnContextUpdated()
-        {
-            if (onContextUpdated != null)
-                onContextUpdated(null, new EventArgs());
-        }
     }
 }

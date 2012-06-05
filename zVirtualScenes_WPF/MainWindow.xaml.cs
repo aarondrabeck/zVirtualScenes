@@ -46,6 +46,8 @@ namespace zVirtualScenes_WPF
                 myCollectionViewSource.Source = application.zvsCore.Logger.LOG;
             }
             application.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", "zVirtualScenes");
+
+
         }       
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -149,7 +151,7 @@ namespace zVirtualScenes_WPF
                             break;
                     }
                     context.SaveChanges();
-                    device.CallOnContextUpdated();
+                    //device.CallOnContextUpdated();
             }
         }
 

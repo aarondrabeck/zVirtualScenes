@@ -62,7 +62,6 @@ namespace zVirtualScenesModel
 
                 this.is_running = true;
                 context.SaveChanges();
-                CallOnContextUpdated();
 
                 string result = "Scene '" + this.friendly_name + "' started.";
                 SceneRunStarted(this, result);
@@ -213,17 +212,9 @@ namespace zVirtualScenesModel
             {
                 this.is_running = false;
                 context.SaveChanges();
-                CallOnContextUpdated();
 
                 SceneRunComplete(this.id, ExecutionErrors);
             }
-        }
-
-        public static event onContextUpdatedEventHandler onContextUpdated;
-        public static void CallOnContextUpdated()
-        {
-            if (onContextUpdated != null)
-                onContextUpdated(null, new EventArgs());
         }
     }
 }

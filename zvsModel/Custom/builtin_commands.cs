@@ -23,15 +23,7 @@ namespace zVirtualScenesModel
                 existing_c.arg_data_type = c.arg_data_type;
             }
             context.SaveChanges();
-            CallOnContextUpdated();
-        }
-
-        public static event onContextUpdatedEventHandler onContextUpdated;
-        public static void CallOnContextUpdated()
-        {
-            if (onContextUpdated != null)
-                onContextUpdated(null, new EventArgs());
-        }
+        }        
     }
 }
 
