@@ -17,6 +17,7 @@ namespace zVirtualScenesModel
         public static event onEntityChangedventHandler onGroupsChanged;
         public static event onEntityChangedventHandler onGroup_DevicesChanged;
         public static event onEntityChangedventHandler onPluginsChanged;
+        public static event onEntityChangedventHandler onDeviceValueChanged;
 
         public static Dictionary<int, Action> EventsDictionary = new Dictionary<int, Action> {
          {0, () => { if(onDevicesChanged != null) { onDevicesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
@@ -30,7 +31,10 @@ namespace zVirtualScenesModel
          {8, () => { if(onGroup_DevicesChanged != null) { onGroup_DevicesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
          {9, () => { if(onPluginsChanged != null) { onPluginsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
          {10, () => { if(onPluginsChanged != null) { onPluginsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
-         {11, () => { if(onPluginsChanged != null) { onPluginsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
+         {11, () => { if(onPluginsChanged != null) { onPluginsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
+         {12, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
+         {13, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
+         {14, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
         };
 
         public override int SaveChanges()
@@ -70,13 +74,23 @@ namespace zVirtualScenesModel
 
             //plugins
             if (this.ChangeTracker.Entries<plugin>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)
-                if (!EventsToTrigger.Contains(9)) { EventsToTrigger.Add(6); }
+                if (!EventsToTrigger.Contains(9)) { EventsToTrigger.Add(9); }
 
             if (this.ChangeTracker.Entries<plugin>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
-                if (!EventsToTrigger.Contains(10)) { EventsToTrigger.Add(7); }
+                if (!EventsToTrigger.Contains(10)) { EventsToTrigger.Add(10); }
 
             if (this.ChangeTracker.Entries<plugin>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
-                if (!EventsToTrigger.Contains(11)) { EventsToTrigger.Add(8); }
+                if (!EventsToTrigger.Contains(11)) { EventsToTrigger.Add(11); }
+
+            //device values
+            if (this.ChangeTracker.Entries<device_values>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)
+                if (!EventsToTrigger.Contains(12)) { EventsToTrigger.Add(12); }
+
+            if (this.ChangeTracker.Entries<device_values>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
+                if (!EventsToTrigger.Contains(13)) { EventsToTrigger.Add(13); }
+
+            if (this.ChangeTracker.Entries<device_values>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
+                if (!EventsToTrigger.Contains(14)) { EventsToTrigger.Add(14); }
 
             //Save the changes to the Database
             int result = base.SaveChanges();

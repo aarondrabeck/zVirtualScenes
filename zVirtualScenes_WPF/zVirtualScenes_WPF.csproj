@@ -74,6 +74,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="DeviceControls\DeviceProperties.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="DeviceControls\DeviceCommands.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -82,7 +86,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceDetails.xaml">
+    <Page Include="DeviceControls\DeviceValues.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDetailsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -90,11 +98,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DynamicSettingsControls\StringSettingsControl.xaml">
+    <Page Include="DynamicActionControls\CheckboxControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="DynamicSettingsControls\NumericSettingsControl.xaml">
+    <Page Include="DynamicActionControls\ComboboxControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DynamicActionControls\StringControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DynamicActionControls\NumericControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -114,25 +130,36 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DeviceControls\DeviceProperties.xaml.cs">
+      <DependentUpon>DeviceProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DeviceControls\DeviceCommands.xaml.cs">
       <DependentUpon>DeviceCommands.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceControls\DeviceDataGridUC.xaml.cs">
       <DependentUpon>DeviceDataGridUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DeviceDetails.xaml.cs">
-      <DependentUpon>DeviceDetails.xaml</DependentUpon>
+    <Compile Include="DeviceControls\DeviceValues.xaml.cs">
+      <DependentUpon>DeviceValues.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceDetailsWindow.xaml.cs">
+      <DependentUpon>DeviceDetailsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="DynamicActionControls\ButtonControl.xaml.cs">
       <DependentUpon>ButtonControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DynamicSettingsControls\StringSettingsControl.xaml.cs">
-      <DependentUpon>StringSettingsControl.xaml</DependentUpon>
+    <Compile Include="DynamicActionControls\CheckboxControl.xaml.cs">
+      <DependentUpon>CheckboxControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DynamicSettingsControls\NumericSettingsControl.xaml.cs">
-      <DependentUpon>NumericSettingsControl.xaml</DependentUpon>
+    <Compile Include="DynamicActionControls\ComboboxControl.xaml.cs">
+      <DependentUpon>ComboboxControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DynamicSettingsControls\DynamicSettingsInterface.cs" />
+    <Compile Include="DynamicActionControls\StringControl.xaml.cs">
+      <DependentUpon>StringControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\NumericControl.xaml.cs">
+      <DependentUpon>NumericControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Groups\GroupEditor.xaml.cs">
       <DependentUpon>GroupEditor.xaml</DependentUpon>
     </Compile>
@@ -143,10 +170,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="DynamicSettingsControls\BoolSettingsControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="PluginManager\PluginManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -157,9 +180,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DynamicSettingsControls\BoolSettingsControl.xaml.cs">
-      <DependentUpon>BoolSettingsControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
       <DependentUpon>PluginManagerWindow.xaml</DependentUpon>
     </Compile>
@@ -183,6 +203,53 @@
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.db_info.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_propertys.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_property_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_property_values.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_types.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+DeviceValueAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventArgs.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers+TRIGGER_OPERATORS.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers+TRIGGER_TYPE.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.group.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.group_devices.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin_settings.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin_setting_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.program_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneModifiedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneRunStartedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property_option.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property_value.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks+frequencys.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedEventArgs.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
     <None Include="Properties\DataSources\zvsModel.builtin_commands.datasource" />
     <None Include="Properties\DataSources\zvsModel.builtin_command_options.datasource" />
     <None Include="Properties\DataSources\zvsModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
@@ -285,7 +352,12 @@
     <Resource Include="Images\switch.png" />
     <Resource Include="Images\thermometer.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\send_signal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\save_check.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

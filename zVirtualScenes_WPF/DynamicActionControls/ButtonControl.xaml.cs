@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -24,13 +25,15 @@ namespace zVirtualScenes_WPF.DynamicActionControls
         private string Description = string.Empty;
         private Action ButtonClickAction = null;
 
-        public ButtonControl(string BtnName, string Description, Action ButtonClickAction)
+        public ButtonControl(string BtnName, string Description, Action ButtonClickAction, BitmapImage icon)
         {
             this.BtnName = BtnName;
             this.Description = Description;
             this.ButtonClickAction = ButtonClickAction;
 
             InitializeComponent();
+
+            this.SignalImg.Source = icon;
         }
 
         private void ButtonBtm_Click(object sender, RoutedEventArgs e)
@@ -38,6 +41,13 @@ namespace zVirtualScenes_WPF.DynamicActionControls
             if (ButtonClickAction != null)
             {
                 ButtonClickAction.DynamicInvoke();
+
+                SignalImg.Opacity = 1;
+                DoubleAnimation da = new DoubleAnimation();
+                da.From = 1;
+                da.To = 0;
+                da.Duration = new Duration(TimeSpan.FromSeconds(.8));
+                SignalImg.BeginAnimation(OpacityProperty, da);          
             }
         }
 

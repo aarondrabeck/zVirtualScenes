@@ -27,7 +27,7 @@
     <Grid DataContext="{StaticResource devicesViewSource}">
         <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
-                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding" RowHeaderWidth="0" AllowDrop="True">
+                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding" RowHeaderWidth="0" AllowDrop="True" PreviewMouseDoubleClick="DeviceGrid_PreviewMouseDoubleClick">
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn MaxWidth="9" MinWidth="9" Width="9"  Header="" CanUserResize="False" CanUserReorder="False">

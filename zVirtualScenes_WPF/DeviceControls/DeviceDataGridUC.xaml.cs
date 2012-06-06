@@ -170,21 +170,9 @@ namespace zVirtualScenes_WPF.DeviceControls
                 }
                 e.Handled = true;
             }
-            else if (e.Key == Key.Enter)
-            {
-                OpenDeviceDetails();
-            }
         }
 
-        private void OpenDeviceDetails()
-        {
-            device d = (device)DeviceGrid.SelectedItem;
-            if (d != null)
-            {
-                DeviceDetails deviceDetailsWindow = new DeviceDetails(d.id);
-                deviceDetailsWindow.Show();
-            }
-        }
+        
 
         private void UserControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -297,6 +285,25 @@ namespace zVirtualScenes_WPF.DeviceControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
                 context.SaveChanges();
                 ////device.CallOnContextUpdated();
+            }
+        }
+
+        private void DeviceGrid_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            OpenDeviceDetails();
+            e.Handled = true;
+        }
+
+        private void OpenDeviceDetails()
+        {
+            device d = (device)DeviceGrid.SelectedItem;
+            if (d != null)
+            {
+                DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.id);
+                deviceDetailsWindow.Owner = Application.Current.MainWindow;
+                deviceDetailsWindow.Show();
+
+                
             }
         }
 

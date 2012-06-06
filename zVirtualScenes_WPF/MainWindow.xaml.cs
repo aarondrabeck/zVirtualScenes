@@ -45,9 +45,7 @@ namespace zVirtualScenes_WPF
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
                 myCollectionViewSource.Source = application.zvsCore.Logger.LOG;
             }
-            application.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", "zVirtualScenes");
-
-
+            application.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", Utils.ApplicationName + " GUI");
         }       
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)

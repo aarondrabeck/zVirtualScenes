@@ -20,11 +20,11 @@ namespace zVirtualScenes_WPF
     /// <summary>
     /// Interaction logic for DeviceDetails.xaml
     /// </summary>
-    public partial class DeviceDetails : Window
+    public partial class DeviceDetailsWindow : Window
     {        
         private int DeviceID = 0;
 
-        public DeviceDetails(int DeviceID)
+        public DeviceDetailsWindow(int DeviceID)
         {
             this.DeviceID = DeviceID;
             InitializeComponent();
@@ -88,6 +88,7 @@ namespace zVirtualScenes_WPF
                             }
                         case "CONTROLLER":
                             {
+                                DeviceCurrentStatus.Visibility = System.Windows.Visibility.Collapsed;
                                 IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/controler.png"));
                                 break;
                             }
@@ -130,7 +131,20 @@ namespace zVirtualScenes_WPF
                 {
                     ContentStackPanel.Children.Add(new DeviceCommands(DeviceID));    
                 }
+                else if (item.Name.Equals("PROPERTIES"))
+                {
+                    ContentStackPanel.Children.Add(new DeviceProperties(DeviceID));
+                }
+                else if (item.Name.Equals("VALUES"))
+                {
+                    ContentStackPanel.Children.Add(new DeviceValues(DeviceID));
+                }                
             }
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
         
     }

@@ -12,8 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections;
-using zVirtualScenes_WPF.DynamicSettingsControls;
 using zVirtualScenesModel;
+using zVirtualScenes_WPF.DynamicActionControls;
 
 namespace zVirtualScenes_WPF.PluginManager
 {
@@ -22,10 +22,9 @@ namespace zVirtualScenes_WPF.PluginManager
     /// </summary>
     public partial class PluginManagerWindow : Window
     {
-
         private App application = (App)Application.Current;
+        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/save_check.png"));
         private zvsLocalDBEntities context;
-        private bool isLoaded = false; 
 
         public PluginManagerWindow()
         {
@@ -47,11 +46,11 @@ namespace zVirtualScenes_WPF.PluginManager
                 //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
 
                 context.plugins.ToList();
-                zvsEntities2ViewSource.Source = context.plugins.Local;               
+                zvsEntities2ViewSource.Source = context.plugins.Local;
             }
 
-            zvsLocalDBEntities.onPluginsChanged+=zvsLocalDBEntities_onPluginsChanged; 
-            isLoaded = true;
+            zvsLocalDBEntities.onPluginsChanged += zvsLocalDBEntities_onPluginsChanged;
+         
         }
 
         void zvsLocalDBEntities_onPluginsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -59,147 +58,177 @@ namespace zVirtualScenes_WPF.PluginManager
             this.Dispatcher.Invoke(new Action(() =>
             {
                 context.plugins.ToList();
-            })); 
+            }));
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged; 
+            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged;
             context.Dispose();
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
-        {
-            PromptSaveNowIfChanged();
+        {            
             this.Close();
-        }
-
-        private void PromptSaveNowIfChanged()
-        {
-            foreach (DynamicSettingsInterface setting in this.ControlsStkPnl.Children.OfType<DynamicSettingsInterface>())
-            {
-                if (setting.hasChanged)
-                {
-                    if (MessageBox.Show("Would you like to save the changes to this plug-in?", "Save Changes?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        //Save the changes made to the context
-                        foreach (DynamicSettingsInterface s in this.ControlsStkPnl.Children.OfType<DynamicSettingsInterface>())
-                            s.SaveToContext();
-
-                        context.SaveChanges();
-
-                        //TODO: RESTART PLUGIN?
-                    }
-                    return;
-                }
-            }
         }
 
         private void PluginLstVw_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PromptSaveNowIfChanged();
-
             this.ControlsStkPnl.Children.Clear();
-
+            
             plugin p = (plugin)PluginLstVw.SelectedItem;
             if (p != null)
             {
+                //ADD THE ENABLED BUTTON
+                CheckboxControl c = new CheckboxControl(string.Format("Enabled the '{0}'", p.friendly_name),
+                    "Starts and stops the selected plugin.",
+                    p.enabled,
+                    (isChecked) =>
+                    {
+                        //Save to the database
+                        p.enabled = isChecked;
+                        context.SaveChanges();
+
+                        //STOP OR START
+                        var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                        if (Plugin != null)
+                            if (isChecked) { Plugin.Start(); } else { Plugin.Stop(); }
+                    },
+                icon);
+                ControlsStkPnl.Children.Add(c);
+
+
+                //Add all the settings
                 foreach (plugin_settings ps in p.plugin_settings)
                 {
-                    switch ((Data_Types)ps.value_data_type)
+                    plugin_settings _ps = ps;
+
+                    switch ((Data_Types)_ps.value_data_type)
                     {
                         case Data_Types.BOOL:
                             {
-                                this.ControlsStkPnl.Children.Add(new BoolSettingsControl(context, ps));
+                                bool DefaultValue = false;
+                                bool.TryParse(_ps.value, out DefaultValue);
 
+                                CheckboxControl control = new CheckboxControl(_ps.friendly_name,
+                                    _ps.description,
+                                    DefaultValue,
+                                    (isChecked) =>
+                                    {
+                                        _ps.value = isChecked.ToString();
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
                                 break;
                             }
                         case Data_Types.DECIMAL:
                             {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = Decimal.MaxValue;
-                                control.MinValue = Decimal.MinValue;
-                                this.ControlsStkPnl.Children.Add(control);
+                                NumericControl control = new NumericControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.value,
+                                    NumericControl.NumberType.Decimal,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
                                 break;
                             }
                         case Data_Types.BYTE:
                             {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = Byte.MaxValue;
-                                control.MinValue = Byte.MinValue;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
+                                NumericControl control = new NumericControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.value,
+                                    NumericControl.NumberType.Byte,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
                                 break;
                             }
                         case Data_Types.INTEGER:
                             {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = Int64.MaxValue;
-                                control.MinValue = Int64.MinValue;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
+                                NumericControl control = new NumericControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.value,
+                                    NumericControl.NumberType.Integer,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
                                 break;
                             }
                         case Data_Types.SHORT:
                             {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = short.MaxValue;
-                                control.MinValue = short.MinValue;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case Data_Types.STRING:
-                            {
-                                this.ControlsStkPnl.Children.Add(new StringSettingsControl(context, ps));
+                                NumericControl control = new NumericControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.value,
+                                    NumericControl.NumberType.Short,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
                                 break;
                             }
                         case Data_Types.COMPORT:
                             {
-                                NumericSettingsControl control = new NumericSettingsControl(context, ps);
-                                control.MaxValue = 0;
-                                control.MinValue = 99;
-                                control.ForceWholeNumber = true;
-                                this.ControlsStkPnl.Children.Add(control);
+                                NumericControl control = new NumericControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.value,
+                                    NumericControl.NumberType.ComPort,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                        case Data_Types.STRING:
+                            {
+                                StringControl control = new StringControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.value,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
+                                break;
+                            }
+                        case Data_Types.LIST:
+                            {
+                                ComboboxControl control = new ComboboxControl(_ps.friendly_name,
+                                    _ps.description,
+                                    _ps.plugin_setting_options.Select(o => o.options).ToList(),
+                                    _ps.value,
+                                    (value) =>
+                                    {
+                                        _ps.value = value;
+                                        context.SaveChanges();
+                                    },
+                                icon);
+                                ControlsStkPnl.Children.Add(control);
                                 break;
                             }
                     }
                 }
             }
-        }
-
-        private void EnabledChkBx_Checked(object sender, RoutedEventArgs e)
-        {
-            //Prevent this from triggering as the UI loads and sets the checkbox
-            if (isLoaded)
-            {
-                context.SaveChanges();
-
-                plugin p = (plugin)PluginLstVw.SelectedItem;
-                if (p != null)
-                {
-                    var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
-                    if (Plugin != null)
-                        Plugin.Start();
-                }
-            }
-        }
-
-        private void EnabledChkBx_Unchecked(object sender, RoutedEventArgs e)
-        {
-            //Prevent this from triggering as the UI loads and sets the checkbox
-            if (isLoaded)
-            {
-                context.SaveChanges();
-
-                plugin p = (plugin)PluginLstVw.SelectedItem;
-                if (p != null)
-                {
-                    var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
-                    if (Plugin != null)
-                        Plugin.Stop();
-                }
-            }
-        }
+        }      
     }
 }

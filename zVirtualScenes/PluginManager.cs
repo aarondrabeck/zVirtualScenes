@@ -17,9 +17,9 @@ namespace zVirtualScenes
         private Core Core;
 
         [ImportMany]
-        #pragma warning disable 649
+#pragma warning disable 649
         private IEnumerable<Plugin> _plugins;
-        #pragma warning restore 649
+#pragma warning restore 649
 
         public PluginManager(Core Core)
         {
@@ -82,7 +82,7 @@ namespace zVirtualScenes
                     default_value = "false",
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
-                                
+
                 // Iterate the plug-in
                 foreach (Plugin p in _plugins)
                 {
@@ -91,7 +91,7 @@ namespace zVirtualScenes
 
                     //Plugin need access to the core in order to use the Logger
                     p2.Core = this.Core;
-                    
+
                     //make sure none of them are new...
                     plugin ent_p = context.plugins.FirstOrDefault(pl => pl.name == p2.Name);
                     if (ent_p == null)
@@ -103,14 +103,14 @@ namespace zVirtualScenes
                     }
 
                     //initialize each plug-in async.
-                    BackgroundWorker pluginInitializer = new BackgroundWorker();	                
-                    pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>	
-	                {
-                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), _FriendlyName);
+                    BackgroundWorker pluginInitializer = new BackgroundWorker();
+                    pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>
+                    {
+                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), Utils.ApplicationName);
                         p2.Initialize();
                         p2.Start();
-	                };	
-	                pluginInitializer.RunWorkerAsync();                    
+                    };
+                    pluginInitializer.RunWorkerAsync();
                 }
             }
 
@@ -129,9 +129,10 @@ namespace zVirtualScenes
                 {
                     if (verbose > 1)
                     {
-                        Core.Logger.WriteToLog(Urgency.INFO, "[Processing Device Type CMD] API:" + cmd.device.device_types.plugin.name +
-                                                               ", CMD_NAME:" + cmd.device_type_commands.friendly_name +
-                                                               ", ARG:" + cmd.arg, _FriendlyName);
+                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("New device type command in queue. Plug-in: '{0}', Name: '{1}', Arg:'{2}'",
+                                                               cmd.device.device_types.plugin.name,
+                                                               cmd.device_type_commands.friendly_name,
+                                                               cmd.arg), Utils.ApplicationName);
                     }
 
                     foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
@@ -146,7 +147,7 @@ namespace zVirtualScenes
                                 {
                                     err = true;
                                     string err_str = "Timed-out while trying to process " + cmd.device_type_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plug-in Not Ready.";
-                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
+                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, Utils.ApplicationName);
 
                                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
                                     context.device_type_command_que.Remove(cmd);
@@ -168,8 +169,13 @@ namespace zVirtualScenes
                         }
                         else
                         {
-                            string err_str = "Attempted command " + cmd.device_type_commands.friendly_name + " on '" + cmd.device.friendly_name + "' on a disabled plug-in. Removing command from queue...";
-                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
+
+                            string err_str = string.Format("Failed to run command '{0}' on '{1}' because the '{2}' plug-in is disabled. Removing command from queue...",
+                            cmd.device_type_commands.friendly_name,
+                            cmd.device.friendly_name,
+                            cmd.device.device_types.plugin.name);
+
+                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, Utils.ApplicationName);
 
                             device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
                             context.device_type_command_que.Remove(cmd);
@@ -182,7 +188,7 @@ namespace zVirtualScenes
                 {
                     string err_str = "Could not locate queued device command.";
                     device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, Utils.ApplicationName);
                 }
             }
 
@@ -198,9 +204,10 @@ namespace zVirtualScenes
                 {
                     if (verbose > 1)
                     {
-                        Core.Logger.WriteToLog(Urgency.INFO, "[Processing Device CMD] API:" + cmd.device.device_types.plugin.name +
-                                                                ", CMD_NAME:" + cmd.device_commands.friendly_name +
-                                                                ", ARG:" + cmd.arg, _FriendlyName);
+                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("New device command in queue. Plug-in: '{0}', Name: '{1}', Arg:'{2}'",
+                                                              cmd.device.device_types.plugin.name,
+                                                              cmd.device_commands.friendly_name,
+                                                              cmd.arg), Utils.ApplicationName);
                     }
 
                     foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
@@ -215,7 +222,7 @@ namespace zVirtualScenes
                                 {
                                     err = true;
                                     string err_str = "Timed-out while trying to process " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plug-in Not Ready.";
-                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, p.Name);
+                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, Utils.ApplicationName);
 
                                     device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
                                     context.device_command_que.Remove(cmd);
@@ -237,8 +244,14 @@ namespace zVirtualScenes
                         }
                         else
                         {
-                            string err_str = "Attempted command " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "' on a disabled plug-in. Removing command from queue...";
-                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, p.Name);
+
+
+                            string err_str = string.Format("Failed to run command '{0}' on '{1}' because the '{2}' plug-in is disabled. Removing command from queue...",
+                            cmd.device_commands.friendly_name,
+                            cmd.device.friendly_name,
+                            cmd.device.device_types.plugin.name);
+
+                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, Utils.ApplicationName);
 
                             device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
                             context.device_command_que.Remove(cmd);
@@ -248,7 +261,7 @@ namespace zVirtualScenes
                     }
                 }
                 else
-                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued device command.", _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued device command.", Utils.ApplicationName);
             }
 
         }
@@ -263,7 +276,9 @@ namespace zVirtualScenes
                 {
                     if (verbose > 1)
                     {
-                        Core.Logger.WriteToLog(Urgency.INFO, "[PROCESSING BUILTIN CMD] CMD_NAME:" + cmd.builtin_commands.friendly_name + ", ARG:" + cmd.arg, "MainForm");
+                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("New built-in command in queue. Name: '{0}', Arg:'{1}'",
+                                                              cmd.builtin_commands.friendly_name,
+                                                              cmd.arg), Utils.ApplicationName);
                     }
 
                     switch (cmd.builtin_commands.name)
@@ -330,7 +345,7 @@ namespace zVirtualScenes
                     context.SaveChanges();
                 }
                 else
-                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued built-in command.", _FriendlyName);
+                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued built-in command.", Utils.ApplicationName);
             }
         }
 

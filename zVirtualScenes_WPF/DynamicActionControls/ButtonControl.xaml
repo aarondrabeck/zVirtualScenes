@@ -3,15 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Loaded="UserControl_Loaded_1" Padding="0,0,0,1" Margin="0,0,5,5"
+             mc:Ignorable="d" Loaded="UserControl_Loaded_1" Padding="0,0,0,1" Margin="0,0,10,10"
              >
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="26"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Name="ButtonBtn" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,5,0" Click="ButtonBtm_Click" Padding="5,1"/>
-        <TextBlock Grid.Column="1" Name="DescTxt" TextTrimming="CharacterEllipsis" Text="TextBlock" VerticalAlignment="Center" HorizontalAlignment="Left" Padding="0"/>
-
+        <Image Grid.Column="0" Name="SignalImg" Source="../Images/send_signal.png" Margin="5,0" Opacity="0"></Image>
+        <Button Grid.Column="1" Height="28" VerticalContentAlignment="Center" Name="ButtonBtn" Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,0,5,0" Click="ButtonBtm_Click" Padding="5,1"/>
+        <TextBlock  Grid.Column="2" VerticalAlignment="Center" Name="DescTxt" TextTrimming="CharacterEllipsis" Text="Long description of what this does." HorizontalAlignment="Left" Padding="0" Margin="10,0"/>
     </Grid>
 </UserControl>

@@ -1,0 +1,26 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" x:Class="zVirtualScenes_WPF.DeviceControls.DeviceValues" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="713" Loaded="UserControl_Loaded_1">
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="device_valuesViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:device_values}, CreateList=True}"/>
+    </UserControl.Resources>
+    <Grid DataContext="{StaticResource device_valuesViewSource}">
+        <DataGrid Name="ValuesDataGrid" AutoGenerateColumns="False" ItemsSource="{Binding}" Unloaded="DataGrid_Unloaded_1">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="50" MinWidth="50" Header="Id" Binding="{Binding Path=id}" IsReadOnly="True" />
+                <DataGridTextColumn Width="150" MinWidth="50" Header="Label" Binding="{Binding Path=label_name}" IsReadOnly="True" />
+                <DataGridTextColumn Width="*" MinWidth="50" Header="Value" Binding="{Binding Path=value2}" IsReadOnly="True" />
+                <DataGridCheckBoxColumn Width="50" MinWidth="50" Header="R/O"  Binding="{Binding Path=read_only}" IsReadOnly="True" />
+                <DataGridTextColumn Width="100" MinWidth="50" Header="Genre" Binding="{Binding Path=genre}" IsReadOnly="True" />
+                <DataGridTextColumn Width="100" MinWidth="50" Header="Index" Binding="{Binding Path=index2}" IsReadOnly="True" />
+                <DataGridTextColumn Width="100" MinWidth="50" Header="Type" Binding="{Binding Path=type}" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

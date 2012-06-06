@@ -249,7 +249,7 @@ namespace OpenZWavePlugin
                 device_propertys.AddOrEdit(new device_propertys
                 {
                     name = "DEFAULONLEVEL",
-                    friendly_name = "Level that an object is set to when using the on command.",
+                    friendly_name = "Level that an device is set to when using the 'ON' command.",                   
                     default_value = "99",
                     value_data_type = (int)Data_Types.BYTE
                 }, Context);
@@ -257,7 +257,7 @@ namespace OpenZWavePlugin
                 device_propertys.AddOrEdit(new device_propertys
                 {
                     name = "ENABLEREPOLLONLEVELCHANGE",
-                    friendly_name = "Repoll dimmers 5 seconds after a level change is received?",
+                    friendly_name = "Repoll dimmers 3 seconds after a level change is received?",
                     default_value = true.ToString(),
                     value_data_type = (int)Data_Types.BOOL
                 }, Context);
