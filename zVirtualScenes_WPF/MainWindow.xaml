@@ -15,6 +15,7 @@
         <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
             <MenuItem Header="File" />
             <MenuItem Header="Groups">
+                <MenuItem Header="Activate Groups" Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
                 <MenuItem Header="Group Editor" Click="MenuItem_Click" />
             </MenuItem>
             <MenuItem Header="Tools">
@@ -29,7 +30,7 @@
                 <Grid DataContext="{StaticResource ListViewSource}">
                     <DataGrid  Name="logListView" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="{x:Null}" VerticalGridLinesBrush="{x:Null}" Background="#00000000" ItemsSource="{Binding}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" />
+                            <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
                             <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
                             <DataGridTextColumn Width="100"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
                             <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>

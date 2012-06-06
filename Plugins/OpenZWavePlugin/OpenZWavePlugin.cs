@@ -125,7 +125,7 @@ namespace OpenZWavePlugin
                 BackgroundWorker worker = new BackgroundWorker();
                 worker.DoWork += (sender, args) =>
                 {
-                    //EKK this are blocking and can be slow
+                    //EKK this is blocking and can be slow
                     if (m_manager != null)
                     {
                         m_manager.OnNotification -= NotificationHandler;
@@ -175,14 +175,14 @@ namespace OpenZWavePlugin
                     description = "The COM port that your z-wave controller is assigned to."
                 }, Context);
 
-                //DefineOrUpdateSetting(new plugin_settings
-                //{
-                //    name = "HID",
-                //    friendly_name = "Use HID",
-                //    value = false.ToString(),
-                //    value_data_type = (int)Data_Types.BOOL,
-                //    description = "Use HID rather than COM port. (use this for ControlThink Sticks)"
-                //});
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "HID",
+                    friendly_name = "Use HID",
+                    value = false.ToString(),
+                    value_data_type = (int)Data_Types.BOOL,
+                    description = "Use HID rather than COM port. (use this for ControlThink Sticks)"
+                }, Context);
 
                 DefineOrUpdateSetting(new plugin_settings
                 {

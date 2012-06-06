@@ -23,7 +23,13 @@ namespace zVirtualScenesModel
                 existing_c.arg_data_type = c.arg_data_type;
             }
             context.SaveChanges();
-        }        
+        }
+
+        public void Run(zvsLocalDBEntities context, string argument = "")
+        {
+            builtin_command_que cmd = new builtin_command_que { builtin_command_id = this.id, arg = argument };
+            cmd.Run(context);
+        }
     }
 }
 

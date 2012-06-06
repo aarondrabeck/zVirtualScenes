@@ -74,6 +74,7 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void DataGrid_Unloaded_1(object sender, RoutedEventArgs e)
         {
+            zvsLocalDBEntities.onDeviceValueChanged -= zvsLocalDBEntities_onDeviceValueChanged;
             context.Dispose();
         }
     }

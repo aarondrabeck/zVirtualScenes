@@ -147,6 +147,15 @@ namespace zVirtualScenes_WPF
                         case 28:
                             d.friendly_name = "Xmas Lights";
                             break;
+                        case 29:
+                            d.friendly_name = "Music Room Rope Light";
+                            break;
+                        case 30:
+                            d.friendly_name = " Not Used";
+                            break;
+                        case 31:
+                            d.friendly_name = "Family Room Rope Light";
+                            break;
                     }
                     context.SaveChanges();
                     //device.CallOnContextUpdated();
@@ -185,6 +194,20 @@ namespace zVirtualScenes_WPF
             new_window.Show();
         }
 
+        private void ActivateGroupMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window is ActivateGroup)
+                {
+                    window.Activate();
+                    return;
+                }
+            }
 
+            ActivateGroup groupEditor = new ActivateGroup();
+            groupEditor.Owner = this;
+            groupEditor.Show();
+        }
     }
 }

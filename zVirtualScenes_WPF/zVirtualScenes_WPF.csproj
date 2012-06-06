@@ -114,6 +114,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Groups\ActivateGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Groups\GroupEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -159,6 +163,9 @@
     </Compile>
     <Compile Include="DynamicActionControls\NumericControl.xaml.cs">
       <DependentUpon>NumericControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Groups\ActivateGroup.xaml.cs">
+      <DependentUpon>ActivateGroup.xaml</DependentUpon>
     </Compile>
     <Compile Include="Groups\GroupEditor.xaml.cs">
       <DependentUpon>GroupEditor.xaml</DependentUpon>
