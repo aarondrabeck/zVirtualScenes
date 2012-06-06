@@ -10,7 +10,8 @@
         <CollectionViewSource x:Key="device_valuesViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:device_values}, CreateList=True}"/>
     </UserControl.Resources>
     <Grid DataContext="{StaticResource device_valuesViewSource}">
-        <DataGrid Name="ValuesDataGrid" AutoGenerateColumns="False" ItemsSource="{Binding}" Unloaded="DataGrid_Unloaded_1">
+        <DataGrid Name="ValuesDataGrid" AutoGenerateColumns="False" ItemsSource="{Binding}" CanUserAddRows="False"
+                  Unloaded="DataGrid_Unloaded_1" BorderThickness="0" CanUserDeleteRows="False">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Width="50" MinWidth="50" Header="Id" Binding="{Binding Path=id}" IsReadOnly="True" />

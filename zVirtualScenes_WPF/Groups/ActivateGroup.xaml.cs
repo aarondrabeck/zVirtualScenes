@@ -39,6 +39,8 @@ namespace zVirtualScenes_WPF.Groups
             groupViewSource.Source = context.groups.Local;
 
             isLoaded = true;
+
+            EvaluateSlection();
         }
 
         void zvsLocalDBEntities_onGroupsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -101,6 +103,11 @@ namespace zVirtualScenes_WPF.Groups
         }
 
         private void GroupsCmbBx_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        {
+            EvaluateSlection();
+        }
+
+        private void EvaluateSlection()
         {
             if (isLoaded)
             {
