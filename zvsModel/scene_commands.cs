@@ -11,18 +11,98 @@ namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;
-    
-    public partial class scene_commands
+    using System.ComponentModel;
+
+    public partial class scene_commands : INotifyPropertyChanged 
     {
-        public int id { get; set; }
-        public int scene_id { get; set; }
-        public Nullable<int> device_id { get; set; }
-        public int command_type_id { get; set; }
-        public int command_id { get; set; }
-        public string arg { get; set; }
-        public Nullable<int> sort_order { get; set; }
-    
+
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private int _scene_id;
+        public int scene_id
+        {
+            get { return _scene_id; }
+            set
+            {
+                _scene_id = value;
+                NotifyPropertyChanged("scene_id");
+            }
+        }
+
+        private Nullable<int> _device_id;
+        public Nullable<int> device_id
+        {
+            get { return _device_id; }
+            set
+            {
+                _device_id = value;
+                NotifyPropertyChanged("device_id");
+            }
+        }
+
+        private int _command_type_id;
+        public int command_type_id
+        {
+            get { return _command_type_id; }
+            set
+            {
+                _command_type_id = value;
+                NotifyPropertyChanged("command_type_id");
+            }
+        }
+
+        private int _command_id;
+        public int command_id
+        {
+            get { return _command_id; }
+            set
+            {
+                _command_id = value;
+                NotifyPropertyChanged("command_id");
+            }
+        }
+
+        private string _arg;
+        public string arg
+        {
+            get { return _arg; }
+            set
+            {
+                _arg = value;
+                NotifyPropertyChanged("arg");
+            }
+        }
+
+        private Nullable<int> _sort_order;
+        public Nullable<int> sort_order
+        {
+            get { return _sort_order; }
+            set
+            {
+                _sort_order = value;
+                NotifyPropertyChanged("sort_order");
+            }
+        }
+            
         public virtual device device { get; set; }
         public virtual scene scene { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

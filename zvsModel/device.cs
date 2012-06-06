@@ -12,8 +12,9 @@ namespace zVirtualScenesModel
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    
-    public partial class device
+    using System.ComponentModel;
+
+    public partial class device : INotifyPropertyChanged 
     {
         public device()
         {
@@ -25,14 +26,73 @@ namespace zVirtualScenesModel
             this.group_devices = new ObservableCollection<group_devices>();
             this.scene_commands = new ObservableCollection<scene_commands>();
         }
-    
-        public int id { get; set; }
-        public int device_type_id { get; set; }
-        public int node_id { get; set; }
-        public string current_status { get; set; }
-        public string friendly_name { get; set; }
-        public Nullable<System.DateTime> last_heard_from { get; set; }
-    
+
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+               
+        private int _device_type_id;
+        public int device_type_id
+        {
+            get { return _device_type_id; }
+            set
+            {
+                _device_type_id = value;
+                NotifyPropertyChanged("device_type_id");
+            }
+        }
+
+        private int _node_id = 0;
+        public int node_id
+        {
+            get { return _node_id; }
+            set
+            {
+                _node_id = value;
+                NotifyPropertyChanged("node_id");
+            }
+        }
+        
+        private string _current_status = string.Empty;
+        public string current_status
+        {
+            get { return _current_status; }
+            set
+            {
+                _current_status = value;
+                NotifyPropertyChanged("current_status");
+            }
+        }
+
+        private string _friendly_name = string.Empty;
+        public string friendly_name
+        {
+            get { return _friendly_name; }
+            set
+            {
+                _friendly_name = value;
+                NotifyPropertyChanged("friendly_name");
+            }
+        }
+
+        private Nullable<System.DateTime> _last_heard_from;
+        public Nullable<System.DateTime> last_heard_from
+        {
+            get { return _last_heard_from; }
+            set
+            {
+                _last_heard_from = value;
+                NotifyPropertyChanged("last_heard_from");
+            }
+        }
+        
         public virtual ObservableCollection<device_command_que> device_command_que { get; set; }
         public virtual ObservableCollection<device_commands> device_commands { get; set; }
         public virtual ObservableCollection<device_property_values> device_property_values { get; set; }
@@ -41,5 +101,14 @@ namespace zVirtualScenesModel
         public virtual ObservableCollection<device_values> device_values { get; set; }
         public virtual ObservableCollection<group_devices> group_devices { get; set; }
         public virtual ObservableCollection<scene_commands> scene_commands { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

@@ -11,14 +11,53 @@ namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;
-    
-    public partial class group_devices
+    using System.ComponentModel;
+
+    public partial class group_devices : INotifyPropertyChanged 
     {
-        public int device_id { get; set; }
-        public int id { get; set; }
-        public int group_id { get; set; }
-    
+        private int _device_id;
+        public int device_id
+        {
+            get { return _device_id; }
+            set
+            {
+                _device_id = value;
+                NotifyPropertyChanged("device_id");
+            }
+        }
+
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private int _group_id;
+        public int group_id
+        {
+            get { return _group_id; }
+            set
+            {
+                _group_id = value;
+                NotifyPropertyChanged("group_id");
+            }
+        }
+
         public virtual device device { get; set; }
         public virtual group group { get; set; }
+       
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

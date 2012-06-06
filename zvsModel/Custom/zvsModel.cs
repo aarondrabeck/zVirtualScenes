@@ -18,6 +18,8 @@ namespace zVirtualScenesModel
         public static event onEntityChangedventHandler onGroup_DevicesChanged;
         public static event onEntityChangedventHandler onPluginsChanged;
         public static event onEntityChangedventHandler onDeviceValueChanged;
+        public static event onEntityChangedventHandler onScenesChanged;
+        public static event onEntityChangedventHandler onSceneCommandsChanged;
 
         public static Dictionary<int, Action> EventsDictionary = new Dictionary<int, Action> {
          {0, () => { if(onDevicesChanged != null) { onDevicesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
@@ -34,7 +36,13 @@ namespace zVirtualScenesModel
          {11, () => { if(onPluginsChanged != null) { onPluginsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
          {12, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
          {13, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
-         {14, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
+         {14, () => { if(onDeviceValueChanged != null) { onDeviceValueChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
+         {15, () => { if(onScenesChanged != null) { onScenesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
+         {16, () => { if(onScenesChanged != null) { onScenesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
+         {17, () => { if(onScenesChanged != null) { onScenesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
+         {18, () => { if(onSceneCommandsChanged != null) { onSceneCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
+         {19, () => { if(onSceneCommandsChanged != null) { onSceneCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
+         {20, () => { if(onSceneCommandsChanged != null) { onSceneCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
         };
 
         public override int SaveChanges()
@@ -91,6 +99,27 @@ namespace zVirtualScenesModel
 
             if (this.ChangeTracker.Entries<device_values>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
                 if (!EventsToTrigger.Contains(14)) { EventsToTrigger.Add(14); }
+
+            //scenes
+            if (this.ChangeTracker.Entries<scene>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)
+                if (!EventsToTrigger.Contains(15)) { EventsToTrigger.Add(15); }
+
+            if (this.ChangeTracker.Entries<scene>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
+                if (!EventsToTrigger.Contains(16)) { EventsToTrigger.Add(15); }
+
+            if (this.ChangeTracker.Entries<scene>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
+                if (!EventsToTrigger.Contains(17)) { EventsToTrigger.Add(15); }
+
+            //scene commands
+            if (this.ChangeTracker.Entries<scene_commands>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)
+                if (!EventsToTrigger.Contains(18)) { EventsToTrigger.Add(18); }
+
+            if (this.ChangeTracker.Entries<scene_commands>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
+                if (!EventsToTrigger.Contains(19)) { EventsToTrigger.Add(19); }
+
+            if (this.ChangeTracker.Entries<scene_commands>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
+                if (!EventsToTrigger.Contains(20)) { EventsToTrigger.Add(20); }
+
 
             //Save the changes to the Database
             int result = base.SaveChanges();

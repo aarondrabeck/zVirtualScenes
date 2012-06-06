@@ -12,26 +12,136 @@ namespace zVirtualScenesModel
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    
-    public partial class device_values
+    using System.ComponentModel;
+
+    public partial class device_values : INotifyPropertyChanged 
     {
         public device_values()
         {
             this.device_value_triggers = new ObservableCollection<device_value_triggers>();
         }
-    
-        public int id { get; set; }
-        public int device_id { get; set; }
-        public string value_id { get; set; }
-        public string label_name { get; set; }
-        public string genre { get; set; }
-        public string index2 { get; set; }
-        public string type { get; set; }
-        public string commandClassId { get; set; }
-        public string value2 { get; set; }
-        public bool read_only { get; set; }
+
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private int _device_id;
+        public int device_id
+        {
+            get { return _device_id; }
+            set
+            {
+                _device_id = value;
+                NotifyPropertyChanged("device_id");
+            }
+        }
+
+        private string _value_id;
+        public string value_id
+        {
+            get { return _value_id; }
+            set
+            {
+                _value_id = value;
+                NotifyPropertyChanged("value_id");
+            }
+        }
+
+        private string _label_name;
+        public string label_name
+        {
+            get { return _label_name; }
+            set
+            {
+                _label_name = value;
+                NotifyPropertyChanged("label_name");
+            }
+        }
+
+        private string _genre;
+        public string genre
+        {
+            get { return _genre; }
+            set
+            {
+                _genre = value;
+                NotifyPropertyChanged("genre");
+            }
+        }
+
+        private string _index2;
+        public string index2
+        {
+            get { return _index2; }
+            set
+            {
+                _index2 = value;
+                NotifyPropertyChanged("index2");
+            }
+        }
+
+
+        private string _type;
+        public string type
+        {
+            get { return _type; }
+            set
+            {
+                _type = value;
+                NotifyPropertyChanged("type");
+            }
+        }
+
+        private string _commandClassId;
+        public string commandClassId
+        {
+            get { return _commandClassId; }
+            set
+            {
+                _commandClassId = value;
+                NotifyPropertyChanged("commandClassId");
+            }
+        }
+
+        private string _value2;
+        public string value2
+        {
+            get { return _value2; }
+            set
+            {
+                _value2 = value;
+                NotifyPropertyChanged("value2");
+            }
+        }
+
+        private bool _read_only;
+        public bool read_only
+        {
+            get { return _read_only; }
+            set
+            {
+                _read_only = value;
+                NotifyPropertyChanged("read_only");
+            }
+        }
     
         public virtual ObservableCollection<device_value_triggers> device_value_triggers { get; set; }
         public virtual device device { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

@@ -12,8 +12,9 @@ namespace zVirtualScenesModel
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    
-    public partial class scene
+    using System.ComponentModel;
+
+    public partial class scene : INotifyPropertyChanged 
     {
         public scene()
         {
@@ -21,14 +22,62 @@ namespace zVirtualScenesModel
             this.scene_commands = new ObservableCollection<scene_commands>();
             this.scene_property_value = new ObservableCollection<scene_property_value>();
         }
-    
-        public int id { get; set; }
-        public string friendly_name { get; set; }
-        public Nullable<int> sort_order { get; set; }
-        public bool is_running { get; set; }
+
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private string _friendly_name;
+        public string friendly_name
+        {
+            get { return _friendly_name; }
+            set
+            {
+                _friendly_name = value;
+                NotifyPropertyChanged("friendly_name");
+            }
+        }
+
+        private Nullable<int> _sort_order = null;
+        public Nullable<int> sort_order
+        {
+            get { return _sort_order; }
+            set
+            {
+                _sort_order = value;
+                NotifyPropertyChanged("sort_order");
+            }
+        }
+
+        private bool _is_running;
+        public bool is_running
+        {
+            get { return _is_running; }
+            set
+            {
+                _is_running = value;
+                NotifyPropertyChanged("is_running");
+            }
+        }
     
         public virtual ObservableCollection<device_value_triggers> device_value_triggers { get; set; }
         public virtual ObservableCollection<scene_commands> scene_commands { get; set; }
         public virtual ObservableCollection<scene_property_value> scene_property_value { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

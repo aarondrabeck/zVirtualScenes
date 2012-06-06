@@ -12,17 +12,46 @@ namespace zVirtualScenesModel
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    
-    public partial class group
+    using System.ComponentModel;
+
+    public partial class group : INotifyPropertyChanged 
     {
         public group()
         {
             this.group_devices = new ObservableCollection<group_devices>();
         }
     
-        public int id { get; set; }
-        public string name { get; set; }
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private string _name;
+        public string name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                NotifyPropertyChanged("name");
+            }
+        }
     
         public virtual ObservableCollection<group_devices> group_devices { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }
