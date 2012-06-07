@@ -57,7 +57,10 @@ namespace zVirtualScenes_WPF.PluginManager
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                context.plugins.ToList();
+                if (context != null)
+                {
+                    context.plugins.ToList();
+                }
             }));
         }
 

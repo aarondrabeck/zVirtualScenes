@@ -40,7 +40,7 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            context.Dispose();
+           // context.Dispose();
         }
 
         private void LoadCommands()

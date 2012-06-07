@@ -61,11 +61,11 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
-
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
+                context = new zvsLocalDBEntities();
+
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
                 context.devices.ToList();
@@ -74,7 +74,7 @@ namespace zVirtualScenes_WPF.DeviceControls
 
             zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
             zvsLocalDBEntities.onGroup_DevicesChanged += zvsLocalDBEntities_onGroup_DevicesChanged;
-            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;
+            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;            
         }
 
         void zvsLocalDBEntities_onGroupsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -83,19 +83,19 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (context != null)
                     {
-                        //Gets new devices
-                        context.groups.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<group>())
-                            ent.Reload();
-
-                        DeviceGrid.CancelEdit();
-                        DeviceGrid.Items.Refresh();
+                        if (args.ChangeType == System.Data.EntityState.Added)
+                        {
+                            //Gets new devices
+                            context.groups.ToList();
+                        }
+                        else
+                        {
+                            //Reloads context from DB when modifcations happen
+                            foreach (var ent in context.ChangeTracker.Entries<group>())
+                                ent.Reload();
+                        }
                     }
                 }));
             }
@@ -107,19 +107,19 @@ namespace zVirtualScenes_WPF.DeviceControls
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (context != null)
                     {
-                        //Gets new devices
-                        context.group_devices.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<group_devices>())
-                            ent.Reload();
-
-                        DeviceGrid.CancelEdit();
-                        DeviceGrid.Items.Refresh();
+                        if (args.ChangeType == System.Data.EntityState.Added)
+                        {
+                            //Gets new devices
+                            context.group_devices.ToList();
+                        }
+                        else
+                        {
+                            //Reloads context from DB when modifcations happen
+                            foreach (var ent in context.ChangeTracker.Entries<group_devices>())
+                                ent.Reload();
+                        }
                     }
                 }));
             }
@@ -129,29 +129,29 @@ namespace zVirtualScenes_WPF.DeviceControls
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                if (args.ChangeType == System.Data.EntityState.Added)
+                if (context != null)
                 {
-                    //Gets new devices
-                    context.devices.ToList();
-                }
-                else
-                {
-                    //Reloads context from DB when modifcations happen
-                    foreach (var ent in context.ChangeTracker.Entries<device>())
-                        ent.Reload();
-
-                    DeviceGrid.CancelEdit();
-                    DeviceGrid.Items.Refresh();
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.devices.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<device>())
+                            ent.Reload();
+                    }
                 }
             }));
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
-        {
-            context.Dispose();
+        {            
             zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
             zvsLocalDBEntities.onGroup_DevicesChanged -= zvsLocalDBEntities_onGroup_DevicesChanged;
             zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
+            //context.Dispose();
         }
 
         ////User Events

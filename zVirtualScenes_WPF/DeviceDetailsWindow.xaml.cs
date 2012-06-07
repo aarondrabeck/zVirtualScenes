@@ -21,7 +21,7 @@ namespace zVirtualScenes_WPF
     /// Interaction logic for DeviceDetails.xaml
     /// </summary>
     public partial class DeviceDetailsWindow : Window
-    {        
+    {
         private int DeviceID = 0;
 
         public DeviceDetailsWindow(int DeviceID)
@@ -36,10 +36,10 @@ namespace zVirtualScenes_WPF
             LoadDevice();
             SelectionList.SelectedIndex = 0;
         }
-        
+
         private void Window_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;           
+            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
         }
 
         void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -129,7 +129,7 @@ namespace zVirtualScenes_WPF
 
                 if (item.Name.Equals("COMMANDS"))
                 {
-                    ContentStackPanel.Children.Add(new DeviceCommands(DeviceID));    
+                    ContentStackPanel.Children.Add(new DeviceCommands(DeviceID));
                 }
                 else if (item.Name.Equals("PROPERTIES"))
                 {
@@ -138,7 +138,7 @@ namespace zVirtualScenes_WPF
                 else if (item.Name.Equals("VALUES"))
                 {
                     ContentStackPanel.Children.Add(new DeviceValues(DeviceID));
-                }                
+                }
             }
         }
 
@@ -146,6 +146,6 @@ namespace zVirtualScenes_WPF
         {
             this.Close();
         }
-        
+
     }
 }

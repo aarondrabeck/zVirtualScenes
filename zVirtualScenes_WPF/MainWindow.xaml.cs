@@ -46,14 +46,15 @@ namespace zVirtualScenes_WPF
                 myCollectionViewSource.Source = application.zvsCore.Logger.LOG;
             }
             application.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", Utils.ApplicationName + " GUI");
-        }       
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
-        {
-            context.Dispose();
-        }
-
-       
+            ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
+            //clear the existing sort order
+            dataView.SortDescriptions.Clear();
+            //create a new sort order for the sorting that is done lastly
+            dataView.SortDescriptions.Add(new SortDescription("Datetime", ListSortDirection.Descending));
+            //refresh the view which in turn refresh the grid
+            dataView.Refresh();
+        }            
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {                
@@ -209,5 +210,12 @@ namespace zVirtualScenes_WPF
             groupEditor.Owner = this;
             groupEditor.Show();
         }
+
+        private void Window_Closing_1(object sender, CancelEventArgs e)
+        {
+            context.Dispose();
+        }
+
+        
     }
 }

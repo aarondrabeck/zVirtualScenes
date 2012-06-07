@@ -47,18 +47,19 @@ namespace zVirtualScenes_WPF.Groups
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                if (args.ChangeType == System.Data.EntityState.Added)
+                if (context != null)
                 {
-                    //Gets new devices
-                    context.groups.ToList();
-                }
-                else
-                {
-                    //Reloads context from DB when modifcations happen
-                    foreach (var ent in context.ChangeTracker.Entries<group>())
-                        ent.Reload();
-
-                    GroupsCmbBx.Items.Refresh();
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.groups.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<group>())
+                            ent.Reload();
+                    }
                 }
             }));
         }

@@ -56,13 +56,14 @@ namespace zVirtualScenes_WPF.Groups
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                if (args.ChangeType != System.Data.EntityState.Added)
-                {                   
-                    //Reloads context from DB when modifcations happen
-                    foreach (var ent in context.ChangeTracker.Entries<device>())
-                        ent.Reload();
-
-                    groupsDevicesLstVw.Items.Refresh();
+                if (context != null)
+                {
+                    if (args.ChangeType != System.Data.EntityState.Added)
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<device>())
+                            ent.Reload();
+                    }
                 }
             }));
         }
@@ -70,7 +71,7 @@ namespace zVirtualScenes_WPF.Groups
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
-            context.Dispose();
+            //context.Dispose();
         }
 
         private void EvaluateAddEditBtnsUsability()

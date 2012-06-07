@@ -55,19 +55,19 @@ namespace zVirtualScenes_WPF.DeviceControls
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                if (args.ChangeType == System.Data.EntityState.Added)
+                if (context != null)
                 {
-                    //Gets new devices
-                    d.device_values.ToList();
-                }
-                else
-                {
-                    //Reloads context from DB when modifcations happen
-                    foreach (var ent in context.ChangeTracker.Entries<device_values>())
-                        ent.Reload();
-
-                    ValuesDataGrid.CancelEdit();
-                    ValuesDataGrid.Items.Refresh();
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        d.device_values.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<device_values>())
+                            ent.Reload();
+                    }
                 }
             }));
         }
@@ -75,7 +75,7 @@ namespace zVirtualScenes_WPF.DeviceControls
         private void DataGrid_Unloaded_1(object sender, RoutedEventArgs e)
         {
             zvsLocalDBEntities.onDeviceValueChanged -= zvsLocalDBEntities_onDeviceValueChanged;
-            context.Dispose();
+            //context.Dispose();
         }
     }
 }
