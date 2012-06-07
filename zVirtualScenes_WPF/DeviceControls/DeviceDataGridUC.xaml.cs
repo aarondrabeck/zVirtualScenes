@@ -290,8 +290,11 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void DeviceGrid_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            OpenDeviceDetails();
-            e.Handled = true;
+            if (AdvancedDisplay)
+            {
+                OpenDeviceDetails();
+                e.Handled = true;
+            }
         }
 
         private void OpenDeviceDetails()

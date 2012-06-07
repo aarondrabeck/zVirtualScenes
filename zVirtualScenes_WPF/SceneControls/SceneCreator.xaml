@@ -26,8 +26,8 @@
     </UserControl.Resources>
     <Grid DataContext="{StaticResource sceneViewSource}">
 
-        <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" HorizontalAlignment="Left" Margin="10,10,0,37" Width="281"  
-                  ItemsSource="{Binding}"
+        <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" 
+                  HorizontalAlignment="Left" Margin="10,10,0,37" Width="281"   ItemsSource="{Binding}"
                  AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
                   CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single">
 
@@ -87,7 +87,9 @@
             </DataGrid.Columns>
 
         </DataGrid>
-        <DataGrid Name="SceneCmdsGrid" CanUserAddRows="False" Margin="308,10,10,248" ItemsSource="{Binding Source={StaticResource scenescene_commandsViewSource}}" d:LayoutOverrides="GridBox"/>
+        <DataGrid Name="SceneCmdsGrid" MouseDoubleClick="SceneCmdsGrid_MouseDoubleClick_1" CanUserAddRows="False" Margin="308,10,10,248" ItemsSource="{Binding Source={StaticResource scenescene_commandsViewSource}}" d:LayoutOverrides="GridBox"
+                AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1"  
+                  />
         <DeviceControls:DeviceDataGridUC x:Name="DevicesGrid" Margin="308,0,10,37" d:LayoutOverrides="GridBox" Height="193" VerticalAlignment="Bottom"/>
     </Grid>
 </UserControl>

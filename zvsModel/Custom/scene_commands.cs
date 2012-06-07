@@ -8,7 +8,15 @@ using System.Threading;
 namespace zVirtualScenesModel
 {
     public partial class scene_commands
-    {         
+    {
+        public enum command_types
+        {
+            unknown = 0,
+            builtin = 1,
+            device_command = 2,
+            device_type_command = 3
+        }
+
         public string Actionable_Object
         {
             get {

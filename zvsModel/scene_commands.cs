@@ -46,6 +46,7 @@ namespace zVirtualScenesModel
             {
                 _device_id = value;
                 NotifyPropertyChanged("device_id");
+                NotifyPropertyChanged("Actionable_Object");
             }
         }
 
@@ -57,6 +58,8 @@ namespace zVirtualScenesModel
             {
                 _command_type_id = value;
                 NotifyPropertyChanged("command_type_id");
+                NotifyPropertyChanged("Action_Description");
+                
             }
         }
 
@@ -68,6 +71,7 @@ namespace zVirtualScenesModel
             {
                 _command_id = value;
                 NotifyPropertyChanged("command_id");
+                NotifyPropertyChanged("Action_Description");
             }
         }
 
@@ -79,6 +83,7 @@ namespace zVirtualScenesModel
             {
                 _arg = value;
                 NotifyPropertyChanged("arg");
+                NotifyPropertyChanged("Action_Description");
             }
         }
 

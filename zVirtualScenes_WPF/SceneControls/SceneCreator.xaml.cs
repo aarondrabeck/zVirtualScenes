@@ -226,6 +226,67 @@ namespace zVirtualScenes_WPF.SceneControls
             }
         }
 
+        private void SceneCmdsGrid_DragOver_1(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<device>))
+            {
+                e.Effects = DragDropEffects.Link;
+            }
+            e.Effects = DragDropEffects.None;
+        }
+
+        private void SceneCmdsGrid_Drop_1(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<device>))
+            {
+                List<device> devices = (List<device>)e.Data.GetData("deviceList");
+
+                scene selected_scene = (scene)SceneGrid.SelectedItem;
+                if (selected_scene != null)
+                {
+                    SceneCmdsGrid.SelectedItems.Clear();
+
+                    foreach (device d in devices)
+                    {
+                        scene_commands scene_command = new scene_commands{
+                            device_id = d.id
+                        };
+
+                        AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, scene_command);
+                        sceneCmdWindow.Owner = Application.Current.MainWindow;
+
+                        if (sceneCmdWindow.ShowDialog() ?? false)
+                        {
+                            selected_scene.scene_commands.Add(scene_command);
+                            context.SaveChanges();
+                        }
+
+                        SceneCmdsGrid.SelectedItems.Add(scene_command);
+                    }
+                    
+                    SceneCmdsGrid.Focus();
+                }
+                e.Effects = DragDropEffects.Move;
+            }
+            e.Handled = true;
+        }
+
+        private void SceneCmdsGrid_MouseDoubleClick_1(object sender, MouseButtonEventArgs e)
+        {
+            scene_commands cmd = (scene_commands)SceneCmdsGrid.SelectedItem;
+            if (cmd != null)
+            {
+                AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, cmd);
+                sceneCmdWindow.Owner = Application.Current.MainWindow;
+
+                if (sceneCmdWindow.ShowDialog() ?? false)
+                {
+                    context.SaveChanges();
+                }
+            }
+            e.Handled = true;
+        }
+
     }
 
     public class IsValidScene : IValueConverter
