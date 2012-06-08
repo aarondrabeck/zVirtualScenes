@@ -1,5 +1,0 @@
-D:\Hobby\zvirtualscenes\trunk\output\zvsProcessor.dll
-D:\Hobby\zvirtualscenes\trunk\output\zvsProcessor.pdb
-D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Debug\zvsProcessor.dll
-D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Debug\zvsProcessor.pdb
-D:\Hobby\zvirtualscenes\trunk\zvsProcessor\obj\Debug\zvsProcessor.csprojResolveAssemblyReference.cache
