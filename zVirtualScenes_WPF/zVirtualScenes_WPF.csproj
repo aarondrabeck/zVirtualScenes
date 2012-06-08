@@ -77,6 +77,9 @@
     <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
       <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SceneControls\AddEditBuiltinSceneCommand.xaml.cs">
+      <DependentUpon>AddEditBuiltinSceneCommand.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SceneControls\SceneCreator.xaml.cs">
       <DependentUpon>SceneCreator.xaml</DependentUpon>
     </Compile>
@@ -194,6 +197,10 @@
     <Page Include="SceneControls\AddEditSceneCommand.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SceneControls\AddEditBuiltinSceneCommand.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SceneControls\SceneCreator.xaml">
       <SubType>Designer</SubType>

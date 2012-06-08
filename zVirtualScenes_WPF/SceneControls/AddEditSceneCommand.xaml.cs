@@ -23,7 +23,7 @@ namespace zVirtualScenes_WPF.SceneControls
     {
         private zvsLocalDBEntities context;
         private scene_commands scene_command;
-        private device _device; 
+        private device _device;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/save_check.png"));
         private string arg = string.Empty;
 
@@ -32,6 +32,11 @@ namespace zVirtualScenes_WPF.SceneControls
             this.context = context;
             this.scene_command = scene_command;
             _device = context.devices.FirstOrDefault(o => o.id == scene_command.device_id);
+
+            if (_device == null)
+                this.Close();
+            else
+                this.Title = string.Format("'{0}' Commands", _device.friendly_name);
 
             InitializeComponent();
         }
@@ -55,20 +60,23 @@ namespace zVirtualScenes_WPF.SceneControls
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (CmdsCmboBox.SelectedItem != null)
+            if (CmdsCmboBox.SelectedItem == null)
             {
-                if (CmdsCmboBox.SelectedItem is device_type_commands)
-                {
-                    device_type_commands d_cmd = (device_type_commands)CmdsCmboBox.SelectedItem;
-                    scene_command.command_id = d_cmd.id;
-                    scene_command.command_type_id = (int)scene_commands.command_types.device_type_command;
-                }
-                else if (CmdsCmboBox.SelectedItem is device_commands)
-                {
-                    device_commands d_cmd = (device_commands)CmdsCmboBox.SelectedItem;
-                    scene_command.command_id = d_cmd.id;
-                    scene_command.command_type_id = (int)scene_commands.command_types.device_command;
-                }
+                MessageBox.Show("You must select a command", "No Command Selected");
+                return;
+            }
+
+            if (CmdsCmboBox.SelectedItem is device_type_commands)
+            {
+                device_type_commands d_cmd = (device_type_commands)CmdsCmboBox.SelectedItem;
+                scene_command.command_id = d_cmd.id;
+                scene_command.command_type_id = (int)scene_commands.command_types.device_type_command;
+            }
+            else if (CmdsCmboBox.SelectedItem is device_commands)
+            {
+                device_commands d_cmd = (device_commands)CmdsCmboBox.SelectedItem;
+                scene_command.command_id = d_cmd.id;
+                scene_command.command_type_id = (int)scene_commands.command_types.device_command;
             }
 
             scene_command.arg = arg;
@@ -109,7 +117,7 @@ namespace zVirtualScenes_WPF.SceneControls
                                         bool.TryParse(dv.value2, out DefaultValue);
                                     }
                                 }
-                                arg = DefaultValue.ToString() ;
+                                arg = DefaultValue.ToString();
 
                                 CheckboxControl control = new CheckboxControl(d_cmd.friendly_name, d_cmd.description, DefaultValue, (isChecked) =>
                                 {

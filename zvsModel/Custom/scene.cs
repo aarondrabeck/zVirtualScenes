@@ -70,6 +70,8 @@ namespace zVirtualScenesModel
                 ExecutedCommands = 0;
                 CommandsToExecute = this.scene_commands.OrderBy(o => o.sort_order).ToList();
 
+                ProcessNextCommand();
+
                 return result;
             }
         }

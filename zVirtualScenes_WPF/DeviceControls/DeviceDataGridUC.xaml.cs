@@ -172,7 +172,8 @@ namespace zVirtualScenes_WPF.DeviceControls
             }
         }
 
-        
+
+       
 
         private void UserControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
