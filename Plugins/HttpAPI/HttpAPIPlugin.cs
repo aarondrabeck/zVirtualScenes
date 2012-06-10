@@ -353,19 +353,15 @@ namespace HttpAPI
                 {
                     foreach (device d in context.devices.OrderBy(o => o.friendly_name))
                     {
-                        string status_symbol = string.Empty;
-                        if (d.device_types.name == "THERMOSTAT")
-                            status_symbol = " F";
-                        if (d.device_types.name == "DIMMER")
-                            status_symbol = "%";
+                       
 
                         var device = new
                         {
                             id = d.id,
                             name = d.friendly_name,
-                            on_off = d.current_status == "0" ? "OFF" : "ON",
-                            level = d.current_status,
-                            level_txt = d.current_status + status_symbol,
+                            on_off = d.current_level_int == 0 ? "OFF" : "ON",
+                            level = d.current_level_int,
+                            level_txt = d.current_level_txt,
                             type = d.device_types.name
                         };
 
@@ -387,8 +383,7 @@ namespace HttpAPI
 
                         if (d != null)
                         {
-                            int level = 0;
-                            int.TryParse(d.current_status, out level);
+                            int level = d.current_level_int;
 
                             string on_off = string.Empty;
                             if (level == 0)
@@ -406,8 +401,8 @@ namespace HttpAPI
                                 id = d.id,
                                 name = d.friendly_name,
                                 on_off = on_off,
-                                level = d.current_status,
-                                level_txt = d.current_status,
+                                level = d.current_level_int,
+                                level_txt = d.current_level_txt,
                                 type = d.device_types.name,
                                 type_txt = d.device_types.friendly_name,
                                 last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",

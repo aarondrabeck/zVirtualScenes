@@ -890,7 +890,7 @@ namespace OpenZWavePlugin
                                         int level = 0;
                                         if (int.TryParse(data, out level))
                                         {
-                                            d.current_level_int = level;
+                                            d.current_level_int = level > 0 ? 100 : 0;
                                             d.current_level_txt = level > 0 ? "On" : "Off";
                                             Context.SaveChanges();
                                         }
@@ -1093,7 +1093,6 @@ namespace OpenZWavePlugin
                                         ozw_device = new device
                                         {
                                             node_id = node.ID,
-                                            current_status = "0",
                                             device_types = device_type,
                                             friendly_name = deviceName
                                         };

@@ -37,14 +37,15 @@
     </UserControl.Resources>
     <Grid DataContext="{StaticResource sceneViewSource}">
 
-        <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" HeadersVisibility="None" GridLinesVisibility="Horizontal"
-                  HorizontalAlignment="Left" Margin="10,24,0,37" Width="281"   ItemsSource="{Binding}" RowHeight="45"
+        <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" HeadersVisibility="None" 
+                  GridLinesVisibility="Horizontal" 
+                  HorizontalAlignment="Left" Margin="10,24,0,37" Width="339"   ItemsSource="{Binding}" RowHeight="45"
                  AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
                   CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single" SelectionChanged="SceneGrid_SelectionChanged">
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
-                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="SceneGrid_Row_PreviewMouseRightButtonDown"/>
-                    <EventSetter Event="MouseDoubleClick" Handler="SceneGrid_Row_MouseDoubleClick"/>
+                    <!--<EventSetter Event="PreviewMouseRightButtonDown" Handler="SceneGrid_Row_PreviewMouseRightButtonDown"/>-->
+                    <!--<EventSetter Event="MouseDoubleClick" Handler="SceneGrid_Row_MouseDoubleClick"/>-->
                 </Style>
             </DataGrid.RowStyle>
 
@@ -63,22 +64,24 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Width="*" MinWidth="50" Header="Scene" Binding="{Binding Path=friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False"/>
-
+                <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scene" Binding="{Binding Path=friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
                 <!--<DataGridTextColumn  Width="25" MinWidth="50" Header="Sort" Binding="{Binding Path=sort_order,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="False"  CanUserReorder="False" CanUserSort="True" />-->
 
-
-                <DataGridTemplateColumn MaxWidth="115" MinWidth="115" Width="115" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                <DataGridTemplateColumn MaxWidth="108" MinWidth="108" Width="108" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,0,0,0">
-                                <Button Name="ActivateScene" Click="ActivateScene_Click_1" Height="22" Width="50" Content="Activate" Margin="5,0,0,0"></Button>
-
-
-                                <Button Name="SortUp" Height="20" Width="20"  ToolTip="Move Up" Click="SortUp_Click_1" Margin="5,0,0,0">
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="3,0">
+                                <Button Name="ActivateScene" Click="ActivateScene_Click_1" Height="32"  Content="Activate" Padding="3,0"></Button>
+                                <Button Name="SortUp" Height="32" Width="20"  ToolTip="Move Up" Click="SortUp_Click_1" Margin="5,0,0,0">
                                     <Image Source="../Images/arrow_up.png" ></Image>
                                 </Button>
-                                <Button Name="SortDown"  Height="20" Width="20"  ToolTip="Move Down" Click="SortDown_Click_1" Margin="5,0,0,0">
+                                <Button Name="SortDown"  Height="32" Width="20"  ToolTip="Move Down" Click="SortDown_Click_1" Margin="5,0,0,0">
                                     <Image Source="../Images/arrow_down.png" ></Image>
                                 </Button>
                             </StackPanel>
@@ -101,13 +104,22 @@
                                 </DataTrigger>-->
                             </DataTemplate.Triggers>
                         </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
 
+                <DataGridTemplateColumn x:Name="SceneSettingsCol" MaxWidth="45" MinWidth="45" Width="45"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Button Name="SceneSettingBtn" ToolTip="Scene Settings" Width="32" Height="32" Click="SceneSettingBtn_Click_1" Margin="3,0">
+                                <Image Cursor="Hand"   Source="/zVirtualScenes_WPF;component/Images/settings.png" Margin="0,0,0,0"  />
+                            </Button>
+                        </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
 
         </DataGrid>
-        <Grid Name="SceneCommandGrid" Margin="308,10,10,37">
+        <Grid Name="SceneCommandGrid" Margin="363,10,10,37">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="Auto"></RowDefinition>
@@ -121,7 +133,6 @@
                        >
                 <DataGrid.RowStyle>
                     <Style TargetType="{x:Type DataGridRow}">
-                        <EventSetter Event="MouseDoubleClick" Handler="SceneCmdsGrid_Row_Double_Click"/>
                         <EventSetter Event="PreviewMouseRightButtonDown" Handler="SceneCmdsGrid_Row_PreviewMouseRightButtonDown"/>
                     </Style>
                 </DataGrid.RowStyle>
@@ -138,7 +149,7 @@
 
                     <DataGridTextColumn  Width="50"  SortDirection="Descending" MinWidth="50"  Binding="{Binding Path=sort_order,UpdateSourceTrigger=PropertyChanged}" Header="Sort" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False" />
 
-                    <DataGridTemplateColumn MaxWidth="63" MinWidth="63" Width="63" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                    <DataGridTemplateColumn MaxWidth="60" MinWidth="60" Width="60" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                         <DataGridTemplateColumn.CellTemplate >
                             <DataTemplate>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,0,0,0">
@@ -154,12 +165,22 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="25" MinWidth="25" Width="25"  Header="" CanUserResize="False" CanUserReorder="False">
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate>
+                                <Button Name="SettingBtn" Width="20" Height="20" Click="SettingBtn_Click_1" ToolTip="Command Settings" Margin="0,0,5,0">
+                                    <Image Cursor="Hand"  Source="/zVirtualScenes_WPF;component/Images/settings.png" />
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                 </DataGrid.Columns>
             </DataGrid>
 
             <Expander Header="Add Commands" Grid.Row="1" Margin="0,5,0,0">
                 <Grid>
-                    <DeviceControls:DeviceDataGridUC  x:Name="DevicesGrid" d:LayoutOverrides="GridBox" Height="150" Margin="5,5,150,5"  />
+                    <DeviceControls:DeviceDataGridUC  x:Name="DevicesGrid" d:LayoutOverrides="GridBox" Height="250" Margin="5,5,150,5"  />
                     <Button  Name="AddBuiltinCmd" Click="AddBuiltinCmd_Click_1" Content="Add Built-in Command" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Margin="0,0,0,5" Width="135" />
                     <TextBlock TextAlignment="Center" HorizontalAlignment="Right" Margin="0,37,0,0" TextWrapping="Wrap" Text="Drag and drop device to add them to scenes or add a built-in command with the button below." VerticalAlignment="Top" Height="80" Width="135"/>
                 </Grid>

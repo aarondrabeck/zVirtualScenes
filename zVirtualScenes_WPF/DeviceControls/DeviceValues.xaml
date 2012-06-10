@@ -11,7 +11,7 @@
     </UserControl.Resources>
     <Grid DataContext="{StaticResource device_valuesViewSource}">
         <DataGrid Name="ValuesDataGrid" AutoGenerateColumns="False" ItemsSource="{Binding}" CanUserAddRows="False"
-                  Unloaded="DataGrid_Unloaded_1" BorderThickness="0" CanUserDeleteRows="False">
+                  Unloaded="DataGrid_Unloaded_1" BorderThickness="0" CanUserDeleteRows="False" Margin="0,0,0,24">
 
             <DataGrid.Columns>
                 <DataGridTextColumn Width="50" MinWidth="50" Header="Id" Binding="{Binding Path=id}" IsReadOnly="True" />
@@ -23,5 +23,6 @@
                 <DataGridTextColumn Width="100" MinWidth="50" Header="Type" Binding="{Binding Path=type}" IsReadOnly="True" />
             </DataGrid.Columns>
         </DataGrid>
+        <TextBlock Name="RepollLnk" Text="Repoll Device" MouseDown="RepollLnk_MouseDown_1" Margin="0,0,8,4" VerticalAlignment="Bottom" FontWeight="Bold" Foreground="#FF1122CC" Cursor="Hand" HorizontalAlignment="Right"/>
     </Grid>
 </UserControl>

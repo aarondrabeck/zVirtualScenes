@@ -77,5 +77,15 @@ namespace zVirtualScenes_WPF.DeviceControls
             zvsLocalDBEntities.onDeviceValueChanged -= zvsLocalDBEntities_onDeviceValueChanged;
             //context.Dispose();
         }
+
+        private void RepollLnk_MouseDown_1(object sender, MouseButtonEventArgs e)
+        {
+            if (d != null)
+            {
+                builtin_commands cmd = context.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
+                if (cmd != null)
+                    cmd.Run(context, d.id.ToString());
+            }
+        }
     }
 }

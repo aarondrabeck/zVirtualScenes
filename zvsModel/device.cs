@@ -67,7 +67,7 @@ namespace zVirtualScenesModel
             set
             {
                 _current_level_txt = value;
-                NotifyPropertyChanged("current_level");
+                NotifyPropertyChanged("current_level_txt");
             }
         }
 

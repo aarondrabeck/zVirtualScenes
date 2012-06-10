@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="zvsLocalDBModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.4.0" ProviderManifestToken="4.0" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="zvsLocalDBModel.Store" Alias="Self" Provider="System.Data.SqlServerCe.4.0" ProviderManifestToken="4.0" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityContainer Name="zvsLocalDBModelStoreContainer">
           <EntitySet Name="builtin_command_options" EntityType="zvsLocalDBModel.Store.builtin_command_options" store:Type="Tables" />
           <EntitySet Name="builtin_command_que" EntityType="zvsLocalDBModel.Store.builtin_command_que" store:Type="Tables" />
@@ -35,111 +35,111 @@
           <EntitySet Name="scene_property_value" EntityType="zvsLocalDBModel.Store.scene_property_value" store:Type="Tables" />
           <EntitySet Name="scenes" EntityType="zvsLocalDBModel.Store.scenes" store:Type="Tables" />
           <EntitySet Name="scheduled_tasks" EntityType="zvsLocalDBModel.Store.scheduled_tasks" store:Type="Tables" />
-          <AssociationSet Name="FK__builtin_command_options__0000000000000150" Association="zvsLocalDBModel.Store.FK__builtin_command_options__0000000000000150">
+          <AssociationSet Name="FK__builtin_command_options__00000000000004F1" Association="zvsLocalDBModel.Store.FK__builtin_command_options__00000000000004F1">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_options" EntitySet="builtin_command_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__builtin_command_que__0000000000000140" Association="zvsLocalDBModel.Store.FK__builtin_command_que__0000000000000140">
+          <AssociationSet Name="FK__builtin_command_que__00000000000004E1" Association="zvsLocalDBModel.Store.FK__builtin_command_que__00000000000004E1">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_que" EntitySet="builtin_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_command_options__00000000000001DF" Association="zvsLocalDBModel.Store.FK__device_command_options__00000000000001DF">
+          <AssociationSet Name="FK__device_command_options__0000000000000585" Association="zvsLocalDBModel.Store.FK__device_command_options__0000000000000585">
             <End Role="device_commands" EntitySet="device_commands" />
             <End Role="device_command_options" EntitySet="device_command_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_command_que__00000000000001F1" Association="zvsLocalDBModel.Store.FK__device_command_que__00000000000001F1">
+          <AssociationSet Name="FK__device_command_que__0000000000000597" Association="zvsLocalDBModel.Store.FK__device_command_que__0000000000000597">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_command_que" EntitySet="device_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_command_que__00000000000001F5" Association="zvsLocalDBModel.Store.FK__device_command_que__00000000000001F5">
+          <AssociationSet Name="FK__device_command_que__000000000000059B" Association="zvsLocalDBModel.Store.FK__device_command_que__000000000000059B">
             <End Role="device_commands" EntitySet="device_commands" />
             <End Role="device_command_que" EntitySet="device_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_commands__00000000000001CF" Association="zvsLocalDBModel.Store.FK__device_commands__00000000000001CF">
+          <AssociationSet Name="FK__device_commands__0000000000000575" Association="zvsLocalDBModel.Store.FK__device_commands__0000000000000575">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_commands" EntitySet="device_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_property_options__0000000000000215" Association="zvsLocalDBModel.Store.FK__device_property_options__0000000000000215">
+          <AssociationSet Name="FK__device_property_options__00000000000005BB" Association="zvsLocalDBModel.Store.FK__device_property_options__00000000000005BB">
             <End Role="device_propertys" EntitySet="device_propertys" />
             <End Role="device_property_options" EntitySet="device_property_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_property_values__0000000000000227" Association="zvsLocalDBModel.Store.FK__device_property_values__0000000000000227">
+          <AssociationSet Name="FK__device_property_values__00000000000005CD" Association="zvsLocalDBModel.Store.FK__device_property_values__00000000000005CD">
             <End Role="device_propertys" EntitySet="device_propertys" />
             <End Role="device_property_values" EntitySet="device_property_values" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_property_values__000000000000022B" Association="zvsLocalDBModel.Store.FK__device_property_values__000000000000022B">
+          <AssociationSet Name="FK__device_property_values__00000000000005D1" Association="zvsLocalDBModel.Store.FK__device_property_values__00000000000005D1">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_property_values" EntitySet="device_property_values" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_command_options__0000000000000262" Association="zvsLocalDBModel.Store.FK__device_type_command_options__0000000000000262">
+          <AssociationSet Name="FK__device_type_command_options__0000000000000608" Association="zvsLocalDBModel.Store.FK__device_type_command_options__0000000000000608">
             <End Role="device_type_commands" EntitySet="device_type_commands" />
             <End Role="device_type_command_options" EntitySet="device_type_command_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_command_que__0000000000000274" Association="zvsLocalDBModel.Store.FK__device_type_command_que__0000000000000274">
+          <AssociationSet Name="FK__device_type_command_que__000000000000061A" Association="zvsLocalDBModel.Store.FK__device_type_command_que__000000000000061A">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_type_command_que" EntitySet="device_type_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_command_que__0000000000000278" Association="zvsLocalDBModel.Store.FK__device_type_command_que__0000000000000278">
+          <AssociationSet Name="FK__device_type_command_que__000000000000061E" Association="zvsLocalDBModel.Store.FK__device_type_command_que__000000000000061E">
             <End Role="device_type_commands" EntitySet="device_type_commands" />
             <End Role="device_type_command_que" EntitySet="device_type_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_commands__0000000000000252" Association="zvsLocalDBModel.Store.FK__device_type_commands__0000000000000252">
+          <AssociationSet Name="FK__device_type_commands__00000000000005F8" Association="zvsLocalDBModel.Store.FK__device_type_commands__00000000000005F8">
             <End Role="device_types" EntitySet="device_types" />
             <End Role="device_type_commands" EntitySet="device_type_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_types__0000000000000189" Association="zvsLocalDBModel.Store.FK__device_types__0000000000000189">
+          <AssociationSet Name="FK__device_types__000000000000052A" Association="zvsLocalDBModel.Store.FK__device_types__000000000000052A">
             <End Role="plugins" EntitySet="plugins" />
             <End Role="device_types" EntitySet="device_types" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_value_triggers__00000000000002CD" Association="zvsLocalDBModel.Store.FK__device_value_triggers__00000000000002CD">
+          <AssociationSet Name="FK__device_value_triggers__0000000000000673" Association="zvsLocalDBModel.Store.FK__device_value_triggers__0000000000000673">
             <End Role="device_values" EntitySet="device_values" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_value_triggers__00000000000002D1" Association="zvsLocalDBModel.Store.FK__device_value_triggers__00000000000002D1">
+          <AssociationSet Name="FK__device_value_triggers__0000000000000677" Association="zvsLocalDBModel.Store.FK__device_value_triggers__0000000000000677">
             <End Role="scenes" EntitySet="scenes" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_values__00000000000002AE" Association="zvsLocalDBModel.Store.FK__device_values__00000000000002AE">
+          <AssociationSet Name="FK__device_values__0000000000000654" Association="zvsLocalDBModel.Store.FK__device_values__0000000000000654">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_values" EntitySet="device_values" />
           </AssociationSet>
-          <AssociationSet Name="FK__devices__00000000000001A5" Association="zvsLocalDBModel.Store.FK__devices__00000000000001A5">
+          <AssociationSet Name="FK__devices__000000000000054B" Association="zvsLocalDBModel.Store.FK__devices__000000000000054B">
             <End Role="device_types" EntitySet="device_types" />
             <End Role="devices" EntitySet="devices" />
           </AssociationSet>
-          <AssociationSet Name="FK__group_devices__00000000000002EB" Association="zvsLocalDBModel.Store.FK__group_devices__00000000000002EB">
+          <AssociationSet Name="FK__group_devices__0000000000000691" Association="zvsLocalDBModel.Store.FK__group_devices__0000000000000691">
             <End Role="groups" EntitySet="groups" />
             <End Role="group_devices" EntitySet="group_devices" />
           </AssociationSet>
-          <AssociationSet Name="FK__group_devices__00000000000002EF" Association="zvsLocalDBModel.Store.FK__group_devices__00000000000002EF">
+          <AssociationSet Name="FK__group_devices__0000000000000695" Association="zvsLocalDBModel.Store.FK__group_devices__0000000000000695">
             <End Role="devices" EntitySet="devices" />
             <End Role="group_devices" EntitySet="group_devices" />
           </AssociationSet>
-          <AssociationSet Name="FK__plugin_setting_options__000000000000031A" Association="zvsLocalDBModel.Store.FK__plugin_setting_options__000000000000031A">
+          <AssociationSet Name="FK__plugin_setting_options__00000000000006C0" Association="zvsLocalDBModel.Store.FK__plugin_setting_options__00000000000006C0">
             <End Role="plugin_settings" EntitySet="plugin_settings" />
             <End Role="plugin_setting_options" EntitySet="plugin_setting_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__plugin_settings__000000000000030A" Association="zvsLocalDBModel.Store.FK__plugin_settings__000000000000030A">
+          <AssociationSet Name="FK__plugin_settings__00000000000006B0" Association="zvsLocalDBModel.Store.FK__plugin_settings__00000000000006B0">
             <End Role="plugins" EntitySet="plugins" />
             <End Role="plugin_settings" EntitySet="plugin_settings" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_commands__0000000000000341" Association="zvsLocalDBModel.Store.FK__scene_commands__0000000000000341">
+          <AssociationSet Name="FK__scene_commands__00000000000006E7" Association="zvsLocalDBModel.Store.FK__scene_commands__00000000000006E7">
             <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_commands" EntitySet="scene_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_commands__0000000000000345" Association="zvsLocalDBModel.Store.FK__scene_commands__0000000000000345">
+          <AssociationSet Name="FK__scene_commands__00000000000006EB" Association="zvsLocalDBModel.Store.FK__scene_commands__00000000000006EB">
             <End Role="devices" EntitySet="devices" />
             <End Role="scene_commands" EntitySet="scene_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_property_option__000000000000036A" Association="zvsLocalDBModel.Store.FK__scene_property_option__000000000000036A">
+          <AssociationSet Name="FK__scene_property_option__0000000000000710" Association="zvsLocalDBModel.Store.FK__scene_property_option__0000000000000710">
             <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_option" EntitySet="scene_property_option" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_property_value__000000000000037F" Association="zvsLocalDBModel.Store.FK__scene_property_value__000000000000037F">
+          <AssociationSet Name="FK__scene_property_value__0000000000000725" Association="zvsLocalDBModel.Store.FK__scene_property_value__0000000000000725">
             <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_property_value__0000000000000383" Association="zvsLocalDBModel.Store.FK__scene_property_value__0000000000000383">
+          <AssociationSet Name="FK__scene_property_value__0000000000000729" Association="zvsLocalDBModel.Store.FK__scene_property_value__0000000000000729">
             <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
@@ -320,7 +320,8 @@
           <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="device_type_id" Type="int" Nullable="false" />
           <Property Name="node_id" Type="int" Nullable="false" />
-          <Property Name="current_status" Type="nvarchar" MaxLength="500" />
+          <Property Name="current_level_txt" Type="nvarchar" MaxLength="500" />
+          <Property Name="current_level_int" Type="int" />
           <Property Name="friendly_name" Type="nvarchar" Nullable="false" MaxLength="500" />
           <Property Name="last_heard_from" Type="datetime" />
         </EntityType>
@@ -482,7 +483,7 @@
           <Property Name="RecurDay30" Type="bit" />
           <Property Name="RecurDay31" Type="bit" />
         </EntityType>
-        <Association Name="FK__builtin_command_options__0000000000000150">
+        <Association Name="FK__builtin_command_options__00000000000004F1">
           <End Role="builtin_commands" Type="zvsLocalDBModel.Store.builtin_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -496,7 +497,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__builtin_command_que__0000000000000140">
+        <Association Name="FK__builtin_command_que__00000000000004E1">
           <End Role="builtin_commands" Type="zvsLocalDBModel.Store.builtin_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -510,7 +511,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_command_options__00000000000001DF">
+        <Association Name="FK__device_command_options__0000000000000585">
           <End Role="device_commands" Type="zvsLocalDBModel.Store.device_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -524,7 +525,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_command_que__00000000000001F1">
+        <Association Name="FK__device_command_que__0000000000000597">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -538,7 +539,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_command_que__00000000000001F5">
+        <Association Name="FK__device_command_que__000000000000059B">
           <End Role="device_commands" Type="zvsLocalDBModel.Store.device_commands" Multiplicity="1" />
           <End Role="device_command_que" Type="zvsLocalDBModel.Store.device_command_que" Multiplicity="*" />
           <ReferentialConstraint>
@@ -550,7 +551,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_commands__00000000000001CF">
+        <Association Name="FK__device_commands__0000000000000575">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -564,7 +565,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_property_options__0000000000000215">
+        <Association Name="FK__device_property_options__00000000000005BB">
           <End Role="device_propertys" Type="zvsLocalDBModel.Store.device_propertys" Multiplicity="1" />
           <End Role="device_property_options" Type="zvsLocalDBModel.Store.device_property_options" Multiplicity="*" />
           <ReferentialConstraint>
@@ -576,7 +577,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_property_values__0000000000000227">
+        <Association Name="FK__device_property_values__00000000000005CD">
           <End Role="device_propertys" Type="zvsLocalDBModel.Store.device_propertys" Multiplicity="1" />
           <End Role="device_property_values" Type="zvsLocalDBModel.Store.device_property_values" Multiplicity="*" />
           <ReferentialConstraint>
@@ -588,7 +589,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_property_values__000000000000022B">
+        <Association Name="FK__device_property_values__00000000000005D1">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -602,7 +603,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_command_options__0000000000000262">
+        <Association Name="FK__device_type_command_options__0000000000000608">
           <End Role="device_type_commands" Type="zvsLocalDBModel.Store.device_type_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -616,7 +617,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_command_que__0000000000000274">
+        <Association Name="FK__device_type_command_que__000000000000061A">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -630,7 +631,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_command_que__0000000000000278">
+        <Association Name="FK__device_type_command_que__000000000000061E">
           <End Role="device_type_commands" Type="zvsLocalDBModel.Store.device_type_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -644,7 +645,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_commands__0000000000000252">
+        <Association Name="FK__device_type_commands__00000000000005F8">
           <End Role="device_types" Type="zvsLocalDBModel.Store.device_types" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -658,7 +659,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_types__0000000000000189">
+        <Association Name="FK__device_types__000000000000052A">
           <End Role="plugins" Type="zvsLocalDBModel.Store.plugins" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -672,7 +673,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_value_triggers__00000000000002CD">
+        <Association Name="FK__device_value_triggers__0000000000000673">
           <End Role="device_values" Type="zvsLocalDBModel.Store.device_values" Multiplicity="1" />
           <End Role="device_value_triggers" Type="zvsLocalDBModel.Store.device_value_triggers" Multiplicity="*" />
           <ReferentialConstraint>
@@ -684,7 +685,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_value_triggers__00000000000002D1">
+        <Association Name="FK__device_value_triggers__0000000000000677">
           <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="0..1" />
           <End Role="device_value_triggers" Type="zvsLocalDBModel.Store.device_value_triggers" Multiplicity="*" />
           <ReferentialConstraint>
@@ -696,7 +697,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_values__00000000000002AE">
+        <Association Name="FK__device_values__0000000000000654">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -710,7 +711,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__devices__00000000000001A5">
+        <Association Name="FK__devices__000000000000054B">
           <End Role="device_types" Type="zvsLocalDBModel.Store.device_types" Multiplicity="1" />
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="*" />
           <ReferentialConstraint>
@@ -722,7 +723,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__group_devices__00000000000002EB">
+        <Association Name="FK__group_devices__0000000000000691">
           <End Role="groups" Type="zvsLocalDBModel.Store.groups" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -736,7 +737,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__group_devices__00000000000002EF">
+        <Association Name="FK__group_devices__0000000000000695">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -750,7 +751,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__plugin_setting_options__000000000000031A">
+        <Association Name="FK__plugin_setting_options__00000000000006C0">
           <End Role="plugin_settings" Type="zvsLocalDBModel.Store.plugin_settings" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -764,7 +765,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__plugin_settings__000000000000030A">
+        <Association Name="FK__plugin_settings__00000000000006B0">
           <End Role="plugins" Type="zvsLocalDBModel.Store.plugins" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -778,7 +779,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_commands__0000000000000341">
+        <Association Name="FK__scene_commands__00000000000006E7">
           <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -792,7 +793,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_commands__0000000000000345">
+        <Association Name="FK__scene_commands__00000000000006EB">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
@@ -806,7 +807,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_property_option__000000000000036A">
+        <Association Name="FK__scene_property_option__0000000000000710">
           <End Role="scene_property" Type="zvsLocalDBModel.Store.scene_property" Multiplicity="1" />
           <End Role="scene_property_option" Type="zvsLocalDBModel.Store.scene_property_option" Multiplicity="*" />
           <ReferentialConstraint>
@@ -818,7 +819,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_property_value__000000000000037F">
+        <Association Name="FK__scene_property_value__0000000000000725">
           <End Role="scene_property" Type="zvsLocalDBModel.Store.scene_property" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -832,7 +833,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_property_value__0000000000000383">
+        <Association Name="FK__scene_property_value__0000000000000729">
           <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -846,8 +847,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="zvsLocalDBModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -1194,7 +1194,6 @@
           <Property Name="id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
           <Property Name="device_type_id" Type="Int32" Nullable="false" />
           <Property Name="node_id" Type="Int32" Nullable="false" />
-          <Property Name="current_status" Type="String" MaxLength="500" Unicode="true" FixedLength="false" />
           <Property Name="friendly_name" Type="String" Nullable="false" MaxLength="500" Unicode="true" FixedLength="false" />
           <Property Name="last_heard_from" Type="DateTime" Precision="3" />
           <NavigationProperty Name="device_command_que" Relationship="zvsLocalDBModel.FK__device_command_que__00000000000001F1" FromRole="devices" ToRole="device_command_que" />
@@ -1205,6 +1204,8 @@
           <NavigationProperty Name="device_values" Relationship="zvsLocalDBModel.FK__device_values__00000000000002AE" FromRole="devices" ToRole="device_values" />
           <NavigationProperty Name="group_devices" Relationship="zvsLocalDBModel.FK__group_devices__00000000000002EF" FromRole="devices" ToRole="group_devices" />
           <NavigationProperty Name="scene_commands" Relationship="zvsLocalDBModel.FK__scene_commands__0000000000000345" FromRole="devices" ToRole="scene_commands" />
+          <Property Type="String" Name="current_level_txt" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Int32" Name="current_level_int" />
         </EntityType>
         <EntityType Name="group_devices">
           <Key>
@@ -1940,10 +1941,11 @@
           <EntitySetMapping Name="devices">
             <EntityTypeMapping TypeName="zvsLocalDBModel.device">
               <MappingFragment StoreEntitySet="devices">
+                <ScalarProperty Name="current_level_int" ColumnName="current_level_int" />
+                <ScalarProperty Name="current_level_txt" ColumnName="current_level_txt" />
                 <ScalarProperty Name="id" ColumnName="id" />
                 <ScalarProperty Name="device_type_id" ColumnName="device_type_id" />
                 <ScalarProperty Name="node_id" ColumnName="node_id" />
-                <ScalarProperty Name="current_status" ColumnName="current_status" />
                 <ScalarProperty Name="friendly_name" ColumnName="friendly_name" />
                 <ScalarProperty Name="last_heard_from" ColumnName="last_heard_from" />
               </MappingFragment>

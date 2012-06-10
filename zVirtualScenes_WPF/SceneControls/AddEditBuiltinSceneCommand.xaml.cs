@@ -50,6 +50,11 @@ namespace zVirtualScenes_WPF.SceneControls
                 builtin_commands cmd = context.builtin_commands.FirstOrDefault(o => o.id == scene_command.command_id);
                 if (cmd != null)
                     CmdsCmboBox.SelectedItem = cmd;
+                else
+                {
+                    if (CmdsCmboBox.Items.Count > 0)
+                        CmdsCmboBox.SelectedIndex = 0;
+                }
             }
         }
 

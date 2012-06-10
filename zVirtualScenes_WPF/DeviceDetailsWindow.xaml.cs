@@ -61,24 +61,19 @@ namespace zVirtualScenes_WPF
                 else
                 {
                     DeviceNameTextBlock.Text = d.friendly_name;
+                    this.Title = string.Format("'{0}' Details", d.friendly_name);
                     DeviceCurrentStatus.Text = d.current_level_txt;
 
                     switch (d.device_types.name)
                     {
                         case "THERMOSTAT":
                             {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/thermometer.png"));
-
-                                //TODO: USE GLOBAL SETTING
-                                DeviceCurrentStatus.Text += "F";
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/thermometer.png"));                                                              
                                 break;
                             }
                         case "DIMMER":
                             {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/bulb.png"));
-
-                                //TODO: USE GLOBAL SETTING
-                                DeviceCurrentStatus.Text += "%";
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/bulb.png"));                                
                                 break;
                             }
                         case "SWITCH":

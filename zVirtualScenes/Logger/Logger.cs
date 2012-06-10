@@ -45,7 +45,7 @@ namespace zVirtualScenes
         /// </summary>
         private int _maxFileCount;
 
-        private string LogPath
+        public static string LogPath
         {
             get
             {

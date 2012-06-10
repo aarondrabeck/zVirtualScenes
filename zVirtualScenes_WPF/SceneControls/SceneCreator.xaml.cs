@@ -323,57 +323,7 @@ namespace zVirtualScenes_WPF.SceneControls
                     }
                 }
             }
-        }
-
-        private void SceneGrid_Row_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
-            {
-                var scene = (scene)obj;
-                if (scene != null)
-                {
-                    ContextMenu menu = new ContextMenu();
-
-                    MenuItem delete = new MenuItem();
-                    delete.Header = string.Format("Delete scene '{0}'", scene.friendly_name);
-                    delete.Click += (s, args) =>
-                    {
-                        DeleteSelectedScene(scene);
-                    };
-
-                    MenuItem properties = new MenuItem();
-                    properties.Header = "Properties";
-                    properties.Click += (s, args) =>
-                    {
-                        ShowSceneProperties(scene.id, scene.friendly_name);
-                    };
-
-                    menu.Items.Add(delete);
-                    menu.Items.Add(new Separator());
-                    menu.Items.Add(properties);
-                    ContextMenu = menu;
-                    e.Handled = true;
-                    return;
-                }
-            }
-
-            ContextMenu = null;
-        }
-
-        private void SceneGrid_Row_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
-            {
-                var scene = (scene)obj;
-                if (scene != null)
-                {
-                    ShowSceneProperties(scene.id, scene.friendly_name);
-                    e.Handled = true;
-                }
-            }
-        }
+        }  
 
         private void ShowSceneProperties(int SceneID, string SceneFriendlyName)
         {
@@ -457,41 +407,7 @@ namespace zVirtualScenes_WPF.SceneControls
                 }
             }
         }
-
-        private void SceneCmdsGrid_Row_Double_Click(object sender, RoutedEventArgs e)
-        {
-
-            Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene_commands)
-            {
-                var cmd = (scene_commands)obj;
-                if (cmd != null)
-                {
-                    if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.builtin)
-                    {
-                        AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
-                        window.Owner = Application.Current.MainWindow;
-
-                        if (window.ShowDialog() ?? false)
-                        {
-                            context.SaveChanges();
-                        }
-                    }
-                    else if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_command ||
-                        (scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_type_command)
-                    {
-                        AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, cmd);
-                        sceneCmdWindow.Owner = Application.Current.MainWindow;
-
-                        if (sceneCmdWindow.ShowDialog() ?? false)
-                        {
-                            context.SaveChanges();
-                        }
-                    }
-                }
-            }
-        }
-
+        
         private void NormalizeSortOrderSceneCmds()
         {
             if (SceneGrid.SelectedItem is scene)
@@ -650,6 +566,52 @@ namespace zVirtualScenes_WPF.SceneControls
                         }
                         SceneCmdsGrid.Focus();
                     }
+                }
+            }
+        }
+
+        private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
+        {
+            Object obj = ((FrameworkElement)sender).DataContext;
+            if (obj is scene_commands)
+            {
+                var cmd = (scene_commands)obj;
+                if (cmd != null)
+                {
+                    if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.builtin)
+                    {
+                        AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
+                        window.Owner = Application.Current.MainWindow;
+
+                        if (window.ShowDialog() ?? false)
+                        {
+                            context.SaveChanges();
+                        }
+                    }
+                    else if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_command ||
+                        (scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_type_command)
+                    {
+                        AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, cmd);
+                        sceneCmdWindow.Owner = Application.Current.MainWindow;
+
+                        if (sceneCmdWindow.ShowDialog() ?? false)
+                        {
+                            context.SaveChanges();
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SceneSettingBtn_Click_1(object sender, RoutedEventArgs e)
+        {
+            Object obj = ((FrameworkElement)sender).DataContext;
+            if (obj is scene)
+            {
+                var s = (scene)obj;
+                if (s != null)
+                {
+                    ShowSceneProperties(s.id, s.friendly_name);
                 }
             }
         }

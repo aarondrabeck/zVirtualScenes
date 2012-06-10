@@ -46,6 +46,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                     DateCol.Visibility = System.Windows.Visibility.Collapsed;
                     DeviceTypeCol.Visibility = System.Windows.Visibility.Collapsed;
                     GroupCol.Visibility = System.Windows.Visibility.Collapsed;
+                    NodeID.Visibility = System.Windows.Visibility.Collapsed;
 
                 }
                 else
@@ -53,6 +54,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                     DateCol.Visibility = System.Windows.Visibility.Visible;
                     DeviceTypeCol.Visibility = System.Windows.Visibility.Visible;
                     GroupCol.Visibility = System.Windows.Visibility.Visible;
+                    NodeID.Visibility = System.Windows.Visibility.Visible;
                 }
             }
         }
@@ -73,6 +75,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                     LevelCol.Visibility = System.Windows.Visibility.Collapsed;
                     DeviceTypeCol.Visibility = System.Windows.Visibility.Collapsed;
                     GroupCol.Visibility = System.Windows.Visibility.Collapsed;
+                    NodeID.Visibility = System.Windows.Visibility.Collapsed;
                     SettingsCol.Visibility = System.Windows.Visibility.Collapsed;
 
                 }
@@ -202,41 +205,41 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void UserControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (_MinimalistDisplay)
-            {
-                ////Context Menus
-                if (DeviceGrid.SelectedItems.Count > 0)
-                {
-                    device[] SelectedItemsCopy = new device[DeviceGrid.SelectedItems.Count];
-                    DeviceGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
+            //if (_MinimalistDisplay)
+            //{
+            //    ////Context Menus
+            //    if (DeviceGrid.SelectedItems.Count > 0)
+            //    {
+            //        device[] SelectedItemsCopy = new device[DeviceGrid.SelectedItems.Count];
+            //        DeviceGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
-                    ContextMenu menu = new ContextMenu();
+            //        ContextMenu menu = new ContextMenu();
 
-                    MenuItem delete = new MenuItem();
-                    delete.Header = "Remove " + (DeviceGrid.SelectedItems.Count > 1 ? DeviceGrid.SelectedItems.Count + " Devices" : "Device");
-                    delete.Click += (s, args) =>
-                    {
-                        if (
-                       MessageBox.Show("Are you sure you want to delete the selected devices?",
-                                       "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                        {
-                            foreach (device selectedDevice in SelectedItemsCopy)
-                            {
-                                device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
-                                if (d != null)
-                                    context.devices.Remove(d);
-                            }
+            //        MenuItem delete = new MenuItem();
+            //        delete.Header = "Remove " + (DeviceGrid.SelectedItems.Count > 1 ? DeviceGrid.SelectedItems.Count + " Devices" : "Device");
+            //        delete.Click += (s, args) =>
+            //        {
+            //            if (
+            //           MessageBox.Show("Are you sure you want to delete the selected devices?",
+            //                           "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            //            {
+            //                foreach (device selectedDevice in SelectedItemsCopy)
+            //                {
+            //                    device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
+            //                    if (d != null)
+            //                        context.devices.Remove(d);
+            //                }
 
-                            context.SaveChanges();
-                        }
-                    };
+            //                context.SaveChanges();
+            //            }
+            //        };
 
-                    menu.Items.Add(delete);
-                    ContextMenu = menu;
-                }
-                else
-                    ContextMenu = null;
-            }
+            //        menu.Items.Add(delete);
+            //        ContextMenu = menu;
+            //    }
+            //    else
+            //        ContextMenu = null;
+            //}
         }
 
         private void DeleteSelectedItems()
@@ -332,6 +335,51 @@ namespace zVirtualScenes_WPF.DeviceControls
                     OpenDeviceDetails(device);
                 }
             }
+        }
+
+        string _searchstr = string.Empty;
+        private void Filter_TextChanged_1(object sender, TextChangedEventArgs e)
+        {
+            TextBox textbox = sender as TextBox;
+            if (textbox != null)
+            {
+                _searchstr = textbox.Text;
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+                ICollectionView view = myCollectionViewSource.View;
+                if (!string.IsNullOrEmpty(_searchstr))
+                {
+                    
+                   
+                    view.Filter = new Predicate<object>(filter);
+                }
+                else
+                {
+                    view.Filter = null;
+                }
+            }
+        }
+
+        private bool filter(object item)
+        {
+            if (item is device)
+            {
+                device d = (device)item;
+                if (d.friendly_name.ToLower().Contains(_searchstr.ToLower()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void ShowMoreBtn_Checked_1(object sender, RoutedEventArgs e)
+        {
+            ShowMore = true;
+        }
+
+        private void ShowMoreBtn_Unchecked_1(object sender, RoutedEventArgs e)
+        {
+            ShowMore = false;
         }
     }
 }
