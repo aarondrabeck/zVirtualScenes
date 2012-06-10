@@ -847,7 +847,6 @@ namespace OpenZWavePlugin
                                                             System.Timers.Timer t = (System.Timers.Timer)timers[d.node_id];
                                                             t.Stop();
                                                             t.Start();
-                                                            WriteToLog(Urgency.INFO, "Timer restarted.");
                                                         }
                                                         else
                                                         {
@@ -857,14 +856,12 @@ namespace OpenZWavePlugin
                                                             t.Elapsed += (sender, e) =>
                                                             {
                                                                 m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);
-                                                                WriteToLog(Urgency.INFO, "Timer stopped");
 
                                                                 t.Stop();
                                                                 timers.Remove(d.node_id);
 
                                                             };
                                                             t.Start();
-                                                            WriteToLog(Urgency.INFO, "Timer started");
                                                         }
                                                     }
                                                 }
@@ -878,7 +875,11 @@ namespace OpenZWavePlugin
                                 {
                                     if (value.Label == "Temperature")
                                     {
-                                        d.current_status = data;
+                                        int level = 0;
+                                        int.TryParse(data, out level);
+
+                                        d.current_level_int = level;
+                                        d.current_level_txt = level + "° F";
                                         Context.SaveChanges();
                                     }
                                 }
@@ -889,7 +890,8 @@ namespace OpenZWavePlugin
                                         int level = 0;
                                         if (int.TryParse(data, out level))
                                         {
-                                            d.current_status = level > 0 ? "On" : "Off";
+                                            d.current_level_int = level;
+                                            d.current_level_txt = level > 0 ? "On" : "Off";
                                             Context.SaveChanges();
                                         }
                                     }
@@ -898,7 +900,12 @@ namespace OpenZWavePlugin
                                 {
                                     if (value.Label == "Basic")
                                     {
-                                        d.current_status = data;
+                                        int level = 0;
+                                        int.TryParse(data, out level);
+
+                                        d.current_level_int = level;
+                                        d.current_level_txt = level + "%";
+                                        Context.SaveChanges();
                                         Context.SaveChanges();
                                     }
                                 }

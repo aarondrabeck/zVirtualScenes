@@ -169,8 +169,8 @@ namespace zVirtualScenes
                 }
             }            
             
-            triggerManager = new TriggerManager(this);
-            scheduledTaskManager = new ScheduledTaskManager(this);
+            triggerManager = new TriggerManager();
+            scheduledTaskManager = new ScheduledTaskManager();
 
         }
     }

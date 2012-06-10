@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 
 namespace zVirtualScenesModel
 {
-    
 
-    public partial class device 
+
+    public partial class device : INotifyPropertyChanged
     {
         /// <summary>
         /// This is called when a device or device value 
@@ -30,6 +31,6 @@ namespace zVirtualScenesModel
             return this.friendly_name;
         }
 
-        
+       
     }
 }

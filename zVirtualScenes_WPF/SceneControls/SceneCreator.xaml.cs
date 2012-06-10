@@ -47,19 +47,15 @@ namespace zVirtualScenes_WPF.SceneControls
                 myCollectionViewSource.Source = context.scenes.Local;
             }
 
-            DevicesGrid.AdvancedDisplay = false;
+            DevicesGrid.MinimalistDisplay = false;
 
             SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
             zvsLocalDBEntities.onScenesChanged += zvsLocalDBEntities_onScenesChanged;
 
-            SortSceneGridBySortOrder();
-            NormalizeSortOrder();
-            SortSceneGridBySortOrder();
-
             if (SceneGrid.Items.Count > 0)
                 SceneGrid.SelectedIndex = 0;
 
-            SceneGrid.Focus();
+            SceneGrid.Focus();           
 
         }
 
@@ -125,7 +121,6 @@ namespace zVirtualScenes_WPF.SceneControls
             //context.Dispose();
         }
 
-        
         private void SortUp_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
@@ -209,20 +204,40 @@ namespace zVirtualScenes_WPF.SceneControls
                 {
                     App application = (App)Application.Current;
 
-                    scene.SceneRunCompleteEventHandler handler = null;
-                    handler = (scene_id, ErrorCount) =>
+                    SceneRunner.onSceneRunEventHandler startHandler = null;
+                    startHandler = (s, args) =>
                     {
-                        if (scene_id == scene.id)
+                        if (args.SceneID == scene.id)
                         {
-                            scene.SceneRunCompleteEvent += handler;
-                            application.zvsCore.Logger.WriteToLog(Urgency.INFO,
-                                string.Format("Scene '{0}' has completed with {1} errors.", scene.friendly_name, ErrorCount),
-                                Utils.ApplicationName + " GUI");
+                            SceneRunner.onSceneRunBegin -= startHandler;
+
+                            this.Dispatcher.Invoke(new Action(() =>
+                            {
+                                application.zvsCore.Logger.WriteToLog(Urgency.INFO, args.Details, Utils.ApplicationName + " GUI");
+                            }));
+
+                            #region LISTEN FOR ENDING
+                            SceneRunner.onSceneRunEventHandler handler = null;
+                            handler = (se, end_args) =>
+                            {
+                                if (end_args.SceneID == scene.id)
+                                {
+                                    SceneRunner.onSceneRunComplete -= handler;
+
+                                    this.Dispatcher.Invoke(new Action(() =>
+                                    {
+                                        application.zvsCore.Logger.WriteToLog(Urgency.INFO, end_args.Details, Utils.ApplicationName + " GUI");
+                                    }));
+                                }
+                            };
+                            SceneRunner.onSceneRunComplete += handler;
+                            #endregion
+
                         }
                     };
-                    scene.SceneRunCompleteEvent += handler;
-
-                    application.zvsCore.Logger.WriteToLog(Urgency.INFO, scene.RunScene(), Utils.ApplicationName + " GUI");
+                    SceneRunner.onSceneRunBegin += startHandler;
+                    SceneRunner sr = new SceneRunner();
+                    sr.RunScene(scene.id);
                 }
             }
         }
@@ -289,7 +304,7 @@ namespace zVirtualScenes_WPF.SceneControls
         }
 
         private void SceneGrid_PreviewKeyDown(object sender, KeyEventArgs e)
-        {            
+        {
             DataGrid dg = sender as DataGrid;
             if (dg != null)
             {
@@ -327,7 +342,16 @@ namespace zVirtualScenes_WPF.SceneControls
                         DeleteSelectedScene(scene);
                     };
 
+                    MenuItem properties = new MenuItem();
+                    properties.Header = "Properties";
+                    properties.Click += (s, args) =>
+                    {
+                        ShowSceneProperties(scene.id, scene.friendly_name);
+                    };
+
                     menu.Items.Add(delete);
+                    menu.Items.Add(new Separator());
+                    menu.Items.Add(properties);
                     ContextMenu = menu;
                     e.Handled = true;
                     return;
@@ -335,6 +359,37 @@ namespace zVirtualScenes_WPF.SceneControls
             }
 
             ContextMenu = null;
+        }
+
+        private void SceneGrid_Row_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Object obj = ((FrameworkElement)sender).DataContext;
+            if (obj is scene)
+            {
+                var scene = (scene)obj;
+                if (scene != null)
+                {
+                    ShowSceneProperties(scene.id, scene.friendly_name);
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private void ShowSceneProperties(int SceneID, string SceneFriendlyName)
+        {
+            foreach (Window window in Application.Current.Windows)
+            {
+                if (window.GetType() == typeof(ScenePropertiesWindow))
+                {
+                    window.Activate();
+                    return;
+                }
+            }
+
+            ScenePropertiesWindow new_window = new ScenePropertiesWindow(SceneID);
+            new_window.Owner = Application.Current.MainWindow;
+            new_window.Title = string.Format("Scene '{0}' Properties", SceneFriendlyName);
+            new_window.Show();
         }
 
         private bool DeleteSelectedScene(scene scene)
@@ -359,24 +414,12 @@ namespace zVirtualScenes_WPF.SceneControls
                                   "Scene Edit Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        
 
 
         private void SceneCmdsGrid_Row_PreviewMouseRightButtonDown(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void SceneCmdsGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
@@ -389,6 +432,7 @@ namespace zVirtualScenes_WPF.SceneControls
                 {
                     e.Handled = true;
                     DeleteSelectedSceneCommands();
+
                 }
             }
         }
@@ -447,7 +491,7 @@ namespace zVirtualScenes_WPF.SceneControls
                 }
             }
         }
-                
+
         private void NormalizeSortOrderSceneCmds()
         {
             if (SceneGrid.SelectedItem is scene)
@@ -537,9 +581,6 @@ namespace zVirtualScenes_WPF.SceneControls
 
         private void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SortSceneCMDsGridBySortOrder();
-            NormalizeSortOrderSceneCmds();
-            SortSceneCMDsGridBySortOrder();
 
             if (SceneGrid.SelectedItem != null && SceneGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
             {
@@ -549,6 +590,26 @@ namespace zVirtualScenes_WPF.SceneControls
             {
                 SceneCommandGrid.Visibility = System.Windows.Visibility.Visible;
             }
+
+            //TODO: FIX lame hack
+            System.Timers.Timer timer = new System.Timers.Timer();
+            timer.Elapsed += (s, args) =>
+            {
+                timer.Stop();
+
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    SortSceneCMDsGridBySortOrder();
+                    NormalizeSortOrderSceneCmds();
+                    SortSceneCMDsGridBySortOrder();                                      
+
+                    if (SceneCmdsGrid.Items.Count > 0)
+                        SceneCmdsGrid.SelectedIndex = 0;
+                }));
+            };
+            timer.Interval = 10;
+            timer.Start();
+            //END TODO
         }
 
         private void AddBuiltinCmd_Click_1(object sender, RoutedEventArgs e)
@@ -592,6 +653,7 @@ namespace zVirtualScenes_WPF.SceneControls
                 }
             }
         }
+        
     }
 
     //public class IsValidScene : IValueConverter

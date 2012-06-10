@@ -20,18 +20,7 @@ namespace zVirtualScenesModel
                 BuiltinCommandAddedToQueEvent(id);
         }
 
-        /// <summary>
-        /// Called after a command is executed
-        /// </summary>
-        public static event BuiltinCommandRunCompleteEventHandler BuiltinCommandRunCompleteEvent;
-        public delegate void BuiltinCommandRunCompleteEventHandler(builtin_command_que cmd, bool withErrors, string txtError);
-
-        public static void BuiltinCommandRunComplete(builtin_command_que cmd, bool withErrors, string txtError)
-        {
-            if (BuiltinCommandRunCompleteEvent != null)
-                BuiltinCommandRunCompleteEvent(cmd, withErrors, txtError);
-        }
-        
+               
         //Methods
         public void Run(zvsLocalDBEntities context)
         {

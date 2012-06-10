@@ -80,8 +80,14 @@
     <Compile Include="SceneControls\AddEditBuiltinSceneCommand.xaml.cs">
       <DependentUpon>AddEditBuiltinSceneCommand.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SceneControls\SceneProperties.xaml.cs">
+      <DependentUpon>SceneProperties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SceneControls\SceneCreator.xaml.cs">
       <DependentUpon>SceneCreator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SceneControls\SceneProperyWindow.xaml.cs">
+      <DependentUpon>SceneProperyWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="DeviceControls\DeviceProperties.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -202,7 +208,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="SceneControls\SceneProperties.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="SceneControls\SceneCreator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SceneControls\SceneProperyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -393,6 +407,9 @@
   <ItemGroup>
     <Resource Include="Images\arrow_down.png" />
     <Resource Include="Images\arrow_up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\settings.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

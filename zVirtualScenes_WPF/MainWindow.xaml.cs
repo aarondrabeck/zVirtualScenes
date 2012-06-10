@@ -54,6 +54,8 @@ namespace zVirtualScenes_WPF
             dataView.SortDescriptions.Add(new SortDescription("Datetime", ListSortDirection.Descending));
             //refresh the view which in turn refresh the grid
             dataView.Refresh();
+
+            dList1.ShowMore = false;
         }            
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -214,6 +216,17 @@ namespace zVirtualScenes_WPF
         private void Window_Closing_1(object sender, CancelEventArgs e)
         {
             context.Dispose();
+        }
+
+        private void ShowMore_Checked_1(object sender, RoutedEventArgs e)
+        {
+            dList1.ShowMore = true;
+        }
+
+        private void ShowMore_Unchecked_1(object sender, RoutedEventArgs e)
+        {
+            
+            dList1.ShowMore = false;
         }
 
         

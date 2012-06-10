@@ -105,10 +105,10 @@ namespace zVirtualScenesModel
                 if (!EventsToTrigger.Contains(15)) { EventsToTrigger.Add(15); }
 
             if (this.ChangeTracker.Entries<scene>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
-                if (!EventsToTrigger.Contains(16)) { EventsToTrigger.Add(15); }
+                if (!EventsToTrigger.Contains(16)) { EventsToTrigger.Add(16); }
 
             if (this.ChangeTracker.Entries<scene>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
-                if (!EventsToTrigger.Contains(17)) { EventsToTrigger.Add(15); }
+                if (!EventsToTrigger.Contains(17)) { EventsToTrigger.Add(17); }
 
             //scene commands
             if (this.ChangeTracker.Entries<scene_commands>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)

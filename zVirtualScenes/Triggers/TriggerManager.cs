@@ -8,12 +8,31 @@ namespace zVirtualScenes.Triggers
 {
     public class TriggerManager : IDisposable
     {
-        private Core Core;
         private zvsLocalDBEntities context;
 
-        public TriggerManager(Core Core)
+        #region Events
+        public delegate void onTriggerStartEventHandler(object sender, onTriggerStartEventArgs args);
+        public class onTriggerStartEventArgs : EventArgs
         {
-            this.Core = Core;
+            public string Details = string.Empty;
+            public int TriggerID = 0;
+            public bool hasErrors = false;
+
+            public onTriggerStartEventArgs(int TriggerID, string Details, bool hasErrors)
+            {
+                this.TriggerID = TriggerID;
+                this.Details = Details;
+                this.hasErrors = hasErrors;
+            }
+        }
+        /// <summary>
+        /// Called when a scene has been called to be executed.
+        /// </summary>
+        public static event onTriggerStartEventHandler onTriggerStart;
+        #endregion
+
+        public TriggerManager()
+        {
             context = new zvsLocalDBEntities();
             device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
         }
@@ -39,8 +58,7 @@ namespace zVirtualScenes.Triggers
                                 {
                                     if (dv.value2.Equals(trigger.trigger_value))
                                     {
-                                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                        Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                        ActivateTriggerScene(trigger);
                                     }
                                     break;
                                 }
@@ -53,12 +71,17 @@ namespace zVirtualScenes.Triggers
                                     {
                                         if (deviceValue > triggerValue)
                                         {
-                                            Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                            ActivateTriggerScene(trigger);
                                         }
                                     }
                                     else
-                                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+                                    {
+                                        if (onTriggerStart != null)
+                                        {
+                                            onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
+                                                string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
+                                        }
+                                    }
 
                                     break;
                                 }
@@ -71,12 +94,17 @@ namespace zVirtualScenes.Triggers
                                     {
                                         if (deviceValue < triggerValue)
                                         {
-                                            Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                            Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                            ActivateTriggerScene(trigger);
                                         }
                                     }
                                     else
-                                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), "TRIGGER");
+                                    {
+                                        if (onTriggerStart != null)
+                                        {
+                                            onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
+                                                string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
+                                        }
+                                    }
 
                                     break;
                                 }
@@ -84,8 +112,7 @@ namespace zVirtualScenes.Triggers
                                 {
                                     if (!dv.value2.Equals(trigger.trigger_value))
                                     {
-                                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), "TRIGGER");
-                                        Core.Logger.WriteToLog(Urgency.INFO, trigger.scene.RunScene(), "TRIGGER");
+                                        ActivateTriggerScene(trigger);
                                     }
                                     break;
                                 }
@@ -97,6 +124,28 @@ namespace zVirtualScenes.Triggers
                     }
                 }
             }
-        }        
+
+        }
+
+        private void ActivateTriggerScene(device_value_triggers trigger) 
+        {
+            SceneRunner.onSceneRunEventHandler startHandler = null;
+            startHandler = (s, args) =>
+            {
+                if (args.SceneID == trigger.scene.id)
+                {
+                    SceneRunner.onSceneRunBegin -= startHandler;
+
+                    if (onTriggerStart != null)
+                    {
+                        onTriggerStart(this, new onTriggerStartEventArgs(trigger.id, 
+                            string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), false));                        
+                    }
+                }
+            };
+            SceneRunner.onSceneRunBegin += startHandler;
+            SceneRunner sr = new SceneRunner();
+            sr.RunScene(trigger.scene.id);
+        }
     }
 }

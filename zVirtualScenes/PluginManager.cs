@@ -16,6 +16,39 @@ namespace zVirtualScenes
         private const string _FriendlyName = "Plug-in Manager";
         private Core Core;
 
+        #region Events
+        public delegate void onProcessingCommandEventHandler(object sender, onProcessingCommandEventArgs args);
+        public class onProcessingCommandEventArgs : EventArgs
+        {
+            public bool hasErrors = true;
+            public string Details = string.Empty;
+            public scene_commands.command_types CommandType = scene_commands.command_types.unknown;
+            public int CommandQueueID = 0;
+
+            public onProcessingCommandEventArgs(scene_commands.command_types CommandType, bool Errors, string Details, int CommandQueueID)
+            {
+                this.CommandQueueID = CommandQueueID;
+                this.CommandType = CommandType;
+                this.hasErrors = Errors;
+                this.Details = Details;
+            }
+        }
+        public static event onProcessingCommandEventHandler onProcessingCommandBegin;
+        public static event onProcessingCommandEventHandler onProcessingCommandEnd;
+
+        public delegate void onPluginInitializedEventHandler(object sender, onPluginInitializedEventArgs args);
+        public class onPluginInitializedEventArgs : EventArgs
+        {
+            public string Details = string.Empty;
+
+            public onPluginInitializedEventArgs(string Details)
+            {
+                this.Details = Details;
+            }
+        }
+        public static event onPluginInitializedEventHandler onPluginInitialized;
+        #endregion
+
         [ImportMany]
 #pragma warning disable 649
         private IEnumerable<Plugin> _plugins;
@@ -106,7 +139,9 @@ namespace zVirtualScenes
                     BackgroundWorker pluginInitializer = new BackgroundWorker();
                     pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>
                     {
-                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("Loading '{0}'", p2.FriendlyName), Utils.ApplicationName);
+                        if (onPluginInitialized != null)
+                            onPluginInitialized(this, new onPluginInitializedEventArgs(string.Format("Initializing '{0}'", p2.FriendlyName)));
+
                         p2.Initialize();
                         p2.Start();
                     };
@@ -125,70 +160,65 @@ namespace zVirtualScenes
             {
                 device_type_command_que cmd = context.device_type_command_que.FirstOrDefault(c => c.id == device_type_command_que_id);
 
-                if (cmd != null && cmd.device != null)
+                if (cmd == null || cmd.device == null)
                 {
-                    if (verbose > 1)
-                    {
-                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("New device type command in queue. Plug-in: '{0}', Name: '{1}', Arg:'{2}'",
-                                                               cmd.device.device_types.plugin.name,
-                                                               cmd.device_type_commands.friendly_name,
-                                                               cmd.arg), Utils.ApplicationName);
-                    }
+                    if (onProcessingCommandBegin != null)
+                        onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, false, string.Format("Processing device type command id {0}", cmd.id), cmd.id));
 
-                    foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
-                    {
-                        if (p.Enabled)
-                        {
-                            bool err = false;
-                            int iterations = 0;
-                            while (!p.IsReady)
-                            {
-                                if (iterations == 5)
-                                {
-                                    err = true;
-                                    string err_str = "Timed-out while trying to process " + cmd.device_type_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plug-in Not Ready.";
-                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, Utils.ApplicationName);
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, true, string.Format("Failed to process device type command id {0}. Could not locate queued command in database.", cmd.id), cmd.id));
+                
+                    return;
+                }
 
-                                    device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                                    context.device_type_command_que.Remove(cmd);
-                                    context.SaveChanges();
-                                    return;
-                                }
-                                iterations++;
-                                Thread.Sleep(1000);
-                            }
+                //We found the command so continue
+                if (onProcessingCommandBegin != null)
+                    onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, false, string.Format("Processing device type command '{0}':'{1}'", cmd.device_type_commands.friendly_name, cmd.arg), cmd.id));
 
-                            if (!err)
-                            {
-                                p.ProcessDeviceTypeCommand(cmd);
-                                device_type_command_que.DeviceTypeCommandRunComplete(cmd, false, string.Empty);
-                                context.device_type_command_que.Remove(cmd);
-                                context.SaveChanges();
-                                return;
-                            }
-                        }
-                        else
-                        {
+                Plugin p = GetPlugins().FirstOrDefault(o => o.Name == cmd.device.device_types.plugin.name);
+                if (p == null)
+                {
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, true, string.Format("Failed to process built-in command id {0}. Could not locate queued commands plug-in.", cmd.id), cmd.id));
+                
+                    context.device_type_command_que.Remove(cmd);
+                    context.SaveChanges();
 
-                            string err_str = string.Format("Failed to run command '{0}' on '{1}' because the '{2}' plug-in is disabled. Removing command from queue...",
-                            cmd.device_type_commands.friendly_name,
-                            cmd.device.friendly_name,
-                            cmd.device.device_types.plugin.name);
+                    return;
+                }
 
-                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, Utils.ApplicationName);
 
-                            device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                            context.device_type_command_que.Remove(cmd);
-                            context.SaveChanges();
-                            return;
-                        }
-                    }
+                if (p.Enabled && p.IsReady)
+                {
+                    string details = string.Format("Processing command '{0}':'{1}' to plug-in '{2}'.",
+                                                          cmd.device_type_commands.friendly_name,
+                                                          cmd.arg,
+                                                          p.FriendlyName);
+
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, false, details, cmd.id));
+
+                    p.ProcessDeviceTypeCommand(cmd);
+                    context.device_type_command_que.Remove(cmd);
+                    context.SaveChanges();
+                    return;
+
                 }
                 else
                 {
-                    string err_str = "Could not locate queued device command.";
-                    device_type_command_que.DeviceTypeCommandRunComplete(cmd, true, err_str);
-                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, Utils.ApplicationName);
+                    string err_str = string.Format("Failed to process command '{0}' on '{1}' because the '{2}' plug-in is {3}. Removing command from queue...",
+                    cmd.device_type_commands.friendly_name,
+                    cmd.device.friendly_name,
+                    cmd.device.device_types.plugin.name,
+                    p.Enabled ? "not ready" : "disabled"
+                    );
+
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, true, err_str, cmd.id));
+
+                    context.device_type_command_que.Remove(cmd);
+                    context.SaveChanges();
+                    return;
                 }
             }
 
@@ -200,153 +230,240 @@ namespace zVirtualScenes
             {
                 device_command_que cmd = context.device_command_que.FirstOrDefault(c => c.id == device_command_que_id);
 
-                if (cmd != null && cmd.device != null)
+                if (cmd == null || cmd.device == null)
                 {
-                    if (verbose > 1)
-                    {
-                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("New device command in queue. Plug-in: '{0}', Name: '{1}', Arg:'{2}'",
-                                                              cmd.device.device_types.plugin.name,
-                                                              cmd.device_commands.friendly_name,
-                                                              cmd.arg), Utils.ApplicationName);
-                    }
+                    if (onProcessingCommandBegin != null)
+                        onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, false, string.Format("Processing device command id {0}", cmd.id), cmd.id));
 
-                    foreach (Plugin p in GetPlugins().Where(p => p.Name == cmd.device.device_types.plugin.name))
-                    {
-                        if (p.Enabled)
-                        {
-                            bool err = false;
-                            int iterations = 0;
-                            while (!p.IsReady)
-                            {
-                                if (iterations == 5)
-                                {
-                                    err = true;
-                                    string err_str = "Timed-out while trying to process " + cmd.device_commands.friendly_name + " on '" + cmd.device.friendly_name + "'. Plug-in Not Ready.";
-                                    Core.Logger.WriteToLog(Urgency.ERROR, err_str, Utils.ApplicationName);
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, true, string.Format("Failed to process device command id {0}. Could not locate queued command in database.", cmd.id), cmd.id));
 
-                                    device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                                    context.device_command_que.Remove(cmd);
-                                    context.SaveChanges();
-                                    return;
-                                }
-                                iterations++;
-                                Thread.Sleep(1000);
-                            }
+                    return;
+                }
 
-                            if (!err)
-                            {
-                                p.ProcessDeviceCommand(cmd);
-                                device_command_que.DeviceCommandRunComplete(cmd, false, string.Empty);
-                                context.device_command_que.Remove(cmd);
-                                context.SaveChanges();
-                                return;
-                            }
-                        }
-                        else
-                        {
+                //We found the command so continue
+                if (onProcessingCommandBegin != null)
+                    onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, false, string.Format("Processing device command '{0}':'{1}'", cmd.device_commands.friendly_name, cmd.arg), cmd.id));
 
 
-                            string err_str = string.Format("Failed to run command '{0}' on '{1}' because the '{2}' plug-in is disabled. Removing command from queue...",
-                            cmd.device_commands.friendly_name,
-                            cmd.device.friendly_name,
-                            cmd.device.device_types.plugin.name);
 
-                            Core.Logger.WriteToLog(Urgency.WARNING, err_str, Utils.ApplicationName);
+                Plugin p = GetPlugins().FirstOrDefault(o => o.Name == cmd.device.device_types.plugin.name);
+                if (p == null)
+                {
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, true, string.Format("Failed to process device command id {0}. Could not locate queued commands plug-in.", cmd.id), cmd.id));
 
-                            device_command_que.DeviceCommandRunComplete(cmd, true, err_str);
-                            context.device_command_que.Remove(cmd);
-                            context.SaveChanges();
-                            return;
-                        }
-                    }
+                    context.device_command_que.Remove(cmd);
+                    context.SaveChanges();
+
+                    return;
+                }
+
+                if (p.Enabled && p.IsReady)
+                {
+                    string details = string.Format("Processed command '{0}':'{1}' to plug-in '{2}'.",
+                                                          cmd.device_commands.friendly_name,
+                                                          cmd.arg,
+                                                          p.FriendlyName);
+
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, false, details, cmd.id));
+
+                    p.ProcessDeviceCommand(cmd);
+                    context.device_command_que.Remove(cmd);
+                    context.SaveChanges();
+                    return;
+
                 }
                 else
-                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued device command.", Utils.ApplicationName);
+                {
+                    string err_str = string.Format("Failed to process command '{0}' on '{1}' because the '{2}' plug-in is {3}. Removing command from queue...",
+                    cmd.device_commands.friendly_name,
+                    cmd.device.friendly_name,
+                    cmd.device.device_types.plugin.name,
+                    p.Enabled ? "not ready" : "disabled"
+                    );
+
+                    if (onProcessingCommandEnd != null)
+                        onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, true, err_str, cmd.id));
+
+                    context.device_command_que.Remove(cmd);
+                    context.SaveChanges();
+                    return;
+                }
             }
 
         }
 
         void builtin_command_que_BuiltinCommandAddedToQueEvent(int builtin_command_que_id)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            zvsLocalDBEntities context = new zvsLocalDBEntities();
+            builtin_command_que cmd = context.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
+
+            if (cmd == null)
             {
-                builtin_command_que cmd = context.builtin_command_que.FirstOrDefault(c => c.id == builtin_command_que_id);
+                if (onProcessingCommandBegin != null)
+                    onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, string.Format("Processing built-in command id {0}", cmd.id), cmd.id));
 
-                if (cmd != null)
-                {
-                    if (verbose > 1)
-                    {
-                        Core.Logger.WriteToLog(Urgency.INFO, string.Format("New built-in command in queue. Name: '{0}', Arg:'{1}'",
-                                                              cmd.builtin_commands.friendly_name,
-                                                              cmd.arg), Utils.ApplicationName);
-                    }
-
-                    switch (cmd.builtin_commands.name)
-                    {
-                        case "REPOLL_ME":
-                            {
-                                int d_id = 0;
-                                int.TryParse(cmd.arg, out d_id);
-                                device d = device.GetAllDevices(context, false).FirstOrDefault(o => o.id == d_id);
-
-                                if (d.device_types.plugin.enabled)
-                                {
-                                    GetPlugin(d.device_types.plugin.name).Repoll(d);
-                                }
-                                break;
-                            }
-                        case "REPOLL_ALL":
-                            {
-                                foreach (device d in device.GetAllDevices(context, false))
-                                {
-                                    if (d.device_types.plugin.enabled)
-                                    {
-                                        GetPlugin(d.device_types.plugin.name).Repoll(d);
-                                    }
-                                }
-                                break;
-                            }
-                        case "GROUP_ON":
-                            {
-                                int g_id = 0;
-                                int.TryParse(cmd.arg, out g_id);
-                                //EXECUTE ON ALL API's
-                                if (g_id > 0)
-                                {
-                                    foreach (Plugin p in GetPlugins())
-                                    {
-                                        if (p.Enabled)
-                                            p.ActivateGroup(g_id);
-                                    }
-                                }
-                                break;
-                            }
-                        case "GROUP_OFF":
-                            {
-                                int g_id = 0;
-                                int.TryParse(cmd.arg, out g_id);
-                                //EXECUTE ON ALL API's
-                                if (g_id > 0)
-                                {
-                                    foreach (Plugin p in GetPlugins())
-                                    {
-                                        if (p.Enabled)
-                                            p.DeactivateGroup(g_id);
-                                    }
-                                }
-                                break;
-                            }
-                    }
-                    //TODO: Error Checking for CMD
-                    builtin_command_que.BuiltinCommandRunComplete(cmd, false, "");
-
-                    //Remove processed command from que
-                    context.builtin_command_que.Remove(cmd);
-                    context.SaveChanges();
-                }
-                else
-                    Core.Logger.WriteToLog(Urgency.ERROR, "Could not locate queued built-in command.", Utils.ApplicationName);
+                if (onProcessingCommandEnd != null)
+                    onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, true, string.Format("Failed to process built-in command id {0}. Could not locate queued command in database.", cmd.id), cmd.id));
+                return;
             }
+
+            //We found the command so continue
+            if (onProcessingCommandBegin != null)
+                onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, string.Format("Processing built-in command '{0}':'{1}'", cmd.builtin_commands.friendly_name, cmd.arg), cmd.id));
+
+            switch (cmd.builtin_commands.name)
+            {
+                case "TIMEDELAY":
+                    {
+                        int delay = 0;
+                        if (int.TryParse(cmd.arg, out delay) && delay > 0)
+                        {
+                            System.Timers.Timer timer = new System.Timers.Timer();
+                            timer.Elapsed += (sender, args) =>
+                            {
+                                timer.Stop();
+
+                                string details = string.Format("Processed command '{0}':'{1}'.",
+                                                         cmd.builtin_commands.friendly_name,
+                                                         cmd.arg);
+
+                                if (onProcessingCommandEnd != null)
+                                    onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, details, cmd.id));
+
+                                //Remove processed command from que
+                                context.builtin_command_que.Remove(cmd);
+                                context.SaveChanges();
+                                context.Dispose();
+
+                            };
+                            timer.Interval = delay * 1000;
+                            timer.Start();
+                        }
+                        break;
+                    }
+                case "REPOLL_ME":
+                    {
+                        int d_id = 0;
+                        int.TryParse(cmd.arg, out d_id);
+                        device d = device.GetAllDevices(context, false).FirstOrDefault(o => o.id == d_id);
+
+                        if (d.device_types.plugin.enabled)
+                            GetPlugin(d.device_types.plugin.name).Repoll(d);
+
+                        string details = string.Format("Processed command '{0}':'{1}'.",
+                                                         cmd.builtin_commands.friendly_name,
+                                                         cmd.arg);
+
+                        if (onProcessingCommandEnd != null)
+                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, details, cmd.id));
+
+                        //Remove processed command from que
+                        context.builtin_command_que.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+
+                        break;
+                    }
+                case "REPOLL_ALL":
+                    {
+                        foreach (device d in device.GetAllDevices(context, false))
+                        {
+                            if (d.device_types.plugin.enabled)
+                            {
+                                GetPlugin(d.device_types.plugin.name).Repoll(d);
+                            }
+                        }
+
+                        string details = string.Format("Processed command '{0}':'{1}'.",
+                                                         cmd.builtin_commands.friendly_name,
+                                                         cmd.arg);
+
+                        if (onProcessingCommandEnd != null)
+                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, details, cmd.id));
+
+                        //Remove processed command from que
+                        context.builtin_command_que.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+
+                        break;
+                    }
+                case "GROUP_ON":
+                    {
+                        int g_id = 0;
+                        int.TryParse(cmd.arg, out g_id);
+                        //EXECUTE ON ALL API's
+                        if (g_id > 0)
+                        {
+                            foreach (Plugin p in GetPlugins())
+                            {
+                                if (p.Enabled)
+                                    p.ActivateGroup(g_id);
+                            }
+                        }
+
+                        string details = string.Format("Processed command '{0}':'{1}'.",
+                                                         cmd.builtin_commands.friendly_name,
+                                                         cmd.arg);
+
+                        if (onProcessingCommandEnd != null)
+                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, details, cmd.id));
+
+                        //Remove processed command from que
+                        context.builtin_command_que.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+
+                        break;
+                    }
+                case "GROUP_OFF":
+                    {
+                        int g_id = 0;
+                        int.TryParse(cmd.arg, out g_id);
+                        //EXECUTE ON ALL API's
+                        if (g_id > 0)
+                        {
+                            foreach (Plugin p in GetPlugins())
+                            {
+                                if (p.Enabled)
+                                    p.DeactivateGroup(g_id);
+                            }
+                        }
+
+                        string details = string.Format("Processed command '{0}':'{1}'.",
+                                                         cmd.builtin_commands.friendly_name,
+                                                         cmd.arg);
+
+                        if (onProcessingCommandEnd != null)
+                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, details, cmd.id));
+
+                        //Remove processed command from que
+                        context.builtin_command_que.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        break;
+                    }
+                default:
+                    {
+                        string details = string.Format("Error processing command '{0}':'{1}'. Commnad {2} not recognized.",
+                                                         cmd.builtin_commands.friendly_name,
+                                                         cmd.arg,
+                                                         cmd.builtin_commands.name);
+
+                        if (onProcessingCommandEnd != null)
+                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, true, details, cmd.id));
+
+                        //Remove processed command from que
+                        context.builtin_command_que.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        break;
+                    }
+            }
+
         }
 
         public IEnumerable<Plugin> GetPlugins()

@@ -94,7 +94,8 @@ CREATE TABLE devices (
   id               integer PRIMARY KEY IDENTITY NOT NULL,
   device_type_id   integer NOT NULL,
   node_id          integer NOT NULL,
-  current_status  nvarchar(500) DEFAULT '0',
+  current_level_txt  nvarchar(500) DEFAULT '0',
+  current_level_int  integer DEFAULT '0',
   friendly_name    nvarchar(500) NOT NULL,
   last_heard_from  datetime DEFAULT NULL,
   /* Foreign keys */

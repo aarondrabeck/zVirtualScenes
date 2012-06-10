@@ -43,7 +43,7 @@ namespace zVirtualScenes_WPF.Groups
                 groupsViewSource.Source = context.groups.Local;
             }            
 
-            DeviceLst.AdvancedDisplay = false;
+            DeviceLst.MinimalistDisplay = false;
 
             EvaluateRemoveBtnUsability();
             EvaluateAddEditBtnsUsability();

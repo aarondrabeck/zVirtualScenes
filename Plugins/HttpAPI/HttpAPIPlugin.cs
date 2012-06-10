@@ -6,15 +6,12 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using System.Security.Cryptography;
-using zVirtualScenesAPI;
 using System.Data;
 using System.ComponentModel;
 using System.Xml;
 using System.IO;
 using System.Xml.Serialization;
 using System.Linq;
-using zVirtualScenesCommon.Entity;
-using zVirtualScenesCommon;
 using System.Runtime.Serialization;
 using System.Web.Script.Serialization;
 using System.Xml.Linq;
@@ -22,6 +19,8 @@ using System.Reflection;
 using System.Web;
 using System.Collections.Specialized;
 using System.Net.Mime;
+using zVirtualScenes;
+using zVirtualScenesModel;
 
 namespace HttpAPI
 {
@@ -30,72 +29,80 @@ namespace HttpAPI
     {
         public volatile bool isActive;
         bool verbose = true;
-        private Guid CookieValue; 
+        private Guid CookieValue;
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
-        
+
         public HttpAPIPlugin()
             : base("HttpAPI",
                "HttpAPI Plugin",
                 "This plug-in acts as a HTTP server to send respond to JSON AJAX requests."
-                ) { }       
+                ) { }
 
         public override void Initialize()
         {
-            DefineOrUpdateSetting(new plugin_settings
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
-                name = "PORT",
-                friendly_name = "HTTP Port",
-                value = "80",
-                value_data_type = (int)Data_Types.INTEGER,
-                description = "The port that HTTP will listen for commands on."
-            });
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "PORT",
+                    friendly_name = "HTTP Port",
+                    value = "80",
+                    value_data_type = (int)Data_Types.INTEGER,
+                    description = "The port that HTTP will listen for commands on."
+                }, context);
 
-            DefineOrUpdateSetting(new plugin_settings
-            {
-                name = "PASSWORD",
-                friendly_name = "Password",
-                value = "C52632B4BCDB6F8CF0F6E4545",
-                value_data_type = (int)Data_Types.STRING,
-                description = "Password that protects public facing web services."
-            });
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "PASSWORD",
+                    friendly_name = "Password",
+                    value = "C52632B4BCDB6F8CF0F6E4545",
+                    value_data_type = (int)Data_Types.STRING,
+                    description = "Password that protects public facing web services."
+                }, context);
 
-            DefineOrUpdateSetting(new plugin_settings
-            {
-                name = "VERBOSE",
-                friendly_name = "Verbose Logging",
-                value = false.ToString(),
-                value_data_type = (int)Data_Types.BOOL,
-                description = "(Writes all server client communication to the log for debugging.)"
-            });
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "VERBOSE",
+                    friendly_name = "Verbose Logging",
+                    value = false.ToString(),
+                    value_data_type = (int)Data_Types.BOOL,
+                    description = "(Writes all server client communication to the log for debugging.)"
+                }, context);
+            }
         }
 
-        protected override bool StartPlugin()
+        protected override void StartPlugin()
         {
             try
             {
+                httplistener = new HttpListener();
+
                 if (!HttpListener.IsSupported)
                 {
-                    WriteToLog(Urgency.ERROR,"Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
-                    return false;
+                    WriteToLog(Urgency.ERROR, "Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
+                    return;
                 }
 
                 if (!httplistener.IsListening)
                 {
-                    bool.TryParse(GetSettingValue("VERBOSE"), out verbose);
+                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    {
+                        bool.TryParse(GetSettingValue("VERBOSE", context), out verbose);
 
-                    CookieValue = Guid.NewGuid(); 
-                    int port = 9999;
-                    int.TryParse(GetSettingValue("PORT"), out port);
-                    httplistener.Prefixes.Add("http://*:" + port + "/");
-                    //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
-                    //httplistener.IgnoreWriteExceptions = true; 
-                    httplistener.Start();
+                        CookieValue = Guid.NewGuid();
+                        int port = 9999;
+                        int.TryParse(GetSettingValue("PORT", context), out port);
+                        httplistener.Prefixes.Add("http://*:" + port + "/");
+                        //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
+                        //httplistener.IgnoreWriteExceptions = true; 
+                        httplistener.Start();
 
 
-                    ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
+                        ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
 
-                    WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", this.Friendly_Name, port));
+                        WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", this.Friendly_Name, port));
+                    }
                 }
             }
             catch (Exception ex)
@@ -103,11 +110,10 @@ namespace HttpAPI
                 WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
             }
 
-            IsReady = true;
-            return true;
+            this.IsReady = true;
         }
 
-        protected override bool StopPlugin()
+        protected override void StopPlugin()
         {
             WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
 
@@ -124,8 +130,7 @@ namespace HttpAPI
                 WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
             }
 
-            IsReady = false;
-            return true;
+            this.IsReady = false;
         }
 
         protected override void SettingChanged(string settingName, string settingValue)
@@ -150,7 +155,7 @@ namespace HttpAPI
         public override bool DeactivateGroup(int groupID)
         {
             return true;
-        }     
+        }
 
         private void HttpListen(object state)
         {
@@ -194,21 +199,21 @@ namespace HttpAPI
             // Obtain a response object
             using (System.Net.HttpListenerResponse response = context.Response)
             {
-                string ip = string.Empty; 
-                if(context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString();};
+                string ip = string.Empty;
+                if (context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString(); };
 
                 if (verbose)
-                    WriteToLog(Urgency.INFO, string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip,context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
+                    WriteToLog(Urgency.INFO, string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
 
                 //doesnt have valid cookies 
                 if (context.Request.Cookies.Count == 0 || (context.Request.Cookies.Count > 0 && context.Request.Cookies["zvs"] != null && context.Request.Cookies["zvs"].Value != CookieValue.ToString()))
                 {
-                    bool allowed = false; 
-                    if(!context.Request.RawUrl.ToLower().StartsWith("/api")) {allowed = true; }
-                    if(context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("login") && (context.Request.HttpMethod == "POST" || context.Request.HttpMethod == "GET") ) {allowed = true; }
-                    if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("logout") && context.Request.HttpMethod == "POST") { allowed = true; } 
+                    bool allowed = false;
+                    if (!context.Request.RawUrl.ToLower().StartsWith("/api")) { allowed = true; }
+                    if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("login") && (context.Request.HttpMethod == "POST" || context.Request.HttpMethod == "GET")) { allowed = true; }
+                    if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("logout") && context.Request.HttpMethod == "POST") { allowed = true; }
 
-                    if(!allowed)
+                    if (!allowed)
                     {
                         WriteToLog(Urgency.INFO, string.Format("[{0}] was denied access to '{1}'", ip, context.Request.RawUrl));
                         sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", context);
@@ -330,31 +335,37 @@ namespace HttpAPI
 
             context.Response.ContentType = "text/html";
             context.Response.StatusCode = statusCode;
-            
+
             //context.Response.AddHeader("Content-Length: ", headerData.Length.ToString());
             context.Response.OutputStream.Write(headerData, 0, headerData.Length);
             context.Response.Close();
-        }               
+        }
 
         private object GetResponse(HttpListenerRequest request, HttpListenerResponse response)
         {
             string ip = string.Empty;
             if (request.RemoteEndPoint != null && request.RemoteEndPoint.Address != null) { ip = request.RemoteEndPoint.Address.ToString(); };
-            
+
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    foreach (device d in db.devices.OrderBy(o => o.friendly_name))
+                    foreach (device d in context.devices.OrderBy(o => o.friendly_name))
                     {
+                        string status_symbol = string.Empty;
+                        if (d.device_types.name == "THERMOSTAT")
+                            status_symbol = " F";
+                        if (d.device_types.name == "DIMMER")
+                            status_symbol = "%";
+
                         var device = new
                         {
                             id = d.id,
                             name = d.friendly_name,
-                            on_off = d.current_status.ToUpper(),
+                            on_off = d.current_status == "0" ? "OFF" : "ON",
                             level = d.current_status,
-                            level_txt = d.current_status,
+                            level_txt = d.current_status + status_symbol,
                             type = d.device_types.name
                         };
 
@@ -364,20 +375,20 @@ namespace HttpAPI
                 return new { success = true, devices = devices.ToArray() };
             }
 
-            if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("device/") && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("device/") && request.HttpMethod == "GET")
             {
                 int id = 0;
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                     {
-                        device d = db.devices.FirstOrDefault(o => o.id == id);
+                        device d = context.devices.FirstOrDefault(o => o.id == id);
 
                         if (d != null)
                         {
-                             int level = 0;
-                             int.TryParse(d.current_status, out level);
+                            int level = 0;
+                            int.TryParse(d.current_status, out level);
 
                             string on_off = string.Empty;
                             if (level == 0)
@@ -386,6 +397,9 @@ namespace HttpAPI
                                 on_off = "ON";
                             else
                                 on_off = "DIM";
+
+                            StringBuilder sb = new StringBuilder();
+                            d.group_devices.ToList().ForEach((o) => sb.Append(o.group.name + " "));
 
                             var details = new
                             {
@@ -397,7 +411,7 @@ namespace HttpAPI
                                 type = d.device_types.name,
                                 type_txt = d.device_types.friendly_name,
                                 last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
-                                groups = d.GroupNames,
+                                groups = sb.ToString(),
                                 mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value2,
                                 fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value2,
                                 op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value2,
@@ -414,15 +428,15 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments[4].ToLower().StartsWith("values")  && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments[4].ToLower().StartsWith("values") && request.HttpMethod == "GET")
             {
                 int id = 0;
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                     {
-                        device d = db.devices.FirstOrDefault(o => o.id == id);
+                        device d = context.devices.FirstOrDefault(o => o.id == id);
 
                         if (d != null)
                         {
@@ -450,11 +464,11 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 3 &&  request.Url.Segments[2].ToLower().StartsWith("scenes") && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("scenes") && request.HttpMethod == "GET")
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    var q0 = from d in db.scenes
+                    var q0 = from d in context.scenes
                              select new
                              {
                                  id = d.id,
@@ -468,14 +482,14 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "GET")
             {
                 int sID = 0;
                 int.TryParse(request.Url.Segments[3], out sID);
 
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    scene scene = db.scenes.FirstOrDefault(s => s.id == sID);
+                    scene scene = context.scenes.FirstOrDefault(s => s.id == sID);
 
                     if (scene != null)
                     {
@@ -504,7 +518,7 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 4 &&  request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "POST")
+            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(request);
 
@@ -515,7 +529,7 @@ namespace HttpAPI
                 bool.TryParse(postData["is_running"], out is_running);
                 string name = postData["name"];
 
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                 {
                     scene scene = db.scenes.FirstOrDefault(s => s.id == sID);
 
@@ -523,8 +537,9 @@ namespace HttpAPI
                     {
                         if (is_running)
                         {
-                            string r = scene.RunScene(db);
-                            return new { success = true, desc = r };
+                            SceneRunner sr = new SceneRunner();
+                            sr.RunScene(scene.id);
+                            return new { success = true, desc = "Scene Started." };
                         }
 
                         if (!string.IsNullOrEmpty(name))
@@ -539,9 +554,9 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 3 &&  request.Url.Segments[2].ToLower().StartsWith("groups") && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("groups") && request.HttpMethod == "GET")
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                 {
                     var q0 = from g in db.groups
                              select new
@@ -561,7 +576,7 @@ namespace HttpAPI
                 int gID = 0;
                 int.TryParse(request.Url.Segments[3], out gID);
 
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                 {
                     group group = db.groups.FirstOrDefault(g => g.id == gID);
 
@@ -597,7 +612,7 @@ namespace HttpAPI
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                     {
                         device d = db.devices.FirstOrDefault(o => o.id == id);
                         if (d != null)
@@ -649,7 +664,7 @@ namespace HttpAPI
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                     {
                         device d = db.devices.FirstOrDefault(o => o.id == id);
 
@@ -674,13 +689,15 @@ namespace HttpAPI
                                             cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
                                         if (cmd != null)
                                         {
-                                            device_command_que.Run(new device_command_que
+                                            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                                             {
-                                                device_id = d.id,
-                                                device_command_id = cmd.id,
-                                                arg = arg
-                                            });
-
+                                                device_command_que.Run(new device_command_que
+                                                {
+                                                    device_id = d.id,
+                                                    device_command_id = cmd.id,
+                                                    arg = arg
+                                                }, context);
+                                            }
                                             return new { success = true };
                                         }
                                         else
@@ -699,12 +716,15 @@ namespace HttpAPI
 
                                         if (cmd != null)
                                         {
-                                            device_type_command_que.Run(new device_type_command_que
+                                            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                                             {
-                                                device_id = d.id,
-                                                device_type_command_id = cmd.id,
-                                                arg = arg
-                                            });
+                                                device_type_command_que.Run(new device_type_command_que
+                                                {
+                                                    device_id = d.id,
+                                                    device_type_command_id = cmd.id,
+                                                    arg = arg
+                                                }, context);
+                                            }
                                             return new { success = true };
                                         }
                                         return new { success = false, reason = "Device type command not found." };
@@ -724,10 +744,10 @@ namespace HttpAPI
 
             //TODO: add search for commands per device ID.
 
-            if (request.Url.Segments.Length == 3 &&  request.Url.Segments[2].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
             {
                 List<object> bi_commands = new List<object>();
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                 {
                     foreach (builtin_commands cmd in db.builtin_commands)
                     {
@@ -751,10 +771,10 @@ namespace HttpAPI
                 string friendlyname = postData["friendlyname"];
 
                 int id = 0;
-                if(request.Url.Segments.Length == 4)
+                if (request.Url.Segments.Length == 4)
                     int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
-                
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+
+                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
                 {
                     builtin_commands cmd = null;
                     if (!string.IsNullOrEmpty(friendlyname))
@@ -766,11 +786,14 @@ namespace HttpAPI
 
                     if (cmd != null)
                     {
-                        builtin_command_que.Run(new builtin_command_que
+                        using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                         {
-                            builtin_command_id = cmd.id,
-                            arg = arg
-                        });
+                            builtin_command_que.Run(new builtin_command_que
+                            {
+                                builtin_command_id = cmd.id,
+                                arg = arg
+                            }, context);
+                        }
                         return new { success = true };
                     }
                 }
@@ -795,27 +818,29 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(request);
-
-                if (postData["password"] == GetSettingValue("PASSWORD"))
+                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    Cookie c = new Cookie("zvs", CookieValue.ToString());
-                    c.Expires = DateTime.Today.AddDays(5);
-                    c.Domain = "";
-                    c.Path = "/";
-                    response.Cookies.Add(c);
+                    if (postData["password"] == GetSettingValue("PASSWORD", context))
+                    {
+                        Cookie c = new Cookie("zvs", CookieValue.ToString());
+                        c.Expires = DateTime.Today.AddDays(5);
+                        c.Domain = "";
+                        c.Path = "/";
+                        response.Cookies.Add(c);
 
-                    WriteToLog(Urgency.INFO, string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, request.UserAgent));
+                        WriteToLog(Urgency.INFO, string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, request.UserAgent));
 
-                    return new { success = true };
-                }
-                else
-                {
-                    WriteToLog(Urgency.INFO, string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], request.UserAgent));
-                    return new { success = false };
+                        return new { success = true };
+                    }
+                    else
+                    {
+                        WriteToLog(Urgency.INFO, string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], request.UserAgent));
+                        return new { success = false };
+                    }
                 }
             }
-                                   
-            return new { success = false, reason = "Invalid Command" };    
+
+            return new { success = false, reason = "Invalid Command" };
         }
 
         private NameValueCollection GetPostData(HttpListenerRequest request)
@@ -831,11 +856,11 @@ namespace HttpAPI
         private string toJSON<T>(T obj, string callback)
         {
             JavaScriptSerializer js = new JavaScriptSerializer();
-            if (!string.IsNullOrEmpty(callback))            
-                return callback + "(" + js.Serialize(obj) + ");";            
-            else            
+            if (!string.IsNullOrEmpty(callback))
+                return callback + "(" + js.Serialize(obj) + ");";
+            else
                 return js.Serialize(obj);
-            
+
         }
 
         private string toXML<T>(T obj)
@@ -861,8 +886,8 @@ namespace HttpAPI
             {
                 get { return Encoding.UTF8; }
             }
-        }              
+        }
 
-         
+
     }
 }

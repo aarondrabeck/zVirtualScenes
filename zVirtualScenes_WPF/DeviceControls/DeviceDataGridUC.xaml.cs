@@ -31,22 +31,49 @@ namespace zVirtualScenes_WPF.DeviceControls
             InitializeComponent();
         }
 
-        private bool _AdvancedDisplay = true;
-        public bool AdvancedDisplay
+        private bool _ShowMore = false;
+        public bool ShowMore
         {
             get
             {
-                return _AdvancedDisplay;
+                return _ShowMore;
             }
             set
             {
-                _AdvancedDisplay = value;
+                _ShowMore = value;
+                if (value == false)
+                {
+                    DateCol.Visibility = System.Windows.Visibility.Collapsed;
+                    DeviceTypeCol.Visibility = System.Windows.Visibility.Collapsed;
+                    GroupCol.Visibility = System.Windows.Visibility.Collapsed;
+
+                }
+                else
+                {
+                    DateCol.Visibility = System.Windows.Visibility.Visible;
+                    DeviceTypeCol.Visibility = System.Windows.Visibility.Visible;
+                    GroupCol.Visibility = System.Windows.Visibility.Visible;
+                }
+            }
+        }
+
+        private bool _MinimalistDisplay = true;
+        public bool MinimalistDisplay
+        {
+            get
+            {
+                return _MinimalistDisplay;
+            }
+            set
+            {
+                _MinimalistDisplay = value;
                 if (value == false)
                 {
                     DateCol.Visibility = System.Windows.Visibility.Collapsed;
                     LevelCol.Visibility = System.Windows.Visibility.Collapsed;
                     DeviceTypeCol.Visibility = System.Windows.Visibility.Collapsed;
                     GroupCol.Visibility = System.Windows.Visibility.Collapsed;
+                    SettingsCol.Visibility = System.Windows.Visibility.Collapsed;
 
                 }
                 else
@@ -55,6 +82,7 @@ namespace zVirtualScenes_WPF.DeviceControls
                     LevelCol.Visibility = System.Windows.Visibility.Visible;
                     DeviceTypeCol.Visibility = System.Windows.Visibility.Visible;
                     GroupCol.Visibility = System.Windows.Visibility.Visible;
+                    SettingsCol.Visibility = System.Windows.Visibility.Visible;
                 }
             }
         }
@@ -74,12 +102,12 @@ namespace zVirtualScenes_WPF.DeviceControls
 
             zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
             zvsLocalDBEntities.onGroup_DevicesChanged += zvsLocalDBEntities_onGroup_DevicesChanged;
-            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;            
+            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;
         }
 
         void zvsLocalDBEntities_onGroupsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
-            if (AdvancedDisplay)
+            if (MinimalistDisplay)
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
@@ -103,7 +131,7 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         void zvsLocalDBEntities_onGroup_DevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
-            if (AdvancedDisplay)
+            if (MinimalistDisplay)
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
@@ -147,7 +175,7 @@ namespace zVirtualScenes_WPF.DeviceControls
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
-        {            
+        {
             zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
             zvsLocalDBEntities.onGroup_DevicesChanged -= zvsLocalDBEntities_onGroup_DevicesChanged;
             zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
@@ -159,7 +187,7 @@ namespace zVirtualScenes_WPF.DeviceControls
         {
             if (e.Key == Key.Delete)
             {
-                if (_AdvancedDisplay)
+                if (_MinimalistDisplay)
                 {
 
                     if (MessageBox.Show("Are you sure you want to delete the selected devices?",
@@ -172,12 +200,9 @@ namespace zVirtualScenes_WPF.DeviceControls
             }
         }
 
-
-       
-
         private void UserControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (_AdvancedDisplay)
+            if (_MinimalistDisplay)
             {
                 ////Context Menus
                 if (DeviceGrid.SelectedItems.Count > 0)
@@ -289,28 +314,24 @@ namespace zVirtualScenes_WPF.DeviceControls
             }
         }
 
-        private void DeviceGrid_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void OpenDeviceDetails(device d)
         {
-            if (AdvancedDisplay)
-            {
-                OpenDeviceDetails();
-                e.Handled = true;
-            }
+            DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.id);
+            deviceDetailsWindow.Owner = Application.Current.MainWindow;
+            deviceDetailsWindow.Show();
         }
 
-        private void OpenDeviceDetails()
+        private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            device d = (device)DeviceGrid.SelectedItem;
-            if (d != null)
+            Object obj = ((FrameworkElement)sender).DataContext;
+            if (obj is device)
             {
-                DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.id);
-                deviceDetailsWindow.Owner = Application.Current.MainWindow;
-                deviceDetailsWindow.Show();
-
-                
+                var device = (device)obj;
+                if (device != null)
+                {
+                    OpenDeviceDetails(device);
+                }
             }
         }
-
-
     }
 }

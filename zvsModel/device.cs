@@ -60,14 +60,25 @@ namespace zVirtualScenesModel
             }
         }
         
-        private string _current_status = string.Empty;
-        public string current_status
+        private string _current_level_txt = string.Empty;
+        public string current_level_txt
         {
-            get { return _current_status; }
+            get { return _current_level_txt; }
             set
             {
-                _current_status = value;
-                NotifyPropertyChanged("current_status");
+                _current_level_txt = value;
+                NotifyPropertyChanged("current_level");
+            }
+        }
+
+        private int _current_level_int = 0;
+        public int current_level_int
+        {
+            get { return _current_level_int; }
+            set
+            {
+                _current_level_int = value;
+                NotifyPropertyChanged("current_level_int");
             }
         }
 

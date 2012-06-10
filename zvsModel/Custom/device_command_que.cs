@@ -19,19 +19,7 @@ namespace zVirtualScenesModel
         {
             if (DeviceCommandAddedToQueEvent != null)
                 DeviceCommandAddedToQueEvent(bcq);
-        }
-
-        /// <summary>
-        /// Called after a command is executed
-        /// </summary>
-        public static event DeviceCommandRunCompleteEventHandler DeviceCommandRunCompleteEvent;
-        public delegate void DeviceCommandRunCompleteEventHandler(device_command_que cmd, bool withErrors, string txtError);
-
-        public static void DeviceCommandRunComplete(device_command_que cmd, bool withErrors, string txtError)
-        {
-            if (DeviceCommandRunCompleteEvent != null)
-                DeviceCommandRunCompleteEvent(cmd, withErrors, txtError);
-        }
+        }        
 
         //Methods
         public void Run(zvsLocalDBEntities context)

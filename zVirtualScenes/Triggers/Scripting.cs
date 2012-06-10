@@ -55,7 +55,8 @@ namespace zVirtualScenes.Triggers
                     // Make sure the user specified a correct scene name
                     if (_scene != null)
                     {
-                        _scene.RunScene();
+                        SceneRunner sr = new SceneRunner();
+                        sr.RunScene(_scene.id);
                         Core.Logger.WriteToLog(Urgency.INFO, "Script " + trigger.FriendlyName + " ran scene '" + scene_name + "'", _FriendlyName);
                     }
                     else

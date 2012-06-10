@@ -127,6 +127,7 @@ namespace zVirtualScenes
         #region public methods
         public void WriteToLog(Urgency urgency, string log, string source)
         {
+            
             if (LogConsole)
                 Console.WriteLine(log);
           

@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:zVirtualScenes_WPF.SceneControls"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" xmlns:DeviceControls="clr-namespace:zVirtualScenes_WPF.DeviceControls" x:Class="zVirtualScenes_WPF.SceneControls.SceneCreator" 
              mc:Ignorable="d" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
 
     <UserControl.Resources>
-        
+
         <Style x:Key="Body_Content_DataGrid_Centering"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
@@ -21,27 +22,38 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:scene}, CreateList=True}"/>
-        <CollectionViewSource x:Key="scenescene_commandsViewSource" Source="{Binding scene_commands, Source={StaticResource sceneViewSource}}"/>
+        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:scene}, CreateList=True}">
+            <CollectionViewSource.SortDescriptions>
+                <d:SortDescription PropertyName="sort_order"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
+        <CollectionViewSource x:Key="scenescene_commandsViewSource" Source="{Binding scene_commands, Source={StaticResource sceneViewSource}}" >
+            <CollectionViewSource.SortDescriptions>
+                <d:SortDescription PropertyName="sort_order" Direction="Acending"/>
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+
     </UserControl.Resources>
     <Grid DataContext="{StaticResource sceneViewSource}">
 
-        <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" HeadersVisibility="None" GridLinesVisibility="Horizontal" RowHeight="29" 
-                  HorizontalAlignment="Left" Margin="10,24,0,37" Width="281"   ItemsSource="{Binding}"
+        <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" HeadersVisibility="None" GridLinesVisibility="Horizontal"
+                  HorizontalAlignment="Left" Margin="10,24,0,37" Width="281"   ItemsSource="{Binding}" RowHeight="45"
                  AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
                   CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single" SelectionChanged="SceneGrid_SelectionChanged">
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
                     <EventSetter Event="PreviewMouseRightButtonDown" Handler="SceneGrid_Row_PreviewMouseRightButtonDown"/>
+                    <EventSetter Event="MouseDoubleClick" Handler="SceneGrid_Row_MouseDoubleClick"/>
                 </Style>
             </DataGrid.RowStyle>
 
             <DataGrid.Columns>
 
-                <DataGridTemplateColumn MaxWidth="30" MinWidth="30" Width="30"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                <DataGridTemplateColumn MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Image Name="img" Width="30" Height="20" Source="/zVirtualScenes_WPF;component/Images/scene64.png" />
+                            <Image Name="img" Width="40" Height="40" Source="/zVirtualScenes_WPF;component/Images/scene64.png" />
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding Path=is_running}" Value="True">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/scene_run64.png"/>
@@ -104,7 +116,9 @@
                   ItemsSource="{Binding Source={StaticResource scenescene_commandsViewSource}}" d:LayoutOverrides="GridBox"
                 AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
-                  PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource Body_Content_DataGrid_Centering}" CanUserResizeRows="False" Margin="0,37,0,0" >
+                  PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource Body_Content_DataGrid_Centering}" CanUserResizeRows="False" Margin="0,37,0,0" 
+                  
+                       >
                 <DataGrid.RowStyle>
                     <Style TargetType="{x:Type DataGridRow}">
                         <EventSetter Event="MouseDoubleClick" Handler="SceneCmdsGrid_Row_Double_Click"/>
@@ -120,7 +134,9 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                     <DataGridTextColumn Width="*"   MinWidth="150" Binding="{Binding Path=Action_Description,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" />
-                    <!--<DataGridTextColumn  Width="50"  MinWidth="50"  Binding="{Binding Path=sort_order,UpdateSourceTrigger=PropertyChanged}" Header="Sort" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False" />-->
+
+
+                    <DataGridTextColumn  Width="50"  SortDirection="Descending" MinWidth="50"  Binding="{Binding Path=sort_order,UpdateSourceTrigger=PropertyChanged}" Header="Sort" IsReadOnly="False"  CanUserReorder="False" CanUserSort="False" />
 
                     <DataGridTemplateColumn MaxWidth="63" MinWidth="63" Width="63" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                         <DataGridTemplateColumn.CellTemplate >

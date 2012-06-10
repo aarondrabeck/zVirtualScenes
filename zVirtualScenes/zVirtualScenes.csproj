@@ -59,6 +59,7 @@
     <Compile Include="Logger\LogItem.cs" />
     <Compile Include="Logger\Urgency.cs" />
     <Compile Include="Plugin.cs" />
+    <Compile Include="SceneRunner.cs" />
     <Compile Include="ScheduledTaskManager.cs" />
     <Compile Include="Triggers\TriggerManager.cs" />
     <Compile Include="Triggers\Scripting.cs" />

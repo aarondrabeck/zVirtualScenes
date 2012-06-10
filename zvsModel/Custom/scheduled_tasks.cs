@@ -23,14 +23,5 @@ namespace zVirtualScenesModel
             Seconds = 3,
             Monthly = 4
         }
-
-        public string Run(zvsLocalDBEntities context)
-        {
-            scene scene = context.scenes.FirstOrDefault(s => s.id == this.Scene_id);
-            if (scene != null)
-                return string.Format("Scheduled task '{0}' {1}", this.friendly_name, scene.RunScene());
-            else
-                return string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", this.friendly_name, this.Scene_id);
-        }        
     }
 }

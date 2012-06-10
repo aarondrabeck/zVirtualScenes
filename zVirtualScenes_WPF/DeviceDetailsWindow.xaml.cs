@@ -61,7 +61,7 @@ namespace zVirtualScenes_WPF
                 else
                 {
                     DeviceNameTextBlock.Text = d.friendly_name;
-                    DeviceCurrentStatus.Text = d.current_status;
+                    DeviceCurrentStatus.Text = d.current_level_txt;
 
                     switch (d.device_types.name)
                     {
@@ -101,20 +101,18 @@ namespace zVirtualScenes_WPF
 
                     if (d.device_types.name.Equals("DIMMER"))
                     {
-                        double level = 0;
-                        if (double.TryParse(d.current_status, out level))
-                        {
-                            if (level >= 0 && level <= 20)
-                                level = 21;
+                        double level = d.current_level_int;
 
-                            level = level / 100;
+                        if (level >= 0 && level <= 20)
+                            level = 21;
 
-                            DoubleAnimation da = new DoubleAnimation();
-                            da.From = IconImg.Opacity;
-                            da.To = level;
-                            da.Duration = new Duration(TimeSpan.FromSeconds(1));
-                            IconImg.BeginAnimation(OpacityProperty, da);
-                        }
+                        level = level / 100;
+
+                        DoubleAnimation da = new DoubleAnimation();
+                        da.From = IconImg.Opacity;
+                        da.To = level;
+                        da.Duration = new Duration(TimeSpan.FromSeconds(1));
+                        IconImg.BeginAnimation(OpacityProperty, da);
                     }
                 }
             }
