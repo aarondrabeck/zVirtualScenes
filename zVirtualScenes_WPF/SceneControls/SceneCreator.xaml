@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:zVirtualScenes_WPF.SceneControls"
-             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" xmlns:DeviceControls="clr-namespace:zVirtualScenes_WPF.DeviceControls" x:Class="zVirtualScenes_WPF.SceneControls.SceneCreator" 
              mc:Ignorable="d" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
 

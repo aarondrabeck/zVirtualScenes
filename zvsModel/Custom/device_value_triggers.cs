@@ -21,7 +21,7 @@ namespace zVirtualScenesModel
             Advanced
         }
 
-        public string FriendlyName
+        public string ActionDescription
         {
             get
             {

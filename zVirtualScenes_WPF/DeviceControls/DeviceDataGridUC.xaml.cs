@@ -186,22 +186,6 @@ namespace zVirtualScenes_WPF.DeviceControls
         }
 
         ////User Events
-        private void UserControl_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete)
-            {
-                if (_MinimalistDisplay)
-                {
-
-                    if (MessageBox.Show("Are you sure you want to delete the selected devices?",
-                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        DeleteSelectedItems();
-                    }
-                }
-                e.Handled = true;
-            }
-        }
 
         private void UserControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -380,6 +364,23 @@ namespace zVirtualScenes_WPF.DeviceControls
         private void ShowMoreBtn_Unchecked_1(object sender, RoutedEventArgs e)
         {
             ShowMore = false;
+        }
+
+        private void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                if (_MinimalistDisplay)
+                {
+
+                    if (MessageBox.Show("Are you sure you want to delete the selected devices?",
+                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        DeleteSelectedItems();
+                    }
+                }
+                e.Handled = true;
+            }
         }
     }
 }

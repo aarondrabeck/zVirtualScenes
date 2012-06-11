@@ -1,0 +1,67 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
+             x:Class="zVirtualScenes_WPF.TriggerControls.TriggerGridUC" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
+    <UserControl.Resources>
+
+        <Style x:Key="Body_Hoz_Center"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:device_value_triggers}, CreateList=True}"/>
+    </UserControl.Resources>
+    <Grid DataContext="{StaticResource device_value_triggersViewSource}">
+        <DataGrid x:Name="TriggerGrid" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
+                  HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
+                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
+                 PreviewKeyDown="Grid_PreviewKeyDown_1" Margin="0,-2,0,32"
+                  >
+            <DataGrid.Columns>
+
+                <DataGridTextColumn MinWidth="200" Width="200" Header="Name" FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn MinWidth="200" Width="*" Header="Trigger" FontSize="14" Binding="{Binding ActionDescription, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"   >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding enabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" >
+
+                </DataGridCheckBoxColumn>
+
+                <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Button Name="SettingBtn" Width="32" Height="32" Click="SettingBtn_Click_1"  ToolTip="Device Details">
+                                <Image Cursor="Hand"   Source="/zVirtualScenes_WPF;component/Images/settings.png" Margin="0,0,0,0"  />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Trigger" HorizontalAlignment="Left" Margin="5,0,0,5" Width="75" VerticalAlignment="Bottom"/>
+    </Grid>
+</UserControl>

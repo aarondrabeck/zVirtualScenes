@@ -11,20 +11,119 @@ namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;
-    
-    public partial class device_value_triggers
+    using System.ComponentModel;
+
+    public partial class device_value_triggers : INotifyPropertyChanged 
     {
-        public int id { get; set; }
-        public int device_value_id { get; set; }
-        public Nullable<int> trigger_operator { get; set; }
-        public string trigger_value { get; set; }
-        public bool enabled { get; set; }
-        public string Name { get; set; }
-        public Nullable<int> scene_id { get; set; }
-        public int trigger_type { get; set; }
-        public string trigger_script { get; set; }
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private int _device_value_id;
+        public int device_value_id
+        {
+            get { return _device_value_id; }
+            set
+            {
+                _device_value_id = value;
+                NotifyPropertyChanged("device_value_id");
+            }
+        }
+
+        private Nullable<int> _trigger_operator;
+        public Nullable<int> trigger_operator
+        {
+            get { return _trigger_operator; }
+            set
+            {
+                _trigger_operator = value;
+                NotifyPropertyChanged("trigger_operator");
+            }
+        }
+
+        private string _trigger_value;
+        public string trigger_value
+        {
+            get { return _trigger_value; }
+            set
+            {
+                _trigger_value = value;
+                NotifyPropertyChanged("trigger_value");
+            }
+        }
+
+        private bool _enabled;
+        public bool enabled
+        {
+            get { return _enabled; }
+            set
+            {
+                _enabled = value;
+                NotifyPropertyChanged("enabled");
+            }
+        }
+
+        private string _Name;
+        public string Name
+        {
+            get { return _Name; }
+            set
+            {
+                _Name = value;
+                NotifyPropertyChanged("Name");
+            }
+        }
+
+        private Nullable<int> _scene_id;
+        public Nullable<int> scene_id
+        {
+            get { return _scene_id; }
+            set
+            {
+                _scene_id = value;
+                NotifyPropertyChanged("scene_id");
+            }
+        }
+
+        private int _trigger_type;
+        public int trigger_type
+        {
+            get { return _trigger_type; }
+            set
+            {
+                _trigger_type = value;
+                NotifyPropertyChanged("trigger_type");
+            }
+        }
+
+        private string _trigger_script;
+        public string trigger_script
+        {
+            get { return _trigger_script; }
+            set
+            {
+                _trigger_script = value;
+                NotifyPropertyChanged("trigger_script");
+            }
+        }
     
         public virtual device_values device_values { get; set; }
         public virtual scene scene { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

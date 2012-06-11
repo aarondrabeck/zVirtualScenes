@@ -89,6 +89,12 @@
     <Compile Include="SceneControls\SceneProperyWindow.xaml.cs">
       <DependentUpon>SceneProperyWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TriggerControls\TriggerEditorWindow.xaml.cs">
+      <DependentUpon>TriggerEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TriggerControls\TriggerGridUC.xaml.cs">
+      <DependentUpon>TriggerGridUC.xaml</DependentUpon>
+    </Compile>
     <Page Include="DeviceControls\DeviceProperties.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -220,6 +226,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="TriggerControls\TriggerEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriggerControls\TriggerGridUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
@@ -248,14 +262,12 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_options.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandRunCompleteEventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.db_info.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_commands.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_command_options.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandRunCompleteEventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_propertys.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_property_options.datasource" />
@@ -264,7 +276,6 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.device_type_commands.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_options.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandRunCompleteEventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_values+DeviceValueAddedEventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventArgs.datasource" />
@@ -279,9 +290,6 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.plugin_settings.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.plugin_setting_options.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.program_options.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneModifiedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneRunCompleteEventHandler.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneRunStartedEventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.scene.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.scene_commands.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.scene_property.datasource" />
@@ -292,51 +300,6 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedEventArgs.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
-    <None Include="Properties\DataSources\zvsModel.builtin_commands.datasource" />
-    <None Include="Properties\DataSources\zvsModel.builtin_command_options.datasource" />
-    <None Include="Properties\DataSources\zvsModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.builtin_command_que+BuiltinCommandRunCompleteEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.builtin_command_que.datasource" />
-    <None Include="Properties\DataSources\zvsModel.db_info.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_commands.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_command_options.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_command_que+DeviceCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_command_que+DeviceCommandRunCompleteEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_command_que.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_propertys.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_property_options.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_property_values.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_types.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_type_commands.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_type_command_options.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_type_command_que+DeviceTypeCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_type_command_que+DeviceTypeCommandRunCompleteEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_type_command_que.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_values+DeviceValueAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_values+ValueDataChangedEventArgs.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_values+ValueDataChangedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_values.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_value_triggers+TRIGGER_OPERATORS.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_value_triggers+TRIGGER_TYPE.datasource" />
-    <None Include="Properties\DataSources\zvsModel.device_value_triggers.datasource" />
-    <None Include="Properties\DataSources\zvsModel.group.datasource" />
-    <None Include="Properties\DataSources\zvsModel.group_devices.datasource" />
-    <None Include="Properties\DataSources\zvsModel.plugin.datasource" />
-    <None Include="Properties\DataSources\zvsModel.plugin_settings.datasource" />
-    <None Include="Properties\DataSources\zvsModel.plugin_setting_options.datasource" />
-    <None Include="Properties\DataSources\zvsModel.program_options.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene+SceneModifiedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene+SceneRunCompleteEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene+SceneRunStartedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene_commands.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene_property.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene_property_option.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scene_property_value.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scheduled_tasks+frequencys.datasource" />
-    <None Include="Properties\DataSources\zvsModel.scheduled_tasks.datasource" />
-    <None Include="Properties\DataSources\zvsModel.zvsLocalDBEntities.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

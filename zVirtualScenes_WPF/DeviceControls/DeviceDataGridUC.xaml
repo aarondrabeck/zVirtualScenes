@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
-             Loaded="UserControl_Loaded" PreviewKeyDown="UserControl_PreviewKeyDown" 
+             Loaded="UserControl_Loaded" 
              PreviewMouseRightButtonDown="UserControl_PreviewMouseRightButtonDown" Unloaded="UserControl_Unloaded_1" >
     <UserControl.Resources>
         <Style x:Key="Body_Content_DataGrid_Centering"
@@ -36,9 +36,9 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid DataContext="{StaticResource devicesViewSource}">
+    <Grid PreviewKeyDown="Grid_PreviewKeyDown_1" DataContext="{StaticResource devicesViewSource}">
         <Border  VerticalAlignment="Top" Height="30" BorderThickness="1,1,1,0" Margin="0" BorderBrush="#FF688CAF" >
-            <Grid  >
+            <Grid>
                 <Grid.Background>
                     <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                         <GradientStop Color="White" Offset="0.969"/>
@@ -60,7 +60,8 @@
         </Border>
         <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False" 
-                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding" RowHeaderWidth="0" AllowDrop="True" Margin="0,30,0,0" >
+                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding" 
+                  RowHeaderWidth="0" AllowDrop="True" Margin="0,30,0,0" >
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn MaxWidth="15" MinWidth="15" Width="15"  Header="" CanUserResize="False" CanUserReorder="False">
@@ -95,6 +96,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                
                 <DataGridTextColumn x:Name="DeviceTypeCol" CellStyle="{StaticResource Body_Hoz_Center}" Width="150" MinWidth="50" Header="Type" 
                                     Binding="{Binding Path=device_types.friendly_name}" IsReadOnly="True" >
                     <DataGridTextColumn.ElementStyle>
@@ -136,10 +138,7 @@
                     </DataGridTemplateColumn.CellTemplate>
 
                 </DataGridTemplateColumn>
-
-               
-
-
+            
                 <DataGridTemplateColumn x:Name="LevelCol" Header="Status" Width="160" MinWidth="160" MaxWidth="160" CanUserResize="False" 
                                         CanUserSort="True" SortMemberPath="current_level_int" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate >
@@ -172,7 +171,6 @@
 
                 <DataGridTextColumn x:Name="NodeID" CellStyle="{StaticResource Body_Hoz_Center}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding node_id}" IsReadOnly="True" 
                                     CanUserResize="False" CanUserReorder="True"  FontSize="14" />
-
 
                 <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate >

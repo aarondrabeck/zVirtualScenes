@@ -2,7 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:DeviceControls="clr-namespace:zVirtualScenes_WPF.DeviceControls"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zvsModel" xmlns:SceneControls="clr-namespace:zVirtualScenes_WPF.SceneControls" x:Class="zVirtualScenes_WPF.MainWindow"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zvsModel" 
+    xmlns:SceneControls="clr-namespace:zVirtualScenes_WPF.SceneControls" 
+    xmlns:TriggerControl="clr-namespace:zVirtualScenes_WPF.TriggerControls"
+    x:Class="zVirtualScenes_WPF.MainWindow"
         Title="MainWindow"  MinWidth="800" MinHeight="570" Loaded="Window_Loaded" Icon="/zVirtualScenes_WPF;component/audio-mixing-desk.ico" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1">
     <Window.Resources>
         <Style TargetType="{x:Type ListViewItem}">
@@ -41,6 +46,9 @@
 
                 <SceneControls:SceneCreator x:Name="SceneControl" />
 
+            </TabItem>
+            <TabItem Header="Trigger">
+                <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
             </TabItem>
             <TabItem Header="Log">
                 <Grid DataContext="{StaticResource ListViewSource}">
