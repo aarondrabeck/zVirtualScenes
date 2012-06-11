@@ -150,7 +150,7 @@ namespace zVirtualScenesModel
 
         public class onEntityChangedEventArgs : EventArgs
         {
-            public System.Data.EntityState ChangeType;
+            public System.Data.EntityState ChangeType { get; private set; }  
 
             public onEntityChangedEventArgs(System.Data.EntityState ChangeType)
             {

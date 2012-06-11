@@ -159,7 +159,7 @@ namespace zVirtualScenes
                         }));
 
                         //Call Event
-                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = existing_dv.id, previousValue = prev_value });
+                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs(existing_dv.id, prev_value, dv.value2));
                     }
                 }
             }

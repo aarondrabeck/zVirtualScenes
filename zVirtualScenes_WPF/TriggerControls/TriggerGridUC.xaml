@@ -21,33 +21,55 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="Body_Content_DataGrid_Vertical_Centering"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:device_value_triggers}, CreateList=True}"/>
     </UserControl.Resources>
     <Grid DataContext="{StaticResource device_value_triggersViewSource}">
         <DataGrid x:Name="TriggerGrid" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
                   HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
-                 PreviewKeyDown="Grid_PreviewKeyDown_1" Margin="0,-2,0,32"
-                  >
+                 PreviewKeyDown="Grid_PreviewKeyDown_1" Margin="0,0,0,32" >
             <DataGrid.Columns>
 
-                <DataGridTextColumn MinWidth="200" Width="200" Header="Name" FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
+                <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserSort="False" CanUserResize="False" CanUserReorder="False" IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Image Name="img" Width="35" Height="35" Source="/zVirtualScenes_WPF;component/Images/trigger.png" Margin="5,0" />                            
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn MinWidth="200" Width="200" Header="Name" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
+                                    FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                            <Setter  Property="Margin" Value="5,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn MinWidth="200" Width="*" Header="Trigger" FontSize="14" Binding="{Binding ActionDescription, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"   >
+                <DataGridTextColumn MinWidth="200" Width="*" Header="Trigger" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" Binding="{Binding TriggerDescription}" IsReadOnly="True"   >
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                            <Setter  Property="TextTrimming" Value="CharacterEllipsis" />
+                            <Setter  Property="Margin" Value="5,0" />
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding enabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" >
+                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding enabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
 
                 </DataGridCheckBoxColumn>
 

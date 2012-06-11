@@ -17,9 +17,9 @@ namespace zVirtualScenes
         public delegate void onScheduledTaskEventHandler(object sender, onScheduledTaskStartEventArgs args);
         public class onScheduledTaskStartEventArgs : EventArgs
         {
-            public string Details = string.Empty;
-            public int TaskID = 0;
-            public bool hasErrors = false;
+            public string Details { get; private set; }
+            public int TaskID { get; private set; }
+            public bool hasErrors { get; private set; }  
 
             public onScheduledTaskStartEventArgs(int TaskID, string Details, bool hasErrors)
             {

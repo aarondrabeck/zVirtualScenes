@@ -77,7 +77,25 @@ namespace zVirtualScenes_WPF.TriggerControls
 
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-
+            Object obj = ((FrameworkElement)sender).DataContext;
+            if (obj is device_value_triggers)
+            {
+                var trigger = (device_value_triggers)obj;
+                if (trigger != null)
+                {
+                    TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
+                    new_window.Owner = Application.Current.MainWindow;
+                    new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
+                    new_window.Show();
+                    new_window.Closing += (s, a) =>
+                    {
+                        if (!new_window.Canceled)
+                        {                            
+                            context.SaveChanges();
+                        }
+                    };
+                }
+            }
         }
 
         private void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
@@ -101,20 +119,19 @@ namespace zVirtualScenes_WPF.TriggerControls
 
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in Application.Current.Windows)
-            {
-                if (window.GetType() == typeof(TriggerEditorWindow))
-                {
-                    window.Activate();
-                    return;
-                }
-            }
-
             device_value_triggers trigger = new device_value_triggers();
-
-            TriggerEditorWindow new_window = new TriggerEditorWindow(trigger);
+            TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
             new_window.Owner = Application.Current.MainWindow;
+            new_window.Title = "Add Trigger";
             new_window.Show();
+            new_window.Closing += (s, a) =>
+            {
+                if (!new_window.Canceled)
+                {
+                    context.device_value_triggers.Add(trigger);
+                    context.SaveChanges();
+                }
+            };
         }
     }
 }

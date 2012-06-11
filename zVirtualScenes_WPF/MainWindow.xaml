@@ -47,7 +47,7 @@
                 <SceneControls:SceneCreator x:Name="SceneControl" />
 
             </TabItem>
-            <TabItem Header="Trigger">
+            <TabItem Header="Triggers">
                 <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
             </TabItem>
             <TabItem Header="Log">

@@ -49,5 +49,17 @@ namespace zVirtualScenes
                 return path + "\\";
             }
         }
+
+        public static string DBName = "zvsLocalDB.sdf";
+        public static string DBNamePlusFullPath = Path.Combine(AppDataPath, DBName);
+
+        public static string BlankDBName = "zvsLocalDB-blank.sdf";
+        public static string BlankDBNamePlusFullPath
+        {
+            get
+            {
+                return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, BlankDBName);
+            }
+        }
     }
 }

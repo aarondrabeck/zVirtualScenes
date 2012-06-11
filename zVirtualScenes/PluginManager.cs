@@ -20,10 +20,10 @@ namespace zVirtualScenes
         public delegate void onProcessingCommandEventHandler(object sender, onProcessingCommandEventArgs args);
         public class onProcessingCommandEventArgs : EventArgs
         {
-            public bool hasErrors = true;
-            public string Details = string.Empty;
-            public scene_commands.command_types CommandType = scene_commands.command_types.unknown;
-            public int CommandQueueID = 0;
+            public bool hasErrors { get; private set; }
+            public string Details { get; private set; }
+            public scene_commands.command_types CommandType { get; private set; }
+            public int CommandQueueID { get; private set; }  
 
             public onProcessingCommandEventArgs(scene_commands.command_types CommandType, bool Errors, string Details, int CommandQueueID)
             {

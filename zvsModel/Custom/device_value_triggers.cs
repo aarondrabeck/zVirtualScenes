@@ -21,15 +21,17 @@ namespace zVirtualScenesModel
             Advanced
         }
 
-        public string ActionDescription
+        public string TriggerDescription
         {
             get
             {
                 if ((TRIGGER_TYPE)this.trigger_type == TRIGGER_TYPE.Basic)
                 {
-                    string trigger_op_name = Enum.GetName(typeof(TRIGGER_OPERATORS), this.trigger_operator);
+                    string trigger_op_name = "UNKNOWN";
+                    if (this.trigger_operator != null)
+                        trigger_op_name = Enum.GetName(typeof(TRIGGER_OPERATORS), this.trigger_operator);
 
-                    return string.Format("When {0} {1} is {2} {3} activate scene '{4}'", this.device_values.device.friendly_name,
+                    return string.Format("When '{0}' {1} is {2} {3} activate scene '{4}'", this.device_values.device.friendly_name,
                                                                     this.device_values.label_name,
                                                                     trigger_op_name,
                                                                     this.trigger_value,
@@ -40,6 +42,6 @@ namespace zVirtualScenesModel
             }
         }
 
-        
+
     }
 }

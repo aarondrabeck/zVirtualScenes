@@ -1230,7 +1230,7 @@ namespace OpenZWavePlugin
 
                                         //Since events are differently than values fire the value change event every time we recieve the event regardless if 
                                         //it is the same value or not.
-                                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs { device_value_id = dv.id, previousValue = string.Empty });
+                                        dv.DeviceValueDataChanged(new device_values.ValueDataChangedEventArgs(dv.id, string.Empty, dv.value2));
                                     }
                                 }
                                 #endregion

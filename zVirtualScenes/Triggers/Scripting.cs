@@ -18,7 +18,7 @@ namespace zVirtualScenes.Triggers
 
         public void RunScript(zvsLocalDBEntities context, device_value_triggers trigger)
         {
-            Core.Logger.WriteToLog(Urgency.INFO, "Running Advanced Script - " + trigger.ActionDescription, _FriendlyName);
+            Core.Logger.WriteToLog(Urgency.INFO, "Running Advanced Script - " + trigger.TriggerDescription, _FriendlyName);
 
             // Step 1: Split up the lines of the script
             String[] splitScript = trigger.trigger_script.ToLower().Split('\n');
@@ -33,7 +33,7 @@ namespace zVirtualScenes.Triggers
                 {
                     if (!scriptLine.StartsWith("{"))
                     {
-                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.ActionDescription + " started 'if' statement without the { on the next line", _FriendlyName);
+                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.TriggerDescription + " started 'if' statement without the { on the next line", _FriendlyName);
                         throw new Exception();
                     }
 
@@ -57,11 +57,11 @@ namespace zVirtualScenes.Triggers
                     {
                         SceneRunner sr = new SceneRunner();
                         sr.RunScene(_scene.id);
-                        Core.Logger.WriteToLog(Urgency.INFO, "Script " + trigger.ActionDescription + " ran scene '" + scene_name + "'", _FriendlyName);
+                        Core.Logger.WriteToLog(Urgency.INFO, "Script " + trigger.TriggerDescription + " ran scene '" + scene_name + "'", _FriendlyName);
                     }
                     else
                     {
-                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.ActionDescription + " specified a invalid scene name '" + scene_name + "'", _FriendlyName);
+                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.TriggerDescription + " specified a invalid scene name '" + scene_name + "'", _FriendlyName);
                         return;
                     }
 
@@ -103,15 +103,15 @@ namespace zVirtualScenes.Triggers
                         else
                         {
                             // ??
-                            Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.ActionDescription + " unkown operator in '" + parameters + "'", _FriendlyName);
+                            Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.TriggerDescription + " unkown operator in '" + parameters + "'", _FriendlyName);
                             return;
                         }
 
                         strValues[0] = parameters.Substring(0, parameters.IndexOf(strOperator));
                         strValues[1] = parameters.Substring(parameters.IndexOf(strOperator) + strOperator.Length);
 
-                        intValues[0] = GetValue(context, trigger.ActionDescription, strValues[0]);
-                        intValues[1] = GetValue(context, trigger.ActionDescription, strValues[1]);
+                        intValues[0] = GetValue(context, trigger.TriggerDescription, strValues[0]);
+                        intValues[1] = GetValue(context, trigger.TriggerDescription, strValues[1]);
 
                         switch (operatorType)
                         {
@@ -145,7 +145,7 @@ namespace zVirtualScenes.Triggers
                     }
                     catch
                     {
-                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.ActionDescription + " - Unable to get parameters for if statement from line", _FriendlyName);
+                        Core.Logger.WriteToLog(Urgency.ERROR, "Script " + trigger.TriggerDescription + " - Unable to get parameters for if statement from line", _FriendlyName);
                         Core.Logger.WriteToLog(Urgency.ERROR, "'" + scriptLine + "'.", _FriendlyName);
                         Core.Logger.WriteToLog(Urgency.ERROR, "Did you include both ( and )?", _FriendlyName);
                         return;
@@ -153,7 +153,7 @@ namespace zVirtualScenes.Triggers
                 }
             }
 
-            Core.Logger.WriteToLog(Urgency.INFO, "Finished Running Advanced Script - " + trigger.ActionDescription, _FriendlyName);
+            Core.Logger.WriteToLog(Urgency.INFO, "Finished Running Advanced Script - " + trigger.TriggerDescription, _FriendlyName);
         }
 
         private int GetValue(zvsLocalDBEntities context, String triggerName, String strValue)

@@ -66,10 +66,5 @@ namespace zVirtualScenes_WPF
 
             base.OnStartup(e);
         }
-
-        private void processorWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-
-        }
     }
 }

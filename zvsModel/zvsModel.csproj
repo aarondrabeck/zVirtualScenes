@@ -195,8 +195,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="zvsLocalDB.sdf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="zvsLocalDB-blank.sdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

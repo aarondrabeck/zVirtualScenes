@@ -364,9 +364,6 @@ namespace zVirtualScenes_WPF.SceneControls
                                   "Scene Edit Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
 
-        
-
-
         private void SceneCmdsGrid_Row_PreviewMouseRightButtonDown(object sender, RoutedEventArgs e)
         {
 

@@ -19,13 +19,20 @@ namespace zVirtualScenesModel
         {
             if (DeviceValueDataChangedEvent != null)
                 DeviceValueDataChangedEvent(this, args);
-
         }
 
         public class ValueDataChangedEventArgs : System.EventArgs
-        {
-            public int device_value_id = 0;
-            public string previousValue;
+        {       
+            public int device_value_id { get; private set; }          
+            public string newValue { get; private set; }
+            public string oldValue { get; private set; }
+
+            public ValueDataChangedEventArgs(int device_value_id, string newValue, string oldValue)
+            {
+                this.device_value_id = device_value_id;
+                this.newValue = newValue;
+                this.oldValue = oldValue;
+            }
         }
 
         public static event DeviceValueAddedEventHandler DeviceValueAddedEvent;

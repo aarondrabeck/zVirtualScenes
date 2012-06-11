@@ -34,6 +34,7 @@ namespace zVirtualScenesModel
             {
                 _device_value_id = value;
                 NotifyPropertyChanged("device_value_id");
+                NotifyPropertyChanged("TriggerDescription");
             }
         }
 
@@ -45,6 +46,7 @@ namespace zVirtualScenesModel
             {
                 _trigger_operator = value;
                 NotifyPropertyChanged("trigger_operator");
+                NotifyPropertyChanged("TriggerDescription");
             }
         }
 
@@ -56,6 +58,7 @@ namespace zVirtualScenesModel
             {
                 _trigger_value = value;
                 NotifyPropertyChanged("trigger_value");
+                NotifyPropertyChanged("TriggerDescription");
             }
         }
 
@@ -89,6 +92,7 @@ namespace zVirtualScenesModel
             {
                 _scene_id = value;
                 NotifyPropertyChanged("scene_id");
+                NotifyPropertyChanged("TriggerDescription");
             }
         }
 

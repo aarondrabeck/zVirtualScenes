@@ -23,9 +23,9 @@ namespace zVirtualScenes
         public delegate void onSceneRunEventHandler(object sender, onSceneRunEventArgs args);
         public class onSceneRunEventArgs : EventArgs
         {
-            public bool Errors = true;
-            public string Details = string.Empty;
-            public int SceneID = 0;
+            public bool Errors { get; private set; }
+            public string Details { get; private set; }
+            public int SceneID { get; private set; }  
 
             public onSceneRunEventArgs(int SceneID, bool Errors, string Details)
             {
