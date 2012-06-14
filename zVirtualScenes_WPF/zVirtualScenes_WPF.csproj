@@ -89,6 +89,9 @@
     <Compile Include="SceneControls\SceneProperyWindow.xaml.cs">
       <DependentUpon>SceneProperyWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ScheduledTaskControls\ScheduledTaskCreator.xaml.cs">
+      <DependentUpon>ScheduledTaskCreator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TriggerControls\TriggerEditorWindow.xaml.cs">
       <DependentUpon>TriggerEditorWindow.xaml</DependentUpon>
     </Compile>
@@ -223,6 +226,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SceneControls\SceneProperyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScheduledTaskControls\ScheduledTaskCreator.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -379,6 +386,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\trigger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\scheduled_task.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

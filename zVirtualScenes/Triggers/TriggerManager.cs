@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using zVirtualScenesModel;
@@ -41,88 +42,93 @@ namespace zVirtualScenes.Triggers
 
         private void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (s, a) =>
             {
-                device_values dv = context.device_values.FirstOrDefault(v => v.id == args.device_value_id);
-                if (dv != null)
+                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    //Event Triggering
-                    foreach (device_value_triggers trigger in dv.device_value_triggers.Where(t => t.enabled))
+                    device_values dv = context.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                    if (dv != null)
                     {
-                        if (((device_value_triggers.TRIGGER_TYPE)trigger.trigger_type) == device_value_triggers.TRIGGER_TYPE.Basic)
+                        //Event Triggering
+                        foreach (device_value_triggers trigger in dv.device_value_triggers.Where(t => t.enabled))
                         {
-                            switch ((device_value_triggers.TRIGGER_OPERATORS)trigger.trigger_operator)
+                            if (((device_value_triggers.TRIGGER_TYPE)trigger.trigger_type) == device_value_triggers.TRIGGER_TYPE.Basic)
                             {
-                                case device_value_triggers.TRIGGER_OPERATORS.EqualTo:
-                                    {
-                                        if (dv.value2.Equals(trigger.trigger_value))
+                                switch ((device_value_triggers.TRIGGER_OPERATORS)trigger.trigger_operator)
+                                {
+                                    case device_value_triggers.TRIGGER_OPERATORS.EqualTo:
                                         {
-                                            ActivateTriggerScene(trigger);
-                                        }
-                                        break;
-                                    }
-                                case device_value_triggers.TRIGGER_OPERATORS.GreaterThan:
-                                    {
-                                        double deviceValue = 0;
-                                        double triggerValue = 0;
-
-                                        if (double.TryParse(dv.value2, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
-                                        {
-                                            if (deviceValue > triggerValue)
+                                            if (dv.value2.Equals(trigger.trigger_value))
                                             {
                                                 ActivateTriggerScene(trigger);
                                             }
+                                            break;
                                         }
-                                        else
+                                    case device_value_triggers.TRIGGER_OPERATORS.GreaterThan:
                                         {
-                                            if (onTriggerStart != null)
+                                            double deviceValue = 0;
+                                            double triggerValue = 0;
+
+                                            if (double.TryParse(dv.value2, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
                                             {
-                                                onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
-                                                    string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
+                                                if (deviceValue > triggerValue)
+                                                {
+                                                    ActivateTriggerScene(trigger);
+                                                }
                                             }
+                                            else
+                                            {
+                                                if (onTriggerStart != null)
+                                                {
+                                                    onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
+                                                        string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
+                                                }
+                                            }
+
+                                            break;
                                         }
-
-                                        break;
-                                    }
-                                case device_value_triggers.TRIGGER_OPERATORS.LessThan:
-                                    {
-                                        double deviceValue = 0;
-                                        double triggerValue = 0;
-
-                                        if (double.TryParse(dv.value2, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                    case device_value_triggers.TRIGGER_OPERATORS.LessThan:
                                         {
-                                            if (deviceValue < triggerValue)                                            
+                                            double deviceValue = 0;
+                                            double triggerValue = 0;
+
+                                            if (double.TryParse(dv.value2, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                            {
+                                                if (deviceValue < triggerValue)
+                                                    ActivateTriggerScene(trigger);
+
+                                            }
+                                            else
+                                            {
+                                                if (onTriggerStart != null)
+                                                {
+                                                    onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
+                                                        string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
+                                                }
+                                            }
+
+                                            break;
+                                        }
+                                    case device_value_triggers.TRIGGER_OPERATORS.NotEqualTo:
+                                        {
+                                            if (!dv.value2.Equals(trigger.trigger_value))
+                                            {
                                                 ActivateTriggerScene(trigger);
-                                            
-                                        }
-                                        else
-                                        {
-                                            if (onTriggerStart != null)
-                                            {
-                                                onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
-                                                    string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
                                             }
+                                            break;
                                         }
-
-                                        break;
-                                    }
-                                case device_value_triggers.TRIGGER_OPERATORS.NotEqualTo:
-                                    {
-                                        if (!dv.value2.Equals(trigger.trigger_value))
-                                        {
-                                            ActivateTriggerScene(trigger);
-                                        }
-                                        break;
-                                    }
+                                }
                             }
-                        }
-                        else
-                        {
-                            //Core.triggerManager.RunScript(trigger);
+                            else
+                            {
+                                //Core.triggerManager.RunScript(trigger);
+                            }
                         }
                     }
                 }
-            }
+            };
+            bw.RunWorkerAsync();
         }
 
         private void ActivateTriggerScene(device_value_triggers trigger)

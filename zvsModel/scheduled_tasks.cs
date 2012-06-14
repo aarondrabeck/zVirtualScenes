@@ -11,14 +11,108 @@ namespace zVirtualScenesModel
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     
-    public partial class scheduled_tasks
+    public partial class scheduled_tasks : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public string friendly_name { get; set; }
-        public bool Enabled { get; set; }
-        public int Scene_id { get; set; }
-        public Nullable<int> Frequency { get; set; }
+        private int _id;
+        public int id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                NotifyPropertyChanged("id");
+            }
+        }
+
+        private string _friendly_name;
+        public string friendly_name
+        {
+            get { return _friendly_name; }
+            set
+            {
+                _friendly_name = value;
+                NotifyPropertyChanged("friendly_name");
+            }
+        }
+
+        private bool _Enabled;
+        public bool Enabled
+        {
+            get { return _Enabled; }
+            set
+            {
+                _Enabled = value;
+                NotifyPropertyChanged("Enabled");
+            }
+        }
+
+        private int _Scene_id;
+        public int Scene_id
+        {
+            get { return _Scene_id; }
+            set
+            {
+                _Scene_id = value;
+                NotifyPropertyChanged("Scene_id");
+            }
+        }
+
+        private Nullable<int> _Frequency;
+        public Nullable<int> Frequency
+        {
+            get { return _Frequency; }
+            set
+            {
+                _Frequency = value;
+                NotifyPropertyChanged("Frequency");
+                NotifyPropertyChanged("FrequencyEnum");
+            }
+        }
+
+        private frequencys _FrequencyEnum;
+        public frequencys FrequencyEnum
+        {
+            get
+            {
+                if (!Frequency.HasValue)
+                    return frequencys.Daily;
+
+                frequencys freq = frequencys.Daily;
+                Enum.TryParse(Frequency.Value.ToString(), out freq);
+                return freq;
+            }
+            set
+            {
+                _FrequencyEnum = value;
+                Frequency = (int)value;
+                NotifyPropertyChanged("FrequencyEnum");
+            }
+        }
+
+        private Nullable<int> _sort_order;
+        public Nullable<int> sort_order
+        {
+            get { return _sort_order; }
+            set
+            {
+                _sort_order = value;
+                NotifyPropertyChanged("sort_order");
+            }
+        }
+
+        private Nullable<System.DateTime> _StartTime;
+        public Nullable<System.DateTime> StartTime
+        {
+            get { return _StartTime; }
+            set
+            {
+                _StartTime = value;
+                NotifyPropertyChanged("StartTime");
+            }
+        }
+
         public Nullable<bool> RecurMonday { get; set; }
         public Nullable<bool> RecurTuesday { get; set; }
         public Nullable<bool> RecurWednesday { get; set; }
@@ -31,8 +125,6 @@ namespace zVirtualScenesModel
         public Nullable<int> RecurMonth { get; set; }
         public Nullable<int> RecurDayofMonth { get; set; }
         public Nullable<int> RecurSeconds { get; set; }
-        public Nullable<System.DateTime> StartTime { get; set; }
-        public Nullable<int> sort_order { get; set; }
         public Nullable<bool> RecurEven { get; set; }
         public Nullable<bool> RecurDay01 { get; set; }
         public Nullable<bool> RecurDay02 { get; set; }
@@ -65,5 +157,14 @@ namespace zVirtualScenesModel
         public Nullable<bool> RecurDay29 { get; set; }
         public Nullable<bool> RecurDay30 { get; set; }
         public Nullable<bool> RecurDay31 { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
     }
 }

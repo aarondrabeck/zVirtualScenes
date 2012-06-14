@@ -13,7 +13,7 @@ using System.IO;
 namespace zVirtualScenes
 {
     public class Core
-    {        
+    {
         public PluginManager pluginManager;
         public TriggerManager triggerManager;
         public ScheduledTaskManager scheduledTaskManager;
@@ -25,12 +25,12 @@ namespace zVirtualScenes
             AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
 
             this.Dispatcher = Dispatcher;
-            //TODO: THESE SHOULD BE FUNCTIONS SYNCRONOUS
 
+            #region Pre App Start Checks
             //Check for VCRedist
             if (!DetectVCRedist.IsVCRedistInstalled())
             {
-               // MessageBox.Show(string.Format("Visual C++ Redistributable Missing!\n\n zVirtualScenes cannot open because Visual C++ Redistributable is not installed.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButton.OK, MessageBoxImage.Error);
+                // MessageBox.Show(string.Format("Visual C++ Redistributable Missing!\n\n zVirtualScenes cannot open because Visual C++ Redistributable is not installed.\n\nPlease check the following path: {0}.", zvsEntityControl.GetDBPath), zvsEntityControl.zvsNameAndVersion, MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }
 
@@ -132,45 +132,54 @@ namespace zVirtualScenes
                     }
                 }
             }
-                       
+            #endregion
 
             //Create a instace of the logger
             Logger = new Logger();
 
-            //Create the Plugin Manager thereby loading the plugins
-            try
+            BackgroundWorker PluginBW = new BackgroundWorker();
+            PluginBW.DoWork += (sender, args) =>
             {
                 pluginManager = new PluginManager(this);
-            }
-            catch (System.Reflection.ReflectionTypeLoadException reflectionEx)
-            {
-                string error = "Cannot load one or more plug-ins.";
-                Exception ex = reflectionEx.LoaderExceptions.FirstOrDefault();
-                if (ex != null)
+            };
+
+            PluginBW.RunWorkerCompleted += (sender, args) =>
                 {
-                    error = ex.ToString() + 
-                        Environment.NewLine + 
-                        Environment.NewLine +
-                        string.Format("This plug-in might not be compatible with {0}. Try removing the plugin and re-launching the application. ", Utils.ApplicationNameAndVersion);
-                }
-                if (MessageBox.Show(error, "Fatal plug-in load error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
-                {
-                    Environment.Exit(1);
-                    return;
-                }
-            }
-            catch (Exception e)
-            {                
-                if (MessageBox.Show(e.Message, "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
-                {
-                    Environment.Exit(1);
-                    return;
-                }
-            }            
-            
+                    if (args.Error != null)
+                    {
+                        if (args.Error is System.Reflection.ReflectionTypeLoadException)
+                        {
+                            System.Reflection.ReflectionTypeLoadException reflectionEx = (System.Reflection.ReflectionTypeLoadException)args.Error;
+                            string error = "Cannot load one or more plug-ins.";
+                            Exception ex = reflectionEx.LoaderExceptions.FirstOrDefault();
+                            if (ex != null)
+                            {
+                                error = ex.ToString() +
+                                    Environment.NewLine +
+                                    Environment.NewLine +
+                                    string.Format("This plug-in might not be compatible with {0}. Try removing the plugin and re-launching the application. ", Utils.ApplicationNameAndVersion);
+                            }
+                            if (MessageBox.Show(error, "Fatal plug-in load error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
+                            {
+                                Environment.Exit(1);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            if (MessageBox.Show(args.Error.Message, "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
+                            {
+                                Environment.Exit(1);
+                                return;
+                            }
+                        }
+                    }
+                };
+            PluginBW.RunWorkerAsync();
+
+
             triggerManager = new TriggerManager();
             scheduledTaskManager = new ScheduledTaskManager();
-
         }
     }
 }

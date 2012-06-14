@@ -1,0 +1,97 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
+             x:Class="zVirtualScenes_WPF.ScheduledTaskControls.ScheduledTaskCreator"
+             xmlns:System="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="465" d:DesignWidth="654" Loaded="UserControl_Loaded_1">
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="scheduled_tasksViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:scheduled_tasks}, CreateList=True}"/>
+        <Style x:Key="Body_Content_DataGrid_Centering"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Body_Hoz_Center"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="zVirtualScenesModel:scheduled_tasks+frequencys"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:scene}, CreateList=True}"/>
+    </UserControl.Resources>
+    
+    
+    <Grid DataContext="{StaticResource scheduled_tasksViewSource}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="98*"/>
+            <ColumnDefinition Width="229*"/>
+        </Grid.ColumnDefinitions>
+
+        <DataGrid x:Name="ScheduledTaskDataGrid" ItemsSource="{Binding}" AllowDrop="False"
+                    HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" 
+                  GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
+                  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single" 
+                  PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1">
+
+            <DataGrid.Columns>
+
+                <DataGridTemplateColumn MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Image Name="img" Width="40" Height="40" Source="/zVirtualScenes_WPF;component/Images/scheduled_task.png" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scene" Binding="{Binding Path=friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" 
+                                        Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
+                </DataGridCheckBoxColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Column="1" BorderThickness="1" CornerRadius="10" Margin="10">
+            <Grid >
+
+                <TextBlock Name="TaskNameTxtBl" Text="{Binding friendly_name}"  Margin="5" VerticalAlignment="Top" FontSize="16"></TextBlock>
+                <TextBlock Text="Frequency" VerticalAlignment="Top" Margin="25,31,-25,0"></TextBlock>
+                <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource dataFromEnum}}"   SelectedItem="{Binding FrequencyEnum}" 
+                          VerticalAlignment="Top" Margin="25,49,0,0" HorizontalAlignment="Left" Width="234"></ComboBox>
+                <TextBlock Text="Scene" VerticalAlignment="Top" Margin="25,80,-25,0"/>
+                <ComboBox x:Name="SceneCmbBx_Copy" SelectedItem="{Binding FrequencyEnum}" VerticalAlignment="Top" Margin="25,98,0,0" HorizontalAlignment="Left" 
+                          Width="234" DisplayMemberPath="friendly_name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" SelectedValuePath="friendly_name"/>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</UserControl>
