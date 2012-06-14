@@ -21,6 +21,7 @@ namespace zVirtualScenesModel
             this.device_value_triggers = new ObservableCollection<device_value_triggers>();
             this.scene_commands = new ObservableCollection<scene_commands>();
             this.scene_property_value = new ObservableCollection<scene_property_value>();
+            this.scheduled_tasks = new ObservableCollection<scheduled_tasks>();
         }
 
         private int _id;
@@ -70,6 +71,7 @@ namespace zVirtualScenesModel
         public virtual ObservableCollection<device_value_triggers> device_value_triggers { get; set; }
         public virtual ObservableCollection<scene_commands> scene_commands { get; set; }
         public virtual ObservableCollection<scene_property_value> scene_property_value { get; set; }
+        public virtual ObservableCollection<scheduled_tasks> scheduled_tasks { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string name)

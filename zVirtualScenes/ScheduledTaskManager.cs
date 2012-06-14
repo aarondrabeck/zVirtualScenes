@@ -46,7 +46,7 @@ namespace zVirtualScenes
             {
                 foreach (scheduled_tasks task in context.scheduled_tasks.Local)
                 {
-                    if (task.Enabled)
+                    if (task.isEnabled)
                     {
                         if (task.Frequency.HasValue)
                         {
@@ -54,9 +54,9 @@ namespace zVirtualScenes
                             {
                                 case scheduled_tasks.frequencys.Seconds:
                                     {
-                                        if (task.StartTime.HasValue)
+                                        if (task.startTime.HasValue)
                                         {
-                                            int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                            int sec = (int)(DateTime.Now - task.startTime.Value).TotalSeconds;
                                             if (sec % task.RecurSeconds == 0)
                                                 RunTask(task);
                                         }
@@ -64,16 +64,16 @@ namespace zVirtualScenes
                                     }
                                 case scheduled_tasks.frequencys.Daily:
                                     {
-                                        if (task.StartTime.HasValue)
+                                        if (task.startTime.HasValue)
                                         {
                                             //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
-                                            if (task.RecurDays > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays == 0))
+                                            if (task.RecurDays > 0 && ((DateTime.Now.Date - task.startTime.Value.Date).TotalDays % task.RecurDays == 0))
                                             {
                                                 TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                                 TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
 
                                                 //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
-                                                if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
                                                     RunTask(task);
                                             }
                                         }
@@ -81,16 +81,16 @@ namespace zVirtualScenes
                                     }
                                 case scheduled_tasks.frequencys.Weekly:
                                     {
-                                        if (task.StartTime.HasValue)
+                                        if (task.startTime.HasValue)
                                         {
-                                            if (task.RecurWeeks > 0 && (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0))  //IF RUN THIS WEEK
+                                            if (task.RecurWeeks > 0 && (((Int32)(DateTime.Now.Date - task.startTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0))  //IF RUN THIS WEEK
                                             {
                                                 if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                                 {
                                                     TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                                     TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                    if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
                                                         RunTask(task);
                                                 }
                                             }
@@ -99,9 +99,9 @@ namespace zVirtualScenes
                                     }
                                 case scheduled_tasks.frequencys.Monthly:
                                     {
-                                        if (task.StartTime.HasValue)
+                                        if (task.startTime.HasValue)
                                         {
-                                            int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
+                                            int monthsapart = ((DateTime.Now.Year - task.startTime.Value.Year) * 12) + DateTime.Now.Month - task.startTime.Value.Month;
                                             //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
                                             if (task.RecurMonth > 0 && monthsapart > -1 && monthsapart % task.RecurMonth == 0)  //IF RUN THIS Month
                                             {
@@ -110,7 +110,7 @@ namespace zVirtualScenes
                                                     TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                                     TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                    if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
                                                         RunTask(task);
                                                 }
                                             }
@@ -120,12 +120,12 @@ namespace zVirtualScenes
                                     }
                                 case scheduled_tasks.frequencys.Once:
                                     {
-                                        if (task.StartTime.HasValue)
+                                        if (task.startTime.HasValue)
                                         {
                                             TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                             TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                            if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                            if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
                                                 RunTask(task);
                                         }
                                         break;
@@ -252,14 +252,14 @@ namespace zVirtualScenes
 
         private void RunTask(scheduled_tasks task)
         {
-            scene scene = context.scenes.FirstOrDefault(s => s.id == task.Scene_id);
+            scene scene = context.scenes.FirstOrDefault(s => s.id == task.SceneID);
 
             if (scene == null)
             {
                 if (onScheduledTaskStart != null)
                 {
                     onScheduledTaskStart(this, new onScheduledTaskStartEventArgs(task.id,
-                        string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", task.friendly_name, task.Scene_id)
+                        string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", task.friendly_name, task.SceneID)
                         , true));
                 }
             }

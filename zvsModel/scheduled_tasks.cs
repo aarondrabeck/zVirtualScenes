@@ -37,25 +37,25 @@ namespace zVirtualScenesModel
             }
         }
 
-        private bool _Enabled;
-        public bool Enabled
+        private bool _isEnabled;
+        public bool isEnabled
         {
-            get { return _Enabled; }
+            get { return _isEnabled; }
             set
             {
-                _Enabled = value;
-                NotifyPropertyChanged("Enabled");
+                _isEnabled = value;
+                NotifyPropertyChanged("isEnabled");
             }
         }
 
-        private int _Scene_id;
-        public int Scene_id
+        private Nullable<int> _SceneID;
+        public Nullable<int> SceneID
         {
-            get { return _Scene_id; }
+            get { return _SceneID; }
             set
             {
-                _Scene_id = value;
-                NotifyPropertyChanged("Scene_id");
+                _SceneID = value;
+                NotifyPropertyChanged("SceneID");
             }
         }
 
@@ -91,25 +91,25 @@ namespace zVirtualScenesModel
             }
         }
 
-        private Nullable<int> _sort_order;
-        public Nullable<int> sort_order
+        private Nullable<int> _sortOrder;
+        public Nullable<int> sortOrder
         {
-            get { return _sort_order; }
+            get { return _sortOrder; }
             set
             {
-                _sort_order = value;
-                NotifyPropertyChanged("sort_order");
+                _sortOrder = value;
+                NotifyPropertyChanged("sortOrder");
             }
         }
 
-        private Nullable<System.DateTime> _StartTime;
-        public Nullable<System.DateTime> StartTime
+        private Nullable<System.DateTime> _startTime;
+        public Nullable<System.DateTime> startTime
         {
-            get { return _StartTime; }
+            get { return _startTime; }
             set
             {
-                _StartTime = value;
-                NotifyPropertyChanged("StartTime");
+                _startTime = value;
+                NotifyPropertyChanged("startTime");
             }
         }
 
@@ -157,6 +157,8 @@ namespace zVirtualScenesModel
         public Nullable<bool> RecurDay29 { get; set; }
         public Nullable<bool> RecurDay30 { get; set; }
         public Nullable<bool> RecurDay31 { get; set; }
+
+         public virtual scene scene { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string name)

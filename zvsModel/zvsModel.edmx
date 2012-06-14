@@ -35,113 +35,117 @@
           <EntitySet Name="scene_property_value" EntityType="zvsLocalDBModel.Store.scene_property_value" store:Type="Tables" />
           <EntitySet Name="scenes" EntityType="zvsLocalDBModel.Store.scenes" store:Type="Tables" />
           <EntitySet Name="scheduled_tasks" EntityType="zvsLocalDBModel.Store.scheduled_tasks" store:Type="Tables" />
-          <AssociationSet Name="FK__builtin_command_options__00000000000004F1" Association="zvsLocalDBModel.Store.FK__builtin_command_options__00000000000004F1">
+          <AssociationSet Name="FK__builtin_command_options__00000000000003F8" Association="zvsLocalDBModel.Store.FK__builtin_command_options__00000000000003F8">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_options" EntitySet="builtin_command_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__builtin_command_que__00000000000004E1" Association="zvsLocalDBModel.Store.FK__builtin_command_que__00000000000004E1">
+          <AssociationSet Name="FK__builtin_command_que__00000000000003E8" Association="zvsLocalDBModel.Store.FK__builtin_command_que__00000000000003E8">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_que" EntitySet="builtin_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_command_options__0000000000000585" Association="zvsLocalDBModel.Store.FK__device_command_options__0000000000000585">
+          <AssociationSet Name="FK__device_command_options__000000000000048C" Association="zvsLocalDBModel.Store.FK__device_command_options__000000000000048C">
             <End Role="device_commands" EntitySet="device_commands" />
             <End Role="device_command_options" EntitySet="device_command_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_command_que__0000000000000597" Association="zvsLocalDBModel.Store.FK__device_command_que__0000000000000597">
+          <AssociationSet Name="FK__device_command_que__000000000000049E" Association="zvsLocalDBModel.Store.FK__device_command_que__000000000000049E">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_command_que" EntitySet="device_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_command_que__000000000000059B" Association="zvsLocalDBModel.Store.FK__device_command_que__000000000000059B">
+          <AssociationSet Name="FK__device_command_que__00000000000004A2" Association="zvsLocalDBModel.Store.FK__device_command_que__00000000000004A2">
             <End Role="device_commands" EntitySet="device_commands" />
             <End Role="device_command_que" EntitySet="device_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_commands__0000000000000575" Association="zvsLocalDBModel.Store.FK__device_commands__0000000000000575">
+          <AssociationSet Name="FK__device_commands__000000000000047C" Association="zvsLocalDBModel.Store.FK__device_commands__000000000000047C">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_commands" EntitySet="device_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_property_options__00000000000005BB" Association="zvsLocalDBModel.Store.FK__device_property_options__00000000000005BB">
+          <AssociationSet Name="FK__device_property_options__00000000000004C2" Association="zvsLocalDBModel.Store.FK__device_property_options__00000000000004C2">
             <End Role="device_propertys" EntitySet="device_propertys" />
             <End Role="device_property_options" EntitySet="device_property_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_property_values__00000000000005CD" Association="zvsLocalDBModel.Store.FK__device_property_values__00000000000005CD">
+          <AssociationSet Name="FK__device_property_values__00000000000004D4" Association="zvsLocalDBModel.Store.FK__device_property_values__00000000000004D4">
             <End Role="device_propertys" EntitySet="device_propertys" />
             <End Role="device_property_values" EntitySet="device_property_values" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_property_values__00000000000005D1" Association="zvsLocalDBModel.Store.FK__device_property_values__00000000000005D1">
+          <AssociationSet Name="FK__device_property_values__00000000000004D8" Association="zvsLocalDBModel.Store.FK__device_property_values__00000000000004D8">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_property_values" EntitySet="device_property_values" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_command_options__0000000000000608" Association="zvsLocalDBModel.Store.FK__device_type_command_options__0000000000000608">
+          <AssociationSet Name="FK__device_type_command_options__000000000000050F" Association="zvsLocalDBModel.Store.FK__device_type_command_options__000000000000050F">
             <End Role="device_type_commands" EntitySet="device_type_commands" />
             <End Role="device_type_command_options" EntitySet="device_type_command_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_command_que__000000000000061A" Association="zvsLocalDBModel.Store.FK__device_type_command_que__000000000000061A">
+          <AssociationSet Name="FK__device_type_command_que__0000000000000521" Association="zvsLocalDBModel.Store.FK__device_type_command_que__0000000000000521">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_type_command_que" EntitySet="device_type_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_command_que__000000000000061E" Association="zvsLocalDBModel.Store.FK__device_type_command_que__000000000000061E">
+          <AssociationSet Name="FK__device_type_command_que__0000000000000525" Association="zvsLocalDBModel.Store.FK__device_type_command_que__0000000000000525">
             <End Role="device_type_commands" EntitySet="device_type_commands" />
             <End Role="device_type_command_que" EntitySet="device_type_command_que" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_type_commands__00000000000005F8" Association="zvsLocalDBModel.Store.FK__device_type_commands__00000000000005F8">
+          <AssociationSet Name="FK__device_type_commands__00000000000004FF" Association="zvsLocalDBModel.Store.FK__device_type_commands__00000000000004FF">
             <End Role="device_types" EntitySet="device_types" />
             <End Role="device_type_commands" EntitySet="device_type_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_types__000000000000052A" Association="zvsLocalDBModel.Store.FK__device_types__000000000000052A">
+          <AssociationSet Name="FK__device_types__0000000000000431" Association="zvsLocalDBModel.Store.FK__device_types__0000000000000431">
             <End Role="plugins" EntitySet="plugins" />
             <End Role="device_types" EntitySet="device_types" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_value_triggers__0000000000000673" Association="zvsLocalDBModel.Store.FK__device_value_triggers__0000000000000673">
+          <AssociationSet Name="FK__device_value_triggers__000000000000057A" Association="zvsLocalDBModel.Store.FK__device_value_triggers__000000000000057A">
             <End Role="device_values" EntitySet="device_values" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_value_triggers__0000000000000677" Association="zvsLocalDBModel.Store.FK__device_value_triggers__0000000000000677">
+          <AssociationSet Name="FK__device_value_triggers__000000000000057E" Association="zvsLocalDBModel.Store.FK__device_value_triggers__000000000000057E">
             <End Role="scenes" EntitySet="scenes" />
             <End Role="device_value_triggers" EntitySet="device_value_triggers" />
           </AssociationSet>
-          <AssociationSet Name="FK__device_values__0000000000000654" Association="zvsLocalDBModel.Store.FK__device_values__0000000000000654">
+          <AssociationSet Name="FK__device_values__000000000000055B" Association="zvsLocalDBModel.Store.FK__device_values__000000000000055B">
             <End Role="devices" EntitySet="devices" />
             <End Role="device_values" EntitySet="device_values" />
           </AssociationSet>
-          <AssociationSet Name="FK__devices__000000000000054B" Association="zvsLocalDBModel.Store.FK__devices__000000000000054B">
+          <AssociationSet Name="FK__devices__0000000000000452" Association="zvsLocalDBModel.Store.FK__devices__0000000000000452">
             <End Role="device_types" EntitySet="device_types" />
             <End Role="devices" EntitySet="devices" />
           </AssociationSet>
-          <AssociationSet Name="FK__group_devices__0000000000000691" Association="zvsLocalDBModel.Store.FK__group_devices__0000000000000691">
+          <AssociationSet Name="FK__group_devices__0000000000000598" Association="zvsLocalDBModel.Store.FK__group_devices__0000000000000598">
             <End Role="groups" EntitySet="groups" />
             <End Role="group_devices" EntitySet="group_devices" />
           </AssociationSet>
-          <AssociationSet Name="FK__group_devices__0000000000000695" Association="zvsLocalDBModel.Store.FK__group_devices__0000000000000695">
+          <AssociationSet Name="FK__group_devices__000000000000059C" Association="zvsLocalDBModel.Store.FK__group_devices__000000000000059C">
             <End Role="devices" EntitySet="devices" />
             <End Role="group_devices" EntitySet="group_devices" />
           </AssociationSet>
-          <AssociationSet Name="FK__plugin_setting_options__00000000000006C0" Association="zvsLocalDBModel.Store.FK__plugin_setting_options__00000000000006C0">
+          <AssociationSet Name="FK__plugin_setting_options__00000000000005C7" Association="zvsLocalDBModel.Store.FK__plugin_setting_options__00000000000005C7">
             <End Role="plugin_settings" EntitySet="plugin_settings" />
             <End Role="plugin_setting_options" EntitySet="plugin_setting_options" />
           </AssociationSet>
-          <AssociationSet Name="FK__plugin_settings__00000000000006B0" Association="zvsLocalDBModel.Store.FK__plugin_settings__00000000000006B0">
+          <AssociationSet Name="FK__plugin_settings__00000000000005B7" Association="zvsLocalDBModel.Store.FK__plugin_settings__00000000000005B7">
             <End Role="plugins" EntitySet="plugins" />
             <End Role="plugin_settings" EntitySet="plugin_settings" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_commands__00000000000006E7" Association="zvsLocalDBModel.Store.FK__scene_commands__00000000000006E7">
+          <AssociationSet Name="FK__scene_commands__00000000000005EE" Association="zvsLocalDBModel.Store.FK__scene_commands__00000000000005EE">
             <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_commands" EntitySet="scene_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_commands__00000000000006EB" Association="zvsLocalDBModel.Store.FK__scene_commands__00000000000006EB">
+          <AssociationSet Name="FK__scene_commands__00000000000005F2" Association="zvsLocalDBModel.Store.FK__scene_commands__00000000000005F2">
             <End Role="devices" EntitySet="devices" />
             <End Role="scene_commands" EntitySet="scene_commands" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_property_option__0000000000000710" Association="zvsLocalDBModel.Store.FK__scene_property_option__0000000000000710">
+          <AssociationSet Name="FK__scene_property_option__0000000000000617" Association="zvsLocalDBModel.Store.FK__scene_property_option__0000000000000617">
             <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_option" EntitySet="scene_property_option" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_property_value__0000000000000725" Association="zvsLocalDBModel.Store.FK__scene_property_value__0000000000000725">
+          <AssociationSet Name="FK__scene_property_value__000000000000062C" Association="zvsLocalDBModel.Store.FK__scene_property_value__000000000000062C">
             <End Role="scene_property" EntitySet="scene_property" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
-          <AssociationSet Name="FK__scene_property_value__0000000000000729" Association="zvsLocalDBModel.Store.FK__scene_property_value__0000000000000729">
+          <AssociationSet Name="FK__scene_property_value__0000000000000630" Association="zvsLocalDBModel.Store.FK__scene_property_value__0000000000000630">
             <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
+          </AssociationSet>
+          <AssociationSet Name="FK__scheduled_tasks__0000000000000730" Association="zvsLocalDBModel.Store.FK__scheduled_tasks__0000000000000730">
+            <End Role="scenes" EntitySet="scenes" />
+            <End Role="scheduled_tasks" EntitySet="scheduled_tasks" />
           </AssociationSet>
         </EntityContainer>
         <EntityType Name="builtin_command_options">
@@ -432,10 +436,12 @@
             <PropertyRef Name="id" />
           </Key>
           <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
-          <Property Name="friendly_name" Type="nvarchar" Nullable="false" MaxLength="500" />
-          <Property Name="Enabled" Type="bit" Nullable="false" />
-          <Property Name="Scene_id" Type="int" Nullable="false" />
+          <Property Name="SceneID" Type="int" />
           <Property Name="Frequency" Type="int" />
+          <Property Name="friendly_name" Type="nvarchar" Nullable="false" MaxLength="500" />
+          <Property Name="isEnabled" Type="bit" Nullable="false" />
+          <Property Name="startTime" Type="datetime" />
+          <Property Name="sortOrder" Type="int" />
           <Property Name="RecurMonday" Type="bit" />
           <Property Name="RecurTuesday" Type="bit" />
           <Property Name="RecurWednesday" Type="bit" />
@@ -448,8 +454,6 @@
           <Property Name="RecurMonth" Type="int" />
           <Property Name="RecurDayofMonth" Type="int" />
           <Property Name="RecurSeconds" Type="int" />
-          <Property Name="StartTime" Type="datetime" />
-          <Property Name="sort_order" Type="int" />
           <Property Name="RecurEven" Type="bit" />
           <Property Name="RecurDay01" Type="bit" />
           <Property Name="RecurDay02" Type="bit" />
@@ -483,7 +487,7 @@
           <Property Name="RecurDay30" Type="bit" />
           <Property Name="RecurDay31" Type="bit" />
         </EntityType>
-        <Association Name="FK__builtin_command_options__00000000000004F1">
+        <Association Name="FK__builtin_command_options__00000000000003F8">
           <End Role="builtin_commands" Type="zvsLocalDBModel.Store.builtin_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -497,7 +501,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__builtin_command_que__00000000000004E1">
+        <Association Name="FK__builtin_command_que__00000000000003E8">
           <End Role="builtin_commands" Type="zvsLocalDBModel.Store.builtin_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -511,7 +515,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_command_options__0000000000000585">
+        <Association Name="FK__device_command_options__000000000000048C">
           <End Role="device_commands" Type="zvsLocalDBModel.Store.device_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -525,7 +529,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_command_que__0000000000000597">
+        <Association Name="FK__device_command_que__000000000000049E">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -539,7 +543,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_command_que__000000000000059B">
+        <Association Name="FK__device_command_que__00000000000004A2">
           <End Role="device_commands" Type="zvsLocalDBModel.Store.device_commands" Multiplicity="1" />
           <End Role="device_command_que" Type="zvsLocalDBModel.Store.device_command_que" Multiplicity="*" />
           <ReferentialConstraint>
@@ -551,7 +555,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_commands__0000000000000575">
+        <Association Name="FK__device_commands__000000000000047C">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -565,7 +569,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_property_options__00000000000005BB">
+        <Association Name="FK__device_property_options__00000000000004C2">
           <End Role="device_propertys" Type="zvsLocalDBModel.Store.device_propertys" Multiplicity="1" />
           <End Role="device_property_options" Type="zvsLocalDBModel.Store.device_property_options" Multiplicity="*" />
           <ReferentialConstraint>
@@ -577,7 +581,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_property_values__00000000000005CD">
+        <Association Name="FK__device_property_values__00000000000004D4">
           <End Role="device_propertys" Type="zvsLocalDBModel.Store.device_propertys" Multiplicity="1" />
           <End Role="device_property_values" Type="zvsLocalDBModel.Store.device_property_values" Multiplicity="*" />
           <ReferentialConstraint>
@@ -589,7 +593,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_property_values__00000000000005D1">
+        <Association Name="FK__device_property_values__00000000000004D8">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -603,7 +607,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_command_options__0000000000000608">
+        <Association Name="FK__device_type_command_options__000000000000050F">
           <End Role="device_type_commands" Type="zvsLocalDBModel.Store.device_type_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -617,7 +621,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_command_que__000000000000061A">
+        <Association Name="FK__device_type_command_que__0000000000000521">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -631,7 +635,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_command_que__000000000000061E">
+        <Association Name="FK__device_type_command_que__0000000000000525">
           <End Role="device_type_commands" Type="zvsLocalDBModel.Store.device_type_commands" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -645,7 +649,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_type_commands__00000000000005F8">
+        <Association Name="FK__device_type_commands__00000000000004FF">
           <End Role="device_types" Type="zvsLocalDBModel.Store.device_types" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -659,7 +663,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_types__000000000000052A">
+        <Association Name="FK__device_types__0000000000000431">
           <End Role="plugins" Type="zvsLocalDBModel.Store.plugins" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -673,7 +677,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_value_triggers__0000000000000673">
+        <Association Name="FK__device_value_triggers__000000000000057A">
           <End Role="device_values" Type="zvsLocalDBModel.Store.device_values" Multiplicity="1" />
           <End Role="device_value_triggers" Type="zvsLocalDBModel.Store.device_value_triggers" Multiplicity="*" />
           <ReferentialConstraint>
@@ -685,7 +689,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_value_triggers__0000000000000677">
+        <Association Name="FK__device_value_triggers__000000000000057E">
           <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="0..1" />
           <End Role="device_value_triggers" Type="zvsLocalDBModel.Store.device_value_triggers" Multiplicity="*" />
           <ReferentialConstraint>
@@ -697,7 +701,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__device_values__0000000000000654">
+        <Association Name="FK__device_values__000000000000055B">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -711,7 +715,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__devices__000000000000054B">
+        <Association Name="FK__devices__0000000000000452">
           <End Role="device_types" Type="zvsLocalDBModel.Store.device_types" Multiplicity="1" />
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="*" />
           <ReferentialConstraint>
@@ -723,7 +727,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__group_devices__0000000000000691">
+        <Association Name="FK__group_devices__0000000000000598">
           <End Role="groups" Type="zvsLocalDBModel.Store.groups" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -737,7 +741,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__group_devices__0000000000000695">
+        <Association Name="FK__group_devices__000000000000059C">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -751,7 +755,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__plugin_setting_options__00000000000006C0">
+        <Association Name="FK__plugin_setting_options__00000000000005C7">
           <End Role="plugin_settings" Type="zvsLocalDBModel.Store.plugin_settings" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -765,7 +769,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__plugin_settings__00000000000006B0">
+        <Association Name="FK__plugin_settings__00000000000005B7">
           <End Role="plugins" Type="zvsLocalDBModel.Store.plugins" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -779,7 +783,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_commands__00000000000006E7">
+        <Association Name="FK__scene_commands__00000000000005EE">
           <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -793,7 +797,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_commands__00000000000006EB">
+        <Association Name="FK__scene_commands__00000000000005F2">
           <End Role="devices" Type="zvsLocalDBModel.Store.devices" Multiplicity="0..1">
             <OnDelete Action="Cascade" />
           </End>
@@ -807,7 +811,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_property_option__0000000000000710">
+        <Association Name="FK__scene_property_option__0000000000000617">
           <End Role="scene_property" Type="zvsLocalDBModel.Store.scene_property" Multiplicity="1" />
           <End Role="scene_property_option" Type="zvsLocalDBModel.Store.scene_property_option" Multiplicity="*" />
           <ReferentialConstraint>
@@ -819,7 +823,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_property_value__0000000000000725">
+        <Association Name="FK__scene_property_value__000000000000062C">
           <End Role="scene_property" Type="zvsLocalDBModel.Store.scene_property" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -833,7 +837,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__scene_property_value__0000000000000729">
+        <Association Name="FK__scene_property_value__0000000000000630">
           <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
@@ -844,6 +848,18 @@
             </Principal>
             <Dependent Role="scene_property_value">
               <PropertyRef Name="scene_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__scheduled_tasks__0000000000000730">
+          <End Role="scenes" Type="zvsLocalDBModel.Store.scenes" Multiplicity="0..1" />
+          <End Role="scheduled_tasks" Type="zvsLocalDBModel.Store.scheduled_tasks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scenes">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scheduled_tasks">
+              <PropertyRef Name="SceneID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -880,7 +896,6 @@
           <EntitySet Name="scene_property_option" EntityType="zvsLocalDBModel.scene_property_option" />
           <EntitySet Name="scene_property_value" EntityType="zvsLocalDBModel.scene_property_value" />
           <EntitySet Name="scenes" EntityType="zvsLocalDBModel.scene" />
-          <EntitySet Name="scheduled_tasks" EntityType="zvsLocalDBModel.scheduled_tasks" />
           <AssociationSet Name="FK__builtin_command_options__0000000000000150" Association="zvsLocalDBModel.FK__builtin_command_options__0000000000000150">
             <End Role="builtin_commands" EntitySet="builtin_commands" />
             <End Role="builtin_command_options" EntitySet="builtin_command_options" />
@@ -989,7 +1004,12 @@
             <End Role="scenes" EntitySet="scenes" />
             <End Role="scene_property_value" EntitySet="scene_property_value" />
           </AssociationSet>
-        </EntityContainer>
+          <EntitySet Name="scheduled_tasks" EntityType="zvsLocalDBModel.scheduled_tasks" />
+          <AssociationSet Name="FK__scheduled_tasks__0000000000000730" Association="zvsLocalDBModel.FK__scheduled_tasks__0000000000000730">
+            <End Role="scene" EntitySet="scenes" />
+            <End Role="scheduled_tasks" EntitySet="scheduled_tasks" />
+          </AssociationSet>
+          </EntityContainer>
         <EntityType Name="builtin_command_options">
           <Key>
             <PropertyRef Name="id" />
@@ -1326,62 +1346,7 @@
           <NavigationProperty Name="device_value_triggers" Relationship="zvsLocalDBModel.FK__device_value_triggers__00000000000002D1" FromRole="scenes" ToRole="device_value_triggers" />
           <NavigationProperty Name="scene_commands" Relationship="zvsLocalDBModel.FK__scene_commands__0000000000000341" FromRole="scenes" ToRole="scene_commands" />
           <NavigationProperty Name="scene_property_value" Relationship="zvsLocalDBModel.FK__scene_property_value__0000000000000383" FromRole="scenes" ToRole="scene_property_value" />
-        </EntityType>
-        <EntityType Name="scheduled_tasks">
-          <Key>
-            <PropertyRef Name="id" />
-          </Key>
-          <Property Name="id" Type="Int32" Nullable="false" p1:StoreGeneratedPattern="Identity" />
-          <Property Name="friendly_name" Type="String" Nullable="false" MaxLength="500" Unicode="true" FixedLength="false" />
-          <Property Name="Enabled" Type="Boolean" Nullable="false" />
-          <Property Name="Scene_id" Type="Int32" Nullable="false" />
-          <Property Name="Frequency" Type="Int32" />
-          <Property Name="RecurMonday" Type="Boolean" />
-          <Property Name="RecurTuesday" Type="Boolean" />
-          <Property Name="RecurWednesday" Type="Boolean" />
-          <Property Name="RecurThursday" Type="Boolean" />
-          <Property Name="RecurFriday" Type="Boolean" />
-          <Property Name="RecurSaturday" Type="Boolean" />
-          <Property Name="RecurSunday" Type="Boolean" />
-          <Property Name="RecurDays" Type="Int32" />
-          <Property Name="RecurWeeks" Type="Int32" />
-          <Property Name="RecurMonth" Type="Int32" />
-          <Property Name="RecurDayofMonth" Type="Int32" />
-          <Property Name="RecurSeconds" Type="Int32" />
-          <Property Name="StartTime" Type="DateTime" Precision="3" />
-          <Property Name="sort_order" Type="Int32" />
-          <Property Name="RecurEven" Type="Boolean" />
-          <Property Name="RecurDay01" Type="Boolean" />
-          <Property Name="RecurDay02" Type="Boolean" />
-          <Property Name="RecurDay03" Type="Boolean" />
-          <Property Name="RecurDay04" Type="Boolean" />
-          <Property Name="RecurDay05" Type="Boolean" />
-          <Property Name="RecurDay06" Type="Boolean" />
-          <Property Name="RecurDay07" Type="Boolean" />
-          <Property Name="RecurDay08" Type="Boolean" />
-          <Property Name="RecurDay09" Type="Boolean" />
-          <Property Name="RecurDay10" Type="Boolean" />
-          <Property Name="RecurDay11" Type="Boolean" />
-          <Property Name="RecurDay12" Type="Boolean" />
-          <Property Name="RecurDay13" Type="Boolean" />
-          <Property Name="RecurDay14" Type="Boolean" />
-          <Property Name="RecurDay15" Type="Boolean" />
-          <Property Name="RecurDay16" Type="Boolean" />
-          <Property Name="RecurDay17" Type="Boolean" />
-          <Property Name="RecurDay18" Type="Boolean" />
-          <Property Name="RecurDay19" Type="Boolean" />
-          <Property Name="RecurDay20" Type="Boolean" />
-          <Property Name="RecurDay21" Type="Boolean" />
-          <Property Name="RecurDay22" Type="Boolean" />
-          <Property Name="RecurDay23" Type="Boolean" />
-          <Property Name="RecurDay24" Type="Boolean" />
-          <Property Name="RecurDay25" Type="Boolean" />
-          <Property Name="RecurDay26" Type="Boolean" />
-          <Property Name="RecurDay27" Type="Boolean" />
-          <Property Name="RecurDay28" Type="Boolean" />
-          <Property Name="RecurDay29" Type="Boolean" />
-          <Property Name="RecurDay30" Type="Boolean" />
-          <Property Name="RecurDay31" Type="Boolean" />
+          <NavigationProperty Name="scheduled_tasks" Relationship="zvsLocalDBModel.FK__scheduled_tasks__0000000000000730" FromRole="scene" ToRole="scheduled_tasks" />
         </EntityType>
         <Association Name="FK__builtin_command_options__0000000000000150">
           <End Role="builtin_commands" Type="zvsLocalDBModel.builtin_commands" Multiplicity="1">
@@ -1747,7 +1712,76 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        <EntityType Name="scheduled_tasks">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="Int32" Name="SceneID" />
+          <Property Type="Int32" Name="Frequency" />
+          <Property Type="String" Name="friendly_name" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="isEnabled" Nullable="false" />
+          <Property Type="DateTime" Name="startTime" Precision="3" />
+          <Property Type="Int32" Name="sortOrder" />
+          <Property Type="Boolean" Name="RecurMonday" />
+          <Property Type="Boolean" Name="RecurTuesday" />
+          <Property Type="Boolean" Name="RecurWednesday" />
+          <Property Type="Boolean" Name="RecurThursday" />
+          <Property Type="Boolean" Name="RecurFriday" />
+          <Property Type="Boolean" Name="RecurSaturday" />
+          <Property Type="Boolean" Name="RecurSunday" />
+          <Property Type="Int32" Name="RecurDays" />
+          <Property Type="Int32" Name="RecurWeeks" />
+          <Property Type="Int32" Name="RecurMonth" />
+          <Property Type="Int32" Name="RecurDayofMonth" />
+          <Property Type="Int32" Name="RecurSeconds" />
+          <Property Type="Boolean" Name="RecurEven" />
+          <Property Type="Boolean" Name="RecurDay01" />
+          <Property Type="Boolean" Name="RecurDay02" />
+          <Property Type="Boolean" Name="RecurDay03" />
+          <Property Type="Boolean" Name="RecurDay04" />
+          <Property Type="Boolean" Name="RecurDay05" />
+          <Property Type="Boolean" Name="RecurDay06" />
+          <Property Type="Boolean" Name="RecurDay07" />
+          <Property Type="Boolean" Name="RecurDay08" />
+          <Property Type="Boolean" Name="RecurDay09" />
+          <Property Type="Boolean" Name="RecurDay10" />
+          <Property Type="Boolean" Name="RecurDay11" />
+          <Property Type="Boolean" Name="RecurDay12" />
+          <Property Type="Boolean" Name="RecurDay13" />
+          <Property Type="Boolean" Name="RecurDay14" />
+          <Property Type="Boolean" Name="RecurDay15" />
+          <Property Type="Boolean" Name="RecurDay16" />
+          <Property Type="Boolean" Name="RecurDay17" />
+          <Property Type="Boolean" Name="RecurDay18" />
+          <Property Type="Boolean" Name="RecurDay19" />
+          <Property Type="Boolean" Name="RecurDay20" />
+          <Property Type="Boolean" Name="RecurDay21" />
+          <Property Type="Boolean" Name="RecurDay22" />
+          <Property Type="Boolean" Name="RecurDay23" />
+          <Property Type="Boolean" Name="RecurDay24" />
+          <Property Type="Boolean" Name="RecurDay25" />
+          <Property Type="Boolean" Name="RecurDay26" />
+          <Property Type="Boolean" Name="RecurDay27" />
+          <Property Type="Boolean" Name="RecurDay28" />
+          <Property Type="Boolean" Name="RecurDay29" />
+          <Property Type="Boolean" Name="RecurDay30" />
+          <Property Type="Boolean" Name="RecurDay31" />
+          <NavigationProperty Name="scene" Relationship="zvsLocalDBModel.FK__scheduled_tasks__0000000000000730" FromRole="scheduled_tasks" ToRole="scene" />
+        </EntityType>
+        <Association Name="FK__scheduled_tasks__0000000000000730">
+          <End Type="zvsLocalDBModel.scene" Role="scene" Multiplicity="0..1" />
+          <End Type="zvsLocalDBModel.scheduled_tasks" Role="scheduled_tasks" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="scene">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="scheduled_tasks">
+              <PropertyRef Name="SceneID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
@@ -2067,57 +2101,57 @@
           <EntitySetMapping Name="scheduled_tasks">
             <EntityTypeMapping TypeName="zvsLocalDBModel.scheduled_tasks">
               <MappingFragment StoreEntitySet="scheduled_tasks">
-                <ScalarProperty Name="id" ColumnName="id" />
-                <ScalarProperty Name="friendly_name" ColumnName="friendly_name" />
-                <ScalarProperty Name="Enabled" ColumnName="Enabled" />
-                <ScalarProperty Name="Scene_id" ColumnName="Scene_id" />
-                <ScalarProperty Name="Frequency" ColumnName="Frequency" />
-                <ScalarProperty Name="RecurMonday" ColumnName="RecurMonday" />
-                <ScalarProperty Name="RecurTuesday" ColumnName="RecurTuesday" />
-                <ScalarProperty Name="RecurWednesday" ColumnName="RecurWednesday" />
-                <ScalarProperty Name="RecurThursday" ColumnName="RecurThursday" />
-                <ScalarProperty Name="RecurFriday" ColumnName="RecurFriday" />
-                <ScalarProperty Name="RecurSaturday" ColumnName="RecurSaturday" />
-                <ScalarProperty Name="RecurSunday" ColumnName="RecurSunday" />
-                <ScalarProperty Name="RecurDays" ColumnName="RecurDays" />
-                <ScalarProperty Name="RecurWeeks" ColumnName="RecurWeeks" />
-                <ScalarProperty Name="RecurMonth" ColumnName="RecurMonth" />
-                <ScalarProperty Name="RecurDayofMonth" ColumnName="RecurDayofMonth" />
-                <ScalarProperty Name="RecurSeconds" ColumnName="RecurSeconds" />
-                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
-                <ScalarProperty Name="sort_order" ColumnName="sort_order" />
-                <ScalarProperty Name="RecurEven" ColumnName="RecurEven" />
-                <ScalarProperty Name="RecurDay01" ColumnName="RecurDay01" />
-                <ScalarProperty Name="RecurDay02" ColumnName="RecurDay02" />
-                <ScalarProperty Name="RecurDay03" ColumnName="RecurDay03" />
-                <ScalarProperty Name="RecurDay04" ColumnName="RecurDay04" />
-                <ScalarProperty Name="RecurDay05" ColumnName="RecurDay05" />
-                <ScalarProperty Name="RecurDay06" ColumnName="RecurDay06" />
-                <ScalarProperty Name="RecurDay07" ColumnName="RecurDay07" />
-                <ScalarProperty Name="RecurDay08" ColumnName="RecurDay08" />
-                <ScalarProperty Name="RecurDay09" ColumnName="RecurDay09" />
-                <ScalarProperty Name="RecurDay10" ColumnName="RecurDay10" />
-                <ScalarProperty Name="RecurDay11" ColumnName="RecurDay11" />
-                <ScalarProperty Name="RecurDay12" ColumnName="RecurDay12" />
-                <ScalarProperty Name="RecurDay13" ColumnName="RecurDay13" />
-                <ScalarProperty Name="RecurDay14" ColumnName="RecurDay14" />
-                <ScalarProperty Name="RecurDay15" ColumnName="RecurDay15" />
-                <ScalarProperty Name="RecurDay16" ColumnName="RecurDay16" />
-                <ScalarProperty Name="RecurDay17" ColumnName="RecurDay17" />
-                <ScalarProperty Name="RecurDay18" ColumnName="RecurDay18" />
-                <ScalarProperty Name="RecurDay19" ColumnName="RecurDay19" />
-                <ScalarProperty Name="RecurDay20" ColumnName="RecurDay20" />
-                <ScalarProperty Name="RecurDay21" ColumnName="RecurDay21" />
-                <ScalarProperty Name="RecurDay22" ColumnName="RecurDay22" />
-                <ScalarProperty Name="RecurDay23" ColumnName="RecurDay23" />
-                <ScalarProperty Name="RecurDay24" ColumnName="RecurDay24" />
-                <ScalarProperty Name="RecurDay25" ColumnName="RecurDay25" />
-                <ScalarProperty Name="RecurDay26" ColumnName="RecurDay26" />
-                <ScalarProperty Name="RecurDay27" ColumnName="RecurDay27" />
-                <ScalarProperty Name="RecurDay28" ColumnName="RecurDay28" />
-                <ScalarProperty Name="RecurDay29" ColumnName="RecurDay29" />
-                <ScalarProperty Name="RecurDay30" ColumnName="RecurDay30" />
                 <ScalarProperty Name="RecurDay31" ColumnName="RecurDay31" />
+                <ScalarProperty Name="RecurDay30" ColumnName="RecurDay30" />
+                <ScalarProperty Name="RecurDay29" ColumnName="RecurDay29" />
+                <ScalarProperty Name="RecurDay28" ColumnName="RecurDay28" />
+                <ScalarProperty Name="RecurDay27" ColumnName="RecurDay27" />
+                <ScalarProperty Name="RecurDay26" ColumnName="RecurDay26" />
+                <ScalarProperty Name="RecurDay25" ColumnName="RecurDay25" />
+                <ScalarProperty Name="RecurDay24" ColumnName="RecurDay24" />
+                <ScalarProperty Name="RecurDay23" ColumnName="RecurDay23" />
+                <ScalarProperty Name="RecurDay22" ColumnName="RecurDay22" />
+                <ScalarProperty Name="RecurDay21" ColumnName="RecurDay21" />
+                <ScalarProperty Name="RecurDay20" ColumnName="RecurDay20" />
+                <ScalarProperty Name="RecurDay19" ColumnName="RecurDay19" />
+                <ScalarProperty Name="RecurDay18" ColumnName="RecurDay18" />
+                <ScalarProperty Name="RecurDay17" ColumnName="RecurDay17" />
+                <ScalarProperty Name="RecurDay16" ColumnName="RecurDay16" />
+                <ScalarProperty Name="RecurDay15" ColumnName="RecurDay15" />
+                <ScalarProperty Name="RecurDay14" ColumnName="RecurDay14" />
+                <ScalarProperty Name="RecurDay13" ColumnName="RecurDay13" />
+                <ScalarProperty Name="RecurDay12" ColumnName="RecurDay12" />
+                <ScalarProperty Name="RecurDay11" ColumnName="RecurDay11" />
+                <ScalarProperty Name="RecurDay10" ColumnName="RecurDay10" />
+                <ScalarProperty Name="RecurDay09" ColumnName="RecurDay09" />
+                <ScalarProperty Name="RecurDay08" ColumnName="RecurDay08" />
+                <ScalarProperty Name="RecurDay07" ColumnName="RecurDay07" />
+                <ScalarProperty Name="RecurDay06" ColumnName="RecurDay06" />
+                <ScalarProperty Name="RecurDay05" ColumnName="RecurDay05" />
+                <ScalarProperty Name="RecurDay04" ColumnName="RecurDay04" />
+                <ScalarProperty Name="RecurDay03" ColumnName="RecurDay03" />
+                <ScalarProperty Name="RecurDay02" ColumnName="RecurDay02" />
+                <ScalarProperty Name="RecurDay01" ColumnName="RecurDay01" />
+                <ScalarProperty Name="RecurEven" ColumnName="RecurEven" />
+                <ScalarProperty Name="RecurSeconds" ColumnName="RecurSeconds" />
+                <ScalarProperty Name="RecurDayofMonth" ColumnName="RecurDayofMonth" />
+                <ScalarProperty Name="RecurMonth" ColumnName="RecurMonth" />
+                <ScalarProperty Name="RecurWeeks" ColumnName="RecurWeeks" />
+                <ScalarProperty Name="RecurDays" ColumnName="RecurDays" />
+                <ScalarProperty Name="RecurSunday" ColumnName="RecurSunday" />
+                <ScalarProperty Name="RecurSaturday" ColumnName="RecurSaturday" />
+                <ScalarProperty Name="RecurFriday" ColumnName="RecurFriday" />
+                <ScalarProperty Name="RecurThursday" ColumnName="RecurThursday" />
+                <ScalarProperty Name="RecurWednesday" ColumnName="RecurWednesday" />
+                <ScalarProperty Name="RecurTuesday" ColumnName="RecurTuesday" />
+                <ScalarProperty Name="RecurMonday" ColumnName="RecurMonday" />
+                <ScalarProperty Name="sortOrder" ColumnName="sortOrder" />
+                <ScalarProperty Name="startTime" ColumnName="startTime" />
+                <ScalarProperty Name="isEnabled" ColumnName="isEnabled" />
+                <ScalarProperty Name="friendly_name" ColumnName="friendly_name" />
+                <ScalarProperty Name="Frequency" ColumnName="Frequency" />
+                <ScalarProperty Name="SceneID" ColumnName="SceneID" />
+                <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

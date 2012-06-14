@@ -4,27 +4,7 @@ CREATE TABLE scenes (
   sort_order     integer DEFAULT NULL,
   is_running     bit NOT NULL DEFAULT 0
 );
-CREATE TABLE scheduled_tasks (
-  id               integer PRIMARY KEY IDENTITY NOT NULL,
-  friendly_name    nvarchar(500) NOT NULL,
-  Enabled          bit NOT NULL,
-  Scene_id         integer NOT NULL,
-  Frequency        integer DEFAULT NULL,
-  RecurMonday      bit DEFAULT NULL,
-  RecurTuesday     bit DEFAULT NULL,
-  RecurWednesday   bit DEFAULT NULL,
-  RecurThursday    bit DEFAULT NULL,
-  RecurFriday      bit DEFAULT NULL,
-  RecurSaturday    bit DEFAULT NULL,
-  RecurSunday      bit DEFAULT NULL,
-  RecurDays        integer DEFAULT NULL,
-  RecurWeeks       integer DEFAULT NULL,
-  RecurMonth       integer DEFAULT NULL,
-  RecurDayofMonth  integer DEFAULT NULL,
-  RecurSeconds     integer DEFAULT NULL,
-  StartTime        datetime DEFAULT NULL,
-  sort_order       integer DEFAULT NULL
-, RecurEven bit DEFAULT NULL, RecurDay01 bit DEFAULT NULL, RecurDay02 bit DEFAULT NULL, RecurDay03 bit DEFAULT NULL, RecurDay04 bit DEFAULT NULL, RecurDay05 bit DEFAULT NULL, RecurDay06 bit DEFAULT NULL, RecurDay07 bit DEFAULT NULL, RecurDay08 bit DEFAULT NULL, RecurDay09 bit DEFAULT NULL, RecurDay10 bit DEFAULT NULL, RecurDay11 bit DEFAULT NULL, RecurDay12 bit DEFAULT NULL, RecurDay13 bit DEFAULT NULL, RecurDay14 bit DEFAULT NULL, RecurDay15 bit DEFAULT NULL, RecurDay16 bit DEFAULT NULL, RecurDay17 bit DEFAULT NULL, RecurDay18 bit DEFAULT NULL, RecurDay19 bit DEFAULT NULL, RecurDay20 bit DEFAULT NULL, RecurDay21 bit DEFAULT NULL, RecurDay22 bit DEFAULT NULL, RecurDay23 bit DEFAULT NULL, RecurDay24 bit DEFAULT NULL, RecurDay25 bit DEFAULT NULL, RecurDay26 bit DEFAULT NULL, RecurDay27 bit DEFAULT NULL, RecurDay28 bit DEFAULT NULL, RecurDay29 bit DEFAULT NULL, RecurDay30 bit DEFAULT NULL, RecurDay31 bit DEFAULT NULL);
+
 
 
 
@@ -368,3 +348,61 @@ CREATE TABLE scene_property_value (
     ON DELETE CASCADE
     ON UPDATE NO ACTION
 );
+
+CREATE TABLE scheduled_tasks (
+  id               integer PRIMARY KEY IDENTITY NOT NULL,
+  SceneID          integer DEFAULT NULL,
+  Frequency        integer DEFAULT NULL,
+  friendly_name    nvarchar(500) NOT NULL,
+  isEnabled        bit NOT NULL,
+  startTime        datetime DEFAULT NULL,
+  sortOrder        integer DEFAULT NULL,     
+  RecurMonday      bit DEFAULT NULL,
+  RecurTuesday     bit DEFAULT NULL,
+  RecurWednesday   bit DEFAULT NULL,
+  RecurThursday    bit DEFAULT NULL,
+  RecurFriday      bit DEFAULT NULL,
+  RecurSaturday    bit DEFAULT NULL,
+  RecurSunday      bit DEFAULT NULL,
+  RecurDays        integer DEFAULT NULL,
+  RecurWeeks       integer DEFAULT NULL,
+  RecurMonth       integer DEFAULT NULL,
+  RecurDayofMonth  integer DEFAULT NULL,
+  RecurSeconds     integer DEFAULT NULL, 
+  RecurEven bit DEFAULT NULL, 
+  RecurDay01 bit DEFAULT NULL, 
+  RecurDay02 bit DEFAULT NULL, 
+  RecurDay03 bit DEFAULT NULL, 
+  RecurDay04 bit DEFAULT NULL, 
+  RecurDay05 bit DEFAULT NULL, 
+  RecurDay06 bit DEFAULT NULL, 
+  RecurDay07 bit DEFAULT NULL, 
+  RecurDay08 bit DEFAULT NULL, 
+  RecurDay09 bit DEFAULT NULL, 
+  RecurDay10 bit DEFAULT NULL, 
+  RecurDay11 bit DEFAULT NULL, 
+  RecurDay12 bit DEFAULT NULL, 
+  RecurDay13 bit DEFAULT NULL, 
+  RecurDay14 bit DEFAULT NULL, 
+  RecurDay15 bit DEFAULT NULL, 
+  RecurDay16 bit DEFAULT NULL, 
+  RecurDay17 bit DEFAULT NULL, 
+  RecurDay18 bit DEFAULT NULL, 
+  RecurDay19 bit DEFAULT NULL, 
+  RecurDay20 bit DEFAULT NULL, 
+  RecurDay21 bit DEFAULT NULL,
+  RecurDay22 bit DEFAULT NULL, 
+  RecurDay23 bit DEFAULT NULL, 
+  RecurDay24 bit DEFAULT NULL, 
+  RecurDay25 bit DEFAULT NULL, 
+  RecurDay26 bit DEFAULT NULL, 
+  RecurDay27 bit DEFAULT NULL, 
+  RecurDay28 bit DEFAULT NULL, 
+  RecurDay29 bit DEFAULT NULL, 
+  RecurDay30 bit DEFAULT NULL, 
+  RecurDay31 bit DEFAULT NULL,
+  FOREIGN KEY (SceneID)
+   REFERENCES scenes(id)
+   ON DELETE SET NULL
+   ON UPDATE NO ACTION
+	);

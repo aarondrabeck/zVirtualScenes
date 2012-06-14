@@ -74,7 +74,7 @@
                 </DataGridTextColumn>
 
                 <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" 
-                                        Binding="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
+                                        Binding="{Binding isEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
                 </DataGridCheckBoxColumn>
             </DataGrid.Columns>
         </DataGrid>
@@ -87,8 +87,10 @@
                 <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource dataFromEnum}}"   SelectedItem="{Binding FrequencyEnum}" 
                           VerticalAlignment="Top" Margin="25,49,0,0" HorizontalAlignment="Left" Width="234"></ComboBox>
                 <TextBlock Text="Scene" VerticalAlignment="Top" Margin="25,80,-25,0"/>
-                <ComboBox x:Name="SceneCmbBx_Copy" SelectedItem="{Binding FrequencyEnum}" VerticalAlignment="Top" Margin="25,98,0,0" HorizontalAlignment="Left" 
-                          Width="234" DisplayMemberPath="friendly_name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" SelectedValuePath="friendly_name"/>
+                
+                
+                <ComboBox x:Name="SceneCmbBx_Copy" SelectedItem="{Binding scene}" VerticalAlignment="Top" Margin="25,98,0,0" HorizontalAlignment="Left" 
+                          Width="234" DisplayMemberPath="friendly_name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" />
 
             </Grid>
         </Border>
