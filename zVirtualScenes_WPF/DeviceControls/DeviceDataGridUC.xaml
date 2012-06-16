@@ -34,17 +34,20 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+
     </UserControl.Resources>
 
     <Grid PreviewKeyDown="Grid_PreviewKeyDown_1" DataContext="{StaticResource devicesViewSource}">
-        <Border  VerticalAlignment="Top" Height="30" BorderThickness="1,1,1,0" Margin="0" BorderBrush="#FF688CAF" >
+        <Border  CornerRadius="10,10,0,0" VerticalAlignment="Top" Height="30" BorderThickness="1,1,1,0" Margin="0" BorderBrush="#FF688CAF" >
+<Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="0.969"/>
+                    <GradientStop Color="#FFF2F3F5"/>
+                </LinearGradientBrush>
+            </Border.Background>
             <Grid>
-                <Grid.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0.969"/>
-                        <GradientStop Color="#FFF2F3F5"/>
-                    </LinearGradientBrush>
-                </Grid.Background>
+               
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="175"  />
@@ -61,7 +64,7 @@
         <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False" 
                   ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" RowEditEnding="DeviceGrid_RowEditEnding" 
-                  RowHeaderWidth="0" AllowDrop="True" Margin="0,30,0,0" >
+                  RowHeaderWidth="0" AllowDrop="True" Margin="0,30,0,0"   Background="#FFF9F9F9"  >
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn MaxWidth="15" MinWidth="15" Width="15"  Header="" CanUserResize="False" CanUserReorder="False">
@@ -96,7 +99,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                
+
                 <DataGridTextColumn x:Name="DeviceTypeCol" CellStyle="{StaticResource Body_Hoz_Center}" Width="150" MinWidth="50" Header="Type" 
                                     Binding="{Binding Path=device_types.friendly_name}" IsReadOnly="True" >
                     <DataGridTextColumn.ElementStyle>
@@ -138,9 +141,9 @@
                     </DataGridTemplateColumn.CellTemplate>
 
                 </DataGridTemplateColumn>
-            
-                <DataGridTemplateColumn x:Name="LevelCol" Header="Status" Width="160" MinWidth="160" MaxWidth="160" CanUserResize="False" 
-                                        CanUserSort="True" SortMemberPath="current_level_int" IsReadOnly="True">
+
+                <DataGridTemplateColumn  x:Name="LevelCol" Header="Status" Width="160" MinWidth="160" MaxWidth="160" CanUserResize="False" 
+                                        CanUserSort="True" SortMemberPath="current_level_int" IsReadOnly="True" >
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <Grid Margin="5,0">
@@ -148,10 +151,22 @@
                                     <ColumnDefinition Width="55"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Name="LevelTxtBlock"  Text="{Binding current_level_txt}" FontSize="18" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
+                                <TextBlock Name="LevelTxtBlock"  Text="{Binding current_level_txt, NotifyOnTargetUpdated=True}" Background="Transparent" FontSize="18" VerticalAlignment="Center" TextAlignment="Center">
+                                    <TextBlock.Triggers>
+                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0" To="LightBlue" />
+                                                    <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0.5" From="LightBlue" To="Transparent" BeginTime="0:0:0.3" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </TextBlock.Triggers>
+                                </TextBlock>
                                 <ProgressBar  Name="LevelProgressBr" Value="{Binding current_level_int}" Grid.Column="1" Height="20" Opacity="6" Margin="3,0,0,0" />
                             </Grid>
                             <DataTemplate.Triggers>
+
                                 <DataTrigger Binding="{Binding Path=device_types.name}" Value="THERMOSTAT">
                                     <Setter TargetName="LevelProgressBr" Property="Foreground" Value="#FF0088DE"/>
                                 </DataTrigger>

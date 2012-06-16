@@ -32,7 +32,15 @@ namespace zVirtualScenes_WPF
                 }));
             };
 
-            ScheduledTaskManager.onScheduledTaskStart += (sender, args) =>
+            ScheduledTaskManager.onScheduledTaskBegin += (sender, args) =>
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Scheduled Task Manager");
+                }));
+            };
+
+            ScheduledTaskManager.onScheduledTaskEnd += (sender, args) =>
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {

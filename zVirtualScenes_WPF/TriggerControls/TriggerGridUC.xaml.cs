@@ -120,6 +120,7 @@ namespace zVirtualScenes_WPF.TriggerControls
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
             device_value_triggers trigger = new device_value_triggers();
+            trigger.Name = "New Trigger";
             TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
             new_window.Owner = Application.Current.MainWindow;
             new_window.Title = "Add Trigger";

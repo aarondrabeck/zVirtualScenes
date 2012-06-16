@@ -11,10 +11,10 @@ namespace zVirtualScenesModel
     {
         public enum frequencys
         {
-            Daily = 0,
-            Weekly = 1,
             Once = 2,
             Seconds = 3,
+            Daily = 0,
+            Weekly = 1,
             Monthly = 4
         }        
     }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel.Composition;
 using System.Windows.Forms;
-using zVirtualScenesAPI;
-using zVirtualScenesCommon.Entity;
-using zVirtualScenesCommon;
+using zVirtualScenes;
+using zVirtualScenesModel;
+using System.ComponentModel;
 
 
 namespace GlobalHotKeyPlugin
@@ -22,9 +22,10 @@ namespace GlobalHotKeyPlugin
                "Global Hot-key Plugin",
                 "This plug-in will allow you to map keyboard shortcuts to scenes."
                 ) { }
-       
+
         public override void Initialize()
         {
+
             scene_property hotkeypropert = new scene_property
             {
                 name = "GLOBALHOTKEY",
@@ -33,25 +34,28 @@ namespace GlobalHotKeyPlugin
                 defualt_value = "None",
                 value_data_type = (int)Data_Types.LIST
             };
-            
+
             foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
             {
                 hotkeypropert.scene_property_option.Add(new scene_property_option { options = option.Replace('_', '+') });
             }
 
-            scene_property.DefineOrUpdateProperty(hotkeypropert);
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            {
+                scene_property.AddOrEdit(hotkeypropert, context);
+            }
 
         }
 
-        protected override bool StartPlugin()
+        protected override void StartPlugin()
         {
-            int success = 0; 
-            int errors = 0; 
+            int success = 0;
+            int errors = 0;
             #region Register Global Hot Keys
             try
             {
                 hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D0)) { success++; } else { errors++; }; 
+                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D0)) { success++; } else { errors++; };
                 if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D1)) { success++; } else { errors++; };
                 if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D2)) { success++; } else { errors++; };
                 if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D3)) { success++; } else { errors++; };
@@ -94,17 +98,16 @@ namespace GlobalHotKeyPlugin
             }
             #endregion
 
-            WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", this.Friendly_Name, success , errors));
+            WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", this.Friendly_Name, success, errors));
 
             IsReady = true;
-            return true;
         }
 
-        protected override bool StopPlugin()
+        protected override void StopPlugin()
         {
+            hook.KeyPressed -= new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
             WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
             IsReady = false;
-            return true;
         }
 
         protected override void SettingChanged(string settingName, string settingValue)
@@ -130,32 +133,62 @@ namespace GlobalHotKeyPlugin
         public override bool DeactivateGroup(int groupID)
         {
             return true;
-        }     
+        }
 
         private void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
+
             string modifiers = e.Modifier.ToString().Replace(", ", "_");
             string KeysPresseed = modifiers + "_" + e.Key.ToString();
 
             if (IsReady)
             {
-                using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += (s, a) =>
                 {
-                    foreach (scene scene in db.scenes)
+                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                     {
-                        string sceneHotKey = scene_property_value.GetPropertyValue(db, scene.id, "GLOBALHOTKEY");
-
-                        if (!string.IsNullOrEmpty(sceneHotKey))
+                        foreach (scene scene in context.scenes)
                         {
-                            if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                            string sceneHotKey = scene_property_value.GetPropertyValue(context, scene.id, "GLOBALHOTKEY");
+
+                            if (!string.IsNullOrEmpty(sceneHotKey))
                             {
-                                string result = scene.RunScene(db);
-                                WriteToLog(Urgency.INFO, "Global HotKey (" + KeysPresseed + "): " + result);
+                                if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+                                {
+                                    SceneRunner sr = new SceneRunner();
+                                    SceneRunner.onSceneRunEventHandler startHandler = null;
+                                    startHandler = (send, args) =>
+                                    {
+                                        if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                        {
+                                            SceneRunner.onSceneRunBegin -= startHandler;
+                                            WriteToLog(Urgency.INFO, string.Format("Global HotKey ({0}): {1}", KeysPresseed, args.Details));
+
+                                            #region LISTEN FOR ENDING
+                                            SceneRunner.onSceneRunEventHandler handler = null;
+                                            handler = (se, end_args) =>
+                                            {
+                                                if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                                {
+                                                    SceneRunner.onSceneRunComplete -= handler;
+                                                    WriteToLog(Urgency.INFO, string.Format("Global HotKey ({0}): {1}", KeysPresseed, end_args.Details));
+                                                }
+                                            };
+                                            SceneRunner.onSceneRunComplete += handler;
+                                            #endregion
+                                        }
+                                    };
+                                    SceneRunner.onSceneRunBegin += startHandler;
+                                    sr.RunScene(scene.id);
+                                }
                             }
                         }
                     }
-                }
+                };
+                bw.RunWorkerAsync();
             }
+
         }
 
         public enum CustomHotKeys

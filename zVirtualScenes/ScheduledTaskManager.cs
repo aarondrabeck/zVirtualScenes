@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Windows.Data;
 using System.Windows.Threading;
 using zVirtualScenesModel;
 
@@ -19,7 +21,7 @@ namespace zVirtualScenes
         {
             public string Details { get; private set; }
             public int TaskID { get; private set; }
-            public bool hasErrors { get; private set; }  
+            public bool hasErrors { get; private set; }
 
             public onScheduledTaskStartEventArgs(int TaskID, string Details, bool hasErrors)
             {
@@ -31,7 +33,8 @@ namespace zVirtualScenes
         /// <summary>
         /// Called when a scene has been called to be executed.
         /// </summary>
-        public static event onScheduledTaskEventHandler onScheduledTaskStart;
+        public static event onScheduledTaskEventHandler onScheduledTaskBegin;
+        public static event onScheduledTaskEventHandler onScheduledTaskEnd;
         #endregion
 
         public ScheduledTaskManager()
@@ -40,12 +43,14 @@ namespace zVirtualScenes
 
             context.scheduled_tasks.ToList();
 
-            //scheduled_tasks.onContextUpdated += scheduled_tasks_onContextUpdated;
-
+            //Keep the local context in sync with other contexts
+            zvsLocalDBEntities.onScheduledTasksChanged += zvsLocalDBEntities_onScheduledTasksChanged;
+            
             TaskTimer = new Timer((state) =>
-            {
+            {                
                 foreach (scheduled_tasks task in context.scheduled_tasks.Local)
                 {
+                    #region Actions
                     if (task.isEnabled)
                     {
                         if (task.Frequency.HasValue)
@@ -54,20 +59,20 @@ namespace zVirtualScenes
                             {
                                 case scheduled_tasks.frequencys.Seconds:
                                     {
-                                        if (task.startTime.HasValue)
+                                        if (task.startTime.HasValue && task.RecurSeconds.Value > 0)
                                         {
                                             int sec = (int)(DateTime.Now - task.startTime.Value).TotalSeconds;
-                                            if (sec % task.RecurSeconds == 0)
+                                            if (sec % task.RecurSeconds.Value == 0)
                                                 RunTask(task);
                                         }
                                         break;
                                     }
                                 case scheduled_tasks.frequencys.Daily:
                                     {
-                                        if (task.startTime.HasValue)
+                                        if (task.startTime.HasValue && task.RecurDays.HasValue && task.RecurDays.Value > 0)
                                         {
                                             //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
-                                            if (task.RecurDays > 0 && ((DateTime.Now.Date - task.startTime.Value.Date).TotalDays % task.RecurDays == 0))
+                                            if (task.RecurDays.Value > 0 && ((DateTime.Now.Date - task.startTime.Value.Date).TotalDays % task.RecurDays.Value == 0))
                                             {
                                                 TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                                 TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
@@ -81,9 +86,9 @@ namespace zVirtualScenes
                                     }
                                 case scheduled_tasks.frequencys.Weekly:
                                     {
-                                        if (task.startTime.HasValue)
+                                        if (task.startTime.HasValue && task.RecurWeeks.HasValue && task.RecurWeeks.Value > 0)
                                         {
-                                            if (task.RecurWeeks > 0 && (((Int32)(DateTime.Now.Date - task.startTime.Value.Date).TotalDays / 7) % task.RecurWeeks == 0))  //IF RUN THIS WEEK
+                                            if (task.RecurWeeks.Value > 0 && (((Int32)(DateTime.Now.Date - task.startTime.Value.Date).TotalDays / 7) % task.RecurWeeks.Value == 0))  //IF RUN THIS WEEK
                                             {
                                                 if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                                 {
@@ -99,11 +104,11 @@ namespace zVirtualScenes
                                     }
                                 case scheduled_tasks.frequencys.Monthly:
                                     {
-                                        if (task.startTime.HasValue)
+                                        if (task.startTime.HasValue && task.RecurMonth.HasValue && task.RecurMonth.Value > 0)
                                         {
                                             int monthsapart = ((DateTime.Now.Year - task.startTime.Value.Year) * 12) + DateTime.Now.Month - task.startTime.Value.Month;
                                             //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
-                                            if (task.RecurMonth > 0 && monthsapart > -1 && monthsapart % task.RecurMonth == 0)  //IF RUN THIS Month
+                                            if (task.RecurMonth.Value > 0 && monthsapart > -1 && monthsapart % task.RecurMonth.Value == 0)  //IF RUN THIS Month
                                             {
                                                 if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
                                                 {
@@ -133,22 +138,42 @@ namespace zVirtualScenes
                             }
                         }
                     }
-                }
+                    #endregion
+                }               
             }, null, 5000, 1000);
+
         }
 
         public void Dispose()
         {
-            //scheduled_tasks.onContextUpdated -= scheduled_tasks_onContextUpdated;
+            zvsLocalDBEntities.onScheduledTasksChanged -= zvsLocalDBEntities_onScheduledTasksChanged;
             context.Dispose();
             TaskTimer.Dispose();
         }
 
-        void scheduled_tasks_onContextUpdated(object sender, EventArgs args)
+        void zvsLocalDBEntities_onScheduledTasksChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
-            context.scheduled_tasks.ToList();
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (s, a) =>
+            {
+                if (context != null)
+                {
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.scheduled_tasks.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<scheduled_tasks>())
+                            ent.Reload();
+                    }
+                }
+            };
+            bw.RunWorkerAsync();
         }
-
+                   
         private bool ShouldRunThisDayOfMonth(scheduled_tasks task)
         {
             switch (DateTime.Now.Day)
@@ -256,32 +281,55 @@ namespace zVirtualScenes
 
             if (scene == null)
             {
-                if (onScheduledTaskStart != null)
+                if (onScheduledTaskBegin != null)
                 {
-                    onScheduledTaskStart(this, new onScheduledTaskStartEventArgs(task.id,
+                    onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(task.id,
                         string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", task.friendly_name, task.SceneID)
                         , true));
                 }
             }
             else
             {
+                SceneRunner sr = new SceneRunner();
+
                 SceneRunner.onSceneRunEventHandler startHandler = null;
                 startHandler = (s, args) =>
                 {
-                    if (args.SceneID == scene.id)
+                    if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
                     {
                         SceneRunner.onSceneRunBegin -= startHandler;
 
-                        if (onScheduledTaskStart != null)
+                        if (onScheduledTaskBegin != null)
                         {
-                            onScheduledTaskStart(this, new onScheduledTaskStartEventArgs(task.id,
-                                string.Format("Scheduled task '{0}' {1}", task.friendly_name, args.Details)
+                            onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(task.id,
+                                string.Format("Task '{0}' started. Result: {1}", task.friendly_name, args.Details)
                                 , false));
-                        }  
+                        }
+
+                        #region LISTEN FOR ENDING
+                        SceneRunner.onSceneRunEventHandler handler = null;
+                        handler = (se, end_args) =>
+                        {
+                            if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                            {
+                                SceneRunner.onSceneRunComplete -= handler;
+
+                                if (onScheduledTaskEnd != null)
+                                {
+                                    onScheduledTaskEnd(this, new onScheduledTaskStartEventArgs(task.id,
+                                        string.Format("Task '{0}' ended. Result: {1}", task.friendly_name, end_args.Details)
+                                        , end_args.Errors));
+                                }
+                            }
+                        };
+                        SceneRunner.onSceneRunComplete += handler;
+                        #endregion
                     }
+
+
                 };
                 SceneRunner.onSceneRunBegin += startHandler;
-                SceneRunner sr = new SceneRunner();
+                
                 sr.RunScene(scene.id);
             }
         }
@@ -355,5 +403,5 @@ namespace zVirtualScenes
 
             return WeekCount;
         }
-    }
+    }    
 }

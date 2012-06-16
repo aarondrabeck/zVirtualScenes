@@ -7,11 +7,11 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("zVirtualScenes")]
+[assembly: AssemblyTitle("zVirtualScenes GUI")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Drabeck Solutions")]
-[assembly: AssemblyProduct("zVirtualScenes")]
+[assembly: AssemblyProduct("zVirtualScenes GUI")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

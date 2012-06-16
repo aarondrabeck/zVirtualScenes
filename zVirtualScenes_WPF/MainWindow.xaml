@@ -33,27 +33,71 @@
             </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
+<MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                 <Separator />
                 <MenuItem Header="Plugin Manager" Click="MenuItem_Click_1" />
             </MenuItem>
         </Menu>
         <TabControl>
-            <TabItem Header="Devices">
+            <TabItem >
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Images/radio.png"  />
+                        <TextBlock Text="Devices" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
                 <Grid>
                     <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />                    
                 </Grid>
             </TabItem>
-            <TabItem Header="Scenes">
+            <TabItem>
+<TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Images/scene64.png"  />
+                        <TextBlock Text="Scenes" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
 
                 <SceneControls:SceneCreator x:Name="SceneControl" />
 
             </TabItem>
-            <TabItem Header="Triggers">
+            <TabItem >
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Images/trigger.png"  />
+                        <TextBlock Text="Triggers" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
                 <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
             </TabItem>
-            <TabItem Header="Log">
+            <TabItem>
+                
+<TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Images/scheduled_task.png"  />
+                        <TextBlock Text="Scheduled Tasks" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
+                <ScheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></ScheduledTaskControls:ScheduledTaskCreator>
+            </TabItem>
+            <TabItem >
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="18" Source="Images/log.png"  />
+                        <TextBlock Text="Log" Margin="2,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </TabItem.Header>
                 <Grid DataContext="{StaticResource ListViewSource}">
-                    <DataGrid  x:Name="logListView" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
+<Border VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
+                        <Border.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="White" Offset="0.969"/>
+                                <GradientStop Color="#FFF2F3F5"/>
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Logs" VerticalAlignment="Center" Margin="5,0,0,0" />
+                    </Border>
+                    <DataGrid  x:Name="logListView"  Margin="0,25,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
                         <DataGrid.Columns>
                             <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
@@ -64,9 +108,7 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Scheduled Tasks">
-                <ScheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></ScheduledTaskControls:ScheduledTaskCreator>
-            </TabItem>
+            
 
         </TabControl>
 

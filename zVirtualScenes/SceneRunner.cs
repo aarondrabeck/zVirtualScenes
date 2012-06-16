@@ -18,6 +18,16 @@ namespace zVirtualScenes
         private int ExecutedCommands = 0;
         private List<scene_commands> CommandsToExecute = new List<scene_commands>();
         private BackgroundWorker worker = new BackgroundWorker();
+        private bool hasExecuted = false;
+
+        private Guid _SceneRunnerGUID = Guid.NewGuid();
+        public Guid SceneRunnerGUID
+        {
+            get
+            {
+                return _SceneRunnerGUID;
+            }
+        }
 
         #region Events
         public delegate void onSceneRunEventHandler(object sender, onSceneRunEventArgs args);
@@ -25,13 +35,15 @@ namespace zVirtualScenes
         {
             public bool Errors { get; private set; }
             public string Details { get; private set; }
-            public int SceneID { get; private set; }  
+            public int SceneID { get; private set; }
+            public Guid SceneRunnerGUID { get; private set; }
 
-            public onSceneRunEventArgs(int SceneID, bool Errors, string Details)
+            public onSceneRunEventArgs(int SceneID, bool Errors, string Details, Guid SceneRunnerGUID)
             {
                 this.SceneID = SceneID;
                 this.Errors = Errors;
                 this.Details = Details;
+                this.SceneRunnerGUID = SceneRunnerGUID;
             }
         }
         /// <summary>
@@ -53,6 +65,10 @@ namespace zVirtualScenes
         //Methods
         public void RunScene(int SceneID)
         {
+            if (hasExecuted)
+                throw new Exception("Scene runners cannot be reused.");
+
+            hasExecuted = true;
             worker.DoWork += (sender, args) =>
             {
                 _scene = context.scenes.FirstOrDefault(o => o.id == SceneID);
@@ -60,28 +76,28 @@ namespace zVirtualScenes
                 if (_scene == null)
                 {
                     if (onSceneRunBegin != null)
-                        onSceneRunBegin(this, new onSceneRunEventArgs(SceneID, false, "Scene '" + SceneID + "' started."));
+                        onSceneRunBegin(this, new onSceneRunEventArgs(SceneID, false, "Scene '" + SceneID + "' started.", SceneRunnerGUID));
 
                     if (onSceneRunComplete != null)
-                        onSceneRunComplete(this, new onSceneRunEventArgs(SceneID, true, "Failed to run scene '" + SceneID + "' because it was not found in the database!"));
+                        onSceneRunComplete(this, new onSceneRunEventArgs(SceneID, true, "Failed to run scene '" + SceneID + "' because it was not found in the database!", SceneRunnerGUID));
                 }
 
 
                 if (onSceneRunBegin != null)
-                    onSceneRunBegin(this, new onSceneRunEventArgs(_scene.id, false, "Scene '" + _scene.friendly_name + "' started."));
+                    onSceneRunBegin(this, new onSceneRunEventArgs(_scene.id, false, "Scene '" + _scene.friendly_name + "' started.", SceneRunnerGUID));
 
 
                 if (_scene.is_running)
                 {
                     if (onSceneRunComplete != null)
-                        onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, true, "Failed to run scene '" + _scene.friendly_name + "' because it is already running!"));
+                        onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, true, "Failed to run scene '" + _scene.friendly_name + "' because it is already running!", SceneRunnerGUID));
                 }
                 else
                 {
                     if (_scene.scene_commands.Count < 1)
                     {
                         if (onSceneRunComplete != null)
-                            onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, true, "Failed to run scene '" + _scene.friendly_name + "' because it has no commands!"));
+                            onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, true, "Failed to run scene '" + _scene.friendly_name + "' because it has no commands!", SceneRunnerGUID));
 
                         return;
                     }
@@ -220,7 +236,7 @@ namespace zVirtualScenes
                 context.SaveChanges();
 
                 if (onSceneRunComplete != null)
-                    onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.friendly_name, ExecutionErrors)));
+                    onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.friendly_name, ExecutionErrors), SceneRunnerGUID));
 
             }
         }

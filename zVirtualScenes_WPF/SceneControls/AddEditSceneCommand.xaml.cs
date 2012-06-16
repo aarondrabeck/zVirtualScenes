@@ -43,6 +43,8 @@ namespace zVirtualScenes_WPF.SceneControls
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
+
+            this.Title = string.Format("Scene command for '{0}'", _device.friendly_name);
             if ((scene_commands.command_types)scene_command.command_type_id == scene_commands.command_types.device_type_command)
             {
                 DeviceTypeCmdRadioBtn.IsChecked = true;

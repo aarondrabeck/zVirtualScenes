@@ -68,12 +68,16 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WPFToolkit.Extended">
+      <HintPath>.\WPFToolkit.Extended.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\NullableIntConverter.cs" />
     <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
       <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
     </Compile>
@@ -98,6 +102,7 @@
     <Compile Include="TriggerControls\TriggerGridUC.xaml.cs">
       <DependentUpon>TriggerGridUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VisibilityAnimation.cs" />
     <Page Include="DeviceControls\DeviceProperties.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -389,6 +394,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\scheduled_task.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\run.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

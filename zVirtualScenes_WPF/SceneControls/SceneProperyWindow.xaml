@@ -6,6 +6,6 @@
     <Grid>
         <SceneControls:SceneProperties x:Name="SceneControl" Margin="0,0,0,55"></SceneControls:SceneProperties>
         <Button Name="DoneBtn" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom"  Width="74" Click="DoneBtn_Click"/>
-        <Button x:Name="ResetBtn" Content="Reset isRunning" HorizontalAlignment="Right" Margin="0,0,330,28" VerticalAlignment="Bottom"  Width="104" Click="ResetBtn_Click_1"/>
+        <Button x:Name="ResetBtn" Content="Reset isRunning" HorizontalAlignment="Right" Margin="0,0,330,10" VerticalAlignment="Bottom"  Width="104" Click="ResetBtn_Click_1"/>
     </Grid>
 </Window>

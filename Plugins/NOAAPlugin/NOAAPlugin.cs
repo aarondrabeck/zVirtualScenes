@@ -5,19 +5,18 @@ using System;
 using System.Net;
 using System.Threading;
 using System.Text;
-using zVirtualScenesAPI;
 using System.Data;
 using System.Timers;
 using System.ComponentModel;
 using System.Linq;
-using zVirtualScenesCommon.Entity;
-using zVirtualScenesCommon;
+using zVirtualScenes;
+using zVirtualScenesModel;
 
 namespace NOAAPlugin
 {
-   [Export(typeof(Plugin))]
+    [Export(typeof(Plugin))]
     public class NOAAPlugin : Plugin
-    {        
+    {
         public volatile bool isActive;
         private System.Timers.Timer timerNOAA = new System.Timers.Timer();
         private Double Lat = 30.6772222222222;
@@ -31,46 +30,52 @@ namespace NOAAPlugin
 
         public override void Initialize()
         {
-            DefineOrUpdateSetting(new plugin_settings
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
-                name = "LAT",
-                friendly_name = "Latitude",
-                value = "37.6772222222222",
-                value_data_type = (int)Data_Types.DECIMAL,
-                description = "Your Latitude in Decimal Notation. ex. 37.6772222222222"
-            });
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "LAT",
+                    friendly_name = "Latitude",
+                    value = "37.6772222222222",
+                    value_data_type = (int)Data_Types.DECIMAL,
+                    description = "Your Latitude in Decimal Notation. ex. 37.6772222222222"
+                }, context);
 
-            DefineOrUpdateSetting(new plugin_settings
-            {
-                name = "LOG",
-                friendly_name = "Longitude",
-                value = "-113.061666666667",
-                value_data_type = (int)Data_Types.DECIMAL,
-                description = "Your Longitude in Decimal Notation. ex. -113.061666666667"
-            });
+                DefineOrUpdateSetting( new plugin_settings
+                {
+                    name = "LOG",
+                    friendly_name = "Longitude",
+                    value = "-113.061666666667",
+                    value_data_type = (int)Data_Types.DECIMAL,
+                    description = "Your Longitude in Decimal Notation. ex. -113.061666666667"
+                }, context);
 
-            scene_property.DefineOrUpdateProperty(new scene_property 
-            {
-                name = "ACTIVATE_SUNRISE",
-                friendly_name = "Activate at Sunrise",
-                description = "Activate this scene at sunrise.",
-                defualt_value = "false",
-                value_data_type = (int)Data_Types.BOOL
-            });
+                scene_property.AddOrEdit(new scene_property
+                {
+                    name = "ACTIVATE_SUNRISE",
+                    friendly_name = "Activate at Sunrise",
+                    description = "Activate this scene at sunrise.",
+                    defualt_value = "false",
+                    value_data_type = (int)Data_Types.BOOL
+                },context);
 
-            scene_property.DefineOrUpdateProperty(new scene_property
-            {
-                name = "ACTIVATE_SUNSET",
-                friendly_name = "Activate at Sunset",
-                description = "Activate this scene at sunset.",
-                defualt_value = "false",
-                value_data_type = (int)Data_Types.BOOL
-            });
-        } 
+                scene_property.AddOrEdit( new scene_property
+                {
+                    name = "ACTIVATE_SUNSET",
+                    friendly_name = "Activate at Sunset",
+                    description = "Activate this scene at sunset.",
+                    defualt_value = "false",
+                    value_data_type = (int)Data_Types.BOOL
+                },context);
+            }
+        }
 
-        protected override bool StartPlugin()
+        protected override void StartPlugin()
         {
-            LoadLatint();
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            {
+                LoadLatint(context);
+            }
 
             DateTime date = DateTime.Today;
             bool isSunrise = false;
@@ -79,31 +84,29 @@ namespace NOAAPlugin
             DateTime sunset = DateTime.Now;
 
             SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-           
+
             WriteToLog(Urgency.INFO, this.FriendlyName + " plugin started." + "(Today's Sunrise: " + sunrise.ToString("T") + ", Sunset: " + sunset.ToString("T") + ")");
-                        
+
             timerNOAA.Interval = 60000;
             timerNOAA.Elapsed += new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = true;
 
             IsReady = true;
-            return true;
         }
 
-        protected override bool StopPlugin()
+        protected override void StopPlugin()
         {
             timerNOAA.Elapsed -= new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = false;
 
             WriteToLog(Urgency.INFO, this.FriendlyName + " plugin ended.");
-                        
+
             IsReady = false;
-            return true;
-        }       
+        }
 
         protected override void SettingChanged(string settingName, string settingValue)
-        {            
-        }               
+        {
+        }
         public override bool ProcessDeviceCommand(device_command_que cmd)
         {
             return true;
@@ -123,13 +126,16 @@ namespace NOAAPlugin
         public override bool DeactivateGroup(int groupID)
         {
             return true;
-        }     
+        }
 
         #region NOAA
 
         public bool isDark()
         {
-            LoadLatint();
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            {
+                LoadLatint(context);
+            }
 
             DateTime date = DateTime.Today;
             bool isSunrise = false;
@@ -145,65 +151,110 @@ namespace NOAAPlugin
             return false;
         }
 
-        private void LoadLatint()
+        private void LoadLatint(zvsLocalDBEntities context)
         {
             Lat = 30.6772222222222;
-            Double.TryParse(GetSettingValue("LAT"), out Lat);
+            Double.TryParse(GetSettingValue("LAT", context), out Lat);
 
             Log = -100.061666666667;
-            Double.TryParse(GetSettingValue("LOG"), out Log);
+            Double.TryParse(GetSettingValue("LOG", context), out Log);
         }
 
         void timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                LoadLatint();
-
-                DateTime date = DateTime.Today;
-                bool isSunrise = false;
-                bool isSunset = false;
-                DateTime sunrise = DateTime.Now;
-                DateTime sunset = DateTime.Now;
-
-                SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-
-                Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
-                if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
+                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    WriteToLog(Urgency.INFO, "It is now sunrise. Activating sunrise scenes.");
+                    LoadLatint(context);
 
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    DateTime date = DateTime.Today;
+                    bool isSunrise = false;
+                    bool isSunset = false;
+                    DateTime sunrise = DateTime.Now;
+                    DateTime sunset = DateTime.Now;
+
+                    SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
+
+                    Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
-                        foreach (scene scene in db.scenes)
+                        WriteToLog(Urgency.INFO, "It is now sunrise. Activating sunrise scenes.");
+                        foreach (scene scene in context.scenes)
                         {
-                            string value = scene_property_value.GetPropertyValue(db, scene.id, "ACTIVATE_SUNRISE");
+                            string value = scene_property_value.GetPropertyValue(context, scene.id, "ACTIVATE_SUNRISE");
                             bool activate = false;
                             bool.TryParse(value, out activate);
 
                             if (activate)
                             {
-                                WriteToLog(Urgency.INFO, "Sunrise: " + scene.RunScene(db));
+                                SceneRunner sr = new SceneRunner();
+                                SceneRunner.onSceneRunEventHandler startHandler = null;
+                                startHandler = (s, args) =>
+                                {
+                                    if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                    {
+                                        SceneRunner.onSceneRunBegin -= startHandler;
+                                        WriteToLog(Urgency.INFO, "Sunrise: " + args.Details);
+                                        
+                                        #region LISTEN FOR ENDING
+                                        SceneRunner.onSceneRunEventHandler handler = null;
+                                        handler = (se, end_args) =>
+                                        {
+                                            if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                            {
+                                                SceneRunner.onSceneRunComplete -= handler;
+                                                WriteToLog(Urgency.INFO, "Sunrise: " + end_args.Details);                                                
+                                            }
+                                        };
+                                        SceneRunner.onSceneRunComplete += handler;
+                                        #endregion
+                                    }
+                                };
+                                SceneRunner.onSceneRunBegin += startHandler;
+                                sr.RunScene(scene.id);                               
                             }
+
                         }
                     }
-                }
 
-                Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
-                if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
-                {
-                    WriteToLog(Urgency.INFO, "It is now sunset. Activating sunrise scenes.");
-                    using (zvsEntities2 db = new zvsEntities2(zvsEntityControl.GetzvsConnectionString))
+                    Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                     {
-                        foreach (scene scene in db.scenes)
+                        WriteToLog(Urgency.INFO, "It is now sunset. Activating sunrise scenes.");
+                        foreach (scene scene in context.scenes)
                         {
-                            string value = scene_property_value.GetPropertyValue(db, scene.id, "ACTIVATE_SUNSET");
+                            string value = scene_property_value.GetPropertyValue(context, scene.id, "ACTIVATE_SUNSET");
                             bool activate = false;
                             bool.TryParse(value, out activate);
 
                             if (activate)
                             {
-                                WriteToLog(Urgency.INFO, "Sunset: " + scene.RunScene(db));
+                                SceneRunner sr = new SceneRunner();
+                                SceneRunner.onSceneRunEventHandler startHandler = null;
+                                startHandler = (s, args) =>
+                                {
+                                    if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                    {
+                                        SceneRunner.onSceneRunBegin -= startHandler;
+                                        WriteToLog(Urgency.INFO, "Sunset: " + args.Details);
+
+                                        #region LISTEN FOR ENDING
+                                        SceneRunner.onSceneRunEventHandler handler = null;
+                                        handler = (se, end_args) =>
+                                        {
+                                            if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                            {
+                                                SceneRunner.onSceneRunComplete -= handler;
+                                                WriteToLog(Urgency.INFO, "Sunset: " + end_args.Details);
+                                            }
+                                        };
+                                        SceneRunner.onSceneRunComplete += handler;
+                                        #endregion
+                                    }
+                                };
+                                SceneRunner.onSceneRunBegin += startHandler;
+                                sr.RunScene(scene.id);  
                             }
                         }
                     }
@@ -213,10 +264,10 @@ namespace NOAAPlugin
             {
                 WriteToLog(Urgency.WARNING, "Error calulating Sunrise/Sunset. - " + ex.Message);
             }
-        } 
+        }
         #endregion
-        
+
     }
-    
+
 }
 

@@ -133,10 +133,11 @@ namespace zVirtualScenes.Triggers
 
         private void ActivateTriggerScene(device_value_triggers trigger)
         {
+            SceneRunner sr = new SceneRunner();
             SceneRunner.onSceneRunEventHandler startHandler = null;
             startHandler = (s, args) =>
             {
-                if (args.SceneID == trigger.scene.id)
+                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
                 {
                     SceneRunner.onSceneRunBegin -= startHandler;
 
@@ -148,7 +149,7 @@ namespace zVirtualScenes.Triggers
                 }
             };
             SceneRunner.onSceneRunBegin += startHandler;
-            SceneRunner sr = new SceneRunner();
+           
             sr.RunScene(trigger.scene.id);
         }
     }

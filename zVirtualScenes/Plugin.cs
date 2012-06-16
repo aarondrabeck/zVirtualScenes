@@ -2,6 +2,7 @@
 using System.Data.Objects;
 using System;
 using zVirtualScenesModel;
+using System.ComponentModel;
 
 namespace zVirtualScenes
 {
@@ -44,15 +45,25 @@ namespace zVirtualScenes
         {
             if (Enabled)
             {
-                StartPlugin();
-                IsRunning = true;
+                BackgroundWorker bw = new BackgroundWorker();
+                bw.DoWork += (s, a) =>
+                {
+                    StartPlugin();
+                    IsRunning = true;
+                };
+                bw.RunWorkerAsync();
             }
         }
 
         public void Stop()
         {
-            StopPlugin();
-            IsRunning = false;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (s, a) =>
+            {
+                StopPlugin();
+                IsRunning = false;
+            };
+            bw.RunWorkerAsync();
         }
 
         public bool Enabled

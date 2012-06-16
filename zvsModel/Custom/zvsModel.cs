@@ -21,6 +21,8 @@ namespace zVirtualScenesModel
         public static event onEntityChangedventHandler onScenesChanged;
         public static event onEntityChangedventHandler onSceneCommandsChanged;
         public static event onEntityChangedventHandler onDeviceValueTriggersChanged;
+        public static event onEntityChangedventHandler onScheduledTasksChanged;
+        
 
         public static Dictionary<int, Action> EventsDictionary = new Dictionary<int, Action> {
          {0, () => { if(onDevicesChanged != null) { onDevicesChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
@@ -46,7 +48,10 @@ namespace zVirtualScenesModel
          {20, () => { if(onSceneCommandsChanged != null) { onSceneCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
          {21, () => { if(onDeviceValueTriggersChanged != null) { onDeviceValueTriggersChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
          {22, () => { if(onDeviceValueTriggersChanged != null) { onDeviceValueTriggersChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
-         {23, () => { if(onDeviceValueTriggersChanged != null) { onDeviceValueTriggersChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
+         {23, () => { if(onDeviceValueTriggersChanged != null) { onDeviceValueTriggersChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
+         {24, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
+         {25, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
+         {26, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
         };
 
         public override int SaveChanges()
@@ -134,6 +139,15 @@ namespace zVirtualScenesModel
             if (this.ChangeTracker.Entries<device_value_triggers>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
                 if (!EventsToTrigger.Contains(23)) { EventsToTrigger.Add(23); }
 
+            //scheduled task
+            if (this.ChangeTracker.Entries<scheduled_tasks>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)
+                if (!EventsToTrigger.Contains(24)) { EventsToTrigger.Add(24); }
+
+            if (this.ChangeTracker.Entries<scheduled_tasks>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
+                if (!EventsToTrigger.Contains(25)) { EventsToTrigger.Add(25); }
+
+            if (this.ChangeTracker.Entries<scheduled_tasks>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
+                if (!EventsToTrigger.Contains(26)) { EventsToTrigger.Add(26); }
 
             //Save the changes to the Database
             int result = base.SaveChanges();

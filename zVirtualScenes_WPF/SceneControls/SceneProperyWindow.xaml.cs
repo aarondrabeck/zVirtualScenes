@@ -40,6 +40,7 @@ namespace zVirtualScenes_WPF.SceneControls
 
         private void ResetBtn_Click_1(object sender, RoutedEventArgs e)
         {
+
             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
                 scene s = context.scenes.FirstOrDefault(sc => sc.id == SceneID);

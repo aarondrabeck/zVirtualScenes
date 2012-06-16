@@ -17,8 +17,8 @@
                    x:Name="DeviceCurrentStatus"  Text="100%" FontSize="16" FontWeight="Bold" VerticalAlignment="Top" Margin="0,5,0,0" />
 
             
-            <Border Grid.Row="2" BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" CornerRadius="5" Margin="0,5,0,0" >
-                <ListBox x:Name="SelectionList" BorderThickness="0" SelectionChanged="SelectionList_SelectionChanged">
+            <Border Grid.Row="2" BorderThickness="1" Background="Transparent" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" CornerRadius="5" Margin="0,5,0,0" >
+                <ListBox x:Name="SelectionList" Margin="0,5" FontWeight="Bold" BorderThickness="0" SelectionChanged="SelectionList_SelectionChanged">
                     <ListBoxItem x:Name="COMMANDS" Content="Commands" />
                     <ListBoxItem x:Name="PROPERTIES" Content="Properties"/>
                     <ListBoxItem x:Name="VALUES" Content="Values"/>

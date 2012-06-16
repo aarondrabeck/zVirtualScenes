@@ -9,7 +9,7 @@ namespace zVirtualScenesModel
 {
     public partial class scene_property
     {
-        public static void AddOrEdit(zvsLocalDBEntities context, scene_property p)
+        public static void AddOrEdit(scene_property p, zvsLocalDBEntities context)
         {
             if (p != null)
             {

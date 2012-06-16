@@ -56,6 +56,8 @@ namespace zVirtualScenes_WPF
             dataView.Refresh();
 
             dList1.ShowMore = false;
+
+            this.Title = Utils.ApplicationNameAndVersion;
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -92,6 +94,8 @@ namespace zVirtualScenes_WPF
                         break;
                     case 8:
                         d.friendly_name = "Office Light";
+                        d.current_level_int = d.current_level_int + 1;
+                        d.current_level_txt = (d.current_level_int).ToString() + "%";
                         break;
                     case 9:
                         d.friendly_name = "Family Hallway Light";
@@ -239,6 +243,18 @@ namespace zVirtualScenes_WPF
             catch
             {
                 MessageBox.Show("Unable to launch Windows Explorer.", "Error", MessageBoxButton.OK,MessageBoxImage.Error );
+            }
+        }
+
+        private void ViewDBMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(Utils.AppDataPath);
+            }
+            catch
+            {
+                MessageBox.Show("Unable to launch Windows Explorer.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
