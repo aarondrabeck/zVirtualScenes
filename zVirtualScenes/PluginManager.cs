@@ -488,6 +488,13 @@ namespace zVirtualScenes
         {
             return _plugins.FirstOrDefault(p => p.Name == pluginName);
         }
+        
+        public void NotifyPluginSettingsChanged(plugin_settings ps)
+        {
+            Plugin p = GetPlugin(ps.plugin.name);
+            if (p != null)            
+                p.SettingsChange(ps);            
+        }
     }
 }
 

@@ -57,7 +57,7 @@ namespace zVirtualScenesModel
         public override int SaveChanges()
         {
             List<int> EventsToTrigger = new List<int>();
-
+                        
             //Determine the changes that are about to be made
             //Devices
             if (this.ChangeTracker.Entries<device>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)

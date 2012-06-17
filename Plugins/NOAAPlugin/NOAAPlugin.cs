@@ -19,8 +19,14 @@ namespace NOAAPlugin
     {
         public volatile bool isActive;
         private System.Timers.Timer timerNOAA = new System.Timers.Timer();
-        private Double Lat = 30.6772222222222;
-        private Double Log = -100.061666666667;
+        private Double _Lat = 30.6772222222222;
+        private Double _Long = -100.061666666667;
+
+        private DateTime _date = DateTime.Today;
+        private bool _isSunrise = false;
+        private bool _isSunset = false;
+        private DateTime _sunrise = DateTime.Now;
+        private DateTime _sunset = DateTime.Now;
 
         public NOAAPlugin()
             : base("NOAA",
@@ -41,7 +47,7 @@ namespace NOAAPlugin
                     description = "Your Latitude in Decimal Notation. ex. 37.6772222222222"
                 }, context);
 
-                DefineOrUpdateSetting( new plugin_settings
+                DefineOrUpdateSetting(new plugin_settings
                 {
                     name = "LOG",
                     friendly_name = "Longitude",
@@ -57,35 +63,27 @@ namespace NOAAPlugin
                     description = "Activate this scene at sunrise.",
                     defualt_value = "false",
                     value_data_type = (int)Data_Types.BOOL
-                },context);
+                }, context);
 
-                scene_property.AddOrEdit( new scene_property
+                scene_property.AddOrEdit(new scene_property
                 {
                     name = "ACTIVATE_SUNSET",
                     friendly_name = "Activate at Sunset",
                     description = "Activate this scene at sunset.",
                     defualt_value = "false",
                     value_data_type = (int)Data_Types.BOOL
-                },context);
+                }, context);
+
+
+                Double.TryParse(GetSettingValue("LAT", context), out _Lat);
+                Double.TryParse(GetSettingValue("LOG", context), out _Long);
+                CalculateSunriseSet();
             }
         }
 
         protected override void StartPlugin()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-            {
-                LoadLatint(context);
-            }
-
-            DateTime date = DateTime.Today;
-            bool isSunrise = false;
-            bool isSunset = false;
-            DateTime sunrise = DateTime.Now;
-            DateTime sunset = DateTime.Now;
-
-            SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-
-            WriteToLog(Urgency.INFO, this.FriendlyName + " plugin started." + "(Today's Sunrise: " + sunrise.ToString("T") + ", Sunset: " + sunset.ToString("T") + ")");
+            WriteToLog(Urgency.INFO, string.Format("{0} started. Today's Sunrise: {1}, Today's Sunset: {2}", this.FriendlyName, _sunrise.ToString("T"), _sunset.ToString("T")));
 
             timerNOAA.Interval = 60000;
             timerNOAA.Elapsed += new ElapsedEventHandler(timerNOAA_Elapsed);
@@ -99,14 +97,30 @@ namespace NOAAPlugin
             timerNOAA.Elapsed -= new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = false;
 
-            WriteToLog(Urgency.INFO, this.FriendlyName + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.FriendlyName + " stopped");
 
             IsReady = false;
         }
 
         protected override void SettingChanged(string settingName, string settingValue)
         {
+            if (settingName == "LAT")
+            {
+                Double.TryParse(settingValue, out _Lat);
+
+                CalculateSunriseSet();
+                WriteToLog(Urgency.INFO, string.Format("Lat/Long changed.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
+
+            }
+            else if (settingName == "LOG")
+            {
+                Double.TryParse(settingValue, out _Long);
+
+                CalculateSunriseSet();
+                WriteToLog(Urgency.INFO, string.Format("Lat/Long changed.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
+            }
         }
+
         public override bool ProcessDeviceCommand(device_command_que cmd)
         {
             return true;
@@ -130,34 +144,17 @@ namespace NOAAPlugin
 
         #region NOAA
 
+        private void CalculateSunriseSet()
+        {
+            SunTimes.Instance.CalculateSunRiseSetTimes(_Lat, _Long, _date, ref _sunrise, ref _sunset, ref _isSunrise, ref _isSunset);
+        }
+
         public bool isDark()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-            {
-                LoadLatint(context);
-            }
-
-            DateTime date = DateTime.Today;
-            bool isSunrise = false;
-            bool isSunset = false;
-            DateTime sunrise = DateTime.Now;
-            DateTime sunset = DateTime.Now;
-
-            SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-
-            if (DateTime.Now.TimeOfDay < sunrise.TimeOfDay || DateTime.Now.TimeOfDay > sunset.TimeOfDay)
+            if (DateTime.Now.TimeOfDay < _sunrise.TimeOfDay || DateTime.Now.TimeOfDay > _sunset.TimeOfDay)
                 return true;
 
             return false;
-        }
-
-        private void LoadLatint(zvsLocalDBEntities context)
-        {
-            Lat = 30.6772222222222;
-            Double.TryParse(GetSettingValue("LAT", context), out Lat);
-
-            Log = -100.061666666667;
-            Double.TryParse(GetSettingValue("LOG", context), out Log);
         }
 
         void timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
@@ -166,17 +163,7 @@ namespace NOAAPlugin
             {
                 using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    LoadLatint(context);
-
-                    DateTime date = DateTime.Today;
-                    bool isSunrise = false;
-                    bool isSunset = false;
-                    DateTime sunrise = DateTime.Now;
-                    DateTime sunset = DateTime.Now;
-
-                    SunTimes.Instance.CalculateSunRiseSetTimes(Lat, Log, date, ref sunrise, ref sunset, ref isSunrise, ref isSunset);
-
-                    Double MinsBetweenTimeSunrise = (sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    Double MinsBetweenTimeSunrise = (_sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
                         WriteToLog(Urgency.INFO, "It is now sunrise. Activating sunrise scenes.");
@@ -196,7 +183,7 @@ namespace NOAAPlugin
                                     {
                                         SceneRunner.onSceneRunBegin -= startHandler;
                                         WriteToLog(Urgency.INFO, "Sunrise: " + args.Details);
-                                        
+
                                         #region LISTEN FOR ENDING
                                         SceneRunner.onSceneRunEventHandler handler = null;
                                         handler = (se, end_args) =>
@@ -204,7 +191,7 @@ namespace NOAAPlugin
                                             if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
                                             {
                                                 SceneRunner.onSceneRunComplete -= handler;
-                                                WriteToLog(Urgency.INFO, "Sunrise: " + end_args.Details);                                                
+                                                WriteToLog(Urgency.INFO, "Sunrise: " + end_args.Details);
                                             }
                                         };
                                         SceneRunner.onSceneRunComplete += handler;
@@ -212,13 +199,13 @@ namespace NOAAPlugin
                                     }
                                 };
                                 SceneRunner.onSceneRunBegin += startHandler;
-                                sr.RunScene(scene.id);                               
+                                sr.RunScene(scene.id);
                             }
-
                         }
+                        CalculateSunriseSet();
                     }
 
-                    Double MinsBetweenTimeSunset = (sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    Double MinsBetweenTimeSunset = (_sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                     {
                         WriteToLog(Urgency.INFO, "It is now sunset. Activating sunrise scenes.");
@@ -254,9 +241,10 @@ namespace NOAAPlugin
                                     }
                                 };
                                 SceneRunner.onSceneRunBegin += startHandler;
-                                sr.RunScene(scene.id);  
+                                sr.RunScene(scene.id);
                             }
                         }
+                        CalculateSunriseSet();
                     }
                 }
             }

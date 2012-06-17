@@ -18,6 +18,8 @@ namespace zVirtualScenes_WPF
     public partial class App : Application
     {
         public Core zvsCore;
+        public ZVSTaskbarIcon taskbarIcon;
+        public bool isShuttingDown = false;
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -72,7 +74,48 @@ namespace zVirtualScenes_WPF
                 }));
             };
 
+            //Create taskbar Icon
+            taskbarIcon = new ZVSTaskbarIcon();
+
             base.OnStartup(e);
+        }
+
+        public void ShowMainWindow()
+        {
+            MainWindow mainWindown = (MainWindow)Application.Current.MainWindow;
+            if (mainWindown != null)
+            {
+                mainWindown.Show();
+
+                //if we have to change the state, listen for when that is complete to activate the window.
+                if (mainWindown.WindowState == WindowState.Minimized)
+                {
+                    EventHandler handler = null;
+                    handler = (sender, args) =>
+                    {
+                        mainWindown.StateChanged -= handler;
+
+                        //ACTIVATE TO BRING IT TO FRONT
+                        mainWindown.Activate();
+                    };
+                    mainWindown.StateChanged += handler;
+                    mainWindown.WindowState = mainWindown.lastOpenedWindowState;
+                }
+                else
+                {
+                    mainWindown.Activate();
+                }
+            }
+        }
+
+        public void ShutdownZVS()
+        {
+             Application.Current.Shutdown(); 
+        }
+               
+        private void Application_Exit_1(object sender, ExitEventArgs e)
+        {
+            taskbarIcon.Dispose();
         }
     }
 }

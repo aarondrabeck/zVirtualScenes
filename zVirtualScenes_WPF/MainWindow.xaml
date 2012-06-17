@@ -9,7 +9,7 @@
     xmlns:TriggerControl="clr-namespace:zVirtualScenes_WPF.TriggerControls"
     xmlns:ScheduledTaskControls="clr-namespace:zVirtualScenes_WPF.ScheduledTaskControls"
     x:Class="zVirtualScenes_WPF.MainWindow"
-        Title="MainWindow"  MinWidth="800" MinHeight="570" Loaded="Window_Loaded" Icon="/zVirtualScenes_WPF;component/audio-mixing-desk.ico" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1">
+        Title="MainWindow"  MinWidth="800" MinHeight="570" Closed="MainWindow_Closed_1" Loaded="Window_Loaded" Icon="Images/32zvsIcon.png" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1" StateChanged="Window_StateChanged_1" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="{x:Type ListViewItem}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -22,7 +22,7 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
             <MenuItem Header="File" >
-                <MenuItem Name="ExitMI" Header="E_xit" Click="ExitMI_Click_1" />
+                <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
             </MenuItem>
             <MenuItem Header="Groups">
                 <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
@@ -36,6 +36,9 @@
 <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                 <Separator />
                 <MenuItem Header="Plugin Manager" Click="MenuItem_Click_1" />
+            </MenuItem>
+            <MenuItem Header="Help">               
+                <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
             </MenuItem>
         </Menu>
         <TabControl>
@@ -102,7 +105,7 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
                             <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
-                            <DataGridTextColumn Width="100"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
+                            <DataGridTextColumn Width="140"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
                             <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
                         </DataGrid.Columns>
                     </DataGrid>

@@ -28,10 +28,11 @@ namespace HttpAPI
     public class HttpAPIPlugin : Plugin
     {
         public volatile bool isActive;
-        bool verbose = true;
+        bool _verbose = true;
         private Guid CookieValue;
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
+        private int _port = 9999;
 
         public HttpAPIPlugin()
             : base("HttpAPI",
@@ -69,15 +70,27 @@ namespace HttpAPI
                     value_data_type = (int)Data_Types.BOOL,
                     description = "(Writes all server client communication to the log for debugging.)"
                 }, context);
+
+                bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
+                int.TryParse(GetSettingValue("PORT", context), out _port);
             }
         }
 
         protected override void StartPlugin()
         {
+            StartHTTP();            
+        }
+
+        protected override void StopPlugin()
+        {
+            StopHTTP();
+        }
+
+        private void StartHTTP()
+        {
             try
             {
                 httplistener = new HttpListener();
-
                 if (!HttpListener.IsSupported)
                 {
                     WriteToLog(Urgency.ERROR, "Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
@@ -86,56 +99,62 @@ namespace HttpAPI
 
                 if (!httplistener.IsListening)
                 {
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-                    {
-                        bool.TryParse(GetSettingValue("VERBOSE", context), out verbose);
-
-                        CookieValue = Guid.NewGuid();
-                        int port = 9999;
-                        int.TryParse(GetSettingValue("PORT", context), out port);
-                        httplistener.Prefixes.Add("http://*:" + port + "/");
-                        //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
-                        //httplistener.IgnoreWriteExceptions = true; 
-                        httplistener.Start();
+                    CookieValue = Guid.NewGuid();
 
 
-                        ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
+                    httplistener.Prefixes.Add("http://*:" + _port + "/");
+                    //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
+                    //httplistener.IgnoreWriteExceptions = true; 
+                    httplistener.Start();
 
-                        WriteToLog(Urgency.INFO, string.Format("{0} plugin started on port {1}.", this.Friendly_Name, port));
-                    }
+                    ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
+
+                    this.IsReady = true;
+                    WriteToLog(Urgency.INFO, string.Format("HTTP server started on port {0}",  _port));                    
                 }
             }
             catch (Exception ex)
             {
                 WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
             }
-
-            this.IsReady = true;
         }
 
-        protected override void StopPlugin()
+        private void StopHTTP()
         {
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
-
             try
             {
                 if (httplistener != null && httplistener.IsListening)
                 {
                     httplistener.Stop();
-                    WriteToLog(Urgency.INFO, string.Format("{0} plugin shutdown."));
+                    WriteToLog(Urgency.INFO,"HTTP server stopped");
+                    this.IsReady = false;
                 }
             }
             catch (Exception ex)
             {
                 WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
             }
-
-            this.IsReady = false;
         }
-
+        
         protected override void SettingChanged(string settingName, string settingValue)
         {
+            if (settingName == "VERBOSE")
+            {
+                bool.TryParse(settingValue, out _verbose);
+            }
+            else if (settingName == "PORT")
+            {
+                if (this.Enabled)
+                    StopHTTP();
+
+                int.TryParse(settingValue, out _port);
+
+                if (this.Enabled)
+                    StartHTTP();
+            }
         }
+
+
         public override bool ProcessDeviceCommand(device_command_que cmd)
         {
             return true;
@@ -202,7 +221,7 @@ namespace HttpAPI
                 string ip = string.Empty;
                 if (context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString(); };
 
-                if (verbose)
+                if (_verbose)
                     WriteToLog(Urgency.INFO, string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
 
                 //doesnt have valid cookies 
@@ -353,7 +372,7 @@ namespace HttpAPI
                 {
                     foreach (device d in context.devices.OrderBy(o => o.friendly_name))
                     {
-                       
+
 
                         var device = new
                         {

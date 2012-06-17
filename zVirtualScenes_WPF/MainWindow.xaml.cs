@@ -29,6 +29,8 @@ namespace zVirtualScenes_WPF
     {
         private App application = (App)Application.Current;
         private zvsLocalDBEntities context;
+        private System.Windows.Forms.NotifyIcon Notify;
+        public WindowState lastOpenedWindowState = WindowState.Normal;
 
         public MainWindow()
         {
@@ -59,7 +61,7 @@ namespace zVirtualScenes_WPF
 
             this.Title = Utils.ApplicationNameAndVersion;
         }
-
+        
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F12)
@@ -219,8 +221,18 @@ namespace zVirtualScenes_WPF
 
         private void Window_Closing_1(object sender, CancelEventArgs e)
         {
+            App app = (App)Application.Current;
+            if (!app.isShuttingDown)
+            {
+                e.Cancel = true;
+                this.WindowState = System.Windows.WindowState.Minimized;
+            }          
+        }
+
+        private void MainWindow_Closed_1(object sender, EventArgs e)
+        {
             context.Dispose();
-        }        
+        }
 
         private void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
         {
@@ -231,7 +243,7 @@ namespace zVirtualScenes_WPF
 
         private void ExitMI_Click_1(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            application.ShutdownZVS();
         }
 
         private void ViewLogsMI_Click_1(object sender, RoutedEventArgs e)
@@ -258,6 +270,29 @@ namespace zVirtualScenes_WPF
             }
         }
 
+        private void Window_StateChanged_1(object sender, EventArgs e)
+        {
+            if (WindowState != System.Windows.WindowState.Minimized)
+                lastOpenedWindowState = WindowState;
+
+            if (WindowState == WindowState.Minimized)
+            {
+                Hide();
+
+                App app = (App)Application.Current;
+                if (app.taskbarIcon != null)
+                {
+                    app.taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationName + " has been minimized to the taskbar.", 3000, System.Windows.Forms.ToolTipIcon.Info);                    
+                }
+            }
+        }
+
+        private void AboutMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            AboutWindow aboutWin = new AboutWindow();
+            aboutWin.Owner = this;
+            aboutWin.ShowDialog();
+        }
 
     }
 }

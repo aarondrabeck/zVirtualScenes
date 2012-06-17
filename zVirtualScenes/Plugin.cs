@@ -307,15 +307,13 @@ namespace zVirtualScenes
 
         public device_types GetDeviceType(string DeviceTypeName, zvsLocalDBEntities context)
         {
-            lock (context)
+            plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
+            if (pl != null)
             {
-                plugin pl = context.plugins.FirstOrDefault(p => p.name == this._name);
-                if (pl != null)
-                {
-                    return pl.device_types.FirstOrDefault(dt => dt.name == DeviceTypeName);
-                }
-                return null;
+                return pl.device_types.FirstOrDefault(dt => dt.name == DeviceTypeName);
             }
+            return null;
+
         }
 
         public void DefineOrUpdateDeviceCommand(device_commands dc, zvsLocalDBEntities context)
@@ -361,6 +359,16 @@ namespace zVirtualScenes
             {
                 Core.Logger.WriteToLog((Urgency)u, message, this.Friendly_Name);
             }));
+        }
+
+        public void SettingsChange(plugin_settings ps)
+        {
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (s, a) =>
+            {
+                SettingChanged(ps.name, ps.value);
+            };
+            bw.RunWorkerAsync();
         }
 
         // Abstract functions

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="zVirtualScenes_WPF.SceneControls.AddEditSceneCommand"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Scene Command" Height="246" Width="445" Loaded="Window_Loaded_1" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Icon="/zVirtualScenes_WPF;component/audio-mixing-desk.ico" WindowStyle="ToolWindow">
+        Title="Scene Command" Height="246" Width="445" Loaded="Window_Loaded_1" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Icon="/zVirtualScenes_WPF;component/Images/zvs32.ico" WindowStyle="ToolWindow">
     <Grid>
         <GroupBox Header="Command Types" Margin="10,7,10,0" VerticalAlignment="Top" Height="63">
             <Grid >

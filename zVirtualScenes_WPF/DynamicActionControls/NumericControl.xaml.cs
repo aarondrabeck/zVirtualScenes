@@ -71,9 +71,9 @@ namespace zVirtualScenes_WPF.DynamicActionControls
                 if (isEntryValid(TextBox.Text))
                 {
                     TextBox.Background = new SolidColorBrush(Colors.White);
-                    
-                    if (lastValue != TextBox.Text)                    
-                        hasChanged = true;                    
+
+                    if (lastValue != TextBox.Text)
+                        hasChanged = true;
                 }
                 else
                     TextBox.Background = new SolidColorBrush(Color.FromArgb(255, 255, 198, 198));
@@ -85,31 +85,47 @@ namespace zVirtualScenes_WPF.DynamicActionControls
         {
             //Allow arrown and delete keys
             if (e.Key == Key.Back || e.Key == Key.Delete || e.Key == Key.Left || e.Key == Key.Right || e.Key == Key.Up || e.Key == Key.Down)
-                return; 
+                return;
 
             if (e.Key == Key.Enter)
             {
-                if (!isEntryValid(TextBox.Text))                
+                if (!isEntryValid(TextBox.Text))
                     TextBox.Text = defaultVaule;
-                else                
-                    SendCommand(); 
+                else
+                    SendCommand();
 
                 e.Handled = true;
                 return;
             }
 
-            //Deny certain keys
-            Regex regex = new Regex("[0-9.]");
-            if (!regex.IsMatch(e.Key.ToString()))
-            {
-                e.Handled = true;
-                return;
-            }
+            ////Deny certain keys
+            //Regex regex = null;
+            //switch (numType)
+            //{
+            //    case NumberType.Byte:
+            //    case NumberType.Integer:
+            //    case NumberType.Short:
+            //    case NumberType.ComPort:
+            //        regex = new Regex("[0-9]");
+            //        break;
+            //    case NumberType.Decimal:
+            //        regex = new Regex(@"([0-9]|\.|\+|-)");
+            //        break;
+            //    default:
+            //        regex = new Regex(@"[0-9]\.");
+            //        break;
+            //}
+
+            //if (!regex.IsMatch(e.Key.ToString()))
+            //{
+            //    e.Handled = true;
+            //    return;
+            //}
         }
 
         private void TextBox_LostFocus_1(object sender, RoutedEventArgs e)
         {
-            if (isEntryValid(TextBox.Text))            
+            if (isEntryValid(TextBox.Text))
                 SendCommand();
         }
 
@@ -126,7 +142,7 @@ namespace zVirtualScenes_WPF.DynamicActionControls
                 da.From = 1;
                 da.To = 0;
                 da.Duration = new Duration(TimeSpan.FromSeconds(.8));
-                SignalImg.BeginAnimation(OpacityProperty, da);               
+                SignalImg.BeginAnimation(OpacityProperty, da);
             }
         }
 
@@ -190,7 +206,7 @@ namespace zVirtualScenes_WPF.DynamicActionControls
             }
             return false;
         }
-        
+
         public enum NumberType
         {
             Integer,
@@ -200,6 +216,6 @@ namespace zVirtualScenes_WPF.DynamicActionControls
             ComPort
         }
 
-        
+
     }
 }

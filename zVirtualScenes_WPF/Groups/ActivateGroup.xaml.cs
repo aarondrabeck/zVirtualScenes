@@ -66,7 +66,11 @@ namespace zVirtualScenes_WPF.Groups
 
         private void Window_Closing_1(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
+            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;            
+        }
+
+        private void ActivateGroup_Closed_1(object sender, EventArgs e)
+        {
             context.Dispose();
         }
 
@@ -124,5 +128,7 @@ namespace zVirtualScenes_WPF.Groups
                 }
             }
         }
+
+        
     }
 }

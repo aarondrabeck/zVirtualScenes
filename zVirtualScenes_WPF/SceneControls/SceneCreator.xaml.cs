@@ -127,7 +127,7 @@ namespace zVirtualScenes_WPF.SceneControls
         {
             SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
             zvsLocalDBEntities.onScenesChanged -= zvsLocalDBEntities_onScenesChanged;
-            //context.Dispose();
+          
         }
 
         private void SortUp_Click_1(object sender, RoutedEventArgs e)

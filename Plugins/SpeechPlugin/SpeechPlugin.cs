@@ -54,7 +54,7 @@ namespace SpeechPlugin
         {
             _synth = new SpeechSynthesizer();
             device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " started");
             _synth.SpeakAsync("Speech Started!");
             IsReady = true;
         }
@@ -62,7 +62,7 @@ namespace SpeechPlugin
         protected override void StopPlugin()
         {
             device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " stopped");
             _synth.Dispose();
             IsReady = false;
         }

@@ -31,6 +31,9 @@ namespace OpenZWavePlugin
         private string LaastEventNameValueId = "9999058723211334119";
         private int verbosity = 1;
         private bool isShuttingDown = false;
+        private bool _useHID = false;
+        private string _comPort = "3";
+        private int _pollint = 0;
 
         public static string LogPath
         {
@@ -52,115 +55,6 @@ namespace OpenZWavePlugin
                "Open ZWave Plugin",
                 "This plug-in interfaces zVirtualScenes with OpenZWave using the OpenZWave open-source project."
                 ) { }
-
-        protected override void StartPlugin()
-        {
-            try
-            {
-                if (isShuttingDown)
-                {
-                    WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin cannot start because it is still shutting down.");
-                    return;
-                }
-
-                WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
-
-                // Environment.CurrentDirectory returns wrong directory in Service env. so we have to make a trick
-                string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
-
-                // Create the Options                
-                m_options = new ZWOptions();
-                m_options.Create(directoryName + @"\config\",
-                                 LogPath,
-                                 @"");
-                m_options.Lock();
-                m_manager = new ZWManager();
-                m_manager.Create();
-                m_manager.OnNotification += NotificationHandler;
-
-                using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
-                {
-                    bool useHID = false;
-                    bool.TryParse(GetSettingValue("HID", Context), out useHID);
-
-                    if (!useHID)
-                    {
-                        string comPort = GetSettingValue("COMPORT", Context);
-                        if (comPort != "0")
-                        {
-                            m_manager.AddDriver(@"\\.\COM" + comPort);
-                        }
-                    }
-                    else
-                    {
-                        m_manager.AddDriver("HID Controller", ZWControllerInterface.Hid);
-                    }
-
-                    int pollint = 0;
-                    int.TryParse(GetSettingValue("POLLint", Context), out pollint);
-                    if (pollint != 0)
-                    {
-                        m_manager.SetPollInterval(pollint, true);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                WriteToLog(Urgency.ERROR, e.Message);
-            }
-        }
-
-        protected override void StopPlugin()
-        {
-            if (!isShuttingDown)
-            {
-                isShuttingDown = true;
-                IsReady = false;
-                string comPort = string.Empty;
-                using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
-                {
-                    comPort = GetSettingValue("COMPORT", Context);
-                }
-
-                BackgroundWorker worker = new BackgroundWorker();
-                worker.DoWork += (sender, args) =>
-                {
-                    //EKK this is blocking and can be slow
-                    if (m_manager != null)
-                    {
-                        m_manager.OnNotification -= NotificationHandler;
-                        m_manager.RemoveDriver(@"\\.\COM" + comPort);
-                        m_manager.Destroy();
-                        m_manager = null;
-                    }
-
-                    if (m_options != null)
-                    {
-                        m_options.Destroy();
-                        m_options = null;
-                    }
-                };
-                worker.RunWorkerCompleted += (sender, args) =>
-                {
-                    isShuttingDown = false;
-                    WriteToLog(Urgency.INFO, Friendly_Name + " plug-in stopped.");
-                };
-                worker.RunWorkerAsync();
-            }
-        }
-
-        protected override void SettingChanged(string settingName, string settingValue)
-        {
-            switch (settingName)
-            {
-                case "Com Port":
-                    // Set the port here
-                    break;
-                case "Polling interval":
-                    // Set the polling interval here
-                    break;
-            }
-        }
 
         public override void Initialize()
         {
@@ -249,7 +143,7 @@ namespace OpenZWavePlugin
                 device_propertys.AddOrEdit(new device_propertys
                 {
                     name = "DEFAULONLEVEL",
-                    friendly_name = "Level that an device is set to when using the 'ON' command.",                   
+                    friendly_name = "Level that an device is set to when using the 'ON' command.",
                     default_value = "99",
                     value_data_type = (int)Data_Types.BYTE
                 }, Context);
@@ -262,6 +156,10 @@ namespace OpenZWavePlugin
                     value_data_type = (int)Data_Types.BOOL
                 }, Context);
 
+                bool.TryParse(GetSettingValue("HID", Context), out _useHID);
+                _comPort = GetSettingValue("COMPORT", Context);
+                int.TryParse(GetSettingValue("POLLint", Context), out _pollint);
+               
             }
 
             //TODO: Make a new DeviceAPIProperty that is API specific for types of settings that applies OpenZWave Devices           
@@ -299,6 +197,136 @@ namespace OpenZWavePlugin
 
 
 
+        }
+
+        protected override void StartPlugin()
+        {
+            StartOpenzwave();
+        }
+
+        protected override void StopPlugin()
+        {
+            StopOpenzwave();
+        }
+
+        private void StartOpenzwave()
+        {
+            if (isShuttingDown)
+            {
+                WriteToLog(Urgency.INFO, this.Friendly_Name + " driver cannot start because it is still shutting down");
+                return;
+            }
+
+            try
+            {
+                WriteToLog(Urgency.INFO, string.Format("OpenZwave driver starting on {0}",_useHID ? "HID" : "COM" + _comPort));
+
+                // Environment.CurrentDirectory returns wrong directory in Service env. so we have to make a trick
+                string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
+
+                // Create the Options                
+                m_options = new ZWOptions();
+                m_options.Create(directoryName + @"\config\",
+                                 LogPath,
+                                 @"");
+                m_options.Lock();
+                m_manager = new ZWManager();
+                m_manager.Create();
+                m_manager.OnNotification += NotificationHandler;
+
+                if (!_useHID)
+                {
+                    if (_comPort != "0")
+                    {
+                        m_manager.AddDriver(@"\\.\COM" + _comPort);
+                    }
+                }
+                else
+                {
+                    m_manager.AddDriver("HID Controller", ZWControllerInterface.Hid);
+                }
+
+
+                if (_pollint != 0)
+                {
+                    m_manager.SetPollInterval(_pollint, true);
+                }
+
+            }
+            catch (Exception e)
+            {
+                WriteToLog(Urgency.ERROR, e.Message);
+            }
+        }
+
+        private void StopOpenzwave()
+        {
+            if (!isShuttingDown)
+            {
+                isShuttingDown = true;
+                IsReady = false;
+
+                //EKK this is blocking and can be slow
+                if (m_manager != null)
+                {
+                    m_manager.OnNotification -= NotificationHandler;
+                    m_manager.RemoveDriver(@"\\.\COM" + _comPort);
+                    m_manager.Destroy();
+                    m_manager = null;
+                }
+
+                if (m_options != null)
+                {
+                    m_options.Destroy();
+                    m_options = null;
+                }
+
+                isShuttingDown = false;
+                WriteToLog(Urgency.INFO, "OpenZwave driver stopped");
+            }
+        }
+
+        protected override void SettingChanged(string settingName, string settingValue)
+        {
+            switch (settingName)
+            {
+                case "COMPORT":
+                    {
+                        if (Enabled)
+                            StopOpenzwave();
+
+                        _comPort = settingValue;
+
+                        if (Enabled)
+                            StartOpenzwave();
+
+                        break;
+                    }
+                case "HID":
+                    {
+                        if (Enabled)
+                            StopOpenzwave();
+
+                        bool.TryParse(settingValue, out _useHID);
+
+                        if (Enabled)
+                            StartOpenzwave();
+
+                        break;
+                    }
+                case "POLLint":
+                    {
+                        if (Enabled)
+                            StopOpenzwave();
+
+                        int.TryParse(settingValue, out _pollint);
+
+                        if (Enabled)
+                            StartOpenzwave();
+
+                        break;
+                    }
+            }
         }
 
         public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)

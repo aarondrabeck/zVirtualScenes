@@ -44,7 +44,7 @@ namespace GrowlPlugin
         protected override void StartPlugin()
         {
 
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " started");
             device_values.DeviceValueDataChangedEvent+=new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent); 
             RegisterGrowl(); 
 
@@ -53,7 +53,7 @@ namespace GrowlPlugin
 
         protected override void StopPlugin()
         {
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " stopped");
             device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent); 
 
             IsReady = false;

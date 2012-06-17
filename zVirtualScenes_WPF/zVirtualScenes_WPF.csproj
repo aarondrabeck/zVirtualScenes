@@ -39,7 +39,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>audio-mixing-desk.ico</ApplicationIcon>
+    <ApplicationIcon>zvs256.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
@@ -55,8 +55,10 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -77,7 +79,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
+    <Compile Include="NotifyIcon.cs" />
     <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
       <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
     </Compile>
@@ -103,6 +109,10 @@
       <DependentUpon>TriggerGridUC.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisibilityAnimation.cs" />
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DeviceControls\DeviceProperties.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -269,6 +279,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
+    <Resource Include="Images\zvs256.ico" />
+    <Resource Include="Images\zvs32.ico" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
@@ -330,9 +342,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="audio-mixing-desk.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\20radio.png" />
@@ -397,6 +406,19 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\run.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\256zvsIcon.png" />
+    <Resource Include="Images\32zvsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="zvs256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="SplashScreen1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\zvsLogoTextOnly.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

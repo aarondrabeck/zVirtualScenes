@@ -66,9 +66,13 @@ namespace zVirtualScenes_WPF.PluginManager
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged;
-            context.Dispose();
+            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged;            
         }
+
+        private void Window_Closed_1(object sender, EventArgs e)
+        {
+            context.Dispose();
+        }  
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {            
@@ -89,7 +93,7 @@ namespace zVirtualScenes_WPF.PluginManager
                     (isChecked) =>
                     {
                         //Save to the database
-                        p.enabled = isChecked;
+                        p.enabled = isChecked;                        
                         context.SaveChanges();
 
                         //STOP OR START
@@ -118,8 +122,9 @@ namespace zVirtualScenes_WPF.PluginManager
                                     DefaultValue,
                                     (isChecked) =>
                                     {
-                                        _ps.value = isChecked.ToString();
+                                        _ps.value = isChecked.ToString();                                        
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -133,8 +138,9 @@ namespace zVirtualScenes_WPF.PluginManager
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.value = value;                                        
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -148,8 +154,9 @@ namespace zVirtualScenes_WPF.PluginManager
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.value = value;                                        
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -163,8 +170,9 @@ namespace zVirtualScenes_WPF.PluginManager
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.value = value;                                       
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -178,8 +186,9 @@ namespace zVirtualScenes_WPF.PluginManager
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.value = value;                                        
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -195,6 +204,7 @@ namespace zVirtualScenes_WPF.PluginManager
                                     {
                                         _ps.value = value;
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -209,6 +219,7 @@ namespace zVirtualScenes_WPF.PluginManager
                                     {
                                         _ps.value = value;
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -224,6 +235,7 @@ namespace zVirtualScenes_WPF.PluginManager
                                     {
                                         _ps.value = value;
                                         context.SaveChanges();
+                                        application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -232,6 +244,8 @@ namespace zVirtualScenes_WPF.PluginManager
                     }
                 }
             }
-        }      
+        }
+
+            
     }
 }

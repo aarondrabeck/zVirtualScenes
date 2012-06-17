@@ -98,7 +98,7 @@ namespace GlobalHotKeyPlugin
             }
             #endregion
 
-            WriteToLog(Urgency.INFO, string.Format("{0} plugin started. (Registered {1} hotkeys with {2} errors.)", this.Friendly_Name, success, errors));
+            WriteToLog(Urgency.INFO, string.Format("{0} started. (Registered {1} hotkeys with {2} errors.)", this.Friendly_Name, success, errors));
 
             IsReady = true;
         }
@@ -106,7 +106,7 @@ namespace GlobalHotKeyPlugin
         protected override void StopPlugin()
         {
             hook.KeyPressed -= new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
+            WriteToLog(Urgency.INFO, this.Friendly_Name + " stopped");
             IsReady = false;
         }
 

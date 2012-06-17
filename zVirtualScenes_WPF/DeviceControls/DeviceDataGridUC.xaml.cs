@@ -182,7 +182,7 @@ namespace zVirtualScenes_WPF.DeviceControls
             zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
             zvsLocalDBEntities.onGroup_DevicesChanged -= zvsLocalDBEntities_onGroup_DevicesChanged;
             zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
-            //context.Dispose();
+           
         }
 
         ////User Events

@@ -71,7 +71,7 @@ namespace zVirtualScenes_WPF.Groups
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
-            //context.Dispose();
+            
         }
 
         private void EvaluateAddEditBtnsUsability()

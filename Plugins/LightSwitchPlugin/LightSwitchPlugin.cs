@@ -25,6 +25,11 @@ namespace LightSwitchPlugin
         private int m_cookie = new Random().Next(65536);
         public volatile bool isActive = false;
         private NetService netservice = null;
+        private bool _verbose = false;
+        private bool _useBonjour = false;
+        private bool _sort_list = true;
+        private int _port = 9909;
+        private int _max_conn = 50;
 
         public LightSwitchPlugin()
             : base("LIGHTSWITCH",
@@ -106,6 +111,12 @@ namespace LightSwitchPlugin
                     defualt_value = "true",
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
+
+                bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
+                bool.TryParse(GetSettingValue("PUBLISHZEROCFG", context), out _useBonjour);
+                bool.TryParse(GetSettingValue("SORTLIST", context), out _sort_list);
+                int.TryParse(GetSettingValue("PORT", context), out _port);
+                int.TryParse(GetSettingValue("MAXCONN", context), out _max_conn);
             }
         }
 
@@ -115,35 +126,9 @@ namespace LightSwitchPlugin
             {
                 device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
                 zVirtualScenes.PluginManager.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
-                zVirtualScenes.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;  
-               
-                WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin started.");
+                zVirtualScenes.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
 
                 OpenLightSwitchSocket();
-
-                bool useBonjour = false;
-                bool.TryParse(GetSettingValue("PUBLISHZEROCFG", context), out useBonjour);
-
-                if (useBonjour)
-                {
-                    try
-                    {
-                        if (netservice == null)
-                            PublishZeroconf();
-                        else
-                        {
-                            netservice.Dispose();
-                            PublishZeroconf();
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        WriteToLog(Urgency.ERROR, ex.Message);
-                    }
-                }
-
-                IsReady = true;
             }
         }
 
@@ -151,16 +136,75 @@ namespace LightSwitchPlugin
         {
             device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
             zVirtualScenes.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
-            zVirtualScenes.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd; 
-
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " plugin ended.");
+            zVirtualScenes.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
             CloseLightSwitchSocket();
-            IsReady = false;
         }
 
         protected override void SettingChanged(string settingName, string settingValue)
         {
+            if (settingName == "VERBOSE")
+            {
+                bool.TryParse(settingValue, out _verbose);
+            }
+            else if (settingName == "PUBLISHZEROCFG")
+            {
+                bool.TryParse(settingValue, out _useBonjour);
+                publishZeroConf();
+            }
+            else if (settingName == "SORTLIST")
+            {
+                bool.TryParse(settingValue, out _sort_list);
+            }
+            else if (settingName == "PORT")
+            {
+                if (this.Enabled)
+                    CloseLightSwitchSocket();
+
+                int.TryParse(settingValue, out _port);
+
+                if (this.Enabled)
+                    OpenLightSwitchSocket();
+
+            }
+            else if (settingName == "MAXCONN")
+            {
+                if (this.Enabled)
+                    CloseLightSwitchSocket();
+
+                int.TryParse(settingValue, out _max_conn);
+
+                if (this.Enabled)
+                    OpenLightSwitchSocket();
+            }
         }
+
+        private void publishZeroConf()
+        {
+            if (_useBonjour)
+            {
+                try
+                {
+                    if (netservice == null)
+                        PublishZeroconf();
+                    else
+                    {
+                        netservice.Dispose();
+                        PublishZeroconf();
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    WriteToLog(Urgency.ERROR, ex.Message);
+                }
+            }
+            else
+            {
+                if (netservice == null)
+                    netservice.Dispose();
+            }
+        }
+
         public override bool ProcessDeviceCommand(device_command_que cmd)
         {
             return true;
@@ -201,7 +245,7 @@ namespace LightSwitchPlugin
 
                         string device_name = string.Empty;
                         device_name = dv.device.friendly_name;
-                        BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + dv.value2 + Environment.NewLine);
+                        BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + args.newValue + Environment.NewLine);
                     }
                 }
             };
@@ -242,19 +286,13 @@ namespace LightSwitchPlugin
                 {
                     using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                     {
-                        int port = 9909;
-                        int.TryParse(GetSettingValue("PORT", context), out port);
-
-                        int max_conn = 50;
-                        int.TryParse(GetSettingValue("MAXCONN", context), out max_conn);
-
-
                         isActive = true;
                         LightSwitchSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                        LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, port));
-                        LightSwitchSocket.Listen(max_conn);
+                        LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, _port));
+                        LightSwitchSocket.Listen(_max_conn);
                         LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                        WriteToLog(Urgency.INFO, "Started listening for LightSwitch clients on port " + port + ".");
+                        WriteToLog(Urgency.INFO, "Lightswitch server started on port " + _port );                        
+                        IsReady = true;
                     }
                 }
                 catch (SocketException e)
@@ -277,8 +315,9 @@ namespace LightSwitchPlugin
                         client.Close();
                     }
                 }
-                WriteToLog(Urgency.INFO, "Stopped listening for new clients.");
+                WriteToLog(Urgency.INFO, "Lightswitch server stopped");
                 isActive = false;
+                IsReady = false;
             }
         }
 
@@ -315,6 +354,8 @@ namespace LightSwitchPlugin
             {
                 WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
             }
+            catch (Exception)
+            { }
         }
 
         /// <summary>
@@ -375,11 +416,7 @@ namespace LightSwitchPlugin
                         int charLen = d.GetChars(socketData.dataBuffer, 0, iRx, chars, 0);
                         string data = new string(chars);
 
-
-                        bool verbose = true;
-                        bool.TryParse(GetSettingValue("VERBOSE", context), out verbose);
-
-                        if (verbose)
+                        if (_verbose)
                             WriteToLog(Urgency.INFO, "Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
 
                         string[] commands = data.Split('\n');
@@ -601,11 +638,7 @@ namespace LightSwitchPlugin
                     }
                 }
 
-
-                //Optional Sort By Name
-                bool sort_list = true;
-                bool.TryParse(GetSettingValue("SORTLIST", context), out sort_list);
-                if (sort_list)
+                if (_sort_list)
                     LS_devices.Sort();
 
                 //Send to Client
@@ -945,16 +978,24 @@ namespace LightSwitchPlugin
                 byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
 
                 foreach (Socket workerSocket in LightSwitchClients)
-                    if (workerSocket != null)
-                        workerSocket.Send(byData);
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-                {
-                    bool verbose = true;
-                    bool.TryParse(GetSettingValue("VERBOSE", context), out verbose);
+                    if (workerSocket != null && workerSocket.Connected)
+                    {
+                        try
+                        {
+                            workerSocket.Send(byData);
+                        }
+                        catch (SocketException se)
+                        {
+                            if (_verbose)
+                                WriteToLog(Urgency.ERROR, "Socket Exception: " + se.Message);
 
-                    if (verbose)
-                        WriteToLog(Urgency.INFO, "SENT TO ALL - " + msg);
-                }
+                            return;
+                        }
+                    }
+
+                if (_verbose)
+                    WriteToLog(Urgency.INFO, "SENT TO ALL - " + msg);
+
             }
         }
 
@@ -968,16 +1009,22 @@ namespace LightSwitchPlugin
             {
                 // Convert the reply to byte array
                 byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
-                LightSwitchClientSocket.Send(byData);
-
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                if (LightSwitchClientSocket != null && LightSwitchClientSocket.Connected)
                 {
-                    bool verbose = true;
-                    bool.TryParse(GetSettingValue("VERBOSE", context), out verbose);
-
-                    if (verbose)
-                        WriteToLog(Urgency.INFO, "SENT - " + msg);
+                    try
+                    {
+                        LightSwitchClientSocket.Send(byData);
+                    }
+                    catch (SocketException se)
+                    {
+                        if (_verbose)
+                            WriteToLog(Urgency.ERROR, "Socket Exception: " + se.Message);
+                    }
                 }
+
+                if (_verbose)
+                    WriteToLog(Urgency.INFO, "SENT - " + msg);
+
             }
         }
 
@@ -990,16 +1037,24 @@ namespace LightSwitchPlugin
             // Convert the reply to byte array
             byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
             Socket LightSwitchClientsSocket = (Socket)LightSwitchClients[clientNumber - 1];
-            LightSwitchClientsSocket.Send(byData);
 
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            if (LightSwitchClientsSocket != null && LightSwitchClientsSocket.Connected)
             {
-                bool verbose = true;
-                bool.TryParse(GetSettingValue("VERBOSE", context), out verbose);
-
-                if (verbose)
-                    WriteToLog(Urgency.INFO, "SENT " + msg);
+                try
+                {
+                    LightSwitchClientsSocket.Send(byData);
+                }
+                catch (SocketException se)
+                {
+                    if (_verbose)
+                        WriteToLog(Urgency.ERROR, "Socket Exception: " + se.Message);
+                }
             }
+
+
+            if (_verbose)
+                WriteToLog(Urgency.INFO, "SENT " + msg);
+
         }
 
         private void DisconnectClientSocket(SocketPacket socketData)
