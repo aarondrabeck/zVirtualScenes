@@ -7,51 +7,72 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-
-    public partial class group : INotifyPropertyChanged 
+    
+    public partial class group : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public group()
         {
             this.group_devices = new ObservableCollection<group_devices>();
         }
     
-        private int _id;
-        public int id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                NotifyPropertyChanged("id");
-            }
-        }
-
-        private string _name;
-        public string name
-        {
-            get { return _name; }
-            set
-            {
-                _name = value;
-                NotifyPropertyChanged("name");
-            }
-        }
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
     
-        public virtual ObservableCollection<group_devices> group_devices { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-        }
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<group_devices> _group_devices;
+        public virtual ObservableCollection<group_devices> group_devices {
+    		get { 
+    			return _group_devices;
+    		} 
+    		set {
+    			if (value != _group_devices){
+    				_group_devices = value;
+    			    NotifyPropertyChanged("group_devices");
+    			}
+    		}
+    	 }
     }
 }

@@ -7,17 +7,81 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
     
-    public partial class builtin_command_options
+    public partial class builtin_command_options : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public int builtin_command_id { get; set; }
-        public string name { get; set; }
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
     
-        public virtual builtin_commands builtin_commands { get; set; }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _builtin_command_id;
+        public int builtin_command_id {
+    		get { 
+    			return _builtin_command_id;
+    		} 
+    		set {
+    			if (value != _builtin_command_id){
+    				_builtin_command_id = value;
+    			    NotifyPropertyChanged("builtin_command_id");
+    			}
+    		}
+    	 }
+    
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    
+    	private builtin_commands _builtin_commands;
+        public virtual builtin_commands builtin_commands {
+    		get { 
+    			return _builtin_commands;
+    		} 
+    		set {
+    			if (value != _builtin_commands){
+    				_builtin_commands = value;
+    			    NotifyPropertyChanged("builtin_commands");
+    			}
+    		}
+    	 }
     }
 }

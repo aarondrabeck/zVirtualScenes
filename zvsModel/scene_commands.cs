@@ -7,109 +7,146 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-
-    public partial class scene_commands : INotifyPropertyChanged 
+    
+    public partial class scene_commands : INotifyPropertyChanged
     {
-
-        private int _id;
-        public int id
-        {
-            get { return _id; }
-            set
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
             {
-                _id = value;
-                NotifyPropertyChanged("id");
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
             }
-        }
-
-        private int _scene_id;
-        public int scene_id
-        {
-            get { return _scene_id; }
-            set
-            {
-                _scene_id = value;
-                NotifyPropertyChanged("scene_id");
-            }
-        }
-
-        private Nullable<int> _device_id;
-        public Nullable<int> device_id
-        {
-            get { return _device_id; }
-            set
-            {
-                _device_id = value;
-                NotifyPropertyChanged("device_id");
-                NotifyPropertyChanged("Actionable_Object");
-                NotifyPropertyChanged("Action_Description");
-            }
-        }
-
-        private int _command_type_id;
-        public int command_type_id
-        {
-            get { return _command_type_id; }
-            set
-            {
-                _command_type_id = value;
-                NotifyPropertyChanged("command_type_id");
-                NotifyPropertyChanged("Action_Description");
-                NotifyPropertyChanged("Actionable_Object");
-            }
-        }
-
-        private int _command_id;
-        public int command_id
-        {
-            get { return _command_id; }
-            set
-            {
-                _command_id = value;
-                NotifyPropertyChanged("command_id");
-                NotifyPropertyChanged("Action_Description");
-                NotifyPropertyChanged("Actionable_Object");
-            }
-        }
-
-        private string _arg;
-        public string arg
-        {
-            get { return _arg; }
-            set
-            {
-                _arg = value;
-                NotifyPropertyChanged("arg");
-                NotifyPropertyChanged("Action_Description");
-            }
-        }
-
-        private Nullable<int> _sort_order;
-        public Nullable<int> sort_order
-        {
-            get { return _sort_order; }
-            set
-            {
-                _sort_order = value;
-                NotifyPropertyChanged("sort_order");
-            }
-        }
-            
-        public virtual device device { get; set; }
-        public virtual scene scene { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-        }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _scene_id;
+        public int scene_id {
+    		get { 
+    			return _scene_id;
+    		} 
+    		set {
+    			if (value != _scene_id){
+    				_scene_id = value;
+    			    NotifyPropertyChanged("scene_id");
+    			}
+    		}
+    	 }
+    
+    	private Nullable<int> _device_id;
+        public Nullable<int> device_id {
+    		get { 
+    			return _device_id;
+    		} 
+    		set {
+    			if (value != _device_id){
+    				_device_id = value;
+    			    NotifyPropertyChanged("device_id");
+    			}
+    		}
+    	 }
+    
+    	private int _command_type_id;
+        public int command_type_id {
+    		get { 
+    			return _command_type_id;
+    		} 
+    		set {
+    			if (value != _command_type_id){
+    				_command_type_id = value;
+    			    NotifyPropertyChanged("command_type_id");
+    			}
+    		}
+    	 }
+    
+    	private int _command_id;
+        public int command_id {
+    		get { 
+    			return _command_id;
+    		} 
+    		set {
+    			if (value != _command_id){
+    				_command_id = value;
+    			    NotifyPropertyChanged("command_id");
+    			}
+    		}
+    	 }
+    
+    	private string _arg;
+        public string arg {
+    		get { 
+    			return _arg;
+    		} 
+    		set {
+    			if (value != _arg){
+    				_arg = value;
+    			    NotifyPropertyChanged("arg");
+    			}
+    		}
+    	 }
+    
+    	private Nullable<int> _sort_order;
+        public Nullable<int> sort_order {
+    		get { 
+    			return _sort_order;
+    		} 
+    		set {
+    			if (value != _sort_order){
+    				_sort_order = value;
+    			    NotifyPropertyChanged("sort_order");
+    			}
+    		}
+    	 }
+    
+    
+    	private device _device;
+        public virtual device device {
+    		get { 
+    			return _device;
+    		} 
+    		set {
+    			if (value != _device){
+    				_device = value;
+    			    NotifyPropertyChanged("device");
+    			}
+    		}
+    	 }
+    
+    	private scene _scene;
+        public virtual scene scene {
+    		get { 
+    			return _scene;
+    		} 
+    		set {
+    			if (value != _scene){
+    				_scene = value;
+    			    NotifyPropertyChanged("scene");
+    			}
+    		}
+    	 }
     }
 }

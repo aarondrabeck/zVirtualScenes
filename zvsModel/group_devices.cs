@@ -7,57 +7,94 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-
-    public partial class group_devices : INotifyPropertyChanged 
+    
+    public partial class group_devices : INotifyPropertyChanged
     {
-        private int _device_id;
-        public int device_id
-        {
-            get { return _device_id; }
-            set
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
             {
-                _device_id = value;
-                NotifyPropertyChanged("device_id");
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
             }
-        }
-
-        private int _id;
-        public int id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                NotifyPropertyChanged("id");
-            }
-        }
-
-        private int _group_id;
-        public int group_id
-        {
-            get { return _group_id; }
-            set
-            {
-                _group_id = value;
-                NotifyPropertyChanged("group_id");
-            }
-        }
-
-        public virtual device device { get; set; }
-        public virtual group group { get; set; }
-       
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-        }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
+    
+    	private int _device_id;
+        public int device_id {
+    		get { 
+    			return _device_id;
+    		} 
+    		set {
+    			if (value != _device_id){
+    				_device_id = value;
+    			    NotifyPropertyChanged("device_id");
+    			}
+    		}
+    	 }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _group_id;
+        public int group_id {
+    		get { 
+    			return _group_id;
+    		} 
+    		set {
+    			if (value != _group_id){
+    				_group_id = value;
+    			    NotifyPropertyChanged("group_id");
+    			}
+    		}
+    	 }
+    
+    
+    	private device _device;
+        public virtual device device {
+    		get { 
+    			return _device;
+    		} 
+    		set {
+    			if (value != _device){
+    				_device = value;
+    			    NotifyPropertyChanged("device");
+    			}
+    		}
+    	 }
+    
+    	private group _group;
+        public virtual group group {
+    		get { 
+    			return _group;
+    		} 
+    		set {
+    			if (value != _group){
+    				_group = value;
+    			    NotifyPropertyChanged("group");
+    			}
+    		}
+    	 }
     }
 }

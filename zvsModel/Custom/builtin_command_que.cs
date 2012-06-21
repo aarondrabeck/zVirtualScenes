@@ -28,7 +28,7 @@ namespace zVirtualScenesModel
         }
 
         public static void Run(builtin_command_que cmd, zvsLocalDBEntities context)
-        {
+        {            
             context.builtin_command_que.Add(cmd);
             context.SaveChanges();
             BuiltinCommandAddedToQue(cmd.id);

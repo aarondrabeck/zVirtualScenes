@@ -7,28 +7,150 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     
-    public partial class plugin_settings
+    public partial class plugin_settings : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public plugin_settings()
         {
             this.plugin_setting_options = new ObservableCollection<plugin_setting_options>();
         }
     
-        public int id { get; set; }
-        public int plugin_id { get; set; }
-        public string friendly_name { get; set; }
-        public string value { get; set; }
-        public int value_data_type { get; set; }
-        public string description { get; set; }
-        public string name { get; set; }
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
     
-        public virtual ObservableCollection<plugin_setting_options> plugin_setting_options { get; set; }
-        public virtual plugin plugin { get; set; }
+    	private int _plugin_id;
+        public int plugin_id {
+    		get { 
+    			return _plugin_id;
+    		} 
+    		set {
+    			if (value != _plugin_id){
+    				_plugin_id = value;
+    			    NotifyPropertyChanged("plugin_id");
+    			}
+    		}
+    	 }
+    
+    	private string _friendly_name;
+        public string friendly_name {
+    		get { 
+    			return _friendly_name;
+    		} 
+    		set {
+    			if (value != _friendly_name){
+    				_friendly_name = value;
+    			    NotifyPropertyChanged("friendly_name");
+    			}
+    		}
+    	 }
+    
+    	private string _value;
+        public string value {
+    		get { 
+    			return _value;
+    		} 
+    		set {
+    			if (value != _value){
+    				_value = value;
+    			    NotifyPropertyChanged("value");
+    			}
+    		}
+    	 }
+    
+    	private int _value_data_type;
+        public int value_data_type {
+    		get { 
+    			return _value_data_type;
+    		} 
+    		set {
+    			if (value != _value_data_type){
+    				_value_data_type = value;
+    			    NotifyPropertyChanged("value_data_type");
+    			}
+    		}
+    	 }
+    
+    	private string _description;
+        public string description {
+    		get { 
+    			return _description;
+    		} 
+    		set {
+    			if (value != _description){
+    				_description = value;
+    			    NotifyPropertyChanged("description");
+    			}
+    		}
+    	 }
+    
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<plugin_setting_options> _plugin_setting_options;
+        public virtual ObservableCollection<plugin_setting_options> plugin_setting_options {
+    		get { 
+    			return _plugin_setting_options;
+    		} 
+    		set {
+    			if (value != _plugin_setting_options){
+    				_plugin_setting_options = value;
+    			    NotifyPropertyChanged("plugin_setting_options");
+    			}
+    		}
+    	 }
+    
+    	private plugin _plugin;
+        public virtual plugin plugin {
+    		get { 
+    			return _plugin;
+    		} 
+    		set {
+    			if (value != _plugin){
+    				_plugin = value;
+    			    NotifyPropertyChanged("plugin");
+    			}
+    		}
+    	 }
     }
 }

@@ -7,28 +7,138 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     
-    public partial class scene_property
+    public partial class scene_property : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public scene_property()
         {
             this.scene_property_option = new ObservableCollection<scene_property_option>();
             this.scene_property_value = new ObservableCollection<scene_property_value>();
         }
     
-        public int id { get; set; }
-        public string friendly_name { get; set; }
-        public string defualt_value { get; set; }
-        public int value_data_type { get; set; }
-        public string description { get; set; }
-        public string name { get; set; }
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
     
-        public virtual ObservableCollection<scene_property_option> scene_property_option { get; set; }
-        public virtual ObservableCollection<scene_property_value> scene_property_value { get; set; }
+    	private string _friendly_name;
+        public string friendly_name {
+    		get { 
+    			return _friendly_name;
+    		} 
+    		set {
+    			if (value != _friendly_name){
+    				_friendly_name = value;
+    			    NotifyPropertyChanged("friendly_name");
+    			}
+    		}
+    	 }
+    
+    	private string _defualt_value;
+        public string defualt_value {
+    		get { 
+    			return _defualt_value;
+    		} 
+    		set {
+    			if (value != _defualt_value){
+    				_defualt_value = value;
+    			    NotifyPropertyChanged("defualt_value");
+    			}
+    		}
+    	 }
+    
+    	private int _value_data_type;
+        public int value_data_type {
+    		get { 
+    			return _value_data_type;
+    		} 
+    		set {
+    			if (value != _value_data_type){
+    				_value_data_type = value;
+    			    NotifyPropertyChanged("value_data_type");
+    			}
+    		}
+    	 }
+    
+    	private string _description;
+        public string description {
+    		get { 
+    			return _description;
+    		} 
+    		set {
+    			if (value != _description){
+    				_description = value;
+    			    NotifyPropertyChanged("description");
+    			}
+    		}
+    	 }
+    
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<scene_property_option> _scene_property_option;
+        public virtual ObservableCollection<scene_property_option> scene_property_option {
+    		get { 
+    			return _scene_property_option;
+    		} 
+    		set {
+    			if (value != _scene_property_option){
+    				_scene_property_option = value;
+    			    NotifyPropertyChanged("scene_property_option");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<scene_property_value> _scene_property_value;
+        public virtual ObservableCollection<scene_property_value> scene_property_value {
+    		get { 
+    			return _scene_property_value;
+    		} 
+    		set {
+    			if (value != _scene_property_value){
+    				_scene_property_value = value;
+    			    NotifyPropertyChanged("scene_property_value");
+    			}
+    		}
+    	 }
     }
 }

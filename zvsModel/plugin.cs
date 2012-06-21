@@ -7,86 +7,125 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-
-    public partial class plugin : INotifyPropertyChanged 
+    
+    public partial class plugin : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public plugin()
         {
             this.device_types = new ObservableCollection<device_types>();
             this.plugin_settings = new ObservableCollection<plugin_settings>();
         }
-
-        private int _id;
-        public int id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                NotifyPropertyChanged("id");
-            }
-        }
-
-        private string _friendly_name;
-        public string friendly_name
-        {
-            get { return _friendly_name; }
-            set
-            {
-                _friendly_name = value;
-                NotifyPropertyChanged("friendly_name");
-            }
-        }
-
-        private string _name;
-        public string name
-        {
-            get { return _name; }
-            set
-            {
-                _name = value;
-                NotifyPropertyChanged("name");
-            }
-        }
-
-        private bool _enabled;
-        public bool enabled
-        {
-            get { return _enabled; }
-            set
-            {
-                _enabled = value;
-                NotifyPropertyChanged("enabled");
-            }
-        }
-
-        private string _description;
-        public string description
-        {
-            get { return _description; }
-            set
-            {
-                _description = value;
-                NotifyPropertyChanged("description");
-            }
-        }
-       
-        public virtual ObservableCollection<device_types> device_types { get; set; }
-        public virtual ObservableCollection<plugin_settings> plugin_settings { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-        }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private string _friendly_name;
+        public string friendly_name {
+    		get { 
+    			return _friendly_name;
+    		} 
+    		set {
+    			if (value != _friendly_name){
+    				_friendly_name = value;
+    			    NotifyPropertyChanged("friendly_name");
+    			}
+    		}
+    	 }
+    
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    	private bool _enabled;
+        public bool enabled {
+    		get { 
+    			return _enabled;
+    		} 
+    		set {
+    			if (value != _enabled){
+    				_enabled = value;
+    			    NotifyPropertyChanged("enabled");
+    			}
+    		}
+    	 }
+    
+    	private string _description;
+        public string description {
+    		get { 
+    			return _description;
+    		} 
+    		set {
+    			if (value != _description){
+    				_description = value;
+    			    NotifyPropertyChanged("description");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<device_types> _device_types;
+        public virtual ObservableCollection<device_types> device_types {
+    		get { 
+    			return _device_types;
+    		} 
+    		set {
+    			if (value != _device_types){
+    				_device_types = value;
+    			    NotifyPropertyChanged("device_types");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<plugin_settings> _plugin_settings;
+        public virtual ObservableCollection<plugin_settings> plugin_settings {
+    		get { 
+    			return _plugin_settings;
+    		} 
+    		set {
+    			if (value != _plugin_settings){
+    				_plugin_settings = value;
+    			    NotifyPropertyChanged("plugin_settings");
+    			}
+    		}
+    	 }
     }
 }

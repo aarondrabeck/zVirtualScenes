@@ -7,15 +7,67 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
     
-    public partial class db_info
+    public partial class db_info : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public string info_name { get; set; }
-        public string info_value { get; set; }
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private string _info_name;
+        public string info_name {
+    		get { 
+    			return _info_name;
+    		} 
+    		set {
+    			if (value != _info_name){
+    				_info_name = value;
+    			    NotifyPropertyChanged("info_name");
+    			}
+    		}
+    	 }
+    
+    	private string _info_value;
+        public string info_value {
+    		get { 
+    			return _info_value;
+    		} 
+    		set {
+    			if (value != _info_value){
+    				_info_value = value;
+    			    NotifyPropertyChanged("info_value");
+    			}
+    		}
+    	 }
     }
 }

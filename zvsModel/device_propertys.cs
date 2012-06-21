@@ -7,27 +7,125 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     
-    public partial class device_propertys
+    public partial class device_propertys : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public device_propertys()
         {
             this.device_property_options = new ObservableCollection<device_property_options>();
             this.device_property_values = new ObservableCollection<device_property_values>();
         }
     
-        public int id { get; set; }
-        public string friendly_name { get; set; }
-        public string name { get; set; }
-        public string default_value { get; set; }
-        public int value_data_type { get; set; }
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
     
-        public virtual ObservableCollection<device_property_options> device_property_options { get; set; }
-        public virtual ObservableCollection<device_property_values> device_property_values { get; set; }
+    	private string _friendly_name;
+        public string friendly_name {
+    		get { 
+    			return _friendly_name;
+    		} 
+    		set {
+    			if (value != _friendly_name){
+    				_friendly_name = value;
+    			    NotifyPropertyChanged("friendly_name");
+    			}
+    		}
+    	 }
+    
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    	private string _default_value;
+        public string default_value {
+    		get { 
+    			return _default_value;
+    		} 
+    		set {
+    			if (value != _default_value){
+    				_default_value = value;
+    			    NotifyPropertyChanged("default_value");
+    			}
+    		}
+    	 }
+    
+    	private int _value_data_type;
+        public int value_data_type {
+    		get { 
+    			return _value_data_type;
+    		} 
+    		set {
+    			if (value != _value_data_type){
+    				_value_data_type = value;
+    			    NotifyPropertyChanged("value_data_type");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<device_property_options> _device_property_options;
+        public virtual ObservableCollection<device_property_options> device_property_options {
+    		get { 
+    			return _device_property_options;
+    		} 
+    		set {
+    			if (value != _device_property_options){
+    				_device_property_options = value;
+    			    NotifyPropertyChanged("device_property_options");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<device_property_values> _device_property_values;
+        public virtual ObservableCollection<device_property_values> device_property_values {
+    		get { 
+    			return _device_property_values;
+    		} 
+    		set {
+    			if (value != _device_property_values){
+    				_device_property_values = value;
+    			    NotifyPropertyChanged("device_property_values");
+    			}
+    		}
+    	 }
     }
 }

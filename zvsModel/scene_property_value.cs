@@ -7,19 +7,107 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
     
-    public partial class scene_property_value
+    public partial class scene_property_value : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public int scene_id { get; set; }
-        public int scene_property_id { get; set; }
-        public string value { get; set; }
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
     
-        public virtual scene_property scene_property { get; set; }
-        public virtual scene scene { get; set; }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _scene_id;
+        public int scene_id {
+    		get { 
+    			return _scene_id;
+    		} 
+    		set {
+    			if (value != _scene_id){
+    				_scene_id = value;
+    			    NotifyPropertyChanged("scene_id");
+    			}
+    		}
+    	 }
+    
+    	private int _scene_property_id;
+        public int scene_property_id {
+    		get { 
+    			return _scene_property_id;
+    		} 
+    		set {
+    			if (value != _scene_property_id){
+    				_scene_property_id = value;
+    			    NotifyPropertyChanged("scene_property_id");
+    			}
+    		}
+    	 }
+    
+    	private string _value;
+        public string value {
+    		get { 
+    			return _value;
+    		} 
+    		set {
+    			if (value != _value){
+    				_value = value;
+    			    NotifyPropertyChanged("value");
+    			}
+    		}
+    	 }
+    
+    
+    	private scene_property _scene_property;
+        public virtual scene_property scene_property {
+    		get { 
+    			return _scene_property;
+    		} 
+    		set {
+    			if (value != _scene_property){
+    				_scene_property = value;
+    			    NotifyPropertyChanged("scene_property");
+    			}
+    		}
+    	 }
+    
+    	private scene _scene;
+        public virtual scene scene {
+    		get { 
+    			return _scene;
+    		} 
+    		set {
+    			if (value != _scene){
+    				_scene = value;
+    			    NotifyPropertyChanged("scene");
+    			}
+    		}
+    	 }
     }
 }

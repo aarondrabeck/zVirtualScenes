@@ -7,17 +7,81 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
     
-    public partial class device_property_options
+    public partial class device_property_options : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public int device_property_id { get; set; }
-        public string name { get; set; }
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
     
-        public virtual device_propertys device_propertys { get; set; }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _device_property_id;
+        public int device_property_id {
+    		get { 
+    			return _device_property_id;
+    		} 
+    		set {
+    			if (value != _device_property_id){
+    				_device_property_id = value;
+    			    NotifyPropertyChanged("device_property_id");
+    			}
+    		}
+    	 }
+    
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    
+    	private device_propertys _device_propertys;
+        public virtual device_propertys device_propertys {
+    		get { 
+    			return _device_propertys;
+    		} 
+    		set {
+    			if (value != _device_propertys){
+    				_device_propertys = value;
+    			    NotifyPropertyChanged("device_propertys");
+    			}
+    		}
+    	 }
     }
 }

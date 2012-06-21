@@ -7,15 +7,29 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.ComponentModel;
-
-    public partial class device : INotifyPropertyChanged 
+    
+    public partial class device : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public device()
         {
             this.device_command_que = new ObservableCollection<device_command_que>();
@@ -26,100 +40,201 @@ namespace zVirtualScenesModel
             this.group_devices = new ObservableCollection<group_devices>();
             this.scene_commands = new ObservableCollection<scene_commands>();
         }
-
-        private int _id;
-        public int id
-        {
-            get { return _id; }
-            set
-            {
-                _id = value;
-                NotifyPropertyChanged("id");
-            }
-        }
-               
-        private int _device_type_id;
-        public int device_type_id
-        {
-            get { return _device_type_id; }
-            set
-            {
-                _device_type_id = value;
-                NotifyPropertyChanged("device_type_id");
-            }
-        }
-
-        private int _node_id = 0;
-        public int node_id
-        {
-            get { return _node_id; }
-            set
-            {
-                _node_id = value;
-                NotifyPropertyChanged("node_id");
-            }
-        }
-        
-        private string _current_level_txt = string.Empty;
-        public string current_level_txt
-        {
-            get { return _current_level_txt; }
-            set
-            {
-                _current_level_txt = value;
-                NotifyPropertyChanged("current_level_txt");
-            }
-        }
-
-        private int _current_level_int = 0;
-        public int current_level_int
-        {
-            get { return _current_level_int; }
-            set
-            {
-                _current_level_int = value;
-                NotifyPropertyChanged("current_level_int");
-            }
-        }
-
-        private string _friendly_name = string.Empty;
-        public string friendly_name
-        {
-            get { return _friendly_name; }
-            set
-            {
-                _friendly_name = value;
-                NotifyPropertyChanged("friendly_name");
-            }
-        }
-
-        private Nullable<System.DateTime> _last_heard_from;
-        public Nullable<System.DateTime> last_heard_from
-        {
-            get { return _last_heard_from; }
-            set
-            {
-                _last_heard_from = value;
-                NotifyPropertyChanged("last_heard_from");
-            }
-        }
-        
-        public virtual ObservableCollection<device_command_que> device_command_que { get; set; }
-        public virtual ObservableCollection<device_commands> device_commands { get; set; }
-        public virtual ObservableCollection<device_property_values> device_property_values { get; set; }
-        public virtual ObservableCollection<device_type_command_que> device_type_command_que { get; set; }
-        public virtual device_types device_types { get; set; }
-        public virtual ObservableCollection<device_values> device_values { get; set; }
-        public virtual ObservableCollection<group_devices> group_devices { get; set; }
-        public virtual ObservableCollection<scene_commands> scene_commands { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-        }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _device_type_id;
+        public int device_type_id {
+    		get { 
+    			return _device_type_id;
+    		} 
+    		set {
+    			if (value != _device_type_id){
+    				_device_type_id = value;
+    			    NotifyPropertyChanged("device_type_id");
+    			}
+    		}
+    	 }
+    
+    	private int _node_id;
+        public int node_id {
+    		get { 
+    			return _node_id;
+    		} 
+    		set {
+    			if (value != _node_id){
+    				_node_id = value;
+    			    NotifyPropertyChanged("node_id");
+    			}
+    		}
+    	 }
+    
+    	private string _friendly_name;
+        public string friendly_name {
+    		get { 
+    			return _friendly_name;
+    		} 
+    		set {
+    			if (value != _friendly_name){
+    				_friendly_name = value;
+    			    NotifyPropertyChanged("friendly_name");
+    			}
+    		}
+    	 }
+    
+    	private Nullable<System.DateTime> _last_heard_from;
+        public Nullable<System.DateTime> last_heard_from {
+    		get { 
+    			return _last_heard_from;
+    		} 
+    		set {
+    			if (value != _last_heard_from){
+    				_last_heard_from = value;
+    			    NotifyPropertyChanged("last_heard_from");
+    			}
+    		}
+    	 }
+    
+    	private string _current_level_txt;
+        public string current_level_txt {
+    		get { 
+    			return _current_level_txt;
+    		} 
+    		set {
+    			if (value != _current_level_txt){
+    				_current_level_txt = value;
+    			    NotifyPropertyChanged("current_level_txt");
+    			}
+    		}
+    	 }
+    
+    	private Nullable<int> _current_level_int;
+        public Nullable<int> current_level_int {
+    		get { 
+    			return _current_level_int;
+    		} 
+    		set {
+    			if (value != _current_level_int){
+    				_current_level_int = value;
+    			    NotifyPropertyChanged("current_level_int");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<device_command_que> _device_command_que;
+        public virtual ObservableCollection<device_command_que> device_command_que {
+    		get { 
+    			return _device_command_que;
+    		} 
+    		set {
+    			if (value != _device_command_que){
+    				_device_command_que = value;
+    			    NotifyPropertyChanged("device_command_que");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<device_commands> _device_commands;
+        public virtual ObservableCollection<device_commands> device_commands {
+    		get { 
+    			return _device_commands;
+    		} 
+    		set {
+    			if (value != _device_commands){
+    				_device_commands = value;
+    			    NotifyPropertyChanged("device_commands");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<device_property_values> _device_property_values;
+        public virtual ObservableCollection<device_property_values> device_property_values {
+    		get { 
+    			return _device_property_values;
+    		} 
+    		set {
+    			if (value != _device_property_values){
+    				_device_property_values = value;
+    			    NotifyPropertyChanged("device_property_values");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<device_type_command_que> _device_type_command_que;
+        public virtual ObservableCollection<device_type_command_que> device_type_command_que {
+    		get { 
+    			return _device_type_command_que;
+    		} 
+    		set {
+    			if (value != _device_type_command_que){
+    				_device_type_command_que = value;
+    			    NotifyPropertyChanged("device_type_command_que");
+    			}
+    		}
+    	 }
+    
+    	private device_types _device_types;
+        public virtual device_types device_types {
+    		get { 
+    			return _device_types;
+    		} 
+    		set {
+    			if (value != _device_types){
+    				_device_types = value;
+    			    NotifyPropertyChanged("device_types");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<device_values> _device_values;
+        public virtual ObservableCollection<device_values> device_values {
+    		get { 
+    			return _device_values;
+    		} 
+    		set {
+    			if (value != _device_values){
+    				_device_values = value;
+    			    NotifyPropertyChanged("device_values");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<group_devices> _group_devices;
+        public virtual ObservableCollection<group_devices> group_devices {
+    		get { 
+    			return _group_devices;
+    		} 
+    		set {
+    			if (value != _group_devices){
+    				_group_devices = value;
+    			    NotifyPropertyChanged("group_devices");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<scene_commands> _scene_commands;
+        public virtual ObservableCollection<scene_commands> scene_commands {
+    		get { 
+    			return _scene_commands;
+    		} 
+    		set {
+    			if (value != _scene_commands){
+    				_scene_commands = value;
+    			    NotifyPropertyChanged("scene_commands");
+    			}
+    		}
+    	 }
     }
 }

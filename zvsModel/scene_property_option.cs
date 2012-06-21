@@ -7,17 +7,81 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
     
-    public partial class scene_property_option
+    public partial class scene_property_option : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public int scene_property_id { get; set; }
-        public string options { get; set; }
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
     
-        public virtual scene_property scene_property { get; set; }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _scene_property_id;
+        public int scene_property_id {
+    		get { 
+    			return _scene_property_id;
+    		} 
+    		set {
+    			if (value != _scene_property_id){
+    				_scene_property_id = value;
+    			    NotifyPropertyChanged("scene_property_id");
+    			}
+    		}
+    	 }
+    
+    	private string _options;
+        public string options {
+    		get { 
+    			return _options;
+    		} 
+    		set {
+    			if (value != _options){
+    				_options = value;
+    			    NotifyPropertyChanged("options");
+    			}
+    		}
+    	 }
+    
+    
+    	private scene_property _scene_property;
+        public virtual scene_property scene_property {
+    		get { 
+    			return _scene_property;
+    		} 
+    		set {
+    			if (value != _scene_property){
+    				_scene_property = value;
+    			    NotifyPropertyChanged("scene_property");
+    			}
+    		}
+    	 }
     }
 }

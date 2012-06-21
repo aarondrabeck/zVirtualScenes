@@ -17,6 +17,17 @@ namespace zVirtualScenesModel
             device_type_command = 3
         }
 
+        partial void onAfterPropertyChanged(string name)
+        {
+            if (name == "device_id" || name == "command_type_id" || name == "command_id")
+            {
+                NotifyPropertyChanged("Action_Description");
+                NotifyPropertyChanged("Actionable_Object");
+            }
+            else if (name == "arg")
+                NotifyPropertyChanged("Action_Description");
+        }
+
         public string Actionable_Object
         {
             get {

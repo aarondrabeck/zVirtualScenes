@@ -7,32 +7,190 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     
-    public partial class builtin_commands
+    public partial class builtin_commands : INotifyPropertyChanged
     {
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
+    
         public builtin_commands()
         {
             this.builtin_command_options = new ObservableCollection<builtin_command_options>();
             this.builtin_command_que = new ObservableCollection<builtin_command_que>();
         }
     
-        public int id { get; set; }
-        public string name { get; set; }
-        public string friendly_name { get; set; }
-        public int arg_data_type { get; set; }
-        public string custom_data1 { get; set; }
-        public string custom_data2 { get; set; }
-        public string description { get; set; }
-        public bool show_on_dynamic_obj_list { get; set; }
-        public string help { get; set; }
-        public Nullable<int> sort_order { get; set; }
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
     
-        public virtual ObservableCollection<builtin_command_options> builtin_command_options { get; set; }
-        public virtual ObservableCollection<builtin_command_que> builtin_command_que { get; set; }
+    	private string _name;
+        public string name {
+    		get { 
+    			return _name;
+    		} 
+    		set {
+    			if (value != _name){
+    				_name = value;
+    			    NotifyPropertyChanged("name");
+    			}
+    		}
+    	 }
+    
+    	private string _friendly_name;
+        public string friendly_name {
+    		get { 
+    			return _friendly_name;
+    		} 
+    		set {
+    			if (value != _friendly_name){
+    				_friendly_name = value;
+    			    NotifyPropertyChanged("friendly_name");
+    			}
+    		}
+    	 }
+    
+    	private int _arg_data_type;
+        public int arg_data_type {
+    		get { 
+    			return _arg_data_type;
+    		} 
+    		set {
+    			if (value != _arg_data_type){
+    				_arg_data_type = value;
+    			    NotifyPropertyChanged("arg_data_type");
+    			}
+    		}
+    	 }
+    
+    	private string _custom_data1;
+        public string custom_data1 {
+    		get { 
+    			return _custom_data1;
+    		} 
+    		set {
+    			if (value != _custom_data1){
+    				_custom_data1 = value;
+    			    NotifyPropertyChanged("custom_data1");
+    			}
+    		}
+    	 }
+    
+    	private string _custom_data2;
+        public string custom_data2 {
+    		get { 
+    			return _custom_data2;
+    		} 
+    		set {
+    			if (value != _custom_data2){
+    				_custom_data2 = value;
+    			    NotifyPropertyChanged("custom_data2");
+    			}
+    		}
+    	 }
+    
+    	private string _description;
+        public string description {
+    		get { 
+    			return _description;
+    		} 
+    		set {
+    			if (value != _description){
+    				_description = value;
+    			    NotifyPropertyChanged("description");
+    			}
+    		}
+    	 }
+    
+    	private bool _show_on_dynamic_obj_list;
+        public bool show_on_dynamic_obj_list {
+    		get { 
+    			return _show_on_dynamic_obj_list;
+    		} 
+    		set {
+    			if (value != _show_on_dynamic_obj_list){
+    				_show_on_dynamic_obj_list = value;
+    			    NotifyPropertyChanged("show_on_dynamic_obj_list");
+    			}
+    		}
+    	 }
+    
+    	private string _help;
+        public string help {
+    		get { 
+    			return _help;
+    		} 
+    		set {
+    			if (value != _help){
+    				_help = value;
+    			    NotifyPropertyChanged("help");
+    			}
+    		}
+    	 }
+    
+    	private Nullable<int> _sort_order;
+        public Nullable<int> sort_order {
+    		get { 
+    			return _sort_order;
+    		} 
+    		set {
+    			if (value != _sort_order){
+    				_sort_order = value;
+    			    NotifyPropertyChanged("sort_order");
+    			}
+    		}
+    	 }
+    
+    
+    	private ObservableCollection<builtin_command_options> _builtin_command_options;
+        public virtual ObservableCollection<builtin_command_options> builtin_command_options {
+    		get { 
+    			return _builtin_command_options;
+    		} 
+    		set {
+    			if (value != _builtin_command_options){
+    				_builtin_command_options = value;
+    			    NotifyPropertyChanged("builtin_command_options");
+    			}
+    		}
+    	 }
+    
+    	private ObservableCollection<builtin_command_que> _builtin_command_que;
+        public virtual ObservableCollection<builtin_command_que> builtin_command_que {
+    		get { 
+    			return _builtin_command_que;
+    		} 
+    		set {
+    			if (value != _builtin_command_que){
+    				_builtin_command_que = value;
+    			    NotifyPropertyChanged("builtin_command_que");
+    			}
+    		}
+    	 }
     }
 }

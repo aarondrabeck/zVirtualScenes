@@ -7,17 +7,81 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 namespace zVirtualScenesModel
 {
-    using System;
-    using System.Collections.Generic;
     
-    public partial class plugin_setting_options
+    public partial class plugin_setting_options : INotifyPropertyChanged
     {
-        public int id { get; set; }
-        public int plugin_settings_id { get; set; }
-        public string options { get; set; }
+    	public event PropertyChangedEventHandler PropertyChanged;
+         protected void NotifyPropertyChanged(string name)
+            {
+                onBeforePropertyChanged(name);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(name));
+                }
+                onAfterPropertyChanged(name);
+            }
+         partial void onBeforePropertyChanged(string name);
+         partial void onAfterPropertyChanged(string name);
     
-        public virtual plugin_settings plugin_settings { get; set; }
+    
+    	private int _id;
+        public int id {
+    		get { 
+    			return _id;
+    		} 
+    		set {
+    			if (value != _id){
+    				_id = value;
+    			    NotifyPropertyChanged("id");
+    			}
+    		}
+    	 }
+    
+    	private int _plugin_settings_id;
+        public int plugin_settings_id {
+    		get { 
+    			return _plugin_settings_id;
+    		} 
+    		set {
+    			if (value != _plugin_settings_id){
+    				_plugin_settings_id = value;
+    			    NotifyPropertyChanged("plugin_settings_id");
+    			}
+    		}
+    	 }
+    
+    	private string _options;
+        public string options {
+    		get { 
+    			return _options;
+    		} 
+    		set {
+    			if (value != _options){
+    				_options = value;
+    			    NotifyPropertyChanged("options");
+    			}
+    		}
+    	 }
+    
+    
+    	private plugin_settings _plugin_settings;
+        public virtual plugin_settings plugin_settings {
+    		get { 
+    			return _plugin_settings;
+    		} 
+    		set {
+    			if (value != _plugin_settings){
+    				_plugin_settings = value;
+    			    NotifyPropertyChanged("plugin_settings");
+    			}
+    		}
+    	 }
     }
 }
