@@ -96,18 +96,21 @@ namespace zVirtualScenes_WPF
 
                     if (d.device_types.name.Equals("DIMMER"))
                     {
-                        double level = d.current_level_int;
+                        if (d.current_level_int.HasValue)
+                        {
+                            double level = d.current_level_int.Value;
 
-                        if (level >= 0 && level <= 20)
-                            level = 21;
+                            if (level >= 0 && level <= 20)
+                                level = 21;
 
-                        level = level / 100;
+                            level = level / 100;
 
-                        DoubleAnimation da = new DoubleAnimation();
-                        da.From = IconImg.Opacity;
-                        da.To = level;
-                        da.Duration = new Duration(TimeSpan.FromSeconds(1));
-                        IconImg.BeginAnimation(OpacityProperty, da);
+                            DoubleAnimation da = new DoubleAnimation();
+                            da.From = IconImg.Opacity;
+                            da.To = level;
+                            da.Duration = new Duration(TimeSpan.FromSeconds(1));
+                            IconImg.BeginAnimation(OpacityProperty, da);
+                        }
                     }
                 }
             }

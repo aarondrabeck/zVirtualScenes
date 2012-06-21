@@ -103,8 +103,8 @@ namespace zVirtualScenes_WPF
         public void ShowzvsWindow()
         {
             if (zvsWindow == null)
-            {      
-                EventHandler handler = null;
+            {
+                zvsWindow = new zvsMainWindow();
                 zvsWindow.Closed += (a, s) =>
                 {
                     zvsWindow = null;

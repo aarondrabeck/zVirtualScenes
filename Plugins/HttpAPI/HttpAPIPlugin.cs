@@ -402,7 +402,10 @@ namespace HttpAPI
 
                         if (d != null)
                         {
-                            int level = d.current_level_int;
+                            int level = 0;
+                            
+                            if(d.current_level_int.HasValue)
+                                level = d.current_level_int.Value;
 
                             string on_off = string.Empty;
                             if (level == 0)
