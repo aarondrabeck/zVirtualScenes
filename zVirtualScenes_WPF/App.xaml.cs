@@ -47,7 +47,7 @@ namespace zVirtualScenes_WPF
             //}
 
 
-            taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationName + " started.", 3000, System.Windows.Forms.ToolTipIcon.Info);
+            taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
 
             TriggerManager.onTriggerStart += (sender, args) =>
             {

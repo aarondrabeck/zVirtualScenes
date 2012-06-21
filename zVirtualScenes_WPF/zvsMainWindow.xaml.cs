@@ -53,7 +53,7 @@ namespace zVirtualScenes_WPF
                 myCollectionViewSource.Source = app.zvsCore.Logger.LOG;
 
             }
-            app.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", Utils.ApplicationName + " GUI");
+            app.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded", Utils.ApplicationName + " GUI");
 
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
             //clear the existing sort order
@@ -231,7 +231,7 @@ namespace zVirtualScenes_WPF
             {
                 if (app.taskbarIcon != null)
                 {
-                    app.taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationName + " is still running.", 3000, System.Windows.Forms.ToolTipIcon.Info);
+                    app.taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, System.Windows.Forms.ToolTipIcon.Info);
                 }
 
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];

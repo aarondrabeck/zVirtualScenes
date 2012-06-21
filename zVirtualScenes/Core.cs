@@ -137,7 +137,7 @@ namespace zVirtualScenes
             //Create a instace of the logger
             Logger = new Logger();
 
-            Logger.WriteToLog(Urgency.INFO, "Starting Core Processor.", Utils.ApplicationName);
+            Logger.WriteToLog(Urgency.INFO, "Starting Core Processor", Utils.ApplicationName);
 
             BackgroundWorker PluginBW = new BackgroundWorker();
             PluginBW.DoWork += (sender, args) =>
