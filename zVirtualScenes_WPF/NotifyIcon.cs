@@ -18,7 +18,7 @@ namespace zVirtualScenes_WPF
         {
             ShowMainWindow = new System.Windows.Forms.MenuItem("Show " + Utils.ApplicationName, (o, e) =>
             {
-                app.ShowMainWindow();
+                app.ShowzvsWindow();
             });           
 
             Notify = new System.Windows.Forms.NotifyIcon();
@@ -40,12 +40,12 @@ namespace zVirtualScenes_WPF
 
         void Notify_Click(object sender, EventArgs e)
         {
-            app.ShowMainWindow();
+            app.ShowzvsWindow();
         }
 
         private void Notify_BalloonTipClicked(object sender, EventArgs e)
         {
-            app.ShowMainWindow();
+            app.ShowzvsWindow();
         }
 
         public void Dispose()

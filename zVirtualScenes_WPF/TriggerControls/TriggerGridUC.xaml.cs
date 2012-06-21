@@ -22,6 +22,7 @@ namespace zVirtualScenes_WPF.TriggerControls
     public partial class TriggerGridUC : UserControl
     {
         private zvsLocalDBEntities context;
+        private App app = (App)Application.Current;
 
         public TriggerGridUC()
         {
@@ -45,20 +46,23 @@ namespace zVirtualScenes_WPF.TriggerControls
 
         void zvsLocalDBEntities_onDeviceValueTriggersChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
         {
-            if (context != null)
+            this.Dispatcher.Invoke(new Action(() =>
             {
-                if (args.ChangeType == System.Data.EntityState.Added)
+                if (context != null)
                 {
-                    //Gets new devices
-                    context.device_value_triggers.ToList();
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.device_value_triggers.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifcations happen
+                        foreach (var ent in context.ChangeTracker.Entries<device_value_triggers>())
+                            ent.Reload();
+                    }
                 }
-                else
-                {
-                    //Reloads context from DB when modifcations happen
-                    foreach (var ent in context.ChangeTracker.Entries<device_value_triggers>())
-                        ent.Reload();
-                }
-            }
+            }));
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
@@ -84,13 +88,13 @@ namespace zVirtualScenes_WPF.TriggerControls
                 if (trigger != null)
                 {
                     TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
-                    new_window.Owner = Application.Current.MainWindow;
+                    new_window.Owner = app.zvsWindow;
                     new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
                     new_window.Show();
                     new_window.Closing += (s, a) =>
                     {
                         if (!new_window.Canceled)
-                        {                            
+                        {
                             context.SaveChanges();
                         }
                     };
@@ -122,7 +126,7 @@ namespace zVirtualScenes_WPF.TriggerControls
             device_value_triggers trigger = new device_value_triggers();
             trigger.Name = "New Trigger";
             TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
-            new_window.Owner = Application.Current.MainWindow;
+            new_window.Owner = app.zvsWindow;
             new_window.Title = "Add Trigger";
             new_window.Show();
             new_window.Closing += (s, a) =>

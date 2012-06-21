@@ -25,16 +25,21 @@ namespace zVirtualScenes_WPF
     /// <summary>
     /// interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class zvsMainWindow : Window
     {
-        private App application = (App)Application.Current;
+        private App app = (App)Application.Current;
         private zvsLocalDBEntities context;
-        private System.Windows.Forms.NotifyIcon Notify;
         public WindowState lastOpenedWindowState = WindowState.Normal;
 
-        public MainWindow()
+        public zvsMainWindow()
         {
             InitializeComponent();
+            
+        }
+
+        ~zvsMainWindow()
+        {
+            Console.WriteLine("zvsMainWindow went for garbage collection");
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -45,9 +50,10 @@ namespace zVirtualScenes_WPF
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
-                myCollectionViewSource.Source = application.zvsCore.Logger.LOG;
+                myCollectionViewSource.Source = app.zvsCore.Logger.LOG;
+
             }
-            application.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", Utils.ApplicationName + " GUI");
+            app.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded.", Utils.ApplicationName + " GUI");
 
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
             //clear the existing sort order
@@ -57,7 +63,7 @@ namespace zVirtualScenes_WPF
             //refresh the view which in turn refresh the grid
             dataView.Refresh();
 
-            dList1.ShowMore = false;
+           // dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
         }
@@ -173,7 +179,7 @@ namespace zVirtualScenes_WPF
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in app.Windows)
             {
                 if (window.GetType() == typeof(GroupEditor))
                 {
@@ -189,7 +195,7 @@ namespace zVirtualScenes_WPF
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in app.Windows)
             {
                 if (window.GetType() == typeof(PluginManagerWindow))
                 {
@@ -205,7 +211,7 @@ namespace zVirtualScenes_WPF
 
         private void ActivateGroupMI_Click_1(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in app.Windows)
             {
                 if (window is ActivateGroup)
                 {
@@ -221,17 +227,24 @@ namespace zVirtualScenes_WPF
 
         private void Window_Closing_1(object sender, CancelEventArgs e)
         {
-            App app = (App)Application.Current;
             if (!app.isShuttingDown)
             {
-                e.Cancel = true;
-                this.WindowState = System.Windows.WindowState.Minimized;
-            }          
+                if (app.taskbarIcon != null)
+                {
+                    app.taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationName + " is still running.", 3000, System.Windows.Forms.ToolTipIcon.Info);
+                }
+
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
+                myCollectionViewSource.Source = null;
+            }            
         }
 
         private void MainWindow_Closed_1(object sender, EventArgs e)
         {
-            context.Dispose();
+            app = null;
+
+            if(context!= null)
+                context.Dispose();
         }
 
         private void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
@@ -243,7 +256,7 @@ namespace zVirtualScenes_WPF
 
         private void ExitMI_Click_1(object sender, RoutedEventArgs e)
         {
-            application.ShutdownZVS();
+            app.ShutdownZVS();
         }
 
         private void ViewLogsMI_Click_1(object sender, RoutedEventArgs e)
@@ -277,13 +290,7 @@ namespace zVirtualScenes_WPF
 
             if (WindowState == WindowState.Minimized)
             {
-                Hide();
-
-                App app = (App)Application.Current;
-                if (app.taskbarIcon != null)
-                {
-                    app.taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationName + " has been minimized to the taskbar.", 3000, System.Windows.Forms.ToolTipIcon.Info);                    
-                }
+                this.Close();
             }
         }
 
@@ -293,6 +300,5 @@ namespace zVirtualScenes_WPF
             aboutWin.Owner = this;
             aboutWin.ShowDialog();
         }
-
     }
 }

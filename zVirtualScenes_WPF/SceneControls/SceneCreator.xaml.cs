@@ -26,6 +26,7 @@ namespace zVirtualScenes_WPF.SceneControls
     {
         private zvsLocalDBEntities context;
         private ObservableCollection<scene> SceneCollection;
+        private App app = (App)Application.Current;
 
         public SceneCreator()
         {
@@ -211,7 +212,6 @@ namespace zVirtualScenes_WPF.SceneControls
                 var scene = (scene)obj;
                 if (scene != null)
                 {
-                    App application = (App)Application.Current;
 
                     SceneRunner sr = new SceneRunner();
                     SceneRunner.onSceneRunEventHandler startHandler = null;
@@ -223,7 +223,7 @@ namespace zVirtualScenes_WPF.SceneControls
 
                             this.Dispatcher.Invoke(new Action(() =>
                             {
-                                application.zvsCore.Logger.WriteToLog(Urgency.INFO, args.Details, Utils.ApplicationName + " GUI");
+                                app.zvsCore.Logger.WriteToLog(Urgency.INFO, args.Details, Utils.ApplicationName + " GUI");
                             }));
 
                             #region LISTEN FOR ENDING
@@ -236,7 +236,7 @@ namespace zVirtualScenes_WPF.SceneControls
 
                                     this.Dispatcher.Invoke(new Action(() =>
                                     {
-                                        application.zvsCore.Logger.WriteToLog(Urgency.INFO, end_args.Details, Utils.ApplicationName + " GUI");
+                                        app.zvsCore.Logger.WriteToLog(Urgency.INFO, end_args.Details, Utils.ApplicationName + " GUI");
                                     }));
                                 }
                             };
@@ -322,7 +322,7 @@ namespace zVirtualScenes_WPF.SceneControls
                             };
 
                             AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, scene_command);
-                            sceneCmdWindow.Owner = Application.Current.MainWindow;
+                            sceneCmdWindow.Owner = app.zvsWindow;
 
                             if (sceneCmdWindow.ShowDialog() ?? false)
                             {
@@ -377,7 +377,7 @@ namespace zVirtualScenes_WPF.SceneControls
 
         private void ShowSceneProperties(int SceneID, string SceneFriendlyName)
         {
-            foreach (Window window in Application.Current.Windows)
+            foreach (Window window in app.Windows)
             {
                 if (window.GetType() == typeof(ScenePropertiesWindow))
                 {
@@ -387,7 +387,7 @@ namespace zVirtualScenes_WPF.SceneControls
             }
 
             ScenePropertiesWindow new_window = new ScenePropertiesWindow(SceneID);
-            new_window.Owner = Application.Current.MainWindow;
+            new_window.Owner = app.zvsWindow;
             new_window.Title = string.Format("Scene '{0}' Properties", SceneFriendlyName);
             new_window.Show();
         }
@@ -595,7 +595,7 @@ namespace zVirtualScenes_WPF.SceneControls
                         cmd.sort_order = 0;
 
                     AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
-                    window.Owner = Application.Current.MainWindow;
+                    window.Owner = app.zvsWindow;
 
                     if (window.ShowDialog() ?? false)
                     {
@@ -627,7 +627,7 @@ namespace zVirtualScenes_WPF.SceneControls
                     if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.builtin)
                     {
                         AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
-                        window.Owner = Application.Current.MainWindow;
+                        window.Owner = app.zvsWindow;
 
                         if (window.ShowDialog() ?? false)
                         {
@@ -638,7 +638,7 @@ namespace zVirtualScenes_WPF.SceneControls
                         (scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_type_command)
                     {
                         AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, cmd);
-                        sceneCmdWindow.Owner = Application.Current.MainWindow;
+                        sceneCmdWindow.Owner = app.zvsWindow;
 
                         if (sceneCmdWindow.ShowDialog() ?? false)
                         {

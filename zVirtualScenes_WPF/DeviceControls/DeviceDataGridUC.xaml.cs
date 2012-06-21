@@ -303,8 +303,9 @@ namespace zVirtualScenes_WPF.DeviceControls
 
         private void OpenDeviceDetails(device d)
         {
+            App app = (App)Application.Current;
             DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.id);
-            deviceDetailsWindow.Owner = Application.Current.MainWindow;
+            deviceDetailsWindow.Owner = app.zvsWindow;
             deviceDetailsWindow.Show();
         }
 

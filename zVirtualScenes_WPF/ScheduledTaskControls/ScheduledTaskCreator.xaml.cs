@@ -32,24 +32,21 @@ namespace zVirtualScenes_WPF.ScheduledTaskControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
-            context.scheduled_tasks.ToList();
-            context.scenes.ToList();
-
             //Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
+                context = new zvsLocalDBEntities();
+
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["scheduled_tasksViewSource"];
                 myCollectionViewSource.Source = context.scheduled_tasks.Local;
-            }
 
-            //Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
                 //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                myCollectionViewSource.Source = context.scenes.Local;
+                System.Windows.Data.CollectionViewSource sceneViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
+                sceneViewSource.Source = context.scenes.Local;
+
+                context.scheduled_tasks.ToList();
+                context.scenes.ToList();
             }
 
             zvsLocalDBEntities.onScenesChanged += zvsLocalDBEntities_onScenesChanged;
@@ -62,7 +59,7 @@ namespace zVirtualScenes_WPF.ScheduledTaskControls
         private void ScheduledTaskCreator_Unloaded_1(object sender, RoutedEventArgs e)
         {
             zvsLocalDBEntities.onScenesChanged -= zvsLocalDBEntities_onScenesChanged;
-            zvsLocalDBEntities.onScheduledTasksChanged -= zvsLocalDBEntities_onScheduledTasksChanged;
+            zvsLocalDBEntities.onScheduledTasksChanged -= zvsLocalDBEntities_onScheduledTasksChanged;   
         }
 
         void zvsLocalDBEntities_onScheduledTasksChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -290,7 +287,7 @@ namespace zVirtualScenes_WPF.ScheduledTaskControls
             FifthChkBx.IsChecked = false;
             SixthChkBx.IsChecked = false;
             SeventhChkBx.IsChecked = false;
-            EightChkBx.IsChecked = false;            
+            EightChkBx.IsChecked = false;
             NinethChkBx.IsChecked = false;
             TenthChkBx.IsChecked = false;
             EleventhChkBx.IsChecked = false;
@@ -298,17 +295,17 @@ namespace zVirtualScenes_WPF.ScheduledTaskControls
             ThirteenthChkBx.IsChecked = false;
             FourteenthChkBx.IsChecked = false;
             FifteenthChkBx.IsChecked = false;
-            SixteenthChkBx.IsChecked = false;            
+            SixteenthChkBx.IsChecked = false;
             SeventeenthChkBx.IsChecked = false;
-            EighteenthChkBx.IsChecked = false; 
-            NineteenthChkBx.IsChecked = false; 
+            EighteenthChkBx.IsChecked = false;
+            NineteenthChkBx.IsChecked = false;
             TwentiethChkBx.IsChecked = false;
             TwentiefirstChkBx.IsChecked = false;
             TwentiesecondChkBx.IsChecked = false;
             TwentiethirdChkBx.IsChecked = false;
-            TwentieforthChkBx.IsChecked = false;            
+            TwentieforthChkBx.IsChecked = false;
             TwentiefifthChkBx.IsChecked = false;
-            TwentiesixChkBx.IsChecked = false; 
+            TwentiesixChkBx.IsChecked = false;
             TwentiesevenChkBx.IsChecked = false;
             TwentieeigthChkBx.IsChecked = false;
             TwentieninthChkBx.IsChecked = false;

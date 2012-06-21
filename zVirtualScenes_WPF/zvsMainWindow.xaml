@@ -8,7 +8,7 @@
     xmlns:SceneControls="clr-namespace:zVirtualScenes_WPF.SceneControls" 
     xmlns:TriggerControl="clr-namespace:zVirtualScenes_WPF.TriggerControls"
     xmlns:ScheduledTaskControls="clr-namespace:zVirtualScenes_WPF.ScheduledTaskControls"
-    x:Class="zVirtualScenes_WPF.MainWindow"
+    x:Class="zVirtualScenes_WPF.zvsMainWindow"
         Title="MainWindow"  MinWidth="800" MinHeight="570" Closed="MainWindow_Closed_1" Loaded="Window_Loaded" Icon="Images/32zvsIcon.png" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1" StateChanged="Window_StateChanged_1" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="{x:Type ListViewItem}">
@@ -98,7 +98,7 @@
                                 <GradientStop Color="#FFF2F3F5"/>
                             </LinearGradientBrush>
                         </Border.Background>
-                        <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Logs" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Log" VerticalAlignment="Center" Margin="5,0,0,0" />
                     </Border>
                     <DataGrid  x:Name="logListView"  Margin="0,25,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >

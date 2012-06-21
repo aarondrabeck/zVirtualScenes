@@ -20,11 +20,34 @@ namespace zVirtualScenes_WPF
         public Core zvsCore;
         public ZVSTaskbarIcon taskbarIcon;
         public bool isShuttingDown = false;
+        public zvsMainWindow zvsWindow = null;
+        public Window firstWindow;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             //Initilize the core
             zvsCore = new Core(this.Dispatcher);
+
+            //This is a placeholder for a main window. Application.Current.MainWindow
+            firstWindow = new Window();
+
+            //Create taskbar Icon 
+            taskbarIcon = new ZVSTaskbarIcon();
+
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    Test main = new Test();
+            //    main.Show();
+            //    main.Close();
+            //    GC.Collect(3);
+
+            //    GC.WaitForPendingFinalizers();
+
+            //    GC.Collect(3);
+            //}
+
+
+            taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationName + " started.", 3000, System.Windows.Forms.ToolTipIcon.Info);
 
             TriggerManager.onTriggerStart += (sender, args) =>
             {
@@ -74,36 +97,41 @@ namespace zVirtualScenes_WPF
                 }));
             };
 
-            //Create taskbar Icon
-            taskbarIcon = new ZVSTaskbarIcon();
-
             base.OnStartup(e);
         }
 
-        public void ShowMainWindow()
+        public void ShowzvsWindow()
         {
-            MainWindow mainWindown = (MainWindow)Application.Current.MainWindow;
-            if (mainWindown != null)
+            if (zvsWindow == null)
+            {      
+                EventHandler handler = null;
+                zvsWindow.Closed += (a, s) =>
+                {
+                    zvsWindow = null;
+                };
+                zvsWindow.Show();
+            }
+            else
             {
-                mainWindown.Show();
+                zvsWindow.Show();
 
                 //if we have to change the state, listen for when that is complete to activate the window.
-                if (mainWindown.WindowState == WindowState.Minimized)
+                if (zvsWindow.WindowState == WindowState.Minimized)
                 {
                     EventHandler handler = null;
                     handler = (sender, args) =>
                     {
-                        mainWindown.StateChanged -= handler;
+                        zvsWindow.StateChanged -= handler;
 
                         //ACTIVATE TO BRING IT TO FRONT
-                        mainWindown.Activate();
+                        zvsWindow.Activate();
                     };
-                    mainWindown.StateChanged += handler;
-                    mainWindown.WindowState = mainWindown.lastOpenedWindowState;
+                    zvsWindow.StateChanged += handler;
+                    zvsWindow.WindowState = zvsWindow.lastOpenedWindowState;
                 }
                 else
                 {
-                    mainWindown.Activate();
+                    zvsWindow.Activate();
                 }
             }
         }

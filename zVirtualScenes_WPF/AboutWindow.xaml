@@ -1,7 +1,7 @@
 ﻿<Window x:Class="zVirtualScenes_WPF.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="About zVirtualScenes" Height="286" Loaded="AboutWindow_Loaded_1" Width="520" Icon="zvs256.ico" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Background="#FFF1F1F1">
+        Title="About zVirtualScenes" Height="286" Loaded="AboutWindow_Loaded_1" Width="520" Icon="zvs256.ico" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Background="#FFF1F1F1" ShowInTaskbar="False">
     <Grid>
         <Rectangle Fill="White" Height="97" VerticalAlignment="Top"/>
         <Image HorizontalAlignment="Left" Height="61" VerticalAlignment="Top" Width="61" Source="Images/256zvsIcon.png" Margin="10,10,0,0"/>
