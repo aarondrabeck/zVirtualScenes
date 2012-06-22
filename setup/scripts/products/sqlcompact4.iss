@@ -1,7 +1,7 @@
 [CustomMessages]
 sqlcompact4_title=SQL Server Compact 4
 
-en.sqlcompact4_size=2.5 MB
+en.sqlcompact4_size=8.7 - 10.1 MB
 
 [Code]
     

@@ -2,11 +2,12 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 #define use_dotnetfx45
 #define use_sqlcompact4
+#define use_vc2010
 
 #define MyAppName "zVirtualScenes"
 #define MyAppVersion "3.0"
 #define MyAppPublisher "Drabeck Solutions"
-#define MyAppExeName "zVirtualScenes.exe"
+#define MyAppExeName "zVirtualScenesGUI.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -45,7 +46,7 @@ Source: "..\output_release\zVirtualScenesGUI.exe"; DestDir: "{app}"; Flags: igno
 Source: "..\output_release\zVirtualScenesGUI.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\zVirtualScenesModel.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\zVirtualScenesModel.dll.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zvsLocalDB-blank.sdf"; DestDir: "{app}\database"; Flags: ignoreversion
+Source: "..\output_release\zvsLocalDB-blank.sdf"; DestDir: "{app}"; Flags: ignoreversion
  
 
 Source: "..\output_release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
@@ -98,6 +99,10 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 #include "scripts\products\dotnetfx45full.iss"
 #endif
 
+#ifdef use_vc2010
+#include "scripts\products\vcredist2010.iss"
+#endif
+
 
 [Code]
 function InitializeSetup(): boolean;
@@ -113,6 +118,10 @@ if (not netfxinstalled(NetFx45Full, '')) then
 
 #ifdef use_sqlcompact4
 sqlcompact4();
+#endif
+
+#ifdef use_vc2010
+	vcredist2010();
 #endif
 
 
