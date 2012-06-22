@@ -435,7 +435,7 @@ namespace HttpAPI
                                 fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value2,
                                 heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1").value2,
                                 cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1").value2,
-                                esm = d.device_values.FirstOrDefault(o => o.label_name == "Basic") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Basic").value2
+                                esm = d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode").value2
                             };
                             return new { success = true, details = details };
                         }
