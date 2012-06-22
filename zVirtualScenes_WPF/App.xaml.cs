@@ -9,8 +9,10 @@ using zVirtualScenesModel;
 using zVirtualScenes;
 using System.ComponentModel;
 using zVirtualScenes.Triggers;
+using System.Diagnostics;
+using System.Text;
 
-namespace zVirtualScenes_WPF
+namespace zVirtualScenesGUI
 {
     /// <summary>
     /// interaction logic for App.xaml
@@ -25,10 +27,38 @@ namespace zVirtualScenes_WPF
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            
+            string error = Utils.PreReqChecks();
+
+            if (error != null)
+            {
+                Window WpfBugWindow = new Window()
+                {
+                    AllowsTransparency = true,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    WindowStyle = WindowStyle.None,
+                    Top = 0,
+                    Left = 0,
+                    Width = 1,
+                    Height = 1,
+                    ShowInTaskbar = false
+                };
+                WpfBugWindow.Show();
+                if (MessageBox.Show(error, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+                {
+                    WpfBugWindow.Close();
+                    Environment.Exit(1);
+                    return;
+                }
+            }
+
+            //throw new Exception("Exception Test!");
             //Initilize the core
             zvsCore = new Core(this.Dispatcher);
 
-            //This is a placeholder for a main window. Application.Current.MainWindow
+             //This is a placeholder for a main window. Application.Current.MainWindow
             firstWindow = new Window();
 
             //Create taskbar Icon 
@@ -53,7 +83,7 @@ namespace zVirtualScenes_WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details,"Trigger Manager");
+                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Trigger Manager");
                 }));
             };
 
@@ -100,47 +130,63 @@ namespace zVirtualScenes_WPF
             base.OnStartup(e);
         }
 
+        void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            App app = (App)Application.Current;
+
+            string exception = GetHostDetails + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString();
+            //if (exception.Length > 4000)
+            //{
+            //    exception = exception.Substring(0, 4000);
+            //}
+
+            FatalErrorWindow fWindow = new FatalErrorWindow(exception);
+            fWindow.ShowDialog();
+        }
+
+        
+
+        public static string GetHostDetails
+        {
+            get
+            {
+                StringBuilder Data = new StringBuilder();
+                Data.AppendLine(string.Format("OSVersion: {0}", System.Environment.OSVersion));
+                Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", System.Environment.Is64BitOperatingSystem));
+                Data.AppendLine(string.Format("MachineName: {0}", System.Environment.MachineName));
+                Data.AppendLine(string.Format("UserDomainName: {0}", System.Environment.UserDomainName));
+                Data.AppendLine(string.Format("UserName: {0}", System.Environment.UserName));
+                Data.AppendLine(string.Format("Version: {0}", System.Environment.Version));
+                return Data.ToString();
+            }
+        }
+
+        bool isLoading = false;
         public void ShowzvsWindow()
         {
-            if (zvsWindow == null)
+            if (zvsWindow == null || !isLoading)
             {
+                isLoading = true;
                 zvsWindow = new zvsMainWindow();
                 zvsWindow.Closed += (a, s) =>
                 {
                     zvsWindow = null;
+                    zvsCore.Logger.WriteToLog(Urgency.INFO, string.Format("{0} User Interface Unloaded", Utils.ApplicationName), Utils.ApplicationName + " GUI");
+                    isLoading = false;
                 };
                 zvsWindow.Show();
             }
             else
             {
-                zvsWindow.Show();
-
-                //if we have to change the state, listen for when that is complete to activate the window.
-                if (zvsWindow.WindowState == WindowState.Minimized)
-                {
-                    EventHandler handler = null;
-                    handler = (sender, args) =>
-                    {
-                        zvsWindow.StateChanged -= handler;
-
-                        //ACTIVATE TO BRING IT TO FRONT
-                        zvsWindow.Activate();
-                    };
-                    zvsWindow.StateChanged += handler;
-                    zvsWindow.WindowState = zvsWindow.lastOpenedWindowState;
-                }
-                else
-                {
-                    zvsWindow.Activate();
-                }
+                zvsWindow.Activate();
             }
         }
 
         public void ShutdownZVS()
         {
-             Application.Current.Shutdown(); 
+            Application.Current.Shutdown();
         }
-               
+
         private void Application_Exit_1(object sender, ExitEventArgs e)
         {
             taskbarIcon.Dispose();

@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.TriggerControls
+namespace zVirtualScenesGUI.TriggerControls
 {
     /// <summary>
     /// Interaction logic for TriggerGridUC.xaml

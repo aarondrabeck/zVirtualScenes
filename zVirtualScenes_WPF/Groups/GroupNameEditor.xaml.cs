@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -11,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace zVirtualScenes_WPF.Groups
+namespace zVirtualScenesGUI.Groups
 {
     /// <summary>
     /// Interaction logic for GroupNameEditor.xaml
@@ -25,6 +26,11 @@ namespace zVirtualScenes_WPF.Groups
             this.GroupName = GroupName;
         }
 
+        ~GroupNameEditor()
+        {
+            Debug.WriteLine("GroupNameEditor Deconstructed.");
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrEmpty(GroupName))
@@ -34,6 +40,11 @@ namespace zVirtualScenes_WPF.Groups
 
             GroupTxtBx.Focus();
             Keyboard.Focus(GroupTxtBx);
+        }
+
+        private void GroupNameEditor_Closed_1(object sender, EventArgs e)
+        {
+
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -72,5 +83,7 @@ namespace zVirtualScenes_WPF.Groups
                 e.Handled = true;
             }
         }
+
+        
     }
 }

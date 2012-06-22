@@ -12,17 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenes_WPF.DynamicActionControls;
+using zVirtualScenesGUI.DynamicActionControls;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.SceneControls
+namespace zVirtualScenesGUI.SceneControls
 {
     /// <summary>
     /// Interaction logic for SceneProperties.xaml
     /// </summary>
     public partial class SceneProperties : UserControl
     {
-        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/save_check.png"));
+        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
         private zvsLocalDBEntities context;
 
 

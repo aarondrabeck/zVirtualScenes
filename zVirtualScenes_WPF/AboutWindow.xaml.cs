@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenes;
 
-namespace zVirtualScenes_WPF
+namespace zVirtualScenesGUI
 {
     /// <summary>
     /// Interaction logic for AboutWindow.xaml
@@ -23,6 +24,11 @@ namespace zVirtualScenes_WPF
         public AboutWindow()
         {
             InitializeComponent();
+        }
+
+        ~AboutWindow()
+        {
+            Debug.WriteLine("AboutWindow Deconstructed.");
         }
 
         private void AboutWindow_Loaded_1(object sender, RoutedEventArgs e)

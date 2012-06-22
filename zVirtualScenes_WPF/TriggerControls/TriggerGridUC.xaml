@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
-             x:Class="zVirtualScenes_WPF.TriggerControls.TriggerGridUC" 
+             x:Class="zVirtualScenesGUI.TriggerControls.TriggerGridUC" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
     <UserControl.Resources>
@@ -55,7 +55,7 @@
                 <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserSort="False" CanUserResize="False" CanUserReorder="False" IsReadOnly="True">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Image Name="img" Width="35" Height="35" Source="/zVirtualScenes_WPF;component/Images/trigger.png" Margin="5,0" />                            
+                            <Image Name="img" Width="35" Height="35" Source="/zVirtualScenesGUI;component/Images/trigger.png" Margin="5,0" />                            
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -87,7 +87,7 @@
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <Button Name="SettingBtn" Width="32" Height="32" Click="SettingBtn_Click_1"  ToolTip="Device Details">
-                                <Image Cursor="Hand"   Source="/zVirtualScenes_WPF;component/Images/settings.png" Margin="0,0,0,0"  />
+                                <Image Cursor="Hand"   Source="/zVirtualScenesGUI;component/Images/settings.png" Margin="0,0,0,0"  />
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

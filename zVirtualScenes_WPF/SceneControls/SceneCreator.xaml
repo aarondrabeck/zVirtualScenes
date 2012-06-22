@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-     xmlns:zvs="clr-namespace:zVirtualScenes_WPF"
-             xmlns:local="clr-namespace:zVirtualScenes_WPF.SceneControls"
-             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" xmlns:DeviceControls="clr-namespace:zVirtualScenes_WPF.DeviceControls" x:Class="zVirtualScenes_WPF.SceneControls.SceneCreator" 
+     xmlns:zvs="clr-namespace:zVirtualScenesGUI"
+             xmlns:local="clr-namespace:zVirtualScenesGUI.SceneControls"
+             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" xmlns:DeviceControls="clr-namespace:zVirtualScenesGUI.DeviceControls" x:Class="zVirtualScenesGUI.SceneControls.SceneCreator" 
              mc:Ignorable="d" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
 
     <UserControl.Resources>
@@ -62,10 +62,10 @@
                 <DataGridTemplateColumn MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Image Name="img" Width="40" Height="40" Source="/zVirtualScenes_WPF;component/Images/scene64.png" />
+                            <Image Name="img" Width="40" Height="40" Source="/zVirtualScenesGUI;component/Images/scene64.png" />
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding Path=is_running}" Value="True">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes_WPF;component/Images/scene_run64.png"/>                                   
+                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/scene_run64.png"/>                                   
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
@@ -123,7 +123,7 @@
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <Button Name="SceneSettingBtn" ToolTip="Scene Settings" Width="32" Height="32" Click="SceneSettingBtn_Click_1" Margin="3,0">
-                                <Image Cursor="Hand"   Source="/zVirtualScenes_WPF;component/Images/settings.png" Margin="0,0,0,0"  />
+                                <Image Cursor="Hand"   Source="/zVirtualScenesGUI;component/Images/settings.png" Margin="0,0,0,0"  />
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -179,7 +179,7 @@
                             <DataGridTemplateColumn.CellTemplate >
                                 <DataTemplate>
                                     <Button Name="SettingBtn" Width="20" Height="20" Click="SettingBtn_Click_1" ToolTip="Command Settings" Margin="0,0,5,0">
-                                        <Image Cursor="Hand"  Source="/zVirtualScenes_WPF;component/Images/settings.png" />
+                                        <Image Cursor="Hand"  Source="/zVirtualScenesGUI;component/Images/settings.png" />
                                     </Button>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>

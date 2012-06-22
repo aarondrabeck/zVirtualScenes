@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace zVirtualScenes_WPF.DynamicActionControls
+namespace zVirtualScenesGUI.DynamicActionControls
 {
     /// <summary>
     /// Interaction logic for ButtonControl.xaml

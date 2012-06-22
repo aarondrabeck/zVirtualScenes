@@ -17,7 +17,7 @@ using zVirtualScenesModel;
 using System.Collections.ObjectModel;
 
 
-namespace zVirtualScenes_WPF.DeviceControls
+namespace zVirtualScenesGUI.DeviceControls
 {
     /// <summary>
     /// Interaction logic for DeviceDataGridUC.xaml

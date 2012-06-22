@@ -14,13 +14,14 @@ using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using zVirtualScenes;
-using zVirtualScenes_WPF.DeviceControls;
-using zVirtualScenes_WPF.Groups;
-using zVirtualScenes_WPF.PluginManager;
+using zVirtualScenesGUI.DeviceControls;
+using zVirtualScenesGUI.Groups;
+using zVirtualScenesGUI.PluginManager;
 using zVirtualScenesModel;
 using System.Threading;
+using System.Diagnostics;
 
-namespace zVirtualScenes_WPF
+namespace zVirtualScenesGUI
 {
     /// <summary>
     /// interaction logic for MainWindow.xaml
@@ -39,7 +40,7 @@ namespace zVirtualScenes_WPF
 
         ~zvsMainWindow()
         {
-            Console.WriteLine("zvsMainWindow went for garbage collection");
+            Debug.WriteLine("zvsMainWindow Deconstructed.");
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -53,7 +54,7 @@ namespace zVirtualScenes_WPF
                 myCollectionViewSource.Source = app.zvsCore.Logger.LOG;
 
             }
-            app.zvsCore.Logger.WriteToLog(Urgency.INFO, "Main window loaded", Utils.ApplicationName + " GUI");
+            app.zvsCore.Logger.WriteToLog(Urgency.INFO, string.Format("{0} User Interface Loaded", Utils.ApplicationName), Utils.ApplicationName + " GUI");
 
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
             //clear the existing sort order
@@ -63,7 +64,7 @@ namespace zVirtualScenes_WPF
             //refresh the view which in turn refresh the grid
             dataView.Refresh();
 
-           // dList1.ShowMore = false;
+            dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
         }

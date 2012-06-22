@@ -12,7 +12,7 @@ namespace zVirtualScenes
 {
     public class ScheduledTaskManager : IDisposable
     {
-        private List<scheduled_tasks> scheduledTasks = new List<scheduled_tasks>(); 
+        private List<scheduled_tasks> scheduledTasks = new List<scheduled_tasks>();
         private Timer TaskTimer;
 
         #region Events
@@ -43,13 +43,13 @@ namespace zVirtualScenes
             {
                 lock (scheduledTasks)
                 {
-                    context.scheduled_tasks.ToList();
+                    scheduledTasks = context.scheduled_tasks.ToList();
                 }
-            }            
+            }
 
             //Keep the local context in sync with other contexts
             zvsLocalDBEntities.onScheduledTasksChanged += zvsLocalDBEntities_onScheduledTasksChanged;
-            
+
             TaskTimer = new Timer((state) =>
             {
                 lock (scheduledTasks)
@@ -148,7 +148,7 @@ namespace zVirtualScenes
                     }
                 }
             }, null, 5000, 1000);
-            
+
         }
 
         public void Dispose()
@@ -166,13 +166,13 @@ namespace zVirtualScenes
                 {
                     lock (scheduledTasks)
                     {
-                        context.scheduled_tasks.ToList();
+                        scheduledTasks = context.scheduled_tasks.ToList();
                     }
                 }
             };
             bw.RunWorkerAsync();
         }
-                   
+
         private bool ShouldRunThisDayOfMonth(scheduled_tasks task)
         {
             switch (DateTime.Now.Day)
@@ -332,7 +332,7 @@ namespace zVirtualScenes
 
                 };
                 SceneRunner.onSceneRunBegin += startHandler;
-                
+
                 sr.RunScene(scene.id);
             }
         }
@@ -406,5 +406,5 @@ namespace zVirtualScenes
 
             return WeekCount;
         }
-    }    
+    }
 }

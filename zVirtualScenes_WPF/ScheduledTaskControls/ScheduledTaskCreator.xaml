@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
-             x:Class="zVirtualScenes_WPF.ScheduledTaskControls.ScheduledTaskCreator"
-             xmlns:zvs="clr-namespace:zVirtualScenes_WPF"
-            xmlns:converters="clr-namespace:zVirtualScenes_WPF.Converters"
+             x:Class="zVirtualScenesGUI.ScheduledTaskControls.ScheduledTaskCreator"
+             xmlns:zvs="clr-namespace:zVirtualScenesGUI"
+            xmlns:converters="clr-namespace:zVirtualScenesGUI.Converters"
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
@@ -72,7 +72,7 @@
                 <DataGridTemplateColumn MaxWidth="45" MinWidth="45" Width="45"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Image Name="img" Width="40" Height="40" Source="/zVirtualScenes_WPF;component/Images/scheduled_task.png" />
+                            <Image Name="img" Width="40" Height="40" Source="/zVirtualScenesGUI;component/Images/scheduled_task.png" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

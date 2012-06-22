@@ -13,9 +13,10 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections;
 using zVirtualScenesModel;
-using zVirtualScenes_WPF.DynamicActionControls;
+using zVirtualScenesGUI.DynamicActionControls;
+using System.Diagnostics;
 
-namespace zVirtualScenes_WPF.PluginManager
+namespace zVirtualScenesGUI.PluginManager
 {
     /// <summary>
     /// Interaction logic for PluginManager.xaml
@@ -23,12 +24,17 @@ namespace zVirtualScenes_WPF.PluginManager
     public partial class PluginManagerWindow : Window
     {
         private App application = (App)Application.Current;
-        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/save_check.png"));
+        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
         private zvsLocalDBEntities context;
 
         public PluginManagerWindow()
         {
             InitializeComponent();
+        }
+
+        ~PluginManagerWindow()
+        {
+            Debug.WriteLine("PluginManagerWindow Deconstructed.");
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -64,13 +70,9 @@ namespace zVirtualScenes_WPF.PluginManager
             }));
         }
 
-        private void Window_Closing(object sender, CancelEventArgs e)
-        {
-            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged;            
-        }
-
         private void Window_Closed_1(object sender, EventArgs e)
         {
+            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged;            
             context.Dispose();
         }  
 

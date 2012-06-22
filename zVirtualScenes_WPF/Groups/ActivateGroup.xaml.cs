@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.Groups
+namespace zVirtualScenesGUI.Groups
 {
     /// <summary>
     /// Interaction logic for ActivateGroup.xaml
@@ -26,6 +27,11 @@ namespace zVirtualScenes_WPF.Groups
         public ActivateGroup()
         {
             InitializeComponent();
+        }
+
+        ~ActivateGroup()
+        {
+            Debug.WriteLine("ActivateGroup Deconstructed.");
         }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
@@ -64,13 +70,9 @@ namespace zVirtualScenes_WPF.Groups
             }));
         }
 
-        private void Window_Closing_1(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;            
-        }
-
         private void ActivateGroup_Closed_1(object sender, EventArgs e)
         {
+            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
             context.Dispose();
         }
 
@@ -129,6 +131,6 @@ namespace zVirtualScenes_WPF.Groups
             }
         }
 
-        
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,10 +12,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenes_WPF.DynamicActionControls;
+using zVirtualScenesGUI.DynamicActionControls;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.SceneControls
+namespace zVirtualScenesGUI.SceneControls
 {
     /// <summary>
     /// Interaction logic for AddEditSceneCommand.xaml
@@ -23,7 +24,7 @@ namespace zVirtualScenes_WPF.SceneControls
     {
         private zvsLocalDBEntities context;
         private scene_commands scene_command;
-        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/save_check.png"));
+        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
         private string arg = string.Empty;
 
         public AddEditBuiltinSceneCommand(zvsLocalDBEntities context, scene_commands scene_command)
@@ -32,6 +33,11 @@ namespace zVirtualScenes_WPF.SceneControls
             this.scene_command = scene_command;
 
             InitializeComponent();
+        }
+
+        ~AddEditBuiltinSceneCommand()
+        {
+            Debug.WriteLine("AddEditBuiltinSceneCommand Deconstructed.");
         }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)

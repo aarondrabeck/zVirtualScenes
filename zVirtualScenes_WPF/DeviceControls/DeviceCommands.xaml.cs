@@ -12,17 +12,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenes_WPF.DynamicActionControls;
+using zVirtualScenesGUI.DynamicActionControls;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.DeviceControls
+namespace zVirtualScenesGUI.DeviceControls
 {
     /// <summary>
     /// Interaction logic for DeviceCommands.xaml
     /// </summary>
     public partial class DeviceCommands : UserControl
     {
-        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/send_signal.png"));
+        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/send_signal.png"));
         private zvsLocalDBEntities context;
         private int DeviceID = 0;
 

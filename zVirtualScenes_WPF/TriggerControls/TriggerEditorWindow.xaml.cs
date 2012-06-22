@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.TriggerControls
+namespace zVirtualScenesGUI.TriggerControls
 {
     /// <summary>
     /// Interaction logic for TriggerEditorWindow.xaml
@@ -30,6 +31,11 @@ namespace zVirtualScenes_WPF.TriggerControls
             this.context = context;
             this.trigger = trigger;
             InitializeComponent();
+        }
+
+        ~TriggerEditorWindow()
+        {
+            Debug.WriteLine("TriggerEditorWindow Deconstructed.");
         }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenes_WPF.DeviceControls;
+using zVirtualScenesGUI.DeviceControls;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF
+namespace zVirtualScenesGUI
 {
     /// <summary>
     /// Interaction logic for DeviceDetails.xaml
@@ -30,6 +31,11 @@ namespace zVirtualScenes_WPF
             InitializeComponent();
         }
 
+        ~DeviceDetailsWindow()
+        {
+            Debug.WriteLine("DeviceDetailsWindow Deconstructed.");
+        }
+
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
             zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
@@ -37,9 +43,9 @@ namespace zVirtualScenes_WPF
             SelectionList.SelectedIndex = 0;
         }
 
-        private void Window_Unloaded_1(object sender, RoutedEventArgs e)
+        private void DeviceDetailsWindow_Closed_1(object sender, EventArgs e)
         {
-            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
+            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;           
         }
 
         void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -68,28 +74,28 @@ namespace zVirtualScenes_WPF
                     {
                         case "THERMOSTAT":
                             {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/thermometer.png"));                                                              
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/thermometer.png"));                                                              
                                 break;
                             }
                         case "DIMMER":
                             {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/bulb.png"));                                
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/bulb.png"));                                
                                 break;
                             }
                         case "SWITCH":
                             {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/switch.png"));
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/switch.png"));
                                 break;
                             }
                         case "CONTROLLER":
                             {
                                 DeviceCurrentStatus.Visibility = System.Windows.Visibility.Collapsed;
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/controler.png"));
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/controler.png"));
                                 break;
                             }
                         case "DOORLOCK":
                             {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes_WPF;component/Images/doorlock.png"));
+                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/doorlock.png"));
                                 break;
                             }
                     }
@@ -142,6 +148,5 @@ namespace zVirtualScenes_WPF
         {
             this.Close();
         }
-
     }
 }

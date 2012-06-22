@@ -16,7 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.ScheduledTaskControls
+namespace zVirtualScenesGUI.ScheduledTaskControls
 {
     /// <summary>
     /// Interaction logic for ScheduledTaskCreator.xaml

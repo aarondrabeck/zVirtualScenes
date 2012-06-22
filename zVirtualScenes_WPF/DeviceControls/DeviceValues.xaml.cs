@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.DeviceControls
+namespace zVirtualScenesGUI.DeviceControls
 {
     /// <summary>
     /// Interaction logic for DeviceValues.xaml

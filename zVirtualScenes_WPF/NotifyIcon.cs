@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using zVirtualScenes;
 
-namespace zVirtualScenes_WPF
+namespace zVirtualScenesGUI
 {
     public class ZVSTaskbarIcon
     {
@@ -24,7 +24,7 @@ namespace zVirtualScenes_WPF
             Notify = new System.Windows.Forms.NotifyIcon();
             Notify.DoubleClick += new EventHandler(Notify_Click);
             Notify.Text = Utils.ApplicationName;
-            Notify.Icon = zVirtualScenes_WPF.Properties.Resources.zvs32;
+            Notify.Icon = zVirtualScenesGUI.Properties.Resources.zvs32;
             Notify.Visible = true;
             Notify.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[] 
             { 
@@ -45,7 +45,7 @@ namespace zVirtualScenes_WPF
 
         private void Notify_BalloonTipClicked(object sender, EventArgs e)
         {
-            app.ShowzvsWindow();
+           // app.ShowzvsWindow();
         }
 
         public void Dispose()

@@ -10,12 +10,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenes_WPF.DeviceControls;
+using zVirtualScenesGUI.DeviceControls;
 using System.Data.Objects;
 using System.ComponentModel;
 using zVirtualScenesModel;
+using System.Diagnostics;
 
-namespace zVirtualScenes_WPF.Groups
+namespace zVirtualScenesGUI.Groups
 {
     /// <summary>
     /// Interaction logic for GroupEditor.xaml
@@ -27,6 +28,11 @@ namespace zVirtualScenes_WPF.Groups
         public GroupEditor()
         {
             InitializeComponent();
+        }
+
+        ~GroupEditor()
+        {
+            Debug.WriteLine("GroupEditor Deconstructed.");
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -47,9 +53,13 @@ namespace zVirtualScenes_WPF.Groups
 
             EvaluateRemoveBtnUsability();
             EvaluateAddEditBtnsUsability();
-            EvaluategroupsDevicesLstVwEnable();
+            EvaluategroupsDevicesLstVwEnable();            
+        }
 
-            
+        private void GroupEditor_Closed_1(object sender, EventArgs e)
+        {
+            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
+            context.Dispose();
         }
 
         void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
@@ -66,12 +76,6 @@ namespace zVirtualScenes_WPF.Groups
                     }
                 }
             }));
-        }
-
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
-        {
-            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
-            
         }
 
         private void EvaluateAddEditBtnsUsability()
@@ -255,5 +259,7 @@ namespace zVirtualScenes_WPF.Groups
             else
                 groupsDevicesLstVw.IsEnabled = true;
         }
+
+        
     }
 }

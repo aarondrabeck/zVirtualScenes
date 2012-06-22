@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 using zVirtualScenes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.SceneControls
+namespace zVirtualScenesGUI.SceneControls
 {
     /// <summary>
     /// Interaction logic for SceneCreator.xaml

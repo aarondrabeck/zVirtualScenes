@@ -1,4 +1,4 @@
-﻿<Window x:Class="zVirtualScenes_WPF.AboutWindow"
+﻿<Window x:Class="zVirtualScenesGUI.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="About zVirtualScenes" Height="286" Loaded="AboutWindow_Loaded_1" Width="520" Icon="zvs256.ico" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow" Background="#FFF1F1F1" ShowInTaskbar="False">

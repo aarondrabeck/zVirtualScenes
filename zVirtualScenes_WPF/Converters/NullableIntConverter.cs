@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace zVirtualScenes_WPF.Converters
+namespace zVirtualScenesGUI.Converters
 {
     public class NullableIntConverter : IValueConverter
     {

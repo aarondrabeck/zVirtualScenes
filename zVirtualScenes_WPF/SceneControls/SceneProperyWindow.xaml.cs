@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenesModel;
 
-namespace zVirtualScenes_WPF.SceneControls
+namespace zVirtualScenesGUI.SceneControls
 {
     /// <summary>
     /// Interaction logic for ScenePropertiesWindow.xaml
@@ -26,6 +27,11 @@ namespace zVirtualScenes_WPF.SceneControls
         {
             this.SceneID = SceneID;
             InitializeComponent();          
+        }
+
+        ~ScenePropertiesWindow()
+        {
+            Debug.WriteLine("ScenePropertiesWindow Deconstructed.");
         }
 
         private void DoneBtn_Click(object sender, RoutedEventArgs e)

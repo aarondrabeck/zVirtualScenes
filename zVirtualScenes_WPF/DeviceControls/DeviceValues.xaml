@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" x:Class="zVirtualScenes_WPF.DeviceControls.DeviceValues" 
+             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" x:Class="zVirtualScenesGUI.DeviceControls.DeviceValues" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="713" Loaded="UserControl_Loaded_1">
     <UserControl.Resources>

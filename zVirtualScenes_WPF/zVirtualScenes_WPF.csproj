@@ -8,8 +8,8 @@
     <ProjectGuid>{CC1028B3-3975-4BA4-BF79-42043BCADBFE}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>zVirtualScenes_WPF</RootNamespace>
-    <AssemblyName>zVirtualScenes_WPF</AssemblyName>
+    <RootNamespace>zVirtualScenesGUI</RootNamespace>
+    <AssemblyName>zVirtualScenesGUI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -58,6 +58,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -83,6 +84,9 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
+    <Compile Include="FatalErrorWindow.xaml.cs">
+      <DependentUpon>FatalErrorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NotifyIcon.cs" />
     <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
       <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
@@ -108,7 +112,6 @@
     <Compile Include="TriggerControls\TriggerGridUC.xaml.cs">
       <DependentUpon>TriggerGridUC.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VisibilityAnimation.cs" />
     <Page Include="AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -152,6 +155,10 @@
     <Page Include="DynamicActionControls\NumericControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="FatalErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Groups\ActivateGroup.xaml">
       <SubType>Designer</SubType>
