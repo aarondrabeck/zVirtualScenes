@@ -47,6 +47,8 @@ Source: "..\output_release\zVirtualScenesGUI.exe.config"; DestDir: "{app}"; Flag
 Source: "..\output_release\zVirtualScenesModel.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\zVirtualScenesModel.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\zvsLocalDB-blank.sdf"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\upgrade.sql"; DestDir: "{app}"; Flags: ignoreversion
+
  
 
 Source: "..\output_release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion

@@ -195,6 +195,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="upgrade.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="zvsLocalDB-blank.sdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -22,11 +22,9 @@ namespace zVirtualScenes
         public Dispatcher Dispatcher;
 
         public Core(Dispatcher Dispatcher)
-        {           
-
+        {
+            AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
             this.Dispatcher = Dispatcher;
-
-         
 
             //Create a instace of the logger
             Logger = new Logger();
