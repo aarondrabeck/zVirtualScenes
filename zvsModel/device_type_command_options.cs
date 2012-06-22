@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class device_type_command_options : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _device_type_command_id;
         public int device_type_command_id {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_type_command_id){
+    			    int old = _device_type_command_id;
+    				Beforedevice_type_command_idChange(old, value);
     				_device_type_command_id = value;
     			    NotifyPropertyChanged("device_type_command_id");
+    				Afterdevice_type_command_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_type_command_idChange(int oldValue, int newValue);
+    	partial void Afterdevice_type_command_idChange(int oldValue, int newValue);
     
     	private string _options;
         public string options {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _options){
+    			    string old = _options;
+    				BeforeoptionsChange(old, value);
     				_options = value;
     			    NotifyPropertyChanged("options");
+    				AfteroptionsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeoptionsChange(string oldValue, string newValue);
+    	partial void AfteroptionsChange(string oldValue, string newValue);
     
     
     	private device_type_commands _device_type_commands;
@@ -78,10 +92,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_type_commands){
+    			    device_type_commands old = _device_type_commands;
+    				Beforedevice_type_commandsChange(old, value);
     				_device_type_commands = value;
     			    NotifyPropertyChanged("device_type_commands");
+    				Afterdevice_type_commandsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_type_commandsChange(device_type_commands oldValue, device_type_commands newValue);
+    	partial void Afterdevice_type_commandsChange(device_type_commands oldValue, device_type_commands newValue);
     }
 }

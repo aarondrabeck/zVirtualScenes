@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class scene_property : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
         public scene_property()
         {
@@ -43,11 +39,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private string _friendly_name;
         public string friendly_name {
@@ -56,11 +58,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _friendly_name){
+    			    string old = _friendly_name;
+    				Beforefriendly_nameChange(old, value);
     				_friendly_name = value;
     			    NotifyPropertyChanged("friendly_name");
+    				Afterfriendly_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforefriendly_nameChange(string oldValue, string newValue);
+    	partial void Afterfriendly_nameChange(string oldValue, string newValue);
     
     	private string _defualt_value;
         public string defualt_value {
@@ -69,11 +77,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _defualt_value){
+    			    string old = _defualt_value;
+    				Beforedefualt_valueChange(old, value);
     				_defualt_value = value;
     			    NotifyPropertyChanged("defualt_value");
+    				Afterdefualt_valueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedefualt_valueChange(string oldValue, string newValue);
+    	partial void Afterdefualt_valueChange(string oldValue, string newValue);
     
     	private int _value_data_type;
         public int value_data_type {
@@ -82,11 +96,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value_data_type){
+    			    int old = _value_data_type;
+    				Beforevalue_data_typeChange(old, value);
     				_value_data_type = value;
     			    NotifyPropertyChanged("value_data_type");
+    				Aftervalue_data_typeChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforevalue_data_typeChange(int oldValue, int newValue);
+    	partial void Aftervalue_data_typeChange(int oldValue, int newValue);
     
     	private string _description;
         public string description {
@@ -95,11 +115,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _description){
+    			    string old = _description;
+    				BeforedescriptionChange(old, value);
     				_description = value;
     			    NotifyPropertyChanged("description");
+    				AfterdescriptionChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforedescriptionChange(string oldValue, string newValue);
+    	partial void AfterdescriptionChange(string oldValue, string newValue);
     
     	private string _name;
         public string name {
@@ -108,11 +134,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _name){
+    			    string old = _name;
+    				BeforenameChange(old, value);
     				_name = value;
     			    NotifyPropertyChanged("name");
+    				AfternameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforenameChange(string oldValue, string newValue);
+    	partial void AfternameChange(string oldValue, string newValue);
     
     
     	private ObservableCollection<scene_property_option> _scene_property_option;
@@ -122,11 +154,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_property_option){
+    			    ObservableCollection<scene_property_option> old = _scene_property_option;
+    				Beforescene_property_optionChange(old, value);
     				_scene_property_option = value;
     			    NotifyPropertyChanged("scene_property_option");
+    				Afterscene_property_optionChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_property_optionChange(ObservableCollection<scene_property_option> oldValue, ObservableCollection<scene_property_option> newValue);
+    	partial void Afterscene_property_optionChange(ObservableCollection<scene_property_option> oldValue, ObservableCollection<scene_property_option> newValue);
     
     	private ObservableCollection<scene_property_value> _scene_property_value;
         public virtual ObservableCollection<scene_property_value> scene_property_value {
@@ -135,10 +173,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_property_value){
+    			    ObservableCollection<scene_property_value> old = _scene_property_value;
+    				Beforescene_property_valueChange(old, value);
     				_scene_property_value = value;
     			    NotifyPropertyChanged("scene_property_value");
+    				Afterscene_property_valueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_property_valueChange(ObservableCollection<scene_property_value> oldValue, ObservableCollection<scene_property_value> newValue);
+    	partial void Afterscene_property_valueChange(ObservableCollection<scene_property_value> oldValue, ObservableCollection<scene_property_value> newValue);
     }
 }

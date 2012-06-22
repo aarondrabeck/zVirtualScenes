@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class device_property_values : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _device_id;
         public int device_id {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_id){
+    			    int old = _device_id;
+    				Beforedevice_idChange(old, value);
     				_device_id = value;
     			    NotifyPropertyChanged("device_id");
+    				Afterdevice_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_idChange(int oldValue, int newValue);
+    	partial void Afterdevice_idChange(int oldValue, int newValue);
     
     	private int _device_property_id;
         public int device_property_id {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_property_id){
+    			    int old = _device_property_id;
+    				Beforedevice_property_idChange(old, value);
     				_device_property_id = value;
     			    NotifyPropertyChanged("device_property_id");
+    				Afterdevice_property_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_property_idChange(int oldValue, int newValue);
+    	partial void Afterdevice_property_idChange(int oldValue, int newValue);
     
     	private string _value;
         public string value {
@@ -77,11 +91,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value){
+    			    string old = _value;
+    				BeforevalueChange(old, value);
     				_value = value;
     			    NotifyPropertyChanged("value");
+    				AftervalueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforevalueChange(string oldValue, string newValue);
+    	partial void AftervalueChange(string oldValue, string newValue);
     
     
     	private device_propertys _device_propertys;
@@ -91,11 +111,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_propertys){
+    			    device_propertys old = _device_propertys;
+    				Beforedevice_propertysChange(old, value);
     				_device_propertys = value;
     			    NotifyPropertyChanged("device_propertys");
+    				Afterdevice_propertysChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_propertysChange(device_propertys oldValue, device_propertys newValue);
+    	partial void Afterdevice_propertysChange(device_propertys oldValue, device_propertys newValue);
     
     	private device _device;
         public virtual device device {
@@ -104,10 +130,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device){
+    			    device old = _device;
+    				BeforedeviceChange(old, value);
     				_device = value;
     			    NotifyPropertyChanged("device");
+    				AfterdeviceChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforedeviceChange(device oldValue, device newValue);
+    	partial void AfterdeviceChange(device oldValue, device newValue);
     }
 }

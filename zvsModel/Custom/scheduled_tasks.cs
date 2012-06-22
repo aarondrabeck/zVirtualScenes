@@ -18,10 +18,9 @@ namespace zVirtualScenesModel
             Monthly = 4
         }
 
-        partial void onAfterPropertyChanged(string name)
+        partial void AfterFrequencyChange(int? oldValue, int? newValue)
         {
-            if(name =="Frequency")
-                NotifyPropertyChanged("FrequencyEnum");
+            NotifyPropertyChanged("FrequencyEnum");
         }
 
         private frequencys _FrequencyEnum;

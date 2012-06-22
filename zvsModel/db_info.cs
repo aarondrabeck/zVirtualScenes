@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class db_info : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private string _info_name;
         public string info_name {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _info_name){
+    			    string old = _info_name;
+    				Beforeinfo_nameChange(old, value);
     				_info_name = value;
     			    NotifyPropertyChanged("info_name");
+    				Afterinfo_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeinfo_nameChange(string oldValue, string newValue);
+    	partial void Afterinfo_nameChange(string oldValue, string newValue);
     
     	private string _info_value;
         public string info_value {
@@ -64,10 +72,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _info_value){
+    			    string old = _info_value;
+    				Beforeinfo_valueChange(old, value);
     				_info_value = value;
     			    NotifyPropertyChanged("info_value");
+    				Afterinfo_valueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeinfo_valueChange(string oldValue, string newValue);
+    	partial void Afterinfo_valueChange(string oldValue, string newValue);
     }
 }

@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class scene_property_value : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _scene_id;
         public int scene_id {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_id){
+    			    int old = _scene_id;
+    				Beforescene_idChange(old, value);
     				_scene_id = value;
     			    NotifyPropertyChanged("scene_id");
+    				Afterscene_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_idChange(int oldValue, int newValue);
+    	partial void Afterscene_idChange(int oldValue, int newValue);
     
     	private int _scene_property_id;
         public int scene_property_id {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_property_id){
+    			    int old = _scene_property_id;
+    				Beforescene_property_idChange(old, value);
     				_scene_property_id = value;
     			    NotifyPropertyChanged("scene_property_id");
+    				Afterscene_property_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_property_idChange(int oldValue, int newValue);
+    	partial void Afterscene_property_idChange(int oldValue, int newValue);
     
     	private string _value;
         public string value {
@@ -77,11 +91,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value){
+    			    string old = _value;
+    				BeforevalueChange(old, value);
     				_value = value;
     			    NotifyPropertyChanged("value");
+    				AftervalueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforevalueChange(string oldValue, string newValue);
+    	partial void AftervalueChange(string oldValue, string newValue);
     
     
     	private scene_property _scene_property;
@@ -91,11 +111,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_property){
+    			    scene_property old = _scene_property;
+    				Beforescene_propertyChange(old, value);
     				_scene_property = value;
     			    NotifyPropertyChanged("scene_property");
+    				Afterscene_propertyChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_propertyChange(scene_property oldValue, scene_property newValue);
+    	partial void Afterscene_propertyChange(scene_property oldValue, scene_property newValue);
     
     	private scene _scene;
         public virtual scene scene {
@@ -104,10 +130,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene){
+    			    scene old = _scene;
+    				BeforesceneChange(old, value);
     				_scene = value;
     			    NotifyPropertyChanged("scene");
+    				AftersceneChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforesceneChange(scene oldValue, scene newValue);
+    	partial void AftersceneChange(scene oldValue, scene newValue);
     }
 }

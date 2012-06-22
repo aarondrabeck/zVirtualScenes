@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class device_values : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
         public device_values()
         {
@@ -42,11 +38,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _device_id;
         public int device_id {
@@ -55,11 +57,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_id){
+    			    int old = _device_id;
+    				Beforedevice_idChange(old, value);
     				_device_id = value;
     			    NotifyPropertyChanged("device_id");
+    				Afterdevice_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_idChange(int oldValue, int newValue);
+    	partial void Afterdevice_idChange(int oldValue, int newValue);
     
     	private string _value_id;
         public string value_id {
@@ -68,11 +76,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value_id){
+    			    string old = _value_id;
+    				Beforevalue_idChange(old, value);
     				_value_id = value;
     			    NotifyPropertyChanged("value_id");
+    				Aftervalue_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforevalue_idChange(string oldValue, string newValue);
+    	partial void Aftervalue_idChange(string oldValue, string newValue);
     
     	private string _label_name;
         public string label_name {
@@ -81,11 +95,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _label_name){
+    			    string old = _label_name;
+    				Beforelabel_nameChange(old, value);
     				_label_name = value;
     			    NotifyPropertyChanged("label_name");
+    				Afterlabel_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforelabel_nameChange(string oldValue, string newValue);
+    	partial void Afterlabel_nameChange(string oldValue, string newValue);
     
     	private string _genre;
         public string genre {
@@ -94,11 +114,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _genre){
+    			    string old = _genre;
+    				BeforegenreChange(old, value);
     				_genre = value;
     			    NotifyPropertyChanged("genre");
+    				AftergenreChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforegenreChange(string oldValue, string newValue);
+    	partial void AftergenreChange(string oldValue, string newValue);
     
     	private string _index2;
         public string index2 {
@@ -107,11 +133,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _index2){
+    			    string old = _index2;
+    				Beforeindex2Change(old, value);
     				_index2 = value;
     			    NotifyPropertyChanged("index2");
+    				Afterindex2Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeindex2Change(string oldValue, string newValue);
+    	partial void Afterindex2Change(string oldValue, string newValue);
     
     	private string _type;
         public string type {
@@ -120,11 +152,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _type){
+    			    string old = _type;
+    				BeforetypeChange(old, value);
     				_type = value;
     			    NotifyPropertyChanged("type");
+    				AftertypeChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforetypeChange(string oldValue, string newValue);
+    	partial void AftertypeChange(string oldValue, string newValue);
     
     	private string _commandClassId;
         public string commandClassId {
@@ -133,11 +171,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _commandClassId){
+    			    string old = _commandClassId;
+    				BeforecommandClassIdChange(old, value);
     				_commandClassId = value;
     			    NotifyPropertyChanged("commandClassId");
+    				AftercommandClassIdChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforecommandClassIdChange(string oldValue, string newValue);
+    	partial void AftercommandClassIdChange(string oldValue, string newValue);
     
     	private string _value2;
         public string value2 {
@@ -146,11 +190,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value2){
+    			    string old = _value2;
+    				Beforevalue2Change(old, value);
     				_value2 = value;
     			    NotifyPropertyChanged("value2");
+    				Aftervalue2Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforevalue2Change(string oldValue, string newValue);
+    	partial void Aftervalue2Change(string oldValue, string newValue);
     
     	private bool _read_only;
         public bool read_only {
@@ -159,11 +209,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _read_only){
+    			    bool old = _read_only;
+    				Beforeread_onlyChange(old, value);
     				_read_only = value;
     			    NotifyPropertyChanged("read_only");
+    				Afterread_onlyChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeread_onlyChange(bool oldValue, bool newValue);
+    	partial void Afterread_onlyChange(bool oldValue, bool newValue);
     
     
     	private ObservableCollection<device_value_triggers> _device_value_triggers;
@@ -173,11 +229,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_value_triggers){
+    			    ObservableCollection<device_value_triggers> old = _device_value_triggers;
+    				Beforedevice_value_triggersChange(old, value);
     				_device_value_triggers = value;
     			    NotifyPropertyChanged("device_value_triggers");
+    				Afterdevice_value_triggersChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_value_triggersChange(ObservableCollection<device_value_triggers> oldValue, ObservableCollection<device_value_triggers> newValue);
+    	partial void Afterdevice_value_triggersChange(ObservableCollection<device_value_triggers> oldValue, ObservableCollection<device_value_triggers> newValue);
     
     	private device _device;
         public virtual device device {
@@ -186,10 +248,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device){
+    			    device old = _device;
+    				BeforedeviceChange(old, value);
     				_device = value;
     			    NotifyPropertyChanged("device");
+    				AfterdeviceChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforedeviceChange(device oldValue, device newValue);
+    	partial void AfterdeviceChange(device oldValue, device newValue);
     }
 }

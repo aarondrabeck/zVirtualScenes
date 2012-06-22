@@ -16,6 +16,7 @@ using System.IO;
 using System.Collections.Specialized;
 using zVirtualScenes;
 using zVirtualScenesModel;
+using System.Diagnostics;
 
 namespace OpenZWavePlugin
 {
@@ -872,6 +873,7 @@ namespace OpenZWavePlugin
                                                         //only allow each device to re-poll 1 time.
                                                         if (timers.Contains(d.node_id))
                                                         {
+                                                            Console.WriteLine(string.Format("Timer {0} restarted.", d.node_id));
                                                             System.Timers.Timer t = (System.Timers.Timer)timers[d.node_id];
                                                             t.Stop();
                                                             t.Start();
@@ -880,16 +882,16 @@ namespace OpenZWavePlugin
                                                         {
                                                             System.Timers.Timer t = new System.Timers.Timer();
                                                             timers.Add(d.node_id, t);
-                                                            t.Interval = 3000;
+                                                            t.Interval = 2000;
                                                             t.Elapsed += (sender, e) =>
                                                             {
-                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);
-
+                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);                                                                
                                                                 t.Stop();
+                                                                Console.WriteLine(string.Format("Timer {0} Elapsed.", d.node_id));
                                                                 timers.Remove(d.node_id);
-
                                                             };
                                                             t.Start();
+                                                            Console.WriteLine(string.Format("Timer {0} started.", d.node_id));
                                                         }
                                                     }
                                                 }

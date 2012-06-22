@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class device_propertys : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
         public device_propertys()
         {
@@ -43,11 +39,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private string _friendly_name;
         public string friendly_name {
@@ -56,11 +58,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _friendly_name){
+    			    string old = _friendly_name;
+    				Beforefriendly_nameChange(old, value);
     				_friendly_name = value;
     			    NotifyPropertyChanged("friendly_name");
+    				Afterfriendly_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforefriendly_nameChange(string oldValue, string newValue);
+    	partial void Afterfriendly_nameChange(string oldValue, string newValue);
     
     	private string _name;
         public string name {
@@ -69,11 +77,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _name){
+    			    string old = _name;
+    				BeforenameChange(old, value);
     				_name = value;
     			    NotifyPropertyChanged("name");
+    				AfternameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforenameChange(string oldValue, string newValue);
+    	partial void AfternameChange(string oldValue, string newValue);
     
     	private string _default_value;
         public string default_value {
@@ -82,11 +96,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _default_value){
+    			    string old = _default_value;
+    				Beforedefault_valueChange(old, value);
     				_default_value = value;
     			    NotifyPropertyChanged("default_value");
+    				Afterdefault_valueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedefault_valueChange(string oldValue, string newValue);
+    	partial void Afterdefault_valueChange(string oldValue, string newValue);
     
     	private int _value_data_type;
         public int value_data_type {
@@ -95,11 +115,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value_data_type){
+    			    int old = _value_data_type;
+    				Beforevalue_data_typeChange(old, value);
     				_value_data_type = value;
     			    NotifyPropertyChanged("value_data_type");
+    				Aftervalue_data_typeChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforevalue_data_typeChange(int oldValue, int newValue);
+    	partial void Aftervalue_data_typeChange(int oldValue, int newValue);
     
     
     	private ObservableCollection<device_property_options> _device_property_options;
@@ -109,11 +135,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_property_options){
+    			    ObservableCollection<device_property_options> old = _device_property_options;
+    				Beforedevice_property_optionsChange(old, value);
     				_device_property_options = value;
     			    NotifyPropertyChanged("device_property_options");
+    				Afterdevice_property_optionsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_property_optionsChange(ObservableCollection<device_property_options> oldValue, ObservableCollection<device_property_options> newValue);
+    	partial void Afterdevice_property_optionsChange(ObservableCollection<device_property_options> oldValue, ObservableCollection<device_property_options> newValue);
     
     	private ObservableCollection<device_property_values> _device_property_values;
         public virtual ObservableCollection<device_property_values> device_property_values {
@@ -122,10 +154,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_property_values){
+    			    ObservableCollection<device_property_values> old = _device_property_values;
+    				Beforedevice_property_valuesChange(old, value);
     				_device_property_values = value;
     			    NotifyPropertyChanged("device_property_values");
+    				Afterdevice_property_valuesChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_property_valuesChange(ObservableCollection<device_property_values> oldValue, ObservableCollection<device_property_values> newValue);
+    	partial void Afterdevice_property_valuesChange(ObservableCollection<device_property_values> oldValue, ObservableCollection<device_property_values> newValue);
     }
 }

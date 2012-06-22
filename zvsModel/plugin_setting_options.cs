@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class plugin_setting_options : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _plugin_settings_id;
         public int plugin_settings_id {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin_settings_id){
+    			    int old = _plugin_settings_id;
+    				Beforeplugin_settings_idChange(old, value);
     				_plugin_settings_id = value;
     			    NotifyPropertyChanged("plugin_settings_id");
+    				Afterplugin_settings_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeplugin_settings_idChange(int oldValue, int newValue);
+    	partial void Afterplugin_settings_idChange(int oldValue, int newValue);
     
     	private string _options;
         public string options {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _options){
+    			    string old = _options;
+    				BeforeoptionsChange(old, value);
     				_options = value;
     			    NotifyPropertyChanged("options");
+    				AfteroptionsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeoptionsChange(string oldValue, string newValue);
+    	partial void AfteroptionsChange(string oldValue, string newValue);
     
     
     	private plugin_settings _plugin_settings;
@@ -78,10 +92,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin_settings){
+    			    plugin_settings old = _plugin_settings;
+    				Beforeplugin_settingsChange(old, value);
     				_plugin_settings = value;
     			    NotifyPropertyChanged("plugin_settings");
+    				Afterplugin_settingsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeplugin_settingsChange(plugin_settings oldValue, plugin_settings newValue);
+    	partial void Afterplugin_settingsChange(plugin_settings oldValue, plugin_settings newValue);
     }
 }

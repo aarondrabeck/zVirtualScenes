@@ -44,17 +44,13 @@ baseClass = " : INotifyPropertyChanged";
 {
 <# if (baseClass == " : INotifyPropertyChanged"){ #>
 	public event PropertyChangedEventHandler PropertyChanged;
-     protected void NotifyPropertyChanged(string name)
+    protected void NotifyPropertyChanged(string name)
+    {
+        if (PropertyChanged != null)
         {
-            onBeforePropertyChanged(name);
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-            onAfterPropertyChanged(name);
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
-     partial void onBeforePropertyChanged(string name);
-     partial void onAfterPropertyChanged(string name);
+    }
 
 <# }#>
 <#
@@ -275,11 +271,17 @@ void WriteProperty(string accessibility, string type, string name, string getter
 		} <#=setterAccessibility#>
 		set {
 			if (value != <#="_"#><#=name#>){
+			    <#=type#> old = _<#=name#>;
+				Before<#=name#>Change(old, value);
 				<#="_"#><#=name#> = value;
 			    NotifyPropertyChanged("<#=name#>");
+				After<#=name#>Change(old, value);
 			}
 		}
-	 }
+	 } 
+
+	partial void Before<#=name#>Change(<#=type#> oldValue, <#=type#> newValue);
+	partial void After<#=name#>Change(<#=type#> oldValue, <#=type#> newValue);
 <#+
 }
 

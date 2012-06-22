@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class builtin_command_options : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _builtin_command_id;
         public int builtin_command_id {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _builtin_command_id){
+    			    int old = _builtin_command_id;
+    				Beforebuiltin_command_idChange(old, value);
     				_builtin_command_id = value;
     			    NotifyPropertyChanged("builtin_command_id");
+    				Afterbuiltin_command_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforebuiltin_command_idChange(int oldValue, int newValue);
+    	partial void Afterbuiltin_command_idChange(int oldValue, int newValue);
     
     	private string _name;
         public string name {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _name){
+    			    string old = _name;
+    				BeforenameChange(old, value);
     				_name = value;
     			    NotifyPropertyChanged("name");
+    				AfternameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforenameChange(string oldValue, string newValue);
+    	partial void AfternameChange(string oldValue, string newValue);
     
     
     	private builtin_commands _builtin_commands;
@@ -78,10 +92,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _builtin_commands){
+    			    builtin_commands old = _builtin_commands;
+    				Beforebuiltin_commandsChange(old, value);
     				_builtin_commands = value;
     			    NotifyPropertyChanged("builtin_commands");
+    				Afterbuiltin_commandsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforebuiltin_commandsChange(builtin_commands oldValue, builtin_commands newValue);
+    	partial void Afterbuiltin_commandsChange(builtin_commands oldValue, builtin_commands newValue);
     }
 }

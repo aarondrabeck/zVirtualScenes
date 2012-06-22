@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class scheduled_tasks : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private Nullable<int> _SceneID;
         public Nullable<int> SceneID {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _SceneID){
+    			    Nullable<int> old = _SceneID;
+    				BeforeSceneIDChange(old, value);
     				_SceneID = value;
     			    NotifyPropertyChanged("SceneID");
+    				AfterSceneIDChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeSceneIDChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterSceneIDChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<int> _Frequency;
         public Nullable<int> Frequency {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _Frequency){
+    			    Nullable<int> old = _Frequency;
+    				BeforeFrequencyChange(old, value);
     				_Frequency = value;
     			    NotifyPropertyChanged("Frequency");
+    				AfterFrequencyChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeFrequencyChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterFrequencyChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private string _friendly_name;
         public string friendly_name {
@@ -77,11 +91,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _friendly_name){
+    			    string old = _friendly_name;
+    				Beforefriendly_nameChange(old, value);
     				_friendly_name = value;
     			    NotifyPropertyChanged("friendly_name");
+    				Afterfriendly_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforefriendly_nameChange(string oldValue, string newValue);
+    	partial void Afterfriendly_nameChange(string oldValue, string newValue);
     
     	private bool _isEnabled;
         public bool isEnabled {
@@ -90,11 +110,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _isEnabled){
+    			    bool old = _isEnabled;
+    				BeforeisEnabledChange(old, value);
     				_isEnabled = value;
     			    NotifyPropertyChanged("isEnabled");
+    				AfterisEnabledChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeisEnabledChange(bool oldValue, bool newValue);
+    	partial void AfterisEnabledChange(bool oldValue, bool newValue);
     
     	private Nullable<System.DateTime> _startTime;
         public Nullable<System.DateTime> startTime {
@@ -103,11 +129,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _startTime){
+    			    Nullable<System.DateTime> old = _startTime;
+    				BeforestartTimeChange(old, value);
     				_startTime = value;
     			    NotifyPropertyChanged("startTime");
+    				AfterstartTimeChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforestartTimeChange(Nullable<System.DateTime> oldValue, Nullable<System.DateTime> newValue);
+    	partial void AfterstartTimeChange(Nullable<System.DateTime> oldValue, Nullable<System.DateTime> newValue);
     
     	private Nullable<int> _sortOrder;
         public Nullable<int> sortOrder {
@@ -116,11 +148,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _sortOrder){
+    			    Nullable<int> old = _sortOrder;
+    				BeforesortOrderChange(old, value);
     				_sortOrder = value;
     			    NotifyPropertyChanged("sortOrder");
+    				AftersortOrderChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforesortOrderChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AftersortOrderChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<bool> _RecurMonday;
         public Nullable<bool> RecurMonday {
@@ -129,11 +167,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurMonday){
+    			    Nullable<bool> old = _RecurMonday;
+    				BeforeRecurMondayChange(old, value);
     				_RecurMonday = value;
     			    NotifyPropertyChanged("RecurMonday");
+    				AfterRecurMondayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurMondayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurMondayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurTuesday;
         public Nullable<bool> RecurTuesday {
@@ -142,11 +186,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurTuesday){
+    			    Nullable<bool> old = _RecurTuesday;
+    				BeforeRecurTuesdayChange(old, value);
     				_RecurTuesday = value;
     			    NotifyPropertyChanged("RecurTuesday");
+    				AfterRecurTuesdayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurTuesdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurTuesdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurWednesday;
         public Nullable<bool> RecurWednesday {
@@ -155,11 +205,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurWednesday){
+    			    Nullable<bool> old = _RecurWednesday;
+    				BeforeRecurWednesdayChange(old, value);
     				_RecurWednesday = value;
     			    NotifyPropertyChanged("RecurWednesday");
+    				AfterRecurWednesdayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurWednesdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurWednesdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurThursday;
         public Nullable<bool> RecurThursday {
@@ -168,11 +224,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurThursday){
+    			    Nullable<bool> old = _RecurThursday;
+    				BeforeRecurThursdayChange(old, value);
     				_RecurThursday = value;
     			    NotifyPropertyChanged("RecurThursday");
+    				AfterRecurThursdayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurThursdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurThursdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurFriday;
         public Nullable<bool> RecurFriday {
@@ -181,11 +243,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurFriday){
+    			    Nullable<bool> old = _RecurFriday;
+    				BeforeRecurFridayChange(old, value);
     				_RecurFriday = value;
     			    NotifyPropertyChanged("RecurFriday");
+    				AfterRecurFridayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurFridayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurFridayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurSaturday;
         public Nullable<bool> RecurSaturday {
@@ -194,11 +262,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurSaturday){
+    			    Nullable<bool> old = _RecurSaturday;
+    				BeforeRecurSaturdayChange(old, value);
     				_RecurSaturday = value;
     			    NotifyPropertyChanged("RecurSaturday");
+    				AfterRecurSaturdayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurSaturdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurSaturdayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurSunday;
         public Nullable<bool> RecurSunday {
@@ -207,11 +281,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurSunday){
+    			    Nullable<bool> old = _RecurSunday;
+    				BeforeRecurSundayChange(old, value);
     				_RecurSunday = value;
     			    NotifyPropertyChanged("RecurSunday");
+    				AfterRecurSundayChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurSundayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurSundayChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<int> _RecurDays;
         public Nullable<int> RecurDays {
@@ -220,11 +300,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDays){
+    			    Nullable<int> old = _RecurDays;
+    				BeforeRecurDaysChange(old, value);
     				_RecurDays = value;
     			    NotifyPropertyChanged("RecurDays");
+    				AfterRecurDaysChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDaysChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterRecurDaysChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<int> _RecurWeeks;
         public Nullable<int> RecurWeeks {
@@ -233,11 +319,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurWeeks){
+    			    Nullable<int> old = _RecurWeeks;
+    				BeforeRecurWeeksChange(old, value);
     				_RecurWeeks = value;
     			    NotifyPropertyChanged("RecurWeeks");
+    				AfterRecurWeeksChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurWeeksChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterRecurWeeksChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<int> _RecurMonth;
         public Nullable<int> RecurMonth {
@@ -246,11 +338,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurMonth){
+    			    Nullable<int> old = _RecurMonth;
+    				BeforeRecurMonthChange(old, value);
     				_RecurMonth = value;
     			    NotifyPropertyChanged("RecurMonth");
+    				AfterRecurMonthChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurMonthChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterRecurMonthChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<int> _RecurDayofMonth;
         public Nullable<int> RecurDayofMonth {
@@ -259,11 +357,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDayofMonth){
+    			    Nullable<int> old = _RecurDayofMonth;
+    				BeforeRecurDayofMonthChange(old, value);
     				_RecurDayofMonth = value;
     			    NotifyPropertyChanged("RecurDayofMonth");
+    				AfterRecurDayofMonthChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDayofMonthChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterRecurDayofMonthChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<int> _RecurSeconds;
         public Nullable<int> RecurSeconds {
@@ -272,11 +376,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurSeconds){
+    			    Nullable<int> old = _RecurSeconds;
+    				BeforeRecurSecondsChange(old, value);
     				_RecurSeconds = value;
     			    NotifyPropertyChanged("RecurSeconds");
+    				AfterRecurSecondsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurSecondsChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void AfterRecurSecondsChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private Nullable<bool> _RecurEven;
         public Nullable<bool> RecurEven {
@@ -285,11 +395,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurEven){
+    			    Nullable<bool> old = _RecurEven;
+    				BeforeRecurEvenChange(old, value);
     				_RecurEven = value;
     			    NotifyPropertyChanged("RecurEven");
+    				AfterRecurEvenChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurEvenChange(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurEvenChange(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay01;
         public Nullable<bool> RecurDay01 {
@@ -298,11 +414,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay01){
+    			    Nullable<bool> old = _RecurDay01;
+    				BeforeRecurDay01Change(old, value);
     				_RecurDay01 = value;
     			    NotifyPropertyChanged("RecurDay01");
+    				AfterRecurDay01Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay01Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay01Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay02;
         public Nullable<bool> RecurDay02 {
@@ -311,11 +433,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay02){
+    			    Nullable<bool> old = _RecurDay02;
+    				BeforeRecurDay02Change(old, value);
     				_RecurDay02 = value;
     			    NotifyPropertyChanged("RecurDay02");
+    				AfterRecurDay02Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay02Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay02Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay03;
         public Nullable<bool> RecurDay03 {
@@ -324,11 +452,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay03){
+    			    Nullable<bool> old = _RecurDay03;
+    				BeforeRecurDay03Change(old, value);
     				_RecurDay03 = value;
     			    NotifyPropertyChanged("RecurDay03");
+    				AfterRecurDay03Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay03Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay03Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay04;
         public Nullable<bool> RecurDay04 {
@@ -337,11 +471,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay04){
+    			    Nullable<bool> old = _RecurDay04;
+    				BeforeRecurDay04Change(old, value);
     				_RecurDay04 = value;
     			    NotifyPropertyChanged("RecurDay04");
+    				AfterRecurDay04Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay04Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay04Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay05;
         public Nullable<bool> RecurDay05 {
@@ -350,11 +490,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay05){
+    			    Nullable<bool> old = _RecurDay05;
+    				BeforeRecurDay05Change(old, value);
     				_RecurDay05 = value;
     			    NotifyPropertyChanged("RecurDay05");
+    				AfterRecurDay05Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay05Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay05Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay06;
         public Nullable<bool> RecurDay06 {
@@ -363,11 +509,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay06){
+    			    Nullable<bool> old = _RecurDay06;
+    				BeforeRecurDay06Change(old, value);
     				_RecurDay06 = value;
     			    NotifyPropertyChanged("RecurDay06");
+    				AfterRecurDay06Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay06Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay06Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay07;
         public Nullable<bool> RecurDay07 {
@@ -376,11 +528,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay07){
+    			    Nullable<bool> old = _RecurDay07;
+    				BeforeRecurDay07Change(old, value);
     				_RecurDay07 = value;
     			    NotifyPropertyChanged("RecurDay07");
+    				AfterRecurDay07Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay07Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay07Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay08;
         public Nullable<bool> RecurDay08 {
@@ -389,11 +547,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay08){
+    			    Nullable<bool> old = _RecurDay08;
+    				BeforeRecurDay08Change(old, value);
     				_RecurDay08 = value;
     			    NotifyPropertyChanged("RecurDay08");
+    				AfterRecurDay08Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay08Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay08Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay09;
         public Nullable<bool> RecurDay09 {
@@ -402,11 +566,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay09){
+    			    Nullable<bool> old = _RecurDay09;
+    				BeforeRecurDay09Change(old, value);
     				_RecurDay09 = value;
     			    NotifyPropertyChanged("RecurDay09");
+    				AfterRecurDay09Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay09Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay09Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay10;
         public Nullable<bool> RecurDay10 {
@@ -415,11 +585,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay10){
+    			    Nullable<bool> old = _RecurDay10;
+    				BeforeRecurDay10Change(old, value);
     				_RecurDay10 = value;
     			    NotifyPropertyChanged("RecurDay10");
+    				AfterRecurDay10Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay10Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay10Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay11;
         public Nullable<bool> RecurDay11 {
@@ -428,11 +604,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay11){
+    			    Nullable<bool> old = _RecurDay11;
+    				BeforeRecurDay11Change(old, value);
     				_RecurDay11 = value;
     			    NotifyPropertyChanged("RecurDay11");
+    				AfterRecurDay11Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay11Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay11Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay12;
         public Nullable<bool> RecurDay12 {
@@ -441,11 +623,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay12){
+    			    Nullable<bool> old = _RecurDay12;
+    				BeforeRecurDay12Change(old, value);
     				_RecurDay12 = value;
     			    NotifyPropertyChanged("RecurDay12");
+    				AfterRecurDay12Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay12Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay12Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay13;
         public Nullable<bool> RecurDay13 {
@@ -454,11 +642,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay13){
+    			    Nullable<bool> old = _RecurDay13;
+    				BeforeRecurDay13Change(old, value);
     				_RecurDay13 = value;
     			    NotifyPropertyChanged("RecurDay13");
+    				AfterRecurDay13Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay13Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay13Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay14;
         public Nullable<bool> RecurDay14 {
@@ -467,11 +661,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay14){
+    			    Nullable<bool> old = _RecurDay14;
+    				BeforeRecurDay14Change(old, value);
     				_RecurDay14 = value;
     			    NotifyPropertyChanged("RecurDay14");
+    				AfterRecurDay14Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay14Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay14Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay15;
         public Nullable<bool> RecurDay15 {
@@ -480,11 +680,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay15){
+    			    Nullable<bool> old = _RecurDay15;
+    				BeforeRecurDay15Change(old, value);
     				_RecurDay15 = value;
     			    NotifyPropertyChanged("RecurDay15");
+    				AfterRecurDay15Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay15Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay15Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay16;
         public Nullable<bool> RecurDay16 {
@@ -493,11 +699,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay16){
+    			    Nullable<bool> old = _RecurDay16;
+    				BeforeRecurDay16Change(old, value);
     				_RecurDay16 = value;
     			    NotifyPropertyChanged("RecurDay16");
+    				AfterRecurDay16Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay16Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay16Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay17;
         public Nullable<bool> RecurDay17 {
@@ -506,11 +718,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay17){
+    			    Nullable<bool> old = _RecurDay17;
+    				BeforeRecurDay17Change(old, value);
     				_RecurDay17 = value;
     			    NotifyPropertyChanged("RecurDay17");
+    				AfterRecurDay17Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay17Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay17Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay18;
         public Nullable<bool> RecurDay18 {
@@ -519,11 +737,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay18){
+    			    Nullable<bool> old = _RecurDay18;
+    				BeforeRecurDay18Change(old, value);
     				_RecurDay18 = value;
     			    NotifyPropertyChanged("RecurDay18");
+    				AfterRecurDay18Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay18Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay18Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay19;
         public Nullable<bool> RecurDay19 {
@@ -532,11 +756,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay19){
+    			    Nullable<bool> old = _RecurDay19;
+    				BeforeRecurDay19Change(old, value);
     				_RecurDay19 = value;
     			    NotifyPropertyChanged("RecurDay19");
+    				AfterRecurDay19Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay19Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay19Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay20;
         public Nullable<bool> RecurDay20 {
@@ -545,11 +775,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay20){
+    			    Nullable<bool> old = _RecurDay20;
+    				BeforeRecurDay20Change(old, value);
     				_RecurDay20 = value;
     			    NotifyPropertyChanged("RecurDay20");
+    				AfterRecurDay20Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay20Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay20Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay21;
         public Nullable<bool> RecurDay21 {
@@ -558,11 +794,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay21){
+    			    Nullable<bool> old = _RecurDay21;
+    				BeforeRecurDay21Change(old, value);
     				_RecurDay21 = value;
     			    NotifyPropertyChanged("RecurDay21");
+    				AfterRecurDay21Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay21Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay21Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay22;
         public Nullable<bool> RecurDay22 {
@@ -571,11 +813,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay22){
+    			    Nullable<bool> old = _RecurDay22;
+    				BeforeRecurDay22Change(old, value);
     				_RecurDay22 = value;
     			    NotifyPropertyChanged("RecurDay22");
+    				AfterRecurDay22Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay22Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay22Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay23;
         public Nullable<bool> RecurDay23 {
@@ -584,11 +832,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay23){
+    			    Nullable<bool> old = _RecurDay23;
+    				BeforeRecurDay23Change(old, value);
     				_RecurDay23 = value;
     			    NotifyPropertyChanged("RecurDay23");
+    				AfterRecurDay23Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay23Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay23Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay24;
         public Nullable<bool> RecurDay24 {
@@ -597,11 +851,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay24){
+    			    Nullable<bool> old = _RecurDay24;
+    				BeforeRecurDay24Change(old, value);
     				_RecurDay24 = value;
     			    NotifyPropertyChanged("RecurDay24");
+    				AfterRecurDay24Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay24Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay24Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay25;
         public Nullable<bool> RecurDay25 {
@@ -610,11 +870,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay25){
+    			    Nullable<bool> old = _RecurDay25;
+    				BeforeRecurDay25Change(old, value);
     				_RecurDay25 = value;
     			    NotifyPropertyChanged("RecurDay25");
+    				AfterRecurDay25Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay25Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay25Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay26;
         public Nullable<bool> RecurDay26 {
@@ -623,11 +889,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay26){
+    			    Nullable<bool> old = _RecurDay26;
+    				BeforeRecurDay26Change(old, value);
     				_RecurDay26 = value;
     			    NotifyPropertyChanged("RecurDay26");
+    				AfterRecurDay26Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay26Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay26Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay27;
         public Nullable<bool> RecurDay27 {
@@ -636,11 +908,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay27){
+    			    Nullable<bool> old = _RecurDay27;
+    				BeforeRecurDay27Change(old, value);
     				_RecurDay27 = value;
     			    NotifyPropertyChanged("RecurDay27");
+    				AfterRecurDay27Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay27Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay27Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay28;
         public Nullable<bool> RecurDay28 {
@@ -649,11 +927,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay28){
+    			    Nullable<bool> old = _RecurDay28;
+    				BeforeRecurDay28Change(old, value);
     				_RecurDay28 = value;
     			    NotifyPropertyChanged("RecurDay28");
+    				AfterRecurDay28Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay28Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay28Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay29;
         public Nullable<bool> RecurDay29 {
@@ -662,11 +946,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay29){
+    			    Nullable<bool> old = _RecurDay29;
+    				BeforeRecurDay29Change(old, value);
     				_RecurDay29 = value;
     			    NotifyPropertyChanged("RecurDay29");
+    				AfterRecurDay29Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay29Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay29Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay30;
         public Nullable<bool> RecurDay30 {
@@ -675,11 +965,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay30){
+    			    Nullable<bool> old = _RecurDay30;
+    				BeforeRecurDay30Change(old, value);
     				_RecurDay30 = value;
     			    NotifyPropertyChanged("RecurDay30");
+    				AfterRecurDay30Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay30Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay30Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     	private Nullable<bool> _RecurDay31;
         public Nullable<bool> RecurDay31 {
@@ -688,11 +984,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _RecurDay31){
+    			    Nullable<bool> old = _RecurDay31;
+    				BeforeRecurDay31Change(old, value);
     				_RecurDay31 = value;
     			    NotifyPropertyChanged("RecurDay31");
+    				AfterRecurDay31Change(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeRecurDay31Change(Nullable<bool> oldValue, Nullable<bool> newValue);
+    	partial void AfterRecurDay31Change(Nullable<bool> oldValue, Nullable<bool> newValue);
     
     
     	private scene _scene;
@@ -702,10 +1004,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene){
+    			    scene old = _scene;
+    				BeforesceneChange(old, value);
     				_scene = value;
     			    NotifyPropertyChanged("scene");
+    				AftersceneChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforesceneChange(scene oldValue, scene newValue);
+    	partial void AftersceneChange(scene oldValue, scene newValue);
     }
 }

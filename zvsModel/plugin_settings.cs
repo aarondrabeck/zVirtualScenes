@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class plugin_settings : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
         public plugin_settings()
         {
@@ -42,11 +38,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _plugin_id;
         public int plugin_id {
@@ -55,11 +57,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin_id){
+    			    int old = _plugin_id;
+    				Beforeplugin_idChange(old, value);
     				_plugin_id = value;
     			    NotifyPropertyChanged("plugin_id");
+    				Afterplugin_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeplugin_idChange(int oldValue, int newValue);
+    	partial void Afterplugin_idChange(int oldValue, int newValue);
     
     	private string _friendly_name;
         public string friendly_name {
@@ -68,11 +76,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _friendly_name){
+    			    string old = _friendly_name;
+    				Beforefriendly_nameChange(old, value);
     				_friendly_name = value;
     			    NotifyPropertyChanged("friendly_name");
+    				Afterfriendly_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforefriendly_nameChange(string oldValue, string newValue);
+    	partial void Afterfriendly_nameChange(string oldValue, string newValue);
     
     	private string _value;
         public string value {
@@ -81,11 +95,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value){
+    			    string old = _value;
+    				BeforevalueChange(old, value);
     				_value = value;
     			    NotifyPropertyChanged("value");
+    				AftervalueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforevalueChange(string oldValue, string newValue);
+    	partial void AftervalueChange(string oldValue, string newValue);
     
     	private int _value_data_type;
         public int value_data_type {
@@ -94,11 +114,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _value_data_type){
+    			    int old = _value_data_type;
+    				Beforevalue_data_typeChange(old, value);
     				_value_data_type = value;
     			    NotifyPropertyChanged("value_data_type");
+    				Aftervalue_data_typeChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforevalue_data_typeChange(int oldValue, int newValue);
+    	partial void Aftervalue_data_typeChange(int oldValue, int newValue);
     
     	private string _description;
         public string description {
@@ -107,11 +133,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _description){
+    			    string old = _description;
+    				BeforedescriptionChange(old, value);
     				_description = value;
     			    NotifyPropertyChanged("description");
+    				AfterdescriptionChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforedescriptionChange(string oldValue, string newValue);
+    	partial void AfterdescriptionChange(string oldValue, string newValue);
     
     	private string _name;
         public string name {
@@ -120,11 +152,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _name){
+    			    string old = _name;
+    				BeforenameChange(old, value);
     				_name = value;
     			    NotifyPropertyChanged("name");
+    				AfternameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforenameChange(string oldValue, string newValue);
+    	partial void AfternameChange(string oldValue, string newValue);
     
     
     	private ObservableCollection<plugin_setting_options> _plugin_setting_options;
@@ -134,11 +172,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin_setting_options){
+    			    ObservableCollection<plugin_setting_options> old = _plugin_setting_options;
+    				Beforeplugin_setting_optionsChange(old, value);
     				_plugin_setting_options = value;
     			    NotifyPropertyChanged("plugin_setting_options");
+    				Afterplugin_setting_optionsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeplugin_setting_optionsChange(ObservableCollection<plugin_setting_options> oldValue, ObservableCollection<plugin_setting_options> newValue);
+    	partial void Afterplugin_setting_optionsChange(ObservableCollection<plugin_setting_options> oldValue, ObservableCollection<plugin_setting_options> newValue);
     
     	private plugin _plugin;
         public virtual plugin plugin {
@@ -147,10 +191,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin){
+    			    plugin old = _plugin;
+    				BeforepluginChange(old, value);
     				_plugin = value;
     			    NotifyPropertyChanged("plugin");
+    				AfterpluginChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforepluginChange(plugin oldValue, plugin newValue);
+    	partial void AfterpluginChange(plugin oldValue, plugin newValue);
     }
 }

@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class device_types : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
         public device_types()
         {
@@ -43,11 +39,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _plugin_id;
         public int plugin_id {
@@ -56,11 +58,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin_id){
+    			    int old = _plugin_id;
+    				Beforeplugin_idChange(old, value);
     				_plugin_id = value;
     			    NotifyPropertyChanged("plugin_id");
+    				Afterplugin_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeplugin_idChange(int oldValue, int newValue);
+    	partial void Afterplugin_idChange(int oldValue, int newValue);
     
     	private string _name;
         public string name {
@@ -69,11 +77,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _name){
+    			    string old = _name;
+    				BeforenameChange(old, value);
     				_name = value;
     			    NotifyPropertyChanged("name");
+    				AfternameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforenameChange(string oldValue, string newValue);
+    	partial void AfternameChange(string oldValue, string newValue);
     
     	private bool _show_in_list;
         public bool show_in_list {
@@ -82,11 +96,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _show_in_list){
+    			    bool old = _show_in_list;
+    				Beforeshow_in_listChange(old, value);
     				_show_in_list = value;
     			    NotifyPropertyChanged("show_in_list");
+    				Aftershow_in_listChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeshow_in_listChange(bool oldValue, bool newValue);
+    	partial void Aftershow_in_listChange(bool oldValue, bool newValue);
     
     	private string _friendly_name;
         public string friendly_name {
@@ -95,11 +115,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _friendly_name){
+    			    string old = _friendly_name;
+    				Beforefriendly_nameChange(old, value);
     				_friendly_name = value;
     			    NotifyPropertyChanged("friendly_name");
+    				Afterfriendly_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforefriendly_nameChange(string oldValue, string newValue);
+    	partial void Afterfriendly_nameChange(string oldValue, string newValue);
     
     
     	private ObservableCollection<device_type_commands> _device_type_commands;
@@ -109,11 +135,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_type_commands){
+    			    ObservableCollection<device_type_commands> old = _device_type_commands;
+    				Beforedevice_type_commandsChange(old, value);
     				_device_type_commands = value;
     			    NotifyPropertyChanged("device_type_commands");
+    				Afterdevice_type_commandsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_type_commandsChange(ObservableCollection<device_type_commands> oldValue, ObservableCollection<device_type_commands> newValue);
+    	partial void Afterdevice_type_commandsChange(ObservableCollection<device_type_commands> oldValue, ObservableCollection<device_type_commands> newValue);
     
     	private plugin _plugin;
         public virtual plugin plugin {
@@ -122,11 +154,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _plugin){
+    			    plugin old = _plugin;
+    				BeforepluginChange(old, value);
     				_plugin = value;
     			    NotifyPropertyChanged("plugin");
+    				AfterpluginChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforepluginChange(plugin oldValue, plugin newValue);
+    	partial void AfterpluginChange(plugin oldValue, plugin newValue);
     
     	private ObservableCollection<device> _devices;
         public virtual ObservableCollection<device> devices {
@@ -135,10 +173,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _devices){
+    			    ObservableCollection<device> old = _devices;
+    				BeforedevicesChange(old, value);
     				_devices = value;
     			    NotifyPropertyChanged("devices");
+    				AfterdevicesChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforedevicesChange(ObservableCollection<device> oldValue, ObservableCollection<device> newValue);
+    	partial void AfterdevicesChange(ObservableCollection<device> oldValue, ObservableCollection<device> newValue);
     }
 }

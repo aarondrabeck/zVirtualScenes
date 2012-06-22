@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class group_devices : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
     
     	private int _device_id;
@@ -38,11 +34,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_id){
+    			    int old = _device_id;
+    				Beforedevice_idChange(old, value);
     				_device_id = value;
     			    NotifyPropertyChanged("device_id");
+    				Afterdevice_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_idChange(int oldValue, int newValue);
+    	partial void Afterdevice_idChange(int oldValue, int newValue);
     
     	private int _id;
         public int id {
@@ -51,11 +53,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private int _group_id;
         public int group_id {
@@ -64,11 +72,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _group_id){
+    			    int old = _group_id;
+    				Beforegroup_idChange(old, value);
     				_group_id = value;
     			    NotifyPropertyChanged("group_id");
+    				Aftergroup_idChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforegroup_idChange(int oldValue, int newValue);
+    	partial void Aftergroup_idChange(int oldValue, int newValue);
     
     
     	private device _device;
@@ -78,11 +92,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device){
+    			    device old = _device;
+    				BeforedeviceChange(old, value);
     				_device = value;
     			    NotifyPropertyChanged("device");
+    				AfterdeviceChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforedeviceChange(device oldValue, device newValue);
+    	partial void AfterdeviceChange(device oldValue, device newValue);
     
     	private group _group;
         public virtual group group {
@@ -91,10 +111,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _group){
+    			    group old = _group;
+    				BeforegroupChange(old, value);
     				_group = value;
     			    NotifyPropertyChanged("group");
+    				AftergroupChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforegroupChange(group oldValue, group newValue);
+    	partial void AftergroupChange(group oldValue, group newValue);
     }
 }

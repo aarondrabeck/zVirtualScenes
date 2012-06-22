@@ -18,17 +18,13 @@ namespace zVirtualScenesModel
     public partial class scene : INotifyPropertyChanged
     {
     	public event PropertyChangedEventHandler PropertyChanged;
-         protected void NotifyPropertyChanged(string name)
+        protected void NotifyPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
             {
-                onBeforePropertyChanged(name);
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs(name));
-                }
-                onAfterPropertyChanged(name);
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
-         partial void onBeforePropertyChanged(string name);
-         partial void onAfterPropertyChanged(string name);
+        }
     
         public scene()
         {
@@ -45,11 +41,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _id){
+    			    int old = _id;
+    				BeforeidChange(old, value);
     				_id = value;
     			    NotifyPropertyChanged("id");
+    				AfteridChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void BeforeidChange(int oldValue, int newValue);
+    	partial void AfteridChange(int oldValue, int newValue);
     
     	private string _friendly_name;
         public string friendly_name {
@@ -58,11 +60,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _friendly_name){
+    			    string old = _friendly_name;
+    				Beforefriendly_nameChange(old, value);
     				_friendly_name = value;
     			    NotifyPropertyChanged("friendly_name");
+    				Afterfriendly_nameChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforefriendly_nameChange(string oldValue, string newValue);
+    	partial void Afterfriendly_nameChange(string oldValue, string newValue);
     
     	private Nullable<int> _sort_order;
         public Nullable<int> sort_order {
@@ -71,11 +79,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _sort_order){
+    			    Nullable<int> old = _sort_order;
+    				Beforesort_orderChange(old, value);
     				_sort_order = value;
     			    NotifyPropertyChanged("sort_order");
+    				Aftersort_orderChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforesort_orderChange(Nullable<int> oldValue, Nullable<int> newValue);
+    	partial void Aftersort_orderChange(Nullable<int> oldValue, Nullable<int> newValue);
     
     	private bool _is_running;
         public bool is_running {
@@ -84,11 +98,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _is_running){
+    			    bool old = _is_running;
+    				Beforeis_runningChange(old, value);
     				_is_running = value;
     			    NotifyPropertyChanged("is_running");
+    				Afteris_runningChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforeis_runningChange(bool oldValue, bool newValue);
+    	partial void Afteris_runningChange(bool oldValue, bool newValue);
     
     
     	private ObservableCollection<device_value_triggers> _device_value_triggers;
@@ -98,11 +118,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _device_value_triggers){
+    			    ObservableCollection<device_value_triggers> old = _device_value_triggers;
+    				Beforedevice_value_triggersChange(old, value);
     				_device_value_triggers = value;
     			    NotifyPropertyChanged("device_value_triggers");
+    				Afterdevice_value_triggersChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforedevice_value_triggersChange(ObservableCollection<device_value_triggers> oldValue, ObservableCollection<device_value_triggers> newValue);
+    	partial void Afterdevice_value_triggersChange(ObservableCollection<device_value_triggers> oldValue, ObservableCollection<device_value_triggers> newValue);
     
     	private ObservableCollection<scene_commands> _scene_commands;
         public virtual ObservableCollection<scene_commands> scene_commands {
@@ -111,11 +137,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_commands){
+    			    ObservableCollection<scene_commands> old = _scene_commands;
+    				Beforescene_commandsChange(old, value);
     				_scene_commands = value;
     			    NotifyPropertyChanged("scene_commands");
+    				Afterscene_commandsChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_commandsChange(ObservableCollection<scene_commands> oldValue, ObservableCollection<scene_commands> newValue);
+    	partial void Afterscene_commandsChange(ObservableCollection<scene_commands> oldValue, ObservableCollection<scene_commands> newValue);
     
     	private ObservableCollection<scene_property_value> _scene_property_value;
         public virtual ObservableCollection<scene_property_value> scene_property_value {
@@ -124,11 +156,17 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scene_property_value){
+    			    ObservableCollection<scene_property_value> old = _scene_property_value;
+    				Beforescene_property_valueChange(old, value);
     				_scene_property_value = value;
     			    NotifyPropertyChanged("scene_property_value");
+    				Afterscene_property_valueChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescene_property_valueChange(ObservableCollection<scene_property_value> oldValue, ObservableCollection<scene_property_value> newValue);
+    	partial void Afterscene_property_valueChange(ObservableCollection<scene_property_value> oldValue, ObservableCollection<scene_property_value> newValue);
     
     	private ObservableCollection<scheduled_tasks> _scheduled_tasks;
         public virtual ObservableCollection<scheduled_tasks> scheduled_tasks {
@@ -137,10 +175,16 @@ namespace zVirtualScenesModel
     		} 
     		set {
     			if (value != _scheduled_tasks){
+    			    ObservableCollection<scheduled_tasks> old = _scheduled_tasks;
+    				Beforescheduled_tasksChange(old, value);
     				_scheduled_tasks = value;
     			    NotifyPropertyChanged("scheduled_tasks");
+    				Afterscheduled_tasksChange(old, value);
     			}
     		}
-    	 }
+    	 } 
+    
+    	partial void Beforescheduled_tasksChange(ObservableCollection<scheduled_tasks> oldValue, ObservableCollection<scheduled_tasks> newValue);
+    	partial void Afterscheduled_tasksChange(ObservableCollection<scheduled_tasks> oldValue, ObservableCollection<scheduled_tasks> newValue);
     }
 }
