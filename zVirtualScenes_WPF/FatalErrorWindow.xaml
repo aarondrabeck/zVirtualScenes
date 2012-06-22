@@ -1,0 +1,15 @@
+﻿<Window x:Class="zVirtualScenesGUI.FatalErrorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FatalErrorWindow" Height="400" Width="568" Icon="zvs256.ico" Loaded="FatalErrorWindow_Loaded_1" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" WindowStyle="ToolWindow" >
+    <Grid>
+        <Rectangle Fill="#FFEEECFB" Margin="0,66,0,-1"/>
+        <TextBlock Name="TitleTxtBl" Text="Woops! Program has encountered a problem and needs to close. We are sorry for the inconvenience." TextWrapping="Wrap"  Margin="35,10,35,0" VerticalAlignment="Top" Height="41" FontWeight="Bold" />
+        <TextBlock HorizontalAlignment="Left" Margin="35,77,0,0" TextWrapping="Wrap" Text="Please report this problem so we can fix it!" VerticalAlignment="Top" FontStyle="Italic" FontWeight="Bold"/>
+        <TextBox Name="ErrorTxtBx" Margin="35,133,35,47" TextWrapping="Wrap" Text="TextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBoxTextBox TextBox TextBox" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+        <Button Name="SendErrorBtn" Content="Send Error Report" Margin="0,0,10,10" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="115" Click="SendErrorBtn_Click"/>
+        <Button Name="CloseBtn" Content="Close" Margin="10,0,0,10" Height="22" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="59" Click="CloseBtn_Click"/>
+        <TextBlock Margin="35,98,35,0" TextWrapping="Wrap" Text="Click the send error report button to draft an error e-mail or copy and paste the below error and submit it to the support forums or issue tracker." Height="32" VerticalAlignment="Top"/>
+
+    </Grid>
+</Window>
