@@ -24,12 +24,43 @@ namespace zVirtualScenesGUI
         public bool isShuttingDown = false;
         public zvsMainWindow zvsWindow = null;
         public Window firstWindow;
+        System.Threading.Mutex zvsMutex = null;
+
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            try
+            {
+                zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");                              
+                Window WpfBugWindow = new Window()
+                {
+                    AllowsTransparency = true,
+                    Background = System.Windows.Media.Brushes.Transparent,
+                    WindowStyle = WindowStyle.None,
+                    Top = 0,
+                    Left = 0,
+                    Width = 1,
+                    Height = 1,
+                    ShowInTaskbar = false
+                };
+                WpfBugWindow.Show();
+                if (MessageBox.Show(Utils.ApplicationName + " can't start because it is already running", Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+                {
+                    WpfBugWindow.Close();
+                    Environment.Exit(1);
+                    return;
+                }
+            }
+            catch
+            {
+                //the specified mutex doesn't exist, we should create it
+                zvsMutex = new System.Threading.Mutex(true, "zVirtualScenesGUIMutex"); //these names need to match.
+            }
+
+
             AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-            
+
             string error = Utils.PreReqChecks();
 
             if (error != null)
@@ -58,7 +89,7 @@ namespace zVirtualScenesGUI
             //Initilize the core
             zvsCore = new Core(this.Dispatcher);
 
-             //This is a placeholder for a main window. Application.Current.MainWindow
+            //This is a placeholder for a main window. Application.Current.MainWindow
             firstWindow = new Window();
 
             //Create taskbar Icon 
@@ -144,7 +175,7 @@ namespace zVirtualScenesGUI
             fWindow.ShowDialog();
         }
 
-        
+
 
         public static string GetHostDetails
         {
@@ -184,6 +215,9 @@ namespace zVirtualScenesGUI
 
         public void ShutdownZVS()
         {
+            if (zvsMutex != null)
+                zvsMutex.ReleaseMutex();
+
             Application.Current.Shutdown();
         }
 

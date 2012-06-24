@@ -26,7 +26,7 @@ namespace zVirtualScenes
             {
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 Version vrs = assembly.GetName().Version;
-                return string.Format("{0}.{1}.{2}.{3}", vrs.Major, vrs.Minor, vrs.Build, vrs.Revision);
+                return string.Format("{0}.{1}", vrs.Major, vrs.Minor);
             }
         }
 

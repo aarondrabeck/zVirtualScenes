@@ -194,9 +194,10 @@ namespace zVirtualScenes
 
                     if (p.Enabled && p.IsReady)
                     {
-                        string details = string.Format("Processing command '{0}':'{1}' to plug-in '{2}'.",
+                        string details = string.Format("Processing command '{0}':'{1}' on {2} to plug-in '{3}'.",
                                                               cmd.device_type_commands.friendly_name,
                                                               cmd.arg,
+                                                              cmd.device.friendly_name,
                                                               p.FriendlyName);
 
                         if (onProcessingCommandEnd != null)
@@ -269,9 +270,10 @@ namespace zVirtualScenes
 
                     if (p.Enabled && p.IsReady)
                     {
-                        string details = string.Format("Processed command '{0}':'{1}' to plug-in '{2}'.",
-                                                              cmd.device_commands.friendly_name,
+                        string details = string.Format("Processed command '{0}':'{1}' on {2} to plug-in '{3}'.",
+                                                              cmd.device_commands.friendly_name,                                                             
                                                               cmd.arg,
+                                                              cmd.device.friendly_name,
                                                               p.FriendlyName);
 
                         if (onProcessingCommandEnd != null)

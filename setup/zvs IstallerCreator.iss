@@ -5,15 +5,16 @@
 #define use_vc2010
 
 #define MyAppName "zVirtualScenes"
-#define MyAppVersion "3.0"
+#define MyAppVersion "3.1"
 #define MyAppPublisher "Drabeck Solutions"
 #define MyAppExeName "zVirtualScenesGUI.exe"
 
-[Setup]
+[Setup]                            
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{09FA2C8A-D475-4DC3-A895-107587BF4B90}
+AppMutex=zVirtualScenesGUIMutex
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppCopyright=Copyright © {#MyAppPublisher} 2012
