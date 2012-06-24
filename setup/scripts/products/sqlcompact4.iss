@@ -16,10 +16,10 @@ const
 procedure sqlcompact4();
 begin
 	if (not RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v4.0\ENU')) then
-    AddProduct(GetString(sqlcompact4_fn, sqlcompact4_fn_x64, ''),
+    AddProduct(GetString(sqlcompact4_fn, sqlcompact4_fn_x64, sqlcompact4_fn_x64),
 			'/qb',
 			CustomMessage('sqlcompact4_title'),
 			CustomMessage('sqlcompact4_size'),
-			GetString(sqlcompact4_url, sqlcompact4_url_x64, ''),
+			GetString(sqlcompact4_url, sqlcompact4_url_x64, sqlcompact4_url_x64),
 			false, false);
 end;
