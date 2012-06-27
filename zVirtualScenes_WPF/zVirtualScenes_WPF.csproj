@@ -422,7 +422,7 @@
     <Resource Include="zvs256.ico" />
   </ItemGroup>
   <ItemGroup>
-    <SplashScreen Include="SplashScreen1.png" />
+    <SplashScreen Include="SplashScreen1222.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\zvsLogoTextOnly.png" />

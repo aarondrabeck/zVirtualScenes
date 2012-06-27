@@ -1,0 +1,8 @@
+D:\Hobby\zvirtualscenes\trunk\Plugins\ThinkStickHIDPlugin\obj\Release\ThinkStickHIDPlugin.csprojResolveAssemblyReference.cache
+D:\Hobby\zvirtualscenes\trunk\output_release\plugins\upgrade.sql
+D:\Hobby\zvirtualscenes\trunk\output_release\plugins\zvsLocalDB-blank.sdf
+D:\Hobby\zvirtualscenes\trunk\output_release\plugins\ThinkStickHIDPlugin.dll.config
+D:\Hobby\zvirtualscenes\trunk\output_release\plugins\ThinkStickHIDPlugin.dll
+D:\Hobby\zvirtualscenes\trunk\output_release\plugins\ThinkStickHIDPlugin.pdb
+D:\Hobby\zvirtualscenes\trunk\Plugins\ThinkStickHIDPlugin\obj\Release\ThinkStickHIDPlugin.dll
+D:\Hobby\zvirtualscenes\trunk\Plugins\ThinkStickHIDPlugin\obj\Release\ThinkStickHIDPlugin.pdb

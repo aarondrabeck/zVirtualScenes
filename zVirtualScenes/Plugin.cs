@@ -116,9 +116,31 @@ namespace zVirtualScenes
             }
         }
 
+        public void UpdateDeviceValue(int deviceID, string ValueID, string Value, zvsLocalDBEntities context)
+        {
+            device d = context.devices.FirstOrDefault(o => o.id == deviceID);
+            if (d != null)
+            {
+                device_values existing_dv = d.device_values.FirstOrDefault(o => o.value_id == ValueID);
+                if(existing_dv != null)
+                {
+                    device_values changed_dv = new device_values();
+                    changed_dv.device_id = existing_dv.device_id;
+                    changed_dv.value_id = existing_dv.value_id;
+                    changed_dv.type = existing_dv.type;
+                    changed_dv.label_name = existing_dv.label_name;
+                    changed_dv.index2 = existing_dv.index2;
+                    changed_dv.genre = existing_dv.genre;
+                    changed_dv.commandClassId = existing_dv.commandClassId;
+                    changed_dv.read_only = existing_dv.read_only;
+                    changed_dv.value2 = Value;
+                    DefineOrUpdateDeviceValue(changed_dv, context);
+                }
+            }
+        }
+
         public void DefineOrUpdateDeviceValue(device_values dv, zvsLocalDBEntities context, bool IgnoreValueChange = false)
         {
-
             device d = context.devices.FirstOrDefault(o => o.id == dv.device_id);
             if (d != null)
             {
