@@ -80,19 +80,19 @@
                         <DataTemplate>
                             <Image Name="img" Width="35" Height="35" Source="/zVirtualScenesGUI;component/Images/20radio.png" Margin="5,0" />
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="THERMOSTAT">
+                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="THERMOSTAT">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/thermometer.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DIMMER">
+                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="DIMMER">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/bulb.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="SWITCH">
+                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="SWITCH">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/switch.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="CONTROLLER">
+                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="CONTROLLER">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/controler.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DOORLOCK">
+                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="DOORLOCK">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/doorlock.png"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>

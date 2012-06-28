@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using ControlThink.ZWave;
 using ControlThink.ZWave.Devices;
 using ControlThink.ZWave.Devices.Specific;
@@ -17,6 +19,7 @@ namespace ThinkStickHIDPlugin
     {
         private readonly ZWaveController CTController = new ZWaveController();
         private List<ZWaveDevice> _CTDevices = new List<ZWaveDevice>();
+        private Window CommandDialogWindow = null;
 
         public ThinkStickPlugin()
             : base("THINKSTICK",
@@ -28,6 +31,9 @@ namespace ThinkStickHIDPlugin
         {
             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
+                device_types generic_dt = new device_types { name = "GENERIC", friendly_name = "ControlThink Device", show_in_list = true };
+                DefineOrUpdateDeviceType(generic_dt, context);
+
                 device_types controller_dt = new device_types { name = "CONTROLLER", friendly_name = "ControlThink Controller", show_in_list = true };
                 DefineOrUpdateDeviceType(controller_dt, context);
 
@@ -41,7 +47,7 @@ namespace ThinkStickHIDPlugin
                 dimmer_dt.device_type_commands.Add(new device_type_commands { name = "TURNON", friendly_name = "Turn On", arg_data_type = (int)Data_Types.NONE, description = "Activates a dimmer." });
                 dimmer_dt.device_type_commands.Add(new device_type_commands { name = "TURNOFF", friendly_name = "Turn Off", arg_data_type = (int)Data_Types.NONE, description = "Deactivates a dimmer." });
 
-                device_type_commands dimmer_preset_cmd = new device_type_commands { name = "SETPRESETLEVEL", friendly_name = "Set Level", arg_data_type = (int)Data_Types.LIST, description = "Sets a dimmer to a preset level." };
+                device_type_commands dimmer_preset_cmd = new device_type_commands { name = "SETPRESETLEVEL", friendly_name = "Set Basic", arg_data_type = (int)Data_Types.LIST, description = "Sets a dimmer to a preset level." };
                 dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "0%" });
                 dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "20%" });
                 dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "40%" });
@@ -63,7 +69,7 @@ namespace ThinkStickHIDPlugin
                 device_propertys.AddOrEdit(new device_propertys
                 {
                     name = "ENABLEREPOLLONLEVELCHANGE",
-                    friendly_name = "Repoll dimmers 3 seconds after a level change is received?",
+                    friendly_name = "Repoll dimmers 3 seconds after a basic change is received?",
                     default_value = true.ToString(),
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
@@ -120,7 +126,35 @@ namespace ThinkStickHIDPlugin
                 ZWaveDevice CTDevice = GetCTDevice((byte)cmd.device.node_id);
                 if (CTDevice != null)
                 {
-                    if (cmd.device.device_types.name == "THERMOSTAT")
+                    if (cmd.device.device_types.name == "CONTROLLER")
+                    {
+                        if (CTDevice.NodeID == CTController.NodeID)
+                        {
+                            if (CommandDialogWindow == null)
+                            {
+                                string cmdName = cmd.device_commands.name;
+                                Thread t = new Thread(() =>
+                                {
+                                    ControllerDialogWindow cdWindow = new ControllerDialogWindow(CTController, cmdName);
+                                    CommandDialogWindow = cdWindow;
+                                    cdWindow.Closed += (s, a) =>
+                                    {
+                                        CommandDialogWindow = null;
+                                    };
+
+                                    cdWindow.ShowDialog();
+                                });
+                                t.SetApartmentState(ApartmentState.STA);
+                                t.Start();
+                            }
+                            else
+                            {
+                                CommandDialogWindow.Dispatcher.Invoke(new Action(() => CommandDialogWindow.Activate()));
+                            }
+
+                        }
+                    }
+                    else if (cmd.device.device_types.name == "THERMOSTAT")
                     {
                         GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
 
@@ -161,7 +195,7 @@ namespace ThinkStickHIDPlugin
                     }
                     else if (cmd.device.device_types.name == "SWITCH" || cmd.device.device_types.name == "DIMMER")
                     {
-                        if (cmd.device_commands.name == "LEVEL")
+                        if (cmd.device_commands.name == "BASIC")
                         {
                             byte level = 0;
                             byte.TryParse(cmd.arg, out level);
@@ -453,10 +487,12 @@ namespace ThinkStickHIDPlugin
             SubscribeEvents();
             WriteToLog(Urgency.INFO, "Initializing: Setting polling intervals...");
             SetPollingIntervals();
-            WriteToLog(Urgency.INFO, "Initializing: Polling each device...");
-            ManuallyPollDevices();
             IsReady = true;
-            WriteToLog(Urgency.INFO, "Initializing Complete: Plug-in now ready.");
+            WriteToLog(Urgency.INFO, "Initializing Complete. Plugin Ready.");
+            
+            WriteToLog(Urgency.INFO, "Polling each device...");
+            ManuallyPollDevices();
+            WriteToLog(Urgency.INFO, "Polling Complete.");
         }
 
         private void CTController_Disconnected(object sender, EventArgs e)
@@ -469,7 +505,7 @@ namespace ThinkStickHIDPlugin
         private void UnSubscribeEvents()
         {
             foreach (ZWaveDevice CTDevice in _CTDevices)
-            {               
+            {
                 if (CTDevice is BinarySwitch)
                     CTDevice.LevelChanged -= Switch_LevelChanged;
                 else if (CTDevice is MultilevelSwitch)
@@ -528,241 +564,340 @@ namespace ThinkStickHIDPlugin
                         device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDevice.NodeID);
                         if (existingDevice == null)
                         {
-                            device d = new zVirtualScenesModel.device();
+                            existingDevice = new device();
+                            existingDevice.device_types = GetDeviceType("GENERIC", context);
+                            existingDevice.node_id = CTDevice.NodeID;
+                            existingDevice.friendly_name = "ControlThink OpenZwave Device";
+                            existingDevice.current_level_int = 0;
+                            existingDevice.current_level_txt = "";
+                            context.devices.Add(existingDevice);
+                            context.SaveChanges();
+                        }
 
-                            d.current_level_int = 0;
-                            d.current_level_txt = "";
+                        //Type
+                        if (CTDevice is Controller)
+                        {
+                            existingDevice.device_types = GetDeviceType("CONTROLLER", context);
 
-                            //node id
-                            d.node_id = CTDevice.NodeID;
+                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
+                                existingDevice.friendly_name = "My ControlThink Controller";
 
-                            //Type
-                            if (CTDevice is Controller)
+                            #region Controller Commands
+                            if (CTController.NodeID == CTDevice.NodeID)
                             {
-                                //Specific.PcController CTController = (Specific.PcController)CTDevice;
-
-                                d.device_types = GetDeviceType("CONTROLLER", context);
-                                d.friendly_name = "My ControlThink Controller";
-
-                                context.devices.Add(d);
-                                context.SaveChanges();
-                            }
-                            else if (CTDevice is BinarySwitch)
-                            {
-                                d.device_types = GetDeviceType("SWITCH", context);
-                                d.friendly_name = "My ControlThink Switch";
-
-                                context.devices.Add(d);
-
-                                //Save in order to get the d.id
-                                context.SaveChanges();
-
-                                #region BinarySwitch Level Value and Command
-                                DefineOrUpdateDeviceValue(new device_values
+                                DefineOrUpdateDeviceCommand(new device_commands
                                 {
-                                    device_id = d.id,
-                                    value_id = "LEVEL",
-                                    label_name = "Level",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "0",
-                                    read_only = false
-                                }, context, true);
-
-                                device_commands dc = new device_commands
-                                {
-                                    device_id = d.id,
-                                    name = "LEVEL",
-                                    friendly_name = "Level",
-                                    arg_data_type = (int)Data_Types.BYTE,
-                                    help = "Changes the Switch Level",
+                                    device_id = existingDevice.id,
+                                    name = "BeginAddController",
+                                    friendly_name = "Add Controller",
+                                    arg_data_type = (int)Data_Types.NONE,
+                                    help = "Adds controller to network",
                                     custom_data1 = "",
-                                    custom_data2 = "LEVEL",
+                                    custom_data2 = "",
                                     sort_order = 1
-                                };
+                                }, context);
 
-                                DefineOrUpdateDeviceCommand(dc, context);
-                                #endregion
-                            }
-                            else if (CTDevice is MultilevelSwitch)
-                            {
-                                d.device_types = GetDeviceType("DIMMER", context);
-                                d.friendly_name = "My ControlThink Dimmer";
-
-                                context.devices.Add(d);
-
-                                //Save in order to get the d.id
-                                context.SaveChanges();
-
-                                #region DimmerSwtich Level Value and Command
-                                DefineOrUpdateDeviceValue(new device_values
+                                DefineOrUpdateDeviceCommand(new device_commands
                                 {
-                                    device_id = d.id,
-                                    value_id = "LEVEL",
-                                    label_name = "Level",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "0",
-                                    read_only = false
-                                }, context, true);
-
-                                device_commands dc = new device_commands
-                                {
-                                    device_id = d.id,
-                                    name = "LEVEL",
-                                    friendly_name = "Level",
-                                    arg_data_type = (int)Data_Types.BYTE,
-                                    help = "Changes the Dimmer Level",
+                                    device_id = existingDevice.id,
+                                    name = "BeginAddDevice",
+                                    friendly_name = "Add Device",
+                                    arg_data_type = (int)Data_Types.NONE,
+                                    help = "Adds device to network",
                                     custom_data1 = "",
-                                    custom_data2 = "LEVEL",
+                                    custom_data2 = "",
                                     sort_order = 1
-                                };
+                                }, context);
 
-                                DefineOrUpdateDeviceCommand(dc, context);
-                                #endregion
-                            }
-                            else if (CTDevice is GeneralThermostatV2)
-                            {
-                                GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
-                                d.device_types = GetDeviceType("THERMOSTAT", context);
-                                d.friendly_name = "My ControlThink Thermostat";
-                                context.devices.Add(d);
-                                context.SaveChanges();
-
-                                #region Temp
-                                DefineOrUpdateDeviceValue(new device_values
+                                DefineOrUpdateDeviceCommand(new device_commands
                                 {
-                                    device_id = d.id,
-                                    value_id = "TEMPERATURE",
-                                    label_name = "Temperature",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = true
-                                }, context, true);
-                                #endregion
-
-                                #region Thermostat SetBack Mode
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = "SETBACK",
-                                    label_name = "SetBack Mode",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = false
-                                }, context, true);                                
-                                #endregion
-
-                                #region Thermostat Fan Mode
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = "FAN_MODE",
-                                    label_name = "Fan Mode",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = false
-                                }, context, true);
-                                device_commands dc = new device_commands
-                                {
-                                    device_id = d.id,
-                                    name = "FAN_MODE",
-                                    friendly_name = "Fan Mode",
-                                    arg_data_type = (int)Data_Types.LIST,
-                                    help = "Changes the Thermostat Fan Mode",
+                                    device_id = existingDevice.id,
+                                    name = "BeginCreateNewPrimaryController",
+                                    friendly_name = "Create New Primary Controller",
+                                    arg_data_type = (int)Data_Types.NONE,
+                                    help = "Creates New Primary Controller",
                                     custom_data1 = "",
-                                    custom_data2 = "FAN_MODE",
+                                    custom_data2 = "",
                                     sort_order = 1
-                                };
+                                }, context);
 
+                                DefineOrUpdateDeviceCommand(new device_commands
+                                {
+                                    device_id = existingDevice.id,
+                                    name = "BeginReceiveConfiguration",
+                                    friendly_name = "Receive Configuration",
+                                    arg_data_type = (int)Data_Types.NONE,
+                                    help = "Receives Configuration",
+                                    custom_data1 = "",
+                                    custom_data2 = "",
+                                    sort_order = 1
+                                }, context);
+
+                                DefineOrUpdateDeviceCommand(new device_commands
+                                {
+                                    device_id = existingDevice.id,
+                                    name = "BeginRemoveController",
+                                    friendly_name = "Remove Controller",
+                                    arg_data_type = (int)Data_Types.NONE,
+                                    help = "Removes Controller",
+                                    custom_data1 = "",
+                                    custom_data2 = "",
+                                    sort_order = 1
+                                }, context);
+
+                                DefineOrUpdateDeviceCommand(new device_commands
+                                {
+                                    device_id = existingDevice.id,
+                                    name = "BeginRemoveDevice",
+                                    friendly_name = "Remove Device",
+                                    arg_data_type = (int)Data_Types.NONE,
+                                    help = "Removes Device",
+                                    custom_data1 = "",
+                                    custom_data2 = "",
+                                    sort_order = 1
+                                }, context);
+
+                                DefineOrUpdateDeviceCommand(new device_commands
+                               {
+                                   device_id = existingDevice.id,
+                                   name = "BeginTransferPrimaryRole",
+                                   friendly_name = "Transfer Primary Role",
+                                   arg_data_type = (int)Data_Types.NONE,
+                                   help = "Transfer Primary Role",
+                                   custom_data1 = "",
+                                   custom_data2 = "",
+                                   sort_order = 1
+                               }, context);
+                            #endregion
+                            }
+                        }
+                        else if (CTDevice is BinarySwitch)
+                        {
+                            existingDevice.device_types = GetDeviceType("SWITCH", context);
+
+                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
+                                existingDevice.friendly_name = "My ControlThink Switch";
+
+                            #region BinarySwitch Level Value and Command
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "BASIC",
+                                label_name = "Basic",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "0",
+                                read_only = false
+                            }, context, true);
+
+                            device_commands dc = new device_commands
+                            {
+                                device_id = existingDevice.id,
+                                name = "BASIC",
+                                friendly_name = "Basic",
+                                arg_data_type = (int)Data_Types.BYTE,
+                                help = "Changes the Switch Level",
+                                custom_data1 = "",
+                                custom_data2 = "BASIC",
+                                sort_order = 1
+                            };
+
+                            DefineOrUpdateDeviceCommand(dc, context);
+                            #endregion
+                        }
+                        else if (CTDevice is MultilevelSwitch)
+                        {
+                            existingDevice.device_types = GetDeviceType("DIMMER", context);
+
+                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
+                                existingDevice.friendly_name = "My ControlThink Dimmer";
+
+                            #region DimmerSwtich Level Value and Command
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "BASIC",
+                                label_name = "Basic",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "0",
+                                read_only = false
+                            }, context, true);
+
+                            device_commands dc = new device_commands
+                            {
+                                device_id = existingDevice.id,
+                                name = "BASIC",
+                                friendly_name = "Basic",
+                                arg_data_type = (int)Data_Types.BYTE,
+                                help = "Changes the Dimmer Level",
+                                custom_data1 = "",
+                                custom_data2 = "BASIC",
+                                sort_order = 1
+                            };
+
+                            DefineOrUpdateDeviceCommand(dc, context);
+                            #endregion
+                        }
+                        else if (CTDevice is GeneralThermostatV2)
+                        {
+                            GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
+                            existingDevice.device_types = GetDeviceType("THERMOSTAT", context);
+
+                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
+                                existingDevice.friendly_name = "My ControlThink Thermostat";
+
+                            #region Temp
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "TEMPERATURE",
+                                label_name = "Temperature",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = true
+                            }, context, true);
+                            #endregion
+
+                            #region Thermostat SetBack Mode
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "SETBACK",
+                                label_name = "SetBack Mode",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = false
+                            }, context, true);
+                            #endregion
+
+                            #region Thermostat Fan Mode
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "FAN_MODE",
+                                label_name = "Fan Mode",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = false
+                            }, context, true);
+                            device_commands dc = new device_commands
+                            {
+                                device_id = existingDevice.id,
+                                name = "FAN_MODE",
+                                friendly_name = "Fan Mode",
+                                arg_data_type = (int)Data_Types.LIST,
+                                help = "Changes the Thermostat Fan Mode",
+                                custom_data1 = "",
+                                custom_data2 = "FAN_MODE",
+                                sort_order = 1
+                            };
+
+
+                            try
+                            {
                                 foreach (ThermostatFanMode mode in CTThermostat.SupportedThermostatFanModes)
                                     dc.device_command_options.Add(new device_command_options { name = mode.ToString() });
+                            }
+                            catch (Exception e)
+                            {
+                                WriteToLog(Urgency.ERROR, "Error getting supported thermostat fan modes. " + e.Message);
+                            }
 
-                                DefineOrUpdateDeviceCommand(dc, context);
-                                #endregion
+                            DefineOrUpdateDeviceCommand(dc, context);
+                            #endregion
 
-                                #region Thermostat Mode
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = "MODE",
-                                    label_name = "Mode",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = false
-                                }, context, true);
+                            #region Thermostat Mode
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "MODE",
+                                label_name = "Mode",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = false
+                            }, context, true);
 
-                                device_commands dc2 = new device_commands
-                                {
-                                    device_id = d.id,
-                                    name = "MODE",
-                                    friendly_name = "Mode",
-                                    arg_data_type = (int)Data_Types.LIST,
-                                    help = "Changes the Thermostat Mode",
-                                    custom_data1 = "",
-                                    custom_data2 = "MODE",
-                                    sort_order = 2
-                                };
+                            device_commands dc2 = new device_commands
+                            {
+                                device_id = existingDevice.id,
+                                name = "MODE",
+                                friendly_name = "Mode",
+                                arg_data_type = (int)Data_Types.LIST,
+                                help = "Changes the Thermostat Mode",
+                                custom_data1 = "",
+                                custom_data2 = "MODE",
+                                sort_order = 2
+                            };
 
+                            try
+                            {
                                 foreach (ThermostatMode mode in CTThermostat.SupportedThermostatModes)
                                     dc2.device_command_options.Add(new device_command_options { name = mode.ToString() });
+                            }
+                            catch (Exception e)
+                            {
+                                WriteToLog(Urgency.ERROR, "Error getting supported thermostat modes. " + e.Message);
+                            }
 
-                                DefineOrUpdateDeviceCommand(dc2, context);
-                                #endregion
+                            DefineOrUpdateDeviceCommand(dc2, context);
+                            #endregion
 
-                                #region Thermostat Fan State
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = "FAN_STATE",
-                                    label_name = "Fan State",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = true
-                                }, context, true);
-                                #endregion
+                            #region Thermostat Fan State
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "FAN_STATE",
+                                label_name = "Fan State",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = true
+                            }, context, true);
+                            #endregion
 
-                                #region Thermostat Operating State
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = "OPERATING_STATE",
-                                    label_name = "Operating State",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = true
-                                }, context, true);
-                                #endregion
+                            #region Thermostat Operating State
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "OPERATING_STATE",
+                                label_name = "Operating State",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = true
+                            }, context, true);
+                            #endregion
 
-                                #region Thermostat Setpoint Collection
+                            #region Thermostat Setpoint Collection
+                            try
+                            {
                                 foreach (ThermostatSetpointType type in CTThermostat.SupportedThermostatSetpoints)
                                 {
                                     ThermostatSetpoint sp = CTThermostat.ThermostatSetpoints[type];
                                     DefineOrUpdateDeviceValue(new device_values
                                     {
-                                        device_id = d.id,
+                                        device_id = existingDevice.id,
                                         value_id = "DYNAMIC_SP_R207_" + type.ToString(),
                                         label_name = type.ToString(),
                                         genre = "",
@@ -770,12 +905,12 @@ namespace ThinkStickHIDPlugin
                                         type = "",
                                         commandClassId = "",
                                         value2 = "",
-                                        read_only = true
+                                        read_only = false
                                     }, context, true);
 
                                     device_commands dc3 = new device_commands
                                     {
-                                        device_id = d.id,
+                                        device_id = existingDevice.id,
                                         name = "DYNAMIC_SP_R207_" + type.ToString(),
                                         friendly_name = "Set " + type.ToString(),
                                         arg_data_type = (int)Data_Types.INTEGER,
@@ -786,47 +921,53 @@ namespace ThinkStickHIDPlugin
                                     };
                                     DefineOrUpdateDeviceCommand(dc3, context);
                                 }
-                                #endregion
                             }
-                            else if (CTDevice is BinarySensor || CTDevice is MultilevelSensor)
+                            catch (Exception e)
                             {
-                                d.device_types = GetDeviceType("SENSOR", context);
-                                d.friendly_name = "My ControlThink Sensor";
-                                context.devices.Add(d);
-                                context.SaveChanges();
-
-                                #region Sensor Level Value and Command
-                                DefineOrUpdateDeviceValue(new device_values
-                                {
-                                    device_id = d.id,
-                                    value_id = "LEVEL",
-                                    label_name = "Level",
-                                    genre = "",
-                                    index2 = "",
-                                    type = "",
-                                    commandClassId = "",
-                                    value2 = "",
-                                    read_only = false
-                                }, context, true);
-
-                                device_commands dc = new device_commands
-                                {
-                                    device_id = d.id,
-                                    name = "LEVEL",
-                                    friendly_name = "Level",
-                                    arg_data_type = (int)Data_Types.BYTE,
-                                    help = "Changes the Dimmer Level",
-                                    custom_data1 = "",
-                                    custom_data2 = "LEVEL",
-                                    sort_order = 1
-                                };
-
-                                DefineOrUpdateDeviceCommand(dc, context);
-                                #endregion
+                                WriteToLog(Urgency.ERROR, "Error getting supported thermostat setpoints. " + e.Message);
                             }
+                            #endregion
+                        }
+                        else if (CTDevice is BinarySensor || CTDevice is MultilevelSensor)
+                        {
+                            existingDevice.device_types = GetDeviceType("SENSOR", context);
+
+                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
+                                existingDevice.friendly_name = "My ControlThink Sensor";
+
+                            #region Sensor Level Value and Command
+                            DefineOrUpdateDeviceValue(new device_values
+                            {
+                                device_id = existingDevice.id,
+                                value_id = "BASIC",
+                                label_name = "Basic",
+                                genre = "",
+                                index2 = "",
+                                type = "",
+                                commandClassId = "",
+                                value2 = "",
+                                read_only = false
+                            }, context, true);
+
+                            device_commands dc = new device_commands
+                            {
+                                device_id = existingDevice.id,
+                                name = "BASIC",
+                                friendly_name = "Basic",
+                                arg_data_type = (int)Data_Types.BYTE,
+                                help = "Changes the Dimmer Level",
+                                custom_data1 = "",
+                                custom_data2 = "BASIC",
+                                sort_order = 1
+                            };
+
+                            DefineOrUpdateDeviceCommand(dc, context);
+                            #endregion
                         }
                     }
+
                     #endregion
+                    context.SaveChanges();
                 }
             }
         }
@@ -954,9 +1095,9 @@ namespace ThinkStickHIDPlugin
 
         }
 
-         void CTThermostat_LevelChanged(object sender, LevelChangedEventArgs e)
-        {                
-           if (sender is GeneralThermostatV2)
+        void CTThermostat_LevelChanged(object sender, LevelChangedEventArgs e)
+        {
+            if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
                 using (zvsLocalDBEntities context = new zvsLocalDBEntities())
@@ -1085,7 +1226,7 @@ namespace ThinkStickHIDPlugin
                         dev.current_level_int = e.Level;
                         dev.current_level_txt = e.Level + "%";
 
-                        UpdateDeviceValue(dev.id, "LEVEL", e.Level.ToString(), context);
+                        UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
 
                         //Some dimmers take x number of seconds to dim to desired level.  Therefor the level recieved here initially is a 
                         //level between old level and new level. (if going from 0 to 100 we get 84 here).
@@ -1093,16 +1234,19 @@ namespace ThinkStickHIDPlugin
                         bool EnableDimmerRepoll = false;
                         bool.TryParse(device_property_values.GetDevicePropertyValue(context, dev.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
 
-                        System.Timers.Timer t = new System.Timers.Timer();
-                        t.Interval = 2000;
-                        t.Elapsed += (s, args) =>
+                        if (IsReady)
                         {
-                            ManuallyPollDevice(CTDimmer);
-                            t.Stop();
-                            Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.node_id));
-                        };
-                        t.Start();
-                        Console.WriteLine(string.Format("Timer {0} started.", dev.node_id));
+                            System.Timers.Timer t = new System.Timers.Timer();
+                            t.Interval = 2000;
+                            t.Elapsed += (s, args) =>
+                            {
+                                Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.node_id));
+                                ManuallyPollDevice(CTDimmer);
+                                t.Stop();
+                            };
+                            t.Start();
+                            Console.WriteLine(string.Format("Timer {0} started.", dev.node_id));
+                        }
                     }
                     else
                         WriteToLog(Urgency.ERROR, "Level Changed on DEVICE NOT FOUND:" + e.Level);
@@ -1124,7 +1268,7 @@ namespace ThinkStickHIDPlugin
                         dev.current_level_int = e.Level;
                         dev.current_level_txt = e.Level > 0 ? "ON" : "OFF";
 
-                        UpdateDeviceValue(dev.id, "LEVEL", e.Level.ToString(), context);
+                        UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
                     }
                     else
                         WriteToLog(Urgency.INFO, "Level Changed on DEVICE NOT FOUND:" + e.Level);

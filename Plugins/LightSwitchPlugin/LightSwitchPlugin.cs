@@ -775,8 +775,17 @@ namespace LightSwitchPlugin
                             }
                         case "DIMMER":
                             {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_BASIC", (Level == 255 ? "99" : Level.ToString()), Client))
-                                    return;
+                                string l = (Level == 255 ? "99" : Level.ToString());
+                                if (d.device_types.plugin.name == "OPENZWAVE")
+                                {
+                                    if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_BASIC",l , Client))
+                                        return;
+                                }
+                                if (d.device_types.plugin.name == "THINKSTICK")
+                                {
+                                    if (ExecuteDynamicCMD(context, d, "BASIC", l, Client))
+                                        return;
+                                }
                                 break;
                             }
                     }
@@ -850,6 +859,14 @@ namespace LightSwitchPlugin
             return false;
         }
 
+        private Dictionary<string, string> ThermoTempCommandTranslations = new Dictionary<string, string>()
+        {
+            {"THINKSTICK2", "DYNAMIC_SP_R207_Heating1"},
+            {"OPENZWAVE2", "DYNAMIC_CMD_HEATING 1"},
+            {"THINKSTICK3", "DYNAMIC_SP_R207_Cooling1"},
+            {"OPENZWAVE3", "DYNAMIC_CMD_COOLING 1"} 
+        };
+
         private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, int Temp, Socket Client)
         {
             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
@@ -857,72 +874,61 @@ namespace LightSwitchPlugin
                 device d = context.devices.FirstOrDefault(o => o.id == deviceID);
                 if (d != null && d.device_types.name.Equals("THERMOSTAT"))
                 {
-                    switch (Mode)
-                    {
-                        case 2:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_HEATING 1", Temp.ToString(), Client))
-                                    return;
-                                break;
-                            }
-                        case 3:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_COOLING 1", Temp.ToString(), Client))
-                                    return;
-                                break;
-                            }
+                    string plugin = d.device_types.plugin.name;
+                    string key = plugin + Mode;
+
+                    if (ThermoTempCommandTranslations.ContainsKey(key))
+                    {                        
+                        if (ExecuteDynamicCMD(context, d, ThermoTempCommandTranslations[key], Temp.ToString(), Client))
+                            return;
                     }
                 }
             }
             BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Agian");
         }
 
+        private class zvsCMD {
+            public string CmdName;
+            public string arg;
+        }
+
+        private Dictionary<string, zvsCMD> ThermoCommandTranslations = new Dictionary<string, zvsCMD>()
+        {
+            {"THINKSTICK0", new zvsCMD() { CmdName="MODE", arg="Off"}},
+            {"OPENZWAVE0", new zvsCMD() { CmdName="DYNAMIC_CMD_MODE", arg="Off"}},
+            {"THINKSTICK1", new zvsCMD() { CmdName="MODE", arg="Auto"}},
+            {"OPENZWAVE1", new zvsCMD() { CmdName="DYNAMIC_CMD_MODE", arg="Auto"}},
+            {"THINKSTICK2", new zvsCMD() { CmdName="MODE", arg="Heat"}},
+            {"OPENZWAVE2", new zvsCMD() { CmdName="DYNAMIC_CMD_MODE", arg="Heat"}},
+            {"THINKSTICK3", new zvsCMD() { CmdName="MODE", arg="Cool"}},
+            {"OPENZWAVE3", new zvsCMD() { CmdName="DYNAMIC_CMD_MODE", arg="Cool"}},
+            {"THINKSTICK4", new zvsCMD() { CmdName="FAN_MODE", arg="OnLow"}},
+            {"OPENZWAVE4", new zvsCMD() { CmdName="DYNAMIC_CMD_FAN MODE", arg="On Low"}},
+            {"THINKSTICK5", new zvsCMD() { CmdName="FAN_MODE", arg="AutoLow"}},
+            {"OPENZWAVE5", new zvsCMD() { CmdName="DYNAMIC_CMD_FAN MODE", arg="Auto Low"}}
+
+        };
+
         private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, Socket Client)
         {
-
+            //PLUGINNAME-0 -->CmdName,Arg 
             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
                 device d = context.devices.FirstOrDefault(o => o.id == deviceID);
                 if (d != null && d.device_types.name.Equals("THERMOSTAT"))
                 {
+                    string plugin = d.device_types.plugin.name;
+                    string key = plugin + Mode;
+
+                    if(ThermoCommandTranslations.ContainsKey(key))
+                    {
+                        zvsCMD cmd = ThermoCommandTranslations[key];
+                        if (ExecuteDynamicCMD(context, d, cmd.CmdName, cmd.arg, Client))
+                            return;
+                    }
+
                     switch (Mode)
                     {
-                        case 0:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_MODE", "Off", Client))
-                                    return;
-                                break;
-                            }
-                        case 1:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_MODE", "Auto", Client))
-                                    return;
-                                break;
-                            }
-                        case 2:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_MODE", "Heat", Client))
-                                    return;
-                                break;
-                            }
-                        case 3:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_MODE", "Cool", Client))
-                                    return;
-                                break;
-                            }
-                        case 4:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_FAN MODE", "On Low", Client))
-                                    return;
-                                break;
-                            }
-                        case 5:
-                            {
-                                if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_FAN MODE", "Auto Low", Client))
-                                    return;
-                                break;
-                            }
                         case 6:
                             {
                                 device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == "SETENERGYMODE");

@@ -22,7 +22,19 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
             <MenuItem Header="File" >
+                <MenuItem Header="Backup" >
+                    <MenuItem Header="Devices" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
+                    <MenuItem Header="Scenes" x:Name="ExportScenesMI" Click="ExportScenesMI_Click_1" />
+                    <MenuItem Header="Triggers" x:Name="ExportTriggersMI" Click="ExportTriggersMI_Click_1" />
+                </MenuItem>
+                <MenuItem Header="Restore" >
+                    <MenuItem Header="Devices" x:Name="ImportDeviceNamesMI" Click="ImportDeviceNamesMI_Click_1" />
+                    <MenuItem Header="Scenes" x:Name="ImportScenesMI" Click="ImportScenesMI_Click_1" />
+                    <MenuItem Header="Triggers" x:Name="ImportTriggersMI" Click="ImportTriggersMI_Click_1" />
+                </MenuItem>
+                <Separator />
                 <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
+
             </MenuItem>
             <MenuItem Header="Groups">
                 <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
@@ -33,11 +45,12 @@
             </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
-<MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
+                <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                 <Separator />
                 <MenuItem Header="Plugin Manager" Click="MenuItem_Click_1" />
+
             </MenuItem>
-            <MenuItem Header="Help">               
+            <MenuItem Header="Help">
                 <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
             </MenuItem>
         </Menu>
@@ -50,11 +63,11 @@
                     </StackPanel>
                 </TabItem.Header>
                 <Grid>
-                    <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />                    
+                    <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
                 </Grid>
             </TabItem>
             <TabItem>
-<TabItem.Header>
+                <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Height="18" Source="Images/scene64.png"  />
                         <TextBlock Text="Scenes" Margin="2,0,0,0" VerticalAlignment="Center" />
@@ -74,8 +87,8 @@
                 <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
             </TabItem>
             <TabItem>
-                
-<TabItem.Header>
+
+                <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Height="18" Source="Images/scheduled_task.png"  />
                         <TextBlock Text="Scheduled Tasks" Margin="2,0,0,0" VerticalAlignment="Center" />
@@ -91,7 +104,7 @@
                     </StackPanel>
                 </TabItem.Header>
                 <Grid DataContext="{StaticResource ListViewSource}">
-<Border VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
+                    <Border VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
                         <Border.Background>
                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                 <GradientStop Color="White" Offset="0.969"/>
@@ -111,7 +124,7 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            
+
 
         </TabControl>
 

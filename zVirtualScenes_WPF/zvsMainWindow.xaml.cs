@@ -20,6 +20,7 @@ using zVirtualScenesGUI.PluginManager;
 using zVirtualScenesModel;
 using System.Threading;
 using System.Diagnostics;
+using zVirtualScenes.Backup;
 
 namespace zVirtualScenesGUI
 {
@@ -35,7 +36,7 @@ namespace zVirtualScenesGUI
         public zvsMainWindow()
         {
             InitializeComponent();
-            
+
         }
 
         ~zvsMainWindow()
@@ -68,7 +69,7 @@ namespace zVirtualScenesGUI
 
             this.Title = Utils.ApplicationNameAndVersion;
         }
-        
+
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F12)
@@ -237,14 +238,14 @@ namespace zVirtualScenesGUI
 
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
                 myCollectionViewSource.Source = null;
-            }            
+            }
         }
 
         private void MainWindow_Closed_1(object sender, EventArgs e)
         {
             app = null;
 
-            if(context!= null)
+            if (context != null)
                 context.Dispose();
         }
 
@@ -268,7 +269,7 @@ namespace zVirtualScenesGUI
             }
             catch
             {
-                MessageBox.Show("Unable to launch Windows Explorer.", "Error", MessageBoxButton.OK,MessageBoxImage.Error );
+                MessageBox.Show("Unable to launch Windows Explorer.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -300,6 +301,129 @@ namespace zVirtualScenesGUI
             AboutWindow aboutWin = new AboutWindow();
             aboutWin.Owner = this;
             aboutWin.ShowDialog();
+        }
+
+        private void ExportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "DevicesBackup"; // Default file name
+            dlg.DefaultExt = ".xml"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? r = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (r ?? true)
+            {
+                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
+                Backup.ExportDevicesAsyc(dlg.FileName, (result) =>
+                {
+                    MessageBox.Show(result, "Backup devices");
+                });
+            }
+        }
+
+        private void ImportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "DevicesBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            bool? r = dlg.ShowDialog();
+
+            if (r ?? true)
+            {
+                Backup.ImportDevicesAsyn(dlg.FileName, (result) =>
+                {
+                    MessageBox.Show(result, "Restored bevice names");
+                });
+            }
+        }
+
+        private void ExportScenesMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "ScenesBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? r = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (r ?? true)
+            {
+                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
+                Backup.ExportScenesAsyc(dlg.FileName, (result) =>
+                {
+                    MessageBox.Show(result, "Scene backup");
+                });
+            }
+        }
+
+        private void ImportScenesMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "ScenesBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            bool? r = dlg.ShowDialog();
+
+            if (r ?? true)
+            {
+                Backup.ImportScenesAsyn(dlg.FileName, (result) =>
+                {
+                    MessageBox.Show(result, "Restored scenes");
+                });
+            }
+        }
+
+        private void ExportTriggersMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "TriggerssBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? r = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (r ?? true)
+            {
+                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
+                Backup.ExportTriggerAsyc(dlg.FileName, (result) =>
+                {
+                    MessageBox.Show(result, "Triggers backup");
+                });
+            }
+        }
+
+        private void ImportTriggersMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "TriggerssBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            bool? r = dlg.ShowDialog();
+
+            if (r ?? true)
+            {
+                Backup.ImportTriggersAsyn(dlg.FileName, (result) =>
+                {
+                    MessageBox.Show(result, "Restored triggers");
+                });
+            }
         }
     }
 }
