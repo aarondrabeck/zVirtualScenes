@@ -45,14 +45,18 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                                 var dimmerSlider = Ext.getCmp('dimmerSlider');
                                 var sliderValue = dimmerSlider.getValue()[0]
 
-                                console.log('AJAX: SendCmd SEt LEVEL' + sliderValue);
+                                var DimmerTPL = Ext.getCmp('dimmerDetailsTPL');
+                                var pluginName = DimmerTPL._data.plugin_name;
+                                var cmd = DeviceLevelTranslations[pluginName + "LEVEL"];
+
+                                console.log('AJAX: Sent ' + cmd + ' : ' + sliderValue);
 
                                 Ext.Ajax.request({
                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                     method: 'POST',
                                     params: {
                                         u: Math.random(),
-                                        name: 'DYNAMIC_CMD_BASIC',
+                                        name: cmd,
                                         arg: sliderValue,
                                         type: 'device'
                                     },
@@ -72,34 +76,34 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                     }
                 }]
             }, {
-                        xtype: 'button',
-                        label: 'Repoll',
-                        text: 'Repoll',
-                        ui: 'confirm',
-                        margin: '15 10 5 10',
-                        handler: function () {
-                            console.log('AJAX: SendCmd REPOLL_ME');
-                            Ext.Ajax.request({
-                                url: zvsMobile.app.BaseURL() + '/commands/',
-                                method: 'POST',
-                                params: {
-                                    u: Math.random(),
-                                    name: 'REPOLL_ME',
-                                    arg: self.deviceID
-                                },
-                                success: function (response, opts) {
-                                    var result = JSON.parse(response.responseText);
-                                    if (result.success) {
-                                        self.delayedReload();
-                                    }
-                                    else {
-                                        console.log('ERROR');
-                                    }
-                                }
-                            });
+                xtype: 'button',
+                label: 'Repoll',
+                text: 'Repoll',
+                ui: 'confirm',
+                margin: '15 10 5 10',
+                handler: function () {
+                    console.log('AJAX: SendCmd REPOLL_ME');
+                    Ext.Ajax.request({
+                        url: zvsMobile.app.BaseURL() + '/commands/',
+                        method: 'POST',
+                        params: {
+                            u: Math.random(),
+                            name: 'REPOLL_ME',
+                            arg: self.deviceID
+                        },
+                        success: function (response, opts) {
+                            var result = JSON.parse(response.responseText);
+                            if (result.success) {
+                                self.delayedReload();
+                            }
+                            else {
+                                console.log('ERROR');
+                            }
                         }
-                    }
-                   ]
+                    });
+                }
+            }
+            ]
 
                   ,
             listeners: {
@@ -194,3 +198,8 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
 
     }
 });
+
+var DeviceLevelTranslations = {
+    "THINKSTICKLEVEL": "BASIC",
+    "OPENZWAVELEVEL": "DYNAMIC_CMD_BASIC"
+};

@@ -1,6 +1,6 @@
 ﻿Ext.define('zvsMobile.view.DeviceDetailsThermo', {
     extend: 'Ext.Panel',
-	requires: ['Ext.ActionSheet', 'Ext.Picker', 'Ext.TitleBar', 'Ext.field.Select'],
+    requires: ['Ext.ActionSheet', 'Ext.Picker', 'Ext.TitleBar', 'Ext.field.Select'],
     xtype: 'DeviceDetailsThermo',
 
     constructor: function (config) {
@@ -14,7 +14,7 @@
             scrollable: 'vertical',
             items: [{
                 xtype: 'panel',
-                id:'ThermoTPL',
+                id: 'ThermoTPL',
                 tpl: new Ext.XTemplate(
 							    '<div class="device_info">',
 							        '<div id="level_temp_img" class="imageholder {type}"></div>',
@@ -142,22 +142,26 @@
                                     scope: this,
                                     handler: function () {
                                         var mode = SetMode.items.items[0].getValue()
-                                        console.log('AJAX DYNAMIC_CMD_MODE ' + mode);
+                                        var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                        var pluginName = ThermoTPL._data.plugin_name;
+                                        var cmd = ThermoModeCommandTranslations[pluginName + mode];
+                                        console.log(cmd.CmdName + ' : ' + cmd.Arg);
+
 
                                         Ext.Ajax.request({
                                             url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),
-                                                name: 'DYNAMIC_CMD_MODE',
-                                                arg: mode,
+                                                name: cmd.CmdName,
+                                                arg: cmd.Arg,
                                                 type: 'device'
                                             },
                                             success: function (response, opts) {
                                                 var result = JSON.parse(response.responseText);
                                                 if (result.success) {
                                                     self.delayedReload();
-                                                   // Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
+                                                    // Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
                                                 }
                                                 else {
                                                     Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -192,10 +196,10 @@
                                 margin: '15 5',
                                 options: [{
                                     text: 'On Low',
-                                    value: 'On Low'
+                                    value: 'OnLow'
                                 }, {
                                     text: 'Auto Low',
-                                    value: 'Auto Low'
+                                    value: 'AutoLow'
                                 }]
                             }, {
                                 xtype: 'toolbar',
@@ -215,7 +219,11 @@
                                     scope: this,
                                     handler: function () {
                                         var mode = SetFanMode.items.items[0].getValue()
-                                        console.log('DYNAMIC_CMD_FAN MODE' + mode);
+
+                                        var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                        var pluginName = ThermoTPL._data.plugin_name;
+                                        var cmd = ThermoFanModeCommandTranslations[pluginName + mode];
+                                        console.log(cmd.CmdName + ' : ' + cmd.Arg);
 
 
                                         Ext.Ajax.request({
@@ -223,8 +231,8 @@
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),
-                                                name: 'DYNAMIC_CMD_FAN MODE',
-                                                arg: mode,
+                                                name: cmd.CmdName,
+                                                arg: cmd.Arg,
                                                 type: 'device'
                                             },
                                             success: function (response, opts) {
@@ -270,14 +278,18 @@
                                             xtype: 'button',
                                             text: 'Set Heat Point',
                                             handler: function () {
+                                                var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                                var pluginName = ThermoTPL._data.plugin_name;
+                                                var cmd = ThermoTempCommandTranslations[pluginName + "HEAT"];
+
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
-                                                console.log('AJAX DYNAMIC_CMD_HEATING 1' + selected_temp);
+                                                console.log(cmd + ' : ' + selected_temp);
                                                 Ext.Ajax.request({
                                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
-                                                        name: 'DYNAMIC_CMD_HEATING 1',
+                                                        name: cmd,
                                                         arg: selected_temp,
                                                         type: 'device'
                                                     },
@@ -322,13 +334,17 @@
                                             text: 'Set Cool Point',
                                             handler: function () {
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
-                                                console.log('AJAX DYNAMIC_CMD_COOLING 1 :' + selected_temp);
+                                                var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                                var pluginName = ThermoTPL._data.plugin_name;
+                                                var cmd = ThermoTempCommandTranslations[pluginName + "COOL"];
+
+                                                console.log(cmd + ' : ' + selected_temp);
                                                 Ext.Ajax.request({
                                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
-                                                        name: 'DYNAMIC_CMD_COOLING 1',
+                                                        name: cmd,
                                                         arg: selected_temp,
                                                         type: 'device'
                                                     },
@@ -382,7 +398,7 @@
                              });
                          }
                      }
-                ],
+            ],
             listeners: {
                 scope: this,
                 deactivate: function () {
@@ -397,7 +413,7 @@
         var ThermoTPL = Ext.getCmp('ThermoTPL');
         if (self.RepollTimer) { clearInterval(self.RepollTimer); }
 
-        self.RepollTimer = setTimeout(function () {         
+        self.RepollTimer = setTimeout(function () {
             self.loadDevice(self.deviceID);
         }, 1500);
     },
@@ -445,6 +461,32 @@
 
     }
 });
+
+var ThermoTempCommandTranslations = {
+    "THINKSTICKHEAT": "DYNAMIC_SP_R207_Heating1",
+    "OPENZWAVEHEAT": "DYNAMIC_CMD_HEATING 1",
+    "THINKSTICKCOOL": "DYNAMIC_SP_R207_Cooling1",
+    "OPENZWAVECOOL": "DYNAMIC_CMD_COOLING 1"
+};
+
+var ThermoFanModeCommandTranslations = {
+    "THINKSTICKOnLow": { CmdName: 'FAN_MODE', Arg: 'OnLow' },
+    "OPENZWAVEOnLow": { CmdName: 'DYNAMIC_CMD_FAN MODE', Arg: 'On Low' },
+    "THINKSTICKAutoLow": { CmdName: 'FAN_MODE', Arg: 'AutoLow' },
+    "OPENZWAVEAutoLow": { CmdName: 'DYNAMIC_CMD_FAN MODE', Arg: 'Auto Low' }
+
+};
+
+var ThermoModeCommandTranslations = {
+    "THINKSTICKOff": { CmdName: 'MODE', Arg: 'Off' },
+    "OPENZWAVEOff": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Off' },
+    "THINKSTICKAuto": { CmdName: 'MODE', Arg: 'Auto' },
+    "OPENZWAVEAuto": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Auto' },
+    "THINKSTICKHeat": { CmdName: 'MODE', Arg: 'Heat' },
+    "OPENZWAVEHeat": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Heat' },
+    "THINKSTICKCool": { CmdName: 'MODE', Arg: 'Cool' },
+    "OPENZWAVECool": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Cool' }
+};
 
 var tempSetPoints = [{ text: '40&deg;', value: 40 },
                     { text: '41&deg;', value: 41 },
@@ -505,4 +547,4 @@ var tempSetPoints = [{ text: '40&deg;', value: 40 },
                     { text: '96&deg;', value: 96 },
                     { text: '97&deg;', value: 97 },
                     { text: '98&deg;', value: 98 },
-                    { text: '99&deg;', value: 99}];
+                    { text: '99&deg;', value: 99 }];

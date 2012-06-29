@@ -1124,7 +1124,9 @@ namespace OpenZWavePlugin
                                         {
                                             node_id = node.ID,
                                             device_types = device_type,
-                                            friendly_name = deviceName
+                                            friendly_name = deviceName,
+                                            current_level_int = 0,
+                                            current_level_txt = ""
                                         };
 
                                         Context.devices.Add(ozw_device);

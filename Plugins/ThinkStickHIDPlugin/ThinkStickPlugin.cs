@@ -70,7 +70,7 @@ namespace ThinkStickHIDPlugin
                 {
                     name = "ENABLEREPOLLONLEVELCHANGE",
                     friendly_name = "Repoll dimmers 3 seconds after a basic change is received?",
-                    default_value = true.ToString(),
+                    default_value = false.ToString(),
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
             }
@@ -984,7 +984,7 @@ namespace ThinkStickHIDPlugin
                         device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDevice.NodeID);
                         if (existingDevice != null)
                         {
-                            int DefaultPollingInterval = 600;
+                            int DefaultPollingInterval = 0;
 
                             //Get the repoll interval saved previously if is there.
                             device_values existingDV = existingDevice.device_values.FirstOrDefault(o => o.value_id == "REPOLLINT");
@@ -1022,7 +1022,7 @@ namespace ThinkStickHIDPlugin
                                 name = "REPOLLINT",
                                 friendly_name = "Repoll Interval (Seconds)",
                                 arg_data_type = (int)Data_Types.INTEGER,
-                                help = "Repoll Interval (Seconds).  0 = No Polling.",
+                                help = "Repoll Interval in seconds (0 = No Polling)",
                                 custom_data1 = "",
                                 custom_data2 = "REPOLLINT",
                                 sort_order = 1
@@ -1104,7 +1104,11 @@ namespace ThinkStickHIDPlugin
                 {
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
                     if (dev != null)
+                    {
                         UpdateDeviceValue(dev.id, "SETBACK", e.Level > 0 ? "Confort Mode" : "Energy Mode", context);
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
+                    }
                     else
                         WriteToLog(Urgency.ERROR, "Thermostat set back Changed on DEVICE NOT FOUND:" + e.Level.ToString());
                 }
@@ -1120,7 +1124,11 @@ namespace ThinkStickHIDPlugin
                 {
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
                     if (dev != null)
+                    {
                         UpdateDeviceValue(dev.id, "DYNAMIC_SP_R207_" + e.ThermostatSetpointType.ToString(), e.Temperature.ToFahrenheit().ToString(), context);
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
+                    }
                     else
                         WriteToLog(Urgency.ERROR, "ThermostatSetpoint Changed on DEVICE NOT FOUND:" + e.ThermostatSetpointType.ToString());
                 }
@@ -1138,7 +1146,9 @@ namespace ThinkStickHIDPlugin
                     if (dev != null)
                     {
                         dev.current_level_int = (int)e.ThermostatTemperature.ToFahrenheit();
-                        dev.current_level_txt = e.ThermostatTemperature.ToFahrenheit().ToString() + "° F"; ;
+                        dev.current_level_txt = e.ThermostatTemperature.ToFahrenheit().ToString() + "° F"; 
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
 
                         UpdateDeviceValue(dev.id, "TEMPERATURE", e.ThermostatTemperature.ToFahrenheit().ToString(), context);
                     }
@@ -1157,7 +1167,11 @@ namespace ThinkStickHIDPlugin
                 {
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
                     if (dev != null)
+                    {
                         UpdateDeviceValue(dev.id, "OPERATING_STATE", e.ThermostatOperatingState.ToString(), context);
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
+                    }
                     else
                         WriteToLog(Urgency.ERROR, "OPERATING_STATE Changed on DEVICE NOT FOUND:" + e.ThermostatOperatingState);
                 }
@@ -1173,7 +1187,11 @@ namespace ThinkStickHIDPlugin
                 {
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
                     if (dev != null)
+                    {
                         UpdateDeviceValue(dev.id, "MODE", e.ThermostatMode.ToString(), context);
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
+                    }
                     else
                         WriteToLog(Urgency.ERROR, "MODE Changed on DEVICE NOT FOUND:" + e.ThermostatMode);
                 }
@@ -1189,7 +1207,11 @@ namespace ThinkStickHIDPlugin
                 {
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
                     if (dev != null)
+                    {
                         UpdateDeviceValue(dev.id, "FAN_STATE", e.ThermostatFanState.ToString(), context);
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
+                    }
                     else
                         WriteToLog(Urgency.ERROR, "FAN_STATE Changed on DEVICE NOT FOUND:" + e.ThermostatFanState);
                 }
@@ -1205,7 +1227,11 @@ namespace ThinkStickHIDPlugin
                 {
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
                     if (dev != null)
+                    {
                         UpdateDeviceValue(dev.id, "FAN_MODE", e.ThermostatFanMode.ToString(), context);
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
+                    }
                     else
                         WriteToLog(Urgency.ERROR, "ThermostatFanMode Changed on DEVICE NOT FOUND:" + e.ThermostatFanMode);
                 }
@@ -1225,6 +1251,8 @@ namespace ThinkStickHIDPlugin
                     {
                         dev.current_level_int = e.Level;
                         dev.current_level_txt = e.Level + "%";
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
 
                         UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
 
@@ -1267,8 +1295,11 @@ namespace ThinkStickHIDPlugin
                     {
                         dev.current_level_int = e.Level;
                         dev.current_level_txt = e.Level > 0 ? "ON" : "OFF";
+                        dev.last_heard_from = DateTime.Now;
+                        context.SaveChanges();
 
                         UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
+
                     }
                     else
                         WriteToLog(Urgency.INFO, "Level Changed on DEVICE NOT FOUND:" + e.Level);

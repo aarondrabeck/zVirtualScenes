@@ -381,7 +381,8 @@ namespace HttpAPI
                             on_off = d.current_level_int == 0 ? "OFF" : "ON",
                             level = d.current_level_int,
                             level_txt = d.current_level_txt,
-                            type = d.device_types.name
+                            type = d.device_types.name,
+                            plugin_name = d.device_types.plugin.name
                         };
 
                         devices.Add(device);
@@ -435,7 +436,8 @@ namespace HttpAPI
                                 fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value2,
                                 heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1" || o.label_name == "Heating1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1" || o.label_name == "Heating1").value2,
                                 cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1" || o.label_name == "Cooling1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1" || o.label_name == "Cooling1").value2,
-                                esm = d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode").value2
+                                esm = d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode").value2,
+                                plugin_name = d.device_types.plugin.name
                             };
                             return new { success = true, details = details };
                         }
