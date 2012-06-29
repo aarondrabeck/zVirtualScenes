@@ -31,6 +31,7 @@ namespace zVirtualScenes.Backup
         public static void ExportScenesAsyc(string PathFileName, Action<string> Callback)
         {
             List<BackupScene> scenes = new List<BackupScene>();
+            int CmdCount = 0;
             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
             {
                 foreach (scene s in context.scenes)
@@ -72,37 +73,48 @@ namespace zVirtualScenes.Backup
                             }
                         }
                         SceneBackup.Commands.Add(SceneCmdBackup);
+                        CmdCount++;
                     }
                     scenes.Add(SceneBackup);
                 }
             }
 
+            Stream stream = null;
             try
             {
-                Stream stream = File.Open(PathFileName, FileMode.Create);
+                stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<BackupScene>));
                 xmlSerializer.Serialize(stream, scenes);
                 stream.Close();
-                Callback("Scene backup saved.");
+                Callback(string.Format("Exported {0} scenes and {1} scene commands to '{2}'", scenes.Count, CmdCount, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)
             {
                 Callback("Error saving " + PathFileName + ": (" + e.Message + ")");
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
             }
         }
 
         public static void ImportScenesAsyn(string PathFileName, Action<string> Callback)
         {
             List<BackupScene> scenes = new List<BackupScene>();
+            FileStream myFileStream = null;
+
             try
             {
                 if (File.Exists(PathFileName))
                 {
                     //Open the file written above and read values from it.       
                     XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<BackupScene>));
-                    FileStream myFileStream = new FileStream(PathFileName, FileMode.Open);
+                    myFileStream = new FileStream(PathFileName, FileMode.Open);
                     scenes = (List<BackupScene>)ScenesSerializer.Deserialize(myFileStream);
-                    myFileStream.Close();
+                   
+                    int ImportedCount = 0;
+                    int ImportedCmdCount = 0;
 
                     using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                     {
@@ -125,12 +137,13 @@ namespace zVirtualScenes.Backup
                                             command_type_id = (int)Command_Types.builtin,
                                             sort_order = backupSceneCMD.Order
                                         });
+                                        ImportedCmdCount++;
                                     }
                                 }
                                 else if (backupSceneCMD.CommandType == Command_Types.device_command)
                                 {
                                     device d = context.devices.FirstOrDefault(o => o.node_id == backupSceneCMD.NodeID);
-                                    if(d != null)
+                                    if (d != null)
                                     {
                                         device_commands cmd = d.device_commands.FirstOrDefault(o => o.name == backupSceneCMD.CommandName);
                                         if (cmd != null)
@@ -143,8 +156,9 @@ namespace zVirtualScenes.Backup
                                                 device_id = d.id,
                                                 sort_order = backupSceneCMD.Order
                                             });
+                                            ImportedCmdCount++;
                                         }
-                                    }                                    
+                                    }
                                 }
                                 else if (backupSceneCMD.CommandType == Command_Types.device_type_command)
                                 {
@@ -162,23 +176,31 @@ namespace zVirtualScenes.Backup
                                                 device_id = d.id,
                                                 sort_order = backupSceneCMD.Order
                                             });
+                                            ImportedCmdCount++;
                                         }
                                     }
                                 }
                             }
                             context.scenes.Add(s);
+                            ImportedCount++;
                         }
                         context.SaveChanges();
                     }
-                    Callback("Restored scenes.");
+                    Callback(string.Format("Imported {0} scenes and {1} scene commands from '{2}'", ImportedCount, ImportedCmdCount, Path.GetFileName(PathFileName)));
                 }
                 else
-                    Callback(PathFileName + " not found.");
+                    Callback(string.Format("File '{0}' not found.", PathFileName));
 
             }
             catch (Exception e)
             {
                 Callback("Error importing " + PathFileName + ": (" + e.Message + ")");
+            }
+            finally
+            {
+
+                if (myFileStream != null)
+                    myFileStream.Close();
             }
         }
     }

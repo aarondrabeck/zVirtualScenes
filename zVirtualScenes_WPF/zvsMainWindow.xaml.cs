@@ -68,117 +68,35 @@ namespace zVirtualScenesGUI
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
+
+            LogItem i = app.zvsCore.Logger.LOG.LastOrDefault();
+            if(i != null)
+            {
+                StatusBarDescriptionTxt.Text = i.Description;
+                StatusBarSourceTxt.Text = i.Source;
+                StatusBarUrgencyTxt.Text = i.Urgency.ToString();   
+            }
+
+            app.zvsCore.Logger.LOG.CollectionChanged += (s, a) =>
+            {
+                if (a.NewItems != null && a.NewItems.Count > 0)
+                {
+                    LogItem entry = (LogItem)a.NewItems[0];
+                    this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            StatusBarDescriptionTxt.Text = entry.Description;
+                            StatusBarSourceTxt.Text = entry.Source;
+                            StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
+                        }));
+                }
+            };
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.F12)
-            {
-                SetNamesDevOnly();
-            }
+            
         }
-
-        private void SetNamesDevOnly()
-        {
-            foreach (device d in context.devices)
-            {
-                switch (d.node_id)
-                {
-                    case 1:
-                        d.friendly_name = "Aeon Labs Z-Stick Series 2";
-                        break;
-                    case 3:
-                        d.friendly_name = "Master Bathtub Light";
-                        break;
-                    case 4:
-                        d.friendly_name = "Masterbath Mirror Light";
-                        break;
-                    case 5:
-                        d.friendly_name = "Masterbed Hallway Light";
-                        break;
-                    case 6:
-                        d.friendly_name = "Masterbed East Light";
-                        break;
-                    case 7:
-                        d.friendly_name = "Masterbed Bed Light";
-                        break;
-                    case 8:
-                        d.friendly_name = "Office Light";
-                        d.current_level_int = d.current_level_int + 1;
-                        d.current_level_txt = (d.current_level_int).ToString() + "%";
-                        break;
-                    case 9:
-                        d.friendly_name = "Family Hallway Light";
-                        break;
-                    case 10:
-                        d.friendly_name = "Outside Entry Light";
-                        break;
-                    case 11:
-                        d.friendly_name = "Entryway Light";
-                        break;
-                    case 12:
-                        d.friendly_name = "Can Lights";
-                        break;
-                    case 13:
-                        d.friendly_name = "Porch Light";
-                        break;
-                    case 14:
-                        d.friendly_name = "Dining Table Light";
-                        break;
-                    case 15:
-                        d.friendly_name = "Fan Light";
-                        break;
-                    case 16:
-                        d.friendly_name = "Kitchen Light";
-                        break;
-                    case 17:
-                        d.friendly_name = "Rear Garage Light";
-                        break;
-                    case 18:
-                        d.friendly_name = "Driveway Light";
-                        break;
-                    case 19:
-                        d.friendly_name = "TV Backlight";
-                        break;
-                    case 20:
-                        d.friendly_name = "Fireplace Light";
-                        break;
-                    case 22:
-                        d.friendly_name = "Label Printer";
-                        break;
-                    case 23:
-                        d.friendly_name = "Brother Printer";
-                        break;
-                    case 24:
-                        d.friendly_name = "South Thermostat";
-                        break;
-                    case 25:
-                        d.friendly_name = "Masterbed Window Fan";
-                        break;
-                    case 26:
-                        d.friendly_name = "Masterbed Thermostat";
-                        break;
-                    case 27:
-                        d.friendly_name = "Aeon Labs Z-Stick Series 1 (Secondary)";
-                        break;
-                    case 28:
-                        d.friendly_name = "Xmas Lights";
-                        break;
-                    case 29:
-                        d.friendly_name = "Music Room Rope Light";
-                        break;
-                    case 30:
-                        d.friendly_name = "Not Used";
-                        break;
-                    case 31:
-                        d.friendly_name = "Family Room Rope Light";
-                        break;
-                }
-                context.SaveChanges();
-                //device.CallOnContextUpdated();
-            }
-        }
-
+        
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             foreach (Window window in app.Windows)
@@ -320,7 +238,7 @@ namespace zVirtualScenesGUI
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportDevicesAsyc(dlg.FileName, (result) =>
                 {
-                    MessageBox.Show(result, "Backup devices");
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
                 });
             }
         }
@@ -339,7 +257,7 @@ namespace zVirtualScenesGUI
             {
                 Backup.ImportDevicesAsyn(dlg.FileName, (result) =>
                 {
-                    MessageBox.Show(result, "Restored bevice names");
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
                 });
             }
         }
@@ -361,7 +279,7 @@ namespace zVirtualScenesGUI
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportScenesAsyc(dlg.FileName, (result) =>
                 {
-                    MessageBox.Show(result, "Scene backup");
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
                 });
             }
         }
@@ -380,7 +298,7 @@ namespace zVirtualScenesGUI
             {
                 Backup.ImportScenesAsyn(dlg.FileName, (result) =>
                 {
-                    MessageBox.Show(result, "Restored scenes");
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
                 });
             }
         }
@@ -389,7 +307,7 @@ namespace zVirtualScenesGUI
         {
             // Configure open file dialog box
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "TriggerssBackup"; // Default file name
+            dlg.FileName = "TriggersBackup"; // Default file name
             dlg.DefaultExt = ".zvs"; // Default file extension
             dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
 
@@ -402,7 +320,7 @@ namespace zVirtualScenesGUI
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportTriggerAsyc(dlg.FileName, (result) =>
                 {
-                    MessageBox.Show(result, "Triggers backup");
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
                 });
             }
         }
@@ -411,7 +329,7 @@ namespace zVirtualScenesGUI
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "TriggerssBackup"; // Default file name
+            dlg.FileName = "TriggersBackup"; // Default file name
             dlg.DefaultExt = ".zvs"; // Default file extension
             dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
 
@@ -421,9 +339,91 @@ namespace zVirtualScenesGUI
             {
                 Backup.ImportTriggersAsyn(dlg.FileName, (result) =>
                 {
-                    MessageBox.Show(result, "Restored triggers");
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
                 });
             }
         }
+
+        private void ExportGroupsMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "GroupsBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? r = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (r ?? true)
+            {
+                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
+                Backup.ExportGroupsAsyc(dlg.FileName, (result) =>
+                {
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                });
+            }
+        }
+
+        private void ImportGroupsMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "GroupsBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            bool? r = dlg.ShowDialog();
+
+            if (r ?? true)
+            {
+                Backup.ImportGroupsAsyn(dlg.FileName, (result) =>
+                {
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result,Utils.ApplicationName + " GUI"); 
+                });
+            }
+        }
+
+        private void ExportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "ScheduledTaskBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? r = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (r ?? true)
+            {
+                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
+                Backup.ExportScheduledTaskAsyc(dlg.FileName, (result) =>
+                {
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI");
+                });
+            }
+        }
+
+        private void ImportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "ScheduledTaskBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            bool? r = dlg.ShowDialog();
+
+            if (r ?? true)
+            {
+                Backup.ImportScheduledTaskAsyn(dlg.FileName, (result) =>
+                {
+                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI");
+                });
+            }
+        }        
     }
 }

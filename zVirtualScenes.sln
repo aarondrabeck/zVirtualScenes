@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", 
 	ProjectSection(SolutionItems) = preProject
 		..\wiki\Requirements1x.wiki = ..\wiki\Requirements1x.wiki
 		..\wiki\Requirements2x.wiki = ..\wiki\Requirements2x.wiki
+		..\wiki\Requirements3x.wiki = ..\wiki\Requirements3x.wiki
 		..\wiki\ScreenShot20.wiki = ..\wiki\ScreenShot20.wiki
 		..\wiki\ScreenShots1420.wiki = ..\wiki\ScreenShots1420.wiki
 		..\wiki\ScreenShotsv1300.wiki = ..\wiki\ScreenShotsv1300.wiki
@@ -47,6 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Googlewiki", "Googlewiki", 
 		..\wiki\ZVS_Plugins.wiki = ..\wiki\ZVS_Plugins.wiki
 		..\wiki\v2ToDo.wiki = ..\wiki\v2ToDo.wiki
 		..\wiki\zVirtualScenes2xReleaseNotes.wiki = ..\wiki\zVirtualScenes2xReleaseNotes.wiki
+		..\wiki\zVirtualScenes3xReleaseNotes.wiki = ..\wiki\zVirtualScenes3xReleaseNotes.wiki
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zVirtualScenes_WPF", "zVirtualScenes_WPF\zVirtualScenes_WPF.csproj", "{CC1028B3-3975-4BA4-BF79-42043BCADBFE}"

@@ -46,32 +46,41 @@ namespace zVirtualScenes.Backup
                 }
             }
 
+            Stream stream = null;
             try
             {
-                Stream stream = File.Open(PathFileName, FileMode.Create);
+                stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<BackupTrigger>));
                 xmlSerializer.Serialize(stream, triggers);
                 stream.Close();
-                Callback("Triggers backup saved.");
+                Callback(string.Format("Exported {0} triggers to '{1}'", triggers.Count, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)
             {
                 Callback("Error saving " + PathFileName + ": (" + e.Message + ")");
+            }
+            finally
+            {
+                if (stream != null)
+                    stream.Close();
             }
         }
 
         public static void ImportTriggersAsyn(string PathFileName, Action<string> Callback)
         {
             List<BackupTrigger> triggers = new List<BackupTrigger>();
+            int ImportedCount = 0;
+
+            FileStream myFileStream = null;
             try
             {
                 if (File.Exists(PathFileName))
                 {
                     //Open the file written above and read values from it.       
                     XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<BackupTrigger>));
-                    FileStream myFileStream = new FileStream(PathFileName, FileMode.Open);
+                    myFileStream = new FileStream(PathFileName, FileMode.Open);
                     triggers = (List<BackupTrigger>)ScenesSerializer.Deserialize(myFileStream);
-                    myFileStream.Close();
+                   
 
                     using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                     {
@@ -94,20 +103,27 @@ namespace zVirtualScenes.Backup
                                     trigger.trigger_type = backupTrigger.trigger_type;
                                     trigger.trigger_value = backupTrigger.value;
                                     context.device_value_triggers.Add(trigger);
+                                    ImportedCount++; 
                                 }
                             }
                         }
                         context.SaveChanges();
                     }
-                    Callback("Triggers restored.");
+                    Callback(string.Format("Imported {0} triggers from '{1}'", ImportedCount, Path.GetFileName(PathFileName)));
                 }
                 else
-                    Callback(PathFileName + " not found.");
+                    Callback(string.Format("File '{0}' not found.", PathFileName));
 
             }
             catch (Exception e)
             {
                 Callback("Error importing " + PathFileName + ": (" + e.Message + ")");
+            }
+            finally
+            {
+
+                if (myFileStream != null)
+                    myFileStream.Close();
             }
         }
     }

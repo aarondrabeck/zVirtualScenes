@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="1f30fa8945c94820833b507f154b5012" Name="Diagram1" ZoomLevel="46">
+      <Diagram DiagramId="1f30fa8945c94820833b507f154b5012" Name="Diagram1" ZoomLevel="77">
         <EntityTypeShape EntityType="zvsLocalDBModel.builtin_command_options" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.builtin_command_que" Width="1.5" PointX="3" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="zvsLocalDBModel.builtin_commands" Width="1.5" PointX="0.75" PointY="1.5" IsExpanded="true" />

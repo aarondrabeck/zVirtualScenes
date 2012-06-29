@@ -53,19 +53,12 @@ namespace zVirtualScenes
                                     Environment.NewLine +
                                     string.Format("This plug-in might not be compatible with {0}. Try removing the plugin and re-launching the application. ", Utils.ApplicationNameAndVersion);
                             }
-                            if (MessageBox.Show(error, "Fatal plug-in load error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
-                            {
-                                Environment.Exit(1);
-                                return;
-                            }
+
+                            Core.ProgramHasToClosePrompt(error);
                         }
                         else
                         {
-                            if (MessageBox.Show(args.Error.Message, "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK) == MessageBoxResult.OK)
-                            {
-                                Environment.Exit(1);
-                                return;
-                            }
+                            Core.ProgramHasToClosePrompt(args.Error.Message);
                         }
                     }
                 };
@@ -74,6 +67,28 @@ namespace zVirtualScenes
 
             triggerManager = new TriggerManager();
             scheduledTaskManager = new ScheduledTaskManager();
+        }
+
+
+        public static void ProgramHasToClosePrompt(string reason)
+        {
+            Window WpfBugWindow = new Window()
+            {
+                AllowsTransparency = true,
+                Background = System.Windows.Media.Brushes.Transparent,
+                WindowStyle = WindowStyle.None,
+                Top = 0,
+                Left = 0,
+                Width = 1,
+                Height = 1,
+                ShowInTaskbar = false
+            };
+            WpfBugWindow.Show();
+            if (MessageBox.Show(reason, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+            {
+                WpfBugWindow.Close();
+                Environment.Exit(1);              
+            }
         }
     }
 }

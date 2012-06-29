@@ -23,14 +23,18 @@
         <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
             <MenuItem Header="File" >
                 <MenuItem Header="Backup" >
-                    <MenuItem Header="Devices" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
+                    <MenuItem Header="Device Names" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
                     <MenuItem Header="Scenes" x:Name="ExportScenesMI" Click="ExportScenesMI_Click_1" />
                     <MenuItem Header="Triggers" x:Name="ExportTriggersMI" Click="ExportTriggersMI_Click_1" />
+                    <MenuItem Header="Groups" x:Name="ExportGroupsMI" Click="ExportGroupsMI_Click_1" />
+                    <MenuItem Header="Scheduled Tasks" x:Name="ExportScheduledTaskMI" Click="ExportScheduledTaskMI_Click_1" />
                 </MenuItem>
                 <MenuItem Header="Restore" >
-                    <MenuItem Header="Devices" x:Name="ImportDeviceNamesMI" Click="ImportDeviceNamesMI_Click_1" />
+                    <MenuItem Header="Device Names" x:Name="ImportDeviceNamesMI" Click="ImportDeviceNamesMI_Click_1" />
                     <MenuItem Header="Scenes" x:Name="ImportScenesMI" Click="ImportScenesMI_Click_1" />
                     <MenuItem Header="Triggers" x:Name="ImportTriggersMI" Click="ImportTriggersMI_Click_1" />
+                    <MenuItem Header="Groups" x:Name="ImportGroupsMI" Click="ImportGroupsMI_Click_1" />
+                    <MenuItem Header="Scheduled Tasks" x:Name="ImportScheduledTaskMI" Click="ImportScheduledTaskMI_Click_1" />
                 </MenuItem>
                 <Separator />
                 <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
@@ -54,6 +58,29 @@
                 <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
             </MenuItem>
         </Menu>
+        <StatusBar  DockPanel.Dock="Bottom" Height="23">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Name="StatusBarDescriptionTxt" TextTrimming="CharacterEllipsis" Margin="5,0,0,0" >GUI Loaded</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1" Margin="10,0" >
+                <TextBlock Name="StatusBarSourceTxt" >Main GUI</TextBlock>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="2">
+                <TextBlock Name="StatusBarUrgencyTxt" Margin="0,0,10,0" >Error</TextBlock>
+            </StatusBarItem>
+
+        </StatusBar>
         <TabControl>
             <TabItem >
                 <TabItem.Header>

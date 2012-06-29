@@ -115,6 +115,10 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
                     {
                         task.friendly_name = "New Task";
                     }
+
+                    //Fixes nulls to frequency when creating a new task.
+                    if (!task.Frequency.HasValue)
+                        task.Frequency = 0;
                 }
 
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event

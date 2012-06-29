@@ -5,7 +5,7 @@
 #define use_vc2010
 
 #define MyAppName "zVirtualScenes"
-#define MyAppVersion "3.1"
+#define MyAppVersion "3.2"
 #define MyAppPublisher "Drabeck Solutions"
 #define MyAppExeName "zVirtualScenesGUI.exe"
 
@@ -81,6 +81,9 @@ Source: "..\output_release\plugins\zVirtualScenes.dll"; DestDir: "{app}\plugins"
 Source: "..\output_release\plugins\zVirtualScenesModel.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\htdocs\*"; DestDir: "{app}\plugins\htdocs"; Flags: ignoreversion recursesubdirs
 Source: "..\output_release\plugins\config\*"; DestDir: "{app}\plugins\config"; Flags: ignoreversion recursesubdirs  
+Source: "..\output_release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

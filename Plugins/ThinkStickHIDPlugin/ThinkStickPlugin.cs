@@ -984,7 +984,7 @@ namespace ThinkStickHIDPlugin
                         device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDevice.NodeID);
                         if (existingDevice != null)
                         {
-                            int DefaultPollingInterval = 0;
+                            int DefaultPollingInterval = 1200;
 
                             //Get the repoll interval saved previously if is there.
                             device_values existingDV = existingDevice.device_values.FirstOrDefault(o => o.value_id == "REPOLLINT");

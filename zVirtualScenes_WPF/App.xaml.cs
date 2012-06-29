@@ -31,25 +31,9 @@ namespace zVirtualScenesGUI
         {
             try
             {
-                zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");                              
-                Window WpfBugWindow = new Window()
-                {
-                    AllowsTransparency = true,
-                    Background = System.Windows.Media.Brushes.Transparent,
-                    WindowStyle = WindowStyle.None,
-                    Top = 0,
-                    Left = 0,
-                    Width = 1,
-                    Height = 1,
-                    ShowInTaskbar = false
-                };
-                WpfBugWindow.Show();
-                if (MessageBox.Show(Utils.ApplicationName + " can't start because it is already running", Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
-                {
-                    WpfBugWindow.Close();
-                    Environment.Exit(1);
-                    return;
-                }
+                zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");  
+                
+                Core.ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");              
             }
             catch
             {
@@ -65,24 +49,7 @@ namespace zVirtualScenesGUI
 
             if (error != null)
             {
-                Window WpfBugWindow = new Window()
-                {
-                    AllowsTransparency = true,
-                    Background = System.Windows.Media.Brushes.Transparent,
-                    WindowStyle = WindowStyle.None,
-                    Top = 0,
-                    Left = 0,
-                    Width = 1,
-                    Height = 1,
-                    ShowInTaskbar = false
-                };
-                WpfBugWindow.Show();
-                if (MessageBox.Show(error, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
-                {
-                    WpfBugWindow.Close();
-                    Environment.Exit(1);
-                    return;
-                }
+                Core.ProgramHasToClosePrompt(error);
             }
 
             //throw new Exception("Exception Test!");

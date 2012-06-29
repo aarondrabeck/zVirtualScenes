@@ -242,7 +242,7 @@ CREATE TABLE device_value_triggers (
     ON UPDATE NO ACTION, 
   FOREIGN KEY (scene_id)
     REFERENCES scenes(id)
-    ON DELETE NO ACTION
+    ON DELETE SET DEFAULT 
     ON UPDATE NO ACTION
 );
 
