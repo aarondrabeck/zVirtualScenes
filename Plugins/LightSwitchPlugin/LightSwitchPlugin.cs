@@ -205,25 +205,20 @@ namespace LightSwitchPlugin
             }
         }
 
-        public override bool ProcessDeviceCommand(device_command_que cmd)
+        public override void ProcessDeviceCommand(device_command_que cmd)
         {
-            return true;
         }
-        public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
+        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
         {
-            return true;
         }
-        public override bool Repoll(device device)
+        public override void Repoll(device device)
         {
-            return true;
         }
-        public override bool ActivateGroup(int groupID)
+        public override void ActivateGroup(int groupID)
         {
-            return true;
         }
-        public override bool DeactivateGroup(int groupID)
+        public override void DeactivateGroup(int groupID)
         {
-            return true;
         }
 
         void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)

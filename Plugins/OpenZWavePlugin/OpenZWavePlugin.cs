@@ -330,7 +330,7 @@ namespace OpenZWavePlugin
             }
         }
 
-        public override bool ProcessDeviceTypeCommand(device_type_command_que cmd)
+        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
         {
             if (cmd.device.device_types.name == "CONTROLLER")
             {
@@ -339,77 +339,77 @@ namespace OpenZWavePlugin
                     case "RESET":
                         {
                             m_manager.ResetController(m_homeId);
-                            return true;
+                            break;
                         }
                     case "ADDDEVICE":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddDevice, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "AddController":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddController, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "CreateNewPrimary":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.CreateNewPrimary, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "ReceiveConfiguration":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReceiveConfiguration, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "RemoveController":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveController, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "RemoveDevice":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveDevice, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "TransferPrimaryRole":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.TransferPrimaryRole, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "HasNodeFailed":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.HasNodeFailed, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "RemoveFailedNode":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveFailedNode, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                     case "ReplaceFailedNode":
                         {
                             ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReplaceFailedNode, (byte)cmd.device.node_id);
                             dlg.ShowDialog();
                             dlg.Dispose();
-                            return true;
+                            break;
                         }
                 }
             }
@@ -433,13 +433,13 @@ namespace OpenZWavePlugin
                                 t.Dispose();
                             };
                             t.Start();
-                            return true;
+                            break;
 
                         }
                     case "TURNON":
                         {
                             m_manager.SetNodeOn(m_homeId, (byte)cmd.device.node_id);
-                            return true;
+                            break;
                         }
                     case "TURNOFF":
                         {
@@ -460,12 +460,12 @@ namespace OpenZWavePlugin
                                 byte.TryParse(device_property_values.GetDevicePropertyValue(Context, cmd.device_id, "DEFAULONLEVEL"), out defaultonlevel);
                                 m_manager.SetNodeLevel(m_homeId, (byte)cmd.device.node_id, defaultonlevel);
                             }
-                            return true;
+                            break;
                         }
                     case "TURNOFF":
                         {
                             m_manager.SetNodeOff(m_homeId, (byte)cmd.device.node_id);
-                            return true;
+                            break;
                         }
                     case "SETPRESETLEVEL":
                         {
@@ -493,7 +493,7 @@ namespace OpenZWavePlugin
                                     m_manager.SetNodeLevel(m_homeId, (byte)cmd.device.node_id, Convert.ToByte(255));
                                     break;
                             }
-                            return true;
+                            break;
                         }
                 }
             }
@@ -504,20 +504,18 @@ namespace OpenZWavePlugin
                     case "SETENERGYMODE":
                         {
                             m_manager.SetNodeOff(m_homeId, (byte)cmd.device.node_id);
-                            return true;
+                            break;
                         }
                     case "SETCONFORTMODE":
                         {
                             m_manager.SetNodeOn(m_homeId, (byte)cmd.device.node_id);
-                            return true;
+                            break;
                         }
                 }
             }
-
-            return false;
         }
 
-        public override bool ProcessDeviceCommand(device_command_que cmd)
+        public override void ProcessDeviceCommand(device_command_que cmd)
         {
             if (cmd.device_commands.name.Contains("DYNAMIC_CMD_"))
             {
@@ -534,7 +532,7 @@ namespace OpenZWavePlugin
                             foreach (Value v in node.Values)
                                 if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.device_commands.custom_data1))
                                     m_manager.SetValue(v.ValueID, b);
-                            return true;
+                            break;
                         }
                     case Data_Types.BOOL:
                         {
@@ -544,7 +542,7 @@ namespace OpenZWavePlugin
                             foreach (Value v in node.Values)
                                 if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.device_commands.custom_data1))
                                     m_manager.SetValue(v.ValueID, b);
-                            return true;
+                            break;
                         }
                     case Data_Types.DECIMAL:
                         {
@@ -553,7 +551,7 @@ namespace OpenZWavePlugin
                             foreach (Value v in node.Values)
                                 if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.device_commands.custom_data1))
                                     m_manager.SetValue(v.ValueID, f);
-                            return true;
+                            break;
                         }
                     case Data_Types.LIST:
                     case Data_Types.STRING:
@@ -561,7 +559,7 @@ namespace OpenZWavePlugin
                             foreach (Value v in node.Values)
                                 if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.device_commands.custom_data1))
                                     m_manager.SetValue(v.ValueID, cmd.arg);
-                            return true;
+                            break;
                         }
                     case Data_Types.INTEGER:
                         {
@@ -570,21 +568,19 @@ namespace OpenZWavePlugin
 
                             foreach (Value v in node.Values)
                                 if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.device_commands.custom_data1))
-                                    m_manager.SetValue(v.ValueID, i);
-                            return true;
+                                    m_manager.SetValue(v.ValueID, i); 
+                            break;                        
                         }
                 }
             }
-            return false;
         }
 
-        public override bool Repoll(device device)
+        public override void Repoll(device device)
         {
-            m_manager.RequestNodeState(m_homeId, Convert.ToByte(device.node_id));
-            return true;
+            m_manager.RequestNodeState(m_homeId, Convert.ToByte(device.node_id));      
         }
 
-        public override bool ActivateGroup(int groupID)
+        public override void ActivateGroup(int groupID)
         {
             using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
             {
@@ -608,10 +604,9 @@ namespace OpenZWavePlugin
                     }
                 }
             }
-            return true;
         }
 
-        public override bool DeactivateGroup(int groupID)
+        public override void DeactivateGroup(int groupID)
         {
             using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
             {
@@ -634,7 +629,6 @@ namespace OpenZWavePlugin
                     }
                 }
             }
-            return true;
         }
 
         #region OpenZWave interface

@@ -398,11 +398,11 @@ namespace zVirtualScenes
         protected abstract void StopPlugin();
         protected abstract void SettingChanged(string settingName, string settingValue);
         public abstract void Initialize();
-        public abstract bool ProcessDeviceCommand(device_command_que cmd);
-        public abstract bool ProcessDeviceTypeCommand(device_type_command_que cmd);
-        public abstract bool Repoll(device device);
-        public abstract bool ActivateGroup(int groupID);
-        public abstract bool DeactivateGroup(int groupID);
+        public abstract void ProcessDeviceCommand(device_command_que cmd);
+        public abstract void ProcessDeviceTypeCommand(device_type_command_que cmd);
+        public abstract void Repoll(device device);
+        public abstract void ActivateGroup(int groupID);
+        public abstract void DeactivateGroup(int groupID);
 
     }
 }

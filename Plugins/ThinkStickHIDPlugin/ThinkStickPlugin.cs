@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
@@ -119,7 +120,7 @@ namespace ThinkStickHIDPlugin
             return;
         }
 
-        public override bool ProcessDeviceCommand(zVirtualScenesModel.device_command_que cmd)
+        public override void ProcessDeviceCommand(zVirtualScenesModel.device_command_que cmd)
         {
             try
             {
@@ -199,7 +200,8 @@ namespace ThinkStickHIDPlugin
                         {
                             byte level = 0;
                             byte.TryParse(cmd.arg, out level);
-                            CTDevice.Level = level;
+                            AsyncSetLevel(CTDevice, level);
+
                         }
                     }
 
@@ -224,13 +226,11 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
-                return false;
-            }
-            return true;
+                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);               
+            }            
         }
 
-        public override bool ProcessDeviceTypeCommand(zVirtualScenesModel.device_type_command_que cmd)
+        public override void ProcessDeviceTypeCommand(zVirtualScenesModel.device_type_command_que cmd)
         {
             try
             {
@@ -251,14 +251,14 @@ namespace ThinkStickHIDPlugin
                                     int delay = 1000;
                                     int.TryParse(cmd.arg, out delay);
                                     byte nodeID = (byte)cmd.device.node_id;
+                                    CTDevice.PowerOn();
 
-                                    CTDevice.Level = 255;
                                     System.Timers.Timer t = new System.Timers.Timer();
                                     t.Interval = delay;
                                     t.Elapsed += (sender, e) =>
                                     {
                                         t.Stop();
-                                        CTDevice.Level = 0;
+                                        CTDevice.PowerOff();
                                         t.Dispose();
                                     };
                                     t.Start();
@@ -268,14 +268,14 @@ namespace ThinkStickHIDPlugin
                             case "TURNON":
                                 {
 
-                                    CTDevice.Level = 255;
+                                    CTDevice.PowerOn();
 
                                     break;
                                 }
                             case "TURNOFF":
                                 {
 
-                                    CTDevice.Level = 0;
+                                    CTDevice.PowerOff();
                                     break;
                                 }
                         }
@@ -291,16 +291,15 @@ namespace ThinkStickHIDPlugin
                                         byte defaultonlevel = 99;
                                         byte.TryParse(device_property_values.GetDevicePropertyValue(Context, cmd.device_id, "DEFAULONLEVEL"), out defaultonlevel);
 
-
-                                        CTDevice.Level = defaultonlevel;
+                                        AsyncSetLevel(CTDevice, defaultonlevel);
                                     }
                                     break;
                                 }
                             case "TURNOFF":
                                 {
 
-                                    CTDevice.Level = 0;
-                                    return true;
+                                    CTDevice.PowerOff();
+                                    break;
                                 }
                             case "SETPRESETLEVEL":
                                 {
@@ -308,25 +307,25 @@ namespace ThinkStickHIDPlugin
                                     switch (cmd.arg)
                                     {
                                         case "0%":
-                                            CTDevice.Level = 0;
+                                            AsyncSetLevel(CTDevice, 0);
                                             break;
                                         case "20%":
-                                            CTDevice.Level = 20;
+                                            AsyncSetLevel(CTDevice, 20);
                                             break;
                                         case "40%":
-                                            CTDevice.Level = 40;
+                                            AsyncSetLevel(CTDevice, 40);
                                             break;
                                         case "60%":
-                                            CTDevice.Level = 60;
+                                            AsyncSetLevel(CTDevice, 60);
                                             break;
                                         case "80%":
-                                            CTDevice.Level = 80;
+                                            AsyncSetLevel(CTDevice, 80);
                                             break;
                                         case "100%":
-                                            CTDevice.Level = 100;
+                                            AsyncSetLevel(CTDevice, 99);
                                             break;
                                         case "255":
-                                            CTDevice.Level = 255;
+                                            AsyncSetLevel(CTDevice, 255);
                                             break;
 
                                     }
@@ -345,13 +344,13 @@ namespace ThinkStickHIDPlugin
                         {
                             case "SETENERGYMODE":
                                 {
-                                    CTThermostat.Level = 0;
-                                    return true;
+                                    AsyncSetLevel(CTThermostat, 0);
+                                    break;
                                 }
                             case "SETCONFORTMODE":
                                 {
-                                    CTThermostat.Level = 255;
-                                    return true;
+                                    AsyncSetLevel(CTThermostat, 255);
+                                    break;
                                 }
                         }
                     }
@@ -359,25 +358,20 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
-                return false;
+                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);                
             }
-
-            return true;
         }
 
-        public override bool Repoll(zVirtualScenesModel.device device)
+        public override void Repoll(zVirtualScenesModel.device device)
         {
             ZWaveDevice CTDevice = GetCTDevice((byte)device.node_id);
             if (CTDevice != null)
             {
                 ManuallyPollDevice(CTDevice);
             }
-
-            return true;
         }
 
-        public override bool ActivateGroup(int groupID)
+        public override void ActivateGroup(int groupID)
         {
             using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
             {
@@ -394,19 +388,18 @@ namespace ThinkStickHIDPlugin
                                 switch (d.device_types.name)
                                 {
                                     case "SWITCH":
-                                        CTDevice.Level = 255;
+                                        AsyncSetLevel(CTDevice, 255);
                                         break;
                                     case "DIMMER":
                                         byte defaultonlevel = 99;
                                         byte.TryParse(device_property_values.GetDevicePropertyValue(Context, d.id, "DEFAULONLEVEL"), out defaultonlevel);
-                                        CTDevice.Level = defaultonlevel;
+                                        AsyncSetLevel(CTDevice, defaultonlevel);
                                         break;
                                 }
                             }
                             catch (Exception ex)
                             {
                                 WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
-                                return false;
                             }
 
                         }
@@ -414,10 +407,9 @@ namespace ThinkStickHIDPlugin
                     }
                 }
             }
-            return true;
         }
 
-        public override bool DeactivateGroup(int groupID)
+        public override void DeactivateGroup(int groupID)
         {
             using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
             {
@@ -435,26 +427,24 @@ namespace ThinkStickHIDPlugin
                                 {
                                     case "DIMMER":
                                     case "SWITCH":
-                                        CTDevice.Level = 0;
+                                        AsyncSetLevel(CTDevice, 0);
                                         break;
                                 }
                             }
                             catch (Exception ex)
                             {
                                 WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
-                                return false;
                             }
                         }
 
                     }
                 }
             }
-            return true;
         }
 
         private ZWaveDevice GetCTDevice(byte NodeID)
         {
-            foreach (ZWaveDevice CTDevice in CTController.Devices)
+            foreach (ZWaveDevice CTDevice in _CTDevices)
                 if (CTDevice.NodeID == NodeID)
                     return CTDevice;
 
@@ -489,7 +479,7 @@ namespace ThinkStickHIDPlugin
             SetPollingIntervals();
             IsReady = true;
             WriteToLog(Urgency.INFO, "Initializing Complete. Plugin Ready.");
-            
+
             WriteToLog(Urgency.INFO, "Polling each device...");
             ManuallyPollDevices();
             WriteToLog(Urgency.INFO, "Polling Complete.");
@@ -927,6 +917,33 @@ namespace ThinkStickHIDPlugin
                                 WriteToLog(Urgency.ERROR, "Error getting supported thermostat setpoints. " + e.Message);
                             }
                             #endregion
+
+                            //try
+                            //{
+                            //    bool alreadyAssociated = false;
+                            //    //first, see if we are already associated with the thermostat.
+                            //    foreach (ControlThink.ZWave.Devices.ZWaveDevice deviceWithinLoop in CTThermostat.Groups[1])
+                            //    {
+                            //        if (deviceWithinLoop.NodeID == CTController.NodeID)
+                            //        {
+                            //            alreadyAssociated = true;
+                            //            break;
+                            //        }
+                            //    }
+
+                            //    //if we are not associated with the thermostat, make it so.  This will ensure that the thermostat sends up updates in real time.
+                            //    if (alreadyAssociated == false)
+                            //        CTThermostat.Groups[1].Add(CTController.Devices.GetByNodeID(CTController.NodeID));
+                            //}
+                            //catch (NotSupportedException ex)
+                            //{
+                            //    //live status is not supported.
+                            //    WriteToLog(Urgency.ERROR, "Live status is not supported. " + ex.Message);
+                            //}
+                            //catch (Exception ex)
+                            //{
+                            //    WriteToLog(Urgency.ERROR, "Live status error. " + ex.Message);
+                            //}
                         }
                         else if (CTDevice is BinarySensor || CTDevice is MultilevelSensor)
                         {
@@ -1064,7 +1081,7 @@ namespace ThinkStickHIDPlugin
                     }
                     catch (Exception e)
                     {
-                        WriteToLog(Urgency.ERROR, string.Format("Node {0} threw an error. {1}", CTDevice.NodeID, e.Message));
+                        WriteToLog(Urgency.ERROR, string.Format("Polling error on node {0}. {1}", CTDevice.NodeID, e.Message));
                     }
                 }
 
@@ -1088,7 +1105,7 @@ namespace ThinkStickHIDPlugin
                     }
                     catch (Exception e)
                     {
-                        WriteToLog(Urgency.ERROR, string.Format("Node {0} threw an error. {1}", CTDevice.NodeID, e.Message));
+                        WriteToLog(Urgency.ERROR, string.Format("Polling error on node {0}. {1}", CTDevice.NodeID, e.Message));
                     }
                 }
             }
@@ -1146,7 +1163,7 @@ namespace ThinkStickHIDPlugin
                     if (dev != null)
                     {
                         dev.current_level_int = (int)e.ThermostatTemperature.ToFahrenheit();
-                        dev.current_level_txt = e.ThermostatTemperature.ToFahrenheit().ToString() + "° F"; 
+                        dev.current_level_txt = e.ThermostatTemperature.ToFahrenheit().ToString() + "° F";
                         dev.last_heard_from = DateTime.Now;
                         context.SaveChanges();
 
@@ -1306,5 +1323,21 @@ namespace ThinkStickHIDPlugin
                 }
             }
         }
+
+        private void AsyncSetLevel(ZWaveDevice CTDevice, byte Level)
+        {
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (s, e) =>
+                {
+                    CTDevice.Level = Level;
+                };
+            bw.RunWorkerCompleted += (s, e) =>
+                {
+                    if(e.Error != null)
+                        WriteToLog(Urgency.INFO, "Level Changed error:" + e.Error);
+                };
+            bw.RunWorkerAsync();
+        }
+
     }
 }
