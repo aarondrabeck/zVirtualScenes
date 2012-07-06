@@ -160,7 +160,7 @@ namespace OpenZWavePlugin
                 bool.TryParse(GetSettingValue("HID", Context), out _useHID);
                 _comPort = GetSettingValue("COMPORT", Context);
                 int.TryParse(GetSettingValue("POLLint", Context), out _pollint);
-               
+
             }
 
             //TODO: Make a new DeviceAPIProperty that is API specific for types of settings that applies OpenZWave Devices           
@@ -220,7 +220,7 @@ namespace OpenZWavePlugin
 
             try
             {
-                WriteToLog(Urgency.INFO, string.Format("OpenZwave driver starting on {0}",_useHID ? "HID" : "COM" + _comPort));
+                WriteToLog(Urgency.INFO, string.Format("OpenZwave driver starting on {0}", _useHID ? "HID" : "COM" + _comPort));
 
                 // Environment.CurrentDirectory returns wrong directory in Service env. so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
@@ -568,8 +568,8 @@ namespace OpenZWavePlugin
 
                             foreach (Value v in node.Values)
                                 if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.device_commands.custom_data1))
-                                    m_manager.SetValue(v.ValueID, i); 
-                            break;                        
+                                    m_manager.SetValue(v.ValueID, i);
+                            break;
                         }
                 }
             }
@@ -577,7 +577,7 @@ namespace OpenZWavePlugin
 
         public override void Repoll(device device)
         {
-            m_manager.RequestNodeState(m_homeId, Convert.ToByte(device.node_id));      
+            m_manager.RequestNodeState(m_homeId, Convert.ToByte(device.node_id));
         }
 
         public override void ActivateGroup(int groupID)
@@ -879,7 +879,7 @@ namespace OpenZWavePlugin
                                                             t.Interval = 2000;
                                                             t.Elapsed += (sender, e) =>
                                                             {
-                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);                                                                
+                                                                m_manager.RefreshNodeInfo(m_homeId, (byte)d.node_id);
                                                                 t.Stop();
                                                                 Console.WriteLine(string.Format("Timer {0} Elapsed.", d.node_id));
                                                                 timers.Remove(d.node_id);

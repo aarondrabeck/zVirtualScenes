@@ -1,137 +1,68 @@
 /**
  * @private
  */
-Ext.define('Ext.event.ListenerStack', {
+Ext.define('Ext.event.publisher.Publisher', {
+    targetType: '',
 
-    currentOrder: 'current',
-
-    length: 0,
+    idSelectorRegex: /^#([\w\-]+)$/i,
 
     constructor: function() {
-        this.listeners = {
-            before: [],
-            current: [],
-            after: []
-        };
+        var handledEvents = this.handledEvents,
+            handledEventsMap,
+            i, ln, event;
 
-        this.lateBindingMap = {};
+        handledEventsMap = this.handledEventsMap = {};
+
+        for (i = 0,ln = handledEvents.length; i < ln; i++) {
+            event = handledEvents[i];
+
+            handledEventsMap[event] = true;
+        }
+
+        this.subscribers = {};
 
         return this;
     },
 
-    add: function(fn, scope, options, order) {
-        var lateBindingMap = this.lateBindingMap,
-            listeners = this.getAll(order),
-            i = listeners.length,
-            bindingMap, listener, id;
+    handles: function(eventName) {
+        var map = this.handledEventsMap;
 
-        if (typeof fn == 'string' && scope.isIdentifiable) {
-            id = scope.getId();
-
-            bindingMap = lateBindingMap[id];
-
-            if (bindingMap) {
-                if (bindingMap[fn]) {
-                    return false;
-                }
-                else {
-                    bindingMap[fn] = true;
-                }
-            }
-            else {
-                lateBindingMap[id] = bindingMap = {};
-                bindingMap[fn] = true;
-            }
-        }
-        else {
-            if (i > 0) {
-                while (i--) {
-                    listener = listeners[i];
-
-                    if (listener.fn === fn && listener.scope === scope) {
-                        listener.options = options;
-                        return false;
-                    }
-                }
-            }
-        }
-
-        listener = this.create(fn, scope, options, order);
-
-        if (options && options.prepend) {
-            delete options.prepend;
-            listeners.unshift(listener);
-        }
-        else {
-            listeners.push(listener);
-        }
-
-        this.length++;
-
-        return true;
+        return !!map[eventName] || !!map['*'] || eventName === '*';
     },
 
-    getAt: function(index, order) {
-        return this.getAll(order)[index];
+    getHandledEvents: function() {
+        return this.handledEvents;
     },
 
-    getAll: function(order) {
-        if (!order) {
-            order = this.currentOrder;
-        }
-
-        return this.listeners[order];
+    setDispatcher: function(dispatcher) {
+        this.dispatcher = dispatcher;
     },
 
-    count: function(order) {
-        return this.getAll(order).length;
+    subscribe: function() {
+        return false;
     },
 
-    create: function(fn, scope, options, order) {
-        return {
-            stack: this,
-            fn: fn,
-            firingFn: false,
-            boundFn: false,
-            isLateBinding: typeof fn == 'string',
-            scope: scope,
-            options: options || {},
-            order: order
-        };
+    unsubscribe: function() {
+        return false;
     },
 
-    remove: function(fn, scope, order) {
-        var listeners = this.getAll(order),
-            i = listeners.length,
-            isRemoved = false,
-            lateBindingMap = this.lateBindingMap,
-            listener, id;
+    unsubscribeAll: function() {
+        delete this.subscribers;
+        this.subscribers = {};
 
-        if (i > 0) {
-            // Start from the end index, faster than looping from the
-            // beginning for "single" listeners,
-            // which are normally LIFO
-            while (i--) {
-                listener = listeners[i];
+        return this;
+    },
 
-                if (listener.fn === fn && listener.scope === scope) {
-                    listeners.splice(i, 1);
-                    isRemoved = true;
-                    this.length--;
+    notify: function() {
+        return false;
+    },
 
-                    if (typeof fn == 'string' && scope.isIdentifiable) {
-                        id = scope.getId();
+    getTargetType: function() {
+        return this.targetType;
+    },
 
-                        if (lateBindingMap[id] && lateBindingMap[id][fn]) {
-                            delete lateBindingMap[id][fn];
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        return isRemoved;
+    dispatch: function(target, eventName, args) {
+        this.dispatcher.doDispatchEvent(this.targetType, target, eventName, args);
     }
 });
 
@@ -413,68 +344,137 @@ Ext.define('Ext.event.Controller', {
 /**
  * @private
  */
-Ext.define('Ext.event.publisher.Publisher', {
-    targetType: '',
+Ext.define('Ext.event.ListenerStack', {
 
-    idSelectorRegex: /^#([\w\-]+)$/i,
+    currentOrder: 'current',
+
+    length: 0,
 
     constructor: function() {
-        var handledEvents = this.handledEvents,
-            handledEventsMap,
-            i, ln, event;
+        this.listeners = {
+            before: [],
+            current: [],
+            after: []
+        };
 
-        handledEventsMap = this.handledEventsMap = {};
+        this.lateBindingMap = {};
 
-        for (i = 0,ln = handledEvents.length; i < ln; i++) {
-            event = handledEvents[i];
+        return this;
+    },
 
-            handledEventsMap[event] = true;
+    add: function(fn, scope, options, order) {
+        var lateBindingMap = this.lateBindingMap,
+            listeners = this.getAll(order),
+            i = listeners.length,
+            bindingMap, listener, id;
+
+        if (typeof fn == 'string' && scope.isIdentifiable) {
+            id = scope.getId();
+
+            bindingMap = lateBindingMap[id];
+
+            if (bindingMap) {
+                if (bindingMap[fn]) {
+                    return false;
+                }
+                else {
+                    bindingMap[fn] = true;
+                }
+            }
+            else {
+                lateBindingMap[id] = bindingMap = {};
+                bindingMap[fn] = true;
+            }
+        }
+        else {
+            if (i > 0) {
+                while (i--) {
+                    listener = listeners[i];
+
+                    if (listener.fn === fn && listener.scope === scope) {
+                        listener.options = options;
+                        return false;
+                    }
+                }
+            }
         }
 
-        this.subscribers = {};
+        listener = this.create(fn, scope, options, order);
 
-        return this;
+        if (options && options.prepend) {
+            delete options.prepend;
+            listeners.unshift(listener);
+        }
+        else {
+            listeners.push(listener);
+        }
+
+        this.length++;
+
+        return true;
     },
 
-    handles: function(eventName) {
-        var map = this.handledEventsMap;
-
-        return !!map[eventName] || !!map['*'] || eventName === '*';
+    getAt: function(index, order) {
+        return this.getAll(order)[index];
     },
 
-    getHandledEvents: function() {
-        return this.handledEvents;
+    getAll: function(order) {
+        if (!order) {
+            order = this.currentOrder;
+        }
+
+        return this.listeners[order];
     },
 
-    setDispatcher: function(dispatcher) {
-        this.dispatcher = dispatcher;
+    count: function(order) {
+        return this.getAll(order).length;
     },
 
-    subscribe: function() {
-        return false;
+    create: function(fn, scope, options, order) {
+        return {
+            stack: this,
+            fn: fn,
+            firingFn: false,
+            boundFn: false,
+            isLateBinding: typeof fn == 'string',
+            scope: scope,
+            options: options || {},
+            order: order
+        };
     },
 
-    unsubscribe: function() {
-        return false;
-    },
+    remove: function(fn, scope, order) {
+        var listeners = this.getAll(order),
+            i = listeners.length,
+            isRemoved = false,
+            lateBindingMap = this.lateBindingMap,
+            listener, id;
 
-    unsubscribeAll: function() {
-        delete this.subscribers;
-        this.subscribers = {};
+        if (i > 0) {
+            // Start from the end index, faster than looping from the
+            // beginning for "single" listeners,
+            // which are normally LIFO
+            while (i--) {
+                listener = listeners[i];
 
-        return this;
-    },
+                if (listener.fn === fn && listener.scope === scope) {
+                    listeners.splice(i, 1);
+                    isRemoved = true;
+                    this.length--;
 
-    notify: function() {
-        return false;
-    },
+                    if (typeof fn == 'string' && scope.isIdentifiable) {
+                        id = scope.getId();
 
-    getTargetType: function() {
-        return this.targetType;
-    },
+                        if (lateBindingMap[id] && lateBindingMap[id][fn]) {
+                            delete lateBindingMap[id][fn];
+                        }
+                    }
+                    break;
+                }
+            }
+        }
 
-    dispatch: function(target, eventName, args) {
-        this.dispatcher.doDispatchEvent(this.targetType, target, eventName, args);
+        return isRemoved;
     }
 });
 
@@ -3844,6 +3844,19 @@ Ext.define('Ext.ComponentManager', {
 });
 
 /**
+ * @private
+ */
+Ext.define('Ext.behavior.Behavior', {
+    constructor: function(component) {
+        this.component = component;
+
+        component.on('destroy', 'onComponentDestroy', this);
+    },
+
+    onComponentDestroy: Ext.emptyFn
+});
+
+/**
  * Base class for all mixins.
  * @private
  */
@@ -3897,18 +3910,679 @@ Ext.define('Ext.mixin.Mixin', {
 });
 
 /**
+ * This class parses the XTemplate syntax and calls abstract methods to process the parts.
  * @private
  */
-Ext.define('Ext.behavior.Behavior', {
-    constructor: function(component) {
-        this.component = component;
-
-        component.on('destroy', 'onComponentDestroy', this);
+Ext.define('Ext.XTemplateParser', {
+    constructor: function (config) {
+        Ext.apply(this, config);
     },
 
-    onComponentDestroy: Ext.emptyFn
+    /**
+     * @property {Number} level The 'for' loop context level. This is adjusted up by one
+     * prior to calling {@link #doFor} and down by one after calling the corresponding
+     * {@link #doEnd} that closes the loop. This will be 1 on the first {@link #doFor}
+     * call.
+     */
+
+    /**
+     * This method is called to process a piece of raw text from the tpl.
+     * @param {String} text
+     * @method doText
+     */
+    // doText: function (text)
+
+    /**
+     * This method is called to process expressions (like `{[expr]}`).
+     * @param {String} expr The body of the expression (inside "{[" and "]}").
+     * @method doExpr
+     */
+    // doExpr: function (expr)
+
+    /**
+     * This method is called to process simple tags (like `{tag}`).
+     * @method doTag
+     */
+    // doTag: function (tag)
+
+    /**
+     * This method is called to process `<tpl else>`.
+     * @method doElse
+     */
+    // doElse: function ()
+
+    /**
+     * This method is called to process `{% text %}`.
+     * @param {String} text
+     * @method doEval
+     */
+    // doEval: function (text)
+
+    /**
+     * This method is called to process `<tpl if="action">`. If there are other attributes,
+     * these are passed in the actions object.
+     * @param {String} action
+     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
+     * @method doIf
+     */
+    // doIf: function (action, actions)
+
+    /**
+     * This method is called to process `<tpl elseif="action">`. If there are other attributes,
+     * these are passed in the actions object.
+     * @param {String} action
+     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
+     * @method doElseIf
+     */
+    // doElseIf: function (action, actions)
+
+    /**
+     * This method is called to process `<tpl switch="action">`. If there are other attributes,
+     * these are passed in the actions object.
+     * @param {String} action
+     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
+     * @method doSwitch
+     */
+    // doSwitch: function (action, actions)
+
+    /**
+     * This method is called to process `<tpl case="action">`. If there are other attributes,
+     * these are passed in the actions object.
+     * @param {String} action
+     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
+     * @method doCase
+     */
+    // doCase: function (action, actions)
+
+    /**
+     * This method is called to process `<tpl default>`.
+     * @method doDefault
+     */
+    // doDefault: function ()
+
+    /**
+     * This method is called to process `</tpl>`. It is given the action type that started
+     * the tpl and the set of additional actions.
+     * @param {String} type The type of action that is being ended.
+     * @param {Object} actions The other actions keyed by the attribute name (such as 'exec').
+     * @method doEnd
+     */
+    // doEnd: function (type, actions)
+
+    /**
+     * This method is called to process `<tpl for="action">`. If there are other attributes,
+     * these are passed in the actions object.
+     * @param {String} action
+     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
+     * @method doFor
+     */
+    // doFor: function (action, actions)
+
+    /**
+     * This method is called to process `<tpl exec="action">`. If there are other attributes,
+     * these are passed in the actions object.
+     * @param {String} action
+     * @param {Object} actions Other actions keyed by the attribute name.
+     * @method doExec
+     */
+    // doExec: function (action, actions)
+
+    /**
+     * This method is called to process an empty `<tpl>`. This is unlikely to need to be
+     * implemented, so a default (do nothing) version is provided.
+     * @method
+     */
+    doTpl: Ext.emptyFn,
+
+    parse: function (str) {
+        var me = this,
+            len = str.length,
+            aliases = { elseif: 'elif' },
+            topRe = me.topRe,
+            actionsRe = me.actionsRe,
+            index, stack, s, m, t, prev, frame, subMatch, begin, end, actions;
+
+        me.level = 0;
+        me.stack = stack = [];
+
+        for (index = 0; index < len; index = end) {
+            topRe.lastIndex = index;
+            m = topRe.exec(str);
+
+            if (!m) {
+                me.doText(str.substring(index, len));
+                break;
+            }
+
+            begin = m.index;
+            end = topRe.lastIndex;
+
+            if (index < begin) {
+                me.doText(str.substring(index, begin));
+            }
+
+            if (m[1]) {
+                end = str.indexOf('%}', begin+2);
+                me.doEval(str.substring(begin+2, end));
+                end += 2;
+            } else if (m[2]) {
+                end = str.indexOf(']}', begin+2);
+                me.doExpr(str.substring(begin+2, end));
+                end += 2;
+            } else if (m[3]) { // if ('{' token)
+                me.doTag(m[3]);
+            } else if (m[4]) { // content of a <tpl xxxxxx> tag
+                actions = null;
+                while ((subMatch = actionsRe.exec(m[4])) !== null) {
+                    s = subMatch[2] || subMatch[3];
+                    if (s) {
+                        s = Ext.String.htmlDecode(s); // decode attr value
+                        t = subMatch[1];
+                        t = aliases[t] || t;
+                        actions = actions || {};
+                        prev = actions[t];
+
+                        if (typeof prev == 'string') {
+                            actions[t] = [prev, s];
+                        } else if (prev) {
+                            actions[t].push(s);
+                        } else {
+                            actions[t] = s;
+                        }
+                    }
+                }
+
+                if (!actions) {
+                    if (me.elseRe.test(m[4])) {
+                        me.doElse();
+                    } else if (me.defaultRe.test(m[4])) {
+                        me.doDefault();
+                    } else {
+                        me.doTpl();
+                        stack.push({ type: 'tpl' });
+                    }
+                }
+                else if (actions['if']) {
+                    me.doIf(actions['if'], actions)
+                    stack.push({ type: 'if' });
+                }
+                else if (actions['switch']) {
+                    me.doSwitch(actions['switch'], actions)
+                    stack.push({ type: 'switch' });
+                }
+                else if (actions['case']) {
+                    me.doCase(actions['case'], actions);
+                }
+                else if (actions['elif']) {
+                    me.doElseIf(actions['elif'], actions);
+                }
+                else if (actions['for']) {
+                    ++me.level;
+                    me.doFor(actions['for'], actions);
+                    stack.push({ type: 'for', actions: actions });
+                }
+                else if (actions.exec) {
+                    me.doExec(actions.exec, actions);
+                    stack.push({ type: 'exec', actions: actions });
+                }
+                /*
+                else {
+                    // todo - error
+                }
+                /**/
+            } else {
+                frame = stack.pop();
+                me.doEnd(frame.type, frame.actions);
+                if (frame.type == 'for') {
+                    --me.level;
+                }
+            }
+        }
+    },
+
+    // Internal regexes
+
+    topRe:     /(?:(\{\%)|(\{\[)|\{([^{}]*)\})|(?:<tpl([^>]*)\>)|(?:<\/tpl>)/g,
+    actionsRe: /\s*(elif|elseif|if|for|exec|switch|case|eval)\s*\=\s*(?:(?:["]([^"]*)["])|(?:[']([^']*)[']))\s*/g,
+    defaultRe: /^\s*default\s*$/,
+    elseRe:    /^\s*else\s*$/
+});
+/**
+ * @private
+ */
+Ext.define('Ext.fx.easing.Abstract', {
+
+    config: {
+        startTime: 0,
+        startValue: 0
+    },
+
+    isEasing: true,
+
+    isEnded: false,
+
+    constructor: function(config) {
+        this.initConfig(config);
+
+        return this;
+    },
+
+    applyStartTime: function(startTime) {
+        if (!startTime) {
+            startTime = Ext.Date.now();
+        }
+
+        return startTime;
+    },
+
+    updateStartTime: function(startTime) {
+        this.reset();
+    },
+
+    reset: function() {
+        this.isEnded = false;
+    },
+
+    getValue: Ext.emptyFn
 });
 
+/**
+ * A Traversable mixin.
+ * @private
+ */
+Ext.define('Ext.mixin.Traversable', {
+    extend: 'Ext.mixin.Mixin',
+
+    mixinConfig: {
+        id: 'traversable'
+    },
+
+    setParent: function(parent) {
+        this.parent = parent;
+
+        return this;
+    },
+
+    /**
+     * @member Ext.Component
+     * Returns `true` if this component has a parent.
+     * @return {Boolean} `true` if this component has a parent.
+     */
+    hasParent: function() {
+        return Boolean(this.parent);
+    },
+
+    /**
+     * @member Ext.Component
+     * Returns the parent of this component, if it has one.
+     * @return {Ext.Component} The parent of this component.
+     */
+    getParent: function() {
+        return this.parent;
+    },
+
+    getAncestors: function() {
+        var ancestors = [],
+            parent = this.getParent();
+
+        while (parent) {
+            ancestors.push(parent);
+            parent = parent.getParent();
+        }
+
+        return ancestors;
+    },
+
+    getAncestorIds: function() {
+        var ancestorIds = [],
+            parent = this.getParent();
+
+        while (parent) {
+            ancestorIds.push(parent.getId());
+            parent = parent.getParent();
+        }
+
+        return ancestorIds;
+    }
+});
+
+/**
+ * This class compiles the XTemplate syntax into a function object. The function is used
+ * like so:
+ *
+ *      function (out, values, parent, xindex, xcount) {
+ *          // out is the output array to store results
+ *          // values, parent, xindex and xcount have their historical meaning
+ *      }
+ *
+ * @markdown
+ * @private
+ */
+Ext.define('Ext.XTemplateCompiler', {
+    extend: 'Ext.XTemplateParser',
+
+    // Chrome really likes "new Function" to realize the code block (as in it is
+    // 2x-3x faster to call it than using eval), but Firefox chokes on it badly.
+    // IE and Opera are also fine with the "new Function" technique.
+    useEval: Ext.isGecko,
+
+    useFormat: true,
+
+    propNameRe: /^[\w\d\$]*$/,
+
+    compile: function (tpl) {
+        var me = this,
+            code = me.generate(tpl);
+
+        // When using "new Function", we have to pass our "Ext" variable to it in order to
+        // support sandboxing. If we did not, the generated function would use the global
+        // "Ext", not the "Ext" from our sandbox (scope chain).
+        //
+        return me.useEval ? me.evalTpl(code) : (new Function('Ext', code))(Ext);
+    },
+
+    generate: function (tpl) {
+        var me = this;
+
+        me.body = [
+            'var c0=values, p0=parent, n0=xcount, i0=xindex;\n'
+        ];
+        me.funcs = [
+            'var fm=Ext.util.Format;' // note: Ext here is properly sandboxed
+        ];
+        me.switches = [];
+
+        me.parse(tpl);
+
+        me.funcs.push(
+            (me.useEval ? '$=' : 'return') + ' function (' + me.fnArgs + ') {',
+                me.body.join(''),
+            '}'
+        );
+
+        var code = me.funcs.join('\n');
+
+        return code;
+    },
+
+    //-----------------------------------
+    // XTemplateParser callouts
+
+    doText: function (text) {
+        text = text.replace(this.aposRe, "\\'");
+        text = text.replace(this.newLineRe, '\\n');
+        this.body.push('out.push(\'', text, '\')\n');
+    },
+
+    doExpr: function (expr) {
+        this.body.push('out.push(String(', expr, '))\n');
+    },
+
+    doTag: function (tag) {
+        this.doExpr(this.parseTag(tag));
+    },
+
+    doElse: function () {
+        this.body.push('} else {\n');
+    },
+
+    doEval: function (text) {
+        this.body.push(text, '\n');
+    },
+
+    doIf: function (action, actions) {
+        var me = this;
+
+        // If it's just a propName, use it directly in the if
+        if (me.propNameRe.test(action)) {
+            me.body.push('if (', me.parseTag(action), ') {\n');
+        }
+        // Otherwise, it must be an expression, and needs to be returned from an fn which uses with(values)
+        else {
+            me.body.push('if (', me.addFn(action), me.callFn, ') {\n');
+        }
+        if (actions.exec) {
+            me.doExec(actions.exec);
+        }
+    },
+
+    doElseIf: function (action, actions) {
+        var me = this;
+
+        // If it's just a propName, use it directly in the else if
+        if (me.propNameRe.test(action)) {
+            me.body.push('} else if (', me.parseTag(action), ') {\n');
+        }
+        // Otherwise, it must be an expression, and needs to be returned from an fn which uses with(values)
+        else {
+            me.body.push('} else if (', me.addFn(action), me.callFn, ') {\n');
+        }
+        if (actions.exec) {
+            me.doExec(actions.exec);
+        }
+    },
+
+    doSwitch: function (action) {
+        var me = this;
+
+        // If it's just a propName, use it directly in the switch
+        if (me.propNameRe.test(action)) {
+            me.body.push('switch (', me.parseTag(action), ') {\n');
+        }
+        // Otherwise, it must be an expression, and needs to be returned from an fn which uses with(values)
+        else {
+            me.body.push('switch (', me.addFn(action), me.callFn, ') {\n');
+        }
+        me.switches.push(0);
+    },
+
+    doCase: function (action) {
+        var me = this,
+            cases = Ext.isArray(action) ? action : [action],
+            n = me.switches.length - 1,
+            match, i;
+
+        if (me.switches[n]) {
+            me.body.push('break;\n');
+        } else {
+            me.switches[n]++;
+        }
+
+        for (i = 0, n = cases.length; i < n; ++i) {
+            match = me.intRe.exec(cases[i]);
+            cases[i] = match ? match[1] : ("'" + cases[i].replace(me.aposRe,"\\'") + "'");
+        }
+
+        me.body.push('case ', cases.join(': case '), ':\n');
+    },
+
+    doDefault: function () {
+        var me = this,
+            n = me.switches.length - 1;
+
+        if (me.switches[n]) {
+            me.body.push('break;\n');
+        } else {
+            me.switches[n]++;
+        }
+
+        me.body.push('default:\n');
+    },
+
+    doEnd: function (type, actions) {
+        var me = this,
+            L = me.level-1;
+
+        if (type == 'for') {
+            /*
+            To exit a for loop we must restore the outer loop's context. The code looks
+            like this (which goes with that produced by doFor:
+
+                    for (...) { // the part generated by doFor
+                        ...  // the body of the for loop
+
+                        // ... any tpl for exec statement goes here...
+                    }
+                    parent = p1;
+                    values = r2;
+                    xcount = n1;
+                    xindex = i1
+            */
+            if (actions.exec) {
+                me.doExec(actions.exec);
+            }
+
+            me.body.push('}\n');
+            me.body.push('parent=p',L,';values=r',L+1,';xcount=n',L,';xindex=i',L,'\n');
+        } else if (type == 'if' || type == 'switch') {
+            me.body.push('}\n');
+        }
+    },
+
+    doFor: function (action, actions) {
+        var me = this,
+            s = me.addFn(action),
+            L = me.level,
+            up = L-1;
+
+        /*
+        We are trying to produce a block of code that looks like below. We use the nesting
+        level to uniquely name the control variables.
+
+            var c2 = f5.call(this, out, values, parent, xindex, xcount),
+                    // c2 is the context object for the for loop
+                a2 = Ext.isArray(c2),
+                    // a2 is the isArray result for the context
+                p2 = (parent=c1),
+                    // p2 is the parent context (of the outer for loop)
+                r2 = values
+                    // r2 is the values object to
+
+            // i2 is the loop index and n2 is the number (xcount) of this for loop
+            for (var i2 = 0, n2 = a2 ? c2.length : (c2 ? 1 : 0), xcount = n2; i2 < n2; ++i2) {
+                values=a2?c2[i2]:c2   // adjust special vars to inner scope
+                xindex=i2+1           // xindex is 1-based
+
+        The body of the loop is whatever comes between the tpl and /tpl statements (which
+        is handled by doEnd).
+        */
+
+        me.body.push('var c',L,'=',s,me.callFn,', a',L,'=Ext.isArray(c',L,'),p',L,'=(parent=c',up,'),r',L,'=values\n',
+            'for (var i',L,'=0,n',L,'=a',L,'?c',L,'.length:(c',L,'?1:0), xcount=n',L,';i',L,'<n'+L+';++i',L,'){\n',
+            'values=a',L,'?c',L,'[i',L,']:c',L,'\n',
+            'xindex=i',L,'+1\n');
+    },
+
+    doExec: function (action, actions) {
+        var me = this,
+            name = 'f' + me.funcs.length;
+
+        me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
+                            ' try { with(values) {',
+                            '  ' + action,
+                            ' }} catch(e) {}',
+                      '}');
+
+        me.body.push(name + me.callFn + '\n');
+    },
+
+    //-----------------------------------
+    // Internal
+
+    addFn: function (body) {
+        var me = this,
+            name = 'f' + me.funcs.length;
+
+        if (body === '.') {
+            me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
+                            ' return values',
+                       '}');
+        } else if (body === '..') {
+            me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
+                            ' return parent',
+                       '}');
+        } else {
+            me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
+                            ' try { with(values) {',
+                            '  return(' + body + ')',
+                            ' }} catch(e) {}',
+                       '}');
+        }
+
+        return name;
+    },
+
+    parseTag: function (tag) {
+        var m = this.tagRe.exec(tag),
+            name = m[1],
+            format = m[2],
+            args = m[3],
+            math = m[4],
+            v;
+
+        // name = "." - Just use the values object.
+        if (name == '.') {
+            // filter to not include arrays/objects/nulls
+            v = 'Ext.Array.indexOf(["string", "number", "boolean"], typeof values) > -1 || Ext.isDate(values) ? values : ""';
+        }
+        // name = "#" - Use the xindex
+        else if (name == '#') {
+            v = 'xindex';
+        }
+        else if (name.substr(0, 7) == "parent.") {
+            v = name;
+        }
+        // name has a . in it - Use object literal notation, starting from values
+        else if ((name.indexOf('.') !== -1) && (name.indexOf('-') === -1)) {
+
+            v = "values." + name;
+        }
+        // name is a property of values
+        else {
+            v = "values['" + name + "']";
+        }
+
+        if (math) {
+            v = '(' + v + math + ')';
+        }
+
+        if (format && this.useFormat) {
+            args = args ? ',' + args : "";
+            if (format.substr(0, 5) != "this.") {
+                format = "fm." + format + '(';
+            } else {
+                format += '(';
+            }
+        } else {
+            args = '';
+            format = "(" + v + " === undefined ? '' : ";
+        }
+
+        return format + v + args + ')';
+    },
+
+    // @private
+    evalTpl: function ($) {
+
+        // We have to use eval to realize the code block and capture the inner func we also
+        // don't want a deep scope chain. We only do this in Firefox and it is also unhappy
+        // with eval containing a return statement, so instead we assign to "$" and return
+        // that. Because we use "eval", we are automatically sandboxed properly.
+        eval($);
+        return $;
+    },
+
+    newLineRe: /\r\n|\r|\n/g,
+    aposRe: /[']/g,
+    intRe:  /^\s*(\d+)\s*$/,
+    tagRe:  /([\w-\.\#]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?(\s?[\+\-\*\/]\s?[\d\.\+\-\*\/\(\)]+)?/
+
+}, function () {
+    var proto = this.prototype;
+
+    proto.fnArgs = 'out,values,parent,xindex,xcount';
+    proto.callFn = '.call(this,' + proto.fnArgs + ')';
+});
 /**
  * Mixin that provides a common interface for publishing events. Classes using this mixin can use the {@link #fireEvent}
  * and {@link #fireAction} methods to notify listeners of events on the class.
@@ -4773,343 +5447,6 @@ Ext.define('Ext.mixin.Observable', {
 });
 
 /**
- * This class parses the XTemplate syntax and calls abstract methods to process the parts.
- * @private
- */
-Ext.define('Ext.XTemplateParser', {
-    constructor: function (config) {
-        Ext.apply(this, config);
-    },
-
-    /**
-     * @property {Number} level The 'for' loop context level. This is adjusted up by one
-     * prior to calling {@link #doFor} and down by one after calling the corresponding
-     * {@link #doEnd} that closes the loop. This will be 1 on the first {@link #doFor}
-     * call.
-     */
-
-    /**
-     * This method is called to process a piece of raw text from the tpl.
-     * @param {String} text
-     * @method doText
-     */
-    // doText: function (text)
-
-    /**
-     * This method is called to process expressions (like `{[expr]}`).
-     * @param {String} expr The body of the expression (inside "{[" and "]}").
-     * @method doExpr
-     */
-    // doExpr: function (expr)
-
-    /**
-     * This method is called to process simple tags (like `{tag}`).
-     * @method doTag
-     */
-    // doTag: function (tag)
-
-    /**
-     * This method is called to process `<tpl else>`.
-     * @method doElse
-     */
-    // doElse: function ()
-
-    /**
-     * This method is called to process `{% text %}`.
-     * @param {String} text
-     * @method doEval
-     */
-    // doEval: function (text)
-
-    /**
-     * This method is called to process `<tpl if="action">`. If there are other attributes,
-     * these are passed in the actions object.
-     * @param {String} action
-     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
-     * @method doIf
-     */
-    // doIf: function (action, actions)
-
-    /**
-     * This method is called to process `<tpl elseif="action">`. If there are other attributes,
-     * these are passed in the actions object.
-     * @param {String} action
-     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
-     * @method doElseIf
-     */
-    // doElseIf: function (action, actions)
-
-    /**
-     * This method is called to process `<tpl switch="action">`. If there are other attributes,
-     * these are passed in the actions object.
-     * @param {String} action
-     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
-     * @method doSwitch
-     */
-    // doSwitch: function (action, actions)
-
-    /**
-     * This method is called to process `<tpl case="action">`. If there are other attributes,
-     * these are passed in the actions object.
-     * @param {String} action
-     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
-     * @method doCase
-     */
-    // doCase: function (action, actions)
-
-    /**
-     * This method is called to process `<tpl default>`.
-     * @method doDefault
-     */
-    // doDefault: function ()
-
-    /**
-     * This method is called to process `</tpl>`. It is given the action type that started
-     * the tpl and the set of additional actions.
-     * @param {String} type The type of action that is being ended.
-     * @param {Object} actions The other actions keyed by the attribute name (such as 'exec').
-     * @method doEnd
-     */
-    // doEnd: function (type, actions)
-
-    /**
-     * This method is called to process `<tpl for="action">`. If there are other attributes,
-     * these are passed in the actions object.
-     * @param {String} action
-     * @param {Object} actions Other actions keyed by the attribute name (such as 'exec').
-     * @method doFor
-     */
-    // doFor: function (action, actions)
-
-    /**
-     * This method is called to process `<tpl exec="action">`. If there are other attributes,
-     * these are passed in the actions object.
-     * @param {String} action
-     * @param {Object} actions Other actions keyed by the attribute name.
-     * @method doExec
-     */
-    // doExec: function (action, actions)
-
-    /**
-     * This method is called to process an empty `<tpl>`. This is unlikely to need to be
-     * implemented, so a default (do nothing) version is provided.
-     * @method
-     */
-    doTpl: Ext.emptyFn,
-
-    parse: function (str) {
-        var me = this,
-            len = str.length,
-            aliases = { elseif: 'elif' },
-            topRe = me.topRe,
-            actionsRe = me.actionsRe,
-            index, stack, s, m, t, prev, frame, subMatch, begin, end, actions;
-
-        me.level = 0;
-        me.stack = stack = [];
-
-        for (index = 0; index < len; index = end) {
-            topRe.lastIndex = index;
-            m = topRe.exec(str);
-
-            if (!m) {
-                me.doText(str.substring(index, len));
-                break;
-            }
-
-            begin = m.index;
-            end = topRe.lastIndex;
-
-            if (index < begin) {
-                me.doText(str.substring(index, begin));
-            }
-
-            if (m[1]) {
-                end = str.indexOf('%}', begin+2);
-                me.doEval(str.substring(begin+2, end));
-                end += 2;
-            } else if (m[2]) {
-                end = str.indexOf(']}', begin+2);
-                me.doExpr(str.substring(begin+2, end));
-                end += 2;
-            } else if (m[3]) { // if ('{' token)
-                me.doTag(m[3]);
-            } else if (m[4]) { // content of a <tpl xxxxxx> tag
-                actions = null;
-                while ((subMatch = actionsRe.exec(m[4])) !== null) {
-                    s = subMatch[2] || subMatch[3];
-                    if (s) {
-                        s = Ext.String.htmlDecode(s); // decode attr value
-                        t = subMatch[1];
-                        t = aliases[t] || t;
-                        actions = actions || {};
-                        prev = actions[t];
-
-                        if (typeof prev == 'string') {
-                            actions[t] = [prev, s];
-                        } else if (prev) {
-                            actions[t].push(s);
-                        } else {
-                            actions[t] = s;
-                        }
-                    }
-                }
-
-                if (!actions) {
-                    if (me.elseRe.test(m[4])) {
-                        me.doElse();
-                    } else if (me.defaultRe.test(m[4])) {
-                        me.doDefault();
-                    } else {
-                        me.doTpl();
-                        stack.push({ type: 'tpl' });
-                    }
-                }
-                else if (actions['if']) {
-                    me.doIf(actions['if'], actions)
-                    stack.push({ type: 'if' });
-                }
-                else if (actions['switch']) {
-                    me.doSwitch(actions['switch'], actions)
-                    stack.push({ type: 'switch' });
-                }
-                else if (actions['case']) {
-                    me.doCase(actions['case'], actions);
-                }
-                else if (actions['elif']) {
-                    me.doElseIf(actions['elif'], actions);
-                }
-                else if (actions['for']) {
-                    ++me.level;
-                    me.doFor(actions['for'], actions);
-                    stack.push({ type: 'for', actions: actions });
-                }
-                else if (actions.exec) {
-                    me.doExec(actions.exec, actions);
-                    stack.push({ type: 'exec', actions: actions });
-                }
-                /*
-                else {
-                    // todo - error
-                }
-                /**/
-            } else {
-                frame = stack.pop();
-                me.doEnd(frame.type, frame.actions);
-                if (frame.type == 'for') {
-                    --me.level;
-                }
-            }
-        }
-    },
-
-    // Internal regexes
-
-    topRe:     /(?:(\{\%)|(\{\[)|\{([^{}]*)\})|(?:<tpl([^>]*)\>)|(?:<\/tpl>)/g,
-    actionsRe: /\s*(elif|elseif|if|for|exec|switch|case|eval)\s*\=\s*(?:(?:["]([^"]*)["])|(?:[']([^']*)[']))\s*/g,
-    defaultRe: /^\s*default\s*$/,
-    elseRe:    /^\s*else\s*$/
-});
-/**
- * @private
- */
-Ext.define('Ext.fx.easing.Abstract', {
-
-    config: {
-        startTime: 0,
-        startValue: 0
-    },
-
-    isEasing: true,
-
-    isEnded: false,
-
-    constructor: function(config) {
-        this.initConfig(config);
-
-        return this;
-    },
-
-    applyStartTime: function(startTime) {
-        if (!startTime) {
-            startTime = Ext.Date.now();
-        }
-
-        return startTime;
-    },
-
-    updateStartTime: function(startTime) {
-        this.reset();
-    },
-
-    reset: function() {
-        this.isEnded = false;
-    },
-
-    getValue: Ext.emptyFn
-});
-
-/**
- * A Traversable mixin.
- * @private
- */
-Ext.define('Ext.mixin.Traversable', {
-    extend: 'Ext.mixin.Mixin',
-
-    mixinConfig: {
-        id: 'traversable'
-    },
-
-    setParent: function(parent) {
-        this.parent = parent;
-
-        return this;
-    },
-
-    /**
-     * @member Ext.Component
-     * Returns `true` if this component has a parent.
-     * @return {Boolean} `true` if this component has a parent.
-     */
-    hasParent: function() {
-        return Boolean(this.parent);
-    },
-
-    /**
-     * @member Ext.Component
-     * Returns the parent of this component, if it has one.
-     * @return {Ext.Component} The parent of this component.
-     */
-    getParent: function() {
-        return this.parent;
-    },
-
-    getAncestors: function() {
-        var ancestors = [],
-            parent = this.getParent();
-
-        while (parent) {
-            ancestors.push(parent);
-            parent = parent.getParent();
-        }
-
-        return ancestors;
-    },
-
-    getAncestorIds: function() {
-        var ancestorIds = [],
-            parent = this.getParent();
-
-        while (parent) {
-            ancestorIds.push(parent.getId());
-            parent = parent.getParent();
-        }
-
-        return ancestorIds;
-    }
-});
-
-/**
  * @private
  */
 Ext.define('Ext.Evented', {
@@ -5397,342 +5734,143 @@ Ext.define('Ext.AbstractComponent', {
 });
 
 /**
- * This class compiles the XTemplate syntax into a function object. The function is used
- * like so:
- *
- *      function (out, values, parent, xindex, xcount) {
- *          // out is the output array to store results
- *          // values, parent, xindex and xcount have their historical meaning
- *      }
- *
- * @markdown
  * @private
  */
-Ext.define('Ext.XTemplateCompiler', {
-    extend: 'Ext.XTemplateParser',
+Ext.define('Ext.util.SizeMonitor', {
 
-    // Chrome really likes "new Function" to realize the code block (as in it is
-    // 2x-3x faster to call it than using eval), but Firefox chokes on it badly.
-    // IE and Opera are also fine with the "new Function" technique.
-    useEval: Ext.isGecko,
+    extend: 'Ext.Evented',
 
-    useFormat: true,
+    config: {
+        element: null,
 
-    propNameRe: /^[\w\d\$]*$/,
+        detectorCls: Ext.baseCSSPrefix + 'size-change-detector',
 
-    compile: function (tpl) {
+        callback: Ext.emptyFn,
+
+        scope: null,
+
+        args: []
+    },
+
+    constructor: function(config) {
+        this.initConfig(config);
+
+        this.doFireSizeChangeEvent = Ext.Function.bind(this.doFireSizeChangeEvent, this);
+
         var me = this,
-            code = me.generate(tpl);
+            element = this.getElement().dom,
+            cls = this.getDetectorCls(),
+            expandDetector = Ext.Element.create({
+                classList: [cls, cls + '-expand'],
+                children: [{}]
+            }, true),
+            shrinkDetector = Ext.Element.create({
+                classList: [cls, cls + '-shrink'],
+                children: [{}]
+            }, true),
+            expandListener = function(e) {
+                me.onDetectorScroll('expand', e);
+            },
+            shrinkListener = function(e) {
+                me.onDetectorScroll('shrink', e);
+            };
 
-        // When using "new Function", we have to pass our "Ext" variable to it in order to
-        // support sandboxing. If we did not, the generated function would use the global
-        // "Ext", not the "Ext" from our sandbox (scope chain).
-        //
-        return me.useEval ? me.evalTpl(code) : (new Function('Ext', code))(Ext);
-    },
+        element.appendChild(expandDetector);
+        element.appendChild(shrinkDetector);
 
-    generate: function (tpl) {
-        var me = this;
+        this.detectors = {
+            expand: expandDetector,
+            shrink: shrinkDetector
+        };
 
-        me.body = [
-            'var c0=values, p0=parent, n0=xcount, i0=xindex;\n'
-        ];
-        me.funcs = [
-            'var fm=Ext.util.Format;' // note: Ext here is properly sandboxed
-        ];
-        me.switches = [];
-
-        me.parse(tpl);
-
-        me.funcs.push(
-            (me.useEval ? '$=' : 'return') + ' function (' + me.fnArgs + ') {',
-                me.body.join(''),
-            '}'
-        );
-
-        var code = me.funcs.join('\n');
-
-        return code;
-    },
-
-    //-----------------------------------
-    // XTemplateParser callouts
-
-    doText: function (text) {
-        text = text.replace(this.aposRe, "\\'");
-        text = text.replace(this.newLineRe, '\\n');
-        this.body.push('out.push(\'', text, '\')\n');
-    },
-
-    doExpr: function (expr) {
-        this.body.push('out.push(String(', expr, '))\n');
-    },
-
-    doTag: function (tag) {
-        this.doExpr(this.parseTag(tag));
-    },
-
-    doElse: function () {
-        this.body.push('} else {\n');
-    },
-
-    doEval: function (text) {
-        this.body.push(text, '\n');
-    },
-
-    doIf: function (action, actions) {
-        var me = this;
-
-        // If it's just a propName, use it directly in the if
-        if (me.propNameRe.test(action)) {
-            me.body.push('if (', me.parseTag(action), ') {\n');
-        }
-        // Otherwise, it must be an expression, and needs to be returned from an fn which uses with(values)
-        else {
-            me.body.push('if (', me.addFn(action), me.callFn, ') {\n');
-        }
-        if (actions.exec) {
-            me.doExec(actions.exec);
-        }
-    },
-
-    doElseIf: function (action, actions) {
-        var me = this;
-
-        // If it's just a propName, use it directly in the else if
-        if (me.propNameRe.test(action)) {
-            me.body.push('} else if (', me.parseTag(action), ') {\n');
-        }
-        // Otherwise, it must be an expression, and needs to be returned from an fn which uses with(values)
-        else {
-            me.body.push('} else if (', me.addFn(action), me.callFn, ') {\n');
-        }
-        if (actions.exec) {
-            me.doExec(actions.exec);
-        }
-    },
-
-    doSwitch: function (action) {
-        var me = this;
-
-        // If it's just a propName, use it directly in the switch
-        if (me.propNameRe.test(action)) {
-            me.body.push('switch (', me.parseTag(action), ') {\n');
-        }
-        // Otherwise, it must be an expression, and needs to be returned from an fn which uses with(values)
-        else {
-            me.body.push('switch (', me.addFn(action), me.callFn, ') {\n');
-        }
-        me.switches.push(0);
-    },
-
-    doCase: function (action) {
-        var me = this,
-            cases = Ext.isArray(action) ? action : [action],
-            n = me.switches.length - 1,
-            match, i;
-
-        if (me.switches[n]) {
-            me.body.push('break;\n');
-        } else {
-            me.switches[n]++;
-        }
-
-        for (i = 0, n = cases.length; i < n; ++i) {
-            match = me.intRe.exec(cases[i]);
-            cases[i] = match ? match[1] : ("'" + cases[i].replace(me.aposRe,"\\'") + "'");
-        }
-
-        me.body.push('case ', cases.join(': case '), ':\n');
-    },
-
-    doDefault: function () {
-        var me = this,
-            n = me.switches.length - 1;
-
-        if (me.switches[n]) {
-            me.body.push('break;\n');
-        } else {
-            me.switches[n]++;
-        }
-
-        me.body.push('default:\n');
-    },
-
-    doEnd: function (type, actions) {
-        var me = this,
-            L = me.level-1;
-
-        if (type == 'for') {
-            /*
-            To exit a for loop we must restore the outer loop's context. The code looks
-            like this (which goes with that produced by doFor:
-
-                    for (...) { // the part generated by doFor
-                        ...  // the body of the for loop
-
-                        // ... any tpl for exec statement goes here...
-                    }
-                    parent = p1;
-                    values = r2;
-                    xcount = n1;
-                    xindex = i1
-            */
-            if (actions.exec) {
-                me.doExec(actions.exec);
+        this.position = {
+            expand: {
+                left: 0,
+                top: 0
+            },
+            shrink: {
+                left: 0,
+                top: 0
             }
+        };
 
-            me.body.push('}\n');
-            me.body.push('parent=p',L,';values=r',L+1,';xcount=n',L,';xindex=i',L,'\n');
-        } else if (type == 'if' || type == 'switch') {
-            me.body.push('}\n');
+        this.listeners = {
+            expand: expandListener,
+            shrink: shrinkListener
+        };
+
+        this.refresh();
+
+        expandDetector.addEventListener('scroll', expandListener, true);
+        shrinkDetector.addEventListener('scroll', shrinkListener, true);
+    },
+
+    applyElement: function(element) {
+        if (element) {
+            return Ext.get(element);
         }
     },
 
-    doFor: function (action, actions) {
-        var me = this,
-            s = me.addFn(action),
-            L = me.level,
-            up = L-1;
-
-        /*
-        We are trying to produce a block of code that looks like below. We use the nesting
-        level to uniquely name the control variables.
-
-            var c2 = f5.call(this, out, values, parent, xindex, xcount),
-                    // c2 is the context object for the for loop
-                a2 = Ext.isArray(c2),
-                    // a2 is the isArray result for the context
-                p2 = (parent=c1),
-                    // p2 is the parent context (of the outer for loop)
-                r2 = values
-                    // r2 is the values object to
-
-            // i2 is the loop index and n2 is the number (xcount) of this for loop
-            for (var i2 = 0, n2 = a2 ? c2.length : (c2 ? 1 : 0), xcount = n2; i2 < n2; ++i2) {
-                values=a2?c2[i2]:c2   // adjust special vars to inner scope
-                xindex=i2+1           // xindex is 1-based
-
-        The body of the loop is whatever comes between the tpl and /tpl statements (which
-        is handled by doEnd).
-        */
-
-        me.body.push('var c',L,'=',s,me.callFn,', a',L,'=Ext.isArray(c',L,'),p',L,'=(parent=c',up,'),r',L,'=values\n',
-            'for (var i',L,'=0,n',L,'=a',L,'?c',L,'.length:(c',L,'?1:0), xcount=n',L,';i',L,'<n'+L+';++i',L,'){\n',
-            'values=a',L,'?c',L,'[i',L,']:c',L,'\n',
-            'xindex=i',L,'+1\n');
+    updateElement: function(element) {
+        element.on('destroy', 'destroy', this);
     },
 
-    doExec: function (action, actions) {
-        var me = this,
-            name = 'f' + me.funcs.length;
+    refreshPosition: function(name) {
+        var detector = this.detectors[name],
+            position = this.position[name],
+            left, top;
 
-        me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
-                            ' try { with(values) {',
-                            '  ' + action,
-                            ' }} catch(e) {}',
-                      '}');
+        position.left = left = detector.scrollWidth - detector.offsetWidth;
+        position.top = top = detector.scrollHeight - detector.offsetHeight;
 
-        me.body.push(name + me.callFn + '\n');
+        detector.scrollLeft = left;
+        detector.scrollTop = top;
     },
 
-    //-----------------------------------
-    // Internal
-
-    addFn: function (body) {
-        var me = this,
-            name = 'f' + me.funcs.length;
-
-        if (body === '.') {
-            me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
-                            ' return values',
-                       '}');
-        } else if (body === '..') {
-            me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
-                            ' return parent',
-                       '}');
-        } else {
-            me.funcs.push('function ' + name + '(' + me.fnArgs + ') {',
-                            ' try { with(values) {',
-                            '  return(' + body + ')',
-                            ' }} catch(e) {}',
-                       '}');
-        }
-
-        return name;
+    refresh: function() {
+        this.refreshPosition('expand');
+        this.refreshPosition('shrink');
     },
 
-    parseTag: function (tag) {
-        var m = this.tagRe.exec(tag),
-            name = m[1],
-            format = m[2],
-            args = m[3],
-            math = m[4],
-            v;
+    onDetectorScroll: function(name) {
+        var detector = this.detectors[name],
+            position = this.position[name];
 
-        // name = "." - Just use the values object.
-        if (name == '.') {
-            // filter to not include arrays/objects/nulls
-            v = 'Ext.Array.indexOf(["string", "number", "boolean"], typeof values) > -1 || Ext.isDate(values) ? values : ""';
+        if (detector.scrollLeft !== position.left || detector.scrollTop !== position.top) {
+            this.refresh();
+            this.fireSizeChangeEvent();
         }
-        // name = "#" - Use the xindex
-        else if (name == '#') {
-            v = 'xindex';
-        }
-        else if (name.substr(0, 7) == "parent.") {
-            v = name;
-        }
-        // name has a . in it - Use object literal notation, starting from values
-        else if ((name.indexOf('.') !== -1) && (name.indexOf('-') === -1)) {
-
-            v = "values." + name;
-        }
-        // name is a property of values
-        else {
-            v = "values['" + name + "']";
-        }
-
-        if (math) {
-            v = '(' + v + math + ')';
-        }
-
-        if (format && this.useFormat) {
-            args = args ? ',' + args : "";
-            if (format.substr(0, 5) != "this.") {
-                format = "fm." + format + '(';
-            } else {
-                format += '(';
-            }
-        } else {
-            args = '';
-            format = "(" + v + " === undefined ? '' : ";
-        }
-
-        return format + v + args + ')';
     },
 
-    // @private
-    evalTpl: function ($) {
+    fireSizeChangeEvent: function() {
+        clearTimeout(this.sizeChangeThrottleTimer);
 
-        // We have to use eval to realize the code block and capture the inner func we also
-        // don't want a deep scope chain. We only do this in Firefox and it is also unhappy
-        // with eval containing a return statement, so instead we assign to "$" and return
-        // that. Because we use "eval", we are automatically sandboxed properly.
-        eval($);
-        return $;
+        this.sizeChangeThrottleTimer = setTimeout(this.doFireSizeChangeEvent, 1);
     },
 
-    newLineRe: /\r\n|\r|\n/g,
-    aposRe: /[']/g,
-    intRe:  /^\s*(\d+)\s*$/,
-    tagRe:  /([\w-\.\#]+)(?:\:([\w\.]*)(?:\((.*?)?\))?)?(\s?[\+\-\*\/]\s?[\d\.\+\-\*\/\(\)]+)?/
+    doFireSizeChangeEvent: function() {
+        this.getCallback().apply(this.getScope(), this.getArgs());
+    },
 
-}, function () {
-    var proto = this.prototype;
+    destroyDetector: function(name) {
+        var detector = this.detectors[name],
+            listener = this.listeners[name];
 
-    proto.fnArgs = 'out,values,parent,xindex,xcount';
-    proto.callFn = '.call(this,' + proto.fnArgs + ')';
+        detector.removeEventListener('scroll', listener, true);
+        Ext.removeNode(detector);
+    },
+
+    destroy: function() {
+        this.callParent(arguments);
+
+        this.destroyDetector('expand');
+        this.destroyDetector('shrink');
+
+        delete this.listeners;
+        delete this.detectors;
+    }
 });
+
 /**
  * @class Ext.Date
  * @mixins Ext.DateExtras
@@ -7936,144 +8074,6 @@ Ext.define('Ext.XTemplate', {
 
             return tpl || null;
         }
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.util.SizeMonitor', {
-
-    extend: 'Ext.Evented',
-
-    config: {
-        element: null,
-
-        detectorCls: Ext.baseCSSPrefix + 'size-change-detector',
-
-        callback: Ext.emptyFn,
-
-        scope: null,
-
-        args: []
-    },
-
-    constructor: function(config) {
-        this.initConfig(config);
-
-        this.doFireSizeChangeEvent = Ext.Function.bind(this.doFireSizeChangeEvent, this);
-
-        var me = this,
-            element = this.getElement().dom,
-            cls = this.getDetectorCls(),
-            expandDetector = Ext.Element.create({
-                classList: [cls, cls + '-expand'],
-                children: [{}]
-            }, true),
-            shrinkDetector = Ext.Element.create({
-                classList: [cls, cls + '-shrink'],
-                children: [{}]
-            }, true),
-            expandListener = function(e) {
-                me.onDetectorScroll('expand', e);
-            },
-            shrinkListener = function(e) {
-                me.onDetectorScroll('shrink', e);
-            };
-
-        element.appendChild(expandDetector);
-        element.appendChild(shrinkDetector);
-
-        this.detectors = {
-            expand: expandDetector,
-            shrink: shrinkDetector
-        };
-
-        this.position = {
-            expand: {
-                left: 0,
-                top: 0
-            },
-            shrink: {
-                left: 0,
-                top: 0
-            }
-        };
-
-        this.listeners = {
-            expand: expandListener,
-            shrink: shrinkListener
-        };
-
-        this.refresh();
-
-        expandDetector.addEventListener('scroll', expandListener, true);
-        shrinkDetector.addEventListener('scroll', shrinkListener, true);
-    },
-
-    applyElement: function(element) {
-        if (element) {
-            return Ext.get(element);
-        }
-    },
-
-    updateElement: function(element) {
-        element.on('destroy', 'destroy', this);
-    },
-
-    refreshPosition: function(name) {
-        var detector = this.detectors[name],
-            position = this.position[name],
-            left, top;
-
-        position.left = left = detector.scrollWidth - detector.offsetWidth;
-        position.top = top = detector.scrollHeight - detector.offsetHeight;
-
-        detector.scrollLeft = left;
-        detector.scrollTop = top;
-    },
-
-    refresh: function() {
-        this.refreshPosition('expand');
-        this.refreshPosition('shrink');
-    },
-
-    onDetectorScroll: function(name) {
-        var detector = this.detectors[name],
-            position = this.position[name];
-
-        if (detector.scrollLeft !== position.left || detector.scrollTop !== position.top) {
-            this.refresh();
-            this.fireSizeChangeEvent();
-        }
-    },
-
-    fireSizeChangeEvent: function() {
-        clearTimeout(this.sizeChangeThrottleTimer);
-
-        this.sizeChangeThrottleTimer = setTimeout(this.doFireSizeChangeEvent, 1);
-    },
-
-    doFireSizeChangeEvent: function() {
-        this.getCallback().apply(this.getScope(), this.getArgs());
-    },
-
-    destroyDetector: function(name) {
-        var detector = this.detectors[name],
-            listener = this.listeners[name];
-
-        detector.removeEventListener('scroll', listener, true);
-        Ext.removeNode(detector);
-    },
-
-    destroy: function() {
-        this.callParent(arguments);
-
-        this.destroyDetector('expand');
-        this.destroyDetector('shrink');
-
-        delete this.listeners;
-        delete this.detectors;
     }
 });
 
@@ -12372,6 +12372,64 @@ Ext.define('Ext.fx.animation.Abstract', {
 /**
  * @private
  */
+Ext.define('Ext.fx.animation.Fade', {
+    extend: 'Ext.fx.animation.Abstract',
+
+    alternateClassName: 'Ext.fx.animation.FadeIn',
+
+    alias: ['animation.fade', 'animation.fadeIn'],
+
+    config: {
+        /**
+         * @cfg {Boolean} out True if you want to make this animation fade out, instead of fade in.
+         * @accessor
+         */
+
+        out: false,
+
+        before: {
+            display: null,
+            opacity: 0
+        },
+
+        after: {
+            opacity: null
+        },
+        reverse: null
+    },
+
+    updateOut: function(newOut) {
+        var to   = this.getTo(),
+            from = this.getFrom();
+
+        if (newOut) {
+            from.set('opacity', 1);
+            to.set('opacity',   0);
+        } else {
+            from.set('opacity', 0);
+            to.set('opacity',   1);
+        }
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.animation.FadeOut', {
+    extend: 'Ext.fx.animation.Fade',
+    alias: 'animation.fadeOut',
+
+    config: {
+        // @hide
+        out: true,
+
+        before: {}
+    }
+});
+
+/**
+ * @private
+ */
 Ext.define('Ext.fx.animation.Slide', {
 
     extend: 'Ext.fx.animation.Abstract',
@@ -12556,64 +12614,6 @@ Ext.define('Ext.fx.animation.SlideOut', {
     config: {
         // @hide
         out: true
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.animation.Fade', {
-    extend: 'Ext.fx.animation.Abstract',
-
-    alternateClassName: 'Ext.fx.animation.FadeIn',
-
-    alias: ['animation.fade', 'animation.fadeIn'],
-
-    config: {
-        /**
-         * @cfg {Boolean} out True if you want to make this animation fade out, instead of fade in.
-         * @accessor
-         */
-
-        out: false,
-
-        before: {
-            display: null,
-            opacity: 0
-        },
-
-        after: {
-            opacity: null
-        },
-        reverse: null
-    },
-
-    updateOut: function(newOut) {
-        var to   = this.getTo(),
-            from = this.getFrom();
-
-        if (newOut) {
-            from.set('opacity', 1);
-            to.set('opacity',   0);
-        } else {
-            from.set('opacity', 0);
-            to.set('opacity',   1);
-        }
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.animation.FadeOut', {
-    extend: 'Ext.fx.animation.Fade',
-    alias: 'animation.fadeOut',
-
-    config: {
-        // @hide
-        out: true,
-
-        before: {}
     }
 });
 
@@ -14079,226 +14079,6 @@ Ext.define('Ext.layout.Default', {
 })(Ext.baseCSSPrefix);
 
 /**
- * @aside guide layouts
- * @aside video layouts
- *
- * AbstractBox is a superclass for the two box layouts:
- *
- * * {@link Ext.layout.HBox hbox}
- * * {@link Ext.layout.VBox vbox}
- *
- * AbstractBox itself is never used directly, but its subclasses provide flexible arrangement of child components
- * inside a {@link Ext.Container Container}. For a full overview of layouts check out the
- * [Layout Guide](#!/guide/layouts).
- *
- * ## Horizontal Box
- *
- * HBox allows you to easily lay out child components horizontally. It can size items based on a fixed width or a
- * fraction of the total width available, enabling you to achieve flexible layouts that expand or contract to fill the
- * space available.
- *
- * {@img ../guides/layouts/hbox.jpg}
- *
- * See the {@link Ext.layout.HBox HBox layout docs} for more information on using hboxes.
- *
- * ## Vertical Box
- *
- * VBox allows you to easily lay out child components verticaly. It can size items based on a fixed height or a
- * fraction of the total height available, enabling you to achieve flexible layouts that expand or contract to fill the
- * space available.
- *
- * {@img ../guides/layouts/vbox.jpg}
- *
- * See the {@link Ext.layout.VBox VBox layout docs} for more information on using vboxes.
- */
-Ext.define('Ext.layout.AbstractBox', {
-    extend: 'Ext.layout.Default',
-
-    config: {
-        /**
-         * @cfg {String} align
-         * Controls how the child items of the container are aligned. Acceptable configuration values for this property are:
-         *
-         * - ** start ** : child items are packed together at left side of container
-         * - ** center ** : child items are packed together at mid-width of container
-         * - ** end ** : child items are packed together at right side of container
-         * - **stretch** : child items are stretched vertically to fill the height of the container
-         *
-         * Please see the 'Pack and Align' section of the [Layout guide](#!/guide/layouts) for a detailed example and
-         * explanation.
-         * @accessor
-         */
-        align: 'stretch',
-
-        /**
-         * @cfg {String} pack
-         * Controls how the child items of the container are packed together. Acceptable configuration values
-         * for this property are:
-         *
-         * - ** start ** : child items are packed together at left side of container
-         * - ** center ** : child items are packed together at mid-width of container
-         * - ** end ** : child items are packed together at right side of container
-         *
-         * Please see the 'Pack and Align' section of the [Layout guide](#!/guide/layouts) for a detailed example and
-         * explanation.
-         * @accessor
-         */
-        pack: null
-    },
-
-    flexItemCls: Ext.baseCSSPrefix + 'layout-box-item',
-
-    positionMap: {
-        middle: 'center',
-        left: 'start',
-        top: 'start',
-        right: 'end',
-        bottom: 'end'
-    },
-
-    constructor: function(container) {
-        this.callParent(arguments);
-
-        container.innerElement.addCls(this.cls);
-
-        container.on(this.sizeChangeEventName, 'onItemSizeChange', this, {
-            delegate: '> component'
-        });
-    },
-
-    reapply: function() {
-        this.container.innerElement.addCls(this.cls);
-
-        this.updatePack(this.getPack());
-        this.updateAlign(this.getAlign());
-    },
-
-    unapply: function() {
-        this.container.innerElement.removeCls(this.cls);
-
-        this.updatePack(null);
-        this.updateAlign(null);
-    },
-
-    /**
-     * @private
-     */
-    doItemAdd: function(item, index) {
-        this.callParent(arguments);
-
-        if (item.isInnerItem()) {
-            var size = item.getConfig(this.sizePropertyName),
-                config = item.config;
-
-            if (!size && ('flex' in config)) {
-                this.setItemFlex(item, config.flex);
-            }
-        }
-    },
-
-    /**
-     * @private
-     */
-    doItemRemove: function(item) {
-        if (item.isInnerItem()) {
-            this.setItemFlex(item, null);
-        }
-
-        this.callParent(arguments);
-    },
-
-    onItemSizeChange: function(item) {
-        this.setItemFlex(item, null);
-    },
-
-    /**
-     * @private
-     */
-    doItemCenteredChange: function(item, centered) {
-        if (centered) {
-            this.setItemFlex(item, null);
-        }
-
-        this.callParent(arguments);
-    },
-
-    /**
-     * @private
-     */
-    doItemFloatingChange: function(item, floating) {
-        if (floating) {
-            this.setItemFlex(item, null);
-        }
-
-        this.callParent(arguments);
-    },
-
-    /**
-     * @private
-     */
-    doItemDockedChange: function(item, docked) {
-        if (docked) {
-            this.setItemFlex(item, null);
-        }
-
-        this.callParent(arguments);
-    },
-
-    redrawContainer: function() {
-        var container = this.container,
-            renderedTo = container.renderElement.dom.parentNode;
-
-        if (renderedTo && renderedTo.nodeType !== 11) {
-            container.innerElement.redraw();
-        }
-    },
-
-    /**
-     * Sets the flex of an item in this box layout.
-     * @param {Ext.Component} item The item of this layout which you want to update the flex of.
-     * @param {Number} flex The flex to set on this method
-     */
-    setItemFlex: function(item, flex) {
-        var element = item.element,
-            flexItemCls = this.flexItemCls;
-
-        if (flex) {
-            element.addCls(flexItemCls);
-        }
-        else if (element.hasCls(flexItemCls)) {
-            this.redrawContainer();
-            element.removeCls(flexItemCls);
-        }
-
-        element.dom.style.webkitBoxFlex = flex;
-    },
-
-    convertPosition: function(position) {
-        if (this.positionMap.hasOwnProperty(position)) {
-            return this.positionMap[position];
-        }
-
-        return position;
-    },
-
-    applyAlign: function(align) {
-        return this.convertPosition(align);
-    },
-
-    updateAlign: function(align) {
-        this.container.innerElement.dom.style.webkitBoxAlign = align;
-    },
-
-    applyPack: function(pack) {
-         return this.convertPosition(pack);
-    },
-
-    updatePack: function(pack) {
-        this.container.innerElement.dom.style.webkitBoxPack = pack;
-    }
-});
-
-/**
  * Represents a filter that can be applied to a {@link Ext.util.MixedCollection MixedCollection}. Can either simply
  * filter on a property/value pair or pass in a filter function with custom logic. Filters are always used in the
  * context of MixedCollections, though {@link Ext.data.Store Store}s frequently create them when filtering and searching
@@ -14757,76 +14537,6 @@ Ext.define('Ext.fx.layout.card.Abstract', {
 /**
  * @private
  */
-Ext.define('Ext.fx.easing.Momentum', {
-
-    extend: 'Ext.fx.easing.Abstract',
-
-    config: {
-        acceleration: 30,
-        friction: 0,
-        startVelocity: 0
-    },
-
-    alpha: 0,
-
-    updateFriction: function(friction) {
-        var theta = Math.log(1 - (friction / 10));
-
-        this.theta = theta;
-
-        this.alpha = theta / this.getAcceleration();
-    },
-
-    updateStartVelocity: function(velocity) {
-        this.velocity = velocity * this.getAcceleration();
-    },
-
-    updateAcceleration: function(acceleration) {
-        this.velocity = this.getStartVelocity() * acceleration;
-
-        this.alpha = this.theta / acceleration;
-    },
-
-    getValue: function() {
-        return this.getStartValue() - this.velocity * (1 - this.getFrictionFactor()) / this.theta;
-    },
-
-    getFrictionFactor: function() {
-        var deltaTime = Ext.Date.now() - this.getStartTime();
-
-        return Math.exp(deltaTime * this.alpha);
-    },
-
-    getVelocity: function() {
-        return this.getFrictionFactor() * this.velocity;
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.easing.Bounce', {
-
-    extend: 'Ext.fx.easing.Abstract',
-
-    config: {
-        springTension: 0.3,
-        acceleration: 30,
-        startVelocity: 0
-    },
-
-    getValue: function() {
-        var deltaTime = Ext.Date.now() - this.getStartTime(),
-            theta = (deltaTime / this.getAcceleration()),
-            powTime = theta * Math.pow(Math.E, -this.getSpringTension() * theta);
-
-        return this.getStartValue() + (this.getStartVelocity() * powTime);
-    }
-});
-
-/**
- * @private
- */
 Ext.define('Ext.scroll.indicator.Abstract', {
     extend: 'Ext.Component',
 
@@ -14940,6 +14650,190 @@ Ext.define('Ext.scroll.indicator.Abstract', {
         else {
             element.setTop(offset);
         }
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.easing.Bounce', {
+
+    extend: 'Ext.fx.easing.Abstract',
+
+    config: {
+        springTension: 0.3,
+        acceleration: 30,
+        startVelocity: 0
+    },
+
+    getValue: function() {
+        var deltaTime = Ext.Date.now() - this.getStartTime(),
+            theta = (deltaTime / this.getAcceleration()),
+            powTime = theta * Math.pow(Math.E, -this.getSpringTension() * theta);
+
+        return this.getStartValue() + (this.getStartVelocity() * powTime);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.scroll.indicator.CssTransform', {
+    extend: 'Ext.scroll.indicator.Abstract',
+
+    config: {
+        cls: 'csstransform'
+    },
+
+    getElementConfig: function() {
+        var config = this.callParent();
+
+        config.children[0].children = [
+            {
+                reference: 'startElement'
+            },
+            {
+                reference: 'middleElement'
+            },
+            {
+                reference: 'endElement'
+            }
+        ];
+
+        return config;
+    },
+
+    refresh: function() {
+        var axis = this.getAxis(),
+            startElementDom = this.startElement.dom,
+            endElementDom = this.endElement.dom,
+            middleElement = this.middleElement,
+            startElementLength, endElementLength;
+
+        if (axis === 'x') {
+            startElementLength = startElementDom.offsetWidth;
+            endElementLength = endElementDom.offsetWidth;
+            middleElement.setLeft(startElementLength);
+        }
+        else {
+            startElementLength = startElementDom.offsetHeight;
+            endElementLength = endElementDom.offsetHeight;
+            middleElement.setTop(startElementLength);
+        }
+
+        this.startElementLength = startElementLength;
+        this.endElementLength = endElementLength;
+        this.minLength = startElementLength + endElementLength;
+
+        this.callParent();
+    },
+
+    applyLength: function(length) {
+        return Math.round(Math.max(this.minLength, length));
+    },
+
+    updateLength: function(length) {
+        var axis = this.getAxis(),
+            endElementStyle = this.endElement.dom.style,
+            middleElementStyle = this.middleElement.dom.style,
+            endElementLength = this.endElementLength,
+            endElementOffset = length - endElementLength,
+            middleElementLength = endElementOffset - this.startElementLength;
+
+        if (axis === 'x') {
+            endElementStyle.webkitTransform = 'translate3d(' + endElementOffset + 'px, 0, 0)';
+            middleElementStyle.webkitTransform = 'translate3d(0, 0, 0) scaleX(' + middleElementLength + ')';
+        }
+        else {
+            endElementStyle.webkitTransform = 'translate3d(0, ' + endElementOffset + 'px, 0)';
+            middleElementStyle.webkitTransform = 'translate3d(0, 0, 0) scaleY(' + middleElementLength + ')';
+        }
+    },
+
+    updateValue: function(value) {
+        var barLength = this.barLength,
+            gapLength = this.gapLength,
+            length = this.getLength(),
+            newLength, offset, extra;
+
+        if (value <= 0) {
+            offset = 0;
+            this.updateLength(this.applyLength(length + value * barLength));
+        }
+        else if (value >= 1) {
+            extra = Math.round((value - 1) * barLength);
+            newLength = this.applyLength(length - extra);
+            extra = length - newLength;
+            this.updateLength(newLength);
+            offset = gapLength + extra;
+        }
+        else {
+            offset = gapLength * value;
+        }
+
+        this.setOffset(offset);
+    },
+
+    setOffset: function(offset) {
+        var axis = this.getAxis(),
+            elementStyle = this.element.dom.style;
+
+        offset = Math.round(offset);
+
+        if (axis === 'x') {
+            elementStyle.webkitTransform = 'translate3d(' + offset + 'px, 0, 0)';
+        }
+        else {
+            elementStyle.webkitTransform = 'translate3d(0, ' + offset + 'px, 0)';
+        }
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.easing.Momentum', {
+
+    extend: 'Ext.fx.easing.Abstract',
+
+    config: {
+        acceleration: 30,
+        friction: 0,
+        startVelocity: 0
+    },
+
+    alpha: 0,
+
+    updateFriction: function(friction) {
+        var theta = Math.log(1 - (friction / 10));
+
+        this.theta = theta;
+
+        this.alpha = theta / this.getAcceleration();
+    },
+
+    updateStartVelocity: function(velocity) {
+        this.velocity = velocity * this.getAcceleration();
+    },
+
+    updateAcceleration: function(acceleration) {
+        this.velocity = this.getStartVelocity() * acceleration;
+
+        this.alpha = this.theta / acceleration;
+    },
+
+    getValue: function() {
+        return this.getStartValue() - this.velocity * (1 - this.getFrictionFactor()) / this.theta;
+    },
+
+    getFrictionFactor: function() {
+        var deltaTime = Ext.Date.now() - this.getStartTime();
+
+        return Math.exp(deltaTime * this.alpha);
+    },
+
+    getVelocity: function() {
+        return this.getFrictionFactor() * this.velocity;
     }
 });
 
@@ -15172,6 +15066,226 @@ Ext.define('Ext.layout.Fit', {
         }
 
         this.callParent(arguments);
+    }
+});
+
+/**
+ * @aside guide layouts
+ * @aside video layouts
+ *
+ * AbstractBox is a superclass for the two box layouts:
+ *
+ * * {@link Ext.layout.HBox hbox}
+ * * {@link Ext.layout.VBox vbox}
+ *
+ * AbstractBox itself is never used directly, but its subclasses provide flexible arrangement of child components
+ * inside a {@link Ext.Container Container}. For a full overview of layouts check out the
+ * [Layout Guide](#!/guide/layouts).
+ *
+ * ## Horizontal Box
+ *
+ * HBox allows you to easily lay out child components horizontally. It can size items based on a fixed width or a
+ * fraction of the total width available, enabling you to achieve flexible layouts that expand or contract to fill the
+ * space available.
+ *
+ * {@img ../guides/layouts/hbox.jpg}
+ *
+ * See the {@link Ext.layout.HBox HBox layout docs} for more information on using hboxes.
+ *
+ * ## Vertical Box
+ *
+ * VBox allows you to easily lay out child components verticaly. It can size items based on a fixed height or a
+ * fraction of the total height available, enabling you to achieve flexible layouts that expand or contract to fill the
+ * space available.
+ *
+ * {@img ../guides/layouts/vbox.jpg}
+ *
+ * See the {@link Ext.layout.VBox VBox layout docs} for more information on using vboxes.
+ */
+Ext.define('Ext.layout.AbstractBox', {
+    extend: 'Ext.layout.Default',
+
+    config: {
+        /**
+         * @cfg {String} align
+         * Controls how the child items of the container are aligned. Acceptable configuration values for this property are:
+         *
+         * - ** start ** : child items are packed together at left side of container
+         * - ** center ** : child items are packed together at mid-width of container
+         * - ** end ** : child items are packed together at right side of container
+         * - **stretch** : child items are stretched vertically to fill the height of the container
+         *
+         * Please see the 'Pack and Align' section of the [Layout guide](#!/guide/layouts) for a detailed example and
+         * explanation.
+         * @accessor
+         */
+        align: 'stretch',
+
+        /**
+         * @cfg {String} pack
+         * Controls how the child items of the container are packed together. Acceptable configuration values
+         * for this property are:
+         *
+         * - ** start ** : child items are packed together at left side of container
+         * - ** center ** : child items are packed together at mid-width of container
+         * - ** end ** : child items are packed together at right side of container
+         *
+         * Please see the 'Pack and Align' section of the [Layout guide](#!/guide/layouts) for a detailed example and
+         * explanation.
+         * @accessor
+         */
+        pack: null
+    },
+
+    flexItemCls: Ext.baseCSSPrefix + 'layout-box-item',
+
+    positionMap: {
+        middle: 'center',
+        left: 'start',
+        top: 'start',
+        right: 'end',
+        bottom: 'end'
+    },
+
+    constructor: function(container) {
+        this.callParent(arguments);
+
+        container.innerElement.addCls(this.cls);
+
+        container.on(this.sizeChangeEventName, 'onItemSizeChange', this, {
+            delegate: '> component'
+        });
+    },
+
+    reapply: function() {
+        this.container.innerElement.addCls(this.cls);
+
+        this.updatePack(this.getPack());
+        this.updateAlign(this.getAlign());
+    },
+
+    unapply: function() {
+        this.container.innerElement.removeCls(this.cls);
+
+        this.updatePack(null);
+        this.updateAlign(null);
+    },
+
+    /**
+     * @private
+     */
+    doItemAdd: function(item, index) {
+        this.callParent(arguments);
+
+        if (item.isInnerItem()) {
+            var size = item.getConfig(this.sizePropertyName),
+                config = item.config;
+
+            if (!size && ('flex' in config)) {
+                this.setItemFlex(item, config.flex);
+            }
+        }
+    },
+
+    /**
+     * @private
+     */
+    doItemRemove: function(item) {
+        if (item.isInnerItem()) {
+            this.setItemFlex(item, null);
+        }
+
+        this.callParent(arguments);
+    },
+
+    onItemSizeChange: function(item) {
+        this.setItemFlex(item, null);
+    },
+
+    /**
+     * @private
+     */
+    doItemCenteredChange: function(item, centered) {
+        if (centered) {
+            this.setItemFlex(item, null);
+        }
+
+        this.callParent(arguments);
+    },
+
+    /**
+     * @private
+     */
+    doItemFloatingChange: function(item, floating) {
+        if (floating) {
+            this.setItemFlex(item, null);
+        }
+
+        this.callParent(arguments);
+    },
+
+    /**
+     * @private
+     */
+    doItemDockedChange: function(item, docked) {
+        if (docked) {
+            this.setItemFlex(item, null);
+        }
+
+        this.callParent(arguments);
+    },
+
+    redrawContainer: function() {
+        var container = this.container,
+            renderedTo = container.renderElement.dom.parentNode;
+
+        if (renderedTo && renderedTo.nodeType !== 11) {
+            container.innerElement.redraw();
+        }
+    },
+
+    /**
+     * Sets the flex of an item in this box layout.
+     * @param {Ext.Component} item The item of this layout which you want to update the flex of.
+     * @param {Number} flex The flex to set on this method
+     */
+    setItemFlex: function(item, flex) {
+        var element = item.element,
+            flexItemCls = this.flexItemCls;
+
+        if (flex) {
+            element.addCls(flexItemCls);
+        }
+        else if (element.hasCls(flexItemCls)) {
+            this.redrawContainer();
+            element.removeCls(flexItemCls);
+        }
+
+        element.dom.style.webkitBoxFlex = flex;
+    },
+
+    convertPosition: function(position) {
+        if (this.positionMap.hasOwnProperty(position)) {
+            return this.positionMap[position];
+        }
+
+        return position;
+    },
+
+    applyAlign: function(align) {
+        return this.convertPosition(align);
+    },
+
+    updateAlign: function(align) {
+        this.container.innerElement.dom.style.webkitBoxAlign = align;
+    },
+
+    applyPack: function(pack) {
+         return this.convertPosition(pack);
+    },
+
+    updatePack: function(pack) {
+        this.container.innerElement.dom.style.webkitBoxPack = pack;
     }
 });
 
@@ -16687,6 +16801,648 @@ Ext.define('Ext.fx.layout.card.Scroll', {
 
 /**
  * @private
+ */
+Ext.define('Ext.fx.layout.card.Style', {
+
+    extend: 'Ext.fx.layout.card.Abstract',
+
+    requires: [
+        'Ext.fx.Animation'
+    ],
+
+    config: {
+        inAnimation: {
+            before: {
+                visibility: null
+            },
+            preserveEndState: false,
+            replacePrevious: true
+        },
+
+        outAnimation: {
+            preserveEndState: false,
+            replacePrevious: true
+        }
+    },
+
+    constructor: function(config) {
+        var inAnimation, outAnimation;
+
+        this.initConfig(config);
+
+        this.endAnimationCounter = 0;
+
+        inAnimation = this.getInAnimation();
+        outAnimation = this.getOutAnimation();
+
+        inAnimation.on('animationend', 'incrementEnd', this);
+        outAnimation.on('animationend', 'incrementEnd', this);
+    },
+
+    updateDirection: function(direction) {
+        this.getInAnimation().setDirection(direction);
+        this.getOutAnimation().setDirection(direction);
+    },
+
+    updateDuration: function(duration) {
+        this.getInAnimation().setDuration(duration);
+        this.getOutAnimation().setDuration(duration);
+    },
+
+    updateReverse: function(reverse) {
+        this.getInAnimation().setReverse(reverse);
+        this.getOutAnimation().setReverse(reverse);
+    },
+
+    incrementEnd: function() {
+        this.endAnimationCounter++;
+
+        if (this.endAnimationCounter > 1) {
+            this.endAnimationCounter = 0;
+            this.fireEvent('animationend', this);
+        }
+    },
+
+    applyInAnimation: function(animation, inAnimation) {
+        return Ext.factory(animation, Ext.fx.Animation, inAnimation);
+    },
+
+    applyOutAnimation: function(animation, outAnimation) {
+        return Ext.factory(animation, Ext.fx.Animation, outAnimation);
+    },
+
+    updateInAnimation: function(animation) {
+        animation.setScope(this);
+    },
+
+    updateOutAnimation: function(animation) {
+        animation.setScope(this);
+    },
+
+    onActiveItemChange: function(cardLayout, newItem, oldItem, options, controller) {
+        var inAnimation = this.getInAnimation(),
+            outAnimation = this.getOutAnimation(),
+            inElement, outElement;
+
+        if (newItem && oldItem && oldItem.isPainted()) {
+            inElement = newItem.renderElement;
+            outElement = oldItem.renderElement;
+
+            inAnimation.setElement(inElement);
+            outAnimation.setElement(outElement);
+
+            outAnimation.setOnBeforeEnd(function(element, interrupted) {
+                if (interrupted || Ext.Animator.hasRunningAnimations(element)) {
+                    controller.firingArguments[1] = null;
+                    controller.firingArguments[2] = null;
+                }
+            });
+            outAnimation.setOnEnd(function() {
+                controller.resume();
+            });
+
+            inElement.dom.style.setProperty('visibility', 'hidden', '!important');
+            newItem.show();
+
+            Ext.Animator.run([outAnimation, inAnimation]);
+            controller.pause();
+        }
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.card.Slide', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.slide',
+
+    config: {
+        inAnimation: {
+            type: 'slide',
+            easing: 'ease-out'
+        },
+        outAnimation: {
+            type: 'slide',
+            easing: 'ease-out',
+            out: true
+        }
+    },
+
+    updateReverse: function(reverse) {
+        this.getInAnimation().setReverse(reverse);
+        this.getOutAnimation().setReverse(reverse);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.card.Reveal', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.reveal',
+
+    config: {
+        inAnimation: {
+            easing: 'ease-out',
+            from: {
+                opacity: 0.99
+            },
+            to: {
+                opacity: 1
+            }
+        },
+        outAnimation: {
+            before: {
+                'z-index': 100
+            },
+            after: {
+                'z-index': 0
+            },
+            type: 'slide',
+            easing: 'ease-out',
+            out: true
+        }
+    },
+
+    updateReverse: function(reverse) {
+        this.getInAnimation().setReverse(reverse);
+        this.getOutAnimation().setReverse(reverse);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.card.Cover', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.cover',
+
+    config: {
+        reverse: null,
+
+        inAnimation: {
+            before: {
+                'z-index': 100
+            },
+            after: {
+                'z-index': 0
+            },
+            type: 'slide',
+            easing: 'ease-out'
+        },
+        outAnimation: {
+            easing: 'ease-out',
+            from: {
+                opacity: 0.99
+            },
+            to: {
+                opacity: 1
+            },
+            out: true
+        }
+    },
+
+    updateReverse: function(reverse) {
+        this.getInAnimation().setReverse(reverse);
+        this.getOutAnimation().setReverse(reverse);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.card.Flip', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.flip',
+
+    config: {
+        duration: 500,
+
+        inAnimation: {
+            type: 'flip',
+            half: true,
+            easing: 'ease-out',
+            before: {
+                'backface-visibility': 'hidden'
+            },
+            after: {
+                'backface-visibility': null
+            }
+        },
+        outAnimation: {
+            type: 'flip',
+            half: true,
+            easing: 'ease-in',
+            before: {
+                'backface-visibility': 'hidden'
+            },
+            after: {
+                'backface-visibility': null
+            },
+            out: true
+        }
+    },
+
+    updateDuration: function(duration) {
+        var halfDuration = duration / 2,
+            inAnimation = this.getInAnimation(),
+            outAnimation = this.getOutAnimation();
+
+        inAnimation.setDelay(halfDuration);
+        inAnimation.setDuration(halfDuration);
+        outAnimation.setDuration(halfDuration);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.card.Fade', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.fade',
+
+    config: {
+        reverse: null,
+        
+        inAnimation: {
+            type: 'fade',
+            easing: 'ease-out'
+        },
+        outAnimation: {
+            type: 'fade',
+            easing: 'ease-out',
+            out: true
+        }
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.card.Pop', {
+    extend: 'Ext.fx.layout.card.Style',
+
+    alias: 'fx.layout.card.pop',
+
+    config: {
+        duration: 500,
+
+        inAnimation: {
+            type: 'pop',
+            easing: 'ease-out'
+        },
+        outAnimation: {
+            type: 'pop',
+            easing: 'ease-in',
+            out: true
+        }
+    },
+
+    updateDuration: function(duration) {
+        var halfDuration = duration / 2,
+            inAnimation = this.getInAnimation(),
+            outAnimation = this.getOutAnimation();
+
+        inAnimation.setDelay(halfDuration);
+        inAnimation.setDuration(halfDuration);
+        outAnimation.setDuration(halfDuration);
+    }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.fx.layout.Card', {
+    requires: [
+        'Ext.fx.layout.card.Slide',
+        'Ext.fx.layout.card.Cover',
+        'Ext.fx.layout.card.Reveal',
+        'Ext.fx.layout.card.Fade',
+        'Ext.fx.layout.card.Flip',
+        'Ext.fx.layout.card.Pop',
+//        'Ext.fx.layout.card.Cube',
+        'Ext.fx.layout.card.Scroll'
+    ],
+
+    constructor: function(config) {
+        var defaultClass = Ext.fx.layout.card.Abstract,
+            type;
+
+        if (!config) {
+            return null;
+        }
+
+        if (typeof config == 'string') {
+            type = config;
+
+            config = {};
+        }
+        else if (config.type) {
+            type = config.type;
+        }
+
+        config.elementBox = false;
+
+        if (type) {
+
+            if (Ext.os.is.Android2) {
+                // In Android 2 we only support scroll and fade. Otherwise force it to slide.
+                if (type != 'fade') {
+                    type = 'scroll';
+                }
+            }
+            else if (type === 'slide' && Ext.browser.is.ChromeMobile) {
+                type = 'scroll';
+            }
+
+            defaultClass = Ext.ClassManager.getByAlias('fx.layout.card.' + type);
+
+        }
+
+        return Ext.factory(config, defaultClass);
+    }
+});
+
+/**
+ * @aside guide layouts
+ * @aside video layouts
+ *
+ * Sometimes you want to show several screens worth of information but you've only got a small screen to work with.
+ * TabPanels and Carousels both enable you to see one screen of many at a time, and underneath they both use a Card
+ * Layout.
+ *
+ * Card Layout takes the size of the Container it is applied to and sizes the currently active item to fill the
+ * Container completely. It then hides the rest of the items, allowing you to change which one is currently visible but
+ * only showing one at once:
+ *
+ * {@img ../guides/layouts/card.jpg}
+ *
+ *
+ * Here the gray box is our Container, and the blue box inside it is the currently active card. The three other cards
+ * are hidden from view, but can be swapped in later. While it's not too common to create Card layouts directly, you
+ * can do so like this:
+ *
+ *     var panel = Ext.create('Ext.Panel', {
+ *         layout: 'card',
+ *         items: [
+ *             {
+ *                 html: "First Item"
+ *             },
+ *             {
+ *                 html: "Second Item"
+ *             },
+ *             {
+ *                 html: "Third Item"
+ *             },
+ *             {
+ *                 html: "Fourth Item"
+ *             }
+ *         ]
+ *     });
+ *
+ *     panel.{@link Ext.Container#setActiveItem setActiveItem}(1);
+ *
+ * Here we create a Panel with a Card Layout and later set the second item active (the active item index is zero-based,
+ * so 1 corresponds to the second item). Normally you're better off using a {@link Ext.tab.Panel tab panel} or a
+ * {@link Ext.carousel.Carousel carousel}.
+ *
+ * For a more detailed overview of what layouts are and the types of layouts shipped with Sencha Touch 2, check out the
+ * [Layout Guide](#!/guide/layouts).
+ */
+Ext.define('Ext.layout.Card', {
+    extend: 'Ext.layout.Fit',
+    alternateClassName: 'Ext.layout.CardLayout',
+
+    isCard: true,
+
+    /**
+     * @event activeitemchange
+     * @preventable doActiveItemChange
+     * Fires when an card is made active
+     * @param {Ext.layout.Card} this The layout instance
+     * @param {Mixed} newActiveItem The new active item
+     * @param {Mixed} oldActiveItem The old active item
+     */
+
+    requires: [
+        'Ext.fx.layout.Card'
+    ],
+
+    alias: 'layout.card',
+
+    cls: Ext.baseCSSPrefix + 'layout-card',
+
+    itemCls: Ext.baseCSSPrefix + 'layout-card-item',
+
+    constructor: function() {
+        this.callParent(arguments);
+        this.container.onInitialized(this.onContainerInitialized, this);
+    },
+
+    /**
+     * @private
+     */
+    applyAnimation: function(animation) {
+        return new Ext.fx.layout.Card(animation);
+    },
+
+    /**
+     * @private
+     */
+    updateAnimation: function(animation, oldAnimation) {
+        if (animation && animation.isAnimation) {
+            animation.setLayout(this);
+        }
+
+        if (oldAnimation) {
+            oldAnimation.destroy();
+        }
+    },
+
+    /**
+     * @private
+     */
+    doItemAdd: function(item, index) {
+        if (item.isInnerItem()) {
+            item.hide();
+        }
+
+        this.callParent(arguments);
+    },
+
+    getInnerItemsContainer: function() {
+        var innerItemsContainer = this.innerItemsContainer;
+
+        if (!innerItemsContainer) {
+            this.innerItemsContainer = innerItemsContainer = Ext.Element.create({
+                className: this.cls + '-container'
+            });
+
+            this.container.innerElement.append(innerItemsContainer);
+        }
+
+        return innerItemsContainer;
+    },
+
+    /**
+     * @private
+     */
+    doItemRemove: function(item, index, destroy) {
+        this.callParent(arguments);
+
+        if (!destroy && item.isInnerItem()) {
+            item.show();
+        }
+    },
+
+    onContainerInitialized: function(container) {
+        var activeItem = container.getActiveItem();
+
+        if (activeItem) {
+            activeItem.show();
+        }
+
+        container.on('activeitemchange', 'onContainerActiveItemChange', this);
+    },
+
+    /**
+     * @private
+     */
+    onContainerActiveItemChange: function(container) {
+        this.relayEvent(arguments, 'doActiveItemChange');
+    },
+
+    /**
+     * @private
+     */
+    doActiveItemChange: function(me, newActiveItem, oldActiveItem) {
+        if (oldActiveItem) {
+            oldActiveItem.hide();
+        }
+
+        if (newActiveItem) {
+            newActiveItem.show();
+        }
+    },
+
+    doItemDockedChange: function(item, docked) {
+        var element = item.element;
+        // See https://sencha.jira.com/browse/TOUCH-1508
+        if (docked) {
+            element.removeCls(this.itemCls);
+        }
+        else {
+            element.addCls(this.itemCls);
+        }
+
+        this.callParent(arguments);
+    }
+});
+
+/**
+ * @aside guide layouts
+ * @aside video layouts
+ *
+ * Factory class which returns an instance of the provided layout.
+ */
+Ext.define('Ext.layout.Layout', {
+
+    requires: [
+        'Ext.layout.Fit',
+        'Ext.layout.Card',
+        'Ext.layout.HBox',
+        'Ext.layout.VBox'
+    ],
+
+    /**
+     * Creates a new Layout for the specified container using the config object's layout to determine
+     * layout to instantiate.
+     * @param {Ext.Container} container A configuration object for the Component you wish to create.
+     * @param {Object} [config] The alias to provide the Layout type; if none is
+     * specified, Ext.layout.Default will be used.
+     * @return {Ext.layout.Default} The newly instantiated Layout.
+     */
+    constructor: function(container, config) {
+        var layoutClass = Ext.layout.Default,
+            type, layout;
+
+        if (typeof config == 'string') {
+            type = config;
+            config = {};
+        }
+        else if ('type' in config) {
+            type = config.type;
+        }
+
+        if (type) {
+            layoutClass = Ext.ClassManager.getByAlias('layout.' + type);
+
+        }
+
+        return new layoutClass(container, config);
+    }
+});
+
+
+/**
+ * @private
+ */
+Ext.define('Ext.scroll.indicator.Default', {
+    extend: 'Ext.scroll.indicator.Abstract',
+
+    config: {
+        cls: 'default'
+    },
+
+    setOffset: function(offset) {
+        var axis = this.getAxis(),
+            domStyle = this.element.dom.style;
+
+        if (axis === 'x') {
+            domStyle.webkitTransform = 'translate3d(' + offset + 'px, 0, 0)';
+        }
+        else {
+            domStyle.webkitTransform = 'translate3d(0, ' + offset + 'px, 0)';
+        }
+    },
+
+    applyLength: function(length) {
+        return Math.round(Math.max(0, length));
+    },
+
+    updateValue: function(value) {
+        var barLength = this.barLength,
+            gapLength = this.gapLength,
+            length = this.getLength(),
+            newLength, offset, extra;
+
+        if (value <= 0) {
+            offset = 0;
+            this.updateLength(this.applyLength(length + value * barLength));
+        }
+        else if (value >= 1) {
+            extra = Math.round((value - 1) * barLength);
+            newLength = this.applyLength(length - extra);
+            extra = length - newLength;
+            this.updateLength(newLength);
+            offset = gapLength + extra;
+        }
+        else {
+            offset = gapLength * value;
+        }
+
+        this.setOffset(offset);
+    }
+});
+
+/**
+ * @private
  *
  * This easing is typically used for {@link Ext.scroll.Scroller}. It's a combination of
  * {@link Ext.fx.easing.Momentum} and {@link Ext.fx.easing.Bounce}, which emulates deceleration when the animated element
@@ -18042,57 +18798,6 @@ Ext.define('Ext.scroll.Scroller', {
 /**
  * @private
  */
-Ext.define('Ext.scroll.indicator.Default', {
-    extend: 'Ext.scroll.indicator.Abstract',
-
-    config: {
-        cls: 'default'
-    },
-
-    setOffset: function(offset) {
-        var axis = this.getAxis(),
-            domStyle = this.element.dom.style;
-
-        if (axis === 'x') {
-            domStyle.webkitTransform = 'translate3d(' + offset + 'px, 0, 0)';
-        }
-        else {
-            domStyle.webkitTransform = 'translate3d(0, ' + offset + 'px, 0)';
-        }
-    },
-
-    applyLength: function(length) {
-        return Math.round(Math.max(0, length));
-    },
-
-    updateValue: function(value) {
-        var barLength = this.barLength,
-            gapLength = this.gapLength,
-            length = this.getLength(),
-            newLength, offset, extra;
-
-        if (value <= 0) {
-            offset = 0;
-            this.updateLength(this.applyLength(length + value * barLength));
-        }
-        else if (value >= 1) {
-            extra = Math.round((value - 1) * barLength);
-            newLength = this.applyLength(length - extra);
-            extra = length - newLength;
-            this.updateLength(newLength);
-            offset = gapLength + extra;
-        }
-        else {
-            offset = gapLength * value;
-        }
-
-        this.setOffset(offset);
-    }
-});
-
-/**
- * @private
- */
 Ext.define('Ext.scroll.indicator.ScrollPosition', {
     extend: 'Ext.scroll.indicator.Abstract',
 
@@ -18153,120 +18858,6 @@ Ext.define('Ext.scroll.indicator.ScrollPosition', {
         }
         else {
             barDom.scrollTop = offset;
-        }
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.scroll.indicator.CssTransform', {
-    extend: 'Ext.scroll.indicator.Abstract',
-
-    config: {
-        cls: 'csstransform'
-    },
-
-    getElementConfig: function() {
-        var config = this.callParent();
-
-        config.children[0].children = [
-            {
-                reference: 'startElement'
-            },
-            {
-                reference: 'middleElement'
-            },
-            {
-                reference: 'endElement'
-            }
-        ];
-
-        return config;
-    },
-
-    refresh: function() {
-        var axis = this.getAxis(),
-            startElementDom = this.startElement.dom,
-            endElementDom = this.endElement.dom,
-            middleElement = this.middleElement,
-            startElementLength, endElementLength;
-
-        if (axis === 'x') {
-            startElementLength = startElementDom.offsetWidth;
-            endElementLength = endElementDom.offsetWidth;
-            middleElement.setLeft(startElementLength);
-        }
-        else {
-            startElementLength = startElementDom.offsetHeight;
-            endElementLength = endElementDom.offsetHeight;
-            middleElement.setTop(startElementLength);
-        }
-
-        this.startElementLength = startElementLength;
-        this.endElementLength = endElementLength;
-        this.minLength = startElementLength + endElementLength;
-
-        this.callParent();
-    },
-
-    applyLength: function(length) {
-        return Math.round(Math.max(this.minLength, length));
-    },
-
-    updateLength: function(length) {
-        var axis = this.getAxis(),
-            endElementStyle = this.endElement.dom.style,
-            middleElementStyle = this.middleElement.dom.style,
-            endElementLength = this.endElementLength,
-            endElementOffset = length - endElementLength,
-            middleElementLength = endElementOffset - this.startElementLength;
-
-        if (axis === 'x') {
-            endElementStyle.webkitTransform = 'translate3d(' + endElementOffset + 'px, 0, 0)';
-            middleElementStyle.webkitTransform = 'translate3d(0, 0, 0) scaleX(' + middleElementLength + ')';
-        }
-        else {
-            endElementStyle.webkitTransform = 'translate3d(0, ' + endElementOffset + 'px, 0)';
-            middleElementStyle.webkitTransform = 'translate3d(0, 0, 0) scaleY(' + middleElementLength + ')';
-        }
-    },
-
-    updateValue: function(value) {
-        var barLength = this.barLength,
-            gapLength = this.gapLength,
-            length = this.getLength(),
-            newLength, offset, extra;
-
-        if (value <= 0) {
-            offset = 0;
-            this.updateLength(this.applyLength(length + value * barLength));
-        }
-        else if (value >= 1) {
-            extra = Math.round((value - 1) * barLength);
-            newLength = this.applyLength(length - extra);
-            extra = length - newLength;
-            this.updateLength(newLength);
-            offset = gapLength + extra;
-        }
-        else {
-            offset = gapLength * value;
-        }
-
-        this.setOffset(offset);
-    },
-
-    setOffset: function(offset) {
-        var axis = this.getAxis(),
-            elementStyle = this.element.dom.style;
-
-        offset = Math.round(offset);
-
-        if (axis === 'x') {
-            elementStyle.webkitTransform = 'translate3d(' + offset + 'px, 0, 0)';
-        }
-        else {
-            elementStyle.webkitTransform = 'translate3d(0, ' + offset + 'px, 0)';
         }
     }
 });
@@ -18707,597 +19298,6 @@ Ext.define('Ext.behavior.Scrollable', {
         }
     }
 });
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Style', {
-
-    extend: 'Ext.fx.layout.card.Abstract',
-
-    requires: [
-        'Ext.fx.Animation'
-    ],
-
-    config: {
-        inAnimation: {
-            before: {
-                visibility: null
-            },
-            preserveEndState: false,
-            replacePrevious: true
-        },
-
-        outAnimation: {
-            preserveEndState: false,
-            replacePrevious: true
-        }
-    },
-
-    constructor: function(config) {
-        var inAnimation, outAnimation;
-
-        this.initConfig(config);
-
-        this.endAnimationCounter = 0;
-
-        inAnimation = this.getInAnimation();
-        outAnimation = this.getOutAnimation();
-
-        inAnimation.on('animationend', 'incrementEnd', this);
-        outAnimation.on('animationend', 'incrementEnd', this);
-    },
-
-    updateDirection: function(direction) {
-        this.getInAnimation().setDirection(direction);
-        this.getOutAnimation().setDirection(direction);
-    },
-
-    updateDuration: function(duration) {
-        this.getInAnimation().setDuration(duration);
-        this.getOutAnimation().setDuration(duration);
-    },
-
-    updateReverse: function(reverse) {
-        this.getInAnimation().setReverse(reverse);
-        this.getOutAnimation().setReverse(reverse);
-    },
-
-    incrementEnd: function() {
-        this.endAnimationCounter++;
-
-        if (this.endAnimationCounter > 1) {
-            this.endAnimationCounter = 0;
-            this.fireEvent('animationend', this);
-        }
-    },
-
-    applyInAnimation: function(animation, inAnimation) {
-        return Ext.factory(animation, Ext.fx.Animation, inAnimation);
-    },
-
-    applyOutAnimation: function(animation, outAnimation) {
-        return Ext.factory(animation, Ext.fx.Animation, outAnimation);
-    },
-
-    updateInAnimation: function(animation) {
-        animation.setScope(this);
-    },
-
-    updateOutAnimation: function(animation) {
-        animation.setScope(this);
-    },
-
-    onActiveItemChange: function(cardLayout, newItem, oldItem, options, controller) {
-        var inAnimation = this.getInAnimation(),
-            outAnimation = this.getOutAnimation(),
-            inElement, outElement;
-
-        if (newItem && oldItem && oldItem.isPainted()) {
-            inElement = newItem.renderElement;
-            outElement = oldItem.renderElement;
-
-            inAnimation.setElement(inElement);
-            outAnimation.setElement(outElement);
-
-            outAnimation.setOnBeforeEnd(function(element, interrupted) {
-                if (interrupted || Ext.Animator.hasRunningAnimations(element)) {
-                    controller.firingArguments[1] = null;
-                    controller.firingArguments[2] = null;
-                }
-            });
-            outAnimation.setOnEnd(function() {
-                controller.resume();
-            });
-
-            inElement.dom.style.setProperty('visibility', 'hidden', '!important');
-            newItem.show();
-
-            Ext.Animator.run([outAnimation, inAnimation]);
-            controller.pause();
-        }
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Slide', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.slide',
-
-    config: {
-        inAnimation: {
-            type: 'slide',
-            easing: 'ease-out'
-        },
-        outAnimation: {
-            type: 'slide',
-            easing: 'ease-out',
-            out: true
-        }
-    },
-
-    updateReverse: function(reverse) {
-        this.getInAnimation().setReverse(reverse);
-        this.getOutAnimation().setReverse(reverse);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Cover', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.cover',
-
-    config: {
-        reverse: null,
-
-        inAnimation: {
-            before: {
-                'z-index': 100
-            },
-            after: {
-                'z-index': 0
-            },
-            type: 'slide',
-            easing: 'ease-out'
-        },
-        outAnimation: {
-            easing: 'ease-out',
-            from: {
-                opacity: 0.99
-            },
-            to: {
-                opacity: 1
-            },
-            out: true
-        }
-    },
-
-    updateReverse: function(reverse) {
-        this.getInAnimation().setReverse(reverse);
-        this.getOutAnimation().setReverse(reverse);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Reveal', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.reveal',
-
-    config: {
-        inAnimation: {
-            easing: 'ease-out',
-            from: {
-                opacity: 0.99
-            },
-            to: {
-                opacity: 1
-            }
-        },
-        outAnimation: {
-            before: {
-                'z-index': 100
-            },
-            after: {
-                'z-index': 0
-            },
-            type: 'slide',
-            easing: 'ease-out',
-            out: true
-        }
-    },
-
-    updateReverse: function(reverse) {
-        this.getInAnimation().setReverse(reverse);
-        this.getOutAnimation().setReverse(reverse);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Fade', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.fade',
-
-    config: {
-        reverse: null,
-        
-        inAnimation: {
-            type: 'fade',
-            easing: 'ease-out'
-        },
-        outAnimation: {
-            type: 'fade',
-            easing: 'ease-out',
-            out: true
-        }
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Flip', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.flip',
-
-    config: {
-        duration: 500,
-
-        inAnimation: {
-            type: 'flip',
-            half: true,
-            easing: 'ease-out',
-            before: {
-                'backface-visibility': 'hidden'
-            },
-            after: {
-                'backface-visibility': null
-            }
-        },
-        outAnimation: {
-            type: 'flip',
-            half: true,
-            easing: 'ease-in',
-            before: {
-                'backface-visibility': 'hidden'
-            },
-            after: {
-                'backface-visibility': null
-            },
-            out: true
-        }
-    },
-
-    updateDuration: function(duration) {
-        var halfDuration = duration / 2,
-            inAnimation = this.getInAnimation(),
-            outAnimation = this.getOutAnimation();
-
-        inAnimation.setDelay(halfDuration);
-        inAnimation.setDuration(halfDuration);
-        outAnimation.setDuration(halfDuration);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.card.Pop', {
-    extend: 'Ext.fx.layout.card.Style',
-
-    alias: 'fx.layout.card.pop',
-
-    config: {
-        duration: 500,
-
-        inAnimation: {
-            type: 'pop',
-            easing: 'ease-out'
-        },
-        outAnimation: {
-            type: 'pop',
-            easing: 'ease-in',
-            out: true
-        }
-    },
-
-    updateDuration: function(duration) {
-        var halfDuration = duration / 2,
-            inAnimation = this.getInAnimation(),
-            outAnimation = this.getOutAnimation();
-
-        inAnimation.setDelay(halfDuration);
-        inAnimation.setDuration(halfDuration);
-        outAnimation.setDuration(halfDuration);
-    }
-});
-
-/**
- * @private
- */
-Ext.define('Ext.fx.layout.Card', {
-    requires: [
-        'Ext.fx.layout.card.Slide',
-        'Ext.fx.layout.card.Cover',
-        'Ext.fx.layout.card.Reveal',
-        'Ext.fx.layout.card.Fade',
-        'Ext.fx.layout.card.Flip',
-        'Ext.fx.layout.card.Pop',
-//        'Ext.fx.layout.card.Cube',
-        'Ext.fx.layout.card.Scroll'
-    ],
-
-    constructor: function(config) {
-        var defaultClass = Ext.fx.layout.card.Abstract,
-            type;
-
-        if (!config) {
-            return null;
-        }
-
-        if (typeof config == 'string') {
-            type = config;
-
-            config = {};
-        }
-        else if (config.type) {
-            type = config.type;
-        }
-
-        config.elementBox = false;
-
-        if (type) {
-
-            if (Ext.os.is.Android2) {
-                // In Android 2 we only support scroll and fade. Otherwise force it to slide.
-                if (type != 'fade') {
-                    type = 'scroll';
-                }
-            }
-            else if (type === 'slide' && Ext.browser.is.ChromeMobile) {
-                type = 'scroll';
-            }
-
-            defaultClass = Ext.ClassManager.getByAlias('fx.layout.card.' + type);
-
-        }
-
-        return Ext.factory(config, defaultClass);
-    }
-});
-
-/**
- * @aside guide layouts
- * @aside video layouts
- *
- * Sometimes you want to show several screens worth of information but you've only got a small screen to work with.
- * TabPanels and Carousels both enable you to see one screen of many at a time, and underneath they both use a Card
- * Layout.
- *
- * Card Layout takes the size of the Container it is applied to and sizes the currently active item to fill the
- * Container completely. It then hides the rest of the items, allowing you to change which one is currently visible but
- * only showing one at once:
- *
- * {@img ../guides/layouts/card.jpg}
- *
- *
- * Here the gray box is our Container, and the blue box inside it is the currently active card. The three other cards
- * are hidden from view, but can be swapped in later. While it's not too common to create Card layouts directly, you
- * can do so like this:
- *
- *     var panel = Ext.create('Ext.Panel', {
- *         layout: 'card',
- *         items: [
- *             {
- *                 html: "First Item"
- *             },
- *             {
- *                 html: "Second Item"
- *             },
- *             {
- *                 html: "Third Item"
- *             },
- *             {
- *                 html: "Fourth Item"
- *             }
- *         ]
- *     });
- *
- *     panel.{@link Ext.Container#setActiveItem setActiveItem}(1);
- *
- * Here we create a Panel with a Card Layout and later set the second item active (the active item index is zero-based,
- * so 1 corresponds to the second item). Normally you're better off using a {@link Ext.tab.Panel tab panel} or a
- * {@link Ext.carousel.Carousel carousel}.
- *
- * For a more detailed overview of what layouts are and the types of layouts shipped with Sencha Touch 2, check out the
- * [Layout Guide](#!/guide/layouts).
- */
-Ext.define('Ext.layout.Card', {
-    extend: 'Ext.layout.Fit',
-    alternateClassName: 'Ext.layout.CardLayout',
-
-    isCard: true,
-
-    /**
-     * @event activeitemchange
-     * @preventable doActiveItemChange
-     * Fires when an card is made active
-     * @param {Ext.layout.Card} this The layout instance
-     * @param {Mixed} newActiveItem The new active item
-     * @param {Mixed} oldActiveItem The old active item
-     */
-
-    requires: [
-        'Ext.fx.layout.Card'
-    ],
-
-    alias: 'layout.card',
-
-    cls: Ext.baseCSSPrefix + 'layout-card',
-
-    itemCls: Ext.baseCSSPrefix + 'layout-card-item',
-
-    constructor: function() {
-        this.callParent(arguments);
-        this.container.onInitialized(this.onContainerInitialized, this);
-    },
-
-    /**
-     * @private
-     */
-    applyAnimation: function(animation) {
-        return new Ext.fx.layout.Card(animation);
-    },
-
-    /**
-     * @private
-     */
-    updateAnimation: function(animation, oldAnimation) {
-        if (animation && animation.isAnimation) {
-            animation.setLayout(this);
-        }
-
-        if (oldAnimation) {
-            oldAnimation.destroy();
-        }
-    },
-
-    /**
-     * @private
-     */
-    doItemAdd: function(item, index) {
-        if (item.isInnerItem()) {
-            item.hide();
-        }
-
-        this.callParent(arguments);
-    },
-
-    getInnerItemsContainer: function() {
-        var innerItemsContainer = this.innerItemsContainer;
-
-        if (!innerItemsContainer) {
-            this.innerItemsContainer = innerItemsContainer = Ext.Element.create({
-                className: this.cls + '-container'
-            });
-
-            this.container.innerElement.append(innerItemsContainer);
-        }
-
-        return innerItemsContainer;
-    },
-
-    /**
-     * @private
-     */
-    doItemRemove: function(item, index, destroy) {
-        this.callParent(arguments);
-
-        if (!destroy && item.isInnerItem()) {
-            item.show();
-        }
-    },
-
-    onContainerInitialized: function(container) {
-        var activeItem = container.getActiveItem();
-
-        if (activeItem) {
-            activeItem.show();
-        }
-
-        container.on('activeitemchange', 'onContainerActiveItemChange', this);
-    },
-
-    /**
-     * @private
-     */
-    onContainerActiveItemChange: function(container) {
-        this.relayEvent(arguments, 'doActiveItemChange');
-    },
-
-    /**
-     * @private
-     */
-    doActiveItemChange: function(me, newActiveItem, oldActiveItem) {
-        if (oldActiveItem) {
-            oldActiveItem.hide();
-        }
-
-        if (newActiveItem) {
-            newActiveItem.show();
-        }
-    },
-
-    doItemDockedChange: function(item, docked) {
-        var element = item.element;
-        // See https://sencha.jira.com/browse/TOUCH-1508
-        if (docked) {
-            element.removeCls(this.itemCls);
-        }
-        else {
-            element.addCls(this.itemCls);
-        }
-
-        this.callParent(arguments);
-    }
-});
-
-/**
- * @aside guide layouts
- * @aside video layouts
- *
- * Factory class which returns an instance of the provided layout.
- */
-Ext.define('Ext.layout.Layout', {
-
-    requires: [
-        'Ext.layout.Fit',
-        'Ext.layout.Card',
-        'Ext.layout.HBox',
-        'Ext.layout.VBox'
-    ],
-
-    /**
-     * Creates a new Layout for the specified container using the config object's layout to determine
-     * layout to instantiate.
-     * @param {Ext.Container} container A configuration object for the Component you wish to create.
-     * @param {Object} [config] The alias to provide the Layout type; if none is
-     * specified, Ext.layout.Default will be used.
-     * @return {Ext.layout.Default} The newly instantiated Layout.
-     */
-    constructor: function(container, config) {
-        var layoutClass = Ext.layout.Default,
-            type, layout;
-
-        if (typeof config == 'string') {
-            type = config;
-            config = {};
-        }
-        else if ('type' in config) {
-            type = config.type;
-        }
-
-        if (type) {
-            layoutClass = Ext.ClassManager.getByAlias('layout.' + type);
-
-        }
-
-        return new layoutClass(container, config);
-    }
-});
-
 
 /**
  * A Container has all of the abilities of {@link Ext.Component Component}, but lets you nest other Components inside
@@ -22366,6 +22366,142 @@ Ext.define('Ext.app.Controller', {
  * @author Ed Spencer
  * @private
  *
+ * Represents a single action as {@link Ext.app.Application#dispatch dispatched} by an Application. This is typically
+ * generated as a result of a url change being matched by a Route, triggering Application's dispatch function.
+ *
+ * This is a private class and its functionality and existence may change in the future. Use at your own risk.
+ *
+ */
+Ext.define('Ext.app.Action', {
+    config: {
+        /**
+         * @cfg {Object} scope The scope in which the {@link #action} should be called
+         */
+        scope: null,
+
+        /**
+         * @cfg {Ext.app.Application} application The Application that this Action is bound to
+         */
+        application: null,
+
+        /**
+         * @cfg {Ext.app.Controller} controller The {@link Ext.app.Controller controller} whose {@link #action} should
+         * be called
+         */
+        controller: null,
+
+        /**
+         * @cfg {String} action The name of the action on the {@link #controller} that should be called
+         */
+        action: null,
+
+        /**
+         * @cfg {Array} args The set of arguments that will be passed to the controller's {@link #action}
+         */
+        args: [],
+
+        /**
+         * @cfg {String} url The url that was decoded into the controller/action/args in this Action
+         */
+        url: undefined,
+        data: {},
+        title: null,
+
+        /**
+         * @cfg {Array} beforeFilters The (optional) set of functions to call before the {@link #action} is called.
+         * This is usually handled directly by the Controller or Application when an Ext.app.Action instance is
+         * created, but is alterable before {@link #resume} is called.
+         * @accessor
+         */
+        beforeFilters: [],
+
+        /**
+         * @private
+         * Keeps track of which before filter is currently being executed by {@link #resume}
+         */
+        currentFilterIndex: -1
+    },
+
+    constructor: function(config) {
+        this.initConfig(config);
+
+        this.getUrl();
+    },
+
+    /**
+     * Starts execution of this Action by calling each of the {@link #beforeFilters} in turn (if any are specified),
+     * before calling the Controller {@link #action}. Same as calling {@link #resume}.
+     */
+    execute: function() {
+        this.resume();
+    },
+
+    /**
+     * Resumes the execution of this Action (or starts it if it had not been started already). This iterates over all
+     * of the configured {@link #beforeFilters} and calls them. Each before filter is called with this Action as the
+     * sole argument, and is expected to call action.resume() in order to allow the next filter to be called, or if
+     * this is the final filter, the original {@link Ext.app.Controller Controller} function.
+     */
+    resume: function() {
+        var index   = this.getCurrentFilterIndex() + 1,
+            filters = this.getBeforeFilters(),
+            controller = this.getController(),
+            nextFilter = filters[index];
+
+        if (nextFilter) {
+            this.setCurrentFilterIndex(index);
+            nextFilter.call(controller, this);
+        } else {
+            controller[this.getAction()].apply(controller, this.getArgs());
+        }
+    },
+
+    /**
+     * @private
+     */
+    applyUrl: function(url) {
+        if (url === null || url === undefined) {
+            url = this.urlEncode();
+        }
+
+        return url;
+    },
+
+    /**
+     * @private
+     * If the controller config is a string, swap it for a reference to the actuall controller instance
+     * @param {String} controller The controller name
+     */
+    applyController: function(controller) {
+        var app = this.getApplication(),
+            profile = app.getCurrentProfile();
+
+        if (Ext.isString(controller)) {
+            controller = app.getController(controller, profile ? profile.getNamespace() : null);
+        }
+
+        return controller;
+    },
+
+    /**
+     * @private
+     */
+    urlEncode: function() {
+        var controller = this.getController(),
+            splits;
+
+        if (controller instanceof Ext.app.Controller) {
+            splits = controller.$className.split('.');
+            controller = splits[splits.length - 1];
+        }
+
+        return controller + "/" + this.getAction();
+    }
+});
+/**
+ * @author Ed Spencer
+ * @private
+ *
  * Manages the stack of {@link Ext.app.Action} instances that have been decoded, pushes new urls into the browser's
  * location object and listens for changes in url, firing the {@link #change} event when a change is detected.
  *
@@ -22716,142 +22852,6 @@ Ext.define('Ext.app.Profile', {
         map.all = allClasses;
 
         return map;
-    }
-});
-/**
- * @author Ed Spencer
- * @private
- *
- * Represents a single action as {@link Ext.app.Application#dispatch dispatched} by an Application. This is typically
- * generated as a result of a url change being matched by a Route, triggering Application's dispatch function.
- *
- * This is a private class and its functionality and existence may change in the future. Use at your own risk.
- *
- */
-Ext.define('Ext.app.Action', {
-    config: {
-        /**
-         * @cfg {Object} scope The scope in which the {@link #action} should be called
-         */
-        scope: null,
-
-        /**
-         * @cfg {Ext.app.Application} application The Application that this Action is bound to
-         */
-        application: null,
-
-        /**
-         * @cfg {Ext.app.Controller} controller The {@link Ext.app.Controller controller} whose {@link #action} should
-         * be called
-         */
-        controller: null,
-
-        /**
-         * @cfg {String} action The name of the action on the {@link #controller} that should be called
-         */
-        action: null,
-
-        /**
-         * @cfg {Array} args The set of arguments that will be passed to the controller's {@link #action}
-         */
-        args: [],
-
-        /**
-         * @cfg {String} url The url that was decoded into the controller/action/args in this Action
-         */
-        url: undefined,
-        data: {},
-        title: null,
-
-        /**
-         * @cfg {Array} beforeFilters The (optional) set of functions to call before the {@link #action} is called.
-         * This is usually handled directly by the Controller or Application when an Ext.app.Action instance is
-         * created, but is alterable before {@link #resume} is called.
-         * @accessor
-         */
-        beforeFilters: [],
-
-        /**
-         * @private
-         * Keeps track of which before filter is currently being executed by {@link #resume}
-         */
-        currentFilterIndex: -1
-    },
-
-    constructor: function(config) {
-        this.initConfig(config);
-
-        this.getUrl();
-    },
-
-    /**
-     * Starts execution of this Action by calling each of the {@link #beforeFilters} in turn (if any are specified),
-     * before calling the Controller {@link #action}. Same as calling {@link #resume}.
-     */
-    execute: function() {
-        this.resume();
-    },
-
-    /**
-     * Resumes the execution of this Action (or starts it if it had not been started already). This iterates over all
-     * of the configured {@link #beforeFilters} and calls them. Each before filter is called with this Action as the
-     * sole argument, and is expected to call action.resume() in order to allow the next filter to be called, or if
-     * this is the final filter, the original {@link Ext.app.Controller Controller} function.
-     */
-    resume: function() {
-        var index   = this.getCurrentFilterIndex() + 1,
-            filters = this.getBeforeFilters(),
-            controller = this.getController(),
-            nextFilter = filters[index];
-
-        if (nextFilter) {
-            this.setCurrentFilterIndex(index);
-            nextFilter.call(controller, this);
-        } else {
-            controller[this.getAction()].apply(controller, this.getArgs());
-        }
-    },
-
-    /**
-     * @private
-     */
-    applyUrl: function(url) {
-        if (url === null || url === undefined) {
-            url = this.urlEncode();
-        }
-
-        return url;
-    },
-
-    /**
-     * @private
-     * If the controller config is a string, swap it for a reference to the actuall controller instance
-     * @param {String} controller The controller name
-     */
-    applyController: function(controller) {
-        var app = this.getApplication(),
-            profile = app.getCurrentProfile();
-
-        if (Ext.isString(controller)) {
-            controller = app.getController(controller, profile ? profile.getNamespace() : null);
-        }
-
-        return controller;
-    },
-
-    /**
-     * @private
-     */
-    urlEncode: function() {
-        var controller = this.getController(),
-            splits;
-
-        if (controller instanceof Ext.app.Controller) {
-            splits = controller.$className.split('.');
-            controller = splits[splits.length - 1];
-        }
-
-        return controller + "/" + this.getAction();
     }
 });
 /**
@@ -23896,6 +23896,33 @@ Ext.define('Ext.app.Application', {
 });
 
 /**
+ * {@link Ext.Title} is used for the {@link Ext.Toolbar#title} configuration in the {@link Ext.Toolbar} component.
+ * @private
+ */
+Ext.define('Ext.Title', {
+    extend: 'Ext.Component',
+    xtype: 'title',
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        baseCls: 'x-title',
+
+        /**
+         * @cfg {String} title The title text
+         */
+        title: ''
+    },
+
+    // @private
+    updateTitle: function(newTitle) {
+        this.setHtml(newTitle);
+    }
+});
+
+/**
  * {@link Ext.Button} is a simple class to display a button in Sencha Touch. There are various
  * different styles of {@link Ext.Button} you can create by using the {@link #icon},
  * {@link #iconCls}, {@link #iconAlign}, {@link #iconMask}, {@link #ui}, and {@link #text}
@@ -24619,410 +24646,6 @@ Ext.define('Ext.Button', {
 });
 
 /**
-The {@link Ext.Spacer} component is generally used to put space between items in {@link Ext.Toolbar} components.
-
-## Examples
-
-By default the {@link #flex} configuration is set to 1:
-
-    @example miniphone preview
-    Ext.create('Ext.Container', {
-        fullscreen: true,
-        items: [
-            {
-                xtype : 'toolbar',
-                docked: 'top',
-                items: [
-                    {
-                        xtype: 'button',
-                        text : 'Button One'
-                    },
-                    {
-                        xtype: 'spacer'
-                    },
-                    {
-                        xtype: 'button',
-                        text : 'Button Two'
-                    }
-                ]
-            }
-        ]
-    });
-
-Alternatively you can just set the {@link #width} configuration which will get the {@link Ext.Spacer} a fixed width:
-
-    @example preview
-    Ext.create('Ext.Container', {
-        fullscreen: true,
-        layout: {
-            type: 'vbox',
-            pack: 'center',
-            align: 'stretch'
-        },
-        items: [
-            {
-                xtype : 'toolbar',
-                docked: 'top',
-                items: [
-                    {
-                        xtype: 'button',
-                        text : 'Button One'
-                    },
-                    {
-                        xtype: 'spacer',
-                        width: 50
-                    },
-                    {
-                        xtype: 'button',
-                        text : 'Button Two'
-                    }
-                ]
-            },
-            {
-                xtype: 'container',
-                items: [
-                    {
-                        xtype: 'button',
-                        text : 'Change Ext.Spacer width',
-                        handler: function() {
-                            //get the spacer using ComponentQuery
-                            var spacer = Ext.ComponentQuery.query('spacer')[0],
-                                from = 10,
-                                to = 250;
-
-                            //set the width to a random number
-                            spacer.setWidth(Math.floor(Math.random() * (to - from + 1) + from));
-                        }
-                    }
-                ]
-            }
-        ]
-    });
-
-You can also insert multiple {@link Ext.Spacer}'s:
-
-    @example preview
-    Ext.create('Ext.Container', {
-        fullscreen: true,
-        items: [
-            {
-                xtype : 'toolbar',
-                docked: 'top',
-                items: [
-                    {
-                        xtype: 'button',
-                        text : 'Button One'
-                    },
-                    {
-                        xtype: 'spacer'
-                    },
-                    {
-                        xtype: 'button',
-                        text : 'Button Two'
-                    },
-                    {
-                        xtype: 'spacer',
-                        width: 20
-                    },
-                    {
-                        xtype: 'button',
-                        text : 'Button Three'
-                    }
-                ]
-            }
-        ]
-    });
- */
-Ext.define('Ext.Spacer', {
-    extend: 'Ext.Component',
-    alias : 'widget.spacer',
-
-    config: {
-        /**
-         * @cfg {Number} flex
-         * The flex value of this spacer. This defaults to 1, if no width has been set.
-         * @accessor
-         */
-        
-        /**
-         * @cfg {Number} width
-         * The width of this spacer. If this is set, the value of {@link #flex} will be ignored.
-         * @accessor
-         */
-    },
-
-    // @private
-    constructor: function(config) {
-        config = config || {};
-
-        if (!config.width) {
-            config.flex = 1;
-        }
-
-        this.callParent([config]);
-    }
-});
-
-/**
- * {@link Ext.Title} is used for the {@link Ext.Toolbar#title} configuration in the {@link Ext.Toolbar} component.
- * @private
- */
-Ext.define('Ext.Title', {
-    extend: 'Ext.Component',
-    xtype: 'title',
-
-    config: {
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        baseCls: 'x-title',
-
-        /**
-         * @cfg {String} title The title text
-         */
-        title: ''
-    },
-
-    // @private
-    updateTitle: function(newTitle) {
-        this.setHtml(newTitle);
-    }
-});
-
-/**
- * @class Ext.util.LineSegment
- *
- * Utility class that represents a line segment, constructed by two {@link Ext.util.Point}
- */
-Ext.define('Ext.util.LineSegment', {
-    requires: ['Ext.util.Point'],
-
-    /**
-     * Creates new LineSegment out of two points.
-     * @param {Ext.util.Point} point1
-     * @param {Ext.util.Point} point2
-     */
-    constructor: function(point1, point2) {
-        var Point = Ext.util.Point;
-
-        this.point1 = Point.from(point1);
-        this.point2 = Point.from(point2);
-    },
-
-    /**
-     * Returns the point where two lines intersect.
-     * @param {Ext.util.LineSegment} lineSegment The line to intersect with.
-     * @return {Ext.util.Point}
-     */
-    intersects: function(lineSegment) {
-        var point1 = this.point1,
-            point2 = this.point2,
-            point3 = lineSegment.point1,
-            point4 = lineSegment.point2,
-            x1 = point1.x,
-            x2 = point2.x,
-            x3 = point3.x,
-            x4 = point4.x,
-            y1 = point1.y,
-            y2 = point2.y,
-            y3 = point3.y,
-            y4 = point4.y,
-            d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4),
-            xi, yi;
-
-        if (d == 0) {
-            return null;
-        }
-
-        xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
-        yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
-
-        if (xi < Math.min(x1, x2) || xi > Math.max(x1, x2)
-            || xi < Math.min(x3, x4) || xi > Math.max(x3, x4)
-            || yi < Math.min(y1, y2) || yi > Math.max(y1, y2)
-            || yi < Math.min(y3, y4) || yi > Math.max(y3, y4)) {
-            return null;
-        }
-
-        return new Ext.util.Point(xi, yi);
-    },
-
-    /**
-     * Returns string representation of the line. Useful for debugging.
-     * @return {String} For example `Point[12,8] Point[0,0]`
-     */
-    toString: function() {
-        return this.point1.toString() + " " + this.point2.toString();
-    }
-});
-
-/**
- * @class Ext.Decorator
- * @extend Ext.Component
- *
- * In a few words, a Decorator is a Component that wraps around another Component. A typical example of a Decorator is a
- * {@link Ext.field.Field Field}. A form field is nothing more than a decorator around another component, and gives the
- * component a label, as well as extra styling to make it look good in a form.
- *
- * A Decorator can be thought of as a lightweight Container that has only one child item, and no layout overhead.
- * The look and feel of decorators can be styled purely in CSS.
- *
- * Another powerful feature that Decorator provides is config proxying. For example: all config items of a
- * {@link Ext.slider.Slider Slider} also exist in a {@link Ext.field.Slider Slider Field} for API convenience.
- * The {@link Ext.field.Slider Slider Field} simply proxies all corresponding getters and setters
- * to the actual {@link Ext.slider.Slider Slider} instance. Writing out all the setters and getters to do that is a tedious task
- * and a waste of code space. Instead, when you sub-class Ext.Decorator, all you need to do is to specify those config items
- * that you want to proxy to the Component using a special 'proxyConfig' class property. Here's how it may look like
- * in a Slider Field class:
- *
- *     Ext.define('My.field.Slider', {
- *         extend: 'Ext.Decorator',
- *
- *         config: {
- *             component: {
- *                 xtype: 'slider'
- *             }
- *         },
- *
- *         proxyConfig: {
- *             minValue: 0,
- *             maxValue: 100,
- *             increment: 1
- *         }
- *
- *         // ...
- *     });
- *
- * Once `My.field.Slider` class is created, it will have all setters and getters methods for all items listed in `proxyConfig`
- * automatically generated. These methods all proxy to the same method names that exist within the Component instance.
- */
-Ext.define('Ext.Decorator', {
-    extend: 'Ext.Component',
-
-    isDecorator: true,
-
-    config: {
-        /**
-         * @cfg {Object} component The config object to factory the Component that this Decorator wraps around
-         */
-        component: {}
-    },
-
-    statics: {
-        generateProxySetter: function(name) {
-            return function(value) {
-                var component = this.getComponent();
-                component[name].call(component, value);
-
-                return this;
-            }
-        },
-        generateProxyGetter: function(name) {
-            return function() {
-                var component = this.getComponent();
-                return component[name].call(component);
-            }
-        }
-    },
-
-    onClassExtended: function(Class, members) {
-        if (!members.hasOwnProperty('proxyConfig')) {
-            return;
-        }
-
-        var ExtClass = Ext.Class,
-            proxyConfig = members.proxyConfig,
-            config = members.config;
-
-        members.config = (config) ? Ext.applyIf(config, proxyConfig) : proxyConfig;
-
-        var name, nameMap, setName, getName;
-
-        for (name in proxyConfig) {
-            if (proxyConfig.hasOwnProperty(name)) {
-                nameMap = ExtClass.getConfigNameMap(name);
-                setName = nameMap.set;
-                getName = nameMap.get;
-
-                members[setName] = this.generateProxySetter(setName);
-                members[getName] = this.generateProxyGetter(getName);
-            }
-        }
-    },
-
-    // @private
-    applyComponent: function(config) {
-        return Ext.factory(config, Ext.Component);
-    },
-
-    // @private
-    updateComponent: function(newComponent, oldComponent) {
-        if (oldComponent) {
-            if (this.isRendered() && oldComponent.setRendered(false)) {
-                oldComponent.fireAction('renderedchange', [this, oldComponent, false],
-                    'doUnsetComponent', this, { args: [oldComponent] });
-            }
-            else {
-                this.doUnsetComponent(oldComponent);
-            }
-        }
-
-        if (newComponent) {
-            if (this.isRendered() && newComponent.setRendered(true)) {
-                newComponent.fireAction('renderedchange', [this, newComponent, true],
-                    'doSetComponent', this, { args: [newComponent] });
-            }
-            else {
-                this.doSetComponent(newComponent);
-            }
-        }
-    },
-
-    // @private
-    doUnsetComponent: function(component) {
-        if (component.renderElement.dom) {
-            this.innerElement.dom.removeChild(component.renderElement.dom);
-        }
-    },
-
-    // @private
-    doSetComponent: function(component) {
-        if (component.renderElement.dom) {
-            this.innerElement.dom.appendChild(component.renderElement.dom);
-        }
-    },
-
-    // @private
-    setRendered: function(rendered) {
-        var component;
-
-        if (this.callParent(arguments)) {
-            component = this.getComponent();
-
-            if (component) {
-                component.setRendered(rendered);
-            }
-
-            return true;
-        }
-
-        return false;
-    },
-
-    // @private
-    setDisabled: function(disabled) {
-        this.callParent(arguments);
-        this.getComponent().setDisabled(disabled);
-    },
-
-    destroy: function() {
-        Ext.destroy(this.getComponent());
-        this.callParent();
-    }
-});
-
-/**
  * @private
  */
 Ext.define('Ext.field.Input', {
@@ -25718,6 +25341,383 @@ Ext.define('Ext.field.Input', {
 });
 
 /**
+The {@link Ext.Spacer} component is generally used to put space between items in {@link Ext.Toolbar} components.
+
+## Examples
+
+By default the {@link #flex} configuration is set to 1:
+
+    @example miniphone preview
+    Ext.create('Ext.Container', {
+        fullscreen: true,
+        items: [
+            {
+                xtype : 'toolbar',
+                docked: 'top',
+                items: [
+                    {
+                        xtype: 'button',
+                        text : 'Button One'
+                    },
+                    {
+                        xtype: 'spacer'
+                    },
+                    {
+                        xtype: 'button',
+                        text : 'Button Two'
+                    }
+                ]
+            }
+        ]
+    });
+
+Alternatively you can just set the {@link #width} configuration which will get the {@link Ext.Spacer} a fixed width:
+
+    @example preview
+    Ext.create('Ext.Container', {
+        fullscreen: true,
+        layout: {
+            type: 'vbox',
+            pack: 'center',
+            align: 'stretch'
+        },
+        items: [
+            {
+                xtype : 'toolbar',
+                docked: 'top',
+                items: [
+                    {
+                        xtype: 'button',
+                        text : 'Button One'
+                    },
+                    {
+                        xtype: 'spacer',
+                        width: 50
+                    },
+                    {
+                        xtype: 'button',
+                        text : 'Button Two'
+                    }
+                ]
+            },
+            {
+                xtype: 'container',
+                items: [
+                    {
+                        xtype: 'button',
+                        text : 'Change Ext.Spacer width',
+                        handler: function() {
+                            //get the spacer using ComponentQuery
+                            var spacer = Ext.ComponentQuery.query('spacer')[0],
+                                from = 10,
+                                to = 250;
+
+                            //set the width to a random number
+                            spacer.setWidth(Math.floor(Math.random() * (to - from + 1) + from));
+                        }
+                    }
+                ]
+            }
+        ]
+    });
+
+You can also insert multiple {@link Ext.Spacer}'s:
+
+    @example preview
+    Ext.create('Ext.Container', {
+        fullscreen: true,
+        items: [
+            {
+                xtype : 'toolbar',
+                docked: 'top',
+                items: [
+                    {
+                        xtype: 'button',
+                        text : 'Button One'
+                    },
+                    {
+                        xtype: 'spacer'
+                    },
+                    {
+                        xtype: 'button',
+                        text : 'Button Two'
+                    },
+                    {
+                        xtype: 'spacer',
+                        width: 20
+                    },
+                    {
+                        xtype: 'button',
+                        text : 'Button Three'
+                    }
+                ]
+            }
+        ]
+    });
+ */
+Ext.define('Ext.Spacer', {
+    extend: 'Ext.Component',
+    alias : 'widget.spacer',
+
+    config: {
+        /**
+         * @cfg {Number} flex
+         * The flex value of this spacer. This defaults to 1, if no width has been set.
+         * @accessor
+         */
+        
+        /**
+         * @cfg {Number} width
+         * The width of this spacer. If this is set, the value of {@link #flex} will be ignored.
+         * @accessor
+         */
+    },
+
+    // @private
+    constructor: function(config) {
+        config = config || {};
+
+        if (!config.width) {
+            config.flex = 1;
+        }
+
+        this.callParent([config]);
+    }
+});
+
+/**
+ * @class Ext.util.LineSegment
+ *
+ * Utility class that represents a line segment, constructed by two {@link Ext.util.Point}
+ */
+Ext.define('Ext.util.LineSegment', {
+    requires: ['Ext.util.Point'],
+
+    /**
+     * Creates new LineSegment out of two points.
+     * @param {Ext.util.Point} point1
+     * @param {Ext.util.Point} point2
+     */
+    constructor: function(point1, point2) {
+        var Point = Ext.util.Point;
+
+        this.point1 = Point.from(point1);
+        this.point2 = Point.from(point2);
+    },
+
+    /**
+     * Returns the point where two lines intersect.
+     * @param {Ext.util.LineSegment} lineSegment The line to intersect with.
+     * @return {Ext.util.Point}
+     */
+    intersects: function(lineSegment) {
+        var point1 = this.point1,
+            point2 = this.point2,
+            point3 = lineSegment.point1,
+            point4 = lineSegment.point2,
+            x1 = point1.x,
+            x2 = point2.x,
+            x3 = point3.x,
+            x4 = point4.x,
+            y1 = point1.y,
+            y2 = point2.y,
+            y3 = point3.y,
+            y4 = point4.y,
+            d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4),
+            xi, yi;
+
+        if (d == 0) {
+            return null;
+        }
+
+        xi = ((x3 - x4) * (x1 * y2 - y1 * x2) - (x1 - x2) * (x3 * y4 - y3 * x4)) / d;
+        yi = ((y3 - y4) * (x1 * y2 - y1 * x2) - (y1 - y2) * (x3 * y4 - y3 * x4)) / d;
+
+        if (xi < Math.min(x1, x2) || xi > Math.max(x1, x2)
+            || xi < Math.min(x3, x4) || xi > Math.max(x3, x4)
+            || yi < Math.min(y1, y2) || yi > Math.max(y1, y2)
+            || yi < Math.min(y3, y4) || yi > Math.max(y3, y4)) {
+            return null;
+        }
+
+        return new Ext.util.Point(xi, yi);
+    },
+
+    /**
+     * Returns string representation of the line. Useful for debugging.
+     * @return {String} For example `Point[12,8] Point[0,0]`
+     */
+    toString: function() {
+        return this.point1.toString() + " " + this.point2.toString();
+    }
+});
+
+/**
+ * @class Ext.Decorator
+ * @extend Ext.Component
+ *
+ * In a few words, a Decorator is a Component that wraps around another Component. A typical example of a Decorator is a
+ * {@link Ext.field.Field Field}. A form field is nothing more than a decorator around another component, and gives the
+ * component a label, as well as extra styling to make it look good in a form.
+ *
+ * A Decorator can be thought of as a lightweight Container that has only one child item, and no layout overhead.
+ * The look and feel of decorators can be styled purely in CSS.
+ *
+ * Another powerful feature that Decorator provides is config proxying. For example: all config items of a
+ * {@link Ext.slider.Slider Slider} also exist in a {@link Ext.field.Slider Slider Field} for API convenience.
+ * The {@link Ext.field.Slider Slider Field} simply proxies all corresponding getters and setters
+ * to the actual {@link Ext.slider.Slider Slider} instance. Writing out all the setters and getters to do that is a tedious task
+ * and a waste of code space. Instead, when you sub-class Ext.Decorator, all you need to do is to specify those config items
+ * that you want to proxy to the Component using a special 'proxyConfig' class property. Here's how it may look like
+ * in a Slider Field class:
+ *
+ *     Ext.define('My.field.Slider', {
+ *         extend: 'Ext.Decorator',
+ *
+ *         config: {
+ *             component: {
+ *                 xtype: 'slider'
+ *             }
+ *         },
+ *
+ *         proxyConfig: {
+ *             minValue: 0,
+ *             maxValue: 100,
+ *             increment: 1
+ *         }
+ *
+ *         // ...
+ *     });
+ *
+ * Once `My.field.Slider` class is created, it will have all setters and getters methods for all items listed in `proxyConfig`
+ * automatically generated. These methods all proxy to the same method names that exist within the Component instance.
+ */
+Ext.define('Ext.Decorator', {
+    extend: 'Ext.Component',
+
+    isDecorator: true,
+
+    config: {
+        /**
+         * @cfg {Object} component The config object to factory the Component that this Decorator wraps around
+         */
+        component: {}
+    },
+
+    statics: {
+        generateProxySetter: function(name) {
+            return function(value) {
+                var component = this.getComponent();
+                component[name].call(component, value);
+
+                return this;
+            }
+        },
+        generateProxyGetter: function(name) {
+            return function() {
+                var component = this.getComponent();
+                return component[name].call(component);
+            }
+        }
+    },
+
+    onClassExtended: function(Class, members) {
+        if (!members.hasOwnProperty('proxyConfig')) {
+            return;
+        }
+
+        var ExtClass = Ext.Class,
+            proxyConfig = members.proxyConfig,
+            config = members.config;
+
+        members.config = (config) ? Ext.applyIf(config, proxyConfig) : proxyConfig;
+
+        var name, nameMap, setName, getName;
+
+        for (name in proxyConfig) {
+            if (proxyConfig.hasOwnProperty(name)) {
+                nameMap = ExtClass.getConfigNameMap(name);
+                setName = nameMap.set;
+                getName = nameMap.get;
+
+                members[setName] = this.generateProxySetter(setName);
+                members[getName] = this.generateProxyGetter(getName);
+            }
+        }
+    },
+
+    // @private
+    applyComponent: function(config) {
+        return Ext.factory(config, Ext.Component);
+    },
+
+    // @private
+    updateComponent: function(newComponent, oldComponent) {
+        if (oldComponent) {
+            if (this.isRendered() && oldComponent.setRendered(false)) {
+                oldComponent.fireAction('renderedchange', [this, oldComponent, false],
+                    'doUnsetComponent', this, { args: [oldComponent] });
+            }
+            else {
+                this.doUnsetComponent(oldComponent);
+            }
+        }
+
+        if (newComponent) {
+            if (this.isRendered() && newComponent.setRendered(true)) {
+                newComponent.fireAction('renderedchange', [this, newComponent, true],
+                    'doSetComponent', this, { args: [newComponent] });
+            }
+            else {
+                this.doSetComponent(newComponent);
+            }
+        }
+    },
+
+    // @private
+    doUnsetComponent: function(component) {
+        if (component.renderElement.dom) {
+            this.innerElement.dom.removeChild(component.renderElement.dom);
+        }
+    },
+
+    // @private
+    doSetComponent: function(component) {
+        if (component.renderElement.dom) {
+            this.innerElement.dom.appendChild(component.renderElement.dom);
+        }
+    },
+
+    // @private
+    setRendered: function(rendered) {
+        var component;
+
+        if (this.callParent(arguments)) {
+            component = this.getComponent();
+
+            if (component) {
+                component.setRendered(rendered);
+            }
+
+            return true;
+        }
+
+        return false;
+    },
+
+    // @private
+    setDisabled: function(disabled) {
+        this.callParent(arguments);
+        this.getComponent().setDisabled(disabled);
+    },
+
+    destroy: function() {
+        Ext.destroy(this.getComponent());
+        this.callParent();
+    }
+});
+
+/**
  * @aside video tabs-toolbars
  *
  * {@link Ext.Toolbar}s are most commonly used as docked items as within a {@link Ext.Container}. They can be docked either `top` or `bottom` using the {@link #docked} configuration.
@@ -26342,6 +26342,16 @@ Ext.define('Ext.Sheet', {
             this.setBottom(0);
         }
     }
+});
+
+/**
+ * @private
+ */
+Ext.define('Ext.field.TextAreaInput', {
+    extend: 'Ext.field.Input',
+    xtype : 'textareainput',
+
+    tag: 'textarea'
 });
 
 /**
@@ -27147,16 +27157,6 @@ Ext.define('Ext.field.Text', {
     }
 });
 
-
-/**
- * @private
- */
-Ext.define('Ext.field.TextAreaInput', {
-    extend: 'Ext.field.Input',
-    xtype : 'textareainput',
-
-    tag: 'textarea'
-});
 
 /**
  * @aside guide forms
@@ -28026,7 +28026,7 @@ Ext.define('zvsMobile.profile.Phone', {
 
                         if (result.success && result.isLoggedIn) {
                             zvsMobile.app.SetStoreProxys();
-                            var settings = zvsMobile.tabPanel.items.items[4];
+                            var settings = Ext.getCmp('SettingsViewPort');//zvsMobile.tabPanel.items.items[4];
                             settings.items.items[1].fireEvent('loggedIn');
                         }
                         else {
@@ -28080,7 +28080,7 @@ Ext.define('zvsMobile.profile.Tablet', {
 
                         if (result.success && result.isLoggedIn) {
                             zvsMobile.app.SetStoreProxys();
-                            var settings = zvsMobile.tabPanel.items.items[4];
+                            var settings = Ext.getCmp('SettingsViewPort');//zvsMobile.tabPanel.items.items[4];
                             settings.items.items[1].fireEvent('loggedIn');
                         }
                         else {
@@ -41356,6 +41356,84 @@ Ext.define('Ext.data.Store', {
 
 });
 
+﻿Ext.define('zvsMobile.model.Group', {
+    extend: 'Ext.data.Model',
+
+    config: {
+        fields: ['id', 'name', 'count']
+    }
+});
+﻿Ext.define('zvsMobile.store.Groups', {
+    extend: 'Ext.data.Store',        
+    requires: ['zvsMobile.model.Group'],		
+	config: {
+		model: 'zvsMobile.model.Group'
+	}
+});
+
+
+var GroupStore = Ext.create('zvsMobile.store.Groups', {
+    id: 'GroupStore',
+    requires: ['zvsMobile.store.Groups']
+});
+
+
+﻿Ext.define('zvsMobile.model.Scene', {
+    extend: 'Ext.data.Model',
+
+    config: {
+        fields: [
+				 { name: 'id', type: 'int' },
+				 { name: 'name', type: 'string' },
+				 { name: 'is_running', type: 'bool' },
+				 { name: 'cmd_count', type: 'string' }
+			 ]
+    }
+});
+﻿Ext.define('zvsMobile.store.Scenes', {
+    extend: 'Ext.data.Store',        
+    requires: ['zvsMobile.model.Scene'],
+	config: {
+		model: 'zvsMobile.model.Scene'		
+	}
+});
+
+SceneStore = Ext.create('zvsMobile.store.Scenes', {
+    id: 'SceneStore',
+    requires: ['zvsMobile.store.Scenes']
+});
+
+
+
+
+﻿Ext.define('zvsMobile.model.LogEntry', {
+    extend: 'Ext.data.Model',
+
+    config: {
+        fields: [
+				 { name: 'DateTime', type: 'string' },
+				 { name: 'Description', type: 'string' },
+				 { name: 'Source', type: 'string' },
+				 { name: 'Urgency', type: 'string' }
+			 ]
+    }
+});
+﻿Ext.define('zvsMobile.store.LogEntries', {
+    extend: 'Ext.data.Store',        
+    requires: ['zvsMobile.model.LogEntry'],
+	config: {
+	    model: 'zvsMobile.model.LogEntry'
+	}
+});
+
+LogEntryStore = Ext.create('zvsMobile.store.LogEntries', {
+    id: 'LogEntryStore',
+    requires: ['zvsMobile.store.LogEntries']
+});
+
+
+
+
 /**
  * @author Ed Spencer
  *
@@ -41858,7 +41936,7 @@ Ext.create('zvsMobile.store.Settings', {
     extend: 'Ext.data.Model',
 
     config: {
-        fields: ['id', 'name', 'on_off', 'level', 'level_txt', 'type']
+        fields: ['id', 'name', 'on_off', 'level', 'level_txt', 'type', 'plugin_name']
     }
 });
 ﻿Ext.define('zvsMobile.store.Devices', {
@@ -41872,56 +41950,6 @@ Ext.create('zvsMobile.store.Settings', {
 var DeviceStore = Ext.create('zvsMobile.store.Devices', {
     id: 'DeviceStore',
     requires: ['zvsMobile.store.Devices']
-});
-
-
-
-
-﻿Ext.define('zvsMobile.model.Group', {
-    extend: 'Ext.data.Model',
-
-    config: {
-        fields: ['id', 'name', 'count']
-    }
-});
-﻿Ext.define('zvsMobile.store.Groups', {
-    extend: 'Ext.data.Store',        
-    requires: ['zvsMobile.model.Group'],		
-	config: {
-		model: 'zvsMobile.model.Group'
-	}
-});
-
-
-var GroupStore = Ext.create('zvsMobile.store.Groups', {
-    id: 'GroupStore',
-    requires: ['zvsMobile.store.Groups']
-});
-
-
-﻿Ext.define('zvsMobile.model.Scene', {
-    extend: 'Ext.data.Model',
-
-    config: {
-        fields: [
-				 { name: 'id', type: 'int' },
-				 { name: 'name', type: 'string' },
-				 { name: 'is_running', type: 'bool' },
-				 { name: 'cmd_count', type: 'string' }
-			 ]
-    }
-});
-﻿Ext.define('zvsMobile.store.Scenes', {
-    extend: 'Ext.data.Store',        
-    requires: ['zvsMobile.model.Scene'],
-	config: {
-		model: 'zvsMobile.model.Scene'		
-	}
-});
-
-SceneStore = Ext.create('zvsMobile.store.Scenes', {
-    id: 'SceneStore',
-    requires: ['zvsMobile.store.Scenes']
 });
 
 
@@ -41979,6 +42007,140 @@ SceneStore = Ext.create('zvsMobile.store.Scenes', {
             scrollable: 'vertical'
         }
     });
+﻿Ext.define('zvsMobile.view.GroupDetails', {
+    extend: 'Ext.Panel',
+    xtype: 'GroupDetails',
+    constructor: function (config) {
+        var self = this;
+        var groupId = 0;
+        var RepollTimer;
+
+        Ext.apply(config || {}, {
+            items: [{
+                xtype: 'panel',
+                id: 'groupStatusTPL',
+                tpl: new Ext.XTemplate(
+                        '<div class="group_info">',
+                            '<div class="head">',
+							    '<div class="image"></div>',
+							    '<tpl for="group">',
+					                '<h1>{name}</h1>',
+                                    '</tpl>',
+                             '</div>',
+                        '</div>')
+            }, {
+                xtype: 'button',
+                text: 'Turn On',
+                ui: 'confirm',
+                margin: '25 5 5 5',
+                handler: function () {
+                    console.log('AJAX: ActivateGroup' + self.groupId);
+                    Ext.Ajax.request({
+                        url: zvsMobile.app.BaseURL() + '/commands/',
+                        method: 'POST',
+                        params: {
+                            u: Math.random(),
+                            name: 'GROUP_ON',
+                            arg: self.groupId
+                        },
+                        success: function (response, opts) {
+                            var result = JSON.parse(response.responseText);
+                            if (result.success) {
+                                Ext.getCmp('GroupActiveResult').setHtml('All device in group Turned On.');
+                            }
+                            else {
+                                Ext.Msg.alert('Group', 'Communication Error!');
+                            }
+                        }
+                    });
+                }
+            }, {
+                xtype: 'button',
+                text: 'Turn Off',
+                ui: 'confirm',
+                margin: '5 5 25 5',
+                handler: function () {
+                    console.log('AJAX: DeactivateGroup' + self.groupId);
+                    Ext.Ajax.request({
+                        url: zvsMobile.app.BaseURL() + '/commands/',
+                        method: 'POST',
+                        params: {
+                            u: Math.random(),
+                            name: 'GROUP_OFF',
+                            arg: self.groupId
+                        },
+                        success: function (response, opts) {
+                            var result = JSON.parse(response.responseText);
+                            if (result.success) {
+                                Ext.getCmp('GroupActiveResult').setHtml('All device in group Turned Off.');
+                            }
+                            else {
+                                Ext.Msg.alert('Group', 'Communication Error!');
+                            }
+                        }
+                    });
+
+                }
+            }, {
+                xtype: 'panel',
+                id: 'GroupActiveResult',
+                cls: 'result',
+                html: ''
+            }, {
+                xtype: 'panel',
+                id: 'groupDetailsTPL',
+                tpl: new Ext.XTemplate(
+                     	'<tpl for="group">',
+                            '<div class="group_overview">',
+                                '<table class="info">',
+                                '<thead>',
+                                    '<tr>',
+                                        '<th scope="col" abbr="Device">Device</th>',
+                                        '<th scope="col" abbr="Action">Type</th>',
+                                    '</tr>',
+                                '</thead>',
+                                '<tbody>',
+                                '<tpl for="devices">',
+                                        '<tr>',
+                                            '<td>{name}</td>',
+                                            '<td>{type}</td>',
+                                            '</tr>',
+                                        '</tpl>',
+                                '</tbody>',
+                                '</table>',
+                            '</div>',
+                        '</tpl>'
+                    )
+
+            }]
+        });
+        this.callOverridden([config]);
+    },
+    config: {
+        layout: 'vbox',
+        scrollable: 'vertical'
+    },    
+    loadGroup: function (groupID) {
+        var self = this;
+        self.groupId = groupID;
+        Ext.getCmp('GroupActiveResult').setHtml('');
+        //Get Device Details			
+        console.log('AJAX: GetgroupDetails');
+
+        Ext.data.JsonP.request({
+            url: zvsMobile.app.BaseURL() + '/group/' + self.groupId,
+            callbackKey: 'callback',
+            params: {
+                u: Math.random()
+            },
+            success: function (result) {
+                //Send data to panel TPL              
+                Ext.getCmp('groupDetailsTPL').setData(result);
+                Ext.getCmp('groupStatusTPL').setData(result);
+            }
+        });
+    }
+});
 ﻿Ext.define('zvsMobile.view.SceneDetails', {
     extend: 'Ext.Panel',
     xtype: 'SceneDetails',
@@ -42128,140 +42290,6 @@ SceneStore = Ext.create('zvsMobile.store.Scenes', {
                 //Refresh the DEvice list
                 Ext.getCmp('SceneList').refresh();
                 Ext.getCmp('SceneActiveResult').setHtml('');
-            }
-        });
-    }
-});
-﻿Ext.define('zvsMobile.view.GroupDetails', {
-    extend: 'Ext.Panel',
-    xtype: 'GroupDetails',
-    constructor: function (config) {
-        var self = this;
-        var groupId = 0;
-        var RepollTimer;
-
-        Ext.apply(config || {}, {
-            items: [{
-                xtype: 'panel',
-                id: 'groupStatusTPL',
-                tpl: new Ext.XTemplate(
-                        '<div class="group_info">',
-                            '<div class="head">',
-							    '<div class="image"></div>',
-							    '<tpl for="group">',
-					                '<h1>{name}</h1>',
-                                    '</tpl>',
-                             '</div>',
-                        '</div>')
-            }, {
-                xtype: 'button',
-                text: 'Turn On',
-                ui: 'confirm',
-                margin: '25 5 5 5',
-                handler: function () {
-                    console.log('AJAX: ActivateGroup' + self.groupId);
-                    Ext.Ajax.request({
-                        url: zvsMobile.app.BaseURL() + '/commands/',
-                        method: 'POST',
-                        params: {
-                            u: Math.random(),
-                            name: 'GROUP_ON',
-                            arg: self.groupId
-                        },
-                        success: function (response, opts) {
-                            var result = JSON.parse(response.responseText);
-                            if (result.success) {
-                                Ext.getCmp('GroupActiveResult').setHtml('All device in group Turned On.');
-                            }
-                            else {
-                                Ext.Msg.alert('Group', 'Communication Error!');
-                            }
-                        }
-                    });
-                }
-            }, {
-                xtype: 'button',
-                text: 'Turn Off',
-                ui: 'confirm',
-                margin: '5 5 25 5',
-                handler: function () {
-                    console.log('AJAX: DeactivateGroup' + self.groupId);
-                    Ext.Ajax.request({
-                        url: zvsMobile.app.BaseURL() + '/commands/',
-                        method: 'POST',
-                        params: {
-                            u: Math.random(),
-                            name: 'GROUP_OFF',
-                            arg: self.groupId
-                        },
-                        success: function (response, opts) {
-                            var result = JSON.parse(response.responseText);
-                            if (result.success) {
-                                Ext.getCmp('GroupActiveResult').setHtml('All device in group Turned Off.');
-                            }
-                            else {
-                                Ext.Msg.alert('Group', 'Communication Error!');
-                            }
-                        }
-                    });
-
-                }
-            }, {
-                xtype: 'panel',
-                id: 'GroupActiveResult',
-                cls: 'result',
-                html: ''
-            }, {
-                xtype: 'panel',
-                id: 'groupDetailsTPL',
-                tpl: new Ext.XTemplate(
-                     	'<tpl for="group">',
-                            '<div class="group_overview">',
-                                '<table class="info">',
-                                '<thead>',
-                                    '<tr>',
-                                        '<th scope="col" abbr="Device">Device</th>',
-                                        '<th scope="col" abbr="Action">Type</th>',
-                                    '</tr>',
-                                '</thead>',
-                                '<tbody>',
-                                '<tpl for="devices">',
-                                        '<tr>',
-                                            '<td>{name}</td>',
-                                            '<td>{type}</td>',
-                                            '</tr>',
-                                        '</tpl>',
-                                '</tbody>',
-                                '</table>',
-                            '</div>',
-                        '</tpl>'
-                    )
-
-            }]
-        });
-        this.callOverridden([config]);
-    },
-    config: {
-        layout: 'vbox',
-        scrollable: 'vertical'
-    },    
-    loadGroup: function (groupID) {
-        var self = this;
-        self.groupId = groupID;
-        Ext.getCmp('GroupActiveResult').setHtml('');
-        //Get Device Details			
-        console.log('AJAX: GetgroupDetails');
-
-        Ext.data.JsonP.request({
-            url: zvsMobile.app.BaseURL() + '/group/' + self.groupId,
-            callbackKey: 'callback',
-            params: {
-                u: Math.random()
-            },
-            success: function (result) {
-                //Send data to panel TPL              
-                Ext.getCmp('groupDetailsTPL').setData(result);
-                Ext.getCmp('groupStatusTPL').setData(result);
             }
         });
     }
@@ -43413,22 +43441,6 @@ Ext.define('Ext.dataview.IndexBar', {
 });
 
 /**
- * @private - To be made a sample
- */
-Ext.define('Ext.dataview.ListItemHeader', {
-    extend: 'Ext.Component',
-    xtype : 'listitemheader',
-
-    config: {
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        baseCls: Ext.baseCSSPrefix + 'list-header',
-        docked: 'top'
-    }
-});
-/**
  * @aside guide ajax
  * @singleton
  *
@@ -43715,123 +43727,21 @@ Ext.define('Ext.data.JsonP', {
 });
 
 /**
- * Used in the {@link Ext.tab.Bar} component. This shouldn't be used directly, instead use
- * {@link Ext.tab.Bar} or {@link Ext.tab.Panel}.
- * @private
+ * @private - To be made a sample
  */
-Ext.define('Ext.tab.Tab', {
-    extend: 'Ext.Button',
-    xtype: 'tab',
-    alternateClassName: 'Ext.Tab',
-
-    // @private
-    isTab: true,
+Ext.define('Ext.dataview.ListItemHeader', {
+    extend: 'Ext.Component',
+    xtype : 'listitemheader',
 
     config: {
         /**
          * @cfg
          * @inheritdoc
          */
-        baseCls: Ext.baseCSSPrefix + 'tab',
-
-        /**
-         * @cfg {String} pressedCls
-         * The CSS class to be applied to a Tab when it is pressed. Defaults to 'x-tab-pressed'.
-         * Providing your own CSS for this class enables you to customize the pressed state.
-         * @accessor
-         */
-        pressedCls: Ext.baseCSSPrefix + 'tab-pressed',
-
-        /**
-         * @cfg {String} activeCls
-         * The CSS class to be applied to a Tab when it is active. Defaults to 'x-tab-active'.
-         * Providing your own CSS for this class enables you to customize the active state.
-         * @accessor
-         */
-        activeCls: Ext.baseCSSPrefix + 'tab-active',
-
-        /**
-         * @cfg {Boolean} active
-         * Set this to true to have the tab be active by default.
-         * @accessor
-         */
-        active: false,
-
-        /**
-         * @cfg {String} title
-         * The title of the card that this tab is bound to.
-         * @accessor
-         */
-        title: '&nbsp;'
-    },
-
-    // We need to override this so the iconElement is properly hidden using visibilty
-    // when we render it.
-    template: [
-        {
-            tag: 'span',
-            reference: 'badgeElement',
-            hidden: true
-        },
-        {
-            tag: 'span',
-            className: Ext.baseCSSPrefix + 'button-icon',
-            reference: 'iconElement',
-            style: 'visibility: hidden !important'
-        },
-        {
-            tag: 'span',
-            reference: 'textElement',
-            hidden: true
-        }
-    ],
-
-    /**
-     * @event activate
-     * Fires when a tab is activated
-     * @param {Ext.tab.Tab} this
-     */
-
-    /**
-     * @event deactivate
-     * Fires when a tab is deactivated
-     * @param {Ext.tab.Tab} this
-     */
-
-    updateTitle: function(title) {
-        this.setText(title);
-    },
-
-    hideIconElement: function() {
-        this.iconElement.dom.style.setProperty('visibility', 'hidden', '!important');
-    },
-
-    showIconElement: function() {
-        this.iconElement.dom.style.setProperty('visibility', 'visible', '!important');
-    },
-
-    updateActive: function(active, oldActive) {
-        var activeCls = this.getActiveCls();
-        if (active && !oldActive) {
-            this.element.addCls(activeCls);
-            this.fireEvent('activate', this);
-        } else if (oldActive) {
-            this.element.removeCls(activeCls);
-            this.fireEvent('deactivate', this);
-        }
+        baseCls: Ext.baseCSSPrefix + 'list-header',
+        docked: 'top'
     }
-}, function() {
-    this.override({
-        activate: function() {
-            this.setActive(true);
-        },
-
-        deactivate: function() {
-            this.setActive(false);
-        }
-    });
 });
-
 /**
  * Tracks what records are currently selected in a databound widget. This class is mixed in to {@link Ext.dataview.DataView} and
  * all subclasses.
@@ -44659,75 +44569,121 @@ Ext.define('Ext.dataview.element.Container', {
 });
 
 /**
+ * Used in the {@link Ext.tab.Bar} component. This shouldn't be used directly, instead use
+ * {@link Ext.tab.Bar} or {@link Ext.tab.Panel}.
  * @private
- * Utility class used by Ext.slider.Slider - should never need to be used directly.
  */
-Ext.define('Ext.slider.Thumb', {
-    extend: 'Ext.Component',
-    xtype : 'thumb',
+Ext.define('Ext.tab.Tab', {
+    extend: 'Ext.Button',
+    xtype: 'tab',
+    alternateClassName: 'Ext.Tab',
+
+    // @private
+    isTab: true,
 
     config: {
         /**
          * @cfg
          * @inheritdoc
          */
-        baseCls: Ext.baseCSSPrefix + 'thumb',
+        baseCls: Ext.baseCSSPrefix + 'tab',
 
         /**
-         * @cfg
-         * @inheritdoc
+         * @cfg {String} pressedCls
+         * The CSS class to be applied to a Tab when it is pressed. Defaults to 'x-tab-pressed'.
+         * Providing your own CSS for this class enables you to customize the pressed state.
+         * @accessor
          */
-        draggable: {
-            direction: 'horizontal'
+        pressedCls: Ext.baseCSSPrefix + 'tab-pressed',
+
+        /**
+         * @cfg {String} activeCls
+         * The CSS class to be applied to a Tab when it is active. Defaults to 'x-tab-active'.
+         * Providing your own CSS for this class enables you to customize the active state.
+         * @accessor
+         */
+        activeCls: Ext.baseCSSPrefix + 'tab-active',
+
+        /**
+         * @cfg {Boolean} active
+         * Set this to true to have the tab be active by default.
+         * @accessor
+         */
+        active: false,
+
+        /**
+         * @cfg {String} title
+         * The title of the card that this tab is bound to.
+         * @accessor
+         */
+        title: '&nbsp;'
+    },
+
+    // We need to override this so the iconElement is properly hidden using visibilty
+    // when we render it.
+    template: [
+        {
+            tag: 'span',
+            reference: 'badgeElement',
+            hidden: true
+        },
+        {
+            tag: 'span',
+            className: Ext.baseCSSPrefix + 'button-icon',
+            reference: 'iconElement',
+            style: 'visibility: hidden !important'
+        },
+        {
+            tag: 'span',
+            reference: 'textElement',
+            hidden: true
         }
+    ],
+
+    /**
+     * @event activate
+     * Fires when a tab is activated
+     * @param {Ext.tab.Tab} this
+     */
+
+    /**
+     * @event deactivate
+     * Fires when a tab is deactivated
+     * @param {Ext.tab.Tab} this
+     */
+
+    updateTitle: function(title) {
+        this.setText(title);
     },
 
-    elementWidth: 0,
-
-    initialize: function() {
-        this.callParent();
-
-        this.getDraggable().onBefore({
-            dragstart: 'onDragStart',
-            drag: 'onDrag',
-            dragend: 'onDragEnd',
-            scope: this
-        });
-
-        this.on('painted', 'onPainted');
+    hideIconElement: function() {
+        this.iconElement.dom.style.setProperty('visibility', 'hidden', '!important');
     },
 
-    onDragStart: function() {
-        if (this.isDisabled()) {
-            return false;
+    showIconElement: function() {
+        this.iconElement.dom.style.setProperty('visibility', 'visible', '!important');
+    },
+
+    updateActive: function(active, oldActive) {
+        var activeCls = this.getActiveCls();
+        if (active && !oldActive) {
+            this.element.addCls(activeCls);
+            this.fireEvent('activate', this);
+        } else if (oldActive) {
+            this.element.removeCls(activeCls);
+            this.fireEvent('deactivate', this);
         }
-
-        this.relayEvent(arguments);
-    },
-
-    onDrag: function() {
-        if (this.isDisabled()) {
-            return false;
-        }
-
-        this.relayEvent(arguments);
-    },
-
-    onDragEnd: function() {
-        if (this.isDisabled()) {
-            return false;
-        }
-
-        this.relayEvent(arguments);
-    },
-
-    onPainted: function() {
-        this.elementWidth = this.element.dom.offsetWidth;
-    },
-
-    getElementWidth: function() {
-        return this.elementWidth;
     }
+}, function() {
+    this.override({
+        activate: function() {
+            this.setActive(true);
+        },
+
+        deactivate: function() {
+            this.setActive(false);
+        }
+    });
 });
 
 /**
@@ -44868,6 +44824,78 @@ Ext.define('Ext.dataview.component.DataItem', {
 
         // Bypassing setter because sometimes we pass the same object (different properties)
         item.updateData(data);
+    }
+});
+
+/**
+ * @private
+ * Utility class used by Ext.slider.Slider - should never need to be used directly.
+ */
+Ext.define('Ext.slider.Thumb', {
+    extend: 'Ext.Component',
+    xtype : 'thumb',
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        baseCls: Ext.baseCSSPrefix + 'thumb',
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        draggable: {
+            direction: 'horizontal'
+        }
+    },
+
+    elementWidth: 0,
+
+    initialize: function() {
+        this.callParent();
+
+        this.getDraggable().onBefore({
+            dragstart: 'onDragStart',
+            drag: 'onDrag',
+            dragend: 'onDragEnd',
+            scope: this
+        });
+
+        this.on('painted', 'onPainted');
+    },
+
+    onDragStart: function() {
+        if (this.isDisabled()) {
+            return false;
+        }
+
+        this.relayEvent(arguments);
+    },
+
+    onDrag: function() {
+        if (this.isDisabled()) {
+            return false;
+        }
+
+        this.relayEvent(arguments);
+    },
+
+    onDragEnd: function() {
+        if (this.isDisabled()) {
+            return false;
+        }
+
+        this.relayEvent(arguments);
+    },
+
+    onPainted: function() {
+        this.elementWidth = this.element.dom.offsetWidth;
+    },
+
+    getElementWidth: function() {
+        return this.elementWidth;
     }
 });
 
@@ -45015,6 +45043,7 @@ Ext.define('Ext.dataview.component.DataItem', {
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).setDisabled(false);
                                 zvsMobile.tabPanel.getTabBar().getComponent(1).setDisabled(false);
                                 zvsMobile.tabPanel.getTabBar().getComponent(2).setDisabled(false);
+                                zvsMobile.tabPanel.getTabBar().getComponent(3).setDisabled(false);
 
                                 //Get data
                                 DeviceStore.load();
@@ -45044,8 +45073,9 @@ Ext.define('Ext.dataview.component.DataItem', {
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).setDisabled(true);
                                 zvsMobile.tabPanel.getTabBar().getComponent(1).setDisabled(true);
                                 zvsMobile.tabPanel.getTabBar().getComponent(2).setDisabled(true);
+                                zvsMobile.tabPanel.getTabBar().getComponent(3).setDisabled(true);
 
-                                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
+                                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(4));
                             }
                         }
                     }
@@ -45370,6 +45400,142 @@ Ext.define('Ext.data.proxy.JsonP', {
         if (lastRequest) {
             Ext.data.JsonP.abort(lastRequest.getJsonP());
         }
+    }
+});
+
+/**
+ * @private
+*/
+Ext.define('Ext.dataview.element.List', {
+    extend: 'Ext.dataview.element.Container',
+
+    updateBaseCls: function(newBaseCls) {
+        var me = this;
+
+        me.itemClsShortCache = newBaseCls + '-item';
+
+        me.headerClsShortCache = newBaseCls + '-header';
+        me.headerClsCache = '.' + me.headerClsShortCache;
+
+        me.headerItemClsShortCache = newBaseCls + '-header-item';
+
+        me.footerClsShortCache = newBaseCls + '-footer-item';
+        me.footerClsCache = '.' + me.footerClsShortCache;
+
+        me.labelClsShortCache = newBaseCls + '-item-label';
+        me.labelClsCache = '.' + me.labelClsShortCache;
+
+        me.disclosureClsShortCache = newBaseCls + '-disclosure';
+        me.disclosureClsCache = '.' + me.disclosureClsShortCache;
+
+        me.iconClsShortCache = newBaseCls + '-icon';
+        me.iconClsCache = '.' + me.iconClsShortCache;
+
+        this.callParent(arguments);
+    },
+
+    hiddenDisplayCache: Ext.baseCSSPrefix + 'hidden-display',
+
+    getItemElementConfig: function(index, data) {
+        var me = this,
+            dataview = me.dataview,
+            itemCls = dataview.getItemCls(),
+            cls = me.itemClsShortCache,
+            config, iconSrc;
+
+        if (itemCls) {
+            cls += ' ' + itemCls;
+        }
+
+        config = {
+            cls: cls,
+            children: [{
+                cls: me.labelClsShortCache,
+                html: dataview.getItemTpl().apply(data)
+            }]
+        };
+
+        if (dataview.getIcon()) {
+            iconSrc = data.iconSrc;
+            config.children.push({
+                cls: me.iconClsShortCache,
+                style: 'background-image: ' + iconSrc ? 'url("' + newSrc + '")' : ''
+            });
+        }
+
+        if (dataview.getOnItemDisclosure()) {
+            config.children.push({
+                cls: me.disclosureClsShortCache + ' ' + ((data[dataview.getDisclosureProperty()] === false) ? me.hiddenDisplayCache : '')
+            });
+        }
+        return config;
+    },
+
+    updateListItem: function(record, item) {
+        var me = this,
+            dataview = me.dataview,
+            extItem = Ext.fly(item),
+            innerItem = extItem.down(me.labelClsCache, true),
+            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record),
+            disclosureProperty = dataview.getDisclosureProperty(),
+            hasDisclosureProperty = data && data.hasOwnProperty(disclosureProperty),
+            iconSrc = data && data.hasOwnProperty('iconSrc'),
+            disclosureEl, iconEl;
+
+        innerItem.innerHTML = dataview.getItemTpl().apply(data);
+
+        if (hasDisclosureProperty) {
+            disclosureEl = extItem.down(me.disclosureClsCache);
+            disclosureEl[data[disclosureProperty] === false ? 'removeCls' : 'addCls'](me.hiddenDisplayCache);
+        }
+
+        if (dataview.getIcon()) {
+            iconEl = extItem.down(me.iconClsCache, true);
+            iconEl.style.backgroundImage = iconSrc ? 'url("' + iconSrc + '")' : '';
+        }
+    },
+
+    doRemoveHeaders: function() {
+        var me = this,
+            headerClsShortCache = me.headerItemClsShortCache,
+            existingHeaders = me.element.query(me.headerClsCache),
+            existingHeadersLn = existingHeaders.length,
+            i = 0,
+            item;
+
+        for (; i < existingHeadersLn; i++) {
+            item = existingHeaders[i];
+            Ext.fly(item.parentNode).removeCls(headerClsShortCache);
+            Ext.removeNode(item);
+        }
+    },
+
+    doRemoveFooterCls: function() {
+        var me = this,
+            footerClsShortCache = me.footerClsShortCache,
+            existingFooters = me.element.query(me.footerClsCache),
+            existingFootersLn = existingFooters.length,
+            i = 0;
+
+        for (; i < existingFootersLn; i++) {
+            Ext.fly(existingFooters[i]).removeCls(footerClsShortCache);
+        }
+    },
+
+    doAddHeader: function(item, html) {
+        item = Ext.fly(item);
+        if (html) {
+            item.insertFirst(Ext.Element.create({
+                cls: this.headerClsShortCache,
+                html: html
+            }));
+        }
+        item.addCls(this.headerItemClsShortCache);
+    },
+
+    destroy: function() {
+        this.doRemoveHeaders();
+        this.callParent();
     }
 });
 
@@ -45912,6 +46078,11 @@ Ext.define('zvsMobile.view.tablet.Main', {
             title: "Groups",
             iconCls: "spaces2"
         }, {
+            xtype: 'LogViewPort',
+            id: 'LogViewPort',
+            title: "Log",
+            iconCls: "spaces2"
+        }, {
             xtype: 'SettingsViewPort',
             id: 'SettingsViewPort',
             title: 'Settings',
@@ -45926,1462 +46097,6 @@ Ext.define('zvsMobile.view.tablet.Main', {
 
 
 
-/**
- * @private
-*/
-Ext.define('Ext.dataview.element.List', {
-    extend: 'Ext.dataview.element.Container',
-
-    updateBaseCls: function(newBaseCls) {
-        var me = this;
-
-        me.itemClsShortCache = newBaseCls + '-item';
-
-        me.headerClsShortCache = newBaseCls + '-header';
-        me.headerClsCache = '.' + me.headerClsShortCache;
-
-        me.headerItemClsShortCache = newBaseCls + '-header-item';
-
-        me.footerClsShortCache = newBaseCls + '-footer-item';
-        me.footerClsCache = '.' + me.footerClsShortCache;
-
-        me.labelClsShortCache = newBaseCls + '-item-label';
-        me.labelClsCache = '.' + me.labelClsShortCache;
-
-        me.disclosureClsShortCache = newBaseCls + '-disclosure';
-        me.disclosureClsCache = '.' + me.disclosureClsShortCache;
-
-        me.iconClsShortCache = newBaseCls + '-icon';
-        me.iconClsCache = '.' + me.iconClsShortCache;
-
-        this.callParent(arguments);
-    },
-
-    hiddenDisplayCache: Ext.baseCSSPrefix + 'hidden-display',
-
-    getItemElementConfig: function(index, data) {
-        var me = this,
-            dataview = me.dataview,
-            itemCls = dataview.getItemCls(),
-            cls = me.itemClsShortCache,
-            config, iconSrc;
-
-        if (itemCls) {
-            cls += ' ' + itemCls;
-        }
-
-        config = {
-            cls: cls,
-            children: [{
-                cls: me.labelClsShortCache,
-                html: dataview.getItemTpl().apply(data)
-            }]
-        };
-
-        if (dataview.getIcon()) {
-            iconSrc = data.iconSrc;
-            config.children.push({
-                cls: me.iconClsShortCache,
-                style: 'background-image: ' + iconSrc ? 'url("' + newSrc + '")' : ''
-            });
-        }
-
-        if (dataview.getOnItemDisclosure()) {
-            config.children.push({
-                cls: me.disclosureClsShortCache + ' ' + ((data[dataview.getDisclosureProperty()] === false) ? me.hiddenDisplayCache : '')
-            });
-        }
-        return config;
-    },
-
-    updateListItem: function(record, item) {
-        var me = this,
-            dataview = me.dataview,
-            extItem = Ext.fly(item),
-            innerItem = extItem.down(me.labelClsCache, true),
-            data = dataview.prepareData(record.getData(true), dataview.getStore().indexOf(record), record),
-            disclosureProperty = dataview.getDisclosureProperty(),
-            hasDisclosureProperty = data && data.hasOwnProperty(disclosureProperty),
-            iconSrc = data && data.hasOwnProperty('iconSrc'),
-            disclosureEl, iconEl;
-
-        innerItem.innerHTML = dataview.getItemTpl().apply(data);
-
-        if (hasDisclosureProperty) {
-            disclosureEl = extItem.down(me.disclosureClsCache);
-            disclosureEl[data[disclosureProperty] === false ? 'removeCls' : 'addCls'](me.hiddenDisplayCache);
-        }
-
-        if (dataview.getIcon()) {
-            iconEl = extItem.down(me.iconClsCache, true);
-            iconEl.style.backgroundImage = iconSrc ? 'url("' + iconSrc + '")' : '';
-        }
-    },
-
-    doRemoveHeaders: function() {
-        var me = this,
-            headerClsShortCache = me.headerItemClsShortCache,
-            existingHeaders = me.element.query(me.headerClsCache),
-            existingHeadersLn = existingHeaders.length,
-            i = 0,
-            item;
-
-        for (; i < existingHeadersLn; i++) {
-            item = existingHeaders[i];
-            Ext.fly(item.parentNode).removeCls(headerClsShortCache);
-            Ext.removeNode(item);
-        }
-    },
-
-    doRemoveFooterCls: function() {
-        var me = this,
-            footerClsShortCache = me.footerClsShortCache,
-            existingFooters = me.element.query(me.footerClsCache),
-            existingFootersLn = existingFooters.length,
-            i = 0;
-
-        for (; i < existingFootersLn; i++) {
-            Ext.fly(existingFooters[i]).removeCls(footerClsShortCache);
-        }
-    },
-
-    doAddHeader: function(item, html) {
-        item = Ext.fly(item);
-        if (html) {
-            item.insertFirst(Ext.Element.create({
-                cls: this.headerClsShortCache,
-                html: html
-            }));
-        }
-        item.addCls(this.headerItemClsShortCache);
-    },
-
-    destroy: function() {
-        this.doRemoveHeaders();
-        this.callParent();
-    }
-});
-
-/**
- * Utility class used by Ext.field.Slider.
- * @private
- */
-Ext.define('Ext.slider.Slider', {
-    extend: 'Ext.Container',
-    xtype: 'slider',
-
-    requires: [
-        'Ext.slider.Thumb',
-        'Ext.fx.easing.EaseOut'
-    ],
-
-    /**
-    * @event change
-    * Fires when the value changes
-    * @param {Ext.slider.Slider} this
-    * @param {Ext.slider.Thumb} thumb The thumb being changed
-    * @param {Number} newValue The new value
-    * @param {Number} oldValue The old value
-    */
-
-    /**
-    * @event dragstart
-    * Fires when the slider thumb starts a drag
-    * @param {Ext.slider.Slider} this
-    * @param {Ext.slider.Thumb} thumb The thumb being dragged
-    * @param {Array} value The start value
-    * @param {Ext.EventObject} e
-    */
-
-    /**
-    * @event drag
-    * Fires when the slider thumb starts a drag
-    * @param {Ext.slider.Slider} this
-    * @param {Ext.slider.Thumb} thumb The thumb being dragged
-    * @param {Ext.EventObject} e
-    */
-
-    /**
-    * @event dragend
-    * Fires when the slider thumb starts a drag
-    * @param {Ext.slider.Slider} this
-    * @param {Ext.slider.Thumb} thumb The thumb being dragged
-    * @param {Array} value The end value
-    * @param {Ext.EventObject} e
-    */
-    config: {
-        baseCls: 'x-slider',
-
-        /**
-         * @cfg {Object} thumbConfig The config object to factory {@link Ext.slider.Thumb} instances
-         * @accessor
-         */
-        thumbConfig: {
-            draggable: {
-                translatable: {
-                    easingX: {
-                        duration: 300,
-                        type: 'ease-out'
-                    }
-                }
-            }
-        },
-
-        /**
-         * @cfg {Number/Number[]} value The value(s) of this slider's thumbs. If you pass
-         * a number, it will assume you have just 1 thumb.
-         * @accessor
-         */
-        value: 0,
-
-        /**
-         * @cfg {Number} minValue The lowest value any thumb on this slider can be set to.
-         * @accessor
-         */
-        minValue: 0,
-
-        /**
-         * @cfg {Number} maxValue The highest value any thumb on this slider can be set to.
-         * @accessor
-         */
-        maxValue: 100,
-
-        /**
-         * @cfg {Number} increment The increment by which to snap each thumb when its value changes. Defaults to 1. Any thumb movement
-         * will be snapped to the nearest value that is a multiple of the increment (e.g. if increment is 10 and the user
-         * tries to move the thumb to 67, it will be snapped to 70 instead)
-         * @accessor
-         */
-        increment: 1,
-
-        /**
-         * @cfg {Boolean} allowThumbsOverlapping Whether or not to allow multiple thumbs to overlap each other.
-         * Setting this to true guarantees the ability to select every possible value in between {@link #minValue}
-         * and {@link #maxValue} that satisfies {@link #increment}
-         * @accessor
-         */
-        allowThumbsOverlapping: false,
-
-        /**
-         * @cfg {Boolean/Object} animation
-         * The animation to use when moving the slider. Possible properties are:
-         *
-         * - duration
-         * - easingX
-         * - easingY
-         *
-         * @accessor
-         */
-        animation: true
-    },
-
-    /**
-     * @cfg {Number/Number[]} values Alias to {@link #value}
-     */
-
-    elementWidth: 0,
-
-    offsetValueRatio: 0,
-
-    activeThumb: null,
-
-    constructor: function(config) {
-        config = config || {};
-
-        if (config.hasOwnProperty('values')) {
-            config.value = config.values;
-        }
-
-        this.callParent([config]);
-    },
-
-    // @private
-    initialize: function() {
-        var element = this.element;
-
-        this.callParent();
-
-        element.on({
-            scope: this,
-            tap: 'onTap'
-        });
-
-        this.on({
-            scope: this,
-            delegate: '> thumb',
-            dragstart: 'onThumbDragStart',
-            drag: 'onThumbDrag',
-            dragend: 'onThumbDragEnd'
-        });
-
-        this.on({
-            painted: 'refresh',
-            resize: 'refresh'
-        });
-    },
-
-    /**
-     * @private
-     */
-    factoryThumb: function() {
-        return Ext.factory(this.getThumbConfig(), Ext.slider.Thumb);
-    },
-
-    /**
-     * Returns the Thumb instances bound to this Slider
-     * @return {Ext.slider.Thumb[]} The thumb instances
-     */
-    getThumbs: function() {
-        return this.innerItems;
-    },
-
-    /**
-     * Returns the Thumb instance bound to this Slider
-     * @param {Number} [index=0] The index of Thumb to return.
-     * @return {Ext.slider.Thumb} The thumb instance
-     */
-    getThumb: function(index) {
-        if (typeof index != 'number') {
-            index = 0;
-        }
-
-        return this.innerItems[index];
-    },
-
-    refreshOffsetValueRatio: function() {
-        var valueRange = this.getMaxValue() - this.getMinValue(),
-            trackWidth = this.elementWidth - this.thumbWidth;
-
-        this.offsetValueRatio = trackWidth / valueRange;
-    },
-
-    refreshElementWidth: function() {
-        this.elementWidth = this.element.dom.offsetWidth;
-        var thumb = this.getThumb(0);
-        if (thumb) {
-            this.thumbWidth = thumb.getElementWidth();
-        }
-    },
-
-    refresh: function() {
-        this.refreshElementWidth();
-        this.refreshValue();
-    },
-
-    setActiveThumb: function(thumb) {
-        var oldActiveThumb = this.activeThumb;
-
-        if (oldActiveThumb && oldActiveThumb !== thumb) {
-            oldActiveThumb.setZIndex(null);
-        }
-
-        this.activeThumb = thumb;
-        thumb.setZIndex(2);
-
-        return this;
-    },
-
-    onThumbDragStart: function(thumb, e) {
-        if (e.absDeltaX <= e.absDeltaY) {
-            return false;
-        }
-        else {
-            e.stopPropagation();
-        }
-
-        if (this.getAllowThumbsOverlapping()) {
-            this.setActiveThumb(thumb);
-        }
-
-        this.dragStartValue = this.getValue()[this.getThumbIndex(thumb)];
-        this.fireEvent('dragstart', this, thumb, this.dragStartValue, e);
-    },
-
-    onThumbDrag: function(thumb, e, offsetX) {
-        var index = this.getThumbIndex(thumb),
-            offsetValueRatio = this.offsetValueRatio,
-            constrainedValue = this.constrainValue(offsetX / offsetValueRatio);
-
-        e.stopPropagation();
-
-        this.setIndexValue(index, constrainedValue);
-
-        this.fireEvent('drag', this, thumb, this.getValue(), e);
-
-        return false;
-    },
-
-    setIndexValue: function(index, value, animation) {
-        var thumb = this.getThumb(index),
-            values = this.getValue(),
-            offsetValueRatio = this.offsetValueRatio,
-            draggable = thumb.getDraggable();
-
-        draggable.setOffset(value * offsetValueRatio, null, animation);
-
-        values[index] = value;
-    },
-
-    onThumbDragEnd: function(thumb, e) {
-        this.refreshThumbConstraints(thumb);
-        var index = this.getThumbIndex(thumb),
-            newValue = this.getValue()[index],
-            oldValue = this.dragStartValue;
-
-        this.fireEvent('dragend', this, thumb, this.getValue(), e);
-        if (oldValue !== newValue) {
-            this.fireEvent('change', this, thumb, newValue, oldValue);
-        }
-    },
-
-    getThumbIndex: function(thumb) {
-        return this.getThumbs().indexOf(thumb);
-    },
-
-    refreshThumbConstraints: function(thumb) {
-        var allowThumbsOverlapping = this.getAllowThumbsOverlapping(),
-            offsetX = thumb.getDraggable().getOffset().x,
-            thumbs = this.getThumbs(),
-            index = this.getThumbIndex(thumb),
-            previousThumb = thumbs[index - 1],
-            nextThumb = thumbs[index + 1],
-            thumbWidth = this.thumbWidth;
-
-        if (previousThumb) {
-            previousThumb.getDraggable().addExtraConstraint({
-                max: {
-                    x: offsetX - ((allowThumbsOverlapping) ? 0 : thumbWidth)
-                }
-            });
-        }
-
-        if (nextThumb) {
-            nextThumb.getDraggable().addExtraConstraint({
-                min: {
-                    x: offsetX + ((allowThumbsOverlapping) ? 0 : thumbWidth)
-                }
-            });
-        }
-    },
-
-    // @private
-    onTap: function(e) {
-        if (this.isDisabled()) {
-            return;
-        }
-
-        var targetElement = Ext.get(e.target);
-
-        if (!targetElement || targetElement.hasCls('x-thumb')) {
-            return;
-        }
-
-        var touchPointX = e.touch.point.x,
-            element = this.element,
-            elementX = element.getX(),
-            offset = touchPointX - elementX - (this.thumbWidth / 2),
-            value = this.constrainValue(offset / this.offsetValueRatio),
-            values = this.getValue(),
-            minDistance = Infinity,
-            ln = values.length,
-            i, absDistance, testValue, closestIndex, oldValue, thumb;
-
-        if (ln === 1) {
-            closestIndex = 0;
-        }
-        else {
-            for (i = 0; i < ln; i++) {
-                testValue = values[i];
-                absDistance = Math.abs(testValue - value);
-
-                if (absDistance < minDistance) {
-                    minDistance = absDistance;
-                    closestIndex = i;
-                }
-            }
-        }
-
-        oldValue = values[closestIndex];
-        thumb = this.getThumb(closestIndex);
-
-        this.setIndexValue(closestIndex, value, this.getAnimation());
-        this.refreshThumbConstraints(thumb);
-
-        if (oldValue !== value) {
-            this.fireEvent('change', this, thumb, value, oldValue);
-        }
-    },
-
-    // @private
-    updateThumbs: function(newThumbs) {
-        this.add(newThumbs);
-    },
-
-    applyValue: function(value) {
-        var values = Ext.Array.from(value || 0),
-            filteredValues = [],
-            previousFilteredValue = this.getMinValue(),
-            filteredValue, i, ln;
-
-        for (i = 0,ln = values.length; i < ln; i++) {
-            filteredValue = this.constrainValue(values[i]);
-
-            if (filteredValue < previousFilteredValue) {
-                filteredValue = previousFilteredValue;
-            }
-
-            filteredValues.push(filteredValue);
-
-            previousFilteredValue = filteredValue;
-        }
-
-        return filteredValues;
-    },
-
-    /**
-     * Updates the sliders thumbs with their new value(s)
-     */
-    updateValue: function(newValue, oldValue) {
-        var thumbs = this.getThumbs(),
-            ln = newValue.length,
-            i;
-
-        this.setThumbsCount(ln);
-
-        for (i = 0; i < ln; i++) {
-            thumbs[i].getDraggable().setExtraConstraint(null)
-                                    .setOffset(newValue[i] * this.offsetValueRatio);
-        }
-
-        for (i = 0; i < ln; i++) {
-            this.refreshThumbConstraints(thumbs[i]);
-        }
-    },
-
-    /**
-     * @private
-     */
-    refreshValue: function() {
-        this.refreshOffsetValueRatio();
-
-        this.setValue(this.getValue());
-    },
-
-    /**
-     * @private
-     * Takes a desired value of a thumb and returns the nearest snap value. e.g if minValue = 0, maxValue = 100, increment = 10 and we
-     * pass a value of 67 here, the returned value will be 70. The returned number is constrained within {@link #minValue} and {@link #maxValue},
-     * so in the above example 68 would be returned if {@link #maxValue} was set to 68.
-     * @param {Number} value The value to snap
-     * @return {Number} The snapped value
-     */
-    constrainValue: function(value) {
-        var me = this,
-            minValue  = me.getMinValue(),
-            maxValue  = me.getMaxValue(),
-            increment = me.getIncrement(),
-            remainder;
-
-        value = parseFloat(value);
-
-        if (isNaN(value)) {
-            value = minValue;
-        }
-
-        remainder = value % increment;
-        value -= remainder;
-
-        if (Math.abs(remainder) >= (increment / 2)) {
-            value += (remainder > 0) ? increment : -increment;
-        }
-
-        value = Math.max(minValue, value);
-        value = Math.min(maxValue, value);
-
-        return value;
-    },
-
-    setThumbsCount: function(count) {
-        var thumbs = this.getThumbs(),
-            thumbsCount = thumbs.length,
-            i, ln, thumb;
-
-        if (thumbsCount > count) {
-            for (i = 0,ln = thumbsCount - count; i < ln; i++) {
-                thumb = thumbs[thumbs.length - 1];
-                thumb.destroy();
-            }
-        }
-        else if (thumbsCount < count) {
-            for (i = 0,ln = count - thumbsCount; i < ln; i++) {
-                this.add(this.factoryThumb());
-            }
-        }
-
-        return this;
-    },
-
-    /**
-     * Convience method. Calls {@link #setValue}
-     */
-    setValues: function(value) {
-        this.setValue(value);
-    },
-
-    /**
-     * Convience method. Calls {@link #getValue}
-     */
-    getValues: function() {
-        return this.getValue();
-    },
-
-    // Sets the {@link #increment} configuration
-    applyIncrement: function(increment) {
-        if (increment === 0) {
-            increment = 1;
-        }
-
-        return Math.abs(increment);
-    },
-
-    // @private
-    updateAllowThumbsOverlapping: function(newValue, oldValue) {
-        if (typeof oldValue != 'undefined') {
-            this.refreshValue();
-        }
-    },
-
-    // @private
-    updateMinValue: function(newValue, oldValue) {
-        if (typeof oldValue != 'undefined') {
-            this.refreshValue();
-        }
-    },
-
-    // @private
-    updateMaxValue: function(newValue, oldValue) {
-        if (typeof oldValue != 'undefined') {
-            this.refreshValue();
-        }
-    },
-
-    // @private
-    updateIncrement: function(newValue, oldValue) {
-        if (typeof oldValue != 'undefined') {
-            this.refreshValue();
-        }
-    },
-
-    doSetDisabled: function(disabled) {
-        this.callParent(arguments);
-
-        var items = this.getItems().items,
-            ln = items.length,
-            i;
-
-        for (i = 0; i < ln; i++) {
-            items[i].setDisabled(disabled);
-        }
-    }
-
-}, function() {
-});
-
-/**
- * @aside guide forms
- *
- * The slider is a way to allow the user to select a value from a given numerical range. You might use it for choosing
- * a percentage, combine two of them to get min and max values, or use three of them to specify the hex values for a
- * color. Each slider contains a single 'thumb' that can be dragged along the slider's length to change the value.
- * Sliders are equally useful inside {@link Ext.form.Panel forms} and standalone. Here's how to quickly create a
- * slider in form, in this case enabling a user to choose a percentage:
- *
- *     @example
- *     Ext.create('Ext.form.Panel', {
- *         fullscreen: true,
- *         items: [
- *             {
- *                 xtype: 'sliderfield',
- *                 label: 'Percentage',
- *                 value: 50,
- *                 minValue: 0,
- *                 maxValue: 100
- *             }
- *         ]
- *     });
- *
- * In this case we set a starting value of 50%, and defined the min and max values to be 0 and 100 respectively, giving
- * us a percentage slider. Because this is such a common use case, the defaults for {@link #minValue} and
- * {@link #maxValue} are already set to 0 and 100 so in the example above they could be removed.
- *
- * It's often useful to render sliders outside the context of a form panel too. In this example we create a slider that
- * allows a user to choose the waist measurement of a pair of jeans. Let's say the online store we're making this for
- * sells jeans with waist sizes from 24 inches to 60 inches in 2 inch increments - here's how we might achieve that:
- *
- *     @example
- *     Ext.create('Ext.form.Panel', {
- *         fullscreen: true,
- *         items: [
- *             {
- *                 xtype: 'sliderfield',
- *                 label: 'Waist Measurement',
- *                 minValue: 24,
- *                 maxValue: 60,
- *                 increment: 2,
- *                 value: 32
- *             }
- *         ]
- *     });
- *
- * Now that we've got our slider, we can ask it what value it currently has and listen to events that it fires. For
- * example, if we wanted our app to show different images for different sizes, we can listen to the {@link #change}
- * event to be informed whenever the slider is moved:
- *
- *     slider.on('change', function(field, newValue) {
- *         if (newValue[0] > 40) {
- *             imgComponent.setSrc('large.png')
- *         } else {
- *             imgComponent.setSrc('small.png');
- *         }
- *     }, this);
- *
- * Here we listened to the {@link #change} event on the slider and updated the background image of an
- * {@link Ext.Img image component} based on what size the user selected. Of course, you can use any logic inside your
- * event listener.
- */
-Ext.define('Ext.field.Slider', {
-    extend  : 'Ext.field.Field',
-    xtype   : 'sliderfield',
-    requires: ['Ext.slider.Slider'],
-    alternateClassName: 'Ext.form.Slider',
-
-    /**
-     * @event change
-     * Fires when an option selection has changed.
-     * @param {Ext.field.Slider} me
-     * @param {Ext.slider.Slider} Slider Component
-     * @param {Ext.slider.Thumb} thumb
-     * @param {Number} newValue the new value of this thumb
-     * @param {Number} oldValue the old value of this thumb
-     */
-
-    /**
-    * @event dragstart
-    * Fires when the slider thumb starts a drag
-    * @param {Ext.field.Slider} this
-    * @param {Ext.slider.Slider} Slider Component
-    * @param {Ext.slider.Thumb} thumb The thumb being dragged
-    * @param {Array} value The start value
-    * @param {Ext.EventObject} e
-    */
-
-    /**
-    * @event drag
-    * Fires when the slider thumb starts a drag
-    * @param {Ext.field.Slider} this
-    * @param {Ext.slider.Slider} Slider Component
-    * @param {Ext.slider.Thumb} thumb The thumb being dragged
-    * @param {Ext.EventObject} e
-    */
-
-    /**
-    * @event dragend
-    * Fires when the slider thumb starts a drag
-    * @param {Ext.field.Slider} this
-    * @param {Ext.slider.Slider} Slider Component
-    * @param {Ext.slider.Thumb} thumb The thumb being dragged
-    * @param {Array} value The end value
-    * @param {Ext.EventObject} e
-    */
-
-    config: {
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        cls: Ext.baseCSSPrefix + 'slider-field',
-
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        tabIndex: -1
-    },
-
-    proxyConfig: {
-        /**
-         * @cfg {Number/Number[]} value See {@link Ext.slider.Slider#value}
-         * @accessor
-         */
-        value: 0,
-
-        /**
-         * @cfg {Number} minValue See {@link Ext.slider.Slider#minValue}
-         * @accessor
-         */
-        minValue: 0,
-
-        /**
-         * @cfg {Number} maxValue See {@link Ext.slider.Slider#maxValue}
-         * @accessor
-         */
-        maxValue: 100,
-
-        /**
-         * @cfg {Number} increment See {@link Ext.slider.Slider#increment}
-         * @accessor
-         */
-        increment: 1
-    },
-
-    /**
-     * @cfg {Number/Number[]} values See {@link Ext.slider.Slider#values}
-     */
-
-    constructor: function(config) {
-        config = config || {};
-
-        if (config.hasOwnProperty('values')) {
-            config.value = config.values;
-        }
-
-        this.callParent([config]);
-    },
-
-    // @private
-    initialize: function() {
-        this.callParent();
-
-        this.getComponent().on({
-            scope: this,
-            change: 'onSliderChange',
-            dragstart: 'onSliderDragStart',
-            drag: 'onSliderDrag',
-            dragend: 'onSliderDragEnd'
-        });
-    },
-
-    // @private
-    applyComponent: function(config) {
-        return Ext.factory(config, Ext.slider.Slider);
-    },
-
-    onSliderChange: function() {
-        this.fireEvent.apply(this, [].concat('change', this, Array.prototype.slice.call(arguments)));
-    },
-
-    onSliderDragStart: function() {
-        this.fireEvent.apply(this, [].concat('dragstart', this, Array.prototype.slice.call(arguments)));
-    },
-
-    onSliderDrag: function() {
-        this.fireEvent.apply(this, [].concat('drag', this, Array.prototype.slice.call(arguments)));
-    },
-
-    onSliderDragEnd: function() {
-        this.fireEvent.apply(this, [].concat('dragend', this, Array.prototype.slice.call(arguments)));
-    },
-
-    /**
-     * Convience method. Calls {@link #setValue}
-     */
-    setValues: function(value) {
-        this.setValue(value);
-    },
-
-    /**
-     * Convience method. Calls {@link #getValue}
-     */
-    getValues: function() {
-        return this.getValue();
-    },
-
-    reset: function() {
-        var config = this.config,
-            initialValue = (this.config.hasOwnProperty('values')) ? config.values : config.value;
-
-        this.setValue(initialValue);
-    },
-
-    doSetDisabled: function(disabled) {
-        this.callParent(arguments);
-
-        this.getComponent().setDisabled(disabled);
-    }
-});
-
-Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
-    extend: 'Ext.Panel',
-    requires: ['Ext.field.Slider', 'Ext.data.proxy.JsonP'],
-    xtype: 'DeviceDetailsDimmer',
-
-    constructor: function (config) {
-        var self = this;
-        self.RepollTimer;
-        self.deviceID = 0;
-        Ext.apply(config || {}, {
-            xtype: 'panel',
-            layout: 'vbox',
-            scrollable: 'vertical',
-            items: [{
-                xtype: 'panel',
-                id: 'dimmerDetailsTPL',
-                tpl: new Ext.XTemplate(
-							    '<div class="device_info">',
-							    '<div id="level_dimmer_img" class="imageholder {type}_{on_off}"></div>',
-							    '<div id="level_dimmer_details" class="level">{level_txt}</div>',
-								    '<h1>{name}</h1>',
-								    '<h2>{type_txt}<h2>',
-								    '<div class="overview"><strong>Groups: </strong>{groups}<br />',
-								    '<strong>Updated: </strong>{last_heard_from}</div>',
-							    '</div>')
-            }, {
-                xtype: 'fieldset',
-                margin: 5,
-                defaults: {
-                    labelAlign: 'right'
-                },
-                items: [{
-                    xtype: 'sliderfield',
-                    id: 'dimmerSlider',
-                    label: 'Level',
-                    minValue: 0,
-                    maxValue: 99,
-                    listeners: {
-                        scope: this,
-                        change: function (slider, value) {
-                            var dimmerSlider = Ext.getCmp('dimmerSlider');
-                            if (dimmerSlider) {
-                                dimmerSlider.element.dom.childNodes[0].childNodes[0].innerHTML = slider.getValue() + "%";
-
-                                var dimmerSlider = Ext.getCmp('dimmerSlider');
-                                var sliderValue = dimmerSlider.getValue()[0]
-
-                                console.log('AJAX: SendCmd SEt LEVEL' + sliderValue);
-
-                                Ext.Ajax.request({
-                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
-                                    method: 'POST',
-                                    params: {
-                                        u: Math.random(),
-                                        name: 'DYNAMIC_CMD_BASIC',
-                                        arg: sliderValue,
-                                        type: 'device'
-                                    },
-                                    success: function (response, opts) {
-                                        var result = JSON.parse(response.responseText);
-                                        if (result.success) {
-                                            self.delayedReload();
-                                            //Ext.Msg.alert('Dimmer Command', 'Dimmer set to ' + sliderValue + '%');
-                                        }
-                                        else {
-                                            Ext.Msg.alert('Dimmer Command', 'Communication Error!');
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }]
-            }, {
-                        xtype: 'button',
-                        label: 'Repoll',
-                        text: 'Repoll',
-                        ui: 'confirm',
-                        margin: '15 10 5 10',
-                        handler: function () {
-                            console.log('AJAX: SendCmd REPOLL_ME');
-                            Ext.Ajax.request({
-                                url: zvsMobile.app.BaseURL() + '/commands/',
-                                method: 'POST',
-                                params: {
-                                    u: Math.random(),
-                                    name: 'REPOLL_ME',
-                                    arg: self.deviceID
-                                },
-                                success: function (response, opts) {
-                                    var result = JSON.parse(response.responseText);
-                                    if (result.success) {
-                                        self.delayedReload();
-                                    }
-                                    else {
-                                        console.log('ERROR');
-                                    }
-                                }
-                            });
-                        }
-                    }
-                   ]
-
-                  ,
-            listeners: {
-                scope: this,
-                deactivate: function () {
-                    if (self.RepollTimer) { clearInterval(self.RepollTimer); }
-                }
-            }
-        });
-        this.callOverridden([config]);
-    },
-    delayedReload: function () {
-        var self = this;
-        var detailsTPL = self.items.items[1];
-        if (self.RepollTimer) { clearInterval(self.RepollTimer); }
-
-        self.RepollTimer = setTimeout(function () {
-            self.loadDevice(self.deviceID);
-        }, 5000);
-    }, ShowBackButton: function () {
-        var self = this;
-        self.items.items[0].visibility = false;
-    },
-    loadDevice: function (deviceId) {
-        var self = this;
-        var detailsTPL = Ext.getCmp('dimmerDetailsTPL');
-        self.deviceID = deviceId;
-        //Get Device Details			
-        console.log('AJAX: GetDeviceDetails');
-
-        Ext.data.JsonP.request({
-            url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
-            callbackKey: 'callback',
-            params: {
-                u: Math.random()
-            },
-            success: function (result) {
-                //Send data to panel TPL                            
-                detailsTPL.setData(result.details);
-                //Update meter levels 
-                self.UpdateLevel(result.details.level);
-            }
-        });
-    },
-    UpdateLevel: function (value) {
-        var level = value > 99 ? 99 : value;
-        var dimmerSlider = Ext.getCmp('dimmerSlider');
-        var detailsTPL = Ext.getCmp('dimmerDetailsTPL');
-
-        dimmerSlider.setValue(level);
-        dimmerSlider.element.dom.childNodes[0].childNodes[0].innerHTML = level + "%";
-
-        //Update panel TPL        
-        var data = Ext.clone(detailsTPL.getData());
-        data.level = level;
-        data.level_txt = level + '%';
-        if (level == 0) {
-            data.on_off = 'OFF';
-        }
-        else if (level > 98) {
-            data.on_off = 'ON';
-        }
-        else {
-            data.on_off = 'DIM';
-        }
-        detailsTPL.setData(data);
-
-        //Update the store 
-        data = DeviceStore.data.items;
-        for (i = 0, len = data.length; i < len; i++) {
-            if (data[i].data.id === detailsTPL._data.id) {
-
-                data[i].data.level_txt = value + '%';
-                data[i].data.level = value;
-
-                if (value == 0) {
-                    data[i].data.on_off = 'OFF';
-                }
-                else if (value > 98) {
-                    data[i].data.on_off = 'ON';
-                }
-                else {
-                    data[i].data.on_off = 'DIM';
-                }
-
-            }
-        }
-        DeviceStore.add(data);
-
-        //Refresh the DEvice list
-        Ext.getCmp('DeviceList').refresh();
-
-    }
-});
-/**
- * @private
- */
-Ext.define('Ext.slider.Toggle', {
-    extend: 'Ext.slider.Slider',
-
-    config: {
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        baseCls: 'x-toggle',
-
-        /**
-         * @cfg {String} minValueCls CSS class added to the field when toggled to its minValue
-         * @accessor
-         */
-        minValueCls: 'x-toggle-off',
-
-        /**
-         * @cfg {String} maxValueCls CSS class added to the field when toggled to its maxValue
-         * @accessor
-         */
-        maxValueCls: 'x-toggle-on'
-    },
-
-    initialize: function() {
-        this.callParent();
-
-        this.on({
-            change: 'onChange'
-        });
-    },
-
-    applyMinValue: function() {
-        return 0;
-    },
-
-    applyMaxValue: function() {
-        return 1;
-    },
-
-    applyIncrement: function() {
-        return 1;
-    },
-
-    updateMinValueCls: function(newCls, oldCls) {
-        var element = this.element;
-
-        if (oldCls && element.hasCls(oldCls)) {
-            element.replaceCls(oldCls, newCls);
-        }
-    },
-
-    updateMaxValueCls: function(newCls, oldCls) {
-        var element = this.element;
-
-        if (oldCls && element.hasCls(oldCls)) {
-            element.replaceCls(oldCls, newCls);
-        }
-    },
-
-    setValue: function(newValue, oldValue) {
-        this.callParent(arguments);
-        this.onChange(this, this.getThumbs()[0], newValue, oldValue);
-    },
-
-    onChange: function(me, thumb, newValue, oldValue) {
-        var isOn = newValue > 0,
-            onCls = me.getMaxValueCls(),
-            offCls = me.getMinValueCls();
-
-        this.element.addCls(isOn ? onCls : offCls);
-        this.element.removeCls(isOn ? offCls : onCls);
-    },
-
-    toggle: function() {
-        var value = this.getValue();
-        this.setValue((value == 1) ? 0 : 1);
-
-        return this;
-    },
-
-    onTap: function() {
-        if (this.isDisabled()) {
-            return;
-        }
-
-        var oldValue = this.getValue(),
-            newValue = (oldValue == 1) ? 0 : 1,
-            thumb = this.getThumb(0);
-
-        this.setIndexValue(0, newValue, this.getAnimation());
-        this.refreshThumbConstraints(thumb);
-
-        this.fireEvent('change', this, thumb, newValue, oldValue);
-    }
-});
-
-/**
- * @aside guide forms
- *
- * Specialized {@link Ext.field.Slider} with a single thumb which only supports two {@link #value values}.
- *
- * ## Examples
- *
- *     @example miniphone preview
- *     Ext.Viewport.add({
- *         xtype: 'togglefield',
- *         name: 'awesome',
- *         label: 'Are you awesome?',
- *         labelWidth: '40%'
- *     });
- *
- * Having a default value of 'toggled':
- *
- *     @example miniphone preview
- *     Ext.Viewport.add({
- *         xtype: 'togglefield',
- *         name: 'awesome',
- *         value: 1,
- *         label: 'Are you awesome?',
- *         labelWidth: '40%'
- *     });
- *
- * And using the {@link #value} {@link #toggle} method:
- *
- *     @example miniphone preview
- *     Ext.Viewport.add([
- *         {
- *             xtype: 'togglefield',
- *             name: 'awesome',
- *             value: 1,
- *             label: 'Are you awesome?',
- *             labelWidth: '40%'
- *         },
- *         {
- *             xtype: 'toolbar',
- *             docked: 'top',
- *             items: [
- *                 {
- *                     xtype: 'button',
- *                     text: 'Toggle',
- *                     flex: 1,
- *                     handler: function() {
- *                         Ext.ComponentQuery.query('togglefield')[0].toggle();
- *                     }
- *                 }
- *             ]
- *         }
- *     ]);
- */
-Ext.define('Ext.field.Toggle', {
-    extend: 'Ext.field.Slider',
-    xtype : 'togglefield',
-    alternateClassName: 'Ext.form.Toggle',
-    requires: ['Ext.slider.Toggle'],
-
-    config: {
-        /**
-         * @cfg
-         * @inheritdoc
-         */
-        cls: 'x-toggle-field'
-    },
-
-    proxyConfig: {
-        /**
-         * @cfg {String} minValueCls See {@link Ext.slider.Toggle#minValueCls}
-         * @accessor
-         */
-        minValueCls: 'x-toggle-off',
-
-        /**
-         * @cfg {String} maxValueCls  See {@link Ext.slider.Toggle#maxValueCls}
-         * @accessor
-         */
-        maxValueCls: 'x-toggle-on'
-    },
-
-    // @private
-    applyComponent: function(config) {
-        return Ext.factory(config, Ext.slider.Toggle);
-    },
-
-    /**
-     * Sets the value of the toggle.
-     * @param {Number} value **1** for toggled, **0** for untoggled.
-     */
-    setValue: function(newValue) {
-        if (newValue === true) {
-            newValue = 1;
-        }
-
-        this.getComponent().setValue(newValue);
-
-        return this;
-    },
-
-    getValue: function() {
-        return (this.getComponent().getValue() == 1) ? 1 : 0;
-    },
-
-    /**
-     * Toggles the value of this toggle field.
-     * @return this
-     */
-    toggle: function() {
-        this.getComponent().toggle();
-        return this;
-    }
-});
-
-Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
-    extend: 'Ext.Panel',
-    requires: ['Ext.field.Toggle', 'Ext.data.proxy.JsonP'],
-    xtype: 'DeviceDetailsSwitch',
-
-    constructor: function (config) {
-        this.RepollTimer;
-        this.deviceID = 0;
-        var self = this;
-        Ext.apply(config || {}, {
-            xtype: 'panel',
-            layout: 'vbox',
-            scrollable: 'vertical',
-            items: [{
-                xtype: 'panel',
-                id: 'switchDetailsTPL',
-                tpl: new Ext.XTemplate(
-							    '<div class="device_info">',
-							    '<div id="level_switch_img" class="imageholder {type}_{on_off}"></div>',
-							    '<div id="level_switch_details" class="level">{level_txt}</div>',
-								    '<h1>{name}</h1>',
-								    '<h2>{type_txt}<h2>',
-								    '<div class="overview"><strong>Groups: </strong>{groups}<br />',
-								    '<strong>Updated: </strong>{last_heard_from}</div>',
-							    '</div>')
-            }, {
-                xtype: 'fieldset',
-                margin: 5,
-                defaults: {
-                    labelAlign: 'right'
-                },
-                items: [{
-                    xtype: 'togglefield',
-                    id: 'switchToggle',
-                    label: 'OFF / ON',
-                    listeners: {
-                        scope: this,
-                        change: function (slider, value) {
-                            var switchToggle = Ext.getCmp('switchToggle');
-                            if (switchToggle) {
-                                var toggleValue = switchToggle.getValue();
-                                console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
-                                Ext.Ajax.request({
-                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
-                                    method: 'POST',
-                                    params: {
-                                        u: Math.random(),
-                                        name: toggleValue > 0 ? 'TURNON' : 'TURNOFF',
-                                        arg: 0,
-                                        type: 'device_type'
-                                    },
-                                    success: function (response, opts) {
-                                        var result = JSON.parse(response.responseText);
-                                        if (result.success) {
-                                            self.delayedReload();
-                                            //Ext.Msg.alert('Switch Command', 'Switch set to ' + (toggleValue > 0 ? 'On' : 'Off'));
-                                        }
-                                        else {
-                                            Ext.Msg.alert('Switch Command', 'Communication Error!');
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }]
-            }, {
-                xtype: 'button',
-                label: 'Repoll',
-                text: 'Repoll',
-                ui: 'confirm',
-                margin: '15 10 5 10',
-                handler: function () {
-                    console.log('AJAX: SendCmd REPOLL_ME');
-
-                    Ext.Ajax.request({
-                        url: zvsMobile.app.BaseURL() + '/commands/',
-                        method: 'POST',
-                        params: {
-                            u: Math.random(),
-                            name: 'REPOLL_ME',
-                            arg: self.deviceID
-                        },
-                        success: function (response, opts) {
-                            var result = JSON.parse(response.responseText);
-                            if (result.success) {
-                                self.delayedReload();
-                            }
-                            else {
-                                console.log('ERROR');
-                            }
-                        }
-                    });
-                }
-
-            }],
-            listeners: {
-                scope: this,
-                deactivate: function () {
-                    if (self.RepollTimer) { clearInterval(self.RepollTimer); }
-                }
-            }
-        });
-        this.callOverridden([config]);
-    },
-    delayedReload: function () {
-        var self = this;
-        var switchDetailsTPL = Ext.getCmp('switchDetailsTPL');
-        if (self.RepollTimer) { clearInterval(self.RepollTimer); }
-
-        self.RepollTimer = setTimeout(function () {           
-            self.loadDevice(self.deviceID);
-        }, 1500);
-    },
-    loadDevice: function (deviceId) {
-        var self = this;
-        var switchDetailsTPL = Ext.getCmp('switchDetailsTPL');
-        this.deviceID = deviceId;
-
-        //Get Device Details			
-        console.log('AJAX: GetDeviceDetails');
-        Ext.data.JsonP.request({
-            url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
-            callbackKey: 'callback',
-            params: {
-                u: Math.random()
-            },
-            success: function (result) {
-                //Send data to panel TPL                            
-                switchDetailsTPL.setData(result.details);
-
-                //Update meter levels 
-                self.UpdateLevel(result.details.level);
-            }
-        });
-    },
-    UpdateLevel: function (value) {
-        var self = this;
-        var switchToggle = Ext.getCmp('switchToggle');
-        var switchDetailsTPL = Ext.getCmp('switchDetailsTPL');
-        switchToggle.setValue(value);
-
-        //Update panel TPL        
-        var data = Ext.clone(switchDetailsTPL.getData());
-        data.level = value;
-        data.level_txt = value > 0 ? 'ON' : 'OFF';
-        data.on_off = value > 0 ? 'ON' : 'OFF';
-        switchDetailsTPL.setData(data);
-
-        //Update the store 
-        data = DeviceStore.data.items;
-        for (i = 0, len = data.length; i < len; i++) {
-            if (data[i].data.id === switchDetailsTPL._data.id) {
-                data[i].data.level = value;
-                data[i].data.level_txt = value > 0 ? 'On' : 'Off';
-                data[i].data.on_off = value > 0 ? 'ON' : 'OFF';
-            }
-        }
-        DeviceStore.add(data);
-        //Refresh the DEvice list
-        Ext.getCmp('DeviceList').refresh();
-    }
-});
 /**
  * @private
  */
@@ -49295,6 +48010,62 @@ Ext.define('Ext.dataview.List', {
     }
 });
 
+Ext.define('zvsMobile.view.LogList', {
+    extend: 'Ext.dataview.List',
+    requires: ['Ext.plugin.PullRefresh'],
+    xtype: 'LogList',
+    config: {
+        cls: 'LogListItem',
+        store: LogEntryStore,
+        scrollable: 'vertical',
+        ui: 'round',
+        scrollToTopOnRefresh: false,
+        plugins: [{ xclass: 'Ext.plugin.PullRefresh'}],
+        itemTpl: new Ext.XTemplate(
+            '<div class="log">',			    
+			    '<h2>{DateTime} ({Description})</h2>',
+			'</div>'
+         ),
+        items: {
+            xtype: 'toolbar',
+            docked: 'top',
+            title: 'Log'
+        }
+
+    }
+});
+
+
+﻿Ext.define('zvsMobile.view.LogViewPort', {
+    extend: 'Ext.Panel',
+    xtype: 'LogViewPort',
+    requires: ['zvsMobile.view.LogList'],
+    initialize: function () {
+        this.callParent(arguments);        
+    },
+    constructor: function (config) {        
+        Ext.apply(config || {}, {
+            items: [
+                    {
+                        xtype: 'toolbar',
+                        docked: 'top',
+                        title: 'Log',
+                        items: []
+                    },                    
+                    {
+                        xtype: 'LogList',
+                        id: 'LogList'                        
+                    }
+                    ]
+        });
+        this.callParent([config]);
+    },
+    config:
+            {
+                layout: 'card'
+            }
+});
+
 Ext.define('zvsMobile.view.DeviceList', {
     extend: 'Ext.dataview.List',
     requires: ['Ext.plugin.PullRefresh'],
@@ -49326,6 +48097,140 @@ Ext.define('zvsMobile.view.DeviceList', {
     }
 });
 
+Ext.define('zvsMobile.view.GroupList', {
+    extend: 'Ext.dataview.List',
+    requires: ['Ext.plugin.PullRefresh'],
+    xtype: 'GroupList',
+    config: {
+        cls: 'GroupList',
+        store: GroupStore,
+        scrollable: 'vertical',
+        ui: 'round',
+        scrollToTopOnRefresh: false,
+        plugins: [{ xclass: 'Ext.plugin.PullRefresh'}],
+        itemTpl: new Ext.XTemplate(
+			'<div class="group">',
+				'<div class="imageholder"></div>',
+				'<h1>{name} ({count})</h1>',
+			'</div>'
+		),
+        items: {
+            xtype: 'toolbar',
+            docked: 'top',
+            title: 'Groups'
+        }
+    }
+});
+
+Ext.define('zvsMobile.view.phone.GroupPhoneViewPort', {
+    extend: 'Ext.Panel',
+    xtype: 'GroupPhoneViewPort',
+    requires: ['zvsMobile.view.DeviceList',
+                      'zvsMobile.view.GroupList',
+                      'zvsMobile.view.GroupDetails'],
+    config: {
+        layout: {
+            type: 'card',
+            animation: {
+                type: 'slide',
+                direction: 'left'
+            }
+        },
+        items: [{
+            xtype: 'GroupList',
+            id: 'GroupList',
+            listeners: {
+                scope: this,
+                selectionchange: function (list, records) {
+                    if (records[0] !== undefined) {
+                        var GroupDetails = Ext.getCmp('GroupDetails');
+                        GroupDetails.loadGroup(records[0].data.id);
+
+                        var GroupPhoneViewPort = Ext.getCmp('GroupPhoneViewPort');
+                        GroupPhoneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
+                        GroupPhoneViewPort.setActiveItem(Ext.getCmp('GroupDetailContainer'));
+                    }
+                },
+                activate: function () {
+                    Ext.getCmp('GroupList').deselectAll();
+                }
+            }
+        }, {
+            id: 'GroupDetailContainer',
+            layout: 'card',
+            items: [{
+                xtype: 'GroupDetails',
+                id: 'GroupDetails'
+            }, {
+                xtype: 'toolbar',
+                docked: 'top',
+                title: 'Group Details',
+                scrollable: false,
+                items: [{
+                    xtype: 'button',
+                    iconMask: true,
+                    ui: 'back',
+                    text: 'Back',
+                    handler: function () {
+                        var GroupPhoneViewPort = Ext.getCmp('GroupPhoneViewPort');
+                        GroupPhoneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
+                        GroupPhoneViewPort.setActiveItem(Ext.getCmp('GroupList'));
+                    }
+                }]
+            }]
+        }]
+    }
+});
+Ext.define('zvsMobile.view.tablet.GroupTabletViewPort', {
+    extend: 'Ext.Panel',
+    xtype: 'GroupTabletViewPort',
+    requires: ['zvsMobile.view.DeviceList',
+                'zvsMobile.view.GroupList',
+                'zvsMobile.view.GroupDetails'],
+    config: {
+        layout: 'hbox',
+        items: [{
+            xtype: 'GroupList',
+            id: 'GroupList',
+            flex: 1,
+            listeners: {
+                scope: this,
+                selectionchange: function (list, records) {
+                    if (records[0] !== undefined) {
+                        var GroupDetails = Ext.getCmp('GroupDetails');
+                        GroupDetails.loadGroup(records[0].data.id);
+
+                        var groupDetailsPane = Ext.getCmp('groupDetailsPane');
+                        groupDetailsPane.getLayout().setAnimation({ type: 'slide', direction: 'up' });
+                        groupDetailsPane.setActiveItem(GroupDetails);
+                    }
+                }
+            }
+        }, {
+            flex: 2,
+            id: 'groupDetailsPane',
+            layout: {
+                type: 'card',
+                animation: {
+                    type: 'slide',
+                    direction: 'left'
+                }
+            },
+            items: [{
+                cls: 'emptyDetail',
+                html: "Select a group to see more details."
+            }, {
+                xtype: 'GroupDetails',
+                id: 'GroupDetails'
+            }, {
+                xtype: 'toolbar',
+                docked: 'top',
+                title: 'Group Details'
+            }]
+        }
+		]
+    }
+});  
 Ext.define('zvsMobile.view.SceneList', {
     extend: 'Ext.dataview.List',
     requires: ['Ext.plugin.PullRefresh'],
@@ -49472,140 +48377,6 @@ Ext.define('zvsMobile.view.tablet.SceneTabletViewPort', {
 		]
     }
 });
-Ext.define('zvsMobile.view.GroupList', {
-    extend: 'Ext.dataview.List',
-    requires: ['Ext.plugin.PullRefresh'],
-    xtype: 'GroupList',
-    config: {
-        cls: 'GroupList',
-        store: GroupStore,
-        scrollable: 'vertical',
-        ui: 'round',
-        scrollToTopOnRefresh: false,
-        plugins: [{ xclass: 'Ext.plugin.PullRefresh'}],
-        itemTpl: new Ext.XTemplate(
-			'<div class="group">',
-				'<div class="imageholder"></div>',
-				'<h1>{name} ({count})</h1>',
-			'</div>'
-		),
-        items: {
-            xtype: 'toolbar',
-            docked: 'top',
-            title: 'Groups'
-        }
-    }
-});
-
-Ext.define('zvsMobile.view.phone.GroupPhoneViewPort', {
-    extend: 'Ext.Panel',
-    xtype: 'GroupPhoneViewPort',
-    requires: ['zvsMobile.view.DeviceList',
-                      'zvsMobile.view.GroupList',
-                      'zvsMobile.view.GroupDetails'],
-    config: {
-        layout: {
-            type: 'card',
-            animation: {
-                type: 'slide',
-                direction: 'left'
-            }
-        },
-        items: [{
-            xtype: 'GroupList',
-            id: 'GroupList',
-            listeners: {
-                scope: this,
-                selectionchange: function (list, records) {
-                    if (records[0] !== undefined) {
-                        var GroupDetails = Ext.getCmp('GroupDetails');
-                        GroupDetails.loadGroup(records[0].data.id);
-
-                        var GroupPhoneViewPort = Ext.getCmp('GroupPhoneViewPort');
-                        GroupPhoneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'left' });
-                        GroupPhoneViewPort.setActiveItem(Ext.getCmp('GroupDetailContainer'));
-                    }
-                },
-                activate: function () {
-                    Ext.getCmp('GroupList').deselectAll();
-                }
-            }
-        }, {
-            id: 'GroupDetailContainer',
-            layout: 'card',
-            items: [{
-                xtype: 'GroupDetails',
-                id: 'GroupDetails'
-            }, {
-                xtype: 'toolbar',
-                docked: 'top',
-                title: 'Group Details',
-                scrollable: false,
-                items: [{
-                    xtype: 'button',
-                    iconMask: true,
-                    ui: 'back',
-                    text: 'Back',
-                    handler: function () {
-                        var GroupPhoneViewPort = Ext.getCmp('GroupPhoneViewPort');
-                        GroupPhoneViewPort.getLayout().setAnimation({ type: 'slide', direction: 'right' });
-                        GroupPhoneViewPort.setActiveItem(Ext.getCmp('GroupList'));
-                    }
-                }]
-            }]
-        }]
-    }
-});
-Ext.define('zvsMobile.view.tablet.GroupTabletViewPort', {
-    extend: 'Ext.Panel',
-    xtype: 'GroupTabletViewPort',
-    requires: ['zvsMobile.view.DeviceList',
-                'zvsMobile.view.GroupList',
-                'zvsMobile.view.GroupDetails'],
-    config: {
-        layout: 'hbox',
-        items: [{
-            xtype: 'GroupList',
-            id: 'GroupList',
-            flex: 1,
-            listeners: {
-                scope: this,
-                selectionchange: function (list, records) {
-                    if (records[0] !== undefined) {
-                        var GroupDetails = Ext.getCmp('GroupDetails');
-                        GroupDetails.loadGroup(records[0].data.id);
-
-                        var groupDetailsPane = Ext.getCmp('groupDetailsPane');
-                        groupDetailsPane.getLayout().setAnimation({ type: 'slide', direction: 'up' });
-                        groupDetailsPane.setActiveItem(GroupDetails);
-                    }
-                }
-            }
-        }, {
-            flex: 2,
-            id: 'groupDetailsPane',
-            layout: {
-                type: 'card',
-                animation: {
-                    type: 'slide',
-                    direction: 'left'
-                }
-            },
-            items: [{
-                cls: 'emptyDetail',
-                html: "Select a group to see more details."
-            }, {
-                xtype: 'GroupDetails',
-                id: 'GroupDetails'
-            }, {
-                xtype: 'toolbar',
-                docked: 'top',
-                title: 'Group Details'
-            }]
-        }
-		]
-    }
-});  
 /**
  * @private
  *
@@ -51125,7 +49896,7 @@ selectBox.setOptions(
 
 ﻿Ext.define('zvsMobile.view.DeviceDetailsThermo', {
     extend: 'Ext.Panel',
-	requires: ['Ext.ActionSheet', 'Ext.Picker', 'Ext.TitleBar', 'Ext.field.Select'],
+    requires: ['Ext.ActionSheet', 'Ext.Picker', 'Ext.TitleBar', 'Ext.field.Select'],
     xtype: 'DeviceDetailsThermo',
 
     constructor: function (config) {
@@ -51139,7 +49910,7 @@ selectBox.setOptions(
             scrollable: 'vertical',
             items: [{
                 xtype: 'panel',
-                id:'ThermoTPL',
+                id: 'ThermoTPL',
                 tpl: new Ext.XTemplate(
 							    '<div class="device_info">',
 							        '<div id="level_temp_img" class="imageholder {type}"></div>',
@@ -51267,22 +50038,26 @@ selectBox.setOptions(
                                     scope: this,
                                     handler: function () {
                                         var mode = SetMode.items.items[0].getValue()
-                                        console.log('AJAX DYNAMIC_CMD_MODE ' + mode);
+                                        var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                        var pluginName = ThermoTPL._data.plugin_name;
+                                        var cmd = ThermoModeCommandTranslations[pluginName + mode];
+                                        console.log(cmd.CmdName + ' : ' + cmd.Arg);
+
 
                                         Ext.Ajax.request({
                                             url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),
-                                                name: 'DYNAMIC_CMD_MODE',
-                                                arg: mode,
+                                                name: cmd.CmdName,
+                                                arg: cmd.Arg,
                                                 type: 'device'
                                             },
                                             success: function (response, opts) {
                                                 var result = JSON.parse(response.responseText);
                                                 if (result.success) {
                                                     self.delayedReload();
-                                                   // Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
+                                                    // Ext.Msg.alert('Thermostat Command', 'Mode set to ' + mode);
                                                 }
                                                 else {
                                                     Ext.Msg.alert('Thermostat Command', 'Communication Error!');
@@ -51317,10 +50092,10 @@ selectBox.setOptions(
                                 margin: '15 5',
                                 options: [{
                                     text: 'On Low',
-                                    value: 'On Low'
+                                    value: 'OnLow'
                                 }, {
                                     text: 'Auto Low',
-                                    value: 'Auto Low'
+                                    value: 'AutoLow'
                                 }]
                             }, {
                                 xtype: 'toolbar',
@@ -51340,7 +50115,11 @@ selectBox.setOptions(
                                     scope: this,
                                     handler: function () {
                                         var mode = SetFanMode.items.items[0].getValue()
-                                        console.log('DYNAMIC_CMD_FAN MODE' + mode);
+
+                                        var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                        var pluginName = ThermoTPL._data.plugin_name;
+                                        var cmd = ThermoFanModeCommandTranslations[pluginName + mode];
+                                        console.log(cmd.CmdName + ' : ' + cmd.Arg);
 
 
                                         Ext.Ajax.request({
@@ -51348,8 +50127,8 @@ selectBox.setOptions(
                                             method: 'POST',
                                             params: {
                                                 u: Math.random(),
-                                                name: 'DYNAMIC_CMD_FAN MODE',
-                                                arg: mode,
+                                                name: cmd.CmdName,
+                                                arg: cmd.Arg,
                                                 type: 'device'
                                             },
                                             success: function (response, opts) {
@@ -51395,14 +50174,18 @@ selectBox.setOptions(
                                             xtype: 'button',
                                             text: 'Set Heat Point',
                                             handler: function () {
+                                                var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                                var pluginName = ThermoTPL._data.plugin_name;
+                                                var cmd = ThermoTempCommandTranslations[pluginName + "HEAT"];
+
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
-                                                console.log('AJAX DYNAMIC_CMD_HEATING 1' + selected_temp);
+                                                console.log(cmd + ' : ' + selected_temp);
                                                 Ext.Ajax.request({
                                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
-                                                        name: 'DYNAMIC_CMD_HEATING 1',
+                                                        name: cmd,
                                                         arg: selected_temp,
                                                         type: 'device'
                                                     },
@@ -51447,13 +50230,17 @@ selectBox.setOptions(
                                             text: 'Set Cool Point',
                                             handler: function () {
                                                 var selected_temp = picker._slots[0].picker._values.temperature;
-                                                console.log('AJAX DYNAMIC_CMD_COOLING 1 :' + selected_temp);
+                                                var ThermoTPL = Ext.getCmp('ThermoTPL');
+                                                var pluginName = ThermoTPL._data.plugin_name;
+                                                var cmd = ThermoTempCommandTranslations[pluginName + "COOL"];
+
+                                                console.log(cmd + ' : ' + selected_temp);
                                                 Ext.Ajax.request({
                                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                                     method: 'POST',
                                                     params: {
                                                         u: Math.random(),
-                                                        name: 'DYNAMIC_CMD_COOLING 1',
+                                                        name: cmd,
                                                         arg: selected_temp,
                                                         type: 'device'
                                                     },
@@ -51507,7 +50294,7 @@ selectBox.setOptions(
                              });
                          }
                      }
-                ],
+            ],
             listeners: {
                 scope: this,
                 deactivate: function () {
@@ -51522,7 +50309,7 @@ selectBox.setOptions(
         var ThermoTPL = Ext.getCmp('ThermoTPL');
         if (self.RepollTimer) { clearInterval(self.RepollTimer); }
 
-        self.RepollTimer = setTimeout(function () {         
+        self.RepollTimer = setTimeout(function () {
             self.loadDevice(self.deviceID);
         }, 1500);
     },
@@ -51570,6 +50357,32 @@ selectBox.setOptions(
 
     }
 });
+
+var ThermoTempCommandTranslations = {
+    "THINKSTICKHEAT": "DYNAMIC_SP_R207_Heating1",
+    "OPENZWAVEHEAT": "DYNAMIC_CMD_HEATING 1",
+    "THINKSTICKCOOL": "DYNAMIC_SP_R207_Cooling1",
+    "OPENZWAVECOOL": "DYNAMIC_CMD_COOLING 1"
+};
+
+var ThermoFanModeCommandTranslations = {
+    "THINKSTICKOnLow": { CmdName: 'FAN_MODE', Arg: 'OnLow' },
+    "OPENZWAVEOnLow": { CmdName: 'DYNAMIC_CMD_FAN MODE', Arg: 'On Low' },
+    "THINKSTICKAutoLow": { CmdName: 'FAN_MODE', Arg: 'AutoLow' },
+    "OPENZWAVEAutoLow": { CmdName: 'DYNAMIC_CMD_FAN MODE', Arg: 'Auto Low' }
+
+};
+
+var ThermoModeCommandTranslations = {
+    "THINKSTICKOff": { CmdName: 'MODE', Arg: 'Off' },
+    "OPENZWAVEOff": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Off' },
+    "THINKSTICKAuto": { CmdName: 'MODE', Arg: 'Auto' },
+    "OPENZWAVEAuto": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Auto' },
+    "THINKSTICKHeat": { CmdName: 'MODE', Arg: 'Heat' },
+    "OPENZWAVEHeat": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Heat' },
+    "THINKSTICKCool": { CmdName: 'MODE', Arg: 'Cool' },
+    "OPENZWAVECool": { CmdName: 'DYNAMIC_CMD_MODE', Arg: 'Cool' }
+};
 
 var tempSetPoints = [{ text: '40&deg;', value: 40 },
                     { text: '41&deg;', value: 41 },
@@ -51630,7 +50443,1336 @@ var tempSetPoints = [{ text: '40&deg;', value: 40 },
                     { text: '96&deg;', value: 96 },
                     { text: '97&deg;', value: 97 },
                     { text: '98&deg;', value: 98 },
-                    { text: '99&deg;', value: 99}];
+                    { text: '99&deg;', value: 99 }];
+/**
+ * Utility class used by Ext.field.Slider.
+ * @private
+ */
+Ext.define('Ext.slider.Slider', {
+    extend: 'Ext.Container',
+    xtype: 'slider',
+
+    requires: [
+        'Ext.slider.Thumb',
+        'Ext.fx.easing.EaseOut'
+    ],
+
+    /**
+    * @event change
+    * Fires when the value changes
+    * @param {Ext.slider.Slider} this
+    * @param {Ext.slider.Thumb} thumb The thumb being changed
+    * @param {Number} newValue The new value
+    * @param {Number} oldValue The old value
+    */
+
+    /**
+    * @event dragstart
+    * Fires when the slider thumb starts a drag
+    * @param {Ext.slider.Slider} this
+    * @param {Ext.slider.Thumb} thumb The thumb being dragged
+    * @param {Array} value The start value
+    * @param {Ext.EventObject} e
+    */
+
+    /**
+    * @event drag
+    * Fires when the slider thumb starts a drag
+    * @param {Ext.slider.Slider} this
+    * @param {Ext.slider.Thumb} thumb The thumb being dragged
+    * @param {Ext.EventObject} e
+    */
+
+    /**
+    * @event dragend
+    * Fires when the slider thumb starts a drag
+    * @param {Ext.slider.Slider} this
+    * @param {Ext.slider.Thumb} thumb The thumb being dragged
+    * @param {Array} value The end value
+    * @param {Ext.EventObject} e
+    */
+    config: {
+        baseCls: 'x-slider',
+
+        /**
+         * @cfg {Object} thumbConfig The config object to factory {@link Ext.slider.Thumb} instances
+         * @accessor
+         */
+        thumbConfig: {
+            draggable: {
+                translatable: {
+                    easingX: {
+                        duration: 300,
+                        type: 'ease-out'
+                    }
+                }
+            }
+        },
+
+        /**
+         * @cfg {Number/Number[]} value The value(s) of this slider's thumbs. If you pass
+         * a number, it will assume you have just 1 thumb.
+         * @accessor
+         */
+        value: 0,
+
+        /**
+         * @cfg {Number} minValue The lowest value any thumb on this slider can be set to.
+         * @accessor
+         */
+        minValue: 0,
+
+        /**
+         * @cfg {Number} maxValue The highest value any thumb on this slider can be set to.
+         * @accessor
+         */
+        maxValue: 100,
+
+        /**
+         * @cfg {Number} increment The increment by which to snap each thumb when its value changes. Defaults to 1. Any thumb movement
+         * will be snapped to the nearest value that is a multiple of the increment (e.g. if increment is 10 and the user
+         * tries to move the thumb to 67, it will be snapped to 70 instead)
+         * @accessor
+         */
+        increment: 1,
+
+        /**
+         * @cfg {Boolean} allowThumbsOverlapping Whether or not to allow multiple thumbs to overlap each other.
+         * Setting this to true guarantees the ability to select every possible value in between {@link #minValue}
+         * and {@link #maxValue} that satisfies {@link #increment}
+         * @accessor
+         */
+        allowThumbsOverlapping: false,
+
+        /**
+         * @cfg {Boolean/Object} animation
+         * The animation to use when moving the slider. Possible properties are:
+         *
+         * - duration
+         * - easingX
+         * - easingY
+         *
+         * @accessor
+         */
+        animation: true
+    },
+
+    /**
+     * @cfg {Number/Number[]} values Alias to {@link #value}
+     */
+
+    elementWidth: 0,
+
+    offsetValueRatio: 0,
+
+    activeThumb: null,
+
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.hasOwnProperty('values')) {
+            config.value = config.values;
+        }
+
+        this.callParent([config]);
+    },
+
+    // @private
+    initialize: function() {
+        var element = this.element;
+
+        this.callParent();
+
+        element.on({
+            scope: this,
+            tap: 'onTap'
+        });
+
+        this.on({
+            scope: this,
+            delegate: '> thumb',
+            dragstart: 'onThumbDragStart',
+            drag: 'onThumbDrag',
+            dragend: 'onThumbDragEnd'
+        });
+
+        this.on({
+            painted: 'refresh',
+            resize: 'refresh'
+        });
+    },
+
+    /**
+     * @private
+     */
+    factoryThumb: function() {
+        return Ext.factory(this.getThumbConfig(), Ext.slider.Thumb);
+    },
+
+    /**
+     * Returns the Thumb instances bound to this Slider
+     * @return {Ext.slider.Thumb[]} The thumb instances
+     */
+    getThumbs: function() {
+        return this.innerItems;
+    },
+
+    /**
+     * Returns the Thumb instance bound to this Slider
+     * @param {Number} [index=0] The index of Thumb to return.
+     * @return {Ext.slider.Thumb} The thumb instance
+     */
+    getThumb: function(index) {
+        if (typeof index != 'number') {
+            index = 0;
+        }
+
+        return this.innerItems[index];
+    },
+
+    refreshOffsetValueRatio: function() {
+        var valueRange = this.getMaxValue() - this.getMinValue(),
+            trackWidth = this.elementWidth - this.thumbWidth;
+
+        this.offsetValueRatio = trackWidth / valueRange;
+    },
+
+    refreshElementWidth: function() {
+        this.elementWidth = this.element.dom.offsetWidth;
+        var thumb = this.getThumb(0);
+        if (thumb) {
+            this.thumbWidth = thumb.getElementWidth();
+        }
+    },
+
+    refresh: function() {
+        this.refreshElementWidth();
+        this.refreshValue();
+    },
+
+    setActiveThumb: function(thumb) {
+        var oldActiveThumb = this.activeThumb;
+
+        if (oldActiveThumb && oldActiveThumb !== thumb) {
+            oldActiveThumb.setZIndex(null);
+        }
+
+        this.activeThumb = thumb;
+        thumb.setZIndex(2);
+
+        return this;
+    },
+
+    onThumbDragStart: function(thumb, e) {
+        if (e.absDeltaX <= e.absDeltaY) {
+            return false;
+        }
+        else {
+            e.stopPropagation();
+        }
+
+        if (this.getAllowThumbsOverlapping()) {
+            this.setActiveThumb(thumb);
+        }
+
+        this.dragStartValue = this.getValue()[this.getThumbIndex(thumb)];
+        this.fireEvent('dragstart', this, thumb, this.dragStartValue, e);
+    },
+
+    onThumbDrag: function(thumb, e, offsetX) {
+        var index = this.getThumbIndex(thumb),
+            offsetValueRatio = this.offsetValueRatio,
+            constrainedValue = this.constrainValue(offsetX / offsetValueRatio);
+
+        e.stopPropagation();
+
+        this.setIndexValue(index, constrainedValue);
+
+        this.fireEvent('drag', this, thumb, this.getValue(), e);
+
+        return false;
+    },
+
+    setIndexValue: function(index, value, animation) {
+        var thumb = this.getThumb(index),
+            values = this.getValue(),
+            offsetValueRatio = this.offsetValueRatio,
+            draggable = thumb.getDraggable();
+
+        draggable.setOffset(value * offsetValueRatio, null, animation);
+
+        values[index] = value;
+    },
+
+    onThumbDragEnd: function(thumb, e) {
+        this.refreshThumbConstraints(thumb);
+        var index = this.getThumbIndex(thumb),
+            newValue = this.getValue()[index],
+            oldValue = this.dragStartValue;
+
+        this.fireEvent('dragend', this, thumb, this.getValue(), e);
+        if (oldValue !== newValue) {
+            this.fireEvent('change', this, thumb, newValue, oldValue);
+        }
+    },
+
+    getThumbIndex: function(thumb) {
+        return this.getThumbs().indexOf(thumb);
+    },
+
+    refreshThumbConstraints: function(thumb) {
+        var allowThumbsOverlapping = this.getAllowThumbsOverlapping(),
+            offsetX = thumb.getDraggable().getOffset().x,
+            thumbs = this.getThumbs(),
+            index = this.getThumbIndex(thumb),
+            previousThumb = thumbs[index - 1],
+            nextThumb = thumbs[index + 1],
+            thumbWidth = this.thumbWidth;
+
+        if (previousThumb) {
+            previousThumb.getDraggable().addExtraConstraint({
+                max: {
+                    x: offsetX - ((allowThumbsOverlapping) ? 0 : thumbWidth)
+                }
+            });
+        }
+
+        if (nextThumb) {
+            nextThumb.getDraggable().addExtraConstraint({
+                min: {
+                    x: offsetX + ((allowThumbsOverlapping) ? 0 : thumbWidth)
+                }
+            });
+        }
+    },
+
+    // @private
+    onTap: function(e) {
+        if (this.isDisabled()) {
+            return;
+        }
+
+        var targetElement = Ext.get(e.target);
+
+        if (!targetElement || targetElement.hasCls('x-thumb')) {
+            return;
+        }
+
+        var touchPointX = e.touch.point.x,
+            element = this.element,
+            elementX = element.getX(),
+            offset = touchPointX - elementX - (this.thumbWidth / 2),
+            value = this.constrainValue(offset / this.offsetValueRatio),
+            values = this.getValue(),
+            minDistance = Infinity,
+            ln = values.length,
+            i, absDistance, testValue, closestIndex, oldValue, thumb;
+
+        if (ln === 1) {
+            closestIndex = 0;
+        }
+        else {
+            for (i = 0; i < ln; i++) {
+                testValue = values[i];
+                absDistance = Math.abs(testValue - value);
+
+                if (absDistance < minDistance) {
+                    minDistance = absDistance;
+                    closestIndex = i;
+                }
+            }
+        }
+
+        oldValue = values[closestIndex];
+        thumb = this.getThumb(closestIndex);
+
+        this.setIndexValue(closestIndex, value, this.getAnimation());
+        this.refreshThumbConstraints(thumb);
+
+        if (oldValue !== value) {
+            this.fireEvent('change', this, thumb, value, oldValue);
+        }
+    },
+
+    // @private
+    updateThumbs: function(newThumbs) {
+        this.add(newThumbs);
+    },
+
+    applyValue: function(value) {
+        var values = Ext.Array.from(value || 0),
+            filteredValues = [],
+            previousFilteredValue = this.getMinValue(),
+            filteredValue, i, ln;
+
+        for (i = 0,ln = values.length; i < ln; i++) {
+            filteredValue = this.constrainValue(values[i]);
+
+            if (filteredValue < previousFilteredValue) {
+                filteredValue = previousFilteredValue;
+            }
+
+            filteredValues.push(filteredValue);
+
+            previousFilteredValue = filteredValue;
+        }
+
+        return filteredValues;
+    },
+
+    /**
+     * Updates the sliders thumbs with their new value(s)
+     */
+    updateValue: function(newValue, oldValue) {
+        var thumbs = this.getThumbs(),
+            ln = newValue.length,
+            i;
+
+        this.setThumbsCount(ln);
+
+        for (i = 0; i < ln; i++) {
+            thumbs[i].getDraggable().setExtraConstraint(null)
+                                    .setOffset(newValue[i] * this.offsetValueRatio);
+        }
+
+        for (i = 0; i < ln; i++) {
+            this.refreshThumbConstraints(thumbs[i]);
+        }
+    },
+
+    /**
+     * @private
+     */
+    refreshValue: function() {
+        this.refreshOffsetValueRatio();
+
+        this.setValue(this.getValue());
+    },
+
+    /**
+     * @private
+     * Takes a desired value of a thumb and returns the nearest snap value. e.g if minValue = 0, maxValue = 100, increment = 10 and we
+     * pass a value of 67 here, the returned value will be 70. The returned number is constrained within {@link #minValue} and {@link #maxValue},
+     * so in the above example 68 would be returned if {@link #maxValue} was set to 68.
+     * @param {Number} value The value to snap
+     * @return {Number} The snapped value
+     */
+    constrainValue: function(value) {
+        var me = this,
+            minValue  = me.getMinValue(),
+            maxValue  = me.getMaxValue(),
+            increment = me.getIncrement(),
+            remainder;
+
+        value = parseFloat(value);
+
+        if (isNaN(value)) {
+            value = minValue;
+        }
+
+        remainder = value % increment;
+        value -= remainder;
+
+        if (Math.abs(remainder) >= (increment / 2)) {
+            value += (remainder > 0) ? increment : -increment;
+        }
+
+        value = Math.max(minValue, value);
+        value = Math.min(maxValue, value);
+
+        return value;
+    },
+
+    setThumbsCount: function(count) {
+        var thumbs = this.getThumbs(),
+            thumbsCount = thumbs.length,
+            i, ln, thumb;
+
+        if (thumbsCount > count) {
+            for (i = 0,ln = thumbsCount - count; i < ln; i++) {
+                thumb = thumbs[thumbs.length - 1];
+                thumb.destroy();
+            }
+        }
+        else if (thumbsCount < count) {
+            for (i = 0,ln = count - thumbsCount; i < ln; i++) {
+                this.add(this.factoryThumb());
+            }
+        }
+
+        return this;
+    },
+
+    /**
+     * Convience method. Calls {@link #setValue}
+     */
+    setValues: function(value) {
+        this.setValue(value);
+    },
+
+    /**
+     * Convience method. Calls {@link #getValue}
+     */
+    getValues: function() {
+        return this.getValue();
+    },
+
+    // Sets the {@link #increment} configuration
+    applyIncrement: function(increment) {
+        if (increment === 0) {
+            increment = 1;
+        }
+
+        return Math.abs(increment);
+    },
+
+    // @private
+    updateAllowThumbsOverlapping: function(newValue, oldValue) {
+        if (typeof oldValue != 'undefined') {
+            this.refreshValue();
+        }
+    },
+
+    // @private
+    updateMinValue: function(newValue, oldValue) {
+        if (typeof oldValue != 'undefined') {
+            this.refreshValue();
+        }
+    },
+
+    // @private
+    updateMaxValue: function(newValue, oldValue) {
+        if (typeof oldValue != 'undefined') {
+            this.refreshValue();
+        }
+    },
+
+    // @private
+    updateIncrement: function(newValue, oldValue) {
+        if (typeof oldValue != 'undefined') {
+            this.refreshValue();
+        }
+    },
+
+    doSetDisabled: function(disabled) {
+        this.callParent(arguments);
+
+        var items = this.getItems().items,
+            ln = items.length,
+            i;
+
+        for (i = 0; i < ln; i++) {
+            items[i].setDisabled(disabled);
+        }
+    }
+
+}, function() {
+});
+
+/**
+ * @aside guide forms
+ *
+ * The slider is a way to allow the user to select a value from a given numerical range. You might use it for choosing
+ * a percentage, combine two of them to get min and max values, or use three of them to specify the hex values for a
+ * color. Each slider contains a single 'thumb' that can be dragged along the slider's length to change the value.
+ * Sliders are equally useful inside {@link Ext.form.Panel forms} and standalone. Here's how to quickly create a
+ * slider in form, in this case enabling a user to choose a percentage:
+ *
+ *     @example
+ *     Ext.create('Ext.form.Panel', {
+ *         fullscreen: true,
+ *         items: [
+ *             {
+ *                 xtype: 'sliderfield',
+ *                 label: 'Percentage',
+ *                 value: 50,
+ *                 minValue: 0,
+ *                 maxValue: 100
+ *             }
+ *         ]
+ *     });
+ *
+ * In this case we set a starting value of 50%, and defined the min and max values to be 0 and 100 respectively, giving
+ * us a percentage slider. Because this is such a common use case, the defaults for {@link #minValue} and
+ * {@link #maxValue} are already set to 0 and 100 so in the example above they could be removed.
+ *
+ * It's often useful to render sliders outside the context of a form panel too. In this example we create a slider that
+ * allows a user to choose the waist measurement of a pair of jeans. Let's say the online store we're making this for
+ * sells jeans with waist sizes from 24 inches to 60 inches in 2 inch increments - here's how we might achieve that:
+ *
+ *     @example
+ *     Ext.create('Ext.form.Panel', {
+ *         fullscreen: true,
+ *         items: [
+ *             {
+ *                 xtype: 'sliderfield',
+ *                 label: 'Waist Measurement',
+ *                 minValue: 24,
+ *                 maxValue: 60,
+ *                 increment: 2,
+ *                 value: 32
+ *             }
+ *         ]
+ *     });
+ *
+ * Now that we've got our slider, we can ask it what value it currently has and listen to events that it fires. For
+ * example, if we wanted our app to show different images for different sizes, we can listen to the {@link #change}
+ * event to be informed whenever the slider is moved:
+ *
+ *     slider.on('change', function(field, newValue) {
+ *         if (newValue[0] > 40) {
+ *             imgComponent.setSrc('large.png')
+ *         } else {
+ *             imgComponent.setSrc('small.png');
+ *         }
+ *     }, this);
+ *
+ * Here we listened to the {@link #change} event on the slider and updated the background image of an
+ * {@link Ext.Img image component} based on what size the user selected. Of course, you can use any logic inside your
+ * event listener.
+ */
+Ext.define('Ext.field.Slider', {
+    extend  : 'Ext.field.Field',
+    xtype   : 'sliderfield',
+    requires: ['Ext.slider.Slider'],
+    alternateClassName: 'Ext.form.Slider',
+
+    /**
+     * @event change
+     * Fires when an option selection has changed.
+     * @param {Ext.field.Slider} me
+     * @param {Ext.slider.Slider} Slider Component
+     * @param {Ext.slider.Thumb} thumb
+     * @param {Number} newValue the new value of this thumb
+     * @param {Number} oldValue the old value of this thumb
+     */
+
+    /**
+    * @event dragstart
+    * Fires when the slider thumb starts a drag
+    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} Slider Component
+    * @param {Ext.slider.Thumb} thumb The thumb being dragged
+    * @param {Array} value The start value
+    * @param {Ext.EventObject} e
+    */
+
+    /**
+    * @event drag
+    * Fires when the slider thumb starts a drag
+    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} Slider Component
+    * @param {Ext.slider.Thumb} thumb The thumb being dragged
+    * @param {Ext.EventObject} e
+    */
+
+    /**
+    * @event dragend
+    * Fires when the slider thumb starts a drag
+    * @param {Ext.field.Slider} this
+    * @param {Ext.slider.Slider} Slider Component
+    * @param {Ext.slider.Thumb} thumb The thumb being dragged
+    * @param {Array} value The end value
+    * @param {Ext.EventObject} e
+    */
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        cls: Ext.baseCSSPrefix + 'slider-field',
+
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        tabIndex: -1
+    },
+
+    proxyConfig: {
+        /**
+         * @cfg {Number/Number[]} value See {@link Ext.slider.Slider#value}
+         * @accessor
+         */
+        value: 0,
+
+        /**
+         * @cfg {Number} minValue See {@link Ext.slider.Slider#minValue}
+         * @accessor
+         */
+        minValue: 0,
+
+        /**
+         * @cfg {Number} maxValue See {@link Ext.slider.Slider#maxValue}
+         * @accessor
+         */
+        maxValue: 100,
+
+        /**
+         * @cfg {Number} increment See {@link Ext.slider.Slider#increment}
+         * @accessor
+         */
+        increment: 1
+    },
+
+    /**
+     * @cfg {Number/Number[]} values See {@link Ext.slider.Slider#values}
+     */
+
+    constructor: function(config) {
+        config = config || {};
+
+        if (config.hasOwnProperty('values')) {
+            config.value = config.values;
+        }
+
+        this.callParent([config]);
+    },
+
+    // @private
+    initialize: function() {
+        this.callParent();
+
+        this.getComponent().on({
+            scope: this,
+            change: 'onSliderChange',
+            dragstart: 'onSliderDragStart',
+            drag: 'onSliderDrag',
+            dragend: 'onSliderDragEnd'
+        });
+    },
+
+    // @private
+    applyComponent: function(config) {
+        return Ext.factory(config, Ext.slider.Slider);
+    },
+
+    onSliderChange: function() {
+        this.fireEvent.apply(this, [].concat('change', this, Array.prototype.slice.call(arguments)));
+    },
+
+    onSliderDragStart: function() {
+        this.fireEvent.apply(this, [].concat('dragstart', this, Array.prototype.slice.call(arguments)));
+    },
+
+    onSliderDrag: function() {
+        this.fireEvent.apply(this, [].concat('drag', this, Array.prototype.slice.call(arguments)));
+    },
+
+    onSliderDragEnd: function() {
+        this.fireEvent.apply(this, [].concat('dragend', this, Array.prototype.slice.call(arguments)));
+    },
+
+    /**
+     * Convience method. Calls {@link #setValue}
+     */
+    setValues: function(value) {
+        this.setValue(value);
+    },
+
+    /**
+     * Convience method. Calls {@link #getValue}
+     */
+    getValues: function() {
+        return this.getValue();
+    },
+
+    reset: function() {
+        var config = this.config,
+            initialValue = (this.config.hasOwnProperty('values')) ? config.values : config.value;
+
+        this.setValue(initialValue);
+    },
+
+    doSetDisabled: function(disabled) {
+        this.callParent(arguments);
+
+        this.getComponent().setDisabled(disabled);
+    }
+});
+
+Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
+    extend: 'Ext.Panel',
+    requires: ['Ext.field.Slider', 'Ext.data.proxy.JsonP'],
+    xtype: 'DeviceDetailsDimmer',
+
+    constructor: function (config) {
+        var self = this;
+        self.RepollTimer;
+        self.deviceID = 0;
+        Ext.apply(config || {}, {
+            xtype: 'panel',
+            layout: 'vbox',
+            scrollable: 'vertical',
+            items: [{
+                xtype: 'panel',
+                id: 'dimmerDetailsTPL',
+                tpl: new Ext.XTemplate(
+							    '<div class="device_info">',
+							    '<div id="level_dimmer_img" class="imageholder {type}_{on_off}"></div>',
+							    '<div id="level_dimmer_details" class="level">{level_txt}</div>',
+								    '<h1>{name}</h1>',
+								    '<h2>{type_txt}<h2>',
+								    '<div class="overview"><strong>Groups: </strong>{groups}<br />',
+								    '<strong>Updated: </strong>{last_heard_from}</div>',
+							    '</div>')
+            }, {
+                xtype: 'fieldset',
+                margin: 5,
+                defaults: {
+                    labelAlign: 'right'
+                },
+                items: [{
+                    xtype: 'sliderfield',
+                    id: 'dimmerSlider',
+                    label: 'Level',
+                    minValue: 0,
+                    maxValue: 99,
+                    listeners: {
+                        scope: this,
+                        change: function (slider, value) {
+                            var dimmerSlider = Ext.getCmp('dimmerSlider');
+                            if (dimmerSlider) {
+                                dimmerSlider.element.dom.childNodes[0].childNodes[0].innerHTML = slider.getValue() + "%";
+
+                                var dimmerSlider = Ext.getCmp('dimmerSlider');
+                                var sliderValue = dimmerSlider.getValue()[0]
+
+                                var DimmerTPL = Ext.getCmp('dimmerDetailsTPL');
+                                var pluginName = DimmerTPL._data.plugin_name;
+                                var cmd = DeviceLevelTranslations[pluginName + "LEVEL"];
+
+                                console.log('AJAX: Sent ' + cmd + ' : ' + sliderValue);
+
+                                Ext.Ajax.request({
+                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
+                                    method: 'POST',
+                                    params: {
+                                        u: Math.random(),
+                                        name: cmd,
+                                        arg: sliderValue,
+                                        type: 'device'
+                                    },
+                                    success: function (response, opts) {
+                                        var result = JSON.parse(response.responseText);
+                                        if (result.success) {
+                                            self.delayedReload();
+                                            //Ext.Msg.alert('Dimmer Command', 'Dimmer set to ' + sliderValue + '%');
+                                        }
+                                        else {
+                                            Ext.Msg.alert('Dimmer Command', 'Communication Error!');
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }]
+            }, {
+                xtype: 'button',
+                label: 'Repoll',
+                text: 'Repoll',
+                ui: 'confirm',
+                margin: '15 10 5 10',
+                handler: function () {
+                    console.log('AJAX: SendCmd REPOLL_ME');
+                    Ext.Ajax.request({
+                        url: zvsMobile.app.BaseURL() + '/commands/',
+                        method: 'POST',
+                        params: {
+                            u: Math.random(),
+                            name: 'REPOLL_ME',
+                            arg: self.deviceID
+                        },
+                        success: function (response, opts) {
+                            var result = JSON.parse(response.responseText);
+                            if (result.success) {
+                                self.delayedReload();
+                            }
+                            else {
+                                console.log('ERROR');
+                            }
+                        }
+                    });
+                }
+            }
+            ]
+
+                  ,
+            listeners: {
+                scope: this,
+                deactivate: function () {
+                    if (self.RepollTimer) { clearInterval(self.RepollTimer); }
+                }
+            }
+        });
+        this.callOverridden([config]);
+    },
+    delayedReload: function () {
+        var self = this;
+        var detailsTPL = self.items.items[1];
+        if (self.RepollTimer) { clearInterval(self.RepollTimer); }
+
+        self.RepollTimer = setTimeout(function () {
+            self.loadDevice(self.deviceID);
+        }, 5000);
+    }, ShowBackButton: function () {
+        var self = this;
+        self.items.items[0].visibility = false;
+    },
+    loadDevice: function (deviceId) {
+        var self = this;
+        var detailsTPL = Ext.getCmp('dimmerDetailsTPL');
+        self.deviceID = deviceId;
+        //Get Device Details			
+        console.log('AJAX: GetDeviceDetails');
+
+        Ext.data.JsonP.request({
+            url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
+            callbackKey: 'callback',
+            params: {
+                u: Math.random()
+            },
+            success: function (result) {
+                //Send data to panel TPL                            
+                detailsTPL.setData(result.details);
+                //Update meter levels 
+                self.UpdateLevel(result.details.level);
+            }
+        });
+    },
+    UpdateLevel: function (value) {
+        var level = value > 99 ? 99 : value;
+        var dimmerSlider = Ext.getCmp('dimmerSlider');
+        var detailsTPL = Ext.getCmp('dimmerDetailsTPL');
+
+        dimmerSlider.setValue(level);
+        dimmerSlider.element.dom.childNodes[0].childNodes[0].innerHTML = level + "%";
+
+        //Update panel TPL        
+        var data = Ext.clone(detailsTPL.getData());
+        data.level = level;
+        data.level_txt = level + '%';
+        if (level == 0) {
+            data.on_off = 'OFF';
+        }
+        else if (level > 98) {
+            data.on_off = 'ON';
+        }
+        else {
+            data.on_off = 'DIM';
+        }
+        detailsTPL.setData(data);
+
+        //Update the store 
+        data = DeviceStore.data.items;
+        for (i = 0, len = data.length; i < len; i++) {
+            if (data[i].data.id === detailsTPL._data.id) {
+
+                data[i].data.level_txt = value + '%';
+                data[i].data.level = value;
+
+                if (value == 0) {
+                    data[i].data.on_off = 'OFF';
+                }
+                else if (value > 98) {
+                    data[i].data.on_off = 'ON';
+                }
+                else {
+                    data[i].data.on_off = 'DIM';
+                }
+
+            }
+        }
+        DeviceStore.add(data);
+
+        //Refresh the DEvice list
+        Ext.getCmp('DeviceList').refresh();
+
+    }
+});
+
+var DeviceLevelTranslations = {
+    "THINKSTICKLEVEL": "BASIC",
+    "OPENZWAVELEVEL": "DYNAMIC_CMD_BASIC"
+};
+/**
+ * @private
+ */
+Ext.define('Ext.slider.Toggle', {
+    extend: 'Ext.slider.Slider',
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        baseCls: 'x-toggle',
+
+        /**
+         * @cfg {String} minValueCls CSS class added to the field when toggled to its minValue
+         * @accessor
+         */
+        minValueCls: 'x-toggle-off',
+
+        /**
+         * @cfg {String} maxValueCls CSS class added to the field when toggled to its maxValue
+         * @accessor
+         */
+        maxValueCls: 'x-toggle-on'
+    },
+
+    initialize: function() {
+        this.callParent();
+
+        this.on({
+            change: 'onChange'
+        });
+    },
+
+    applyMinValue: function() {
+        return 0;
+    },
+
+    applyMaxValue: function() {
+        return 1;
+    },
+
+    applyIncrement: function() {
+        return 1;
+    },
+
+    updateMinValueCls: function(newCls, oldCls) {
+        var element = this.element;
+
+        if (oldCls && element.hasCls(oldCls)) {
+            element.replaceCls(oldCls, newCls);
+        }
+    },
+
+    updateMaxValueCls: function(newCls, oldCls) {
+        var element = this.element;
+
+        if (oldCls && element.hasCls(oldCls)) {
+            element.replaceCls(oldCls, newCls);
+        }
+    },
+
+    setValue: function(newValue, oldValue) {
+        this.callParent(arguments);
+        this.onChange(this, this.getThumbs()[0], newValue, oldValue);
+    },
+
+    onChange: function(me, thumb, newValue, oldValue) {
+        var isOn = newValue > 0,
+            onCls = me.getMaxValueCls(),
+            offCls = me.getMinValueCls();
+
+        this.element.addCls(isOn ? onCls : offCls);
+        this.element.removeCls(isOn ? offCls : onCls);
+    },
+
+    toggle: function() {
+        var value = this.getValue();
+        this.setValue((value == 1) ? 0 : 1);
+
+        return this;
+    },
+
+    onTap: function() {
+        if (this.isDisabled()) {
+            return;
+        }
+
+        var oldValue = this.getValue(),
+            newValue = (oldValue == 1) ? 0 : 1,
+            thumb = this.getThumb(0);
+
+        this.setIndexValue(0, newValue, this.getAnimation());
+        this.refreshThumbConstraints(thumb);
+
+        this.fireEvent('change', this, thumb, newValue, oldValue);
+    }
+});
+
+/**
+ * @aside guide forms
+ *
+ * Specialized {@link Ext.field.Slider} with a single thumb which only supports two {@link #value values}.
+ *
+ * ## Examples
+ *
+ *     @example miniphone preview
+ *     Ext.Viewport.add({
+ *         xtype: 'togglefield',
+ *         name: 'awesome',
+ *         label: 'Are you awesome?',
+ *         labelWidth: '40%'
+ *     });
+ *
+ * Having a default value of 'toggled':
+ *
+ *     @example miniphone preview
+ *     Ext.Viewport.add({
+ *         xtype: 'togglefield',
+ *         name: 'awesome',
+ *         value: 1,
+ *         label: 'Are you awesome?',
+ *         labelWidth: '40%'
+ *     });
+ *
+ * And using the {@link #value} {@link #toggle} method:
+ *
+ *     @example miniphone preview
+ *     Ext.Viewport.add([
+ *         {
+ *             xtype: 'togglefield',
+ *             name: 'awesome',
+ *             value: 1,
+ *             label: 'Are you awesome?',
+ *             labelWidth: '40%'
+ *         },
+ *         {
+ *             xtype: 'toolbar',
+ *             docked: 'top',
+ *             items: [
+ *                 {
+ *                     xtype: 'button',
+ *                     text: 'Toggle',
+ *                     flex: 1,
+ *                     handler: function() {
+ *                         Ext.ComponentQuery.query('togglefield')[0].toggle();
+ *                     }
+ *                 }
+ *             ]
+ *         }
+ *     ]);
+ */
+Ext.define('Ext.field.Toggle', {
+    extend: 'Ext.field.Slider',
+    xtype : 'togglefield',
+    alternateClassName: 'Ext.form.Toggle',
+    requires: ['Ext.slider.Toggle'],
+
+    config: {
+        /**
+         * @cfg
+         * @inheritdoc
+         */
+        cls: 'x-toggle-field'
+    },
+
+    proxyConfig: {
+        /**
+         * @cfg {String} minValueCls See {@link Ext.slider.Toggle#minValueCls}
+         * @accessor
+         */
+        minValueCls: 'x-toggle-off',
+
+        /**
+         * @cfg {String} maxValueCls  See {@link Ext.slider.Toggle#maxValueCls}
+         * @accessor
+         */
+        maxValueCls: 'x-toggle-on'
+    },
+
+    // @private
+    applyComponent: function(config) {
+        return Ext.factory(config, Ext.slider.Toggle);
+    },
+
+    /**
+     * Sets the value of the toggle.
+     * @param {Number} value **1** for toggled, **0** for untoggled.
+     */
+    setValue: function(newValue) {
+        if (newValue === true) {
+            newValue = 1;
+        }
+
+        this.getComponent().setValue(newValue);
+
+        return this;
+    },
+
+    getValue: function() {
+        return (this.getComponent().getValue() == 1) ? 1 : 0;
+    },
+
+    /**
+     * Toggles the value of this toggle field.
+     * @return this
+     */
+    toggle: function() {
+        this.getComponent().toggle();
+        return this;
+    }
+});
+
+Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
+    extend: 'Ext.Panel',
+    requires: ['Ext.field.Toggle', 'Ext.data.proxy.JsonP'],
+    xtype: 'DeviceDetailsSwitch',
+
+    constructor: function (config) {
+        this.RepollTimer;
+        this.deviceID = 0;
+        var self = this;
+        Ext.apply(config || {}, {
+            xtype: 'panel',
+            layout: 'vbox',
+            scrollable: 'vertical',
+            items: [{
+                xtype: 'panel',
+                id: 'switchDetailsTPL',
+                tpl: new Ext.XTemplate(
+							    '<div class="device_info">',
+							    '<div id="level_switch_img" class="imageholder {type}_{on_off}"></div>',
+							    '<div id="level_switch_details" class="level">{level_txt}</div>',
+								    '<h1>{name}</h1>',
+								    '<h2>{type_txt}<h2>',
+								    '<div class="overview"><strong>Groups: </strong>{groups}<br />',
+								    '<strong>Updated: </strong>{last_heard_from}</div>',
+							    '</div>')
+            }, {
+                xtype: 'fieldset',
+                margin: 5,
+                defaults: {
+                    labelAlign: 'right'
+                },
+                items: [{
+                    xtype: 'togglefield',
+                    id: 'switchToggle',
+                    label: 'OFF / ON',
+                    listeners: {
+                        scope: this,
+                        change: function (slider, value) {
+                            var switchToggle = Ext.getCmp('switchToggle');
+                            if (switchToggle) {
+                                var toggleValue = switchToggle.getValue();
+                                console.log('AJAX: SendCmd SEt LEVEL' + toggleValue);
+                                Ext.Ajax.request({
+                                    url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
+                                    method: 'POST',
+                                    params: {
+                                        u: Math.random(),
+                                        name: toggleValue > 0 ? 'TURNON' : 'TURNOFF',
+                                        arg: 0,
+                                        type: 'device_type'
+                                    },
+                                    success: function (response, opts) {
+                                        var result = JSON.parse(response.responseText);
+                                        if (result.success) {
+                                            self.delayedReload();
+                                            //Ext.Msg.alert('Switch Command', 'Switch set to ' + (toggleValue > 0 ? 'On' : 'Off'));
+                                        }
+                                        else {
+                                            Ext.Msg.alert('Switch Command', 'Communication Error!');
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }]
+            }, {
+                xtype: 'button',
+                label: 'Repoll',
+                text: 'Repoll',
+                ui: 'confirm',
+                margin: '15 10 5 10',
+                handler: function () {
+                    console.log('AJAX: SendCmd REPOLL_ME');
+
+                    Ext.Ajax.request({
+                        url: zvsMobile.app.BaseURL() + '/commands/',
+                        method: 'POST',
+                        params: {
+                            u: Math.random(),
+                            name: 'REPOLL_ME',
+                            arg: self.deviceID
+                        },
+                        success: function (response, opts) {
+                            var result = JSON.parse(response.responseText);
+                            if (result.success) {
+                                self.delayedReload();
+                            }
+                            else {
+                                console.log('ERROR');
+                            }
+                        }
+                    });
+                }
+
+            }],
+            listeners: {
+                scope: this,
+                deactivate: function () {
+                    if (self.RepollTimer) { clearInterval(self.RepollTimer); }
+                }
+            }
+        });
+        this.callOverridden([config]);
+    },
+    delayedReload: function () {
+        var self = this;
+        var switchDetailsTPL = Ext.getCmp('switchDetailsTPL');
+        if (self.RepollTimer) { clearInterval(self.RepollTimer); }
+
+        self.RepollTimer = setTimeout(function () {           
+            self.loadDevice(self.deviceID);
+        }, 1500);
+    },
+    loadDevice: function (deviceId) {
+        var self = this;
+        var switchDetailsTPL = Ext.getCmp('switchDetailsTPL');
+        this.deviceID = deviceId;
+
+        //Get Device Details			
+        console.log('AJAX: GetDeviceDetails');
+        Ext.data.JsonP.request({
+            url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
+            callbackKey: 'callback',
+            params: {
+                u: Math.random()
+            },
+            success: function (result) {
+                //Send data to panel TPL                            
+                switchDetailsTPL.setData(result.details);
+
+                //Update meter levels 
+                self.UpdateLevel(result.details.level);
+            }
+        });
+    },
+    UpdateLevel: function (value) {
+        var self = this;
+        var switchToggle = Ext.getCmp('switchToggle');
+        var switchDetailsTPL = Ext.getCmp('switchDetailsTPL');
+        switchToggle.setValue(value);
+
+        //Update panel TPL        
+        var data = Ext.clone(switchDetailsTPL.getData());
+        data.level = value;
+        data.level_txt = value > 0 ? 'ON' : 'OFF';
+        data.on_off = value > 0 ? 'ON' : 'OFF';
+        switchDetailsTPL.setData(data);
+
+        //Update the store 
+        data = DeviceStore.data.items;
+        for (i = 0, len = data.length; i < len; i++) {
+            if (data[i].data.id === switchDetailsTPL._data.id) {
+                data[i].data.level = value;
+                data[i].data.level_txt = value > 0 ? 'On' : 'Off';
+                data[i].data.on_off = value > 0 ? 'ON' : 'OFF';
+            }
+        }
+        DeviceStore.add(data);
+        //Refresh the DEvice list
+        Ext.getCmp('DeviceList').refresh();
+    }
+});
 Ext.define('zvsMobile.view.phone.DevicePhoneViewPort', {
     extend: 'Ext.Panel',
     xtype: 'DevicePhoneViewPort',
@@ -52012,9 +52154,9 @@ Ext.application({
         'Ext.MessageBox'
     ],
 
-   profiles: ['Phone', 'Tablet'],
-    stores: ['Settings', 'Devices', 'Groups', 'Scenes'],
-    views: ['SettingsViewPort'],
+    profiles: ['Phone', 'Tablet'],
+    stores: ['Settings', 'Devices', 'Groups', 'Scenes', 'LogEntries'],
+    views: ['SettingsViewPort', 'LogViewPort'],
 
     icon: {
         '57': 'resources/icons/Icon.png',
@@ -52036,7 +52178,7 @@ Ext.application({
 
     listeners: {
         ShowLoginScreen: function () {
-            var settings = zvsMobile.tabPanel.items.items[4];
+            var settings = Ext.getCmp('SettingsViewPort');//  zvsMobile.tabPanel.items.items[5];
             settings.items.items[2].fireEvent('loggedOut');
 
         }
@@ -52101,6 +52243,23 @@ Ext.application({
 
             callbackParam: 'callback'
         });
+
+        LogEntryStore = Ext.getStore('LogEntryStore');
+        LogEntryStore.setProxy({
+            type: 'scripttag',
+            url: zvsMobile.app.BaseURL() + '/LogEntries/',
+            extraParams: {
+                u: Math.random()
+            },
+            reader: {
+                type: 'json',
+                rootProperty: 'logentry',
+                idProperty: 'id',
+                successProperty: 'success'
+            },
+
+            callbackParam: 'callback'
+        });
     },
 
     launch: function() {
@@ -52114,7 +52273,7 @@ Ext.application({
     onUpdated: function() {
         Ext.Msg.confirm(
             "Application Update",
-            "This application has just successfully been updated to the latest version. Reload now?",
+            "zvsMobile has just successfully been updated to the latest version. Reload now?",
             function(buttonId) {
                 if (buttonId === 'yes') {
                     window.location.reload();

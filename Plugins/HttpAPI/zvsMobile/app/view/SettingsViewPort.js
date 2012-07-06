@@ -36,12 +36,13 @@
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).setDisabled(false);
                                 zvsMobile.tabPanel.getTabBar().getComponent(1).setDisabled(false);
                                 zvsMobile.tabPanel.getTabBar().getComponent(2).setDisabled(false);
+                                zvsMobile.tabPanel.getTabBar().getComponent(3).setDisabled(false);
 
                                 //Get data
                                 DeviceStore.load();
                                 SceneStore.load();
                                 GroupStore.load();
-
+                                LogEntryStore.load();
 
                                 //Change view to the device list
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(0));
@@ -65,8 +66,9 @@
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).setDisabled(true);
                                 zvsMobile.tabPanel.getTabBar().getComponent(1).setDisabled(true);
                                 zvsMobile.tabPanel.getTabBar().getComponent(2).setDisabled(true);
+                                zvsMobile.tabPanel.getTabBar().getComponent(3).setDisabled(true);
 
-                                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(3));
+                                zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(4));
                             }
                         }
                     }

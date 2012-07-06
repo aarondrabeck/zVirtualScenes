@@ -25,7 +25,12 @@ Ext.define('zvsMobile.view.phone.Main', {
             xtype: 'GroupPhoneViewPort',
             id: 'GroupPhoneViewPort',
             title: "Groups",
-            iconCls: "spaces2"
+            iconCls: "groups"
+        }, {
+            xtype: 'LogViewPort',
+            id: 'LogViewPort',
+            title: "Activity Log",
+            iconCls: "log"
         }, {
             xtype: 'SettingsViewPort',
             id: 'SettingsViewPort',

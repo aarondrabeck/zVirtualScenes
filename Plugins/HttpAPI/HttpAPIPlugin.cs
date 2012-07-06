@@ -78,7 +78,7 @@ namespace HttpAPI
 
         protected override void StartPlugin()
         {
-            StartHTTP();            
+            StartHTTP();
         }
 
         protected override void StopPlugin()
@@ -110,7 +110,7 @@ namespace HttpAPI
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
 
                     this.IsReady = true;
-                    WriteToLog(Urgency.INFO, string.Format("HTTP server started on port {0}",  _port));                    
+                    WriteToLog(Urgency.INFO, string.Format("HTTP server started on port {0}", _port));
                 }
             }
             catch (Exception ex)
@@ -126,7 +126,7 @@ namespace HttpAPI
                 if (httplistener != null && httplistener.IsListening)
                 {
                     httplistener.Stop();
-                    WriteToLog(Urgency.INFO,"HTTP server stopped");
+                    WriteToLog(Urgency.INFO, "HTTP server stopped");
                     this.IsReady = false;
                 }
             }
@@ -135,7 +135,7 @@ namespace HttpAPI
                 WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
             }
         }
-        
+
         protected override void SettingChanged(string settingName, string settingValue)
         {
             if (settingName == "VERBOSE")
@@ -157,23 +157,23 @@ namespace HttpAPI
 
         public override void ProcessDeviceCommand(device_command_que cmd)
         {
-           
+
         }
         public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
         {
-           
+
         }
         public override void Repoll(device device)
         {
-          
+
         }
         public override void ActivateGroup(int groupID)
         {
-           
+
         }
         public override void DeactivateGroup(int groupID)
         {
-          
+
         }
 
         private void HttpListen(object state)
@@ -365,6 +365,27 @@ namespace HttpAPI
             string ip = string.Empty;
             if (request.RemoteEndPoint != null && request.RemoteEndPoint.Address != null) { ip = request.RemoteEndPoint.Address.ToString(); };
 
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
+            {
+                List<object> logEntries = new List<object>();
+
+                foreach (LogItem entry in Core.Logger.LOG.OrderByDescending(o => o.Datetime).Take(30))
+                {
+                    var LogEntry = new
+                    {
+                        id = Core.Logger.LOG.IndexOf(entry),
+                        DateTime = entry.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt"),
+                        Description = entry.Description,
+                        Source = entry.Source,
+                        Urgency = entry.Urgency.ToString()                        
+                    };
+
+                    logEntries.Add(LogEntry);
+                }
+
+                return new { success = true, logentries = logEntries.ToArray() };
+            }
+
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
@@ -404,8 +425,8 @@ namespace HttpAPI
                         if (d != null)
                         {
                             int level = 0;
-                            
-                            if(d.current_level_int.HasValue)
+
+                            if (d.current_level_int.HasValue)
                                 level = d.current_level_int.Value;
 
                             string on_off = string.Empty;
@@ -557,7 +578,31 @@ namespace HttpAPI
                         if (is_running)
                         {
                             SceneRunner sr = new SceneRunner();
+                            SceneRunner.onSceneRunEventHandler startHandler = null;
+                            startHandler = (s, args) =>
+                            {
+                                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                {
+                                    SceneRunner.onSceneRunBegin -= startHandler;
+                                    WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", ip, args.Details));
+
+                                    #region LISTEN FOR ENDING
+                                    SceneRunner.onSceneRunEventHandler handler = null;
+                                    handler = (se, end_args) =>
+                                    {
+                                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                        {
+                                            SceneRunner.onSceneRunComplete -= handler;
+                                            WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", ip, end_args.Details));
+                                        }
+                                    };
+                                    SceneRunner.onSceneRunComplete += handler;
+                                    #endregion
+                                }
+                            };
+                            SceneRunner.onSceneRunBegin += startHandler;
                             sr.RunScene(scene.id);
+
                             return new { success = true, desc = "Scene Started." };
                         }
 
@@ -710,6 +755,8 @@ namespace HttpAPI
                                         {
                                             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                                             {
+                                                WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.friendly_name));
+
                                                 device_command_que.Run(new device_command_que
                                                 {
                                                     device_id = d.id,
@@ -737,6 +784,8 @@ namespace HttpAPI
                                         {
                                             using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                                             {
+                                                WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.friendly_name));
+
                                                 device_type_command_que.Run(new device_type_command_que
                                                 {
                                                     device_id = d.id,
@@ -807,6 +856,7 @@ namespace HttpAPI
                     {
                         using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                         {
+                            WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.friendly_name));
                             builtin_command_que.Run(new builtin_command_que
                             {
                                 builtin_command_id = cmd.id,
@@ -820,6 +870,7 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logout") && request.HttpMethod == "POST")
             {
+                WriteToLog(Urgency.INFO, string.Format("[{0}] Logged out.", ip));
                 Cookie c = new Cookie("zvs", "No Access");
                 c.Expires = DateTime.Today.AddDays(-5);
                 c.Domain = "";

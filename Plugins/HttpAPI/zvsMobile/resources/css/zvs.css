@@ -13,8 +13,9 @@
 
 .x-tab .x-button-icon.bulb,.x-button .x-button-icon.x-icon-mask.bulb { -webkit-mask-image:url('../images/bulb.png'); }
 .x-tab .x-button-icon.equalizer2,.x-button .x-button-icon.x-icon-mask.equalizer2 { -webkit-mask-image:url('../images/equalizer2.png'); }
-.x-tab .x-button-icon.spaces2,.x-button .x-button-icon.x-icon-mask.spaces2 {-webkit-mask-image:url('../images/spaces2.png'); }
+.x-tab .x-button-icon.groups,.x-button .x-button-icon.x-icon-mask.groups {-webkit-mask-image:url('../images/nodes1.png'); }
 .x-tab .x-button-icon.settings5,.x-button .x-button-icon.x-icon-mask.settings5 {-webkit-mask-image:url('../images/settings5.png'); }
+.x-tab .x-button-icon.log,.x-button .x-button-icon.x-icon-mask.settings5 {-webkit-mask-image:url('../images/compose2.png'); }
 
 html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Helvetica, "BBAlpha Sans", sans-serif }
 /*Device List*/
@@ -115,6 +116,16 @@ html, body { font-family: "Helvetica Neue", HelveticaNeue, "Helvetica-Neue", Hel
 .group_info .image { width: 64px; height: 64px; position: absolute; right: 5px; top: 5px; background-image: url('../images/group64.png')}	
 .group_info h1  {   font-size: 1.3em;  color: #000;}
 .group_overview { font-size:.9em ;color: #333;width:100%}
+
+/*Log List*/
+.LogList .x-list-item .x-list-item-label { padding: 0.3em 0.4em; }
+.LogList .log { position: relative; padding: 0px 0px 0px 0px !important;min-height: 25px !important;}
+.LogList .description {font-weight: normal; font-size: .9em;}
+
+.LogList .log h3 { font-size: .6em; margin:5px 0 0 5px; color:#999}
+.LogList .source {font-weight: normal;}
+.LogList .urgency {}
+
 
 
 /*info table */

@@ -5,9 +5,9 @@ Ext.application({
         'Ext.MessageBox'
     ],
 
-   profiles: ['Phone', 'Tablet'],
-    stores: ['Settings', 'Devices', 'Groups', 'Scenes'],
-    views: ['SettingsViewPort'],
+    profiles: ['Phone', 'Tablet'],
+    stores: ['Settings', 'Devices', 'Groups', 'Scenes', 'LogEntries'],
+    views: ['SettingsViewPort', 'LogViewPort'],
 
     icon: {
         '57': 'resources/icons/Icon.png',
@@ -29,7 +29,7 @@ Ext.application({
 
     listeners: {
         ShowLoginScreen: function () {
-            var settings = zvsMobile.tabPanel.items.items[4];
+            var settings = Ext.getCmp('SettingsViewPort');//  zvsMobile.tabPanel.items.items[5];
             settings.items.items[2].fireEvent('loggedOut');
 
         }
@@ -94,6 +94,23 @@ Ext.application({
 
             callbackParam: 'callback'
         });
+
+        LogEntryStore = Ext.getStore('LogEntryStore');
+        LogEntryStore.setProxy({
+            type: 'scripttag',
+            url: zvsMobile.app.BaseURL() + '/LogEntries/',
+            extraParams: {
+                u: Math.random()
+            },
+            reader: {
+                type: 'json',
+                rootProperty: 'logentries',
+                idProperty: 'id',
+                successProperty: 'success'
+            },
+
+            callbackParam: 'callback'
+        });
     },
 
     launch: function() {
@@ -107,7 +124,7 @@ Ext.application({
     onUpdated: function() {
         Ext.Msg.confirm(
             "Application Update",
-            "This application has just successfully been updated to the latest version. Reload now?",
+            "zvsMobile has just successfully been updated to the latest version. Reload now?",
             function(buttonId) {
                 if (buttonId === 'yes') {
                     window.location.reload();

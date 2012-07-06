@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace ThinkStickHIDPlugin
         private readonly ZWaveController CTController = new ZWaveController();
         private List<ZWaveDevice> _CTDevices = new List<ZWaveDevice>();
         private Window CommandDialogWindow = null;
+        private bool isPolling = true;
 
         public ThinkStickPlugin()
             : base("THINKSTICK",
@@ -480,9 +482,11 @@ namespace ThinkStickHIDPlugin
             IsReady = true;
             WriteToLog(Urgency.INFO, "Initializing Complete. Plugin Ready.");
 
+            isPolling = true;
             WriteToLog(Urgency.INFO, "Polling each device...");
             ManuallyPollDevices();
             WriteToLog(Urgency.INFO, "Polling Complete.");
+            isPolling = false;
         }
 
         private void CTController_Disconnected(object sender, EventArgs e)
@@ -1255,6 +1259,7 @@ namespace ThinkStickHIDPlugin
             }
         }
 
+        private HybridDictionary timers = new HybridDictionary();
         void Dimmer_LevelChanged(object sender, LevelChangedEventArgs e)
         {
             if (sender is MultilevelSwitch)
@@ -1266,31 +1271,47 @@ namespace ThinkStickHIDPlugin
                     device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDimmer.NodeID);
                     if (dev != null)
                     {
-                        dev.current_level_int = e.Level;
-                        dev.current_level_txt = e.Level + "%";
-                        dev.last_heard_from = DateTime.Now;
-                        context.SaveChanges();
-
-                        UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
-
-                        //Some dimmers take x number of seconds to dim to desired level.  Therefor the level recieved here initially is a 
-                        //level between old level and new level. (if going from 0 to 100 we get 84 here).
-                        //To get the real level repoll the device a second or two after a level change was recieved.     
-                        bool EnableDimmerRepoll = false;
-                        bool.TryParse(device_property_values.GetDevicePropertyValue(context, dev.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
-
-                        if (IsReady)
+                        if (dev.current_level_int != e.Level)
                         {
-                            System.Timers.Timer t = new System.Timers.Timer();
-                            t.Interval = 2000;
-                            t.Elapsed += (s, args) =>
+                            dev.current_level_int = e.Level;
+                            dev.current_level_txt = e.Level + "%";
+                            dev.last_heard_from = DateTime.Now;
+                            context.SaveChanges();
+
+                            UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
+
+                            //Some dimmers take x number of seconds to dim to desired level.  Therefor the level recieved here initially is a 
+                            //level between old level and new level. (if going from 0 to 100 we get 84 here).
+                            //To get the real level repoll the device a second or two after a level change was recieved.     
+                            bool EnableDimmerRepoll = false;
+                            bool.TryParse(device_property_values.GetDevicePropertyValue(context, dev.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+
+                            if (!isPolling)
                             {
-                                Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.node_id));
-                                ManuallyPollDevice(CTDimmer);
-                                t.Stop();
-                            };
-                            t.Start();
-                            Console.WriteLine(string.Format("Timer {0} started.", dev.node_id));
+                                //only allow each device to re-poll 1 time.
+                                if (timers.Contains(dev.node_id))
+                                {
+                                    Console.WriteLine(string.Format("Timer {0} restarted.", dev.node_id));
+                                    System.Timers.Timer t = (System.Timers.Timer)timers[dev.node_id];
+                                    t.Stop();
+                                    t.Start();
+                                }
+                                else
+                                {
+                                    System.Timers.Timer t = new System.Timers.Timer();
+                                    timers.Add(dev.node_id, t);
+                                    t.Interval = 2000;
+                                    t.Elapsed += (s, args) =>
+                                    {
+                                        ManuallyPollDevice(CTDimmer);
+                                        t.Stop();
+                                        Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.node_id));
+                                        timers.Remove(dev.node_id);
+                                    };
+                                    t.Start();
+                                    Console.WriteLine(string.Format("Timer {0} started.", dev.node_id));
+                                }
+                            }
                         }
                     }
                     else

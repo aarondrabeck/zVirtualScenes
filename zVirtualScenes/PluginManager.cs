@@ -175,15 +175,21 @@ namespace zVirtualScenes
                         return;
                     }
 
+                    string StartDetails = string.Format("Processing queued device type command #{0} ({1} with arg {2} on {3})",
+                                                             device_type_command_que_id,
+                                                             cmd.device_type_commands.friendly_name,
+                                                             cmd.arg,
+                                                             cmd.device.friendly_name);
+
                     //We found the command so continue
                     if (onProcessingCommandBegin != null)
-                        onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, false, string.Format("Processing device type command '{0}':'{1}'", cmd.device_type_commands.friendly_name, cmd.arg), cmd.id));
+                        onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, false, StartDetails, cmd.id));
 
                     Plugin p = GetPlugins().FirstOrDefault(o => o.Name == cmd.device.device_types.plugin.name);
                     if (p == null)
                     {
                         if (onProcessingCommandEnd != null)
-                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, true, string.Format("Failed to process built-in command id {0}. Could not locate queued commands plug-in.", cmd.id), cmd.id));
+                            onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, true, string.Format("Failed to process device type command id {0}. Could not locate queued commands plug-in.", cmd.id), cmd.id));
 
                         context.device_type_command_que.Remove(cmd);
                         context.SaveChanges();
@@ -194,11 +200,12 @@ namespace zVirtualScenes
 
                     if (p.Enabled && p.IsReady)
                     {
-                        string details = string.Format("Processing command '{0}':'{1}' on {2} to plug-in '{3}'.",
-                                                              cmd.device_type_commands.friendly_name,
-                                                              cmd.arg,
-                                                              cmd.device.friendly_name,
-                                                              p.FriendlyName);
+                        string details = string.Format("Finished processing command #{0} ({1} with arg {2} on {3} to plug-in '{4}')",
+                                                            device_type_command_que_id,
+                                                            cmd.device_type_commands.friendly_name,
+                                                            cmd.arg,
+                                                            cmd.device.friendly_name,
+                                                            p.FriendlyName);
 
                         if (onProcessingCommandEnd != null)
                             onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_type_command, false, details, cmd.id));
@@ -211,7 +218,8 @@ namespace zVirtualScenes
                     }
                     else
                     {
-                        string err_str = string.Format("Failed to process command '{0}' on '{1}' because the '{2}' plug-in is {3}. Removing command from queue...",
+                        string err_str = string.Format("Failed to process command #{0} '{1}' on '{2}' because the '{3}' plug-in is {4}. Removing command from queue...",
+                        device_type_command_que_id,
                         cmd.device_type_commands.friendly_name,
                         cmd.device.friendly_name,
                         cmd.device.device_types.plugin.name,
@@ -250,11 +258,15 @@ namespace zVirtualScenes
                         return;
                     }
 
+                    string StartDetails = string.Format("Processing queued device command #{0} ({1} with arg {2} on {3})",
+                                                             device_command_que_id,
+                                                             cmd.device_commands.friendly_name,
+                                                             cmd.arg,
+                                                             cmd.device.friendly_name);
+
                     //We found the command so continue
                     if (onProcessingCommandBegin != null)
-                        onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, false, string.Format("Processing device command '{0}':'{1}'", cmd.device_commands.friendly_name, cmd.arg), cmd.id));
-
-
+                        onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, false, StartDetails, cmd.id));
 
                     Plugin p = GetPlugins().FirstOrDefault(o => o.Name == cmd.device.device_types.plugin.name);
                     if (p == null)
@@ -270,8 +282,9 @@ namespace zVirtualScenes
 
                     if (p.Enabled && p.IsReady)
                     {
-                        string details = string.Format("Processed command '{0}':'{1}' on {2} to plug-in '{3}'.",
-                                                              cmd.device_commands.friendly_name,                                                             
+                        string details = string.Format("Finished processing command #{0} ({1} with arg {2} on {3} to plug-in '{4}')",
+                                                              device_command_que_id,
+                                                              cmd.device_commands.friendly_name,
                                                               cmd.arg,
                                                               cmd.device.friendly_name,
                                                               p.FriendlyName);
@@ -287,12 +300,12 @@ namespace zVirtualScenes
                     }
                     else
                     {
-                        string err_str = string.Format("Failed to process command '{0}' on '{1}' because the '{2}' plug-in is {3}. Removing command from queue...",
-                        cmd.device_commands.friendly_name,
-                        cmd.device.friendly_name,
-                        cmd.device.device_types.plugin.name,
-                        p.Enabled ? "not ready" : "disabled"
-                        );
+                        string err_str = string.Format("Failed to process command #{0} '{1}' on '{2}' because the '{3}' plug-in is {4}. Removing command from queue...",
+                            device_command_que_id,
+                            cmd.device_commands.friendly_name,
+                            cmd.device.friendly_name,
+                            cmd.device.device_types.plugin.name,
+                            p.Enabled ? "not ready" : "disabled");
 
                         if (onProcessingCommandEnd != null)
                             onProcessingCommandEnd(this, new onProcessingCommandEventArgs(scene_commands.command_types.device_command, true, err_str, cmd.id));
@@ -324,9 +337,14 @@ namespace zVirtualScenes
                     return;
                 }
 
+                string StartDetails = string.Format("Processing queued built-in command #{0} ({1} with arg {2})",
+                                                             builtin_command_que_id,
+                                                             cmd.builtin_commands.friendly_name,
+                                                             cmd.arg);
+
                 //We found the command so continue
                 if (onProcessingCommandBegin != null)
-                    onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, string.Format("Processing built-in command '{0}':'{1}'", cmd.builtin_commands.friendly_name, cmd.arg), cmd.id));
+                    onProcessingCommandBegin(this, new onProcessingCommandEventArgs(scene_commands.command_types.builtin, false, StartDetails, cmd.id));
 
                 switch (cmd.builtin_commands.name)
                 {
@@ -340,7 +358,8 @@ namespace zVirtualScenes
                                 {
                                     timer.Stop();
 
-                                    string details = string.Format("Processed command '{0}':'{1}'.",
+                                    string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg {2})",
+                                                             builtin_command_que_id,
                                                              cmd.builtin_commands.friendly_name,
                                                              cmd.arg);
 
@@ -367,7 +386,8 @@ namespace zVirtualScenes
                             if (d.device_types.plugin.enabled)
                                 GetPlugin(d.device_types.plugin.name).Repoll(d);
 
-                            string details = string.Format("Processed command '{0}':'{1}'.",
+                            string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg {2})",
+                                                              builtin_command_que_id,
                                                              cmd.builtin_commands.friendly_name,
                                                              cmd.arg);
 
@@ -391,7 +411,8 @@ namespace zVirtualScenes
                                 }
                             }
 
-                            string details = string.Format("Processed command '{0}':'{1}'.",
+                            string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg {2})",
+                                                              builtin_command_que_id,
                                                              cmd.builtin_commands.friendly_name,
                                                              cmd.arg);
 
@@ -419,7 +440,8 @@ namespace zVirtualScenes
                                 }
                             }
 
-                            string details = string.Format("Processed command '{0}':'{1}'.",
+                            string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg {2})",
+                                                              builtin_command_que_id,
                                                              cmd.builtin_commands.friendly_name,
                                                              cmd.arg);
 
@@ -447,7 +469,8 @@ namespace zVirtualScenes
                                 }
                             }
 
-                            string details = string.Format("Processed command '{0}':'{1}'.",
+                            string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg {2})",
+                                                             builtin_command_que_id,
                                                              cmd.builtin_commands.friendly_name,
                                                              cmd.arg);
 
@@ -490,12 +513,12 @@ namespace zVirtualScenes
         {
             return _plugins.FirstOrDefault(p => p.Name == pluginName);
         }
-        
+
         public void NotifyPluginSettingsChanged(plugin_settings ps)
         {
             Plugin p = GetPlugin(ps.plugin.name);
-            if (p != null)            
-                p.SettingsChange(ps);            
+            if (p != null)
+                p.SettingsChange(ps);
         }
     }
 }

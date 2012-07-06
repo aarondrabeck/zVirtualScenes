@@ -35,7 +35,7 @@ Ext.define('zvsMobile.profile.Phone', {
 
                         if (result.success && result.isLoggedIn) {
                             zvsMobile.app.SetStoreProxys();
-                            var settings = zvsMobile.tabPanel.items.items[4];
+                            var settings = Ext.getCmp('SettingsViewPort');//zvsMobile.tabPanel.items.items[4];
                             settings.items.items[1].fireEvent('loggedIn');
                         }
                         else {
