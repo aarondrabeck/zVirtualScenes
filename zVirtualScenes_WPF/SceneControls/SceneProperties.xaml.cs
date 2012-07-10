@@ -23,7 +23,7 @@ namespace zVirtualScenesGUI.SceneControls
     public partial class SceneProperties : UserControl
     {
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
-        private zvsLocalDBEntities context;
+        private zvsLocalDBEntities context = null;
 
 
         private int _SceneID = 0;
@@ -43,7 +43,10 @@ namespace zVirtualScenesGUI.SceneControls
         public SceneProperties()
         {
             InitializeComponent();
-            context = new zvsLocalDBEntities();
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                context = new zvsLocalDBEntities();
+            }
         }
 
         public SceneProperties(int SceneID)

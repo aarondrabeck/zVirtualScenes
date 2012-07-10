@@ -2,10 +2,12 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:SceneControls="clr-namespace:zVirtualScenesGUI.SceneControls"
-        Title="Scene Properties" Loaded="Window_Loaded_1" Height="350" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Icon="/zVirtualScenesGUI;component/Images/zvs32.ico" WindowStyle="ToolWindow">
+        Title="Scene Properties" Loaded="Window_Loaded_1" Height="350" Width="450" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
+        Icon="/zVirtualScenesGUI;component/Images/zvs32.ico" WindowStyle="ToolWindow">
     <Grid>
         <SceneControls:SceneProperties x:Name="SceneControl" Margin="0,0,0,55"></SceneControls:SceneProperties>
         <Button Name="DoneBtn" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom"  Width="74" Click="DoneBtn_Click"/>
-        <Button x:Name="ResetBtn" Content="Reset isRunning" HorizontalAlignment="Right" Margin="10,0,330,10" VerticalAlignment="Bottom"  Width="104" Click="ResetBtn_Click_1"/>
+        <Button x:Name="ResetBtn" Content="Reset isRunning" HorizontalAlignment="Right" Margin="0,0,320,10" VerticalAlignment="Bottom"  Width="114" 
+                Click="ResetBtn_Click_1"/>
     </Grid>
 </Window>
