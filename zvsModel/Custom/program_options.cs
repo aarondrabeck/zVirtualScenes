@@ -33,15 +33,8 @@ namespace zVirtualScenesModel
 
             if (option != null)
                 return option.value;
-            else
-            {
-                //DEFAULTS
-                if (optionName.Equals("TempAbbreviation"))
-                    return "F";
 
-                return null;
-            }
+            return null;
         }
-
     }
 }

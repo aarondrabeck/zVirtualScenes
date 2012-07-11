@@ -60,8 +60,15 @@ namespace zVirtualScenesGUI
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
             //clear the existing sort order
             dataView.SortDescriptions.Clear();
-            //create a new sort order for the sorting that is done lastly
-            dataView.SortDescriptions.Add(new SortDescription("Datetime", ListSortDirection.Descending));
+
+            //create a new sort order for the sorting that is done lastly            
+            ListSortDirection dir = ListSortDirection.Ascending;
+
+            string direction = program_options.GetProgramOption(context, "LOGDIRECTION");
+            if (direction != null && direction == "Descending")
+                dir = ListSortDirection.Descending;
+
+            dataView.SortDescriptions.Add(new SortDescription("Datetime", dir));
             //refresh the view which in turn refresh the grid
             dataView.Refresh();
 
@@ -424,6 +431,13 @@ namespace zVirtualScenesGUI
                     app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI");
                 });
             }
+        }
+
+        private void SettingMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            SettingWindow settingWindow = new SettingWindow();
+            settingWindow.Owner = this;
+            settingWindow.ShowDialog();
         }        
     }
 }

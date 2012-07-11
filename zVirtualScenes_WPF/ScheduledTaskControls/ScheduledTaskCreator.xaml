@@ -114,7 +114,7 @@
 
                     <GroupBox Name="SecondsGpBx" Header="Per Second" HorizontalAlignment="Left" Width="224">
                         <Grid>
-                            <TextBlock Text="Reccur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
+                            <TextBlock Text="Recur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
                             <TextBox VerticalAlignment="Top" HorizontalAlignment="Left" Width="76" Margin="78,1,0,0" Text="{Binding RecurSeconds, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}}" LostFocus="LostFocus_SaveChanges"/>
                             <TextBlock Text="seconds" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="161,4,0,0" />
                         </Grid>
@@ -122,7 +122,7 @@
 
                     <GroupBox Name="DailyGpBx" Header="Daily" HorizontalAlignment="Left" Width="208">
                         <Grid>
-                            <TextBlock Text="Reccur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
+                            <TextBlock Text="Recur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
                             <TextBox VerticalAlignment="Top" HorizontalAlignment="Left" Width="76" Margin="78,1,0,0" Text="{Binding RecurDays, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}}" LostFocus="LostFocus_SaveChanges"/>
                             <TextBlock Text="days" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="161,4,0,0" />
                         </Grid>
@@ -132,7 +132,7 @@
 
                     <GroupBox Name="WeeklyGpBx" Header="Weekly" HorizontalAlignment="Left" Width="208" Height="165">
                         <Grid>
-                            <TextBlock Text="Reccur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
+                            <TextBlock Text="Recur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
                             <TextBox VerticalAlignment="Top" HorizontalAlignment="Left" Width="76" Margin="78,1,0,0" Text="{Binding RecurWeeks, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}}"
          LostFocus="LostFocus_SaveChanges"/>
                             <TextBlock Text="week" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="161,4,0,0" LostFocus="LostFocus_SaveChanges"/>
@@ -148,7 +148,7 @@
                     </GroupBox>
                     <GroupBox Name="MonthlyGpBx" Header="Monthly" HorizontalAlignment="Left" Width="268" Height="249">
                         <Grid Margin="0,0,-2,0">
-                            <TextBlock Text="Reccur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
+                            <TextBlock Text="Recur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
                             <TextBox VerticalAlignment="Top" HorizontalAlignment="Left" Width="76" Margin="78,1,0,0" Text="{Binding RecurMonth, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}}" LostFocus="LostFocus_SaveChanges"/>
                             <TextBlock Text="month" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="161,4,0,0" />
                             <CheckBox Name="FirstChkBx" Content="1st" IsChecked="{Binding RecurDay01, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,36,0,0" LostFocus="LostFocus_SaveChanges"/>

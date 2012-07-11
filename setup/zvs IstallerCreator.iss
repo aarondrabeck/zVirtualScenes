@@ -5,7 +5,7 @@
 #define use_vc2010
 
 #define MyAppName "zVirtualScenes"
-#define MyAppVersion "3.3"
+#define MyAppVersion "3.4"
 #define MyAppPublisher "Drabeck Solutions"
 #define MyAppExeName "zVirtualScenesGUI.exe"
 

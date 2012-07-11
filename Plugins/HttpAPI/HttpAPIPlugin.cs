@@ -33,6 +33,7 @@ namespace HttpAPI
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
         private int _port = 9999;
+        private bool _isCookieAuthEnabled = true;
 
         public HttpAPIPlugin()
             : base("HttpAPI",
@@ -68,10 +69,37 @@ namespace HttpAPI
                     friendly_name = "Verbose Logging",
                     value = false.ToString(),
                     value_data_type = (int)Data_Types.BOOL,
-                    description = "(Writes all server client communication to the log for debugging.)"
+                    description = "Writes all server client communication to the log for debugging."
+                }, context);
+
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "EnableAuth",
+                    friendly_name = "Enable Authentication",
+                    value = true.ToString(),
+                    value_data_type = (int)Data_Types.BOOL,
+                    description = "WARNING: Use caution when disabling this! Not recommened!"
+                }, context);
+
+                device_propertys.AddOrEdit(new device_propertys
+                {
+                    name = "HTTPAPI_SHOW",
+                    friendly_name = "If enabled this device will show in applications that use the HTTP API",
+                    value_data_type = (int)Data_Types.BOOL,
+                    default_value = "true"
+                }, context);
+
+                scene_property.AddOrEdit(new scene_property
+                {
+                    name = "HTTPAPI_SHOW",
+                    friendly_name = "Show in HTTP API Applications",
+                    description = "If enabled this scene will show in applications that use the HTTP API",
+                    defualt_value = "true",
+                    value_data_type = (int)Data_Types.BOOL
                 }, context);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
+                bool.TryParse(GetSettingValue("EnableAuth", context), out _isCookieAuthEnabled);
                 int.TryParse(GetSettingValue("PORT", context), out _port);
             }
         }
@@ -151,6 +179,10 @@ namespace HttpAPI
 
                 if (this.Enabled)
                     StartHTTP();
+            }
+            else if (settingName == "EnableAuth")
+            {
+                bool.TryParse(settingValue, out _isCookieAuthEnabled);
             }
         }
 
@@ -232,7 +264,7 @@ namespace HttpAPI
                     if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("login") && (context.Request.HttpMethod == "POST" || context.Request.HttpMethod == "GET")) { allowed = true; }
                     if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("logout") && context.Request.HttpMethod == "POST") { allowed = true; }
 
-                    if (!allowed)
+                    if (!allowed && _isCookieAuthEnabled)
                     {
                         WriteToLog(Urgency.INFO, string.Format("[{0}] was denied access to '{1}'", ip, context.Request.RawUrl));
                         sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", context);
@@ -377,7 +409,7 @@ namespace HttpAPI
                         DateTime = entry.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt"),
                         Description = entry.Description,
                         Source = entry.Source,
-                        Urgency = entry.Urgency.ToString()                        
+                        Urgency = entry.Urgency.ToString()
                     };
 
                     logEntries.Add(LogEntry);
@@ -393,20 +425,24 @@ namespace HttpAPI
                 {
                     foreach (device d in context.devices.OrderBy(o => o.friendly_name))
                     {
+                        bool show = true;
+                        bool.TryParse(device_property_values.GetDevicePropertyValue(context, d.id, "HTTPAPI_SHOW"), out show);
 
-
-                        var device = new
+                        if (show)
                         {
-                            id = d.id,
-                            name = d.friendly_name,
-                            on_off = d.current_level_int == 0 ? "OFF" : "ON",
-                            level = d.current_level_int,
-                            level_txt = d.current_level_txt,
-                            type = d.device_types.name,
-                            plugin_name = d.device_types.plugin.name
-                        };
+                            var device = new
+                            {
+                                id = d.id,
+                                name = d.friendly_name,
+                                on_off = d.current_level_int == 0 ? "OFF" : "ON",
+                                level = d.current_level_int,
+                                level_txt = d.current_level_txt,
+                                type = d.device_types.name,
+                                plugin_name = d.device_types.plugin.name
+                            };
 
-                        devices.Add(device);
+                            devices.Add(device);
+                        }
                     }
                 }
                 return new { success = true, devices = devices.ToArray() };
@@ -508,17 +544,25 @@ namespace HttpAPI
             {
                 using (zvsLocalDBEntities context = new zvsLocalDBEntities())
                 {
-                    var q0 = from d in context.scenes
-                             select new
+                    List<object> scenes = new List<object>();
+                    foreach (scene scene in context.scenes)
+                    {
+                        bool show = false;
+                        bool.TryParse(scene_property_value.GetPropertyValue(context, scene.id, "HTTPAPI_SHOW"), out show);
+
+                        if (show)
+                        {
+                            scenes.Add(new
                              {
-                                 id = d.id,
-                                 name = d.friendly_name,
-                                 is_running = d.is_running,
-                                 cmd_count = d.scene_commands.Count()
-                             };
+                                 id = scene.id,
+                                 name = scene.friendly_name,
+                                 is_running = scene.is_running,
+                                 cmd_count = scene.scene_commands.Count()
+                             });
+                        }
+                    }
 
-
-                    return new { success = true, scenes = q0.ToArray() };
+                    return new { success = true, scenes = scenes.ToArray() };
                 }
             }
 
@@ -882,7 +926,14 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "GET")
             {
-                return new { success = true, isLoggedIn = (request.Cookies.Count > 0 && request.Cookies["zvs"] != null && request.Cookies["zvs"].Value == CookieValue.ToString()) };
+                bool isLoggedin = false;
+
+                if (_isCookieAuthEnabled)
+                    isLoggedin = (request.Cookies.Count > 0 && request.Cookies["zvs"] != null && request.Cookies["zvs"].Value == CookieValue.ToString());
+                else
+                    isLoggedin = true;
+
+                return new { success = true, isLoggedIn = isLoggedin };
             }
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "POST")

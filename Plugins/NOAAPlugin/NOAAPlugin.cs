@@ -21,6 +21,8 @@ namespace NOAAPlugin
         private System.Timers.Timer timerNOAA = new System.Timers.Timer();
         private Double _Lat = 30.6772222222222;
         private Double _Long = -100.061666666667;
+        private Double _SunriseDelay = 0;
+        private Double _SunsetDelay = 0;
 
         private DateTime _date = DateTime.Today;
         private bool _isSunrise = false;
@@ -56,11 +58,29 @@ namespace NOAAPlugin
                     description = "Your Longitude in Decimal Notation. ex. -113.061666666667"
                 }, context);
 
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "DELAY_SUNRISE",
+                    friendly_name = "Minutes to delay sunrise",
+                    value = (0).ToString(),
+                    value_data_type = (int)Data_Types.DECIMAL,
+                    description = "The minutes to delay sunrise as a positive or negative number"
+                }, context);
+
+                DefineOrUpdateSetting(new plugin_settings
+                {
+                    name = "DELAY_SUNSET",
+                    friendly_name = "Minutes to delay sunset",
+                    value = (0).ToString(),
+                    value_data_type = (int)Data_Types.DECIMAL,
+                    description = "The minutes to delay sunset as a positive or negative number"
+                }, context);
+
                 scene_property.AddOrEdit(new scene_property
                 {
                     name = "ACTIVATE_SUNRISE",
                     friendly_name = "Activate at Sunrise",
-                    description = "Activate this scene at sunrise.",
+                    description = "Activates this scene at sunrise",
                     defualt_value = "false",
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
@@ -69,12 +89,13 @@ namespace NOAAPlugin
                 {
                     name = "ACTIVATE_SUNSET",
                     friendly_name = "Activate at Sunset",
-                    description = "Activate this scene at sunset.",
+                    description = "Activates this scene at sunset",
                     defualt_value = "false",
                     value_data_type = (int)Data_Types.BOOL
                 }, context);
 
-
+                Double.TryParse(GetSettingValue("DELAY_SUNRISE", context), out _SunriseDelay);
+                Double.TryParse(GetSettingValue("DELAY_SUNSET", context), out _SunsetDelay);
                 Double.TryParse(GetSettingValue("LAT", context), out _Lat);
                 Double.TryParse(GetSettingValue("LOG", context), out _Long);
                 CalculateSunriseSet();
@@ -104,21 +125,25 @@ namespace NOAAPlugin
 
         protected override void SettingChanged(string settingName, string settingValue)
         {
-            if (settingName == "LAT")
+            if (settingName == "DELAY_SUNRISE")
+            {
+                Double.TryParse(settingValue, out _SunriseDelay);
+            }
+            else if (settingName == "DELAY_SUNSET")
+            {
+                Double.TryParse(settingValue, out _SunsetDelay);
+            }
+            else if (settingName == "LAT")
             {
                 Double.TryParse(settingValue, out _Lat);
-
-                CalculateSunriseSet();
-                WriteToLog(Urgency.INFO, string.Format("Lat/Long changed.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
-
             }
             else if (settingName == "LOG")
             {
                 Double.TryParse(settingValue, out _Long);
-
-                CalculateSunriseSet();
-                WriteToLog(Urgency.INFO, string.Format("Lat/Long changed.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
             }
+
+            CalculateSunriseSet();
+            WriteToLog(Urgency.INFO, string.Format("Lat/Long updated.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
         }
 
         public override void ProcessDeviceCommand(device_command_que cmd)
@@ -142,6 +167,13 @@ namespace NOAAPlugin
         private void CalculateSunriseSet()
         {
             SunTimes.Instance.CalculateSunRiseSetTimes(_Lat, _Long, _date, ref _sunrise, ref _sunset, ref _isSunrise, ref _isSunset);
+
+            //Add delays
+            if (_sunrise != null)
+                _sunrise = _sunrise.AddMinutes(_SunriseDelay);
+
+            if (_sunset != null)
+                _sunset = _sunset.AddMinutes(_SunsetDelay);
         }
 
         public bool isDark()

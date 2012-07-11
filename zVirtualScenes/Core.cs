@@ -48,7 +48,7 @@ namespace zVirtualScenes
                             Exception ex = reflectionEx.LoaderExceptions.FirstOrDefault();
                             if (ex != null)
                             {
-                                error = ex.ToString() +
+                                error = ex.StackTrace.ToString() +
                                     Environment.NewLine +
                                     Environment.NewLine +
                                     string.Format("This plug-in might not be compatible with {0}. Try removing the plugin and re-launching the application. ", Utils.ApplicationNameAndVersion);
@@ -67,6 +67,19 @@ namespace zVirtualScenes
 
             triggerManager = new TriggerManager();
             scheduledTaskManager = new ScheduledTaskManager();
+
+            //Install Program Options
+            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            {
+                if (program_options.GetProgramOption(context, "LOGDIRECTION") == null)
+                {
+                    program_options.AddOrEdit(context, new program_options()
+                    {
+                        name = "LOGDIRECTION",
+                        value = "Descending"
+                    });
+                }
+            }
         }
 
 
@@ -87,7 +100,7 @@ namespace zVirtualScenes
             if (MessageBox.Show(reason, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
             {
                 WpfBugWindow.Close();
-                Environment.Exit(1);              
+                Environment.Exit(1);
             }
         }
     }

@@ -52,6 +52,7 @@
                 <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                 <Separator />
                 <MenuItem Header="Plugin Manager" Click="MenuItem_Click_1" />
+                <MenuItem Name="SettingMI" Header="Settings" Click="SettingMI_Click_1" />
 
             </MenuItem>
             <MenuItem Header="Help">
