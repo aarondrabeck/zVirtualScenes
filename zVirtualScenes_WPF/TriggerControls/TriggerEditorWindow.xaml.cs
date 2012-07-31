@@ -152,6 +152,7 @@ namespace zVirtualScenesGUI.TriggerControls
             }
 
             trigger.trigger_operator = (int)OperatorCmboBx.SelectedItem;
+            trigger.trigger_type = (int)device_value_triggers.TRIGGER_TYPE.Basic;
 
             Canceled = false;
             this.Close();

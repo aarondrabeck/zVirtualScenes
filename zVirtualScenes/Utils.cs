@@ -173,9 +173,10 @@ namespace zVirtualScenes
                                 {
                                     if (new_db_version == curr_db_version + 1)
                                     {
-                                        upgradeScript = upgradeScript.Replace(upgradeScript.Substring(0, upgradeScript.IndexOf('\n')), "");
-                                        context.Database.ExecuteSqlCommand(upgradeScript, null);
-                                        context.Database.ExecuteSqlCommand(@"UPDATE db_info SET info_value = '" + new_db_version + "' WHERE info_name='Version';", null);
+                                        upgradeScript = upgradeScript.Replace(upgradeScript.Substring(0, upgradeScript.IndexOf('\n') +1), "");
+                                        List<string> SQLCommands = new List<string>(upgradeScript.Split(';').ToArray());
+                                        SQLCommands.Where(o=> !string.IsNullOrEmpty(o)).ToList().ForEach(o => context.Database.ExecuteSqlCommand(o));
+                                        context.Database.ExecuteSqlCommand(@"UPDATE db_info SET info_value = '" + new_db_version + "' WHERE info_name='Version';");
                                     }
                                     else
                                     {
@@ -191,7 +192,7 @@ namespace zVirtualScenes
                                             ShowInTaskbar = false
                                         };
                                         WpfBugWindow.Show();
-                                        if (MessageBox.Show("Your database is over 1 version old. Upgrading is not supported. Would you like to replace your database with a new blank one?", "Database too old.", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                                        if (MessageBox.Show("Your database is over 1 version old. Upgrading is not supported. Would you like to replace your database with a new blank one?", "Database too old", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                                         {
                                             FileInfo blank_database = new FileInfo(Utils.BlankDBNamePlusFullPath);
                                             if (!database.Exists)

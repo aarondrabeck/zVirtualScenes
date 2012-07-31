@@ -54,5 +54,6 @@ namespace zVirtualScenesModel
         public DbSet<scene_property_value> scene_property_value { get; set; }
         public DbSet<scene> scenes { get; set; }
         public DbSet<scheduled_tasks> scheduled_tasks { get; set; }
+        public DbSet<javascript_triggers> javascript_triggers { get; set; }
     }
 }

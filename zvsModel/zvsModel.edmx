@@ -25,6 +25,7 @@
           <EntitySet Name="devices" EntityType="zvsLocalDBModel.Store.devices" store:Type="Tables" />
           <EntitySet Name="group_devices" EntityType="zvsLocalDBModel.Store.group_devices" store:Type="Tables" />
           <EntitySet Name="groups" EntityType="zvsLocalDBModel.Store.groups" store:Type="Tables" />
+          <EntitySet Name="javascript_triggers" EntityType="zvsLocalDBModel.Store.javascript_triggers" store:Type="Tables" />
           <EntitySet Name="plugin_setting_options" EntityType="zvsLocalDBModel.Store.plugin_setting_options" store:Type="Tables" />
           <EntitySet Name="plugin_settings" EntityType="zvsLocalDBModel.Store.plugin_settings" store:Type="Tables" />
           <EntitySet Name="plugins" EntityType="zvsLocalDBModel.Store.plugins" store:Type="Tables" />
@@ -343,6 +344,15 @@
           </Key>
           <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
           <Property Name="name" Type="nvarchar" Nullable="false" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="javascript_triggers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="nvarchar" MaxLength="500" />
+          <Property Name="Script" Type="nvarchar" MaxLength="2000" />
+          <Property Name="isEnabled" Type="bit" Nullable="false" />
         </EntityType>
         <EntityType Name="plugin_setting_options">
           <Key>
@@ -1009,6 +1019,7 @@
             <End Role="scene" EntitySet="scenes" />
             <End Role="scheduled_tasks" EntitySet="scheduled_tasks" />
           </AssociationSet>
+          <EntitySet Name="javascript_triggers" EntityType="zvsLocalDBModel.javascript_triggers" />
           </EntityContainer>
         <EntityType Name="builtin_command_options">
           <Key>
@@ -1781,6 +1792,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="javascript_triggers">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Type="Int32" Name="id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Type="String" Name="Name" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Type="String" Name="Script" MaxLength="2000" FixedLength="false" Unicode="true" />
+          <Property Type="Boolean" Name="isEnabled" Nullable="false" />
+        </EntityType>
         </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -2151,6 +2171,16 @@
                 <ScalarProperty Name="friendly_name" ColumnName="friendly_name" />
                 <ScalarProperty Name="Frequency" ColumnName="Frequency" />
                 <ScalarProperty Name="SceneID" ColumnName="SceneID" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="javascript_triggers">
+            <EntityTypeMapping TypeName="zvsLocalDBModel.javascript_triggers">
+              <MappingFragment StoreEntitySet="javascript_triggers">
+                <ScalarProperty Name="isEnabled" ColumnName="isEnabled" />
+                <ScalarProperty Name="Script" ColumnName="Script" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

@@ -62,6 +62,7 @@
         <AssociationConnector Association="zvsLocalDBModel.FK__scene_property_value__0000000000000383" ManuallyRouted="false" />
         <EntityTypeShape EntityType="zvsLocalDBModel.scheduled_tasks" Width="1.5" PointX="17.125" PointY="22" />
         <AssociationConnector Association="zvsLocalDBModel.FK__scheduled_tasks__0000000000000730" />
+        <EntityTypeShape EntityType="zvsLocalDBModel.javascript_triggers" Width="1.5" PointX="11.886659514106187" PointY="31.671643823232337" />
         </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

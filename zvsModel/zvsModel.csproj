@@ -147,6 +147,9 @@
     <Compile Include="group_devices.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="javascript_triggers.cs">
+      <DependentUpon>zvsModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="plugin.cs">
       <DependentUpon>zvsModel.tt</DependentUpon>
     </Compile>

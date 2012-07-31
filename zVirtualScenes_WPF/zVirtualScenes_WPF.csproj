@@ -109,6 +109,9 @@
     <Compile Include="SettingWindow.xaml.cs">
       <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TriggerControls\JSTriggerEditorWindow.xaml.cs">
+      <DependentUpon>JSTriggerEditorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TriggerControls\TriggerEditorWindow.xaml.cs">
       <DependentUpon>TriggerEditorWindow.xaml</DependentUpon>
     </Compile>
@@ -178,6 +181,10 @@
     <Page Include="SettingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriggerControls\JSTriggerEditorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="zvsMainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
