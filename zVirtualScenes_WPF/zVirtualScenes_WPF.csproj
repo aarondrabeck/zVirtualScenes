@@ -49,6 +49,10 @@
       <HintPath>..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ScintillaNET, Version=1.0.1601.23443, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\ScintillaNET v2.5\ScintillaNET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Addin.Contract" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -71,6 +75,7 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
     <Reference Include="WPFToolkit.Extended">
       <HintPath>.\WPFToolkit.Extended.dll</HintPath>
     </Reference>
@@ -84,6 +89,9 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
+    <Compile Include="Editor\JSEditor.xaml.cs">
+      <DependentUpon>JSEditor.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FatalErrorWindow.xaml.cs">
       <DependentUpon>FatalErrorWindow.xaml</DependentUpon>
     </Compile>
@@ -161,6 +169,10 @@
     <Page Include="DynamicActionControls\NumericControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Editor\JSEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="FatalErrorWindow.xaml">
       <SubType>Designer</SubType>
@@ -440,6 +452,20 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\zvsLogoTextOnly.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ScintillaNET.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SciLexer.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SciLexer64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

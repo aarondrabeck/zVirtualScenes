@@ -42,10 +42,25 @@ namespace zVirtualScenesGUI.TriggerControls
         {
             //context.devices.ToList();
            // context.scenes.ToList();
-            
-            ScriptTxtBx.AppendText(trigger.Script);
+
+            TriggerScriptEditor.Editor.AppendText(trigger.Script);
+            TriggerScriptEditor.Editor.KeyUp += Editor_KeyUp;
         }
 
+        void Editor_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == System.Windows.Forms.Keys.F5)
+            {
+                Run();
+            }
+        }
+        private void Run()
+        {
+            string script = TriggerScriptEditor.Editor.Text;
+            string result = "";
+            if (!string.IsNullOrEmpty(script)) result = zVirtualScenes.JSTriggerRunner.ExecuteScript(script);
+
+        }
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -53,10 +68,15 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            trigger.Script = new TextRange(ScriptTxtBx.Document.ContentStart, ScriptTxtBx.Document.ContentEnd).Text;
+            trigger.Script = TriggerScriptEditor.Editor.Text;
 
             Canceled = false;
             this.Close();
+        }
+
+        private void TestBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Run();
         }
     }
 }

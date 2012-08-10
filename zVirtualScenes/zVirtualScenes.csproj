@@ -38,6 +38,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Jint">
+      <HintPath>..\packages\Jint - 0.9.2\Jint.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -68,6 +71,7 @@
     <Compile Include="DetectVCRedist.cs" />
     <Compile Include="Backup\BackupScene.cs" />
     <Compile Include="Backup\BackupDevice.cs" />
+    <Compile Include="JSTriggerRunner.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\LogItem.cs" />
     <Compile Include="Logger\Urgency.cs" />
