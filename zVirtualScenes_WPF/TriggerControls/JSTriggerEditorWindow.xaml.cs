@@ -40,10 +40,9 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            //context.devices.ToList();
-           // context.scenes.ToList();
+            if(trigger.Script != null)
+                TriggerScriptEditor.Editor.AppendText(trigger.Script);
 
-            TriggerScriptEditor.Editor.AppendText(trigger.Script);
             TriggerScriptEditor.Editor.KeyUp += Editor_KeyUp;
         }
 
