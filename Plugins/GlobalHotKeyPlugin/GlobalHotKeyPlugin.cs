@@ -5,48 +5,52 @@ using System.Text;
 using System.ComponentModel.Composition;
 using System.Windows.Forms;
 using zVirtualScenes;
-using zVirtualScenesModel;
+
 using System.ComponentModel;
+using zvs.Entities;
+using UnManaged;
+using System.Windows.Input;
 
 
 namespace GlobalHotKeyPlugin
 {
-    [Export(typeof(Plugin))]
-    public class GlobalHotKeyPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class GlobalHotKeyPlugin : zvsPlugin
     {
         public volatile bool isActive;
-        private KeyboardHook hook = new KeyboardHook();
+       // private KeyboardHook hook = new KeyboardHook();
 
         public GlobalHotKeyPlugin()
             : base("GLOBALHOTKEYS",
-               "Global Hot-key Plugin",
+               "Global Hot-key Plug-in",
                 "This plug-in will allow you to map keyboard shortcuts to scenes."
                 ) { }
 
         public override void Initialize()
         {
-
-            scene_property hotkeypropert = new scene_property
+            SceneProperty hotkeypropert = new SceneProperty
             {
-                name = "GLOBALHOTKEY",
-                friendly_name = "Global Hotkey",
-                description = "Hotkey that will activate this scene.",
-                defualt_value = "None",
-                value_data_type = (int)Data_Types.LIST
+                UniqueIdentifier = "GLOBALHOTKEY",
+                Name = "Global Hotkey",
+                Description = "Hotkey that will activate this scene.",
+                Value = "None",
+                ValueType = DataType.LIST
             };
 
             foreach (string option in Enum.GetNames(typeof(CustomHotKeys)))
-            {
-                hotkeypropert.scene_property_option.Add(new scene_property_option { options = option.Replace('_', '+') });
-            }
+                hotkeypropert.Options.Add(new ScenePropertyOption { Name = option.Replace('_', '+') });
 
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                scene_property.AddOrEdit(hotkeypropert, context);
+                SceneProperty.AddOrEdit(hotkeypropert, context);
             }
-
+        }
+        private void OnHotKeyHandler(HotKey hotKey)
+        {
+            Console.WriteLine(hotKey.Key + " " + hotKey.KeyModifiers);
         }
 
+        HotKey _hotKey;
         protected override void StartPlugin()
         {
             int success = 0;
@@ -54,43 +58,44 @@ namespace GlobalHotKeyPlugin
             #region Register Global Hot Keys
             try
             {
-                hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D0)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D1)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D2)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D3)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D4)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D5)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D6)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D7)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D8)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D9)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.A)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.B)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.C)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.E)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.F)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.G)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.H)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.I)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.J)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.K)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.L)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.M)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.N)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.O)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.P)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Q)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.R)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.S)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.T)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.U)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.V)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.W)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.X)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Y)) { success++; } else { errors++; };
-                if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Z)) { success++; } else { errors++; };
+                _hotKey = new HotKey(Key.D1, KeyModifier.Shift | KeyModifier.Ctrl, OnHotKeyHandler);
+                //hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
+                //if (hook.RegisterHotKey(ModifierKeys.Control  | ModifierKeys.Shift , Keys.D1)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D1)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D2)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D3)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D4)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D5)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D6)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D7)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D8)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D9)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.A)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.B)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.C)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.D)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.E)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.F)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.G)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.H)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.I)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.J)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.K)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.L)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.M)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.N)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.O)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.P)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Q)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.R)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.S)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.T)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.U)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.V)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.W)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.X)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Y)) { success++; } else { errors++; };
+                //if (hook.RegisterHotKey((ModifierKeys)1 | (ModifierKeys)2 | (ModifierKeys)8, Keys.Z)) { success++; } else { errors++; };
             }
             catch (Exception ex)
             {
@@ -98,93 +103,85 @@ namespace GlobalHotKeyPlugin
             }
             #endregion
 
-            WriteToLog(Urgency.INFO, string.Format("{0} started. (Registered {1} hotkeys with {2} errors.)", this.Friendly_Name, success, errors));
+            WriteToLog(Urgency.INFO, string.Format("{0} started. (Registered {1} hotkeys with {2} errors.)", this.Name, success, errors));
 
             IsReady = true;
         }
 
         protected override void StopPlugin()
         {
-            hook.KeyPressed -= new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " stopped");
+            //hook.KeyPressed -= new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
+            WriteToLog(Urgency.INFO, this.Name + " stopped");
             IsReady = false;
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
-        {
-        }
-        public override void ProcessDeviceCommand(device_command_que cmd)
-        {
-        }
-        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
-        {
-        }
-        public override void Repoll(device device)
-        {
-        }
-        public override void ActivateGroup(int groupID)
-        {
-        }
+        protected override void SettingChanged(string settingUniqueIdentifier, string settingValue) { }
 
-        public override void DeactivateGroup(int groupID)
-        {
-        }
+        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
 
-        private void hook_KeyPressed(object sender, KeyPressedEventArgs e)
-        {
+        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
 
-            string modifiers = e.Modifier.ToString().Replace(", ", "_");
-            string KeysPresseed = modifiers + "_" + e.Key.ToString();
+        public override void Repoll(zvs.Entities.Device device) { }
 
-            if (IsReady)
-            {
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.DoWork += (s, a) =>
-                {
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-                    {
-                        foreach (scene scene in context.scenes)
-                        {
-                            string sceneHotKey = scene_property_value.GetPropertyValue(context, scene.id, "GLOBALHOTKEY");
+        public override void ActivateGroup(int groupID) { }
 
-                            if (!string.IsNullOrEmpty(sceneHotKey))
-                            {
-                                if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
-                                {
-                                    SceneRunner sr = new SceneRunner();
-                                    SceneRunner.onSceneRunEventHandler startHandler = null;
-                                    startHandler = (send, args) =>
-                                    {
-                                        if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                        {
-                                            SceneRunner.onSceneRunBegin -= startHandler;
-                                            WriteToLog(Urgency.INFO, string.Format("Global HotKey ({0}): {1}", KeysPresseed, args.Details));
+        public override void DeactivateGroup(int groupID) { }
 
-                                            #region LISTEN FOR ENDING
-                                            SceneRunner.onSceneRunEventHandler handler = null;
-                                            handler = (se, end_args) =>
-                                            {
-                                                if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                                {
-                                                    SceneRunner.onSceneRunComplete -= handler;
-                                                    WriteToLog(Urgency.INFO, string.Format("Global HotKey ({0}): {1}", KeysPresseed, end_args.Details));
-                                                }
-                                            };
-                                            SceneRunner.onSceneRunComplete += handler;
-                                            #endregion
-                                        }
-                                    };
-                                    SceneRunner.onSceneRunBegin += startHandler;
-                                    sr.RunScene(scene.id);
-                                }
-                            }
-                        }
-                    }
-                };
-                bw.RunWorkerAsync();
-            }
+        //private void hook_KeyPressed(object sender, KeyPressedEventArgs e)
+        //{
 
-        }
+        //    string modifiers = e.Modifier.ToString().Replace(", ", "_");
+        //    string KeysPresseed = modifiers + "_" + e.Key.ToString();
+
+        //    if (IsReady)
+        //    {
+        //        BackgroundWorker bw = new BackgroundWorker();
+        //        bw.DoWork += (s, a) =>
+        //        {
+        //            using (zvsContext context = new zvsContext())
+        //            {
+        //                foreach (Scene scene in context.Scenes)
+        //                {
+        //                    string sceneHotKey = ScenePropertyValue.GetPropertyValue(context, scene, "GLOBALHOTKEY");
+
+        //                    if (!string.IsNullOrEmpty(sceneHotKey))
+        //                    {
+        //                        if (sceneHotKey.Replace("+", "_").Equals(KeysPresseed))
+        //                        {
+        //                            SceneRunner sr = new SceneRunner();
+        //                            SceneRunner.onSceneRunEventHandler startHandler = null;
+        //                            startHandler = (send, args) =>
+        //                            {
+        //                                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+        //                                {
+        //                                    SceneRunner.onSceneRunBegin -= startHandler;
+        //                                    WriteToLog(Urgency.INFO, string.Format("Global HotKey ({0}): {1}", KeysPresseed, args.Details));
+
+        //                                    #region LISTEN FOR ENDING
+        //                                    SceneRunner.onSceneRunEventHandler handler = null;
+        //                                    handler = (se, end_args) =>
+        //                                    {
+        //                                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+        //                                        {
+        //                                            SceneRunner.onSceneRunComplete -= handler;
+        //                                            WriteToLog(Urgency.INFO, string.Format("Global HotKey ({0}): {1}", KeysPresseed, end_args.Details));
+        //                                        }
+        //                                    };
+        //                                    SceneRunner.onSceneRunComplete += handler;
+        //                                    #endregion
+        //                                }
+        //                            };
+        //                            SceneRunner.onSceneRunBegin += startHandler;
+        //                            sr.RunScene(scene.SceneId);
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        };
+        //        bw.RunWorkerAsync();
+        //    }
+
+        //}
 
         public enum CustomHotKeys
         {
@@ -227,5 +224,7 @@ namespace GlobalHotKeyPlugin
             Alt_Control_Win_D0 = 36
 
         }
+
+
     }
 }

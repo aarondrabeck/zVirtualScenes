@@ -11,13 +11,14 @@ using System.ComponentModel;
 using System.Linq;
 using ZeroconfService;
 using zVirtualScenes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 
 namespace LightSwitchPlugin
 {
-    [Export(typeof(Plugin))]
-    public class LightSwitchPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class LightSwitchPlugin : zvsPlugin
     {
         private Socket LightSwitchSocket;
         private readonly List<Socket> LightSwitchClients = new List<Socket>();
@@ -33,83 +34,84 @@ namespace LightSwitchPlugin
 
         public LightSwitchPlugin()
             : base("LIGHTSWITCH",
-               "LightSwitch Plugin",
+               "LightSwitch Plug-in",
                 "This plug-in is a server that allows LightSwitch clients to connect and control zVirtualScene devices."
                 ) { }
 
         public override void Initialize()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "PORT",
-                    friendly_name = "Port",
-                    value = (1337).ToString(),
-                    value_data_type = (int)Data_Types.INTEGER,
-                    description = "LightSwitch will listen for connections on this port."
+                    UniqueIdentifier = "PORT",
+                    Name = "Port",
+                    Value = (1337).ToString(),
+                    ValueType = DataType.INTEGER,
+                    Description = "LightSwitch will listen for connections on this port."
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "MAXCONN",
-                    friendly_name = "Max Conn.",
-                    value = (200).ToString(),
-                    value_data_type = (int)Data_Types.INTEGER,
-                    description = "The maximum number of connections allowed."
+                    UniqueIdentifier = "MAXCONN",
+                    Name = "Max Conn.",
+                    Value = (200).ToString(),
+                    ValueType = DataType.INTEGER,
+                    Description = "The maximum number of connections allowed."
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "VERBOSE",
-                    friendly_name = "Verbose Logging",
-                    value = false.ToString(),
-                    value_data_type = (int)Data_Types.BOOL,
-                    description = "(Writes all server client communication to the log for debugging.)"
+                    UniqueIdentifier = "VERBOSE",
+                    Name = "Verbose Logging",
+                    Value = false.ToString(),
+                    ValueType = DataType.BOOL,
+                    Description = "(Writes all server client communication to the log for debugging.)"
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "PASSWORD",
-                    friendly_name = "Password",
-                    value = "ChaNgeMe444",
-                    value_data_type = (int)Data_Types.STRING,
-                    description = "The password clients must use to connect to the LightSwitch server. "
+                    UniqueIdentifier = "PASSWORD",
+                    Name = "Password",
+                    Value = "ChaNgeMe444",
+                    ValueType = DataType.STRING,
+                    Description = "The password clients must use to connect to the LightSwitch server. "
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "SORTLIST",
-                    friendly_name = "Sort Device List",
-                    value = true.ToString(),
-                    value_data_type = (int)Data_Types.BOOL,
-                    description = "(Alphabetically sorts the device list.)"
+                    UniqueIdentifier = "SORTLIST",
+                    Name = "Sort Device List",
+                    Value = true.ToString(),
+                    ValueType = DataType.BOOL,
+                    Description = "(Alphabetically sorts the device list.)"
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "PUBLISHZEROCFG",
-                    friendly_name = "Publish ZeroConf/Bonjour",
-                    value = false.ToString(),
-                    value_data_type = (int)Data_Types.BOOL,
-                    description = "Zero configuration networking allows clients on your network to detect and connect to your LightSwitch server automatically."
+                    UniqueIdentifier = "PUBLISHZEROCFG",
+                    Name = "Publish ZeroConf/Bonjour",
+                    Value = false.ToString(),
+                    ValueType = DataType.BOOL,
+                    Description = "Zero configuration networking allows clients on your network to detect and connect to your LightSwitch server automatically."
                 }, context);
 
-                device_propertys.AddOrEdit(new device_propertys
+                DeviceProperty.AddOrEdit(new DeviceProperty
                 {
-                    name = "SHOWINLSLIST",
-                    friendly_name = "If enabled this device will show in the LightSwitch device tab.",
-                    value_data_type = (int)Data_Types.BOOL,
-                    default_value = "true"
+                    UniqueIdentifier = "SHOWINLSLIST",
+                    Name = "Show device in LightSwitch", 
+                    Description = "If enabled this device will show in the LightSwitch device tab.",
+                    ValueType = DataType.BOOL,
+                    Value = "true"
                 }, context);
 
-                scene_property.AddOrEdit(new scene_property
+                SceneProperty.AddOrEdit(new SceneProperty
                 {
-                    name = "SHOWSCENEINLSLIST",
-                    friendly_name = "Show in Lightswitch List",
-                    description = "If enabled this scene will show in the LightSwitch scene tab.",
-                    defualt_value = "true",
-                    value_data_type = (int)Data_Types.BOOL
+                    UniqueIdentifier = "SHOWSCENEINLSLIST",
+                    Name = "Show scene in LightSwitch",
+                    Description = "If enabled this scene will show in the LightSwitch scene tab.",
+                    Value = "true",
+                    ValueType = DataType.BOOL
                 }, context);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
@@ -122,40 +124,39 @@ namespace LightSwitchPlugin
 
         protected override void StartPlugin()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+                DeviceValue.DeviceValueDataChangedEvent +=DeviceValue_DeviceValueDataChangedEvent;
                 zVirtualScenes.PluginManager.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
                 zVirtualScenes.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
-
                 OpenLightSwitchSocket();
             }
         }
-
+        
         protected override void StopPlugin()
         {
-            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+            DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
             zVirtualScenes.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
             zVirtualScenes.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
             CloseLightSwitchSocket();
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
+        protected override void SettingChanged(string UniqueIdentifier, string settingValue)
         {
-            if (settingName == "VERBOSE")
+            if (UniqueIdentifier == "VERBOSE")
             {
                 bool.TryParse(settingValue, out _verbose);
             }
-            else if (settingName == "PUBLISHZEROCFG")
+            else if (UniqueIdentifier == "PUBLISHZEROCFG")
             {
                 bool.TryParse(settingValue, out _useBonjour);
                 publishZeroConf();
             }
-            else if (settingName == "SORTLIST")
+            else if (UniqueIdentifier == "SORTLIST")
             {
                 bool.TryParse(settingValue, out _sort_list);
             }
-            else if (settingName == "PORT")
+            else if (UniqueIdentifier == "PORT")
             {
                 if (this.Enabled)
                     CloseLightSwitchSocket();
@@ -166,7 +167,7 @@ namespace LightSwitchPlugin
                     OpenLightSwitchSocket();
 
             }
-            else if (settingName == "MAXCONN")
+            else if (UniqueIdentifier == "MAXCONN")
             {
                 if (this.Enabled)
                     CloseLightSwitchSocket();
@@ -205,30 +206,24 @@ namespace LightSwitchPlugin
             }
         }
 
-        public override void ProcessDeviceCommand(device_command_que cmd)
-        {
-        }
-        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
-        {
-        }
-        public override void Repoll(device device)
-        {
-        }
-        public override void ActivateGroup(int groupID)
-        {
-        }
-        public override void DeactivateGroup(int groupID)
-        {
-        }
+        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
 
-        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
+        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
+
+        public override void Repoll(zvs.Entities.Device device) { }
+
+        public override void ActivateGroup(int groupID) { }
+
+        public override void DeactivateGroup(int groupID) { }
+
+        private void DeviceValue_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
         {
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (s, a) =>
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device_values dv = context.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
                     if (dv != null)
                     {
                         string UpdateString = DeviceToString(dv);
@@ -239,8 +234,8 @@ namespace LightSwitchPlugin
                         }
 
                         string device_name = string.Empty;
-                        device_name = dv.device.friendly_name;
-                        BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.label_name + " changed to " + args.newValue + Environment.NewLine);
+                        device_name = dv.Device.Name;
+                        BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.Name + " changed to " + args.newValue + Environment.NewLine);
                     }
                 }
             };
@@ -279,14 +274,14 @@ namespace LightSwitchPlugin
             {
                 try
                 {
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
                         isActive = true;
                         LightSwitchSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                         LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, _port));
                         LightSwitchSocket.Listen(_max_conn);
                         LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                        WriteToLog(Urgency.INFO, "Lightswitch server started on port " + _port );                        
+                        WriteToLog(Urgency.INFO, "LightSwitch server started on port " + _port );                        
                         IsReady = true;
                     }
                 }
@@ -310,7 +305,7 @@ namespace LightSwitchPlugin
                         client.Close();
                     }
                 }
-                WriteToLog(Urgency.INFO, "Lightswitch server stopped");
+                WriteToLog(Urgency.INFO, "LightSwitch server stopped");
                 isActive = false;
                 IsReady = false;
             }
@@ -333,7 +328,7 @@ namespace LightSwitchPlugin
                 WriteToLog(Urgency.INFO, "Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
 
                 // Send a welcome message to client                
-                string msg = "LightSwitch zVirtualScenes Plugin (Active Connections " + LightSwitchClients.Count + ")" + Environment.NewLine;
+                string msg = "LightSwitch zVirtualScenes Plug-in (Active Connections " + LightSwitchClients.Count + ")" + Environment.NewLine;
                 SendMsgToLightSwitchClient(msg, LightSwitchClients.Count);
 
                 // Let the worker Socket do the further processing for the just connected client
@@ -391,7 +386,7 @@ namespace LightSwitchPlugin
 
             try
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
                     // Complete the BeginReceive() asynchronous call by EndReceive() method which will return the number of characters written to the stream  by the client
                     int iRx = LightSwitchClientSocket.EndReceive(asyn);
@@ -518,19 +513,19 @@ namespace LightSwitchPlugin
                                         if (values.Length > 1)
                                         {
                                             int groupId = int.TryParse(values[1], out groupId) ? groupId : 0;
-                                            string cmd_name = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
+                                            string cmdUniqId = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
 
-                                            group g = context.groups.FirstOrDefault(o => o.id == groupId);
+                                            Group g = context.Groups.FirstOrDefault(o => o.GroupId == groupId);
                                             if (g != null)
                                             {
-                                                builtin_commands zvs_cmd = context.builtin_commands.FirstOrDefault(c => c.name == cmd_name);
+                                                BuiltinCommand zvs_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqId);
                                                 if (zvs_cmd != null)
                                                 {
-                                                    string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.friendly_name, g.name);
+                                                    string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.Name, g.Name);
                                                     WriteToLog(Urgency.INFO, result);
                                                     BroadcastMessage("MSG~" + result + Environment.NewLine);
 
-                                                    zvs_cmd.Run(context, g.id.ToString());
+                                                    zvs_cmd.Run(context, g.GroupId.ToString());
                                                 }
                                             }
 
@@ -589,26 +584,26 @@ namespace LightSwitchPlugin
 
         private void SendSceneList(Socket LightSwitchClientSocket)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (scene scene in context.scenes)
+                foreach (Scene scene in context.Scenes)
                 {
                     bool show = false;
-                    bool.TryParse(scene_property_value.GetPropertyValue(context, scene.id, "SHOWSCENEINLSLIST"), out show);
+                    bool.TryParse(ScenePropertyValue.GetPropertyValue(context, scene, "SHOWSCENEINLSLIST"), out show);
 
                     if (show)
-                        SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.friendly_name + "~" + scene.id + Environment.NewLine);
+                        SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.Name + "~" + scene.SceneId + Environment.NewLine);
                 }
             }
         }
 
         private void SendZoneList(Socket LightSwitchClientSocket)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (group g in context.groups)
+                foreach (Group g in context.Groups)
                 {
-                    SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.name + "~" + g.id + Environment.NewLine);
+                    SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.Name + "~" + g.GroupId + Environment.NewLine);
                 }
             }
         }
@@ -617,13 +612,13 @@ namespace LightSwitchPlugin
         {
             List<string> LS_devices = new List<string>();
 
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
                 //Get Devices
-                foreach (device d in context.devices)
+                foreach (Device d in context.Devices)
                 {
                     bool show = true;
-                    bool.TryParse(device_property_values.GetDevicePropertyValue(context, d.id, "SHOWINLSLIST"), out show);
+                    bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "SHOWINLSLIST"), out show);
 
                     if (show)
                     {
@@ -643,75 +638,75 @@ namespace LightSwitchPlugin
 
         }
 
-        private string DeviceToString(device d)
+        private string DeviceToString(Device d)
         {
-            switch (d.device_types.name)
+            switch (d.Type.UniqueIdentifier)
             {
                 case "SWITCH":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
+                        DeviceValue dv = d.Values.FirstOrDefault(v => v.Name == "Basic");
                         if (dv != null)
-                            int.TryParse(dv.value2, out level);
+                            int.TryParse(dv.Value, out level);
 
-                        return d.friendly_name + "~" + d.id + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
+                        return d.Name + "~" + d.DeviceId + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
                     }
                 case "DIMMER":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
+                        DeviceValue dv = d.Values.FirstOrDefault(v => v.Name == "Basic");
                         if (dv != null)
-                            int.TryParse(dv.value2, out level);
+                            int.TryParse(dv.Value, out level);
 
-                        return d.friendly_name + "~" + d.id + "~" + level + "~" + "MultiLevelSwitch";
+                        return d.Name + "~" + d.DeviceId + "~" + level + "~" + "MultiLevelSwitch";
                     }
                 case "THERMOSTAT":
                     {
                         int temp = 0;
-                        device_values dv_temp = d.device_values.FirstOrDefault(v => v.label_name == "Temperature");
+                        DeviceValue dv_temp = d.Values.FirstOrDefault(v => v.Name == "Temperature");
                         if (dv_temp != null)
-                            int.TryParse(dv_temp.value2, out temp);
+                            int.TryParse(dv_temp.Value, out temp);
 
-                        return d.friendly_name + "~" + d.id + "~" + temp + "~" + "Thermostat";
+                        return d.Name + "~" + d.DeviceId + "~" + temp + "~" + "Thermostat";
                     }
                 case "SENSOR":
                     {
                         int level = 0;
-                        device_values dv = d.device_values.FirstOrDefault(v => v.label_name == "Basic");
+                        DeviceValue dv = d.Values.FirstOrDefault(v => v.Name == "Basic");
                         if (dv != null)
-                            int.TryParse(dv.value2, out level);
+                            int.TryParse(dv.Value, out level);
 
-                        return d.friendly_name + "~" + d.id + "~" + level + "~" + "Sensor";
+                        return d.Name + "~" + d.DeviceId + "~" + level + "~" + "Sensor";
                     }
             }
             return string.Empty;
         }
 
-        private string DeviceToString(device_values dv)
+        private string DeviceToString(DeviceValue dv)
         {
             //Only send applicable updated to LightSwitch
-            if (dv.label_name == "Basic")
+            if (dv.Name == "Basic")
             {
                 int level = 0;
-                int.TryParse(dv.value2, out level);
+                int.TryParse(dv.Value, out level);
 
-                switch (dv.device.device_types.name)
+                switch (dv.Device.Type.UniqueIdentifier)
                 {
                     case "SWITCH":
-                        return dv.device.friendly_name + "~" + dv.device.id + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
+                        return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
                     case "DIMMER":
-                        return dv.device.friendly_name + "~" + dv.device.id + "~" + level + "~" + "MultiLevelSwitch";
+                        return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + level + "~" + "MultiLevelSwitch";
                     case "SENSOR":
-                        return dv.device.friendly_name + "~" + dv.device.id + "~" + level + "~" + "Sensor";
+                        return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + level + "~" + "Sensor";
                 }
             }
-            else if (dv.label_name == "Temperature")
+            else if (dv.Name == "Temperature")
             {
-                if (dv.device.device_types.name.Equals("THERMOSTAT"))
+                if (dv.Device.Type.UniqueIdentifier.Equals("THERMOSTAT"))
                 {
                     int temp = 0;
-                    int.TryParse(dv.value2, out temp);
-                    return dv.device.friendly_name + "~" + dv.device.id + "~" + temp + "~" + "Thermostat";
+                    int.TryParse(dv.Value, out temp);
+                    return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + temp + "~" + "Thermostat";
                 }
             }
             return string.Empty;
@@ -740,30 +735,23 @@ namespace LightSwitchPlugin
         /// <returns></returns>
         private void ExecuteZVSCommand(int device_id, byte Level, Socket Client)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                device d = context.devices.FirstOrDefault(o => o.id == device_id);
+                Device d = context.Devices.FirstOrDefault(o => o.DeviceId == device_id);
 
                 if (d != null)
                 {
-                    switch (d.device_types.name)
+                    switch (d.Type.UniqueIdentifier)
                     {
                         case "SWITCH":
                             {
-                                string cmd_name = (Level == 0 ? "TURNOFF" : "TURNON");
-                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == cmd_name);
+                                string cmdUniqueId = (Level == 0 ? "TURNOFF" : "TURNON");
+                                DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqueId);
                                 if (cmd != null)
                                 {
-                                    string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.friendly_name, d.friendly_name);
+                                    string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.Name, d.Name);
                                     WriteToLog(Urgency.INFO, result);
-
-                                    device_type_command_que.Run(new device_type_command_que
-                                    {
-                                        device_id = d.id,
-                                        device_type_command_id = cmd.id,
-                                        arg = string.Empty
-                                    }, context);
-
+                                    cmd.Run(context, d, string.Empty);
                                     return;
                                 }
                                 break;
@@ -771,12 +759,12 @@ namespace LightSwitchPlugin
                         case "DIMMER":
                             {
                                 string l = (Level == 255 ? "99" : Level.ToString());
-                                if (d.device_types.plugin.name == "OPENZWAVE")
+                                if (d.Type.Plugin.UniqueIdentifier == "OPENZWAVE")
                                 {
                                     if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_BASIC",l , Client))
                                         return;
                                 }
-                                if (d.device_types.plugin.name == "THINKSTICK")
+                                if (d.Type.Plugin.UniqueIdentifier == "THINKSTICK")
                                 {
                                     if (ExecuteDynamicCMD(context, d, "BASIC", l, Client))
                                         return;
@@ -796,9 +784,9 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void ExecuteZVSCommand(int SceneID, Socket Client)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                scene scene = context.scenes.FirstOrDefault(s => s.id == SceneID);
+                Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == SceneID);
                 if (scene != null)
                 {
 
@@ -828,27 +816,20 @@ namespace LightSwitchPlugin
                         }
                     };
                     SceneRunner.onSceneRunBegin += startHandler;
-                    sr.RunScene(scene.id);
+                    sr.RunScene(scene.SceneId);
 
                 }
             }
         }
 
-        private bool ExecuteDynamicCMD(zvsLocalDBEntities context, device d, string device_cmd_name, string arg, Socket Client)
+        private bool ExecuteDynamicCMD(zvsContext context, Device d, string cmdUniqueId, string arg, Socket Client)
         {
-            device_commands cmd = d.device_commands.FirstOrDefault(c => c.name == device_cmd_name);
+            DeviceCommand cmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqueId);
             if (cmd != null)
             {
-                string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.friendly_name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.friendly_name);
+                string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.Name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.Name);
                 WriteToLog(Urgency.INFO, result);
-
-                device_command_que.Run(new device_command_que
-                {
-                    device_id = d.id,
-                    device_command_id = cmd.id,
-                    arg = arg
-                }, context);
-
+                cmd.Run(context, arg);
                 return true;
             }
             return false;
@@ -864,12 +845,12 @@ namespace LightSwitchPlugin
 
         private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, int Temp, Socket Client)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                device d = context.devices.FirstOrDefault(o => o.id == deviceID);
-                if (d != null && d.device_types.name.Equals("THERMOSTAT"))
+                Device d = context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
+                if (d != null && d.Type.UniqueIdentifier.Equals("THERMOSTAT"))
                 {
-                    string plugin = d.device_types.plugin.name;
+                    string plugin = d.Type.Plugin.UniqueIdentifier;
                     string key = plugin + Mode;
 
                     if (ThermoTempCommandTranslations.ContainsKey(key))
@@ -907,12 +888,12 @@ namespace LightSwitchPlugin
         private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, Socket Client)
         {
             //PLUGINNAME-0 -->CmdName,Arg 
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                device d = context.devices.FirstOrDefault(o => o.id == deviceID);
-                if (d != null && d.device_types.name.Equals("THERMOSTAT"))
+                Device d = context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
+                if (d != null && d.Type.UniqueIdentifier.Equals("THERMOSTAT"))
                 {
-                    string plugin = d.device_types.plugin.name;
+                    string plugin = d.Type.Plugin.UniqueIdentifier;
                     string key = plugin + Mode;
 
                     if(ThermoCommandTranslations.ContainsKey(key))
@@ -926,37 +907,22 @@ namespace LightSwitchPlugin
                     {
                         case 6:
                             {
-                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == "SETENERGYMODE");
+                                DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETENERGYMODE");
                                 if (cmd != null)
                                 {
-                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.friendly_name + " on " + d.friendly_name + ".");
-
-                                    device_type_command_que.Run(new device_type_command_que
-                                    {
-                                        device_id = d.id,
-                                        device_type_command_id = cmd.id,
-                                        arg = string.Empty
-                                    }, context);
-
-
+                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
+                                    cmd.Run(context, d, string.Empty);
                                     return;
                                 }
                                 break;
                             }
                         case 7:
                             {
-                                device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name == "SETCONFORTMODE");
+                                DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETCONFORTMODE");
                                 if (cmd != null)
                                 {
-                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.friendly_name + " on " + d.friendly_name + ".");
-
-                                    device_type_command_que.Run(new device_type_command_que
-                                    {
-                                        device_id = d.id,
-                                        device_type_command_id = cmd.id,
-                                        arg = string.Empty
-                                    }, context);
-
+                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
+                                    cmd.Run(context, d, string.Empty);
                                     return;
                                 }
                                 break;
@@ -1094,7 +1060,7 @@ namespace LightSwitchPlugin
 
         private void PublishZeroconf()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
                 int port = 9909;
                 int.TryParse(GetSettingValue("PORT", context), out port);

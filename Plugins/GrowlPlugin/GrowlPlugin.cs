@@ -10,16 +10,17 @@ using Growl.Connector;
 using System.Drawing;
 using System.Linq;
 using zVirtualScenes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace GrowlPlugin
 {
-    [Export(typeof(Plugin))]
-    public class GrowlPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class GrowlPlugin : zvsPlugin
     {
         public GrowlPlugin()
             : base("GROWL",
-               "Growl Plugin",
+               "Growl Plug-in",
                 "This plug-in will send notifications to Growl."
                 ) { }
 
@@ -28,15 +29,15 @@ namespace GrowlPlugin
 
         public override void Initialize()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "NOTIFICATIONS",
-                    friendly_name = "Notifications to send",
-                    value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
-                    value_data_type = (int)Data_Types.STRING,
-                    description = "Include all values you would like announced. Comma Seperated."
+                    UniqueIdentifier = "NOTIFICATIONS",
+                    Name = "Notifications to send",
+                    Value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
+                    ValueType = DataType.STRING,
+                    Description = "Include all values you would like announced. Comma Separated."
                 }, context);
             }
         }
@@ -44,30 +45,20 @@ namespace GrowlPlugin
         protected override void StartPlugin()
         {
 
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " started");
-            device_values.DeviceValueDataChangedEvent+=new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent); 
+            WriteToLog(Urgency.INFO, this.Name + " started");
+            DeviceValue.DeviceValueDataChangedEvent +=DeviceValue_DeviceValueDataChangedEvent;
             RegisterGrowl(); 
 
             IsReady = true;
-        }     
-
-        protected override void StopPlugin()
-        {
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " stopped");
-            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent); 
-
-            IsReady = false;
         }
 
-       
-
-        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
+        void DeviceValue_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
         {
             if (IsReady)
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device_values dv = context.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
                     if (dv != null)
                     {
 
@@ -75,37 +66,37 @@ namespace GrowlPlugin
 
                         foreach (string deviceTypeValuespair in deviceTypeValuespairs)
                         {
-                            string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+                            string thisEvent = dv.Device.Type.Name + ":" + dv.Name;
 
                             if (thisEvent.Equals(deviceTypeValuespair.Trim()))
                             {
-                                Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.device.friendly_name + " " + dv.label_name, "Changed to " + args.newValue + " from " + args.oldValue + ".");
+                                Notification notification = new Notification("zVirtualScenes", NOTIFY_DEVICE_VALUE_CHANGE, "0", dv.Device.Name + " " + dv.Name, "Changed to " + args.newValue + " from " + args.oldValue + ".");
                                 GrowlConnector.Notify(notification);
                             }
                         }
                     }
                 }
             }
+        }     
+
+        protected override void StopPlugin()
+        {
+            WriteToLog(Urgency.INFO, this.Name + " stopped");
+            DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
+            IsReady = false;
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
-        {
-        }
-        public override void ProcessDeviceCommand(device_command_que cmd)
-        {
-        }
-        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
-        {
-        }
-        public override void Repoll(device device)
-        {
-        }
-        public override void ActivateGroup(int groupID)
-        {
-        }
-        public override void DeactivateGroup(int groupID)
-        {
-        }     
+        protected override void SettingChanged(string settingUniqueIdentifier, string settingValue) { }
+
+        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
+
+        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
+
+        public override void Repoll(zvs.Entities.Device device) { }
+
+        public override void ActivateGroup(int groupID) { }
+
+        public override void DeactivateGroup(int groupID) { }
 
         public void RegisterGrowl()
         {

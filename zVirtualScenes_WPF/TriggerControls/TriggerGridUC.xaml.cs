@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.TriggerControls
 {
@@ -21,7 +22,7 @@ namespace zVirtualScenesGUI.TriggerControls
     /// </summary>
     public partial class TriggerGridUC : UserControl
     {
-        private zvsLocalDBEntities context;
+        private zvsContext context;
         private App app = (App)Application.Current;
 
         public TriggerGridUC()
@@ -33,23 +34,23 @@ namespace zVirtualScenesGUI.TriggerControls
         {
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                context = new zvsLocalDBEntities();
+                context = new zvsContext();
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
-                context.device_value_triggers.ToList();
-                myCollectionViewSource.Source = context.device_value_triggers.Local;
+                context.DeviceValueTriggers.ToList();
+                myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource JSTrigggerViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["JSTriggerViewSource"];
-                context.javascript_triggers.ToList();
-                JSTrigggerViewSource.Source = context.javascript_triggers.Local;
+                ////Load your data here and assign the result to the CollectionViewSource.
+                //System.Windows.Data.CollectionViewSource JSTrigggerViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["JSTriggerViewSource"];
+                //context.javascript_triggersToList();
+                //JSTrigggerViewSource.Source = context.javascript_triggers.Local;
             }
 
-            zvsLocalDBEntities.onDeviceValueTriggersChanged += zvsLocalDBEntities_onDeviceValueTriggersChanged;
+            zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
         }
 
-        void zvsLocalDBEntities_onDeviceValueTriggersChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onDeviceValueTriggersChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -58,12 +59,12 @@ namespace zVirtualScenesGUI.TriggerControls
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        context.device_value_triggers.ToList();
+                        context.DeviceValueTriggers.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<device_value_triggers>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<DeviceValueTrigger>())
                             ent.Reload();
                     }
                 }
@@ -72,7 +73,7 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onDeviceValueTriggersChanged -= zvsLocalDBEntities_onDeviceValueTriggersChanged;
+            zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
         }
 
         private void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
@@ -87,9 +88,9 @@ namespace zVirtualScenesGUI.TriggerControls
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is device_value_triggers)
+            if (obj is DeviceValueTrigger)
             {
-                var trigger = (device_value_triggers)obj;
+                var trigger = (DeviceValueTrigger)obj;
                 if (trigger != null)
                 {
                     TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
@@ -111,13 +112,13 @@ namespace zVirtualScenesGUI.TriggerControls
         {
             if (e.Key == Key.Delete)
             {
-                device_value_triggers trigger = (device_value_triggers)TriggerGrid.SelectedItem;
+                DeviceValueTrigger trigger = (DeviceValueTrigger)TriggerGrid.SelectedItem;
                 if (trigger != null)
                 {
                     if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' trigger?", trigger.Name), "Are you sure?",
                         MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        context.device_value_triggers.Local.Remove(trigger);
+                        context.DeviceValueTriggers.Local.Remove(trigger);
                         context.SaveChanges();
                     }
                 }
@@ -128,7 +129,7 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
-            device_value_triggers trigger = new device_value_triggers();
+            DeviceValueTrigger trigger = new DeviceValueTrigger();
             trigger.Name = "New Trigger";
             TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
             new_window.Owner = app.zvsWindow;
@@ -138,7 +139,7 @@ namespace zVirtualScenesGUI.TriggerControls
             {
                 if (!new_window.Canceled)
                 {
-                    context.device_value_triggers.Add(trigger);
+                    context.DeviceValueTriggers.Add(trigger);
                     context.SaveChanges();
                 }
             };
@@ -146,71 +147,71 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void AddJSTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
-            javascript_triggers trigger = new javascript_triggers();
-            trigger.Name = "New JS Trigger";
-            JSTriggerEditorWindow new_window = new JSTriggerEditorWindow(trigger, context);
-            new_window.Owner = app.zvsWindow;
-            new_window.Title = "Add JS Trigger";
-            new_window.Show();
-            new_window.Closing += (s, a) =>
-            {
-                if (!new_window.Canceled)
-                {
-                    context.javascript_triggers.Add(trigger);
-                    context.SaveChanges();
-                }
-            };
+            //javascript_triggers trigger = new javascript_triggers();
+            //trigger.Name = "New JS Trigger";
+            //JSTriggerEditorWindow new_window = new JSTriggerEditorWindow(trigger, context);
+            //new_window.Owner = app.zvsWindow;
+            //new_window.Title = "Add JS Trigger";
+            //new_window.Show();
+            //new_window.Closing += (s, a) =>
+            //{
+            //    if (!new_window.Canceled)
+            //    {
+            //        context.javascript_triggers.Add(trigger);
+            //        context.SaveChanges();
+            //    }
+            //};
         }
 
         private void JSTriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
+                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 context.SaveChanges();
             }
         }
 
         private void JSTriggerGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete)
-            {
-                javascript_triggers trigger = (javascript_triggers)TriggerGrid.SelectedItem;
-                if (trigger != null)
-                {
-                    if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' javascript trigger?", trigger.Name), "Are you sure?",
-                        MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        context.javascript_triggers.Local.Remove(trigger);
-                        context.SaveChanges();
-                    }
-                }
+            //if (e.Key == Key.Delete)
+            //{
+            //    javascript_triggers trigger = (javascript_triggers)TriggerGrid.SelectedItem;
+            //    if (trigger != null)
+            //    {
+            //        if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' javascript trigger?", trigger.Name), "Are you sure?",
+            //            MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            //        {
+            //            context.javascript_triggers.Local.Remove(trigger);
+            //            context.SaveChanges();
+            //        }
+            //    }
 
-                e.Handled = true;
-            }
+            //    e.Handled = true;
+            //}
         }
 
         private void JSTrigger_SettingBtn_Click(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is javascript_triggers)
-            {
-                var trigger = (javascript_triggers)obj;
-                if (trigger != null)
-                {
-                    JSTriggerEditorWindow new_window = new JSTriggerEditorWindow(trigger, context);
-                    new_window.Owner = app.zvsWindow;
-                    new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
-                    new_window.Show();
-                    new_window.Closing += (s, a) =>
-                    {
-                        if (!new_window.Canceled)
-                        {
-                            context.SaveChanges();
-                        }
-                    };
-                }
-            }
+            //Object obj = ((FrameworkElement)sender).DataContext;
+            //if (obj is javascript_triggers)
+            //{
+            //    var trigger = (javascript_triggers)obj;
+            //    if (trigger != null)
+            //    {
+            //        JSTriggerEditorWindow new_window = new JSTriggerEditorWindow(trigger, context);
+            //        new_window.Owner = app.zvsWindow;
+            //        new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
+            //        new_window.Show();
+            //        new_window.Closing += (s, a) =>
+            //        {
+            //            if (!new_window.Canceled)
+            //            {
+            //                context.SaveChanges();
+            //            }
+            //        };
+            //    }
+            //}
         }
     }
 }

@@ -12,9 +12,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections;
-using zVirtualScenesModel;
+
 using zVirtualScenesGUI.DynamicActionControls;
 using System.Diagnostics;
+using zvs.Entities;
 
 namespace zVirtualScenesGUI.PluginManager
 {
@@ -25,7 +26,7 @@ namespace zVirtualScenesGUI.PluginManager
     {
         private App application = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
-        private zvsLocalDBEntities context;
+        private zvsContext context;
 
         public PluginManagerWindow()
         {
@@ -39,7 +40,7 @@ namespace zVirtualScenesGUI.PluginManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
+            context = new zvsContext();
 
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
@@ -51,28 +52,28 @@ namespace zVirtualScenesGUI.PluginManager
                 //This will prevent plug-ins that are in the DB but not loaded from being configurable.
                 //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
 
-                context.plugins.ToList();
-                zvsEntities2ViewSource.Source = context.plugins.Local;
+                context.Plugins.ToList();
+                zvsEntities2ViewSource.Source = context.Plugins.Local;
             }
 
-            zvsLocalDBEntities.onPluginsChanged += zvsLocalDBEntities_onPluginsChanged;
+            zvsContext.onPluginsChanged += zvsContext_onPluginsChanged;
          
         }
 
-        void zvsLocalDBEntities_onPluginsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onPluginsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
                 if (context != null)
                 {
-                    context.plugins.ToList();
+                    context.Plugins.ToList();
                 }
             }));
         }
 
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsLocalDBEntities.onPluginsChanged -= zvsLocalDBEntities_onPluginsChanged;            
+            zvsContext.onPluginsChanged -= zvsContext_onPluginsChanged;            
             context.Dispose();
         }  
 
@@ -84,22 +85,22 @@ namespace zVirtualScenesGUI.PluginManager
         private void PluginLstVw_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             this.ControlsStkPnl.Children.Clear();
-            
-            plugin p = (plugin)PluginLstVw.SelectedItem;
+
+            Plugin p = (Plugin)PluginLstVw.SelectedItem;
             if (p != null)
             {
                 //ADD THE ENABLED BUTTON
-                CheckboxControl c = new CheckboxControl(string.Format("Enabled the '{0}'", p.friendly_name),
-                    "Starts and stops the selected plugin.",
-                    p.enabled,
+                CheckboxControl c = new CheckboxControl(string.Format("Enabled the '{0}'", p.Name),
+                    "Starts and stops the selected plug-in.",
+                    p.isEnabled,
                     (isChecked) =>
                     {
                         //Save to the database
-                        p.enabled = isChecked;                        
+                        p.isEnabled = isChecked;                        
                         context.SaveChanges();
 
                         //STOP OR START
-                        var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.name);
+                        var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.Name);
                         if (Plugin != null)
                             if (isChecked) { Plugin.Start(); } else { Plugin.Stop(); }
                     },
@@ -108,23 +109,23 @@ namespace zVirtualScenesGUI.PluginManager
 
 
                 //Add all the settings
-                foreach (plugin_settings ps in p.plugin_settings)
+                foreach (PluginSetting ps in p.Settings)
                 {
-                    plugin_settings _ps = ps;
+                    PluginSetting _ps = ps;
 
-                    switch ((Data_Types)_ps.value_data_type)
+                    switch (_ps.ValueType)
                     {
-                        case Data_Types.BOOL:
+                        case DataType.BOOL:
                             {
                                 bool DefaultValue = false;
-                                bool.TryParse(_ps.value, out DefaultValue);
+                                bool.TryParse(_ps.Value, out DefaultValue);
 
-                                CheckboxControl control = new CheckboxControl(_ps.friendly_name,
-                                    _ps.description,
+                                CheckboxControl control = new CheckboxControl(_ps.Name,
+                                    _ps.Description,
                                     DefaultValue,
                                     (isChecked) =>
                                     {
-                                        _ps.value = isChecked.ToString();                                        
+                                        _ps.Value = isChecked.ToString();                                        
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -132,15 +133,15 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.DECIMAL:
+                        case DataType.DECIMAL:
                             {
-                                NumericControl control = new NumericControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.value,
+                                NumericControl control = new NumericControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Value,
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        _ps.value = value;                                        
+                                        _ps.Value = value;                                        
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -148,15 +149,15 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.BYTE:
+                        case DataType.BYTE:
                             {
-                                NumericControl control = new NumericControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.value,
+                                NumericControl control = new NumericControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Value,
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        _ps.value = value;                                        
+                                        _ps.Value = value;                                        
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -164,15 +165,15 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.INTEGER:
+                        case DataType.INTEGER:
                             {
-                                NumericControl control = new NumericControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.value,
+                                NumericControl control = new NumericControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Value,
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        _ps.value = value;                                       
+                                        _ps.Value = value;                                       
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -180,15 +181,15 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.SHORT:
+                        case DataType.SHORT:
                             {
-                                NumericControl control = new NumericControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.value,
+                                NumericControl control = new NumericControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Value,
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        _ps.value = value;                                        
+                                        _ps.Value = value;                                        
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -196,15 +197,15 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.COMPORT:
+                        case DataType.COMPORT:
                             {
-                                NumericControl control = new NumericControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.value,
+                                NumericControl control = new NumericControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Value,
                                     NumericControl.NumberType.ComPort,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.Value = value;
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -212,14 +213,14 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.STRING:
+                        case DataType.STRING:
                             {
-                                StringControl control = new StringControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.value,
+                                StringControl control = new StringControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Value,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.Value = value;
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -227,15 +228,15 @@ namespace zVirtualScenesGUI.PluginManager
                                 ControlsStkPnl.Children.Add(control);
                                 break;
                             }
-                        case Data_Types.LIST:
+                        case DataType.LIST:
                             {
-                                ComboboxControl control = new ComboboxControl(_ps.friendly_name,
-                                    _ps.description,
-                                    _ps.plugin_setting_options.Select(o => o.options).ToList(),
-                                    _ps.value,
+                                ComboboxControl control = new ComboboxControl(_ps.Name,
+                                    _ps.Description,
+                                    _ps.Options.Select(o => o.Name).ToList(),
+                                    _ps.Value,
                                     (value) =>
                                     {
-                                        _ps.value = value;
+                                        _ps.Value = value;
                                         context.SaveChanges();
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
@@ -246,8 +247,6 @@ namespace zVirtualScenesGUI.PluginManager
                     }
                 }
             }
-        }
-
-            
+        }            
     }
 }

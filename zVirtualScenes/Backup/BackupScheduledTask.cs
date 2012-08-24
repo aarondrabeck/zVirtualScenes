@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes.Backup
 {
@@ -69,14 +70,14 @@ namespace zVirtualScenes.Backup
         public static void ExportScheduledTaskAsyc(string PathFileName, Action<string> Callback)
         {
             List<BackupScheduledTask> tasks = new List<BackupScheduledTask>();
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (scheduled_tasks t in context.scheduled_tasks)
+                foreach (ScheduledTask t in context.ScheduledTasks)
                 {
                     BackupScheduledTask task = new BackupScheduledTask();
-                    task.sceneName = t.scene.friendly_name;
-                    task.Frequency = t.Frequency;
-                    task.friendly_name = t.friendly_name;
+                    task.sceneName = t.Scene.Name;
+                    task.Frequency = (int)t.Frequency;
+                    task.friendly_name = t.Name;
                     task.isEnabled = t.isEnabled;
                     task.RecurDay01 = t.RecurDay01;
                     task.RecurDay02 = t.RecurDay02;
@@ -122,8 +123,8 @@ namespace zVirtualScenes.Backup
                     task.RecurTuesday = t.RecurTuesday;
                     task.RecurWednesday = t.RecurWednesday;
                     task.RecurWeeks = t.RecurWeeks;
-                    task.sortOrder = t.sortOrder;
-                    task.startTime = t.startTime;
+                    task.sortOrder = t.SortOrder;
+                    task.startTime = t.StartTime;
                     tasks.Add(task);
                 }
             }
@@ -163,18 +164,18 @@ namespace zVirtualScenes.Backup
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
                     tasks = (List<BackupScheduledTask>)ScenesSerializer.Deserialize(myFileStream);
                     
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
                         foreach (BackupScheduledTask t in tasks)
                         {
-                            scene s = context.scenes.FirstOrDefault(o => o.friendly_name == t.sceneName);
+                            Scene s = context.Scenes.FirstOrDefault(o => o.Name == t.sceneName);
 
                             if (s != null)
                             {
-                                scheduled_tasks task = new scheduled_tasks();
-                                task.SceneID = s.id;
-                                task.Frequency = t.Frequency;
-                                task.friendly_name = t.friendly_name;
+                                ScheduledTask task = new ScheduledTask();
+                                task.Scene = s;
+                                task.Frequency = (TaskFrequency)t.Frequency;
+                                task.Name = t.friendly_name;
                                 task.isEnabled = t.isEnabled;
                                 task.RecurDay01 = t.RecurDay01;
                                 task.RecurDay02 = t.RecurDay02;
@@ -220,10 +221,10 @@ namespace zVirtualScenes.Backup
                                 task.RecurTuesday = t.RecurTuesday;
                                 task.RecurWednesday = t.RecurWednesday;
                                 task.RecurWeeks = t.RecurWeeks;
-                                task.sortOrder = t.sortOrder;
-                                task.startTime = t.startTime;
+                                task.SortOrder = t.sortOrder;
+                                task.StartTime = t.startTime;
 
-                                context.scheduled_tasks.Add(task);
+                                context.ScheduledTasks.Add(task);
                                 ImportedCount++;
 
                             }

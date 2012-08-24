@@ -13,7 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zVirtualScenesGUI.DynamicActionControls;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.DeviceControls
 {
@@ -23,7 +24,7 @@ namespace zVirtualScenesGUI.DeviceControls
     public partial class DeviceProperties : UserControl
     {
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
-        private zvsLocalDBEntities context;
+        private zvsContext context;
         private int DeviceID = 0;
 
         public DeviceProperties(int DeviceID)
@@ -34,7 +35,7 @@ namespace zVirtualScenesGUI.DeviceControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
+            context = new zvsContext();
             LoadCommands();
         }
 
@@ -47,36 +48,38 @@ namespace zVirtualScenesGUI.DeviceControls
         {
             PropertiesStkPnl.Children.Clear();
 
-            device d = context.devices.FirstOrDefault(dv => dv.id == DeviceID);
+            Device d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
             if (d != null)
             {
                 #region Device Properties
-                foreach (device_propertys dp in context.device_propertys)
+                foreach (DeviceProperty dp in context.DeviceProperties)
                 {
-                    device_propertys _dp = dp;
-                    device_property_values _dpv = d.device_property_values.FirstOrDefault(v => v.device_property_id == _dp.id);
-                    string _default = _dpv == null ? _dp.default_value : _dpv.value;
+                    DeviceProperty _dp = dp;
 
-                    switch ((Data_Types)_dp.value_data_type)
+                    //See if the device has a value stored for it for this property
+                    DevicePropertyValue _dpv = d.PropertyValues.FirstOrDefault(v => v.DeivceProperty == _dp);                    
+                    string _default = _dpv == null ? _dp.Value : _dpv.Value;
+
+                    switch (_dp.ValueType)
                     {
-                        case Data_Types.BOOL:
+                        case DataType.BOOL:
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
                                 bool.TryParse(_default, out DefaultValue);
 
-                                CheckboxControl control = new CheckboxControl(_dp.friendly_name, string.Empty, DefaultValue, (isChecked) =>
+                                CheckboxControl control = new CheckboxControl(_dp.Name, _dp.Description, DefaultValue, (isChecked) =>
                                 {
                                     if (_dpv != null)
                                     {
-                                        _dpv.value = isChecked.ToString();
+                                        _dpv.Value = isChecked.ToString();
                                     }
                                     else
                                     {
-                                        d.device_property_values.Add(new device_property_values()
+                                        d.PropertyValues.Add(new DevicePropertyValue()
                                         {
-                                            device_property_id = _dp.id,
-                                            value = isChecked.ToString()
+                                            DeivceProperty = _dp,
+                                            Value = isChecked.ToString()
                                         });
                                     }
 
@@ -87,24 +90,24 @@ namespace zVirtualScenesGUI.DeviceControls
 
                                 break;
                             }
-                        case Data_Types.DECIMAL:
+                        case DataType.DECIMAL:
                             {
-                                NumericControl control = new NumericControl(_dp.friendly_name,
-                                    string.Empty,
+                                NumericControl control = new NumericControl(_dp.Name,
+                                    _dp.Description,
                                     _default,
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
                                         if (_dpv != null)
                                         {
-                                            _dpv.value = value;
+                                            _dpv.Value = value;
                                         }
                                         else
                                         {
-                                            d.device_property_values.Add(new device_property_values()
+                                            d.PropertyValues.Add(new DevicePropertyValue()
                                             {
-                                                device_property_id = _dp.id,
-                                                value = value
+                                                DeivceProperty = _dp,
+                                                Value = value
                                             });
                                         }
 
@@ -115,24 +118,24 @@ namespace zVirtualScenesGUI.DeviceControls
 
                                 break;
                             }
-                        case Data_Types.INTEGER:
+                        case DataType.INTEGER:
                             {
-                                NumericControl control = new NumericControl(_dp.friendly_name,
-                                    string.Empty,
+                                NumericControl control = new NumericControl(_dp.Name,
+                                    _dp.Description,
                                     _default,
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
                                         if (_dpv != null)
                                         {
-                                            _dpv.value = value;
+                                            _dpv.Value = value;
                                         }
                                         else
                                         {
-                                            d.device_property_values.Add(new device_property_values()
+                                            d.PropertyValues.Add(new DevicePropertyValue()
                                             {
-                                                device_property_id = _dp.id,
-                                                value = value
+                                                DeivceProperty = _dp,
+                                                Value = value
                                             });
                                         }
 
@@ -143,24 +146,24 @@ namespace zVirtualScenesGUI.DeviceControls
 
                                 break;
                             }
-                        case Data_Types.BYTE:
+                        case DataType.BYTE:
                             {
-                                NumericControl control = new NumericControl(_dp.friendly_name,
-                                    string.Empty,
+                                NumericControl control = new NumericControl(_dp.Name,
+                                    _dp.Description,
                                     _default,
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
                                         if (_dpv != null)
                                         {
-                                            _dpv.value = value;
+                                            _dpv.Value = value;
                                         }
                                         else
                                         {
-                                            d.device_property_values.Add(new device_property_values()
+                                            d.PropertyValues.Add(new DevicePropertyValue()
                                             {
-                                                device_property_id = _dp.id,
-                                                value = value
+                                                DeivceProperty = _dp,
+                                                Value = value
                                             });
                                         }
 
@@ -171,24 +174,24 @@ namespace zVirtualScenesGUI.DeviceControls
 
                                 break;
                             }
-                        case Data_Types.SHORT:
+                        case DataType.SHORT:
                             {
-                                NumericControl control = new NumericControl(_dp.friendly_name,
-                                    string.Empty,
+                                NumericControl control = new NumericControl(_dp.Name,
+                                   _dp.Description,
                                     _default,
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
                                         if (_dpv != null)
                                         {
-                                            _dpv.value = value;
+                                            _dpv.Value = value;
                                         }
                                         else
                                         {
-                                            d.device_property_values.Add(new device_property_values()
+                                            d.PropertyValues.Add(new DevicePropertyValue()
                                             {
-                                                device_property_id = _dp.id,
-                                                value = value
+                                                DeivceProperty = _dp,
+                                                Value = value
                                             });
                                         }
 
@@ -200,23 +203,23 @@ namespace zVirtualScenesGUI.DeviceControls
                                 break;
                             }
 
-                        case Data_Types.STRING:
+                        case DataType.STRING:
                             {
-                                StringControl control = new StringControl(_dp.friendly_name,
-                                    string.Empty,
+                                StringControl control = new StringControl(_dp.Name,
+                                    _dp.Description,
                                     _default,
                                     (value) =>
                                     {
                                         if (_dpv != null)
                                         {
-                                            _dpv.value = value;
+                                            _dpv.Value = value;
                                         }
                                         else
                                         {
-                                            d.device_property_values.Add(new device_property_values()
+                                            d.PropertyValues.Add(new DevicePropertyValue()
                                             {
-                                                device_property_id = _dp.id,
-                                                value = value
+                                                DeivceProperty = _dp,
+                                                Value = value
                                             });
                                         }
 
@@ -228,24 +231,24 @@ namespace zVirtualScenesGUI.DeviceControls
                                 break;
                             }
 
-                        case Data_Types.LIST:
+                        case DataType.LIST:
                             {
-                                ComboboxControl control = new ComboboxControl(_dp.friendly_name,
-                                    string.Empty,
-                                    _dp.device_property_options.Select(o => o.name).ToList(),
+                                ComboboxControl control = new ComboboxControl(_dp.Name,
+                                    _dp.Description,
+                                    _dp.Options.Select(o => o.Name).ToList(),
                                     _default,
                                     (value) =>
                                     {
                                         if (_dpv != null)
                                         {
-                                            _dpv.value = value;
+                                            _dpv.Value = value;
                                         }
                                         else
                                         {
-                                            d.device_property_values.Add(new device_property_values()
+                                            d.PropertyValues.Add(new DevicePropertyValue()
                                             {
-                                                device_property_id = _dp.id,
-                                                value = value
+                                                DeivceProperty = _dp,
+                                                Value = value
                                             });
                                         }
 

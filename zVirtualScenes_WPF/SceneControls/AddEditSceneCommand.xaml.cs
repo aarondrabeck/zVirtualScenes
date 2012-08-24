@@ -13,7 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenesGUI.DynamicActionControls;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.SceneControls
 {
@@ -22,22 +23,22 @@ namespace zVirtualScenesGUI.SceneControls
     /// </summary>
     public partial class AddEditSceneCommand : Window
     {
-        private zvsLocalDBEntities context;
-        private scene_commands scene_command;
-        private device _device;
+        private zvsContext context;
+        private SceneCommand scene_command;
+        private Device _device;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
         private string arg = string.Empty;
 
-        public AddEditSceneCommand(zvsLocalDBEntities context, scene_commands scene_command)
+        public AddEditSceneCommand(zvsContext context, SceneCommand scene_command)
         {
             this.context = context;
             this.scene_command = scene_command;
-            _device = context.devices.FirstOrDefault(o => o.id == scene_command.device_id);
+            _device = scene_command.Device;
 
             if (_device == null)
                 this.Close();
             else
-                this.Title = string.Format("'{0}' Commands", _device.friendly_name);
+                this.Title = string.Format("'{0}' Commands", _device.Name);
 
             InitializeComponent();
         }
@@ -50,8 +51,8 @@ namespace zVirtualScenesGUI.SceneControls
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
 
-            this.Title = string.Format("Scene command for '{0}'", _device.friendly_name);
-            if ((scene_commands.command_types)scene_command.command_type_id == scene_commands.command_types.device_type_command)
+            this.Title = string.Format("Scene command for '{0}'", _device.Name);
+            if ( scene_command.Command is DeviceTypeCommand)
             {
                 DeviceTypeCmdRadioBtn.IsChecked = true;
             }
@@ -74,20 +75,18 @@ namespace zVirtualScenesGUI.SceneControls
                 return;
             }
 
-            if (CmdsCmboBox.SelectedItem is device_type_commands)
+            if (CmdsCmboBox.SelectedItem is DeviceTypeCommand)
             {
-                device_type_commands d_cmd = (device_type_commands)CmdsCmboBox.SelectedItem;
-                scene_command.command_id = d_cmd.id;
-                scene_command.command_type_id = (int)scene_commands.command_types.device_type_command;
+                DeviceTypeCommand d_cmd = (DeviceTypeCommand)CmdsCmboBox.SelectedItem;
+                scene_command.Command = d_cmd;
             }
-            else if (CmdsCmboBox.SelectedItem is device_commands)
+            else if (CmdsCmboBox.SelectedItem is DeviceCommand)
             {
-                device_commands d_cmd = (device_commands)CmdsCmboBox.SelectedItem;
-                scene_command.command_id = d_cmd.id;
-                scene_command.command_type_id = (int)scene_commands.command_types.device_command;
+                DeviceCommand d_cmd = (DeviceCommand)CmdsCmboBox.SelectedItem;
+                scene_command.Command = d_cmd;
             }
 
-            scene_command.arg = arg;
+            scene_command.Argument = arg;
 
             this.DialogResult = true;
             this.Close();
@@ -98,13 +97,13 @@ namespace zVirtualScenesGUI.SceneControls
             ArgSckPnl.Children.Clear();
             if (CmdsCmboBox.SelectedItem != null)
             {
-                if (CmdsCmboBox.SelectedItem is device_type_commands)
+                if (CmdsCmboBox.SelectedItem is DeviceTypeCommand)
                 {
-                    device_type_commands d_cmd = (device_type_commands)CmdsCmboBox.SelectedItem;
+                    DeviceTypeCommand d_cmd = (DeviceTypeCommand)CmdsCmboBox.SelectedItem;
                     #region Device Type Commands
-                    switch ((Data_Types)d_cmd.arg_data_type)
+                    switch (d_cmd.ArgumentType)
                     {
-                        case Data_Types.NONE:
+                        case DataType.NONE:
                             {
                                 ArgSckPnl.Children.Add(new TextBlock()
                                 {
@@ -113,21 +112,21 @@ namespace zVirtualScenesGUI.SceneControls
                                 });
                                 break;
                             }
-                        case Data_Types.BOOL:
+                        case DataType.BOOL:
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
-                                if (!bool.TryParse(scene_command.arg, out DefaultValue))
+                                if (!bool.TryParse(scene_command.Argument, out DefaultValue))
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        bool.TryParse(dv.value2, out DefaultValue);
+                                        bool.TryParse(dv.Value, out DefaultValue);
                                     }
                                 }
                                 arg = DefaultValue.ToString();
 
-                                CheckboxControl control = new CheckboxControl(d_cmd.friendly_name, d_cmd.description, DefaultValue, (isChecked) =>
+                                CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
                                     arg = isChecked.ToString();
                                 }, icon);
@@ -135,25 +134,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.DECIMAL:
+                        case DataType.DECIMAL:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
@@ -164,25 +163,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.INTEGER:
+                        case DataType.INTEGER:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                    NumericControl.NumberType.Integer,
                                     (value) =>
@@ -193,25 +192,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.SHORT:
+                        case DataType.SHORT:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Short,
                                     (value) =>
@@ -222,25 +221,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.BYTE:
+                        case DataType.BYTE:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                    NumericControl.NumberType.Byte,
                                     (value) =>
@@ -251,24 +250,24 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.STRING:
+                        case DataType.STRING:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0"; if (!string.IsNullOrEmpty(scene_command.arg))
+                                string DefaultValue = "0"; if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                StringControl control = new StringControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                StringControl control = new StringControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     (value) =>
                                     {
@@ -278,26 +277,26 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.LIST:
+                        case DataType.LIST:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                ComboboxControl control = new ComboboxControl(d_cmd.friendly_name,
-                                    d_cmd.description,
-                                    d_cmd.device_type_command_options.Select(o => o.options).ToList(),
+                                ComboboxControl control = new ComboboxControl(d_cmd.Name,
+                                    d_cmd.Description,
+                                    d_cmd.Options.Select(o => o.Name).ToList(),
                                     DefaultValue,
                                     (value) =>
                                     {
@@ -312,14 +311,14 @@ namespace zVirtualScenesGUI.SceneControls
                     #endregion
                 }
 
-                if (CmdsCmboBox.SelectedItem is device_commands)
+                if (CmdsCmboBox.SelectedItem is DeviceCommand)
                 {
-                    device_commands d_cmd = (device_commands)CmdsCmboBox.SelectedItem;
+                    DeviceCommand d_cmd = (DeviceCommand)CmdsCmboBox.SelectedItem;
                     #region Device Commands
 
-                    switch ((Data_Types)d_cmd.arg_data_type)
+                    switch (d_cmd.ArgumentType)
                     {
-                        case Data_Types.NONE:
+                        case DataType.NONE:
                             {
                                 ArgSckPnl.Children.Add(new TextBlock()
                                 {
@@ -328,22 +327,22 @@ namespace zVirtualScenesGUI.SceneControls
                                 });
                                 break;
                             }
-                        case Data_Types.BOOL:
+                        case DataType.BOOL:
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
 
-                                if (!bool.TryParse(scene_command.arg, out DefaultValue))
+                                if (!bool.TryParse(scene_command.Argument, out DefaultValue))
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        bool.TryParse(dv.value2, out DefaultValue);
+                                        bool.TryParse(dv.Value, out DefaultValue);
                                     }
                                 }
                                 arg = DefaultValue.ToString();
 
-                                CheckboxControl control = new CheckboxControl(d_cmd.friendly_name, d_cmd.description, DefaultValue, (isChecked) =>
+                                CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
                                     arg = isChecked.ToString();
                                 }, icon);
@@ -351,26 +350,26 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.DECIMAL:
+                        case DataType.DECIMAL:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
@@ -381,25 +380,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.INTEGER:
+                        case DataType.INTEGER:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Integer,
                                     (value) =>
@@ -410,25 +409,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.BYTE:
+                        case DataType.BYTE:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Byte,
                                     (value) =>
@@ -439,25 +438,25 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.SHORT:
+                        case DataType.SHORT:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Short,
                                     (value) =>
@@ -469,25 +468,25 @@ namespace zVirtualScenesGUI.SceneControls
                                 break;
                             }
 
-                        case Data_Types.STRING:
+                        case DataType.STRING:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                StringControl control = new StringControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                StringControl control = new StringControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     (value) =>
                                     {
@@ -497,26 +496,26 @@ namespace zVirtualScenesGUI.SceneControls
 
                                 break;
                             }
-                        case Data_Types.LIST:
+                        case DataType.LIST:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(scene_command.arg))
+                                if (!string.IsNullOrEmpty(scene_command.Argument))
                                 {
-                                    DefaultValue = scene_command.arg;
+                                    DefaultValue = scene_command.Argument;
                                 }
                                 else
                                 {
-                                    device_values dv = _device.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                    DeviceValue dv = _device.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
-                                        DefaultValue = dv.value2;
+                                        DefaultValue = dv.Value;
                                     }
                                 }
                                 arg = DefaultValue;
-                                ComboboxControl control = new ComboboxControl(d_cmd.friendly_name,
-                                    d_cmd.description,
-                                    d_cmd.device_command_options.Select(o => o.name).ToList(),
+                                ComboboxControl control = new ComboboxControl(d_cmd.Name,
+                                    d_cmd.Description,
+                                    d_cmd.Options.Select(o => o.Name).ToList(),
                                     DefaultValue,
                                     (value) =>
                                     {
@@ -536,11 +535,18 @@ namespace zVirtualScenesGUI.SceneControls
         {
             DeviceTypeCmdRadioBtn.IsChecked = false;
 
-            _device.device_commands.ToList();
-            CmdsCmboBox.ItemsSource = _device.device_commands;
+            _device.Commands.ToList();
+            CmdsCmboBox.ItemsSource = _device.Commands;
+
+            if (scene_command.Command == null)
+            {
+                if (CmdsCmboBox.Items.Count > 0)
+                    CmdsCmboBox.SelectedIndex = 0;
+                return;
+            }
 
             //Is there a cmd already assigned?
-            device_commands cmd = _device.device_commands.FirstOrDefault(o => o.id == scene_command.command_id);
+            DeviceCommand cmd = _device.Commands.FirstOrDefault(o => o.CommandId == scene_command.Command.CommandId);
             if (cmd != null)
             {
                 CmdsCmboBox.SelectedItem = cmd;
@@ -556,11 +562,18 @@ namespace zVirtualScenesGUI.SceneControls
         {
             DeviceCmdRadioBtn.IsChecked = false;
 
-            _device.device_types.device_type_commands.ToList();
-            CmdsCmboBox.ItemsSource = _device.device_types.device_type_commands;
+            _device.Type.Commands.ToList();
+            CmdsCmboBox.ItemsSource = _device.Type.Commands;
+
+            if (scene_command.Command == null)
+            {
+                if (CmdsCmboBox.Items.Count > 0)
+                    CmdsCmboBox.SelectedIndex = 0;
+                return;
+            }
 
             //Is there a cmd already assigned?
-            device_type_commands cmd = _device.device_types.device_type_commands.FirstOrDefault(o => o.id == scene_command.command_id);
+            DeviceTypeCommand cmd = _device.Type.Commands.FirstOrDefault(o => o.CommandId == scene_command.Command.CommandId);
             if (cmd != null)
             {
                 CmdsCmboBox.SelectedItem = cmd;

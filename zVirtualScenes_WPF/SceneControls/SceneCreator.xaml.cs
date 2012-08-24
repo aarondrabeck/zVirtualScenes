@@ -15,7 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zVirtualScenes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.SceneControls
 {
@@ -24,8 +25,8 @@ namespace zVirtualScenesGUI.SceneControls
     /// </summary>
     public partial class SceneCreator : UserControl
     {
-        private zvsLocalDBEntities context;
-        private ObservableCollection<scene> SceneCollection;
+        private zvsContext context;
+        private ObservableCollection<Scene> SceneCollection;
         private App app = (App)Application.Current;
 
         public SceneCreator()
@@ -35,23 +36,23 @@ namespace zVirtualScenesGUI.SceneControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
+            context = new zvsContext();
             //Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-
-                context.scenes.ToList();
-                SceneCollection = context.scenes.Local;
+                context.Devices.ToList();
+                context.Scenes.ToList();
+                SceneCollection = context.Scenes.Local;
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                myCollectionViewSource.Source = context.scenes.Local;
+                myCollectionViewSource.Source = context.Scenes.Local;
             }
 
             DevicesGrid.MinimalistDisplay = false;
 
             SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
-            zvsLocalDBEntities.onScenesChanged += zvsLocalDBEntities_onScenesChanged;
+            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
 
             if (SceneGrid.Items.Count > 0)
                 SceneGrid.SelectedIndex = 0;
@@ -60,7 +61,7 @@ namespace zVirtualScenesGUI.SceneControls
 
         }
 
-        void zvsLocalDBEntities_onScenesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -69,12 +70,12 @@ namespace zVirtualScenesGUI.SceneControls
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        context.scenes.ToList();
+                        context.Scenes.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<scene>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<Scene>())
                             ent.Reload();
                     }
                 }
@@ -88,17 +89,17 @@ namespace zVirtualScenesGUI.SceneControls
             //Give the new items a sort order
             if (e.NewItems != null)
             {
-                foreach (scene s in e.NewItems)
+                foreach (Scene s in e.NewItems)
                 {
-                    int? max = SceneCollection.Max(o => o.sort_order);
+                    int? max = SceneCollection.Max(o => o.SortOrder);
 
                     if (max.HasValue)
                     {
-                        s.sort_order = SceneCollection.Max(o => o.sort_order).Value + 1;
+                        s.SortOrder = SceneCollection.Max(o => o.SortOrder).Value + 1;
                     }
                     else
                     {
-                        s.sort_order = 1;
+                        s.SortOrder = 1;
                     }
                 }
             }
@@ -110,16 +111,16 @@ namespace zVirtualScenesGUI.SceneControls
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                scene s = e.Row.DataContext as scene;
+                Scene s = e.Row.DataContext as Scene;
                 if (s != null)
                 {
-                    if (string.IsNullOrEmpty(s.friendly_name))
+                    if (string.IsNullOrEmpty(s.Name))
                     {
-                        s.friendly_name = "New Scene";
+                        s.Name = "New Scene";
                     }
                 }
 
-                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
+                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 context.SaveChanges();
             }
         }
@@ -127,23 +128,23 @@ namespace zVirtualScenesGUI.SceneControls
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
             SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
-            zvsLocalDBEntities.onScenesChanged -= zvsLocalDBEntities_onScenesChanged;
-          
+            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+
         }
 
         private void SortUp_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
+            if (obj is Scene)
             {
-                var scene = (scene)obj;
+                var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.sort_order == scene.sort_order - 1);
+                    Scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder - 1);
                     if (scene_we_are_replacing != null)
-                        scene_we_are_replacing.sort_order++;
+                        scene_we_are_replacing.SortOrder++;
 
-                    scene.sort_order--;
+                    scene.SortOrder--;
 
                     SortSceneGridBySortOrder();
                     NormalizeSortOrder();
@@ -158,16 +159,16 @@ namespace zVirtualScenesGUI.SceneControls
         private void SortDown_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
+            if (obj is Scene)
             {
-                var scene = (scene)obj;
+                var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.sort_order == scene.sort_order + 1);
+                    Scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder + 1);
                     if (scene_we_are_replacing != null)
-                        scene_we_are_replacing.sort_order--;
+                        scene_we_are_replacing.SortOrder--;
 
-                    scene.sort_order++;
+                    scene.SortOrder++;
 
                     SortSceneGridBySortOrder();
                     NormalizeSortOrder();
@@ -182,8 +183,8 @@ namespace zVirtualScenesGUI.SceneControls
         private void NormalizeSortOrder()
         {
             //normalize sort order
-            foreach (scene s in SceneCollection)
-                s.sort_order = SceneGrid.Items.IndexOf(s);
+            foreach (Scene s in SceneCollection)
+                s.SortOrder = SceneGrid.Items.IndexOf(s);
 
             context.SaveChanges();
         }
@@ -198,7 +199,7 @@ namespace zVirtualScenesGUI.SceneControls
                 //clear the existing sort order
                 dataView.SortDescriptions.Clear();
                 //create a new sort order for the sorting that is done lastly
-                dataView.SortDescriptions.Add(new SortDescription("sort_order", ListSortDirection.Ascending));
+                dataView.SortDescriptions.Add(new SortDescription("SortOrder", ListSortDirection.Ascending));
                 //refresh the view which in turn refresh the grid
                 dataView.Refresh();
             }
@@ -207,9 +208,9 @@ namespace zVirtualScenesGUI.SceneControls
         private void ActivateScene_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
+            if (obj is Scene)
             {
-                var scene = (scene)obj;
+                var scene = (Scene)obj;
                 if (scene != null)
                 {
 
@@ -246,7 +247,7 @@ namespace zVirtualScenesGUI.SceneControls
                         }
                     };
                     SceneRunner.onSceneRunBegin += startHandler;
-                    sr.RunScene(scene.id);
+                    sr.RunScene(scene.SceneId);
                 }
             }
         }
@@ -254,9 +255,9 @@ namespace zVirtualScenesGUI.SceneControls
         private void SceneGrid_Row_PreviewMouseRightButtonDown(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
+            if (obj is Scene)
             {
-                var scene = (scene)obj;
+                var scene = (Scene)obj;
                 if (scene != null)
                 {
                     ContextMenu menu = new ContextMenu();
@@ -268,20 +269,19 @@ namespace zVirtualScenesGUI.SceneControls
                         if (MessageBox.Show("Are you sure you want to duplicate this scene?",
                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
-                            scene new_scene = new scene { friendly_name = "Copy of " + scene.friendly_name, sort_order = SceneGrid.Items.Count + 1 };
-                            foreach (scene_commands sc in scene.scene_commands)
+                            Scene new_scene = new Scene { Name = "Copy of " + scene.Name, SortOrder = SceneGrid.Items.Count + 1 };
+                            foreach (SceneCommand sc in scene.Commands)
                             {
-                                new_scene.scene_commands.Add(new scene_commands
+                                new_scene.Commands.Add(new SceneCommand
                                 {
-                                    arg = sc.arg,
-                                    command_id = sc.command_id,
-                                    command_type_id = sc.command_type_id,
-                                    sort_order = sc.sort_order,
-                                    device_id = sc.device_id
+                                    Argument = sc.Argument,
+                                    Command = sc.Command,
+                                    SortOrder = sc.SortOrder,
+                                    Device = sc.Device
                                 });
                                 SceneGrid.Focus();
                             }
-                            context.scenes.Local.Add(new_scene);
+                            context.Scenes.Local.Add(new_scene);
                             context.SaveChanges();
                         }
                     };
@@ -294,7 +294,7 @@ namespace zVirtualScenesGUI.SceneControls
 
         private void SceneCmdsGrid_DragOver_1(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<device>))
+            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
                 e.Effects = DragDropEffects.Link;
             }
@@ -303,22 +303,26 @@ namespace zVirtualScenesGUI.SceneControls
 
         private void SceneCmdsGrid_Drop_1(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<device>))
+            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
-                List<device> devices = (List<device>)e.Data.GetData("deviceList");
+                List<Device> devices = (List<Device>)e.Data.GetData("deviceList");
 
-                if (SceneGrid.SelectedItem is scene)
+                if (SceneGrid.SelectedItem is Scene)
                 {
-                    scene selected_scene = (scene)SceneGrid.SelectedItem;
+                    Scene selected_scene = (Scene)SceneGrid.SelectedItem;
                     if (selected_scene != null)
                     {
                         SceneCmdsGrid.SelectedItems.Clear();
 
-                        foreach (device d in devices)
+                        foreach (Device d in devices)
                         {
-                            scene_commands scene_command = new scene_commands
+                            Device d2 = context.Devices.FirstOrDefault(o => o.DeviceId == d.DeviceId);
+                            if (d2 == null)
+                                continue;
+
+                            SceneCommand scene_command = new SceneCommand
                             {
-                                device_id = d.id
+                                Device = d2
                             };
 
                             AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, scene_command);
@@ -326,19 +330,19 @@ namespace zVirtualScenesGUI.SceneControls
 
                             if (sceneCmdWindow.ShowDialog() ?? false)
                             {
-                                int? max = selected_scene.scene_commands.Max(o => o.sort_order);
+                                int? max = selected_scene.Commands.Max(o => o.SortOrder);
                                 if (max.HasValue)
-                                    scene_command.sort_order = max.Value + 1;
+                                    scene_command.SortOrder = max.Value + 1;
                                 else
-                                    scene_command.sort_order = 0;
+                                    scene_command.SortOrder = 0;
 
-                                if (selected_scene.is_running)
+                                if (selected_scene.isRunning)
                                 {
-                                    ShowSceneEditWarning(selected_scene.friendly_name);
+                                    ShowSceneEditWarning(selected_scene.Name);
                                 }
                                 else
                                 {
-                                    selected_scene.scene_commands.Add(scene_command);
+                                    selected_scene.Commands.Add(scene_command);
                                     context.SaveChanges();
                                     SceneCmdsGrid.SelectedItems.Add(scene_command);
                                 }
@@ -363,9 +367,9 @@ namespace zVirtualScenesGUI.SceneControls
                 {
                     e.Handled = true;
 
-                    if (dgr.Item is scene)
+                    if (dgr.Item is Scene)
                     {
-                        var scene = (scene)dgr.Item;
+                        var scene = (Scene)dgr.Item;
                         if (scene != null)
                         {
                             e.Handled = !DeleteSelectedScene(scene);
@@ -375,7 +379,7 @@ namespace zVirtualScenesGUI.SceneControls
             }
         }
 
-        private void ShowSceneProperties(int SceneID, string SceneFriendlyName)
+        private void ShowSceneProperties(int SceneID, string name)
         {
             foreach (Window window in app.Windows)
             {
@@ -388,18 +392,18 @@ namespace zVirtualScenesGUI.SceneControls
 
             ScenePropertiesWindow new_window = new ScenePropertiesWindow(SceneID);
             new_window.Owner = app.zvsWindow;
-            new_window.Title = string.Format("Scene '{0}' Properties", SceneFriendlyName);
+            new_window.Title = string.Format("Scene '{0}' Properties", name);
             new_window.Show();
         }
 
-        private bool DeleteSelectedScene(scene scene)
+        private bool DeleteSelectedScene(Scene scene)
         {
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.friendly_name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (scene.is_running)
-                    ShowSceneEditWarning(scene.friendly_name);
+                if (scene.isRunning)
+                    ShowSceneEditWarning(scene.Name);
                 else
-                    context.scenes.Local.Remove(scene);
+                    context.Scenes.Local.Remove(scene);
 
                 context.SaveChanges();
                 SceneGrid.Focus();
@@ -436,17 +440,17 @@ namespace zVirtualScenesGUI.SceneControls
         {
             if (SceneCmdsGrid.SelectedItems.Count > 0)
             {
-                scene_commands[] SelectedItemsCopy = new scene_commands[SceneCmdsGrid.SelectedItems.Count];
+                SceneCommand[] SelectedItemsCopy = new SceneCommand[SceneCmdsGrid.SelectedItems.Count];
                 SceneCmdsGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
                 if (MessageBox.Show(string.Format("Are you sure you want to delete {0} selected scene command(s)?", SceneCmdsGrid.SelectedItems.Count),
                                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    foreach (scene_commands scene_command in SelectedItemsCopy)
+                    foreach (SceneCommand scene_command in SelectedItemsCopy)
                     {
-                        scene_commands d = context.scene_commands.FirstOrDefault(o => o.id == scene_command.id);
+                        SceneCommand d = context.SceneCommands.FirstOrDefault(o => o.SceneCommandId == scene_command.SceneCommandId);
                         if (d != null)
-                            context.scene_commands.Local.Remove(d);
+                            context.SceneCommands.Local.Remove(d);
                     }
                     context.SaveChanges();
                 }
@@ -455,18 +459,18 @@ namespace zVirtualScenesGUI.SceneControls
 
         private void NormalizeSortOrderSceneCmds()
         {
-            if (SceneGrid.SelectedItem is scene)
+            if (SceneGrid.SelectedItem is Scene)
             {
-                scene selectedscene = (scene)SceneGrid.SelectedItem;
+                Scene selectedscene = (Scene)SceneGrid.SelectedItem;
                 if (selectedscene != null)
                 {
                     //normalize sort order
-                    foreach (scene_commands cmd in selectedscene.scene_commands)
+                    foreach (SceneCommand cmd in selectedscene.Commands)
                     {
-                        foreach (scene_commands item in SceneCmdsGrid.Items)
+                        foreach (SceneCommand item in SceneCmdsGrid.Items)
                         {
-                            if (item.id == cmd.id)
-                                cmd.sort_order = SceneCmdsGrid.Items.IndexOf(item);
+                            if (item.SceneCommandId == cmd.SceneCommandId)
+                                cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
                         }
                     }
 
@@ -486,7 +490,7 @@ namespace zVirtualScenesGUI.SceneControls
                 //clear the existing sort order
                 dataView.SortDescriptions.Clear();
                 //create a new sort order for the sorting that is done lastly
-                dataView.SortDescriptions.Add(new SortDescription("sort_order", ListSortDirection.Ascending));
+                dataView.SortDescriptions.Add(new SortDescription("SortOrder", ListSortDirection.Ascending));
                 //refresh the view which in turn refresh the grid
                 dataView.Refresh();
             }
@@ -495,16 +499,16 @@ namespace zVirtualScenesGUI.SceneControls
         private void SortUpSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene_commands)
+            if (obj is SceneCommand)
             {
-                var scene_command = (scene_commands)obj;
+                var scene_command = (SceneCommand)obj;
                 if (scene_command != null)
                 {
-                    scene_commands scenecmd_we_are_replacing = scene_command.scene.scene_commands.FirstOrDefault(s => s.sort_order == scene_command.sort_order - 1);
+                    SceneCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder - 1);
                     if (scenecmd_we_are_replacing != null)
-                        scenecmd_we_are_replacing.sort_order++;
+                        scenecmd_we_are_replacing.SortOrder++;
 
-                    scene_command.sort_order--;
+                    scene_command.SortOrder--;
 
                     SortSceneCMDsGridBySortOrder();
                     NormalizeSortOrderSceneCmds();
@@ -519,16 +523,16 @@ namespace zVirtualScenesGUI.SceneControls
         private void SortDownSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene_commands)
+            if (obj is SceneCommand)
             {
-                var scene_command = (scene_commands)obj;
+                var scene_command = (SceneCommand)obj;
                 if (scene_command != null)
                 {
-                    scene_commands scenecmd_we_are_replacing = scene_command.scene.scene_commands.FirstOrDefault(s => s.sort_order == scene_command.sort_order + 1);
+                    SceneCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder + 1);
                     if (scenecmd_we_are_replacing != null)
-                        scenecmd_we_are_replacing.sort_order--;
+                        scenecmd_we_are_replacing.SortOrder--;
 
-                    scene_command.sort_order++;
+                    scene_command.SortOrder++;
 
                     SortSceneCMDsGridBySortOrder();
                     NormalizeSortOrderSceneCmds();
@@ -543,7 +547,7 @@ namespace zVirtualScenesGUI.SceneControls
         private void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
-            if (SceneGrid.SelectedItem == null ||  SceneGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
+            if (SceneGrid.SelectedItem == null || SceneGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
             {
                 SceneCommandGrid.Visibility = System.Windows.Visibility.Hidden;
                 SceneCommandGrid.Visibility = System.Windows.Visibility.Hidden;
@@ -576,36 +580,34 @@ namespace zVirtualScenesGUI.SceneControls
 
         private void AddBuiltinCmd_Click_1(object sender, RoutedEventArgs e)
         {
-            if (SceneGrid.SelectedItem is scene)
+            if (SceneGrid.SelectedItem is Scene)
             {
-                scene selected_scene = (scene)SceneGrid.SelectedItem;
+                Scene selected_scene = (Scene)SceneGrid.SelectedItem;
                 if (selected_scene != null)
                 {
                     SceneCmdsGrid.SelectedItems.Clear();
 
-                    scene_commands cmd = new scene_commands
-                    {
-                        command_type_id = (int)scene_commands.command_types.builtin
-                    };
+                    SceneCommand cmd = new SceneCommand();
 
-                    int? max = selected_scene.scene_commands.Max(o => o.sort_order);
+
+                    int? max = selected_scene.Commands.Max(o => o.SortOrder);
                     if (max.HasValue)
-                        cmd.sort_order = max.Value + 1;
+                        cmd.SortOrder = max.Value + 1;
                     else
-                        cmd.sort_order = 0;
+                        cmd.SortOrder = 0;
 
                     AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
                     window.Owner = app.zvsWindow;
 
                     if (window.ShowDialog() ?? false)
                     {
-                        if (selected_scene.is_running)
+                        if (selected_scene.isRunning)
                         {
-                            ShowSceneEditWarning(selected_scene.friendly_name);
+                            ShowSceneEditWarning(selected_scene.Name);
                         }
                         else
                         {
-                            selected_scene.scene_commands.Add(cmd);
+                            selected_scene.Commands.Add(cmd);
                             context.SaveChanges();
 
                             SceneCmdsGrid.SelectedItems.Add(cmd);
@@ -619,12 +621,12 @@ namespace zVirtualScenesGUI.SceneControls
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene_commands)
+            if (obj is SceneCommand)
             {
-                var cmd = (scene_commands)obj;
+                var cmd = (SceneCommand)obj;
                 if (cmd != null)
                 {
-                    if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.builtin)
+                    if (cmd.Command is BuiltinCommand)
                     {
                         AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
                         window.Owner = app.zvsWindow;
@@ -634,8 +636,8 @@ namespace zVirtualScenesGUI.SceneControls
                             context.SaveChanges();
                         }
                     }
-                    else if ((scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_command ||
-                        (scene_commands.command_types)cmd.command_type_id == scene_commands.command_types.device_type_command)
+                    else if (cmd.Command is DeviceCommand ||
+                        cmd.Command is DeviceTypeCommand)
                     {
                         AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, cmd);
                         sceneCmdWindow.Owner = app.zvsWindow;
@@ -652,12 +654,12 @@ namespace zVirtualScenesGUI.SceneControls
         private void SceneSettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is scene)
+            if (obj is Scene)
             {
-                var s = (scene)obj;
+                var s = (Scene)obj;
                 if (s != null)
                 {
-                    ShowSceneProperties(s.id, s.friendly_name);
+                    ShowSceneProperties(s.SceneId, s.Name);
                 }
             }
         }

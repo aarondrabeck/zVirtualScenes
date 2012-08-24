@@ -13,7 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zVirtualScenesGUI.DynamicActionControls;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.DeviceControls
 {
@@ -23,7 +24,7 @@ namespace zVirtualScenesGUI.DeviceControls
     public partial class DeviceCommands : UserControl
     {
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/send_signal.png"));
-        private zvsLocalDBEntities context;
+        private zvsContext context;
         private int DeviceID = 0;
 
         public DeviceCommands(int DeviceID)
@@ -34,13 +35,13 @@ namespace zVirtualScenesGUI.DeviceControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
+            context = new zvsContext();
             LoadCommands();
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-           
+
         }
 
         private void LoadCommands()
@@ -48,170 +49,134 @@ namespace zVirtualScenesGUI.DeviceControls
             DeviceCommandsStkPnl.Children.Clear();
             TypeCommandsStkPnl.Children.Clear();
 
-            device d = context.devices.FirstOrDefault(dv => dv.id == DeviceID);
+            Device d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
             if (d != null)
             {
                 #region Device Commands
-                foreach (device_commands d_cmd in d.device_commands.OrderByDescending(c => c.sort_order))
+                foreach (DeviceCommand d_cmd in d.Commands.OrderByDescending(c => c.SortOrder))
                 {
-                    device_commands device_command = d_cmd;
-                    switch ((Data_Types)d_cmd.arg_data_type)
+                    DeviceCommand device_command = d_cmd;
+                    switch ((DataType)d_cmd.ArgumentType)
                     {
-                        case Data_Types.NONE:
+                        case DataType.NONE:
                             {
-                                ButtonControl bc = new ButtonControl(d_cmd.friendly_name, d_cmd.description, () =>
+                                ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
-                                    device_command_que cmd = new device_command_que()
-                                    {
-                                        device_id = d.id,
-                                        device_command_id = device_command.id,
-                                        arg = ""
-                                    };
-
-                                    device_command_que.Run(cmd, context);
+                                    QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, "");
+                                    QueuedDeviceCommand.Run(cmd, context);
                                 }, icon);
                                 DeviceCommandsStkPnl.Children.Add(bc);
                                 break;
                             }
-                        case Data_Types.BOOL:
+                        case DataType.BOOL:
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    bool.TryParse(dv.value2, out DefaultValue);
+                                    bool.TryParse(dv.Value, out DefaultValue);
                                 }
 
-                                CheckboxControl control = new CheckboxControl(d_cmd.friendly_name, d_cmd.description, DefaultValue, (isChecked) =>
+                                CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
-                                    device_command_que cmd = new device_command_que()
-                                    {
-                                        device_id = d.id,
-                                        device_command_id = device_command.id,
-                                        arg = isChecked.ToString()
-                                    };
-
-                                    device_command_que.Run(cmd, context);
+                                    QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, isChecked.ToString());
+                                    QueuedDeviceCommand.Run(cmd, context);
                                 }, icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.DECIMAL:
+                        case DataType.DECIMAL:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        device_command_que cmd = new device_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = device_command.id,
-                                            arg = value
-                                        };
-
-                                        device_command_que.Run(cmd, context);
+                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
+                                        QueuedDeviceCommand.Run(cmd, context);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.INTEGER:
+                        case DataType.INTEGER:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        device_command_que cmd = new device_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = device_command.id,
-                                            arg = value
-                                        };
-
-                                        device_command_que.Run(cmd, context);
+                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
+                                        QueuedDeviceCommand.Run(cmd, context);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.BYTE:
+                        case DataType.BYTE:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        device_command_que cmd = new device_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = device_command.id,
-                                            arg = value
-                                        };
-
-                                        device_command_que.Run(cmd, context);
+                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
+                                        QueuedDeviceCommand.Run(cmd, context);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.SHORT:
+                        case DataType.SHORT:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        device_command_que cmd = new device_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = device_command.id,
-                                            arg = value
-                                        };
-
-                                        device_command_que.Run(cmd, context);
+                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
+                                        QueuedDeviceCommand.Run(cmd, context);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -219,59 +184,47 @@ namespace zVirtualScenesGUI.DeviceControls
                                 break;
                             }
 
-                        case Data_Types.STRING:
+                        case DataType.STRING:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                StringControl control = new StringControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                StringControl control = new StringControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        device_command_que cmd = new device_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = device_command.id,
-                                            arg = value
-                                        };
-
-                                        device_command_que.Run(cmd, context);
+                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
+                                        QueuedDeviceCommand.Run(cmd, context);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.LIST:
+                        case DataType.LIST:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                ComboboxControl control = new ComboboxControl(d_cmd.friendly_name,
-                                    d_cmd.description,
-                                    d_cmd.device_command_options.Select(o => o.name).ToList(),
+                                ComboboxControl control = new ComboboxControl(d_cmd.Name,
+                                    d_cmd.Description,
+                                    d_cmd.Options.Select(o => o.Name).ToList(),
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        device_command_que cmd = new device_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_command_id = device_command.id,
-                                            arg = value
-                                        };
-
-                                        device_command_que.Run(cmd, context);
+                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
+                                        QueuedDeviceCommand.Run(cmd, context);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -283,227 +236,179 @@ namespace zVirtualScenesGUI.DeviceControls
                 #endregion
 
                 #region Device Type Commands
-                foreach (device_type_commands d_cmd in d.device_types.device_type_commands.OrderByDescending(c => c.sort_order))
+                foreach (DeviceTypeCommand d_cmd in d.Type.Commands.OrderByDescending(c => c.SortOrder))
                 {
-                    device_type_commands device_type_command = d_cmd;
-                    switch ((Data_Types)d_cmd.arg_data_type)
+                    DeviceTypeCommand device_type_command = d_cmd;
+                    switch (d_cmd.ArgumentType)
                     {
-                        case Data_Types.NONE:
+                        case DataType.NONE:
                             {
-                                ButtonControl bc = new ButtonControl(d_cmd.friendly_name, d_cmd.description, () =>
+                                ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
-                                    device_type_command_que cmd = new device_type_command_que()
-                                    {
-                                        device_id = d.id,
-                                        device_type_command_id = device_type_command.id,
-                                        arg = ""
-                                    };
-
-                                    device_type_command_que.Run(cmd, context);
+                                    QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, "");
+                                    QueuedDeviceTypeCommand.Run(qdtc, context);
                                 },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(bc);
                                 break;
                             }
-                        case Data_Types.BOOL:
+                        case DataType.BOOL:
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    bool.TryParse(dv.value2, out DefaultValue);
+                                    bool.TryParse(dv.Value, out DefaultValue);
                                 }
 
-                                CheckboxControl control = new CheckboxControl(d_cmd.friendly_name, d_cmd.description, DefaultValue, (isChecked) =>
+                                CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
-                                    device_type_command_que cmd = new device_type_command_que()
-                                    {
-                                        device_id = d.id,
-                                        device_type_command_id = device_type_command.id,
-                                        arg = isChecked.ToString()
-                                    };
-
-                                    device_type_command_que.Run(cmd, context);
+                                    QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, isChecked.ToString());
+                                    QueuedDeviceTypeCommand.Run(qdtc, context);                                    
                                 },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.DECIMAL:
+                        case DataType.DECIMAL:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        device_type_command_que cmd = new device_type_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_type_command_id = device_type_command.id,
-                                            arg = value
-                                        };
-
-                                        device_type_command_que.Run(cmd, context);
+                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
+                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.INTEGER:
+                        case DataType.INTEGER:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                    NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        device_type_command_que cmd = new device_type_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_type_command_id = device_type_command.id,
-                                            arg = value
-                                        };
-
-                                        device_type_command_que.Run(cmd, context);
+                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
+                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.SHORT:
+                        case DataType.SHORT:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        device_type_command_que cmd = new device_type_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_type_command_id = device_type_command.id,
-                                            arg = value
-                                        };
-
-                                        device_type_command_que.Run(cmd, context);
+                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
+                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.BYTE:
+                        case DataType.BYTE:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                NumericControl control = new NumericControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                NumericControl control = new NumericControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                    NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        device_type_command_que cmd = new device_type_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_type_command_id = device_type_command.id,
-                                            arg = value
-                                        };
-
-                                        device_type_command_que.Run(cmd, context);
+                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
+                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.STRING:
+                        case DataType.STRING:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                StringControl control = new StringControl(d_cmd.friendly_name,
-                                    d_cmd.description,
+                                StringControl control = new StringControl(d_cmd.Name,
+                                    d_cmd.Description,
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        device_type_command_que cmd = new device_type_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_type_command_id = device_type_command.id,
-                                            arg = value
-                                        };
-
-                                        device_type_command_que.Run(cmd, context);
+                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
+                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
 
                                 break;
                             }
-                        case Data_Types.LIST:
+                        case DataType.LIST:
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                device_values dv = d.device_values.FirstOrDefault(v => v.value_id == d_cmd.custom_data2);
+                                DeviceValue dv = d.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                 if (dv != null)
                                 {
-                                    DefaultValue = dv.value2;
+                                    DefaultValue = dv.Value;
                                 }
 
-                                ComboboxControl control = new ComboboxControl(d_cmd.friendly_name,
-                                    d_cmd.description,
-                                    d_cmd.device_type_command_options.Select(o => o.options).ToList(),
+                                ComboboxControl control = new ComboboxControl(d_cmd.Name,
+                                    d_cmd.Description,
+                                    d_cmd.Options.Select(o => o.Name).ToList(),
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        device_type_command_que cmd = new device_type_command_que()
-                                        {
-                                            device_id = d.id,
-                                            device_type_command_id = device_type_command.id,
-                                            arg = value
-                                        };
-
-                                        device_type_command_que.Run(cmd, context);
+                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
+                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);

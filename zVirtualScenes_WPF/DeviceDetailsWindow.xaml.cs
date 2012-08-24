@@ -14,7 +14,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenesGUI.DeviceControls;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI
 {
@@ -38,17 +39,17 @@ namespace zVirtualScenesGUI
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
+            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
             LoadDevice();
             SelectionList.SelectedIndex = 0;
         }
 
         private void DeviceDetailsWindow_Closed_1(object sender, EventArgs e)
         {
-            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;           
+            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;           
         }
 
-        void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onDevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -58,19 +59,19 @@ namespace zVirtualScenesGUI
 
         private void LoadDevice()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                device d = context.devices.FirstOrDefault(dv => dv.id == DeviceID);
+                Device d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
 
                 if (d == null)
                     this.Close();
                 else
                 {
-                    DeviceNameTextBlock.Text = d.friendly_name;
-                    this.Title = string.Format("'{0}' Details", d.friendly_name);
-                    DeviceCurrentStatus.Text = d.current_level_txt;
+                    DeviceNameTextBlock.Text = d.Name;
+                    this.Title = string.Format("'{0}' Details", d.Name);
+                    DeviceCurrentStatus.Text = d.CurrentLevelText;
 
-                    switch (d.device_types.name)
+                    switch (d.Type.UniqueIdentifier)
                     {
                         case "THERMOSTAT":
                             {
@@ -100,11 +101,11 @@ namespace zVirtualScenesGUI
                             }
                     }
 
-                    if (d.device_types.name.Equals("DIMMER"))
+                    if (d.Type.UniqueIdentifier.Equals("DIMMER"))
                     {
-                        if (d.current_level_int.HasValue)
+                        if (d.CurrentLevelInt.HasValue)
                         {
-                            double level = d.current_level_int.Value;
+                            double level = d.CurrentLevelInt.Value;
 
                             if (level >= 0 && level <= 20)
                                 level = 21;

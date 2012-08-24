@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
+             xmlns:zVirtualScenesModel="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
              x:Class="zVirtualScenesGUI.TriggerControls.TriggerGridUC" 
              mc:Ignorable="d" 
              d:DesignHeight="489" d:DesignWidth="627" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
@@ -85,7 +85,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding enabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
+                    <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding isEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
 
                     </DataGridCheckBoxColumn>
 

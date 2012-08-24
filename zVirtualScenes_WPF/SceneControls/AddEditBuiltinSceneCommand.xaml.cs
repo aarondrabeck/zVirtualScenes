@@ -13,7 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zVirtualScenesGUI.DynamicActionControls;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.SceneControls
 {
@@ -22,12 +23,12 @@ namespace zVirtualScenesGUI.SceneControls
     /// </summary>
     public partial class AddEditBuiltinSceneCommand : Window
     {
-        private zvsLocalDBEntities context;
-        private scene_commands scene_command;
+        private zvsContext context;
+        private SceneCommand scene_command;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenesGUI;component/Images/save_check.png"));
         private string arg = string.Empty;
 
-        public AddEditBuiltinSceneCommand(zvsLocalDBEntities context, scene_commands scene_command)
+        public AddEditBuiltinSceneCommand(zvsContext context, SceneCommand scene_command)
         {
             this.context = context;
             this.scene_command = scene_command;
@@ -43,17 +44,17 @@ namespace zVirtualScenesGUI.SceneControls
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
             //Make sure we got passed a built-in command...
-            if ((scene_commands.command_types)scene_command.command_type_id != scene_commands.command_types.builtin)
+            if (scene_command.Command is BuiltinCommand)
             {
                 this.Close();
             }
             else
             {
-                context.builtin_commands.ToList();
-                CmdsCmboBox.ItemsSource = context.builtin_commands.Local;
+                context.BuiltinCommands.ToList();
+                CmdsCmboBox.ItemsSource = context.BuiltinCommands.Local;
 
                 //select existing command if there was one
-                builtin_commands cmd = context.builtin_commands.FirstOrDefault(o => o.id == scene_command.command_id);
+                BuiltinCommand cmd = (BuiltinCommand)scene_command.Command;
                 if (cmd != null)
                     CmdsCmboBox.SelectedItem = cmd;
                 else
@@ -77,13 +78,13 @@ namespace zVirtualScenesGUI.SceneControls
                 return;
             }
 
-            if (CmdsCmboBox.SelectedItem is builtin_commands)
+            if (CmdsCmboBox.SelectedItem is BuiltinCommand)
             {
-                builtin_commands d_cmd = (builtin_commands)CmdsCmboBox.SelectedItem;
-                scene_command.command_id = d_cmd.id;
+                BuiltinCommand d_cmd = (BuiltinCommand)CmdsCmboBox.SelectedItem;
+                scene_command.Command = d_cmd;
             }
 
-            scene_command.arg = arg;
+            scene_command.Argument = arg;
 
             this.DialogResult = true;
             this.Close();
@@ -92,10 +93,9 @@ namespace zVirtualScenesGUI.SceneControls
         private void CmdsCmboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ArgSckPnl.Children.Clear();
-            builtin_commands selected_cmd = (builtin_commands)CmdsCmboBox.SelectedItem;
+            BuiltinCommand selected_cmd = (BuiltinCommand)CmdsCmboBox.SelectedItem;
 
-
-            switch (selected_cmd.name)
+            switch (selected_cmd.UniqueIdentifier)
             {
                 #region Do Custom things for some Builtin Commands
                 case "REPOLL_ME":
@@ -104,36 +104,36 @@ namespace zVirtualScenesGUI.SceneControls
 
                         //Lookup the device involved in the command
                         int deviceID = 0;
-                        if (int.TryParse(scene_command.arg, out deviceID))
+                        if (int.TryParse(scene_command.Argument, out deviceID))
                         {
-                            device d = context.devices.FirstOrDefault(o => o.id == deviceID);
+                            Device d = context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
                             if (d != null)
                             {
-                                default_value = d.friendly_name;
-                                arg = d.id.ToString();
+                                default_value = d.Name;
+                                arg = d.DeviceId.ToString();
                             }
                         }
 
                         //If this is a new command or we cannot find the old device, just preselect the first device.
                         if (string.IsNullOrEmpty(default_value))
                         {
-                            device d = context.devices.FirstOrDefault();
+                            Device d = context.Devices.FirstOrDefault();
                             if (d != null)
                             {
-                                default_value = d.friendly_name;
-                                arg = d.id.ToString();
+                                default_value = d.Name;
+                                arg = d.DeviceId.ToString();
                             }
                         }
 
-                        ComboboxControl control = new ComboboxControl(selected_cmd.friendly_name,
-                            selected_cmd.description,
-                            context.devices.Select(o => o.friendly_name).ToList(),
+                        ComboboxControl control = new ComboboxControl(selected_cmd.Name,
+                            selected_cmd.Description,
+                            context.Devices.Select(o => o.Name).ToList(),
                             default_value,
                             (value) =>
                             {
-                                device d = context.devices.FirstOrDefault(o => o.friendly_name == value);
+                                Device d = context.Devices.FirstOrDefault(o => o.Name == value);
                                 if (d != null)
-                                    arg = d.id.ToString();
+                                    arg = d.DeviceId.ToString();
                             }, icon);
                         ArgSckPnl.Children.Add(control);
                         break;
@@ -145,36 +145,36 @@ namespace zVirtualScenesGUI.SceneControls
 
                         //Lookup the group involved in the command
                         int groupID = 0;
-                        if (int.TryParse(scene_command.arg, out groupID))
+                        if (int.TryParse(scene_command.Argument, out groupID))
                         {
-                            group g = context.groups.FirstOrDefault(o => o.id == groupID);
+                            Group g = context.Groups.FirstOrDefault(o => o.GroupId == groupID);
                             if (g != null)
                             {
-                                default_value = g.name;
-                                arg = g.id.ToString();
+                                default_value = g.Name;
+                                arg = g.GroupId.ToString();
                             }
                         }
 
                         //If this is a new command or we cannot find the old group, just preselect the first group.
                         if (string.IsNullOrEmpty(default_value))
                         {
-                            group g = context.groups.FirstOrDefault();
+                            Group g = context.Groups.FirstOrDefault();
                             if (g != null)
                             {
-                                default_value = g.name;
-                                arg = g.id.ToString();
+                                default_value = g.Name;
+                                arg = g.GroupId.ToString();
                             }
                         }
 
-                        ComboboxControl control = new ComboboxControl(selected_cmd.friendly_name,
-                            selected_cmd.description,
-                            context.groups.Select(o => o.name).ToList(),
+                        ComboboxControl control = new ComboboxControl(selected_cmd.Name,
+                            selected_cmd.Description,
+                            context.Groups.Select(o => o.Name).ToList(),
                             default_value,
                             (value) =>
                             {
-                                group g = context.groups.FirstOrDefault(o => o.name == value);
+                                Group g = context.Groups.FirstOrDefault(o => o.Name == value);
                                 if (g != null)
-                                    arg = g.id.ToString();
+                                    arg = g.GroupId.ToString();
                             }, icon);
                         ArgSckPnl.Children.Add(control);
                     }
@@ -183,9 +183,9 @@ namespace zVirtualScenesGUI.SceneControls
                 default:
                     {
                         #region Built-in Commands
-                        switch ((Data_Types)selected_cmd.arg_data_type)
+                        switch (selected_cmd.ArgumentType)
                         {
-                            case Data_Types.NONE:
+                            case DataType.NONE:
                                 {
                                     ArgSckPnl.Children.Add(new TextBlock()
                                     {
@@ -194,15 +194,15 @@ namespace zVirtualScenesGUI.SceneControls
                                     });
                                     break;
                                 }
-                            case Data_Types.BOOL:
+                            case DataType.BOOL:
                                 {
                                     //get the current value from the value table list
                                     bool DefaultValue = false;
-                                    bool.TryParse(scene_command.arg, out DefaultValue);
+                                    bool.TryParse(scene_command.Argument, out DefaultValue);
                                     arg = DefaultValue.ToString();
 
-                                    CheckboxControl control = new CheckboxControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
+                                    CheckboxControl control = new CheckboxControl(selected_cmd.Name,
+                                        selected_cmd.Description,
                                         DefaultValue, (isChecked) =>
                                         {
                                             arg = isChecked.ToString();
@@ -211,15 +211,15 @@ namespace zVirtualScenesGUI.SceneControls
 
                                     break;
                                 }
-                            case Data_Types.DECIMAL:
+                            case DataType.DECIMAL:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(scene_command.arg))
-                                        DefaultValue = scene_command.arg;
+                                    if (!string.IsNullOrEmpty(scene_command.Argument))
+                                        DefaultValue = scene_command.Argument;
                                     arg = DefaultValue;
 
-                                    NumericControl control = new NumericControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
+                                    NumericControl control = new NumericControl(selected_cmd.Name,
+                                        selected_cmd.Description,
                                         DefaultValue,
                                         NumericControl.NumberType.Decimal,
                                         (value) =>
@@ -230,15 +230,15 @@ namespace zVirtualScenesGUI.SceneControls
 
                                     break;
                                 }
-                            case Data_Types.INTEGER:
+                            case DataType.INTEGER:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(scene_command.arg))
-                                        DefaultValue = scene_command.arg;
+                                    if (!string.IsNullOrEmpty(scene_command.Argument))
+                                        DefaultValue = scene_command.Argument;
                                     arg = DefaultValue;
 
-                                    NumericControl control = new NumericControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
+                                    NumericControl control = new NumericControl(selected_cmd.Name,
+                                        selected_cmd.Description,
                                         DefaultValue,
                                         NumericControl.NumberType.Integer,
                                         (value) =>
@@ -249,15 +249,15 @@ namespace zVirtualScenesGUI.SceneControls
 
                                     break;
                                 }
-                            case Data_Types.BYTE:
+                            case DataType.BYTE:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(scene_command.arg))
-                                        DefaultValue = scene_command.arg;
+                                    if (!string.IsNullOrEmpty(scene_command.Argument))
+                                        DefaultValue = scene_command.Argument;
                                     arg = DefaultValue;
 
-                                    NumericControl control = new NumericControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
+                                    NumericControl control = new NumericControl(selected_cmd.Name,
+                                        selected_cmd.Description,
                                         DefaultValue,
                                         NumericControl.NumberType.Byte,
                                         (value) =>
@@ -268,15 +268,15 @@ namespace zVirtualScenesGUI.SceneControls
 
                                     break;
                                 }
-                            case Data_Types.SHORT:
+                            case DataType.SHORT:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(scene_command.arg))
-                                        DefaultValue = scene_command.arg;
+                                    if (!string.IsNullOrEmpty(scene_command.Argument))
+                                        DefaultValue = scene_command.Argument;
                                     arg = DefaultValue;
 
-                                    NumericControl control = new NumericControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
+                                    NumericControl control = new NumericControl(selected_cmd.Name,
+                                        selected_cmd.Description,
                                         DefaultValue,
                                         NumericControl.NumberType.Short,
                                         (value) =>
@@ -288,16 +288,16 @@ namespace zVirtualScenesGUI.SceneControls
                                     break;
                                 }
 
-                            case Data_Types.STRING:
+                            case DataType.STRING:
                                 {
                                     //get the current value from the value table list
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(scene_command.arg))
-                                        DefaultValue = scene_command.arg;
+                                    if (!string.IsNullOrEmpty(scene_command.Argument))
+                                        DefaultValue = scene_command.Argument;
                                     arg = DefaultValue;
 
-                                    StringControl control = new StringControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
+                                    StringControl control = new StringControl(selected_cmd.Name,
+                                        selected_cmd.Description,
                                         DefaultValue,
                                         (value) =>
                                         {
@@ -307,21 +307,21 @@ namespace zVirtualScenesGUI.SceneControls
 
                                     break;
                                 }
-                            case Data_Types.LIST:
+                            case DataType.LIST:
                                 {
                                     string DefaultValue = "";
-                                    string option = selected_cmd.builtin_command_options.FirstOrDefault().name;
+                                    string option = selected_cmd.Options.FirstOrDefault().Name;
 
                                     if (option != null)
                                         DefaultValue = option;
 
-                                    if (!string.IsNullOrEmpty(scene_command.arg))
-                                        DefaultValue = scene_command.arg;
+                                    if (!string.IsNullOrEmpty(scene_command.Argument))
+                                        DefaultValue = scene_command.Argument;
                                     arg = DefaultValue;
 
-                                    ComboboxControl control = new ComboboxControl(selected_cmd.friendly_name,
-                                        selected_cmd.description,
-                                        selected_cmd.builtin_command_options.Select(o => o.name).ToList(),
+                                    ComboboxControl control = new ComboboxControl(selected_cmd.Name,
+                                        selected_cmd.Description,
+                                        selected_cmd.Options.Select(o => o.Name).ToList(),
                                         DefaultValue,
                                         (value) =>
                                         {

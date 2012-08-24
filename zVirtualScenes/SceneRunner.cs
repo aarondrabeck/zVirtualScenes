@@ -6,17 +6,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes
 {
     public class SceneRunner : IDisposable
     {
-        private zvsLocalDBEntities context;
-        private scene _scene;
+        private zvsContext context;
+        private Scene _scene;
         private int ExecutionErrors = 0;
         private int ExecutedCommands = 0;
-        private List<scene_commands> CommandsToExecute = new List<scene_commands>();
+        private List<SceneCommand> CommandsToExecute = new List<SceneCommand>();
         private BackgroundWorker worker = new BackgroundWorker();
         private bool hasExecuted = false;
 
@@ -59,7 +60,7 @@ namespace zVirtualScenes
 
         public SceneRunner()
         {
-            context = new zvsLocalDBEntities();
+            context = new zvsContext();
         }
 
         //Methods
@@ -71,7 +72,7 @@ namespace zVirtualScenes
             hasExecuted = true;
             worker.DoWork += (sender, args) =>
             {
-                _scene = context.scenes.FirstOrDefault(o => o.id == SceneID);
+                _scene = context.Scenes.FirstOrDefault(o => o.SceneId == SceneID);
 
                 if (_scene == null)
                 {
@@ -84,30 +85,30 @@ namespace zVirtualScenes
 
 
                 if (onSceneRunBegin != null)
-                    onSceneRunBegin(this, new onSceneRunEventArgs(_scene.id, false, "Scene '" + _scene.friendly_name + "' started.", SceneRunnerGUID));
+                    onSceneRunBegin(this, new onSceneRunEventArgs(_scene.SceneId, false, "Scene '" + _scene.Name + "' started.", SceneRunnerGUID));
 
 
-                if (_scene.is_running)
+                if (_scene.isRunning)
                 {
                     if (onSceneRunComplete != null)
-                        onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, true, "Failed to run scene '" + _scene.friendly_name + "' because it is already running!", SceneRunnerGUID));
+                        onSceneRunComplete(this, new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it is already running!", SceneRunnerGUID));
                 }
                 else
                 {
-                    if (_scene.scene_commands.Count < 1)
+                    if (_scene.Commands.Count < 1)
                     {
                         if (onSceneRunComplete != null)
-                            onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, true, "Failed to run scene '" + _scene.friendly_name + "' because it has no commands!", SceneRunnerGUID));
+                            onSceneRunComplete(this, new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!", SceneRunnerGUID));
 
                         return;
                     }
 
-                    _scene.is_running = true;
+                    _scene.isRunning = true;
                     context.SaveChanges();
 
                     ExecutionErrors = 0;
                     ExecutedCommands = 0;
-                    CommandsToExecute = _scene.scene_commands.OrderBy(o => o.sort_order).ToList();
+                    CommandsToExecute = _scene.Commands.OrderBy(o => o.SortOrder).ToList();
 
                     ProcessNextCommand();
                 }
@@ -119,124 +120,99 @@ namespace zVirtualScenes
         {
             if (ExecutedCommands < CommandsToExecute.Count)
             {
-                scene_commands sceneCommand = CommandsToExecute[ExecutedCommands];
-                switch ((Command_Types)sceneCommand.command_type_id)
+                SceneCommand sceneCommand = CommandsToExecute[ExecutedCommands];
+
+                if (sceneCommand.Command is DeviceCommand)
                 {
-                    #region Process Commands
-                    case Command_Types.builtin:
+                    //Add the command to the queue    
+                    QueuedDeviceCommand d_cmd = QueuedDeviceCommand.Create((DeviceCommand)sceneCommand.Command, sceneCommand.Argument);
+                    context.QueuedCommands.Add(d_cmd);
+                    context.SaveChanges();
+
+                    PluginManager.onProcessingCommandEventHandler handler = null;
+                    handler = (sender, args) =>
+                    {
+                        if (args.CommandQueueID == d_cmd.QueuedCommandId)
                         {
-                            builtin_commands cmd = context.builtin_commands.FirstOrDefault(c => c.id == sceneCommand.command_id);
-                            if (cmd != null)
-                            {
-                                //Add the command to the queue    
-                                builtin_command_que b_cmd = new builtin_command_que()
-                                {
-                                    arg = sceneCommand.arg,
-                                    builtin_command_id = sceneCommand.command_id
-                                };
-                                context.builtin_command_que.Add(b_cmd);
-                                context.SaveChanges();
+                            PluginManager.onProcessingCommandEnd -= handler;
 
-                                PluginManager.onProcessingCommandEventHandler handler = null;
-                                handler = (sender, args) =>
-                                {
-                                    if (args.CommandType == scene_commands.command_types.builtin && args.CommandQueueID == b_cmd.id)
-                                    {
-                                        PluginManager.onProcessingCommandEnd -= handler;
+                            if (args.hasErrors)
+                                ExecutionErrors++;
 
-                                        if (args.hasErrors)
-                                            ExecutionErrors++;
+                            ExecutedCommands++;
 
-                                        ExecutedCommands++;
-
-                                        //on to the next one
-                                        ProcessNextCommand();
-                                    }
-                                };
-                                PluginManager.onProcessingCommandEnd += handler;
-
-                                builtin_command_que.BuiltinCommandAddedToQue(b_cmd.id);
-                            }
-                            break;
+                            //on to the next one
+                            ProcessNextCommand();
                         }
-                    case Command_Types.device_command:
-                        {
-                            //Add the command to the queue    
-                            device_command_que d_cmd = new device_command_que()
-                            {
-                                device_id = sceneCommand.device_id.Value,
-                                device_command_id = sceneCommand.command_id,
-                                arg = sceneCommand.arg
-                            };
-                            context.device_command_que.Add(d_cmd);
-                            context.SaveChanges();
-
-
-                            PluginManager.onProcessingCommandEventHandler handler = null;
-                            handler = (sender, args) =>
-                            {
-                                if (args.CommandType == scene_commands.command_types.device_command && args.CommandQueueID == d_cmd.id)
-                                {
-                                    PluginManager.onProcessingCommandEnd -= handler;
-
-                                    if (args.hasErrors)
-                                        ExecutionErrors++;
-
-                                    ExecutedCommands++;
-
-                                    //on to the next one
-                                    ProcessNextCommand();
-                                }
-                            };
-                            PluginManager.onProcessingCommandEnd += handler;
-
-                            device_command_que.DeviceCommandAddedToQue(d_cmd.id);
-
-                            break;
-                        }
-                    case Command_Types.device_type_command:
-                        {
-                            //Add the command to the queue    
-                            device_type_command_que dt_cmd = new device_type_command_que()
-                            {
-                                device_type_command_id = sceneCommand.command_id,
-                                device_id = sceneCommand.device_id.Value,
-                                arg = sceneCommand.arg
-                            };
-                            context.device_type_command_que.Add(dt_cmd);
-                            context.SaveChanges();
-
-                            PluginManager.onProcessingCommandEventHandler handler = null;
-                            handler = (sender, args) =>
-                            {
-                                if (args.CommandType == scene_commands.command_types.device_type_command && args.CommandQueueID == dt_cmd.id)
-                                {
-                                    PluginManager.onProcessingCommandEnd -= handler;
-
-                                    if (args.hasErrors)
-                                        ExecutionErrors++;
-
-                                    ExecutedCommands++;
-
-                                    //on to the next one
-                                    ProcessNextCommand();
-                                }
-                            };
-
-                            PluginManager.onProcessingCommandEnd += handler;
-                            device_type_command_que.DeviceTypeCommandAddedToQue(dt_cmd.id);
-                            break;
-                        }
-                    #endregion
+                    };
+                    PluginManager.onProcessingCommandEnd += handler;
+                    QueuedCommand.AddNewCommandCommand(new QueuedCommand.NewCommandArgs(d_cmd));
                 }
+
+                if (sceneCommand.Command is DeviceTypeCommand)
+                {
+                    //Add the command to the queue    
+                    QueuedDeviceTypeCommand dt_cmd = QueuedDeviceTypeCommand.Create((DeviceTypeCommand)sceneCommand.Command, sceneCommand.Device, sceneCommand.Argument);
+                    context.QueuedCommands.Add(dt_cmd);
+                    context.SaveChanges();
+
+                    PluginManager.onProcessingCommandEventHandler handler = null;
+                    handler = (sender, args) =>
+                    {
+                        if (args.CommandQueueID == dt_cmd.QueuedCommandId)
+                        {
+                            PluginManager.onProcessingCommandEnd -= handler;
+
+                            if (args.hasErrors)
+                                ExecutionErrors++;
+
+                            ExecutedCommands++;
+
+                            //on to the next one
+                            ProcessNextCommand();
+                        }
+                    };
+
+                    PluginManager.onProcessingCommandEnd += handler;
+                    QueuedCommand.AddNewCommandCommand(new QueuedCommand.NewCommandArgs(dt_cmd));
+                }
+
+                if (sceneCommand.Command is BuiltinCommand)
+                {
+                    //Add the command to the queue   
+                    QueuedBuiltinCommand b_cmd = QueuedBuiltinCommand.Create((BuiltinCommand)sceneCommand.Command, sceneCommand.Argument);
+
+                    context.QueuedCommands.Add(b_cmd);
+                    context.SaveChanges();
+
+                    PluginManager.onProcessingCommandEventHandler handler = null;
+                    handler = (sender, args) =>
+                    {
+                        if (args.CommandQueueID == b_cmd.QueuedCommandId)
+                        {
+                            PluginManager.onProcessingCommandEnd -= handler;
+
+                            if (args.hasErrors)
+                                ExecutionErrors++;
+
+                            ExecutedCommands++;
+
+                            //on to the next one
+                            ProcessNextCommand();
+                        }
+                    };
+                    PluginManager.onProcessingCommandEnd += handler;
+                    QueuedCommand.AddNewCommandCommand(new QueuedCommand.NewCommandArgs(b_cmd));
+                }
+
             }
             else
             {
-                _scene.is_running = false;
+                _scene.isRunning = false;
                 context.SaveChanges();
 
                 if (onSceneRunComplete != null)
-                    onSceneRunComplete(this, new onSceneRunEventArgs(_scene.id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.friendly_name, ExecutionErrors), SceneRunnerGUID));
+                    onSceneRunComplete(this, new onSceneRunEventArgs(_scene.SceneId, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors), SceneRunnerGUID));
 
             }
         }

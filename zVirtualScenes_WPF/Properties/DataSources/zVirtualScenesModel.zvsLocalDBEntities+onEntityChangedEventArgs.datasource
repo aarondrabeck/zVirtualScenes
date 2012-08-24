@@ -5,6 +5,6 @@
     Renaming the file extension or editing the content of this file may   
     cause the file to be unrecognizable by the program.
 -->
-<GenericObjectDataSource DisplayName="zvsLocalDBEntities+onEntityChangedEventArgs" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedEventArgs, zVirtualScenesModel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
+<GenericObjectDataSource DisplayName="zvsContext+onEntityChangedEventArgs" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+   <TypeInfo>zVirtualScenesModel.zvsContext+onEntityChangedEventArgs, zVirtualScenesModel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>

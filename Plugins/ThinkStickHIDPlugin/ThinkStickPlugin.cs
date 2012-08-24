@@ -12,12 +12,13 @@ using ControlThink.ZWave;
 using ControlThink.ZWave.Devices;
 using ControlThink.ZWave.Devices.Specific;
 using zVirtualScenes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace ThinkStickHIDPlugin
 {
-    [Export(typeof(Plugin))]
-    public class ThinkStickPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class ThinkStickPlugin : zvsPlugin
     {
         private readonly ZWaveController CTController = new ZWaveController();
         private List<ZWaveDevice> _CTDevices = new List<ZWaveDevice>();
@@ -26,55 +27,56 @@ namespace ThinkStickHIDPlugin
 
         public ThinkStickPlugin()
             : base("THINKSTICK",
-               "ThinkStick HID Plugin",
+               "ThinkStick HID Plug-in",
                 "This plug-in interfaces zVirtualScenes with OpenZwave using the ThinkStick HID .net library."
                 ) { }
 
         public override void Initialize()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                device_types generic_dt = new device_types { name = "GENERIC", friendly_name = "ControlThink Device", show_in_list = true };
+                DeviceType generic_dt = new DeviceType { UniqueIdentifier = "GENERIC", Name = "ControlThink Device", ShowInList = true };
                 DefineOrUpdateDeviceType(generic_dt, context);
 
-                device_types controller_dt = new device_types { name = "CONTROLLER", friendly_name = "ControlThink Controller", show_in_list = true };
+                DeviceType controller_dt = new DeviceType { UniqueIdentifier = "CONTROLLER", Name = "ControlThink Controller", ShowInList = true };
                 DefineOrUpdateDeviceType(controller_dt, context);
 
-                device_types switch_dt = new device_types { name = "SWITCH", friendly_name = "ControlThink Binary", show_in_list = true };
-                switch_dt.device_type_commands.Add(new device_type_commands { name = "TURNON", friendly_name = "Turn On", arg_data_type = (int)Data_Types.NONE, description = "Activates a switch." });
-                switch_dt.device_type_commands.Add(new device_type_commands { name = "TURNOFF", friendly_name = "Turn Off", arg_data_type = (int)Data_Types.NONE, description = "Deactivates a switch." });
-                switch_dt.device_type_commands.Add(new device_type_commands { name = "MOMENTARY", friendly_name = "Turn On for X milliseconds", arg_data_type = (int)Data_Types.INTEGER, description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
+                DeviceType switch_dt = new DeviceType { UniqueIdentifier = "SWITCH", Name = "ControlThink Binary", ShowInList = true };
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a switch." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a switch." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "MOMENTARY", Name = "Turn On for X milliseconds", ArgumentType = DataType.INTEGER, Description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
                 DefineOrUpdateDeviceType(switch_dt, context);
 
-                device_types dimmer_dt = new device_types { name = "DIMMER", friendly_name = "ControlThink Dimmer", show_in_list = true };
-                dimmer_dt.device_type_commands.Add(new device_type_commands { name = "TURNON", friendly_name = "Turn On", arg_data_type = (int)Data_Types.NONE, description = "Activates a dimmer." });
-                dimmer_dt.device_type_commands.Add(new device_type_commands { name = "TURNOFF", friendly_name = "Turn Off", arg_data_type = (int)Data_Types.NONE, description = "Deactivates a dimmer." });
+                DeviceType dimmer_dt = new DeviceType { UniqueIdentifier = "DIMMER", Name = "ControlThink Dimmer", ShowInList = true };
+                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a dimmer." });
+                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a dimmer." });
 
-                device_type_commands dimmer_preset_cmd = new device_type_commands { name = "SETPRESETLEVEL", friendly_name = "Set Basic", arg_data_type = (int)Data_Types.LIST, description = "Sets a dimmer to a preset level." };
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "0%" });
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "20%" });
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "40%" });
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "60%" });
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "80%" });
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "100%" });
-                dimmer_preset_cmd.device_type_command_options.Add(new device_type_command_options { options = "255" });
-                dimmer_dt.device_type_commands.Add(dimmer_preset_cmd);
+                DeviceTypeCommand dimmer_preset_cmd = new DeviceTypeCommand { UniqueIdentifier = "SETPRESETLEVEL", Name = "Set Basic", ArgumentType = DataType.LIST, Description = "Sets a dimmer to a preset level." };
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "0%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "20%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "40%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "60%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "80%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "100%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "255" });
+                dimmer_dt.Commands.Add(dimmer_preset_cmd);
                 DefineOrUpdateDeviceType(dimmer_dt, context);
 
-                device_types thermo_dt = new device_types { name = "THERMOSTAT", friendly_name = "ControlThink Thermostat", show_in_list = true };
-                thermo_dt.device_type_commands.Add(new device_type_commands { name = "SETENERGYMODE", friendly_name = "Set Energy Mode", arg_data_type = (int)Data_Types.NONE, description = "Set thermosat to Energy Mode." });
-                thermo_dt.device_type_commands.Add(new device_type_commands { name = "SETCONFORTMODE", friendly_name = "Set Comfort Mode", arg_data_type = (int)Data_Types.NONE, description = "Set thermosat to Confort Mode. (Run)" });
+                DeviceType thermo_dt = new DeviceType { UniqueIdentifier = "THERMOSTAT", Name = "ControlThink Thermostat", ShowInList = true };
+                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETENERGYMODE", Name = "Set Energy Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Energy Mode." });
+                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETCONFORTMODE", Name = "Set Comfort Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Comfort Mode. (Run)" });
                 DefineOrUpdateDeviceType(thermo_dt, context);
 
-                device_types sensor_dt = new device_types { name = "SENSOR", friendly_name = "ControlThink Sensor", show_in_list = true };
+                DeviceType sensor_dt = new DeviceType { UniqueIdentifier = "SENSOR", Name = "ControlThink Sensor", ShowInList = true };
                 DefineOrUpdateDeviceType(sensor_dt, context);
 
-                device_propertys.AddOrEdit(new device_propertys
+                DeviceProperty.AddOrEdit(new DeviceProperty
                 {
-                    name = "ENABLEREPOLLONLEVELCHANGE",
-                    friendly_name = "Repoll dimmers 3 seconds after a basic change is received?",
-                    default_value = false.ToString(),
-                    value_data_type = (int)Data_Types.BOOL
+                    UniqueIdentifier = "ENABLEREPOLLONLEVELCHANGE",
+                    Name = "ThinkStick Re-poll",
+                    Description = "Re-poll dimmers 3 seconds after a basic change is received?",
+                    Value = false.ToString(),
+                    ValueType = DataType.BOOL
                 }, context);
             }
 
@@ -117,25 +119,24 @@ namespace ThinkStickHIDPlugin
             }
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
+        protected override void SettingChanged(string settingsettingUniqueIdentifier, string settingValue)
         {
-            return;
         }
 
-        public override void ProcessDeviceCommand(zVirtualScenesModel.device_command_que cmd)
+        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd)
         {
             try
             {
-                ZWaveDevice CTDevice = GetCTDevice((byte)cmd.device.node_id);
+                ZWaveDevice CTDevice = GetCTDevice((byte)cmd.Device.NodeNumber);
                 if (CTDevice != null)
                 {
-                    if (cmd.device.device_types.name == "CONTROLLER")
+                    if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
                     {
                         if (CTDevice.NodeID == CTController.NodeID)
                         {
                             if (CommandDialogWindow == null)
                             {
-                                string cmdName = cmd.device_commands.name;
+                                string cmdName = cmd.Command.UniqueIdentifier;
                                 Thread t = new Thread(() =>
                                 {
                                     ControllerDialogWindow cdWindow = new ControllerDialogWindow(CTController, cmdName);
@@ -157,16 +158,16 @@ namespace ThinkStickHIDPlugin
 
                         }
                     }
-                    else if (cmd.device.device_types.name == "THERMOSTAT")
+                    else if (cmd.Device.Type.UniqueIdentifier == "THERMOSTAT")
                     {
                         GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
 
-                        switch (cmd.device_commands.name)
+                        switch (cmd.Command.UniqueIdentifier)
                         {
                             case "FAN_MODE":
                                 {
                                     ThermostatFanMode mode = ThermostatFanMode.AutoLow;
-                                    if (Enum.TryParse(cmd.arg, out mode))
+                                    if (Enum.TryParse(cmd.Argument, out mode))
                                     {
                                         CTThermostat.ThermostatFanMode = mode;
                                     }
@@ -175,7 +176,7 @@ namespace ThinkStickHIDPlugin
                             case "MODE":
                                 {
                                     ThermostatMode mode = ThermostatMode.Off;
-                                    if (Enum.TryParse(cmd.arg, out mode))
+                                    if (Enum.TryParse(cmd.Argument, out mode))
                                     {
                                         CTThermostat.ThermostatMode = mode;
                                     }
@@ -184,43 +185,43 @@ namespace ThinkStickHIDPlugin
                         }
 
                         //Dynamic SP's
-                        if (cmd.device_commands.name.StartsWith("DYNAMIC_SP_R207_"))
+                        if (cmd.Command.UniqueIdentifier.StartsWith("DYNAMIC_SP_R207_"))
                         {
-                            string spTypeStr = cmd.device_commands.name.Replace("DYNAMIC_SP_R207_", "");
+                            string spTypeStr = cmd.Command.UniqueIdentifier.Replace("DYNAMIC_SP_R207_", "");
                             ThermostatSetpointType setPointType = ThermostatSetpointType.Cooling1;
                             decimal temp = 0;
 
-                            if (Enum.TryParse(spTypeStr, out setPointType) && decimal.TryParse(cmd.arg, out temp))
+                            if (Enum.TryParse(spTypeStr, out setPointType) && decimal.TryParse(cmd.Argument, out temp))
                             {
                                 CTThermostat.ThermostatSetpoints[setPointType].Temperature = new Temperature(temp, TemperatureScale.Fahrenheit);
                             }
                         }
                     }
-                    else if (cmd.device.device_types.name == "SWITCH" || cmd.device.device_types.name == "DIMMER")
+                    else if (cmd.Device.Type.UniqueIdentifier == "SWITCH" || cmd.Device.Type.UniqueIdentifier == "DIMMER")
                     {
-                        if (cmd.device_commands.name == "BASIC")
+                        if (cmd.Command.UniqueIdentifier == "BASIC")
                         {
                             byte level = 0;
-                            byte.TryParse(cmd.arg, out level);
+                            byte.TryParse(cmd.Argument, out level);
                             AsyncSetLevel(CTDevice, level);
 
                         }
                     }
 
                     //Polling all devices
-                    if (cmd.device_commands.name == "REPOLLINT")
+                    if (cmd.Command.UniqueIdentifier == "REPOLLINT")
                     {
                         int PollingInt = 0;
 
-                        if (int.TryParse(cmd.arg, out PollingInt))
+                        if (int.TryParse(cmd.Argument, out PollingInt))
                         {
                             //Set the Polling Interval
                             CTDevice.PollEnabled = PollingInt > 0;
                             CTDevice.PollInterval = TimeSpan.FromSeconds(PollingInt);
 
-                            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                            using (zvsContext context = new zvsContext())
                             {
-                                UpdateDeviceValue(cmd.device.id, "REPOLLINT", PollingInt.ToString(), context);
+                                UpdateDeviceValue(cmd.Device.DeviceId, "REPOLLINT", PollingInt.ToString(), context);
                             }
                         }
                     }
@@ -228,31 +229,31 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);               
-            }            
+                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
+            }
         }
 
-        public override void ProcessDeviceTypeCommand(zVirtualScenesModel.device_type_command_que cmd)
+        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd)
         {
             try
             {
-                ZWaveDevice CTDevice = GetCTDevice((byte)cmd.device.node_id);
+                ZWaveDevice CTDevice = GetCTDevice((byte)cmd.Device.NodeNumber);
                 if (CTDevice != null)
                 {
-                    if (cmd.device.device_types.name == "CONTROLLER")
+                    if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
                     {
 
                     }
-                    else if (cmd.device.device_types.name == "SWITCH")
+                    else if (cmd.Device.Type.UniqueIdentifier == "SWITCH")
                     {
-                        switch (cmd.device_type_commands.name)
+                        switch (cmd.Command.UniqueIdentifier)
                         {
                             case "MOMENTARY":
                                 {
 
                                     int delay = 1000;
-                                    int.TryParse(cmd.arg, out delay);
-                                    byte nodeID = (byte)cmd.device.node_id;
+                                    int.TryParse(cmd.Argument, out delay);
+                                    byte nodeID = (byte)cmd.Device.NodeNumber;
                                     CTDevice.PowerOn();
 
                                     System.Timers.Timer t = new System.Timers.Timer();
@@ -282,16 +283,16 @@ namespace ThinkStickHIDPlugin
                                 }
                         }
                     }
-                    else if (cmd.device.device_types.name == "DIMMER")
+                    else if (cmd.Device.Type.UniqueIdentifier == "DIMMER")
                     {
-                        switch (cmd.device_type_commands.name)
+                        switch (cmd.Command.UniqueIdentifier)
                         {
                             case "TURNON":
                                 {
-                                    using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
+                                    using (zvsContext Context = new zvsContext())
                                     {
                                         byte defaultonlevel = 99;
-                                        byte.TryParse(device_property_values.GetDevicePropertyValue(Context, cmd.device_id, "DEFAULONLEVEL"), out defaultonlevel);
+                                        byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, cmd.Device, "DEFAULONLEVEL"), out defaultonlevel);
 
                                         AsyncSetLevel(CTDevice, defaultonlevel);
                                     }
@@ -306,7 +307,7 @@ namespace ThinkStickHIDPlugin
                             case "SETPRESETLEVEL":
                                 {
 
-                                    switch (cmd.arg)
+                                    switch (cmd.Argument)
                                     {
                                         case "0%":
                                             AsyncSetLevel(CTDevice, 0);
@@ -337,12 +338,12 @@ namespace ThinkStickHIDPlugin
 
                         }
                     }
-                    else if (cmd.device.device_types.name == "THERMOSTAT")
+                    else if (cmd.Device.Type.UniqueIdentifier == "THERMOSTAT")
                     {
 
                         GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
 
-                        switch (cmd.device_type_commands.name)
+                        switch (cmd.Command.UniqueIdentifier)
                         {
                             case "SETENERGYMODE":
                                 {
@@ -360,13 +361,13 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);                
+                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
             }
         }
 
-        public override void Repoll(zVirtualScenesModel.device device)
+        public override void Repoll(zvs.Entities.Device device)
         {
-            ZWaveDevice CTDevice = GetCTDevice((byte)device.node_id);
+            ZWaveDevice CTDevice = GetCTDevice((byte)device.NodeNumber);
             if (CTDevice != null)
             {
                 ManuallyPollDevice(CTDevice);
@@ -375,26 +376,26 @@ namespace ThinkStickHIDPlugin
 
         public override void ActivateGroup(int groupID)
         {
-            using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
+            using (zvsContext Context = new zvsContext())
             {
-                IQueryable<device> devices = GetDeviceInGroup(groupID, Context);
+                IQueryable<Device> devices = GetDeviceInGroup(groupID, Context);
                 if (devices != null)
                 {
-                    foreach (device d in devices)
+                    foreach (Device d in devices)
                     {
-                        ZWaveDevice CTDevice = GetCTDevice(Convert.ToByte(d.node_id));
+                        ZWaveDevice CTDevice = GetCTDevice(Convert.ToByte(d.NodeNumber));
                         if (CTDevice != null)
                         {
                             try
                             {
-                                switch (d.device_types.name)
+                                switch (d.Type.UniqueIdentifier)
                                 {
                                     case "SWITCH":
                                         AsyncSetLevel(CTDevice, 255);
                                         break;
                                     case "DIMMER":
                                         byte defaultonlevel = 99;
-                                        byte.TryParse(device_property_values.GetDevicePropertyValue(Context, d.id, "DEFAULONLEVEL"), out defaultonlevel);
+                                        byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, d, "DEFAULONLEVEL"), out defaultonlevel);
                                         AsyncSetLevel(CTDevice, defaultonlevel);
                                         break;
                                 }
@@ -413,19 +414,19 @@ namespace ThinkStickHIDPlugin
 
         public override void DeactivateGroup(int groupID)
         {
-            using (zvsLocalDBEntities Context = new zvsLocalDBEntities())
+            using (zvsContext Context = new zvsContext())
             {
-                IQueryable<device> devices = GetDeviceInGroup(groupID, Context);
+                IQueryable<Device> devices = GetDeviceInGroup(groupID, Context);
                 if (devices != null)
                 {
-                    foreach (device d in devices)
+                    foreach (Device d in devices)
                     {
-                        ZWaveDevice CTDevice = GetCTDevice(Convert.ToByte(d.node_id));
+                        ZWaveDevice CTDevice = GetCTDevice(Convert.ToByte(d.NodeNumber));
                         if (CTDevice != null)
                         {
                             try
                             {
-                                switch (d.device_types.name)
+                                switch (d.Type.UniqueIdentifier)
                                 {
                                     case "DIMMER":
                                     case "SWITCH":
@@ -549,153 +550,153 @@ namespace ThinkStickHIDPlugin
         {
             if (CTController.IsConnected)
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
                     #region Discover Devices
                     foreach (ZWaveDevice CTDevice in CTController.Devices)
                     {
                         //Look for this device in the DB
-                        device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDevice.NodeID);
+                        Device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTDevice.NodeID);
                         if (existingDevice == null)
                         {
-                            existingDevice = new device();
-                            existingDevice.device_types = GetDeviceType("GENERIC", context);
-                            existingDevice.node_id = CTDevice.NodeID;
-                            existingDevice.friendly_name = "ControlThink OpenZwave Device";
-                            existingDevice.current_level_int = 0;
-                            existingDevice.current_level_txt = "";
-                            context.devices.Add(existingDevice);
+                            existingDevice = new Device();
+                            existingDevice.Type = GetDeviceType("GENERIC", context);
+                            existingDevice.NodeNumber = CTDevice.NodeID;
+                            existingDevice.Name = "ControlThink OpenZwave Device";
+                            existingDevice.CurrentLevelInt = 0;
+                            existingDevice.CurrentLevelText = "";
+                            context.Devices.Add(existingDevice);
                             context.SaveChanges();
                         }
 
                         //Type
                         if (CTDevice is Controller)
                         {
-                            existingDevice.device_types = GetDeviceType("CONTROLLER", context);
+                            existingDevice.Type = GetDeviceType("CONTROLLER", context);
 
-                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
-                                existingDevice.friendly_name = "My ControlThink Controller";
+                            if (existingDevice.Name == "ControlThink OpenZwave Device")
+                                existingDevice.Name = "My ControlThink Controller";
 
                             #region Controller Commands
                             if (CTController.NodeID == CTDevice.NodeID)
                             {
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                 {
-                                    device_id = existingDevice.id,
-                                    name = "BeginAddController",
-                                    friendly_name = "Add Controller",
-                                    arg_data_type = (int)Data_Types.NONE,
-                                    help = "Adds controller to network",
-                                    custom_data1 = "",
-                                    custom_data2 = "",
-                                    sort_order = 1
+                                    Device = existingDevice,
+                                    UniqueIdentifier = "BeginAddController",
+                                    Name = "Add Controller",
+                                    ArgumentType = DataType.NONE,
+                                    Help = "Adds controller to network",
+                                    CustomData1 = "",
+                                    CustomData2 = "",
+                                    SortOrder = 1
                                 }, context);
 
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                 {
-                                    device_id = existingDevice.id,
-                                    name = "BeginAddDevice",
-                                    friendly_name = "Add Device",
-                                    arg_data_type = (int)Data_Types.NONE,
-                                    help = "Adds device to network",
-                                    custom_data1 = "",
-                                    custom_data2 = "",
-                                    sort_order = 1
+                                    Device = existingDevice,
+                                    UniqueIdentifier = "BeginAddDevice",
+                                    Name = "Add Device",
+                                    ArgumentType = DataType.NONE,
+                                    Help = "Adds device to network",
+                                    CustomData1 = "",
+                                    CustomData2 = "",
+                                    SortOrder = 1
                                 }, context);
 
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                 {
-                                    device_id = existingDevice.id,
-                                    name = "BeginCreateNewPrimaryController",
-                                    friendly_name = "Create New Primary Controller",
-                                    arg_data_type = (int)Data_Types.NONE,
-                                    help = "Creates New Primary Controller",
-                                    custom_data1 = "",
-                                    custom_data2 = "",
-                                    sort_order = 1
+                                    Device = existingDevice,
+                                    UniqueIdentifier = "BeginCreateNewPrimaryController",
+                                    Name = "Create New Primary Controller",
+                                    ArgumentType = DataType.NONE,
+                                    Help = "Creates New Primary Controller",
+                                    CustomData1 = "",
+                                    CustomData2 = "",
+                                    SortOrder = 1
                                 }, context);
 
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                 {
-                                    device_id = existingDevice.id,
-                                    name = "BeginReceiveConfiguration",
-                                    friendly_name = "Receive Configuration",
-                                    arg_data_type = (int)Data_Types.NONE,
-                                    help = "Receives Configuration",
-                                    custom_data1 = "",
-                                    custom_data2 = "",
-                                    sort_order = 1
+                                    Device = existingDevice,
+                                    UniqueIdentifier = "BeginReceiveConfiguration",
+                                    Name = "Receive Configuration",
+                                    ArgumentType = DataType.NONE,
+                                    Help = "Receives Configuration",
+                                    CustomData1 = "",
+                                    CustomData2 = "",
+                                    SortOrder = 1
                                 }, context);
 
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                 {
-                                    device_id = existingDevice.id,
-                                    name = "BeginRemoveController",
-                                    friendly_name = "Remove Controller",
-                                    arg_data_type = (int)Data_Types.NONE,
-                                    help = "Removes Controller",
-                                    custom_data1 = "",
-                                    custom_data2 = "",
-                                    sort_order = 1
+                                    Device = existingDevice,
+                                    UniqueIdentifier = "BeginRemoveController",
+                                    Name = "Remove Controller",
+                                    ArgumentType = DataType.NONE,
+                                    Help = "Removes Controller",
+                                    CustomData1 = "",
+                                    CustomData2 = "",
+                                    SortOrder = 1
                                 }, context);
 
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                 {
-                                    device_id = existingDevice.id,
-                                    name = "BeginRemoveDevice",
-                                    friendly_name = "Remove Device",
-                                    arg_data_type = (int)Data_Types.NONE,
-                                    help = "Removes Device",
-                                    custom_data1 = "",
-                                    custom_data2 = "",
-                                    sort_order = 1
+                                    Device = existingDevice,
+                                    UniqueIdentifier = "BeginRemoveDevice",
+                                    Name = "Remove Device",
+                                    ArgumentType = DataType.NONE,
+                                    Help = "Removes Device",
+                                    CustomData1 = "",
+                                    CustomData2 = "",
+                                    SortOrder = 1
                                 }, context);
 
-                                DefineOrUpdateDeviceCommand(new device_commands
+                                DefineOrUpdateDeviceCommand(new DeviceCommand
                                {
-                                   device_id = existingDevice.id,
-                                   name = "BeginTransferPrimaryRole",
-                                   friendly_name = "Transfer Primary Role",
-                                   arg_data_type = (int)Data_Types.NONE,
-                                   help = "Transfer Primary Role",
-                                   custom_data1 = "",
-                                   custom_data2 = "",
-                                   sort_order = 1
+                                   Device = existingDevice,
+                                   UniqueIdentifier = "BeginTransferPrimaryRole",
+                                   Name = "Transfer Primary Role",
+                                   ArgumentType = DataType.NONE,
+                                   Help = "Transfer Primary Role",
+                                   CustomData1 = "",
+                                   CustomData2 = "",
+                                   SortOrder = 1
                                }, context);
                             #endregion
                             }
                         }
                         else if (CTDevice is BinarySwitch)
                         {
-                            existingDevice.device_types = GetDeviceType("SWITCH", context);
+                            existingDevice.Type = GetDeviceType("SWITCH", context);
 
-                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
-                                existingDevice.friendly_name = "My ControlThink Switch";
+                            if (existingDevice.Name == "ControlThink OpenZwave Device")
+                                existingDevice.Name = "My ControlThink Switch";
 
                             #region BinarySwitch Level Value and Command
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "BASIC",
-                                label_name = "Basic",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "0",
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "BASIC",
+                                Name = "Basic",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.INTEGER,
+                                CommandClass = "",
+                                Value = "0",
+                                isReadOnly = false
                             }, context, true);
 
-                            device_commands dc = new device_commands
+                            DeviceCommand dc = new DeviceCommand
                             {
-                                device_id = existingDevice.id,
-                                name = "BASIC",
-                                friendly_name = "Basic",
-                                arg_data_type = (int)Data_Types.BYTE,
-                                help = "Changes the Switch Level",
-                                custom_data1 = "",
-                                custom_data2 = "BASIC",
-                                sort_order = 1
+                                Device = existingDevice,
+                                UniqueIdentifier = "BASIC",
+                                Name = "Basic",
+                                ArgumentType = DataType.BYTE,
+                                Help = "Changes the Switch Level",
+                                CustomData1 = "",
+                                CustomData2 = "BASIC",
+                                SortOrder = 1
                             };
 
                             DefineOrUpdateDeviceCommand(dc, context);
@@ -703,35 +704,35 @@ namespace ThinkStickHIDPlugin
                         }
                         else if (CTDevice is MultilevelSwitch)
                         {
-                            existingDevice.device_types = GetDeviceType("DIMMER", context);
+                            existingDevice.Type = GetDeviceType("DIMMER", context);
 
-                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
-                                existingDevice.friendly_name = "My ControlThink Dimmer";
+                            if (existingDevice.Name == "ControlThink OpenZwave Device")
+                                existingDevice.Name = "My ControlThink Dimmer";
 
                             #region DimmerSwtich Level Value and Command
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "BASIC",
-                                label_name = "Basic",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "0",
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "BASIC",
+                                Name = "Basic",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.INTEGER,
+                                CommandClass = "",
+                                Value = "0",
+                                isReadOnly = false
                             }, context, true);
 
-                            device_commands dc = new device_commands
+                            DeviceCommand dc = new DeviceCommand
                             {
-                                device_id = existingDevice.id,
-                                name = "BASIC",
-                                friendly_name = "Basic",
-                                arg_data_type = (int)Data_Types.BYTE,
-                                help = "Changes the Dimmer Level",
-                                custom_data1 = "",
-                                custom_data2 = "BASIC",
-                                sort_order = 1
+                                Device = existingDevice,
+                                UniqueIdentifier = "BASIC",
+                                Name = "Basic",
+                                ArgumentType = DataType.BYTE,
+                                Help = "Changes the Dimmer Level",
+                                CustomData1 = "",
+                                CustomData2 = "BASIC",
+                                SortOrder = 1
                             };
 
                             DefineOrUpdateDeviceCommand(dc, context);
@@ -740,71 +741,71 @@ namespace ThinkStickHIDPlugin
                         else if (CTDevice is GeneralThermostatV2)
                         {
                             GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
-                            existingDevice.device_types = GetDeviceType("THERMOSTAT", context);
+                            existingDevice.Type = GetDeviceType("THERMOSTAT", context);
 
-                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
-                                existingDevice.friendly_name = "My ControlThink Thermostat";
+                            if (existingDevice.Name == "ControlThink OpenZwave Device")
+                                existingDevice.Name = "My ControlThink Thermostat";
 
                             #region Temp
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "TEMPERATURE",
-                                label_name = "Temperature",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = true
+                                Device = existingDevice,
+                                UniqueIdentifier = "TEMPERATURE",
+                                Name = "Temperature",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.INTEGER,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = true
                             }, context, true);
                             #endregion
 
                             #region Thermostat SetBack Mode
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "SETBACK",
-                                label_name = "SetBack Mode",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "SETBACK",
+                                Name = "SetBack Mode",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.INTEGER,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = false
                             }, context, true);
                             #endregion
 
                             #region Thermostat Fan Mode
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "FAN_MODE",
-                                label_name = "Fan Mode",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "FAN_MODE",
+                                Name = "Fan Mode",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.STRING,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = false
                             }, context, true);
-                            device_commands dc = new device_commands
+                            DeviceCommand dc = new DeviceCommand
                             {
-                                device_id = existingDevice.id,
-                                name = "FAN_MODE",
-                                friendly_name = "Fan Mode",
-                                arg_data_type = (int)Data_Types.LIST,
-                                help = "Changes the Thermostat Fan Mode",
-                                custom_data1 = "",
-                                custom_data2 = "FAN_MODE",
-                                sort_order = 1
+                                Device = existingDevice,
+                                UniqueIdentifier = "FAN_MODE",
+                                Name = "Fan Mode",
+                                ArgumentType = DataType.LIST,
+                                Help = "Changes the Thermostat Fan Mode",
+                                CustomData1 = "",
+                                CustomData2 = "FAN_MODE",
+                                SortOrder = 1
                             };
 
 
                             try
                             {
                                 foreach (ThermostatFanMode mode in CTThermostat.SupportedThermostatFanModes)
-                                    dc.device_command_options.Add(new device_command_options { name = mode.ToString() });
+                                    dc.Options.Add(new CommandOption { Name = mode.ToString() });
                             }
                             catch (Exception e)
                             {
@@ -815,35 +816,35 @@ namespace ThinkStickHIDPlugin
                             #endregion
 
                             #region Thermostat Mode
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "MODE",
-                                label_name = "Mode",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "MODE",
+                                Name = "Mode",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.STRING,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = false
                             }, context, true);
 
-                            device_commands dc2 = new device_commands
+                            DeviceCommand dc2 = new DeviceCommand
                             {
-                                device_id = existingDevice.id,
-                                name = "MODE",
-                                friendly_name = "Mode",
-                                arg_data_type = (int)Data_Types.LIST,
-                                help = "Changes the Thermostat Mode",
-                                custom_data1 = "",
-                                custom_data2 = "MODE",
-                                sort_order = 2
+                                Device = existingDevice,
+                                UniqueIdentifier = "MODE",
+                                Name = "Mode",
+                                ArgumentType = DataType.LIST,
+                                Help = "Changes the Thermostat Mode",
+                                CustomData1 = "",
+                                CustomData2 = "MODE",
+                                SortOrder = 2
                             };
 
                             try
                             {
                                 foreach (ThermostatMode mode in CTThermostat.SupportedThermostatModes)
-                                    dc2.device_command_options.Add(new device_command_options { name = mode.ToString() });
+                                    dc2.Options.Add(new CommandOption { Name = mode.ToString() });
                             }
                             catch (Exception e)
                             {
@@ -854,32 +855,32 @@ namespace ThinkStickHIDPlugin
                             #endregion
 
                             #region Thermostat Fan State
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "FAN_STATE",
-                                label_name = "Fan State",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = true
+                                Device = existingDevice,
+                                UniqueIdentifier = "FAN_STATE",
+                                Name = "Fan State",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.STRING,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = true
                             }, context, true);
                             #endregion
 
                             #region Thermostat Operating State
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "OPERATING_STATE",
-                                label_name = "Operating State",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = true
+                                Device = existingDevice,
+                                UniqueIdentifier = "OPERATING_STATE",
+                                Name = "Operating State",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.STRING,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = true
                             }, context, true);
                             #endregion
 
@@ -889,29 +890,29 @@ namespace ThinkStickHIDPlugin
                                 foreach (ThermostatSetpointType type in CTThermostat.SupportedThermostatSetpoints)
                                 {
                                     ThermostatSetpoint sp = CTThermostat.ThermostatSetpoints[type];
-                                    DefineOrUpdateDeviceValue(new device_values
+                                    DefineOrUpdateDeviceValue(new DeviceValue
                                     {
-                                        device_id = existingDevice.id,
-                                        value_id = "DYNAMIC_SP_R207_" + type.ToString(),
-                                        label_name = type.ToString(),
-                                        genre = "",
-                                        index2 = "",
-                                        type = "",
-                                        commandClassId = "",
-                                        value2 = "",
-                                        read_only = false
+                                        Device = existingDevice,
+                                        UniqueIdentifier = "DYNAMIC_SP_R207_" + type.ToString(),
+                                        Name = type.ToString(),
+                                        Genre = "",
+                                        Index = "",
+                                        ValueType = DataType.INTEGER,
+                                        CommandClass = "",
+                                        Value = "",
+                                        isReadOnly = false
                                     }, context, true);
 
-                                    device_commands dc3 = new device_commands
+                                    DeviceCommand dc3 = new DeviceCommand
                                     {
-                                        device_id = existingDevice.id,
-                                        name = "DYNAMIC_SP_R207_" + type.ToString(),
-                                        friendly_name = "Set " + type.ToString(),
-                                        arg_data_type = (int)Data_Types.INTEGER,
-                                        help = "Changes the Thermostat " + type.ToString(),
-                                        custom_data1 = "",
-                                        custom_data2 = "DYNAMIC_SP_R207_" + type.ToString(),
-                                        sort_order = 1
+                                        Device = existingDevice,
+                                        UniqueIdentifier = "DYNAMIC_SP_R207_" + type.ToString(),
+                                        Name = "Set " + type.ToString(),
+                                        ArgumentType = DataType.INTEGER,
+                                        Help = "Changes the Thermostat " + type.ToString(),
+                                        CustomData1 = "",
+                                        CustomData2 = "DYNAMIC_SP_R207_" + type.ToString(),
+                                        SortOrder = 1
                                     };
                                     DefineOrUpdateDeviceCommand(dc3, context);
                                 }
@@ -951,35 +952,35 @@ namespace ThinkStickHIDPlugin
                         }
                         else if (CTDevice is BinarySensor || CTDevice is MultilevelSensor)
                         {
-                            existingDevice.device_types = GetDeviceType("SENSOR", context);
+                            existingDevice.Type = GetDeviceType("SENSOR", context);
 
-                            if (existingDevice.friendly_name == "ControlThink OpenZwave Device")
-                                existingDevice.friendly_name = "My ControlThink Sensor";
+                            if (existingDevice.Name == "ControlThink OpenZwave Device")
+                                existingDevice.Name = "My ControlThink Sensor";
 
                             #region Sensor Level Value and Command
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "BASIC",
-                                label_name = "Basic",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = "",
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "BASIC",
+                                Name = "Basic",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.BYTE,
+                                CommandClass = "",
+                                Value = "",
+                                isReadOnly = false
                             }, context, true);
 
-                            device_commands dc = new device_commands
+                            DeviceCommand dc = new DeviceCommand
                             {
-                                device_id = existingDevice.id,
-                                name = "BASIC",
-                                friendly_name = "Basic",
-                                arg_data_type = (int)Data_Types.BYTE,
-                                help = "Changes the Dimmer Level",
-                                custom_data1 = "",
-                                custom_data2 = "BASIC",
-                                sort_order = 1
+                                Device = existingDevice,
+                                UniqueIdentifier = "BASIC",
+                                Name = "Basic",
+                                ArgumentType = DataType.BYTE,
+                                Help = "Changes the Dimmer Level",
+                                CustomData1 = "",
+                                CustomData2 = "BASIC",
+                                SortOrder = 1
                             };
 
                             DefineOrUpdateDeviceCommand(dc, context);
@@ -997,20 +998,20 @@ namespace ThinkStickHIDPlugin
         {
             if (CTController.IsConnected)
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
                     foreach (ZWaveDevice CTDevice in CTController.Devices)
                     {
                         //Look for this device in the DB
-                        device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDevice.NodeID);
+                        Device existingDevice = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTDevice.NodeID);
                         if (existingDevice != null)
                         {
                             int DefaultPollingInterval = 1200;
 
                             //Get the repoll interval saved previously if is there.
-                            device_values existingDV = existingDevice.device_values.FirstOrDefault(o => o.value_id == "REPOLLINT");
+                            DeviceValue existingDV = existingDevice.Values.FirstOrDefault(o => o.UniqueIdentifier == "REPOLLINT");
                             if (existingDV != null)
-                                int.TryParse(existingDV.value2, out DefaultPollingInterval);
+                                int.TryParse(existingDV.Value, out DefaultPollingInterval);
 
                             try
                             {
@@ -1024,29 +1025,29 @@ namespace ThinkStickHIDPlugin
                             }
 
                             #region Repoll Value and Command
-                            DefineOrUpdateDeviceValue(new device_values
+                            DefineOrUpdateDeviceValue(new DeviceValue
                             {
-                                device_id = existingDevice.id,
-                                value_id = "REPOLLINT",
-                                label_name = "Repoll Interval (Seconds). 0 = No Polling.",
-                                genre = "",
-                                index2 = "",
-                                type = "",
-                                commandClassId = "",
-                                value2 = DefaultPollingInterval.ToString(),
-                                read_only = false
+                                Device = existingDevice,
+                                UniqueIdentifier = "REPOLLINT",
+                                Name = "Re-poll Interval (Seconds). 0 = No Polling.",
+                                Genre = "",
+                                Index = "",
+                                ValueType = DataType.INTEGER,
+                                CommandClass = "",
+                                Value = DefaultPollingInterval.ToString(),
+                                isReadOnly = false
                             }, context, true);
 
-                            device_commands dc = new device_commands
+                            DeviceCommand dc = new DeviceCommand
                             {
-                                device_id = existingDevice.id,
-                                name = "REPOLLINT",
-                                friendly_name = "Repoll Interval (Seconds)",
-                                arg_data_type = (int)Data_Types.INTEGER,
-                                help = "Repoll Interval in seconds (0 = No Polling)",
-                                custom_data1 = "",
-                                custom_data2 = "REPOLLINT",
-                                sort_order = 1
+                                Device = existingDevice,
+                                UniqueIdentifier = "REPOLLINT",
+                                Name = "Re-poll Interval (Seconds)",
+                                ArgumentType = DataType.INTEGER,
+                                Help = "Re-poll Interval in seconds (0 = No Polling)",
+                                CustomData1 = "",
+                                CustomData2 = "REPOLLINT",
+                                SortOrder = 1
                             };
 
                             DefineOrUpdateDeviceCommand(dc, context);
@@ -1121,13 +1122,13 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        UpdateDeviceValue(dev.id, "SETBACK", e.Level > 0 ? "Confort Mode" : "Energy Mode", context);
-                        dev.last_heard_from = DateTime.Now;
+                        UpdateDeviceValue(dev.DeviceId, "SETBACK", e.Level > 0 ? "Comfort Mode" : "Energy Mode", context);
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
                     }
                     else
@@ -1141,13 +1142,13 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        UpdateDeviceValue(dev.id, "DYNAMIC_SP_R207_" + e.ThermostatSetpointType.ToString(), e.Temperature.ToFahrenheit().ToString(), context);
-                        dev.last_heard_from = DateTime.Now;
+                        UpdateDeviceValue(dev.DeviceId, "DYNAMIC_SP_R207_" + e.ThermostatSetpointType.ToString(), e.Temperature.ToFahrenheit().ToString(), context);
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
                     }
                     else
@@ -1161,17 +1162,17 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        dev.current_level_int = (int)e.ThermostatTemperature.ToFahrenheit();
-                        dev.current_level_txt = e.ThermostatTemperature.ToFahrenheit().ToString() + "° F";
-                        dev.last_heard_from = DateTime.Now;
+                        dev.CurrentLevelInt = (int)e.ThermostatTemperature.ToFahrenheit();
+                        dev.CurrentLevelText = e.ThermostatTemperature.ToFahrenheit().ToString() + "° F";
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
 
-                        UpdateDeviceValue(dev.id, "TEMPERATURE", e.ThermostatTemperature.ToFahrenheit().ToString(), context);
+                        UpdateDeviceValue(dev.DeviceId, "TEMPERATURE", e.ThermostatTemperature.ToFahrenheit().ToString(), context);
                     }
                     else
                         WriteToLog(Urgency.ERROR, "TEMPERATURE Changed on DEVICE NOT FOUND:" + e.ThermostatTemperature.ToFahrenheit());
@@ -1184,13 +1185,13 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        UpdateDeviceValue(dev.id, "OPERATING_STATE", e.ThermostatOperatingState.ToString(), context);
-                        dev.last_heard_from = DateTime.Now;
+                        UpdateDeviceValue(dev.DeviceId, "OPERATING_STATE", e.ThermostatOperatingState.ToString(), context);
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
                     }
                     else
@@ -1204,13 +1205,13 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        UpdateDeviceValue(dev.id, "MODE", e.ThermostatMode.ToString(), context);
-                        dev.last_heard_from = DateTime.Now;
+                        UpdateDeviceValue(dev.DeviceId, "MODE", e.ThermostatMode.ToString(), context);
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
                     }
                     else
@@ -1224,13 +1225,13 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        UpdateDeviceValue(dev.id, "FAN_STATE", e.ThermostatFanState.ToString(), context);
-                        dev.last_heard_from = DateTime.Now;
+                        UpdateDeviceValue(dev.DeviceId, "FAN_STATE", e.ThermostatFanState.ToString(), context);
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
                     }
                     else
@@ -1244,13 +1245,13 @@ namespace ThinkStickHIDPlugin
             if (sender is GeneralThermostatV2)
             {
                 GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)sender;
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTThermostat.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTThermostat.NodeID);
                     if (dev != null)
                     {
-                        UpdateDeviceValue(dev.id, "FAN_MODE", e.ThermostatFanMode.ToString(), context);
-                        dev.last_heard_from = DateTime.Now;
+                        UpdateDeviceValue(dev.DeviceId, "FAN_MODE", e.ThermostatFanMode.ToString(), context);
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
                     }
                     else
@@ -1266,50 +1267,50 @@ namespace ThinkStickHIDPlugin
             {
                 MultilevelSwitch CTDimmer = (MultilevelSwitch)sender;
 
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTDimmer.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTDimmer.NodeID);
                     if (dev != null)
                     {
-                        if (dev.current_level_int != e.Level)
+                        if (dev.CurrentLevelInt != e.Level)
                         {
-                            dev.current_level_int = e.Level;
-                            dev.current_level_txt = e.Level + "%";
-                            dev.last_heard_from = DateTime.Now;
+                            dev.CurrentLevelInt = e.Level;
+                            dev.CurrentLevelText = e.Level + "%";
+                            dev.LastHeardFrom = DateTime.Now;
                             context.SaveChanges();
 
-                            UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
+                            UpdateDeviceValue(dev.DeviceId, "BASIC", e.Level.ToString(), context);
 
                             //Some dimmers take x number of seconds to dim to desired level.  Therefor the level recieved here initially is a 
                             //level between old level and new level. (if going from 0 to 100 we get 84 here).
                             //To get the real level repoll the device a second or two after a level change was recieved.     
                             bool EnableDimmerRepoll = false;
-                            bool.TryParse(device_property_values.GetDevicePropertyValue(context, dev.id, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+                            bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, dev, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
 
                             if (!isPolling)
                             {
                                 //only allow each device to re-poll 1 time.
-                                if (timers.Contains(dev.node_id))
+                                if (timers.Contains(dev.NodeNumber))
                                 {
-                                    Console.WriteLine(string.Format("Timer {0} restarted.", dev.node_id));
-                                    System.Timers.Timer t = (System.Timers.Timer)timers[dev.node_id];
+                                    Console.WriteLine(string.Format("Timer {0} restarted.", dev.NodeNumber));
+                                    System.Timers.Timer t = (System.Timers.Timer)timers[dev.NodeNumber];
                                     t.Stop();
                                     t.Start();
                                 }
                                 else
                                 {
                                     System.Timers.Timer t = new System.Timers.Timer();
-                                    timers.Add(dev.node_id, t);
+                                    timers.Add(dev.NodeNumber, t);
                                     t.Interval = 2000;
                                     t.Elapsed += (s, args) =>
                                     {
                                         ManuallyPollDevice(CTDimmer);
                                         t.Stop();
-                                        Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.node_id));
-                                        timers.Remove(dev.node_id);
+                                        Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.NodeNumber));
+                                        timers.Remove(dev.NodeNumber);
                                     };
                                     t.Start();
-                                    Console.WriteLine(string.Format("Timer {0} started.", dev.node_id));
+                                    Console.WriteLine(string.Format("Timer {0} started.", dev.NodeNumber));
                                 }
                             }
                         }
@@ -1326,17 +1327,17 @@ namespace ThinkStickHIDPlugin
             {
                 BinarySwitch CTSwitch = (BinarySwitch)sender;
 
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.node_id == CTSwitch.NodeID);
+                    Device dev = GetMyPluginsDevices(context).FirstOrDefault(o => o.NodeNumber == CTSwitch.NodeID);
                     if (dev != null)
                     {
-                        dev.current_level_int = e.Level;
-                        dev.current_level_txt = e.Level > 0 ? "ON" : "OFF";
-                        dev.last_heard_from = DateTime.Now;
+                        dev.CurrentLevelInt = e.Level;
+                        dev.CurrentLevelText = e.Level > 0 ? "ON" : "OFF";
+                        dev.LastHeardFrom = DateTime.Now;
                         context.SaveChanges();
 
-                        UpdateDeviceValue(dev.id, "BASIC", e.Level.ToString(), context);
+                        UpdateDeviceValue(dev.DeviceId, "BASIC", e.Level.ToString(), context);
 
                     }
                     else
@@ -1354,7 +1355,7 @@ namespace ThinkStickHIDPlugin
                 };
             bw.RunWorkerCompleted += (s, e) =>
                 {
-                    if(e.Error != null)
+                    if (e.Error != null)
                         WriteToLog(Urgency.INFO, "Level Changed error:" + e.Error);
                 };
             bw.RunWorkerAsync();

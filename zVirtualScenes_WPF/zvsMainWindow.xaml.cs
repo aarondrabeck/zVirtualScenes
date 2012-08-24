@@ -17,10 +17,11 @@ using zVirtualScenes;
 using zVirtualScenesGUI.DeviceControls;
 using zVirtualScenesGUI.Groups;
 using zVirtualScenesGUI.PluginManager;
-using zVirtualScenesModel;
+
 using System.Threading;
 using System.Diagnostics;
 using zVirtualScenes.Backup;
+using zvs.Entities;
 
 namespace zVirtualScenesGUI
 {
@@ -30,7 +31,7 @@ namespace zVirtualScenesGUI
     public partial class zvsMainWindow : Window
     {
         private App app = (App)Application.Current;
-        private zvsLocalDBEntities context;
+        private zvsContext context;
         public WindowState lastOpenedWindowState = WindowState.Normal;
 
         public zvsMainWindow()
@@ -46,7 +47,7 @@ namespace zVirtualScenesGUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
+            context = new zvsContext();
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -64,7 +65,7 @@ namespace zVirtualScenesGUI
             //create a new sort order for the sorting that is done lastly            
             ListSortDirection dir = ListSortDirection.Ascending;
 
-            string direction = program_options.GetProgramOption(context, "LOGDIRECTION");
+            string direction = ProgramOption.GetProgramOption(context, "LOGDIRECTION");
             if (direction != null && direction == "Descending")
                 dir = ListSortDirection.Descending;
 
@@ -176,7 +177,7 @@ namespace zVirtualScenesGUI
 
         private void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
         {
-            builtin_commands cmd = context.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ALL");
+            BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ALL");
             if (cmd != null)
                 cmd.Run(context);
         }

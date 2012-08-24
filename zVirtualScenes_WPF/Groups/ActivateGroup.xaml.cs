@@ -12,7 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.Groups
 {
@@ -21,7 +22,7 @@ namespace zVirtualScenesGUI.Groups
     /// </summary>
     public partial class ActivateGroup : Window
     {
-        private zvsLocalDBEntities context;
+        private zvsContext context;
         private bool isLoaded = false;
 
         public ActivateGroup()
@@ -36,20 +37,20 @@ namespace zVirtualScenesGUI.Groups
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;
-            context = new zvsLocalDBEntities();
-            context.groups.ToList();
+            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
+            context = new zvsContext();
+            context.Groups.ToList();
 
             System.Windows.Data.CollectionViewSource groupViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
-            groupViewSource.Source = context.groups.Local;
+            groupViewSource.Source = context.Groups.Local;
 
             isLoaded = true;
 
             EvaluateSlection();
         }
 
-        void zvsLocalDBEntities_onGroupsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -58,12 +59,12 @@ namespace zVirtualScenesGUI.Groups
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        context.groups.ToList();
+                        context.Groups.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<group>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<Group>())
                             ent.Reload();
                     }
                 }
@@ -72,7 +73,7 @@ namespace zVirtualScenesGUI.Groups
 
         private void ActivateGroup_Closed_1(object sender, EventArgs e)
         {
-            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;
+            zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
             context.Dispose();
         }
 
@@ -83,23 +84,23 @@ namespace zVirtualScenesGUI.Groups
 
         private void AllOnBtn_Click(object sender, RoutedEventArgs e)
         {
-            group g = (group)GroupsCmbBx.SelectedItem;
+            Group g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
             {
-                builtin_commands group_on_cmd = context.builtin_commands.FirstOrDefault(c => c.name == "GROUP_ON");
+                BuiltinCommand group_on_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_ON");
                 if (group_on_cmd != null)
-                    group_on_cmd.Run(context, g.id.ToString());
+                    group_on_cmd.Run(context, g.GroupId.ToString());
             }
         }
 
         private void AllOffBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            group g = (group)GroupsCmbBx.SelectedItem;
+            Group g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
             {
-                builtin_commands group_on_cmd = context.builtin_commands.FirstOrDefault(c => c.name == "GROUP_OFF");
+                BuiltinCommand group_on_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_OFF");
                 if (group_on_cmd != null)
-                    group_on_cmd.Run(context, g.id.ToString());
+                    group_on_cmd.Run(context, g.GroupId.ToString());
             }
         }
 

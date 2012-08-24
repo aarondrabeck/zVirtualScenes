@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes
 {
@@ -129,7 +130,7 @@ namespace zVirtualScenes
             }
 
             //Check DB integrity
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
                 try
                 {
@@ -139,7 +140,7 @@ namespace zVirtualScenes
                         throw new Exception("Database Empty!");
                     }
                 }
-                catch (Exception ex)
+                catch 
                 {
                     return string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following DB: {0}.", Utils.BlankDBNamePlusFullPath);
 
@@ -161,13 +162,13 @@ namespace zVirtualScenes
                     int.TryParse(upgradeScript.Substring(upgradeScript.IndexOf("=") + 1, upgradeScript.IndexOf('\n') - upgradeScript.IndexOf("=")), out new_db_version);
                     try
                     {
-                        using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                        using (zvsContext context = new zvsContext())
                         {
-                            var ver = context.db_info.FirstOrDefault(o => o.info_name == "Version");
+                            var ver = context.DbInfo.FirstOrDefault(o => o.UniqueIdentifier == "Version");
                             if (ver != null)
                             {
                                 int curr_db_version = 1;
-                                int.TryParse(ver.info_value, out curr_db_version);
+                                int.TryParse(ver.Value, out curr_db_version);
 
                                 if (new_db_version > curr_db_version)
                                 {
@@ -214,7 +215,7 @@ namespace zVirtualScenes
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch  
                     {
                         Window WpfBugWindow = new Window()
                         {

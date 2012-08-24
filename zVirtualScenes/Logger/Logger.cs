@@ -90,7 +90,7 @@ namespace zVirtualScenes
             {
                 if (value < 1)
                     value = 1;
-                // ensure Max is allways > min
+                // ensure Max is always > min
                 if (value < CacheMinLogLines)
                     CacheMinLogLines = value - 1;
 
@@ -105,7 +105,7 @@ namespace zVirtualScenes
                 if (value < 0)
                     value = 0;
 
-                // ensure Max is allways > min
+                // ensure Max is always > min
                 if (value > CacheMaxLogLines)
                     CacheMaxLogLines = value + 1;
 

@@ -11,7 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI
 {
@@ -28,9 +29,9 @@ namespace zVirtualScenesGUI
 
         private void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                string direction = program_options.GetProgramOption(context, "LOGDIRECTION");
+                string direction = ProgramOption.GetProgramOption(context, "LOGDIRECTION");
                 if (direction != null && direction == "Descending")
                     DecenLogOrderRadioBtn.IsChecked = true;
                 else
@@ -45,12 +46,12 @@ namespace zVirtualScenesGUI
 
             if (!isLoading)
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    program_options.AddOrEdit(context, new program_options()
+                    ProgramOption.AddOrEdit(context, new ProgramOption()
                     {
-                        name = "LOGDIRECTION",
-                        value = "Ascending"
+                        UniqueIdentifier = "LOGDIRECTION",
+                        Value = "Ascending"
                     });
                 }
             }
@@ -62,12 +63,12 @@ namespace zVirtualScenesGUI
 
             if (!isLoading)
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    program_options.AddOrEdit(context, new program_options()
+                    ProgramOption.AddOrEdit(context, new ProgramOption()
                     {
-                        name = "LOGDIRECTION",
-                        value = "Descending"
+                        UniqueIdentifier = "LOGDIRECTION",
+                        Value = "Descending"
                     });
                 }
             }

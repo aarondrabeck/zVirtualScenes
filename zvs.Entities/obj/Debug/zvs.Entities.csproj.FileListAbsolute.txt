@@ -1,0 +1,7 @@
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\zvs.Entities.dll.config
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\zvs.Entities.dll
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\zvs.Entities.pdb
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\EntityFramework.dll
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\EntityFramework.xml
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Entities.dll
+D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Entities.pdb

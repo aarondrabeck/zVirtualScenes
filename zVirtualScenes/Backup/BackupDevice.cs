@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes.Backup
 {
@@ -21,14 +22,14 @@ namespace zVirtualScenes.Backup
         public static void ExportDevicesAsyc(string PathFileName, Action<string> Callback)
         {
             List<BackupDevice> devices = new List<BackupDevice>();
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (device d in context.devices)
+                foreach (Device d in context.Devices)
                 {
                     devices.Add(new BackupDevice()
                     {
-                        NodeID = d.node_id,
-                        FreindlyName = d.friendly_name
+                        NodeID = d.NodeNumber,
+                        FreindlyName = d.Name
                     });
                 }
             }
@@ -67,14 +68,14 @@ namespace zVirtualScenes.Backup
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
                     devices = (List<BackupDevice>)ScenesSerializer.Deserialize(myFileStream);
                    
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
-                        foreach (device d in context.devices)
+                        foreach (Device d in context.Devices)
                         {
-                            BackupDevice dev = devices.FirstOrDefault(o => o.NodeID == d.node_id);
+                            BackupDevice dev = devices.FirstOrDefault(o => o.NodeID == d.NodeNumber);
                             if (dev != null)
                             {
-                                d.friendly_name = dev.FreindlyName;
+                                d.Name = dev.FreindlyName;
                                 ImportedCount++;
                             }
                         }

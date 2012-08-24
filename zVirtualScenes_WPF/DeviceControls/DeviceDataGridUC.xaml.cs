@@ -13,8 +13,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
 using System.ComponentModel;
-using zVirtualScenesModel;
+
 using System.Collections.ObjectModel;
+using zvs.Entities;
 
 
 namespace zVirtualScenesGUI.DeviceControls
@@ -24,7 +25,7 @@ namespace zVirtualScenesGUI.DeviceControls
     /// </summary>
     public partial class DeviceDataGridUC : UserControl
     {
-        private zvsLocalDBEntities context;
+        private zvsContext context;
 
         public DeviceDataGridUC()
         {
@@ -95,20 +96,20 @@ namespace zVirtualScenesGUI.DeviceControls
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                context = new zvsLocalDBEntities();
+                context = new zvsContext();
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                context.devices.ToList();
-                myCollectionViewSource.Source = context.devices.Local;
+                context.Devices.ToList();
+                myCollectionViewSource.Source = context.Devices.Local;
             }
 
-            zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
-            zvsLocalDBEntities.onGroup_DevicesChanged += zvsLocalDBEntities_onGroup_DevicesChanged;
-            zvsLocalDBEntities.onGroupsChanged += zvsLocalDBEntities_onGroupsChanged;
+            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
+            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
+            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
         }
 
-        void zvsLocalDBEntities_onGroupsChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             if (MinimalistDisplay)
             {
@@ -119,12 +120,12 @@ namespace zVirtualScenesGUI.DeviceControls
                         if (args.ChangeType == System.Data.EntityState.Added)
                         {
                             //Gets new devices
-                            context.groups.ToList();
+                            context.Groups.ToList();
                         }
                         else
                         {
-                            //Reloads context from DB when modifcations happen
-                            foreach (var ent in context.ChangeTracker.Entries<group>())
+                            //Reloads context from DB when modifications happen
+                            foreach (var ent in context.ChangeTracker.Entries<Group>())
                                 ent.Reload();
                         }
                     }
@@ -132,7 +133,7 @@ namespace zVirtualScenesGUI.DeviceControls
             }
         }
 
-        void zvsLocalDBEntities_onGroup_DevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onGroup_DevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             if (MinimalistDisplay)
             {
@@ -143,12 +144,12 @@ namespace zVirtualScenesGUI.DeviceControls
                         if (args.ChangeType == System.Data.EntityState.Added)
                         {
                             //Gets new devices
-                            context.group_devices.ToList();
+                            context.Groups.ToList();
                         }
                         else
                         {
-                            //Reloads context from DB when modifcations happen
-                            foreach (var ent in context.ChangeTracker.Entries<group_devices>())
+                            //Reloads context from DB when modifications happen
+                            foreach (var ent in context.ChangeTracker.Entries<Group>())
                                 ent.Reload();
                         }
                     }
@@ -156,7 +157,7 @@ namespace zVirtualScenesGUI.DeviceControls
             }
         }
 
-        void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onDevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -165,12 +166,12 @@ namespace zVirtualScenesGUI.DeviceControls
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        context.devices.ToList();
+                        context.Devices.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<device>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<Device>())
                             ent.Reload();
                     }
                 }
@@ -179,9 +180,9 @@ namespace zVirtualScenesGUI.DeviceControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
-            zvsLocalDBEntities.onGroup_DevicesChanged -= zvsLocalDBEntities_onGroup_DevicesChanged;
-            zvsLocalDBEntities.onGroupsChanged -= zvsLocalDBEntities_onGroupsChanged;           
+            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
+            zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
+            zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;           
         }
 
         ////User Events
@@ -208,9 +209,9 @@ namespace zVirtualScenesGUI.DeviceControls
             //            {
             //                foreach (device selectedDevice in SelectedItemsCopy)
             //                {
-            //                    device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
+            //                    device d = context.Devices.FirstOrDefault(o => o.id == selectedDevice.id);
             //                    if (d != null)
-            //                        context.devices.Remove(d);
+            //                        context.Devices.Remove(d);
             //                }
 
             //                context.SaveChanges();
@@ -229,14 +230,14 @@ namespace zVirtualScenesGUI.DeviceControls
         {
             if (DeviceGrid.SelectedItems.Count > 0)
             {
-                device[] SelectedItemsCopy = new device[DeviceGrid.SelectedItems.Count];
+                Device[] SelectedItemsCopy = new Device[DeviceGrid.SelectedItems.Count];
                 DeviceGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
-                foreach (device selectedDevice in SelectedItemsCopy)
+                foreach (Device selectedDevice in SelectedItemsCopy)
                 {
-                    device d = context.devices.FirstOrDefault(o => o.id == selectedDevice.id);
+                    Device d = context.Devices.FirstOrDefault(o => o.DeviceId == selectedDevice.DeviceId);
                     if (d != null)
-                        context.devices.Remove(d);
+                        context.Devices.Remove(d);
                 }
                 context.SaveChanges();
             }
@@ -277,11 +278,11 @@ namespace zVirtualScenesGUI.DeviceControls
                 {
                     DataObject dataObject = new DataObject("objects", DeviceGrid.SelectedItems);
 
-                    var devices = DeviceGrid.SelectedItems.OfType<device>().ToList();
+                    var devices = DeviceGrid.SelectedItems.OfType<Device>().ToList();
                     if (devices.Count > 0)
                         dataObject.SetData("deviceList", devices);
 
-                    var scenes = DeviceGrid.SelectedItems.OfType<scene>().ToList();
+                    var scenes = DeviceGrid.SelectedItems.OfType<Scene>().ToList();
                     if (scenes.Count > 0)
                         dataObject.SetData("sceneList", scenes);
 
@@ -300,10 +301,10 @@ namespace zVirtualScenesGUI.DeviceControls
             }
         }
 
-        private void OpenDeviceDetails(device d)
+        private void OpenDeviceDetails(Device d)
         {
             App app = (App)Application.Current;
-            DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.id);
+            DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.DeviceId);
             deviceDetailsWindow.Owner = app.zvsWindow;
             deviceDetailsWindow.Show();
         }
@@ -311,9 +312,9 @@ namespace zVirtualScenesGUI.DeviceControls
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is device)
+            if (obj is Device)
             {
-                var device = (device)obj;
+                var device = (Device)obj;
                 if (device != null)
                 {
                     OpenDeviceDetails(device);
@@ -345,10 +346,10 @@ namespace zVirtualScenesGUI.DeviceControls
 
         private bool filter(object item)
         {
-            if (item is device)
+            if (item is Device)
             {
-                device d = (device)item;
-                if (d.friendly_name.ToLower().Contains(_searchstr.ToLower()))
+                Device d = (Device)item;
+                if (d.Name.ToLower().Contains(_searchstr.ToLower()))
                 {
                     return true;
                 }

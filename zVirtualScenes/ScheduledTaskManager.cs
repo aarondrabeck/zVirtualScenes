@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading;
 using System.Windows.Data;
 using System.Windows.Threading;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes
 {
     public class ScheduledTaskManager : IDisposable
     {
-        private List<scheduled_tasks> scheduledTasks = new List<scheduled_tasks>();
+        private List<ScheduledTask> scheduledTasks = new List<ScheduledTask>();
         private Timer TaskTimer;
 
         #region Events
@@ -39,110 +40,109 @@ namespace zVirtualScenes
 
         public ScheduledTaskManager()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
                 lock (scheduledTasks)
                 {
-                    scheduledTasks = context.scheduled_tasks.ToList();
+                    scheduledTasks = context.ScheduledTasks.ToList();
                 }
             }
 
             //Keep the local context in sync with other contexts
-            zvsLocalDBEntities.onScheduledTasksChanged += zvsLocalDBEntities_onScheduledTasksChanged;
+            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
 
             TaskTimer = new Timer((state) =>
             {
                 lock (scheduledTasks)
                 {
-                    foreach (scheduled_tasks task in scheduledTasks)
+                    foreach (ScheduledTask task in scheduledTasks)
                     {
                         #region Actions
                         if (task.isEnabled)
                         {
-                            if (task.Frequency.HasValue)
+
+                            switch (task.Frequency)
                             {
-                                switch ((scheduled_tasks.frequencys)task.Frequency)
-                                {
-                                    case scheduled_tasks.frequencys.Seconds:
+                                case TaskFrequency.Seconds:
+                                    {
+                                        if (task.StartTime.HasValue && task.RecurSeconds.Value > 0)
                                         {
-                                            if (task.startTime.HasValue && task.RecurSeconds.Value > 0)
+                                            int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                            if (sec % task.RecurSeconds.Value == 0)
+                                                RunTask(task);
+                                        }
+                                        break;
+                                    }
+                                case TaskFrequency.Daily:
+                                    {
+                                        if (task.StartTime.HasValue && task.RecurDays.HasValue && task.RecurDays.Value > 0)
+                                        {
+                                            //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
+                                            if (task.RecurDays.Value > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays.Value == 0))
                                             {
-                                                int sec = (int)(DateTime.Now - task.startTime.Value).TotalSeconds;
-                                                if (sec % task.RecurSeconds.Value == 0)
+                                                TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                                TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
+
+                                                //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
+                                                if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
                                                     RunTask(task);
                                             }
-                                            break;
                                         }
-                                    case scheduled_tasks.frequencys.Daily:
+                                        break;
+                                    }
+                                case TaskFrequency.Weekly:
+                                    {
+                                        if (task.StartTime.HasValue && task.RecurWeeks.HasValue && task.RecurWeeks.Value > 0)
                                         {
-                                            if (task.startTime.HasValue && task.RecurDays.HasValue && task.RecurDays.Value > 0)
+                                            if (task.RecurWeeks.Value > 0 && (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks.Value == 0))  //IF RUN THIS WEEK
                                             {
-                                                //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
-                                                if (task.RecurDays.Value > 0 && ((DateTime.Now.Date - task.startTime.Value.Date).TotalDays % task.RecurDays.Value == 0))
+                                                if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                                 {
                                                     TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                    TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
+                                                    TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                                    //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
-                                                    if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
+                                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
                                                         RunTask(task);
                                                 }
                                             }
-                                            break;
                                         }
-                                    case scheduled_tasks.frequencys.Weekly:
+                                        break;
+                                    }
+                                case TaskFrequency.Monthly:
+                                    {
+                                        if (task.StartTime.HasValue && task.RecurMonth.HasValue && task.RecurMonth.Value > 0)
                                         {
-                                            if (task.startTime.HasValue && task.RecurWeeks.HasValue && task.RecurWeeks.Value > 0)
+                                            int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
+                                            //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
+                                            if (task.RecurMonth.Value > 0 && monthsapart > -1 && monthsapart % task.RecurMonth.Value == 0)  //IF RUN THIS Month
                                             {
-                                                if (task.RecurWeeks.Value > 0 && (((Int32)(DateTime.Now.Date - task.startTime.Value.Date).TotalDays / 7) % task.RecurWeeks.Value == 0))  //IF RUN THIS WEEK
+                                                if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
                                                 {
-                                                    if (ShouldRunToday(task))  //IF RUN THIS DAY 
-                                                    {
-                                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                        TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
+                                                    TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                                    TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                                        if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
-                                                            RunTask(task);
-                                                    }
+                                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                        RunTask(task);
                                                 }
                                             }
-                                            break;
                                         }
-                                    case scheduled_tasks.frequencys.Monthly:
+
+                                        break;
+                                    }
+                                case TaskFrequency.Once:
+                                    {
+                                        if (task.StartTime.HasValue)
                                         {
-                                            if (task.startTime.HasValue && task.RecurMonth.HasValue && task.RecurMonth.Value > 0)
-                                            {
-                                                int monthsapart = ((DateTime.Now.Year - task.startTime.Value.Year) * 12) + DateTime.Now.Month - task.startTime.Value.Month;
-                                                //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
-                                                if (task.RecurMonth.Value > 0 && monthsapart > -1 && monthsapart % task.RecurMonth.Value == 0)  //IF RUN THIS Month
-                                                {
-                                                    if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
-                                                    {
-                                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                        TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
+                                            TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                            TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                                                        if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
-                                                            RunTask(task);
-                                                    }
-                                                }
-                                            }
-
-                                            break;
+                                            if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                RunTask(task);
                                         }
-                                    case scheduled_tasks.frequencys.Once:
-                                        {
-                                            if (task.startTime.HasValue)
-                                            {
-                                                TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
-
-                                                if (TimeNowToTheSeconds.Equals(task.startTime.Value.TimeOfDay))
-                                                    RunTask(task);
-                                            }
-                                            break;
-                                        }
-                                }
+                                        break;
+                                    }
                             }
+
                         }
                         #endregion
                     }
@@ -153,27 +153,27 @@ namespace zVirtualScenes
 
         public void Dispose()
         {
-            zvsLocalDBEntities.onScheduledTasksChanged -= zvsLocalDBEntities_onScheduledTasksChanged;
+            zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
             TaskTimer.Dispose();
         }
 
-        void zvsLocalDBEntities_onScheduledTasksChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (s, a) =>
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
                     lock (scheduledTasks)
                     {
-                        scheduledTasks = context.scheduled_tasks.ToList();
+                        scheduledTasks = context.ScheduledTasks.ToList();
                     }
                 }
             };
             bw.RunWorkerAsync();
         }
 
-        private bool ShouldRunThisDayOfMonth(scheduled_tasks task)
+        private bool ShouldRunThisDayOfMonth(ScheduledTask task)
         {
             switch (DateTime.Now.Day)
             {
@@ -274,70 +274,77 @@ namespace zVirtualScenes
             return false;
         }
 
-        private void RunTask(scheduled_tasks task)
+        private void RunTask(ScheduledTask task)
         {
-            scene scene = null;
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-            {
-                scene = context.scenes.FirstOrDefault(s => s.id == task.SceneID);
-            }
+            Scene scene = null;
+            ScheduledTask _task = null;
 
-            if (scene == null)
+            using (zvsContext context = new zvsContext())
             {
-                if (onScheduledTaskBegin != null)
-                {
-                    onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(task.id,
-                        string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", task.friendly_name, task.SceneID)
-                        , true));
-                }
-            }
-            else
-            {
-                SceneRunner sr = new SceneRunner();
+                _task = context.ScheduledTasks.FirstOrDefault(o => o.ScheduledTaskId == task.ScheduledTaskId);
+                
+                if (_task == null)
+                    return;
 
-                SceneRunner.onSceneRunEventHandler startHandler = null;
-                startHandler = (s, args) =>
+                scene = context.Scenes.FirstOrDefault(s => s.SceneId == _task.Scene.SceneId);
+
+                if (scene == null)
                 {
-                    if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                    if (onScheduledTaskBegin != null)
                     {
-                        SceneRunner.onSceneRunBegin -= startHandler;
+                        onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
+                            string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", _task.Name, _task.Scene.SceneId)
+                            , true));
+                    }
+                }
+                else
+                {
+                    SceneRunner sr = new SceneRunner();
 
-                        if (onScheduledTaskBegin != null)
+                    SceneRunner.onSceneRunEventHandler startHandler = null;
+                    startHandler = (s, args) =>
+                    {
+                        if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
                         {
-                            onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(task.id,
-                                string.Format("Task '{0}' started. Result: {1}", task.friendly_name, args.Details)
-                                , false));
+                            SceneRunner.onSceneRunBegin -= startHandler;
+
+                            if (onScheduledTaskBegin != null)
+                            {
+                                onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
+                                    string.Format("Task '{0}' started. Result: {1}", _task.Name, args.Details)
+                                    , false));
+                            }
+
+                            #region LISTEN FOR ENDING
+                            SceneRunner.onSceneRunEventHandler handler = null;
+                            handler = (se, end_args) =>
+                            {
+                                if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                {
+                                    SceneRunner.onSceneRunComplete -= handler;
+
+                                    if (onScheduledTaskEnd != null)
+                                    {
+                                        onScheduledTaskEnd(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
+                                            string.Format("Task '{0}' ended. Result: {1}", _task.Name, end_args.Details)
+                                            , end_args.Errors));
+                                    }
+                                }
+                            };
+                            SceneRunner.onSceneRunComplete += handler;
+                            #endregion
                         }
 
-                        #region LISTEN FOR ENDING
-                        SceneRunner.onSceneRunEventHandler handler = null;
-                        handler = (se, end_args) =>
-                        {
-                            if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                            {
-                                SceneRunner.onSceneRunComplete -= handler;
 
-                                if (onScheduledTaskEnd != null)
-                                {
-                                    onScheduledTaskEnd(this, new onScheduledTaskStartEventArgs(task.id,
-                                        string.Format("Task '{0}' ended. Result: {1}", task.friendly_name, end_args.Details)
-                                        , end_args.Errors));
-                                }
-                            }
-                        };
-                        SceneRunner.onSceneRunComplete += handler;
-                        #endregion
-                    }
+                    };
+                    SceneRunner.onSceneRunBegin += startHandler;
 
-
-                };
-                SceneRunner.onSceneRunBegin += startHandler;
-
-                sr.RunScene(scene.id);
+                    sr.RunScene(scene.SceneId);
+                }
             }
         }
 
-        private bool ShouldRunToday(scheduled_tasks task)
+        private bool ShouldRunToday(ScheduledTask task)
         {
             switch (DateTime.Now.DayOfWeek)
             {

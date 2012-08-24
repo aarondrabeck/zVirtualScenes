@@ -15,7 +15,7 @@
         <ComboBox Grid.Column="1" Height="28" VerticalContentAlignment="Center" MinWidth="75" Name="ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,5,0" Padding="5,1" SelectionChanged="ComboBox_SelectionChanged_1" />
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Grid.Column="2">
             <TextBlock Name="NameTxt" TextTrimming="CharacterEllipsis"  Text="Name" HorizontalAlignment="Left" Padding="0" Margin="5,0"/>
-            <TextBlock Name="DescTxt" TextTrimming="CharacterEllipsis" Text="Long description of what this does." HorizontalAlignment="Left" Padding="0" Margin="10,0" FontSize="9"/>
+            <TextBlock Name="DescTxt" TextTrimming="CharacterEllipsis" Text="Long Description of what this does." HorizontalAlignment="Left" Padding="0" Margin="10,0" FontSize="9"/>
         </StackPanel>
 
     </Grid>

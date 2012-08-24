@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes.Backup
 {
@@ -28,20 +29,18 @@ namespace zVirtualScenes.Backup
         public static void ExportTriggerAsyc(string PathFileName, Action<string> Callback)
         {
             List<BackupTrigger> triggers = new List<BackupTrigger>();
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (device_value_triggers trigger in context.device_value_triggers)
+                foreach (DeviceValueTrigger trigger in context.DeviceValueTriggers)
                 {
                     BackupTrigger triggerBackup = new BackupTrigger();
                     triggerBackup.Name = trigger.Name;
-                    triggerBackup.Enabled = trigger.enabled;
-                    triggerBackup.DeviceValueName = trigger.device_values.label_name;
-                    triggerBackup.NodeID = trigger.device_values.device.node_id;
-                    triggerBackup.sceneName = trigger.scene.friendly_name;
-                    triggerBackup.trigger_operator = trigger.trigger_operator;
-                    triggerBackup.trigger_type = trigger.trigger_type;
-                    triggerBackup.trigger_script = trigger.trigger_script;
-                    triggerBackup.value = trigger.trigger_value;
+                    triggerBackup.Enabled = trigger.isEnabled;
+                    triggerBackup.DeviceValueName = trigger.DeviceValue.Name;
+                    triggerBackup.NodeID = trigger.DeviceValue.Device.NodeNumber;
+                    triggerBackup.sceneName = trigger.Scene.Name;
+                    triggerBackup.trigger_operator = (int?)trigger.Operator;
+                    triggerBackup.value = trigger.Value;
                     triggers.Add(triggerBackup);
                 }
             }
@@ -82,27 +81,25 @@ namespace zVirtualScenes.Backup
                     triggers = (List<BackupTrigger>)ScenesSerializer.Deserialize(myFileStream);
                    
 
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
                         foreach (BackupTrigger backupTrigger in triggers)
                         {
-                            scene s = context.scenes.FirstOrDefault(o => o.friendly_name == backupTrigger.sceneName);
-                            device d = context.devices.FirstOrDefault(o => o.node_id == backupTrigger.NodeID);
+                            Scene s = context.Scenes.FirstOrDefault(o => o.Name == backupTrigger.sceneName);
+                            Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupTrigger.NodeID);
                             if (d != null && s != null)
                             {
-                                device_values dv = d.device_values.FirstOrDefault(o => o.label_name == backupTrigger.DeviceValueName);
+                                DeviceValue dv = d.Values.FirstOrDefault(o => o.Name == backupTrigger.DeviceValueName);
                                 if (dv != null)
                                 {
-                                    device_value_triggers trigger = new device_value_triggers();
-                                    trigger.device_value_id = dv.id;
-                                    trigger.enabled = backupTrigger.Enabled;
+                                    DeviceValueTrigger trigger = new DeviceValueTrigger();
+                                    trigger.DeviceValue = dv;
+                                    trigger.isEnabled = backupTrigger.Enabled;
                                     trigger.Name = backupTrigger.Name;
-                                    trigger.scene_id = s.id;
-                                    trigger.trigger_operator = backupTrigger.trigger_operator;
-                                    trigger.trigger_script = backupTrigger.trigger_script;
-                                    trigger.trigger_type = backupTrigger.trigger_type;
-                                    trigger.trigger_value = backupTrigger.value;
-                                    context.device_value_triggers.Add(trigger);
+                                    trigger.Scene = s;
+                                    trigger.Operator = (TriggerOperator)backupTrigger.trigger_operator;
+                                    trigger.Value = backupTrigger.value;
+                                    context.DeviceValueTriggers.Add(trigger);
                                     ImportedCount++; 
                                 }
                             }

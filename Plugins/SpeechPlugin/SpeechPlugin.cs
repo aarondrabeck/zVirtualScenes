@@ -4,48 +4,49 @@ using System.Speech.Synthesis;
 using System.Collections.Generic;
 using System.Linq;
 using zVirtualScenes;
-using zVirtualScenesModel;
+
 using System.ComponentModel;
+using zvs.Entities;
 
 namespace SpeechPlugin
 {
-    [Export(typeof(Plugin))]
-    public class SpeechPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class SpeechPlugin : zvsPlugin
     {
         private SpeechSynthesizer _synth;
 
         public SpeechPlugin()
             : base("SPEECH",
-               "Speech Annouce Plugin",
+               "Speech Announce Plug-in",
                 "This plug-in will announce when zVirtualScene devices change values. It can be customized to announce only desired value changes."
                 ) { }
 
         public override void Initialize()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                plugin_settings ps = new plugin_settings
+                PluginSetting ps = new PluginSetting
                 {
-                    name = "ANNOUCEOPTIONS",
-                    friendly_name = "Announce options",
-                    value = "Level",
-                    value_data_type = (int)Data_Types.LIST,
-                    description = "Select the values you would like announced."
+                    UniqueIdentifier = "ANNOUCEOPTIONS",                    
+                    Name = "Announce options",
+                    Value = "Level",
+                    ValueType = DataType.LIST,
+                    Description = "Select the values you would like announced."
                 };
-                ps.plugin_setting_options.Add(new plugin_setting_options { options = "Switch Level" });
-                ps.plugin_setting_options.Add(new plugin_setting_options { options = "Dimmer Level" });
-                ps.plugin_setting_options.Add(new plugin_setting_options { options = "Thermostat Operating State and Temp" });
-                ps.plugin_setting_options.Add(new plugin_setting_options { options = "All of the above" });
-                ps.plugin_setting_options.Add(new plugin_setting_options { options = "Custom" });
+                ps.Options.Add(new PluginSettingOption { Name = "Switch Level" });
+                ps.Options.Add(new PluginSettingOption { Name = "Dimmer Level" });
+                ps.Options.Add(new PluginSettingOption { Name = "Thermostat Operating State and Temp" });
+                ps.Options.Add(new PluginSettingOption { Name = "All of the above" });
+                ps.Options.Add(new PluginSettingOption { Name = "Custom" });
                 DefineOrUpdateSetting(ps, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "CUSTOMVALUES",
-                    friendly_name = "Announce on custom values",
-                    value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
-                    value_data_type = (int)Data_Types.STRING,
-                    description = "Include all values you would like announced. (DEVICE_TYPE_NAME:VALUE_LABEL_NAME) Comma Seperated."
+                    UniqueIdentifier = "CUSTOMVALUES",
+                    Name = "Announce on custom values",
+                    Value = "DIMMER:Basic, THERMOSTAT:Temperature, SWITCH:Basic, THERMOSTAT:Operating State",
+                    ValueType = DataType.STRING,
+                    Description = "Include all values you would like announced. (DEVICE_TYPE_NAME:VALUE_LABEL_NAME) Comma Separated."
                 }, context);
             }
         }
@@ -53,49 +54,42 @@ namespace SpeechPlugin
         protected override void StartPlugin()
         {
             _synth = new SpeechSynthesizer();
-            device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " started");
+            DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
+            WriteToLog(Urgency.INFO, this.Name + " started");
             _synth.SpeakAsync("Speech Started!");
             IsReady = true;
         }
 
         protected override void StopPlugin()
         {
-            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
-            WriteToLog(Urgency.INFO, this.Friendly_Name + " stopped");
+            DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
+            WriteToLog(Urgency.INFO, this.Name + " stopped");
             _synth.Dispose();
             IsReady = false;
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
-        {
-        }
-        public override void ProcessDeviceCommand(device_command_que cmd)
-        {
-        }
-        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
-        {
-        }
-        public override void Repoll(device device)
-        {
-        }
-        public override void ActivateGroup(int groupID)
-        {
-        }
-        public override void DeactivateGroup(int groupID)
-        {
-        }
+        protected override void SettingChanged(string settingsettingUniqueIdentifier, string settingValue) { }
 
-        void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
+        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
+
+        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
+
+        public override void Repoll(zvs.Entities.Device device) { }
+
+        public override void ActivateGroup(int groupID) { }
+
+        public override void DeactivateGroup(int groupID) { }
+
+        private void DeviceValue_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
         {
             if (IsReady)
             {
                 BackgroundWorker bw = new BackgroundWorker();
                 bw.DoWork += (s, a) =>
                 {
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
-                        device_values dv = context.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                        DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
                         if (dv != null)
                         {
 
@@ -103,30 +97,30 @@ namespace SpeechPlugin
 
                             if (user_selected_announce_option == "Switch Level" || user_selected_announce_option == "All of the above")
                             {
-                                if (dv.device.device_types.name == "SWITCH" && dv.label_name == "Basic")
+                                if (dv.Device.Type.UniqueIdentifier == "SWITCH" && dv.Name == "Basic")
                                 {
-                                    _synth.SpeakAsync(dv.device.friendly_name + " switched " + (dv.value2 == "255" ? "On" : "Off") + ".");
+                                    _synth.SpeakAsync(dv.Device.Name + " switched " + (dv.Value == "255" ? "On" : "Off") + ".");
                                 }
                             }
 
                             if (user_selected_announce_option == "Dimmer Level" || user_selected_announce_option == "All of the above")
                             {
-                                if (dv.device.device_types.name == "DIMMER" && dv.label_name == "Level")
+                                if (dv.Device.Type.UniqueIdentifier == "DIMMER" && dv.Name == "Level")
                                 {
-                                    _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
+                                    _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                                 }
                             }
 
                             if (user_selected_announce_option == "Thermostat Operating State and Temp" || user_selected_announce_option == "All of the above")
                             {
-                                if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Temperature")
+                                if (dv.Device.Type.UniqueIdentifier == "THERMOSTAT" && dv.Name == "Temperature")
                                 {
-                                    _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
+                                    _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                                 }
 
-                                if (dv.device.device_types.name == "THERMOSTAT" && dv.label_name == "Operating State")
+                                if (dv.Device.Type.UniqueIdentifier == "THERMOSTAT" && dv.Name == "Operating State")
                                 {
-                                    _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
+                                    _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                                 }
                             }
                             if (user_selected_announce_option == "Custom")
@@ -135,10 +129,10 @@ namespace SpeechPlugin
 
                                 foreach (string objTypeValuespair in objTypeValuespairs)
                                 {
-                                    string thisEvent = dv.device.device_types.name + ":" + dv.label_name;
+                                    string thisEvent = dv.Device.Type.UniqueIdentifier + ":" + dv.Name;
 
                                     if (thisEvent.Equals(objTypeValuespair.Trim()))
-                                        _synth.SpeakAsync(dv.device.friendly_name + " " + dv.label_name + " changed to " + dv.value2 + ".");
+                                        _synth.SpeakAsync(dv.Device.Name + " " + dv.Name + " changed to " + dv.Value + ".");
                                 }
                             }
                         }
@@ -147,5 +141,7 @@ namespace SpeechPlugin
                 bw.RunWorkerAsync();
             }
         }
+
+
     }
 }

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
+             d:DesignHeight="300" d:DesignWidth="300" xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities"
              Loaded="UserControl_Loaded" 
              PreviewMouseRightButtonDown="UserControl_PreviewMouseRightButtonDown" Unloaded="UserControl_Unloaded_1" >
     <UserControl.Resources>
@@ -20,7 +20,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:device, CreateList=True}">
+        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:Device, CreateList=True}">
         </CollectionViewSource>
         <Style x:Key="Body_Hoz_Center"
         TargetType="{x:Type DataGridCell}">
@@ -75,24 +75,24 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn SortMemberPath="device_types.friendly_name" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False">
+                <DataGridTemplateColumn SortMemberPath="Type.Name" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <Image Name="img" Width="35" Height="35" Source="/zVirtualScenesGUI;component/Images/20radio.png" Margin="5,0" />
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="THERMOSTAT">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="THERMOSTAT">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/thermometer.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="DIMMER">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="DIMMER">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/bulb.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="SWITCH">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="SWITCH">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/switch.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="CONTROLLER">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="CONTROLLER">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/controler.png"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name, UpdateSourceTrigger=PropertyChanged}" Value="DOORLOCK">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="DOORLOCK">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenesGUI;component/Images/doorlock.png"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -101,7 +101,7 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn x:Name="DeviceTypeCol" CellStyle="{StaticResource Body_Hoz_Center}" Width="150" MinWidth="50" Header="Type" 
-                                    Binding="{Binding Path=device_types.friendly_name}" IsReadOnly="True" >
+                                    Binding="{Binding Path=Type.Name}" IsReadOnly="True" >
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -109,7 +109,7 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridTextColumn MinWidth="200" Width="*" Header="Name" FontSize="14" Binding="{Binding friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
+                <DataGridTextColumn MinWidth="200" Width="*" Header="Name" FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -123,17 +123,17 @@
 
                         <DataTemplate>
 
-                            <ComboBox x:Name="GroupsCmbBox" ItemsSource="{Binding Path=group_devices}" SelectedIndex="0" Margin="5,0">
+                            <ComboBox x:Name="GroupsCmbBox" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Path=group.name}"/>
+                                        <TextBlock Text="{Binding Path=Name}"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ComboBox>
 
                             <DataTemplate.Triggers>
 
-                                <DataTrigger Binding="{Binding Path=group_devices.Count}" Value="0">
+                                <DataTrigger Binding="{Binding Path=Groups.Count}" Value="0">
                                     <Setter TargetName="GroupsCmbBox" Property="Visibility" Value="Hidden"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -151,7 +151,7 @@
                                     <ColumnDefinition Width="55"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Name="LevelTxtBlock"  Text="{Binding current_level_txt, NotifyOnTargetUpdated=True}" Background="Transparent" FontSize="18" VerticalAlignment="Center" TextAlignment="Center">
+                                <TextBlock Name="LevelTxtBlock"  Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent" FontSize="18" VerticalAlignment="Center" TextAlignment="Center">
                                     <TextBlock.Triggers>
                                         <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                             <BeginStoryboard>
@@ -163,17 +163,17 @@
                                         </EventTrigger>
                                     </TextBlock.Triggers>
                                 </TextBlock>
-                                <ProgressBar  Name="LevelProgressBr" Value="{Binding current_level_int}" Grid.Column="1" Height="20" Opacity="6" Margin="3,0,0,0" />
+                                <ProgressBar  Name="LevelProgressBr" Value="{Binding CurrentLevelInt}" Grid.Column="1" Height="20" Opacity="6" Margin="3,0,0,0" />
                             </Grid>
                             <DataTemplate.Triggers>
 
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="THERMOSTAT">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="THERMOSTAT">
                                     <Setter TargetName="LevelProgressBr" Property="Foreground" Value="#FF0088DE"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="CONTROLLER">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="CONTROLLER">
                                     <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=device_types.name}" Value="DOORLOCK">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="DOORLOCK">
                                     <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -182,9 +182,9 @@
                 </DataGridTemplateColumn>
 
                 <DataGridTextColumn x:Name="DateCol" CellStyle="{StaticResource Body_Hoz_Center}" Header="Last Repoll" Width="140" MinWidth="140" MaxWidth="140" 
-                                    Binding="{Binding last_heard_from}" IsReadOnly="True" FontSize="12" />
+                                    Binding="{Binding LastHeardFrom}" IsReadOnly="True" FontSize="12" />
 
-                <DataGridTextColumn x:Name="NodeID" CellStyle="{StaticResource Body_Hoz_Center}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding node_id}" IsReadOnly="True" 
+                <DataGridTextColumn x:Name="NodeID" CellStyle="{StaticResource Body_Hoz_Center}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
                                     CanUserResize="False" CanUserReorder="True"  FontSize="14" />
 
                 <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False">

@@ -13,8 +13,9 @@ using System.Windows.Shapes;
 using zVirtualScenesGUI.DeviceControls;
 using System.Data.Objects;
 using System.ComponentModel;
-using zVirtualScenesModel;
+
 using System.Diagnostics;
+using zvs.Entities;
 
 namespace zVirtualScenesGUI.Groups
 {
@@ -23,7 +24,7 @@ namespace zVirtualScenesGUI.Groups
     /// </summary>
     public partial class GroupEditor : Window
     {
-        private zvsLocalDBEntities context;
+        private zvsContext context;
 
         public GroupEditor()
         {
@@ -37,32 +38,32 @@ namespace zVirtualScenesGUI.Groups
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
-            zvsLocalDBEntities.onDevicesChanged += zvsLocalDBEntities_onDevicesChanged;
+            context = new zvsContext();
+            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
 
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
-                context.groups.ToList();
-                context.devices.ToList();
-                groupsViewSource.Source = context.groups.Local;
-            }            
+                context.Groups.ToList();
+                context.Devices.ToList();
+                groupsViewSource.Source = context.Groups.Local;
+            }
 
             DeviceLst.MinimalistDisplay = false;
 
             EvaluateRemoveBtnUsability();
             EvaluateAddEditBtnsUsability();
-            EvaluategroupsDevicesLstVwEnable();            
+            EvaluategroupsDevicesLstVwEnable();
         }
 
         private void GroupEditor_Closed_1(object sender, EventArgs e)
         {
-            zvsLocalDBEntities.onDevicesChanged -= zvsLocalDBEntities_onDevicesChanged;
+            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
             context.Dispose();
         }
 
-        void zvsLocalDBEntities_onDevicesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onDevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -70,8 +71,8 @@ namespace zVirtualScenesGUI.Groups
                 {
                     if (args.ChangeType != System.Data.EntityState.Added)
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<device>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<Device>())
                             ent.Reload();
                     }
                 }
@@ -99,30 +100,30 @@ namespace zVirtualScenesGUI.Groups
 
             if (nameWindow.ShowDialog() ?? false)
             {
-                group new_g = new group()
+                Group new_g = new Group()
                 {
-                    name = nameWindow.GroupName
+                    Name = nameWindow.GroupName
                 };
 
-                context.groups.Local.Add(new_g);
+                context.Groups.Local.Add(new_g);
                 context.SaveChanges();
 
-                GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<group>().FirstOrDefault(o => o.name == new_g.name);
+                GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<Group>().FirstOrDefault(o => o.Name == new_g.Name);
 
             }
         }
 
         private void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
-            group g = (group)GroupCmbBx.SelectedItem;
+            Group g = (Group)GroupCmbBx.SelectedItem;
             if (g != null)
             {
                 if (
-                    MessageBox.Show("Are you sure you want to delete the '" + g.name + "' group?",
+                    MessageBox.Show("Are you sure you want to delete the '" + g.Name + "' group?",
                                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
 
-                    context.groups.Local.Remove(g);
+                    context.Groups.Local.Remove(g);
                     context.SaveChanges();
                 }
             }
@@ -131,15 +132,15 @@ namespace zVirtualScenesGUI.Groups
 
         private void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            group g = (group)GroupCmbBx.SelectedItem;
+            Group g = (Group)GroupCmbBx.SelectedItem;
             if (g != null)
             {
-                GroupNameEditor nameWindow = new GroupNameEditor(g.name);
+                GroupNameEditor nameWindow = new GroupNameEditor(g.Name);
                 nameWindow.Owner = this;
 
                 if (nameWindow.ShowDialog() ?? false)
                 {
-                    g.name = nameWindow.GroupName;
+                    g.Name = nameWindow.GroupName;
                     context.SaveChanges();
                 }
             }
@@ -147,7 +148,7 @@ namespace zVirtualScenesGUI.Groups
 
         private void groupsDevicesLstVw_DragOver(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<device>))
+            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
                 e.Effects = DragDropEffects.Link;
             }
@@ -156,36 +157,34 @@ namespace zVirtualScenesGUI.Groups
 
         private void groupsDevicesLstVw_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<device>))
+            if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
-                List<device> devices = (List<device>)e.Data.GetData("deviceList");
+                List<Device> devices = (List<Device>)e.Data.GetData("deviceList");
 
-                group selected_group = (group)GroupCmbBx.SelectedItem;
+                Group selected_group = (Group)GroupCmbBx.SelectedItem;
                 if (selected_group != null)
                 {
                     groupsDevicesLstVw.SelectedItems.Clear();
 
-                    foreach (device device in devices)
+                    foreach (Device device in devices)
                     {
-                        //If not already in the group...
-                        if (!selected_group.group_devices.Any(o => o.device_id == device.id && o.group_id == selected_group.id))
+                        Device d2 = context.Devices.FirstOrDefault(o => o.DeviceId == device.DeviceId); ;
+                        if (d2 != null)
                         {
-                            group_devices gd = new group_devices
+                            //If not already in the group...
+                            if (!selected_group.Devices.Contains(d2))
                             {
-                                device_id = device.id,
-                                group_id = selected_group.id
-                            };
-
-                            context.group_devices.Local.Add(gd);
-                            groupsDevicesLstVw.SelectedItems.Add(gd);
-                            DeviceLst.DeviceGrid.SelectedItems.Clear();
-                        }
-                        else
-                        {
-                            MessageBox.Show(string.Format("{0} is already a member of the '{1}' group.", device.friendly_name, selected_group.name),
-                                            "Already a member",
-                                            MessageBoxButton.OK,
-                                            MessageBoxImage.Error);
+                                selected_group.Devices.Add(d2);
+                                groupsDevicesLstVw.SelectedItems.Add(d2);
+                                DeviceLst.DeviceGrid.SelectedItems.Clear();
+                            }
+                            else
+                            {
+                                MessageBox.Show(string.Format("{0} is already a member of the '{1}' group.", device.Name, selected_group.Name),
+                                                "Already a member",
+                                                MessageBoxButton.OK,
+                                                MessageBoxImage.Error);
+                            }
                         }
                     }
                     context.SaveChanges();
@@ -212,25 +211,23 @@ namespace zVirtualScenesGUI.Groups
 
         private void RemoveSelectedGroupDevices()
         {
-            group selected_group = (group)GroupCmbBx.SelectedItem;
+            Group selected_group = (Group)GroupCmbBx.SelectedItem;
             if (selected_group != null && groupsDevicesLstVw.SelectedItems.Count > 0)
             {
-                group_devices[] SelectedItemsCopy = new group_devices[groupsDevicesLstVw.SelectedItems.Count];
-                groupsDevicesLstVw.SelectedItems.CopyTo(SelectedItemsCopy, 0);
-
                 if (MessageBox.Show(string.Format("Are you sure you want to remove the {0} selected devices from this group?", groupsDevicesLstVw.SelectedItems.Count),
                                          "Remove Devices?",
                                          MessageBoxButton.YesNo,
                                          MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
+                    Device[] devicesToRemove = new Device[groupsDevicesLstVw.SelectedItems.Count];
+                    groupsDevicesLstVw.SelectedItems.CopyTo(devicesToRemove, 0);
 
-                    foreach (group_devices gd in SelectedItemsCopy)
-                        context.group_devices.Remove(gd);
+                    foreach (Device gd in devicesToRemove)
+                        selected_group.Devices.Remove(gd);
+
                     context.SaveChanges();
                 }
             }
-
-
         }
 
         private void groupsDevicesLstVw_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -260,6 +257,6 @@ namespace zVirtualScenesGUI.Groups
                 groupsDevicesLstVw.IsEnabled = true;
         }
 
-        
+
     }
 }

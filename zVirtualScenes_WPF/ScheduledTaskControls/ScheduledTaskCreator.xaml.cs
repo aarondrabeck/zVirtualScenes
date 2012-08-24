@@ -14,7 +14,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.ScheduledTaskControls
 {
@@ -23,7 +24,7 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
     /// </summary>
     public partial class ScheduledTaskCreator : UserControl
     {
-        private zvsLocalDBEntities context;
+        private zvsContext context;
 
         public ScheduledTaskCreator()
         {
@@ -35,22 +36,22 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
             //Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                context = new zvsLocalDBEntities();
+                context = new zvsContext();
 
                 //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["scheduled_tasksViewSource"];
-                myCollectionViewSource.Source = context.scheduled_tasks.Local;
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
+                myCollectionViewSource.Source = context.ScheduledTasks.Local;
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource sceneViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                sceneViewSource.Source = context.scenes.Local;
+                sceneViewSource.Source = context.Scenes.Local;
 
-                context.scheduled_tasks.ToList();
-                context.scenes.ToList();
+                context.ScheduledTasks.ToList();
+                context.Scenes.ToList();
             }
 
-            zvsLocalDBEntities.onScenesChanged += zvsLocalDBEntities_onScenesChanged;
-            zvsLocalDBEntities.onScheduledTasksChanged += zvsLocalDBEntities_onScheduledTasksChanged;
+            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
+            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
 
             if (ScheduledTaskDataGrid.Items.Count > 0)
                 ScheduledTaskDataGrid.SelectedIndex = 0;
@@ -58,11 +59,11 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
 
         private void ScheduledTaskCreator_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onScenesChanged -= zvsLocalDBEntities_onScenesChanged;
-            zvsLocalDBEntities.onScheduledTasksChanged -= zvsLocalDBEntities_onScheduledTasksChanged;   
+            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+            zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;   
         }
 
-        void zvsLocalDBEntities_onScheduledTasksChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -71,19 +72,19 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        context.scheduled_tasks.ToList();
+                        context.ScheduledTasks.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<scheduled_tasks>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<ScheduledTask>())
                             ent.Reload();
                     }
                 }
             }));
         }
 
-        void zvsLocalDBEntities_onScenesChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -92,12 +93,12 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        context.scenes.ToList();
+                        context.Scenes.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<scene>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<Scene>())
                             ent.Reload();
                     }
                 }
@@ -108,20 +109,20 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                scheduled_tasks task = e.Row.DataContext as scheduled_tasks;
+                ScheduledTask task = e.Row.DataContext as ScheduledTask;
                 if (task != null)
                 {
-                    if (task.friendly_name == null)
+                    if (task.Name == null)
                     {
-                        task.friendly_name = "New Task";
+                        task.Name = "New Task";
                     }
 
                     //Fixes nulls to frequency when creating a new task.
-                    if (!task.Frequency.HasValue)
-                        task.Frequency = 0;
+                    //if (!task.Frequency.HasValue)
+                    //    task.Frequency = 0;
                 }
 
-                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
+                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 context.SaveChanges();
             }
         }
@@ -136,9 +137,9 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
                 {
                     e.Handled = true;
 
-                    if (dgr.Item is scheduled_tasks)
+                    if (dgr.Item is ScheduledTask)
                     {
-                        var task = (scheduled_tasks)dgr.Item;
+                        var task = (ScheduledTask)dgr.Item;
                         if (task != null)
                         {
                             e.Handled = !DeleteTask(task);
@@ -148,11 +149,11 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
             }
         }
 
-        private bool DeleteTask(scheduled_tasks task)
+        private bool DeleteTask(ScheduledTask task)
         {
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.friendly_name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                context.scheduled_tasks.Local.Remove(task);
+                context.ScheduledTasks.Local.Remove(task);
                 context.SaveChanges();
                 ScheduledTaskDataGrid.Focus();
                 return true;
@@ -183,25 +184,24 @@ namespace zVirtualScenesGUI.ScheduledTaskControls
 
             if (FrequencyCmbBx.SelectedItem != null)
             {
-                scheduled_tasks.frequencys freq = (scheduled_tasks.frequencys)FrequencyCmbBx.SelectedItem;
-                switch (freq)
+                switch ((TaskFrequency)FrequencyCmbBx.SelectedItem)
                 {
-                    case scheduled_tasks.frequencys.Daily:
+                    case TaskFrequency.Daily:
                         {
                             DailyGpBx.Visibility = System.Windows.Visibility.Visible;
                             break;
                         }
-                    case scheduled_tasks.frequencys.Seconds:
+                    case TaskFrequency.Seconds:
                         {
                             SecondsGpBx.Visibility = System.Windows.Visibility.Visible;
                             break;
                         }
-                    case scheduled_tasks.frequencys.Weekly:
+                    case TaskFrequency.Weekly:
                         {
                             WeeklyGpBx.Visibility = System.Windows.Visibility.Visible;
                             break;
                         }
-                    case scheduled_tasks.frequencys.Monthly:
+                    case TaskFrequency.Monthly:
                         {
                             MonthlyGpBx.Visibility = System.Windows.Visibility.Visible;
                             break;

@@ -41,13 +41,14 @@
   <PropertyGroup>
     <ApplicationIcon>zvs256.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
-    <NoWin32Manifest>true</NoWin32Manifest>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework">
-      <HintPath>..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="ScintillaNET, Version=1.0.1601.23443, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
@@ -314,6 +315,7 @@
     <None Include="App.config" />
     <Resource Include="Images\zvs256.ico" />
     <Resource Include="Images\zvs32.ico" />
+    <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
@@ -368,9 +370,9 @@
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
       <Name>zVirtualScenes</Name>
     </ProjectReference>
-    <ProjectReference Include="..\zvsModel\zvsModel.csproj">
-      <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
-      <Name>zvsModel</Name>
+    <ProjectReference Include="..\zvs.Entities\zvs.Entities.csproj">
+      <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
+      <Name>zvs.Entities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -14,7 +14,7 @@
             </Grid>
         </GroupBox>
         <TextBlock HorizontalAlignment="Left" Margin="12,88,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
-        <ComboBox Name="CmdsCmboBox" Margin="87,85,10,0" VerticalAlignment="Top" DisplayMemberPath="friendly_name" SelectionChanged="CmdsCmboBox_SelectionChanged"/>
+        <ComboBox Name="CmdsCmboBox" Margin="87,85,10,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="CmdsCmboBox_SelectionChanged"/>
         <StackPanel Name="ArgSckPnl" HorizontalAlignment="Left" Height="49" Margin="60,123,0,0" VerticalAlignment="Top" Width="369"/>
         <TextBlock  HorizontalAlignment="Left" Margin="12,122,0,0" TextWrapping="Wrap" Text="Arg" VerticalAlignment="Top"/>
         <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click"/>

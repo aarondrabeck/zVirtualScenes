@@ -20,12 +20,13 @@ using System.Web;
 using System.Collections.Specialized;
 using System.Net.Mime;
 using zVirtualScenes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace HttpAPI
 {
-    [Export(typeof(Plugin))]
-    public class HttpAPIPlugin : Plugin
+    [Export(typeof(zvsPlugin))]
+    public class HttpAPIPlugin : zvsPlugin
     {
         public volatile bool isActive;
         bool _verbose = true;
@@ -37,65 +38,66 @@ namespace HttpAPI
 
         public HttpAPIPlugin()
             : base("HttpAPI",
-               "HttpAPI Plugin",
+               "HttpAPI Plug-in",
                 "This plug-in acts as a HTTP server to send respond to JSON AJAX requests."
                 ) { }
 
         public override void Initialize()
         {
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "PORT",
-                    friendly_name = "HTTP Port",
-                    value = "80",
-                    value_data_type = (int)Data_Types.INTEGER,
-                    description = "The port that HTTP will listen for commands on."
+                    UniqueIdentifier = "PORT",
+                    Name = "HTTP Port",
+                    Value = "80",
+                    ValueType = DataType.INTEGER,
+                    Description = "The port that HTTP will listen for commands on."
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "PASSWORD",
-                    friendly_name = "Password",
-                    value = "C52632B4BCDB6F8CF0F6E4545",
-                    value_data_type = (int)Data_Types.STRING,
-                    description = "Password that protects public facing web services."
+                    UniqueIdentifier = "PASSWORD",
+                    Name = "Password",
+                    Value = "C52632B4BCDB6F8CF0F6E4545",
+                    ValueType = DataType.STRING,
+                    Description = "Password that protects public facing web services."
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "VERBOSE",
-                    friendly_name = "Verbose Logging",
-                    value = false.ToString(),
-                    value_data_type = (int)Data_Types.BOOL,
-                    description = "Writes all server client communication to the log for debugging."
+                    UniqueIdentifier = "VERBOSE",
+                    Name = "Verbose Logging",
+                    Value = false.ToString(),
+                    ValueType = DataType.BOOL,
+                    Description = "Writes all server client communication to the log for debugging."
                 }, context);
 
-                DefineOrUpdateSetting(new plugin_settings
+                DefineOrUpdateSetting(new PluginSetting
                 {
-                    name = "EnableAuth",
-                    friendly_name = "Enable Authentication",
-                    value = true.ToString(),
-                    value_data_type = (int)Data_Types.BOOL,
-                    description = "WARNING: Use caution when disabling this! Not recommened!"
+                    UniqueIdentifier = "EnableAuth",
+                    Name = "Enable Authentication",
+                    Value = true.ToString(),
+                    ValueType = DataType.BOOL,
+                    Description = "WARNING: Use caution when disabling this! Not recommended!"
                 }, context);
 
-                device_propertys.AddOrEdit(new device_propertys
+                DeviceProperty.AddOrEdit(new DeviceProperty
                 {
-                    name = "HTTPAPI_SHOW",
-                    friendly_name = "If enabled this device will show in applications that use the HTTP API",
-                    value_data_type = (int)Data_Types.BOOL,
-                    default_value = "true"
+                    UniqueIdentifier = "HTTPAPI_SHOW",
+                    Name = "Show device in HTTP API",
+                    Description = "If enabled this device will show in applications that use the HTTP API",
+                    ValueType = DataType.BOOL,
+                    Value = "true"
                 }, context);
 
-                scene_property.AddOrEdit(new scene_property
+                SceneProperty.AddOrEdit(new SceneProperty
                 {
-                    name = "HTTPAPI_SHOW",
-                    friendly_name = "Show in HTTP API Applications",
-                    description = "If enabled this scene will show in applications that use the HTTP API",
-                    defualt_value = "true",
-                    value_data_type = (int)Data_Types.BOOL
+                    UniqueIdentifier = "HTTPAPI_SHOW",
+                    Name = "Show in HTTP API Applications",
+                    Description = "If enabled this scene will show in applications that use the HTTP API",
+                    Value = "true",
+                    ValueType = DataType.BOOL
                 }, context);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
@@ -160,17 +162,17 @@ namespace HttpAPI
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error while shuting down. " + ex.Message);
+                WriteToLog(Urgency.ERROR, "Error while shutting down. " + ex.Message);
             }
         }
 
-        protected override void SettingChanged(string settingName, string settingValue)
+        protected override void SettingChanged(string settingUniqueIdentifier, string settingValue)
         {
-            if (settingName == "VERBOSE")
+            if (settingUniqueIdentifier == "VERBOSE")
             {
                 bool.TryParse(settingValue, out _verbose);
             }
-            else if (settingName == "PORT")
+            else if (settingUniqueIdentifier == "PORT")
             {
                 if (this.Enabled)
                     StopHTTP();
@@ -180,33 +182,21 @@ namespace HttpAPI
                 if (this.Enabled)
                     StartHTTP();
             }
-            else if (settingName == "EnableAuth")
+            else if (settingUniqueIdentifier == "EnableAuth")
             {
                 bool.TryParse(settingValue, out _isCookieAuthEnabled);
             }
         }
 
+        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
 
-        public override void ProcessDeviceCommand(device_command_que cmd)
-        {
+        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
 
-        }
-        public override void ProcessDeviceTypeCommand(device_type_command_que cmd)
-        {
+        public override void Repoll(zvs.Entities.Device device) { }
 
-        }
-        public override void Repoll(device device)
-        {
+        public override void ActivateGroup(int groupID) { }
 
-        }
-        public override void ActivateGroup(int groupID)
-        {
-
-        }
-        public override void DeactivateGroup(int groupID)
-        {
-
-        }
+        public override void DeactivateGroup(int groupID) { }
 
         private void HttpListen(object state)
         {
@@ -421,24 +411,24 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    foreach (device d in context.devices.OrderBy(o => o.friendly_name))
+                    foreach (Device d in context.Devices.OrderBy(o => o.Name))
                     {
                         bool show = true;
-                        bool.TryParse(device_property_values.GetDevicePropertyValue(context, d.id, "HTTPAPI_SHOW"), out show);
+                        bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
 
                         if (show)
                         {
                             var device = new
                             {
-                                id = d.id,
-                                name = d.friendly_name,
-                                on_off = d.current_level_int == 0 ? "OFF" : "ON",
-                                level = d.current_level_int,
-                                level_txt = d.current_level_txt,
-                                type = d.device_types.name,
-                                plugin_name = d.device_types.plugin.name
+                                id = d.DeviceId,
+                                name = d.Name,
+                                on_off = d.CurrentLevelInt == 0 ? "OFF" : "ON",
+                                level = d.CurrentLevelInt,
+                                level_txt = d.CurrentLevelText,
+                                type = d.Type.UniqueIdentifier,
+                                plugin_name = d.Type.Plugin.UniqueIdentifier
                             };
 
                             devices.Add(device);
@@ -454,16 +444,16 @@ namespace HttpAPI
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
-                        device d = context.devices.FirstOrDefault(o => o.id == id);
+                        Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
 
                         if (d != null)
                         {
                             int level = 0;
 
-                            if (d.current_level_int.HasValue)
-                                level = d.current_level_int.Value;
+                            if (d.CurrentLevelInt.HasValue)
+                                level = d.CurrentLevelInt.Value;
 
                             string on_off = string.Empty;
                             if (level == 0)
@@ -474,27 +464,27 @@ namespace HttpAPI
                                 on_off = "DIM";
 
                             StringBuilder sb = new StringBuilder();
-                            d.group_devices.ToList().ForEach((o) => sb.Append(o.group.name + " "));
+                            d.Groups.ToList().ForEach((o) => sb.Append(o.Name + " "));
 
                             var details = new
                             {
-                                id = d.id,
-                                name = d.friendly_name,
+                                id = d.DeviceId,
+                                name = d.Name,
                                 on_off = on_off,
-                                level = d.current_level_int,
-                                level_txt = d.current_level_txt,
-                                type = d.device_types.name,
-                                type_txt = d.device_types.friendly_name,
-                                last_heard_from = d.last_heard_from.HasValue ? d.last_heard_from.Value.ToString() : "",
+                                level = d.CurrentLevelInt,
+                                level_txt = d.CurrentLevelText,
+                                type = d.Type.UniqueIdentifier,
+                                type_txt = d.Type.Name,
+                                last_heard_from = d.LastHeardFrom.HasValue ? d.LastHeardFrom.Value.ToString() : "",
                                 groups = sb.ToString(),
-                                mode = d.device_values.FirstOrDefault(o => o.label_name == "Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Mode").value2,
-                                fan_mode = d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan Mode").value2,
-                                op_state = d.device_values.FirstOrDefault(o => o.label_name == "Operating State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Operating State").value2,
-                                fan_state = d.device_values.FirstOrDefault(o => o.label_name == "Fan State") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Fan State").value2,
-                                heat_p = d.device_values.FirstOrDefault(o => o.label_name == "Heating 1" || o.label_name == "Heating1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Heating 1" || o.label_name == "Heating1").value2,
-                                cool_p = d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1" || o.label_name == "Cooling1") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "Cooling 1" || o.label_name == "Cooling1").value2,
-                                esm = d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode") == null ? "" : d.device_values.FirstOrDefault(o => o.label_name == "SetBack Mode").value2,
-                                plugin_name = d.device_types.plugin.name
+                                mode = d.Values.FirstOrDefault(o => o.Name == "Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Mode").Value,
+                                fan_mode = d.Values.FirstOrDefault(o => o.Name == "Fan Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan Mode").Value,
+                                op_state = d.Values.FirstOrDefault(o => o.Name == "Operating State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Operating State").Value,
+                                fan_state = d.Values.FirstOrDefault(o => o.Name == "Fan State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan State").Value,
+                                heat_p = d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1").Value,
+                                cool_p = d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1").Value,
+                                esm = d.Values.FirstOrDefault(o => o.Name == "SetBack Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "SetBack Mode").Value,
+                                plugin_name = d.Type.Plugin.UniqueIdentifier
                             };
                             return new { success = true, details = details };
                         }
@@ -510,25 +500,25 @@ namespace HttpAPI
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
-                        device d = context.devices.FirstOrDefault(o => o.id == id);
+                        Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
 
                         if (d != null)
                         {
                             List<object> values = new List<object>();
-                            foreach (device_values v in d.device_values)
+                            foreach (DeviceValue v in d.Values)
                             {
                                 values.Add(new
                                 {
-                                    value_id = v.value_id,
-                                    value = v.value2,
-                                    grene = v.genre,
-                                    index2 = v.index2,
-                                    read_only = v.read_only,
-                                    label_name = v.label_name,
-                                    type = v.type,
-                                    id = v.id
+                                    value_id = v.UniqueIdentifier,
+                                    value = v.Value,
+                                    grene = v.Genre,
+                                    index2 = v.Index,
+                                    read_only = v.isReadOnly,
+                                    label_name = v.Name,
+                                    type = v.ValueType,
+                                    id = v.DeviceValueId
                                 });
                             }
 
@@ -542,22 +532,23 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("scenes") && request.HttpMethod == "GET")
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
                     List<object> scenes = new List<object>();
-                    foreach (scene scene in context.scenes)
+                    foreach (Scene scene in context.Scenes)
                     {
                         bool show = false;
-                        bool.TryParse(scene_property_value.GetPropertyValue(context, scene.id, "HTTPAPI_SHOW"), out show);
+                        string prop = ScenePropertyValue.GetPropertyValue(context, scene, "HTTPAPI_SHOW");
+                        bool.TryParse(prop, out show);
 
                         if (show)
                         {
                             scenes.Add(new
                              {
-                                 id = scene.id,
-                                 name = scene.friendly_name,
-                                 is_running = scene.is_running,
-                                 cmd_count = scene.scene_commands.Count()
+                                 id = scene.SceneId,
+                                 name = scene.Name,
+                                 is_running = scene.isRunning,
+                                 cmd_count = scene.Commands.Count()
                              });
                         }
                     }
@@ -571,28 +562,28 @@ namespace HttpAPI
                 int sID = 0;
                 int.TryParse(request.Url.Segments[3], out sID);
 
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    scene scene = context.scenes.FirstOrDefault(s => s.id == sID);
+                    Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == sID);
 
                     if (scene != null)
                     {
                         List<object> s_cmds = new List<object>();
-                        foreach (scene_commands sc in scene.scene_commands.OrderBy(o => o.sort_order))
+                        foreach (SceneCommand sc in scene.Commands.OrderBy(o => o.SortOrder))
                         {
                             s_cmds.Add(new
                             {
-                                device = sc.Actionable_Object,
-                                action = sc.Action_Description,
-                                order = (sc.sort_order + 1)
+                                device = sc.ActionableObject,
+                                action = sc.ActionDescription,
+                                order = (sc.SortOrder + 1)
                             });
                         }
                         var s = new
                         {
-                            id = scene.id,
-                            name = scene.friendly_name,
-                            is_running = scene.is_running,
-                            cmd_count = scene.scene_commands.Count(),
+                            id = scene.SceneId,
+                            name = scene.Name,
+                            is_running = scene.isRunning,
+                            cmd_count = scene.Commands.Count(),
                             cmds = s_cmds.ToArray()
                         };
                         return new { success = true, scene = s };
@@ -613,9 +604,9 @@ namespace HttpAPI
                 bool.TryParse(postData["is_running"], out is_running);
                 string name = postData["name"];
 
-                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                using (zvsContext db = new zvsContext())
                 {
-                    scene scene = db.scenes.FirstOrDefault(s => s.id == sID);
+                    Scene scene = db.Scenes.FirstOrDefault(s => s.SceneId == sID);
 
                     if (scene != null)
                     {
@@ -645,14 +636,14 @@ namespace HttpAPI
                                 }
                             };
                             SceneRunner.onSceneRunBegin += startHandler;
-                            sr.RunScene(scene.id);
+                            sr.RunScene(scene.SceneId);
 
                             return new { success = true, desc = "Scene Started." };
                         }
 
                         if (!string.IsNullOrEmpty(name))
                         {
-                            scene.friendly_name = name;
+                            scene.Name = name;
                             db.SaveChanges();
                             return new { success = true, desc = "Scene Name Updated." };
                         }
@@ -664,14 +655,14 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("groups") && request.HttpMethod == "GET")
             {
-                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                using (zvsContext db = new zvsContext())
                 {
-                    var q0 = from g in db.groups
+                    var q0 = from g in db.Groups
                              select new
                              {
-                                 id = g.id,
-                                 name = g.name,
-                                 count = g.group_devices.Count()
+                                 id = g.GroupId,
+                                 name = g.Name,
+                                 count = g.Devices.Count()
                              };
 
                     return new { success = true, groups = q0.ToArray() };
@@ -684,26 +675,26 @@ namespace HttpAPI
                 int gID = 0;
                 int.TryParse(request.Url.Segments[3], out gID);
 
-                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                using (zvsContext db = new zvsContext())
                 {
-                    group group = db.groups.FirstOrDefault(g => g.id == gID);
+                    Group group = db.Groups.FirstOrDefault(g => g.GroupId == gID);
 
                     if (group != null)
                     {
                         List<object> group_devices = new List<object>();
-                        foreach (group_devices gd in group.group_devices)
+                        foreach (Device gd in group.Devices)
                         {
                             group_devices.Add(new
                             {
-                                id = gd.device.id,
-                                name = gd.device.friendly_name,
-                                type = gd.device.device_types.name
+                                id = gd.DeviceId,
+                                name = gd.Name,
+                                type = gd.Type.Name
                             });
                         }
                         var g = new
                         {
-                            id = group.id,
-                            name = group.name,
+                            id = group.GroupId,
+                            name = group.Name,
                             devices = group_devices.ToArray()
                         };
                         return new { success = true, group = g };
@@ -720,37 +711,37 @@ namespace HttpAPI
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                    using (zvsContext db = new zvsContext())
                     {
-                        device d = db.devices.FirstOrDefault(o => o.id == id);
+                        Device d = db.Devices.FirstOrDefault(o => o.DeviceId == id);
                         if (d != null)
                         {
-                            List<object> device_commands = new List<object>();
-                            foreach (device_commands cmd in d.device_commands)
+                            List<object> DeviceCommand = new List<object>();
+                            foreach (DeviceCommand cmd in d.Commands)
                             {
-                                device_commands.Add(new
+                                DeviceCommand.Add(new
                                 {
-                                    id = cmd.id,
+                                    id = cmd.CommandId,
                                     type = "device",
-                                    friendlyname = cmd.friendly_name,
-                                    helptext = cmd.help,
-                                    name = cmd.name
+                                    friendlyname = cmd.Name,
+                                    helptext = cmd.Help,
+                                    name = cmd.UniqueIdentifier
                                 });
                             }
 
-                            foreach (device_type_commands cmd in d.device_types.device_type_commands)
+                            foreach (DeviceTypeCommand cmd in d.Type.Commands)
                             {
-                                device_commands.Add(new
+                                DeviceCommand.Add(new
                                 {
-                                    id = cmd.id,
+                                    id = cmd.CommandId,
                                     type = "device_type",
-                                    friendlyname = cmd.friendly_name,
-                                    helptext = cmd.help,
-                                    name = cmd.name
+                                    friendlyname = cmd.Name,
+                                    helptext = cmd.Help,
+                                    name = cmd.UniqueIdentifier
                                 });
                             }
 
-                            return new { success = true, device_commands = device_commands.ToArray() };
+                            return new { success = true, DeviceCommand = DeviceCommand.ToArray() };
 
                         }
                         else
@@ -772,42 +763,33 @@ namespace HttpAPI
                 int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
-                        device d = db.devices.FirstOrDefault(o => o.id == id);
+                        Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
 
                         if (d != null)
                         {
                             string arg = postData["arg"];
                             string strtype = postData["type"];
-                            string commandName = postData["name"];
-                            string friendlyname = postData["friendlyname"];
+                            string cmdUnqId = postData["name"];
+                            string cmdName = postData["friendlyname"];
 
                             switch (strtype)
                             {
                                 case "device":
                                     {
-                                        //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
-                                        device_commands cmd = null;
-                                        if (!string.IsNullOrEmpty(friendlyname))
-                                            cmd = d.device_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
-                                        else if (!string.IsNullOrEmpty(commandName))
-                                            cmd = d.device_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                                        //If the user sends the command name in the post, ignore the ID if sent and do a lookup by name
+                                        DeviceCommand cmd = null;
+                                        if (!string.IsNullOrEmpty(cmdName))
+                                            cmd = d.Commands.FirstOrDefault(c => c.Name.Equals(cmdName));
+                                        else if (!string.IsNullOrEmpty(cmdUnqId))
+                                            cmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUnqId));
                                         else if (c_id > 0)
-                                            cmd = d.device_commands.FirstOrDefault(c => c.id == c_id);
+                                            cmd = d.Commands.FirstOrDefault(c => c.CommandId == c_id);
                                         if (cmd != null)
                                         {
-                                            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-                                            {
-                                                WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.friendly_name));
-
-                                                device_command_que.Run(new device_command_que
-                                                {
-                                                    device_id = d.id,
-                                                    device_command_id = cmd.id,
-                                                    arg = arg
-                                                }, context);
-                                            }
+                                            WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.Name));
+                                            cmd.Run(context, arg);
                                             return new { success = true };
                                         }
                                         else
@@ -815,28 +797,21 @@ namespace HttpAPI
                                     }
                                 case "device_type":
                                     {
-                                        //If the user sends the command name in the post, ignore the ID if sent and doo a lookup by name
-                                        device_type_commands cmd = null;
-                                        if (!string.IsNullOrEmpty(friendlyname))
-                                            cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
-                                        else if (!string.IsNullOrEmpty(commandName))
-                                            cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                                        //If the user sends the command name in the post, ignore the ID if sent and do a lookup by name
+                                        DeviceTypeCommand cmd = null;
+                                        if (!string.IsNullOrEmpty(cmdName))
+                                            cmd = d.Type.Commands.FirstOrDefault(c => c.Name.Equals(cmdName));
+                                        else if (!string.IsNullOrEmpty(cmdUnqId))
+                                            cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUnqId));
                                         else if (c_id > 0)
-                                            cmd = d.device_types.device_type_commands.FirstOrDefault(c => c.id == c_id);
+                                            cmd = d.Type.Commands.FirstOrDefault(c => c.CommandId == c_id);
 
                                         if (cmd != null)
                                         {
-                                            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-                                            {
-                                                WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.friendly_name));
 
-                                                device_type_command_que.Run(new device_type_command_que
-                                                {
-                                                    device_id = d.id,
-                                                    device_type_command_id = cmd.id,
-                                                    arg = arg
-                                                }, context);
-                                            }
+                                            WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.Name));
+                                            cmd.Run(context, d, arg);
+
                                             return new { success = true };
                                         }
                                         return new { success = false, reason = "Device type command not found." };
@@ -859,16 +834,16 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
             {
                 List<object> bi_commands = new List<object>();
-                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    foreach (builtin_commands cmd in db.builtin_commands)
+                    foreach (BuiltinCommand cmd in context.BuiltinCommands)
                     {
                         bi_commands.Add(new
                         {
-                            id = cmd.id,
-                            friendlyname = cmd.friendly_name,
-                            helptext = cmd.help,
-                            name = cmd.name
+                            id = cmd.CommandId,
+                            friendlyname = cmd.Name,
+                            helptext = cmd.Help,
+                            name = cmd.UniqueIdentifier
                         });
                     }
                     return new { success = true, builtin_commands = bi_commands.ToArray() };
@@ -879,34 +854,27 @@ namespace HttpAPI
             {
                 NameValueCollection postData = GetPostData(request);
                 string arg = postData["arg"];
-                string commandName = postData["name"];
-                string friendlyname = postData["friendlyname"];
+                string cmdUniqId = postData["name"];
+                string Name = postData["friendlyname"];
 
                 int id = 0;
                 if (request.Url.Segments.Length == 4)
                     int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
 
-                using (zvsLocalDBEntities db = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    builtin_commands cmd = null;
-                    if (!string.IsNullOrEmpty(friendlyname))
-                        cmd = db.builtin_commands.FirstOrDefault(c => c.friendly_name.Equals(friendlyname));
-                    else if (!string.IsNullOrEmpty(commandName))
-                        cmd = db.builtin_commands.FirstOrDefault(c => c.name.Equals(commandName));
+                    BuiltinCommand cmd = null;
+                    if (!string.IsNullOrEmpty(Name))
+                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.Name.Equals(Name));
+                    else if (!string.IsNullOrEmpty(cmdUniqId))
+                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUniqId));
                     else
-                        cmd = db.builtin_commands.FirstOrDefault(c => c.id == id);
+                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.CommandId == id);
 
                     if (cmd != null)
                     {
-                        using (zvsLocalDBEntities context = new zvsLocalDBEntities())
-                        {
-                            WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.friendly_name));
-                            builtin_command_que.Run(new builtin_command_que
-                            {
-                                builtin_command_id = cmd.id,
-                                arg = arg
-                            }, context);
-                        }
+                        WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.Name));
+                        cmd.Run(context, arg);
                         return new { success = true };
                     }
                 }
@@ -939,7 +907,7 @@ namespace HttpAPI
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(request);
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
                     if (postData["password"] == GetSettingValue("PASSWORD", context))
                     {

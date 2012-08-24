@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
+        xmlns:zVirtualScenesModel="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
         mc:Ignorable="d" x:Class="zVirtualScenesGUI.TriggerControls.JSTriggerEditorWindow"
         Title="Trigger Editor" Height="500" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
         WindowStyle="ToolWindow" Loaded="Window_Loaded_1" Icon="/zVirtualScenesGUI;component/Images/zvs32.ico">

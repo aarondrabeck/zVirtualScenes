@@ -12,7 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.SceneControls
 {
@@ -47,12 +48,12 @@ namespace zVirtualScenesGUI.SceneControls
         private void ResetBtn_Click_1(object sender, RoutedEventArgs e)
         {
 
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                scene s = context.scenes.FirstOrDefault(sc => sc.id == SceneID);
+                Scene s = context.Scenes.FirstOrDefault(sc => sc.SceneId == SceneID);
                 if (s != null)
                 {
-                    s.is_running = false;
+                    s.isRunning = false;
                     context.SaveChanges();
                 }
             }

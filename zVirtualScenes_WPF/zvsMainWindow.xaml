@@ -1,10 +1,11 @@
 ﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-         xmlns:DeviceControls="clr-namespace:zVirtualScenesGUI.DeviceControls"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:DeviceControls="clr-namespace:zVirtualScenesGUI.DeviceControls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:my="clr-namespace:zVirtualScenesModel;assembly=zvsModel" 
+    xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
+    
     xmlns:SceneControls="clr-namespace:zVirtualScenesGUI.SceneControls" 
     xmlns:TriggerControl="clr-namespace:zVirtualScenesGUI.TriggerControls"
     xmlns:ScheduledTaskControls="clr-namespace:zVirtualScenesGUI.ScheduledTaskControls"

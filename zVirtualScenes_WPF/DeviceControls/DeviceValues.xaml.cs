@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.DeviceControls
 {
@@ -21,9 +22,9 @@ namespace zVirtualScenesGUI.DeviceControls
     /// </summary>
     public partial class DeviceValues : UserControl
     {
-        private zvsLocalDBEntities context;
+        private zvsContext context;
         private int DeviceID = 0;
-        private device d;
+        private Device d;
 
         public DeviceValues(int DeviceID)
         {
@@ -33,25 +34,25 @@ namespace zVirtualScenesGUI.DeviceControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsLocalDBEntities();
-            zvsLocalDBEntities.onDeviceValueChanged += zvsLocalDBEntities_onDeviceValueChanged;
+            context = new zvsContext();
+            zvsContext.onDeviceValueChanged += zvsContext_onDeviceValueChanged;
 
-            d = context.devices.FirstOrDefault(dv => dv.id == DeviceID);
+            d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
             if (d != null)
             {
-                d.device_values.OrderBy(dv => dv.id).ToList();
+                d.Values.OrderBy(dv => dv.DeviceValueId).ToList();
 
                 // Do not load your data at design time.
                 if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
                 {
                     //Load your data here and assign the result to the CollectionViewSource.
-                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_valuesViewSource"];
-                    myCollectionViewSource.Source = d.device_values;
+                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["DeviceValueViewSource"];
+                    myCollectionViewSource.Source = d.Values;
                 }
             }
         }
 
-        void zvsLocalDBEntities_onDeviceValueChanged(object sender, zvsLocalDBEntities.onEntityChangedEventArgs args)
+        void zvsContext_onDeviceValueChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -60,12 +61,12 @@ namespace zVirtualScenesGUI.DeviceControls
                     if (args.ChangeType == System.Data.EntityState.Added)
                     {
                         //Gets new devices
-                        d.device_values.ToList();
+                        d.Values.ToList();
                     }
                     else
                     {
-                        //Reloads context from DB when modifcations happen
-                        foreach (var ent in context.ChangeTracker.Entries<device_values>())
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<DeviceValue>())
                             ent.Reload();
                     }
                 }
@@ -74,7 +75,7 @@ namespace zVirtualScenesGUI.DeviceControls
 
         private void DataGrid_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsLocalDBEntities.onDeviceValueChanged -= zvsLocalDBEntities_onDeviceValueChanged;
+            zvsContext.onDeviceValueChanged -= zvsContext_onDeviceValueChanged;
            
         }
 
@@ -82,9 +83,9 @@ namespace zVirtualScenesGUI.DeviceControls
         {
             if (d != null)
             {
-                builtin_commands cmd = context.builtin_commands.FirstOrDefault(c => c.name == "REPOLL_ME");
+                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ME");
                 if (cmd != null)
-                    cmd.Run(context, d.id.ToString());
+                    cmd.Run(context, d.DeviceId.ToString());
             }
         }
     }

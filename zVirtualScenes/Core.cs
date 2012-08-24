@@ -5,11 +5,12 @@ using System.Text;
 using System.ComponentModel;
 using zVirtualScenes.Triggers;
 using System.Windows.Threading;
-using zVirtualScenesModel;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.IO;
 using Microsoft.Win32;
+using zvs.Context;
+using zvs.Entities;
 
 namespace zVirtualScenes
 {
@@ -26,7 +27,7 @@ namespace zVirtualScenes
             AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
             this.Dispatcher = Dispatcher;
 
-            //Create a instace of the logger
+            //Create a instance of the logger
             Logger = new Logger();
 
             Logger.WriteToLog(Urgency.INFO, "Starting Core Processor", Utils.ApplicationName);
@@ -69,14 +70,14 @@ namespace zVirtualScenes
             scheduledTaskManager = new ScheduledTaskManager();
 
             //Install Program Options
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                if (program_options.GetProgramOption(context, "LOGDIRECTION") == null)
+                if (ProgramOption.GetProgramOption(context, "LOGDIRECTION") == null)
                 {
-                    program_options.AddOrEdit(context, new program_options()
+                    ProgramOption.AddOrEdit(context, new ProgramOption()
                     {
-                        name = "LOGDIRECTION",
-                        value = "Descending"
+                        UniqueIdentifier = "LOGDIRECTION",
+                        Value = "Descending"
                     });
                 }
             }

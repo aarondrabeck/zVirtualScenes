@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes.Backup
 {
@@ -21,15 +22,15 @@ namespace zVirtualScenes.Backup
         public static void ExportGroupsAsyc(string PathFileName, Action<string> Callback)
         {
             List<BackupGroup> groups = new List<BackupGroup>();
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (group group in context.groups)
+                foreach (Group group in context.Groups)
                 {
                     BackupGroup backupGroup = new BackupGroup();
-                    backupGroup.Name = group.name;
+                    backupGroup.Name = group.Name;
 
-                    foreach (group_devices d in group.group_devices)
-                        backupGroup.NodeIds.Add(d.device.node_id);
+                    foreach (Device d in group.Devices)
+                        backupGroup.NodeIds.Add(d.NodeNumber);
 
                     groups.Add(backupGroup);
                 }               
@@ -71,21 +72,21 @@ namespace zVirtualScenes.Backup
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
                     groups = (List<BackupGroup>)ScenesSerializer.Deserialize(myFileStream);                    
 
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
                         foreach (BackupGroup backupGroup in groups)
                         {
-                            group g = new group();
-                            g.name = backupGroup.Name;
+                            Group g = new Group();
+                            g.Name = backupGroup.Name;
 
                             foreach (int NodeID in backupGroup.NodeIds) 
                             {
-                                device d = context.devices.FirstOrDefault(o => o.node_id == NodeID);
+                                Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == NodeID);
                                 if (d != null)
-                                    g.group_devices.Add(new group_devices() { device_id = d.id });
+                                    g.Devices.Add(d);
                             }
 
-                            context.groups.Add(g);
+                            context.Groups.Add(g);
                             ImportedCount++;
                         }
                         context.SaveChanges();

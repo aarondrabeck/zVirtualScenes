@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:zVirtualScenesModel="clr-namespace:zVirtualScenesModel;assembly=zVirtualScenesModel" 
+             xmlns:zvsEntities="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
              x:Class="zVirtualScenesGUI.ScheduledTaskControls.ScheduledTaskCreator"
              xmlns:zvs="clr-namespace:zVirtualScenesGUI"
             xmlns:converters="clr-namespace:zVirtualScenesGUI.Converters"
@@ -41,14 +41,14 @@
 
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="zVirtualScenesModel:scheduled_tasks+frequencys"/>
+                <x:Type TypeName="zvsEntities:TaskFrequency"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <CollectionViewSource x:Key="scheduled_tasksViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:scheduled_tasks}, CreateList=True}"/>
-        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:scene}, CreateList=True}"/>
+        <CollectionViewSource x:Key="ScheduledTaskViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:ScheduledTask}, CreateList=True}"/>
+        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:Scene}, CreateList=True}"/>
     </UserControl.Resources>
 
-    <Grid DataContext="{StaticResource scheduled_tasksViewSource}">
+    <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
 
         <Border Width="350" HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
             <Border.Background>
@@ -77,7 +77,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scheduled Task" Binding="{Binding Path=friendly_name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
+                <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scheduled Task" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -93,19 +93,19 @@
 
         <Border Name="TaskDetails" Grid.Column="1" BorderThickness="1" CornerRadius="10" BorderBrush="Gray" Margin="355,0,0,0" Background="#FFFDFDFD">
             <Grid>
-                <TextBlock Name="TaskNameTxtBl" Text="{Binding friendly_name, StringFormat={}{0} Details}"  Margin="10,5,10,0" VerticalAlignment="Top"
+                <TextBlock Name="TaskNameTxtBl" Text="{Binding Name, StringFormat={}{0} Details}"  Margin="10,5,10,0" VerticalAlignment="Top"
                            FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis" ></TextBlock>
                 <TextBlock Text="Task Frequency" VerticalAlignment="Top"  HorizontalAlignment="Left" Margin="10,131,0,0"></TextBlock>
-                <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource dataFromEnum}}"   SelectedItem="{Binding FrequencyEnum, UpdateSourceTrigger=PropertyChanged}" 
+                <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource dataFromEnum}}"   SelectedItem="{Binding Frequency, UpdateSourceTrigger=PropertyChanged}" 
                           VerticalAlignment="Top" Margin="10,149,0,0" HorizontalAlignment="Left" Width="176" SelectionChanged="FrequencyCmbBx_SelectionChanged" LostFocus="LostFocus_SaveChanges"></ComboBox>
 
                 <TextBlock Text="Activate Scene" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,81,0,0"/>
-                <ComboBox x:Name="SceneCmbBx_Copy" SelectedItem="{Binding scene, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="10,99,0,0" HorizontalAlignment="Left" 
-                          Width="325" DisplayMemberPath="friendly_name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" LostFocus="LostFocus_SaveChanges" />
+                <ComboBox x:Name="SceneCmbBx_Copy" SelectedItem="{Binding Scene, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="10,99,0,0" HorizontalAlignment="Left" 
+                          Width="325" DisplayMemberPath="Name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" LostFocus="LostFocus_SaveChanges" />
 
 
                 <TextBlock Text="Start Time" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,35,0,0"/>
-                <xctk:DateTimePicker  Value="{Binding startTime, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="10,54,0,0" Width="325" LostFocus="LostFocus_SaveChanges" />
+                <xctk:DateTimePicker  Value="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="10,54,0,0" Width="325" LostFocus="LostFocus_SaveChanges" />
 
 
 

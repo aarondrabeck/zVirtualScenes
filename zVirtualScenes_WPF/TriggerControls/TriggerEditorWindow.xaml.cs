@@ -13,7 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.TriggerControls
 {
@@ -22,11 +23,11 @@ namespace zVirtualScenesGUI.TriggerControls
     /// </summary>
     public partial class TriggerEditorWindow : Window
     {
-        private zvsLocalDBEntities context;
-        private device_value_triggers trigger;
+        private zvsContext context;
+        private DeviceValueTrigger trigger;
         public bool Canceled = true;
 
-        public TriggerEditorWindow(device_value_triggers trigger, zvsLocalDBEntities context)
+        public TriggerEditorWindow(DeviceValueTrigger trigger, zvsContext context)
         {
             this.context = context;
             this.trigger = trigger;
@@ -40,48 +41,42 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context.devices.ToList();
-            context.scenes.ToList();
+            context.Devices.ToList();
+            context.Scenes.ToList();
 
             System.Windows.Data.CollectionViewSource deviceViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("deviceViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
-            deviceViewSource.Source = context.devices.Local;
+            deviceViewSource.Source = context.Devices.Local;
 
-            OperatorCmboBx.ItemsSource = Enum.GetValues(typeof(device_value_triggers.TRIGGER_OPERATORS));
+            OperatorCmboBx.ItemsSource = Enum.GetValues(typeof(TriggerOperator));
             OperatorCmboBx.SelectedIndex = 0;
 
             System.Windows.Data.CollectionViewSource sceneViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("sceneViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
-            sceneViewSource.Source = context.scenes.Local;
+            sceneViewSource.Source = context.Scenes.Local;
 
             //Set presets
-            if (trigger.device_values != null)
+            if (trigger.DeviceValue != null)
             {
-                device d = context.devices.FirstOrDefault(o => o.id == trigger.device_values.device_id);
-                if (d != null)
-                    DeviceCmboBx.SelectedItem = d;
+                if (trigger.DeviceValue.Device != null)
+                    DeviceCmboBx.SelectedItem = trigger.DeviceValue.Device;
 
-                device_values dv = context.device_values.FirstOrDefault(o => o.id == trigger.device_value_id);
-                if (dv != null)
-                    ValueCmboBx.SelectedItem = dv;
+                if (trigger.DeviceValue != null)
+                    ValueCmboBx.SelectedItem = trigger.DeviceValue;
             }
-
-            if (trigger.trigger_operator.HasValue)
+            
+            try
             {
-                try
-                {
-                    OperatorCmboBx.Text = Enum.GetName(typeof(device_value_triggers.TRIGGER_OPERATORS), trigger.trigger_operator.Value);
-                }
-                catch { }
+                OperatorCmboBx.Text = Enum.GetName(typeof(TriggerOperator), trigger.Operator);
             }
+            catch { }
+            
+            if (trigger.Value != null)
+                ValueTxtBx.Text = trigger.Value;
 
-            if (trigger.trigger_value != null)
-                ValueTxtBx.Text = trigger.trigger_value;            
-
-            if (trigger.scene_id.HasValue)
-            {
-                scene s = context.scenes.FirstOrDefault(o => o.id == trigger.scene_id.Value);
-                SceneCmbBx.SelectedItem = s;
+            if (trigger.Scene != null)
+            {                
+                SceneCmbBx.SelectedItem = trigger.Scene;
             }
         }
 
@@ -92,7 +87,7 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            device d = (device)DeviceCmboBx.SelectedItem;
+            Device d = (Device)DeviceCmboBx.SelectedItem;
             if (d == null)
             {
                 DeviceCmboBx.Focus();
@@ -104,7 +99,7 @@ namespace zVirtualScenesGUI.TriggerControls
                 return;
             }
 
-            device_values dv = (device_values)ValueCmboBx.SelectedItem;
+            DeviceValue dv = (DeviceValue)ValueCmboBx.SelectedItem;
             if (dv == null)
             {
                 ValueCmboBx.Focus();
@@ -117,10 +112,10 @@ namespace zVirtualScenesGUI.TriggerControls
             }
             else
             {
-                trigger.device_values = dv;
+                trigger.DeviceValue = dv;
             }
 
-            scene s = (scene)SceneCmbBx.SelectedItem;
+            Scene s = (Scene)SceneCmbBx.SelectedItem;
             if (s == null)
             {
                 SceneCmbBx.Focus();
@@ -133,7 +128,7 @@ namespace zVirtualScenesGUI.TriggerControls
             }
             else
             {
-                trigger.scene = s;
+                trigger.Scene = s;
             }
 
             if (string.IsNullOrEmpty(ValueTxtBx.Text))
@@ -148,11 +143,10 @@ namespace zVirtualScenesGUI.TriggerControls
             }
             else
             {
-                trigger.trigger_value = ValueTxtBx.Text;
+                trigger.Value = ValueTxtBx.Text;
             }
 
-            trigger.trigger_operator = (int)OperatorCmboBx.SelectedItem;
-            trigger.trigger_type = (int)device_value_triggers.TRIGGER_TYPE.Basic;
+            trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
             Canceled = false;
             this.Close();

@@ -65,9 +65,9 @@
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
       <Name>zVirtualScenes</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\zvsModel\zvsModel.csproj">
-      <Project>{796e1087-65e8-4cda-bdd6-6661bd843a7d}</Project>
-      <Name>zvsModel</Name>
+    <ProjectReference Include="..\..\zvs.Entities\zvs.Entities.csproj">
+      <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
+      <Name>zvs.Entities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

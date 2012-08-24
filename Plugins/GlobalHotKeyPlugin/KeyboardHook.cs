@@ -1,156 +1,150 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+using System.Net.Mime;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Interop;
 
-namespace GlobalHotKeyPlugin
+namespace UnManaged
 {
-    public sealed class KeyboardHook : IDisposable
+    public class HotKey : IDisposable
     {
-        // Registers a hot key with Windows.
+        private static Dictionary<int, HotKey> _dictHotKeyToCalBackProc;
+
         [DllImport("user32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-        // Unregisters the hot key with Windows.
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, UInt32 fsModifiers, UInt32 vlc);
+
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
-        /// <summary>
-        /// Represents the window that is used internally to get the messages.
-        /// </summary>
-        private class Window : NativeWindow, IDisposable
-        {
-            private static int WM_HOTKEY = 0x0312;
+        public const int WmHotKey = 0x0312;
 
-            public Window()
+        private bool _disposed = false;
+
+        public Key Key { get; private set; }
+        public KeyModifier KeyModifiers { get; private set; }
+        public Action<HotKey> Action { get; private set; }
+        public int Id { get; set; }
+
+        // ******************************************************************
+        public HotKey(Key k, KeyModifier keyModifiers, Action<HotKey> action, bool register = true)
+        {
+            Key = k;
+            KeyModifiers = keyModifiers;
+            Action = action;
+            if (register)
             {
-                // create the handle for the window.
-                this.CreateHandle(new CreateParams());
+                Register();
+            }
+        }
+
+        // ******************************************************************
+        public bool Register()
+        {
+            int virtualKeyCode = KeyInterop.VirtualKeyFromKey(Key);
+            Id = virtualKeyCode + ((int)KeyModifiers * 0x10000);
+            bool result = RegisterHotKey(IntPtr.Zero, Id, (UInt32)KeyModifiers, (UInt32)virtualKeyCode);
+
+            if (_dictHotKeyToCalBackProc == null)
+            {
+                _dictHotKeyToCalBackProc = new Dictionary<int, HotKey>();
+                ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
             }
 
-            /// <summary>
-            /// Overridden to get the notifications.
-            /// </summary>
-            /// <param name="m"></param>
-            protected override void WndProc(ref Message m)
+            _dictHotKeyToCalBackProc.Add(Id, this);
+
+            Debug.Print(result.ToString() + ", " + Id + ", " + virtualKeyCode);
+            return result;
+        }
+
+        // ******************************************************************
+        public void Unregister()
+        {
+            HotKey hotKey;
+            if (_dictHotKeyToCalBackProc.TryGetValue(Id, out hotKey))
             {
-                base.WndProc(ref m);
+                UnregisterHotKey(IntPtr.Zero, Id);
+            }
+        }
 
-                // check if we got a hot key pressed.
-                if (m.Msg == WM_HOTKEY)
+        // ******************************************************************
+        private static void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
+        {
+            if (!handled)
+            {
+                if (msg.message == WmHotKey)
                 {
-                    // get the keys.
-                    Keys key = (Keys)(((int)m.LParam >> 16) & 0xFFFF);
-                    ModifierKeys modifier = (ModifierKeys)((int)m.LParam & 0xFFFF);
+                    HotKey hotKey;
 
-                    // invoke the event to notify the parent.
-                    if (KeyPressed != null)
-                        KeyPressed(this, new KeyPressedEventArgs(modifier, key));
+                    if (_dictHotKeyToCalBackProc.TryGetValue((int)msg.wParam, out hotKey))
+                    {
+                        if (hotKey.Action != null)
+                        {
+                            hotKey.Action.Invoke(hotKey);
+                        }
+                        handled = true;
+                    }
                 }
             }
-
-            public event EventHandler<KeyPressedEventArgs> KeyPressed;
-
-            #region IDisposable Members
-
-            public void Dispose()
-            {
-                this.DestroyHandle();
-            }
-
-            #endregion
         }
 
-        private Window _window = new Window();
-        private int _currentId;
-
-        public KeyboardHook()
-        {
-            // register the event of the inner native window.
-            _window.KeyPressed += delegate(object sender, KeyPressedEventArgs args)
-            {
-                if (KeyPressed != null)
-                    KeyPressed(this, args);
-            };
-        }
-
-        /// <summary>
-        /// Registers a hot key in the system.
-        /// </summary>
-        /// <param name="modifier">The modifiers that are associated with the hot key.</param>
-        /// <param name="key">The key itself that is associated with the hot key.</param>
-        public bool RegisterHotKey(ModifierKeys modifier, Keys key)
-        {
-            // increment the counter.
-            _currentId = _currentId + 1;
-
-            // register the hot key.
-            if (!RegisterHotKey(_window.Handle, _currentId, (uint)modifier, (uint)key))
-                return false;
-
-            return true;            
-        }
-
-        /// <summary>
-        /// A hot key has been pressed.
-        /// </summary>
-        public event EventHandler<KeyPressedEventArgs> KeyPressed;
-
-        #region IDisposable Members
-
+        // ******************************************************************
+        // Implement IDisposable.
+        // Do not make this method virtual.
+        // A derived class should not be able to override this method.
         public void Dispose()
         {
-            // unregister all the registered hot keys.
-            for (int i = _currentId; i > 0; i--)
+            Dispose(true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SupressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        // ******************************************************************
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be _disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be _disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!this._disposed)
             {
-                UnregisterHotKey(_window.Handle, i);
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    // Dispose managed resources.
+                    Unregister();
+                }
+
+                // Note disposing has been done.
+                _disposed = true;
             }
-
-            // dispose the inner native window.
-            _window.Dispose();
         }
-
-        #endregion
     }
 
-    /// <summary>
-    /// Event Args for the event that is fired after the hot key has been pressed.
-    /// </summary>
-    public class KeyPressedEventArgs : EventArgs
-    {
-        private ModifierKeys _modifier;
-        private Keys _key;
-
-        internal KeyPressedEventArgs(ModifierKeys modifier, Keys key)
-        {
-            _modifier = modifier;
-            _key = key;
-        }
-
-        public ModifierKeys Modifier
-        {
-            get { return _modifier; }
-        }
-
-        public Keys Key
-        {
-            get { return _key; }
-        }
-
-    }
-
-    /// <summary>
-    /// The enumeration of possible modifiers.
-    /// </summary>
+    // ******************************************************************
     [Flags]
-
-    public enum ModifierKeys : uint
+    public enum KeyModifier
     {
-        Alt = 1,
-        Control = 2,
-        Shift = 4,
-        Win = 8
+        None = 0x0000,
+        Alt = 0x0001,
+        Ctrl = 0x0002,
+        NoRepeat = 0x4000,
+        Shift = 0x0004,
+        Win = 0x0008
     }
 
+    // ******************************************************************
 }

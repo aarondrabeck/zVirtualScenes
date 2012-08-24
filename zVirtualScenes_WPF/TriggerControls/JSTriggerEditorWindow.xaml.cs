@@ -13,7 +13,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenesGUI.TriggerControls
 {
@@ -22,16 +23,16 @@ namespace zVirtualScenesGUI.TriggerControls
     /// </summary>
     public partial class JSTriggerEditorWindow : Window
     {
-        private zvsLocalDBEntities context;
-        private javascript_triggers trigger;
+        private zvsContext context;
+       // private javascript_triggers trigger;
         public bool Canceled = true;
 
-        public JSTriggerEditorWindow(javascript_triggers trigger, zvsLocalDBEntities context)
-        {
-            this.context = context;
-            this.trigger = trigger;
-            InitializeComponent();
-        }
+        //public JSTriggerEditorWindow(javascript_triggers trigger, zvsContext context)
+        //{
+        //    this.context = context;
+        //    this.trigger = trigger;
+        //    InitializeComponent();
+        //}
 
         ~JSTriggerEditorWindow()
         {
@@ -40,8 +41,8 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            if(trigger.Script != null)
-                TriggerScriptEditor.Editor.AppendText(trigger.Script);
+            //if(trigger.Script != null)
+            //    TriggerScriptEditor.Editor.AppendText(trigger.Script);
 
             TriggerScriptEditor.Editor.KeyUp += Editor_KeyUp;
         }
@@ -67,7 +68,7 @@ namespace zVirtualScenesGUI.TriggerControls
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            trigger.Script = TriggerScriptEditor.Editor.Text;
+           // trigger.Script = TriggerScriptEditor.Editor.Text;
 
             Canceled = false;
             this.Close();

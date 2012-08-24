@@ -7,7 +7,7 @@
     <Grid>
         <SceneControls:SceneProperties x:Name="SceneControl" Margin="0,0,0,55"></SceneControls:SceneProperties>
         <Button Name="DoneBtn" Content="Done" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom"  Width="74" Click="DoneBtn_Click"/>
-        <Button x:Name="ResetBtn" Content="Reset isRunning" HorizontalAlignment="Right" Margin="0,0,320,10" VerticalAlignment="Bottom"  Width="114" 
+        <Button x:Name="ResetBtn" Content="Reset Scene State" ToolTip="Sets is running to false. Use if the application was closed in the middle of a scene execution." HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" 
                 Click="ResetBtn_Click_1"/>
     </Grid>
 </Window>

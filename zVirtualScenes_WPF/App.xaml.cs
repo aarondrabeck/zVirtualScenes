@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.IO;
-using zVirtualScenesModel;
+
 using zVirtualScenes;
 using System.ComponentModel;
 using zVirtualScenes.Triggers;

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes.Triggers
 {
@@ -32,98 +33,92 @@ namespace zVirtualScenes.Triggers
 
         public TriggerManager()
         {
-            device_values.DeviceValueDataChangedEvent += new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+            DeviceValue.DeviceValueDataChangedEvent += new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
         }
 
         public void Dispose()
         {
-            device_values.DeviceValueDataChangedEvent -= new device_values.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+            DeviceValue.DeviceValueDataChangedEvent -= new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
         }
 
-        private void device_values_DeviceValueDataChangedEvent(object sender, device_values.ValueDataChangedEventArgs args)
+        private void device_values_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
         {
             BackgroundWorker bw = new BackgroundWorker();
             bw.DoWork += (s, a) =>
             {
-                using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                using (zvsContext context = new zvsContext())
                 {
-                    device_values dv = context.device_values.FirstOrDefault(v => v.id == args.device_value_id);
+                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
                     if (dv != null)
                     {
                         //Event Triggering
-                        foreach (device_value_triggers trigger in dv.device_value_triggers.Where(t => t.enabled))
+                        foreach (DeviceValueTrigger trigger in dv.Triggers.Where(t => t.isEnabled))
                         {
-                            if (((device_value_triggers.TRIGGER_TYPE)trigger.trigger_type) == device_value_triggers.TRIGGER_TYPE.Basic)
+                            switch (trigger.Operator)
                             {
-                                switch ((device_value_triggers.TRIGGER_OPERATORS)trigger.trigger_operator)
-                                {
-                                    case device_value_triggers.TRIGGER_OPERATORS.EqualTo:
+                                case TriggerOperator.EqualTo:
+                                    {
+                                        if (dv.Value.Equals(trigger.Value))
                                         {
-                                            if (dv.value2.Equals(trigger.trigger_value))
+                                            ActivateTriggerScene(trigger);
+                                        }
+                                        break;
+                                    }
+                                case TriggerOperator.GreaterThan:
+                                    {
+                                        double deviceValue = 0;
+                                        double triggerValue = 0;
+
+                                        if (double.TryParse(dv.Value, out deviceValue) && double.TryParse(trigger.Value, out triggerValue))
+                                        {
+                                            if (deviceValue > triggerValue)
                                             {
                                                 ActivateTriggerScene(trigger);
                                             }
-                                            break;
                                         }
-                                    case device_value_triggers.TRIGGER_OPERATORS.GreaterThan:
+                                        else
                                         {
-                                            double deviceValue = 0;
-                                            double triggerValue = 0;
-
-                                            if (double.TryParse(dv.value2, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
+                                            if (onTriggerStart != null)
                                             {
-                                                if (deviceValue > triggerValue)
-                                                {
-                                                    ActivateTriggerScene(trigger);
-                                                }
+                                                onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
+                                                    string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
                                             }
-                                            else
-                                            {
-                                                if (onTriggerStart != null)
-                                                {
-                                                    onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
-                                                        string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
-                                                }
-                                            }
-
-                                            break;
                                         }
-                                    case device_value_triggers.TRIGGER_OPERATORS.LessThan:
+
+                                        break;
+                                    }
+                                case TriggerOperator.LessThan:
+                                    {
+                                        double deviceValue = 0;
+                                        double triggerValue = 0;
+
+                                        if (double.TryParse(dv.Value, out deviceValue) && double.TryParse(trigger.Value, out triggerValue))
                                         {
-                                            double deviceValue = 0;
-                                            double triggerValue = 0;
-
-                                            if (double.TryParse(dv.value2, out deviceValue) && double.TryParse(trigger.trigger_value, out triggerValue))
-                                            {
-                                                if (deviceValue < triggerValue)
-                                                    ActivateTriggerScene(trigger);
-
-                                            }
-                                            else
-                                            {
-                                                if (onTriggerStart != null)
-                                                {
-                                                    onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
-                                                        string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
-                                                }
-                                            }
-
-                                            break;
-                                        }
-                                    case device_value_triggers.TRIGGER_OPERATORS.NotEqualTo:
-                                        {
-                                            if (!dv.value2.Equals(trigger.trigger_value))
-                                            {
+                                            if (deviceValue < triggerValue)
                                                 ActivateTriggerScene(trigger);
-                                            }
-                                            break;
+
                                         }
-                                }
+                                        else
+                                        {
+                                            if (onTriggerStart != null)
+                                            {
+                                                onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
+                                                    string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
+                                            }
+                                        }
+
+                                        break;
+                                    }
+                                case TriggerOperator.NotEqualTo:
+                                    {
+                                        if (!dv.Value.Equals(trigger.Value))
+                                        {
+                                            ActivateTriggerScene(trigger);
+                                        }
+                                        break;
+                                    }
                             }
-                            else
-                            {
-                                //Core.triggerManager.RunScript(trigger);
-                            }
+
                         }
                     }
                 }
@@ -131,7 +126,7 @@ namespace zVirtualScenes.Triggers
             bw.RunWorkerAsync();
         }
 
-        private void ActivateTriggerScene(device_value_triggers trigger)
+        private void ActivateTriggerScene(DeviceValueTrigger trigger)
         {
             SceneRunner sr = new SceneRunner();
             SceneRunner.onSceneRunEventHandler startHandler = null;
@@ -143,14 +138,14 @@ namespace zVirtualScenes.Triggers
 
                     if (onTriggerStart != null)
                     {
-                        onTriggerStart(this, new onTriggerStartEventArgs(trigger.id,
-                            string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.scene.friendly_name), false));
+                        onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
+                            string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.Scene.Name), false));
                     }
                 }
             };
             SceneRunner.onSceneRunBegin += startHandler;
-           
-            sr.RunScene(trigger.scene.id);
+
+            sr.RunScene(trigger.Scene.SceneId);
         }
     }
 }

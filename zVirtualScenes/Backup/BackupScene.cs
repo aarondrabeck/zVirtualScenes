@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using zVirtualScenesModel;
+using zvs.Entities;
+
 
 namespace zVirtualScenes.Backup
 {
@@ -16,6 +17,14 @@ namespace zVirtualScenes.Backup
         {
             public string FreindlyName;
             public List<BackupSceneCMD> Commands = new List<BackupSceneCMD>();
+        }
+
+        public enum Command_Types
+        {
+            unknown = 0,
+            builtin = 1,
+            device_command = 2,
+            device_type_command = 3
         }
 
         [Serializable]
@@ -32,46 +41,35 @@ namespace zVirtualScenes.Backup
         {
             List<BackupScene> scenes = new List<BackupScene>();
             int CmdCount = 0;
-            using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+            using (zvsContext context = new zvsContext())
             {
-                foreach (scene s in context.scenes)
+                foreach (Scene s in context.Scenes)
                 {
                     BackupScene SceneBackup = new BackupScene();
-                    SceneBackup.FreindlyName = s.friendly_name;
+                    SceneBackup.FreindlyName = s.Name;
 
-                    foreach (scene_commands scmd in s.scene_commands)
+                    foreach (SceneCommand scmd in s.Commands)
                     {
                         BackupSceneCMD SceneCmdBackup = new BackupSceneCMD();
-                        SceneCmdBackup.CommandType = (Command_Types)scmd.command_type_id;
-                        SceneCmdBackup.CommandArg = scmd.arg;
-                        SceneCmdBackup.Order = scmd.sort_order;
+                        SceneCmdBackup.CommandArg = scmd.Argument;
+                        SceneCmdBackup.Order = scmd.SortOrder;
+                        SceneCmdBackup.CommandName = scmd.Command.UniqueIdentifier;
 
-                        if (((Command_Types)scmd.command_type_id) == Command_Types.builtin)
+                        if (scmd.Command is BuiltinCommand)
                         {
-                            builtin_commands bc = context.builtin_commands.FirstOrDefault(o => o.id == scmd.command_id);
-                            if (bc != null)
-                                SceneCmdBackup.CommandName = bc.name;
+                            SceneCmdBackup.CommandType = Command_Types.builtin;
+                        }
+                        else if (scmd.Command is DeviceTypeCommand)
+                        {
+                            SceneCmdBackup.CommandType = Command_Types.device_type_command;
+                            SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
+                        }
+                        else if (scmd.Command is DeviceCommand)
+                        {
+                            SceneCmdBackup.CommandType = Command_Types.device_command;
+                            SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
                         }
 
-                        if (((Command_Types)scmd.command_type_id) == Command_Types.device_command)
-                        {
-                            device_commands dc = context.device_commands.FirstOrDefault(o => o.id == scmd.command_id);
-                            if (dc != null)
-                            {
-                                SceneCmdBackup.NodeID = scmd.device.node_id;
-                                SceneCmdBackup.CommandName = dc.name;
-                            }
-                        }
-
-                        if (((Command_Types)scmd.command_type_id) == Command_Types.device_type_command)
-                        {
-                            device_type_commands dtc = context.device_type_commands.FirstOrDefault(o => o.id == scmd.command_id);
-                            if (dtc != null)
-                            {
-                                SceneCmdBackup.NodeID = scmd.device.node_id;
-                                SceneCmdBackup.CommandName = dtc.name;
-                            }
-                        }
                         SceneBackup.Commands.Add(SceneCmdBackup);
                         CmdCount++;
                     }
@@ -116,45 +114,43 @@ namespace zVirtualScenes.Backup
                     int ImportedCount = 0;
                     int ImportedCmdCount = 0;
 
-                    using (zvsLocalDBEntities context = new zvsLocalDBEntities())
+                    using (zvsContext context = new zvsContext())
                     {
                         foreach (BackupScene backupScene in scenes)
                         {
-                            scene s = new scene();
-                            s.friendly_name = backupScene.FreindlyName;
+                            Scene s = new Scene();
+                            s.Name = backupScene.FreindlyName;
 
                             foreach (BackupSceneCMD backupSceneCMD in backupScene.Commands)
                             {
                                 if (backupSceneCMD.CommandType == Command_Types.builtin)
                                 {
-                                    builtin_commands cmd = context.builtin_commands.FirstOrDefault(o => o.name == backupSceneCMD.CommandName);
+                                    BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(o => o.UniqueIdentifier == backupSceneCMD.CommandName);
                                     if (cmd != null)
                                     {
-                                        s.scene_commands.Add(new scene_commands()
+                                        s.Commands.Add(new SceneCommand()
                                         {
-                                            arg = backupSceneCMD.CommandArg,
-                                            command_id = cmd.id,
-                                            command_type_id = (int)Command_Types.builtin,
-                                            sort_order = backupSceneCMD.Order
+                                            Argument = backupSceneCMD.CommandArg,
+                                            Command = cmd,
+                                            SortOrder = backupSceneCMD.Order
                                         });
                                         ImportedCmdCount++;
                                     }
                                 }
                                 else if (backupSceneCMD.CommandType == Command_Types.device_command)
                                 {
-                                    device d = context.devices.FirstOrDefault(o => o.node_id == backupSceneCMD.NodeID);
+                                    Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupSceneCMD.NodeID);
                                     if (d != null)
                                     {
-                                        device_commands cmd = d.device_commands.FirstOrDefault(o => o.name == backupSceneCMD.CommandName);
+                                        DeviceCommand cmd = d.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupSceneCMD.CommandName);
                                         if (cmd != null)
                                         {
-                                            s.scene_commands.Add(new scene_commands()
+                                            s.Commands.Add(new SceneCommand()
                                             {
-                                                arg = backupSceneCMD.CommandArg,
-                                                command_id = cmd.id,
-                                                command_type_id = (int)Command_Types.device_command,
-                                                device_id = d.id,
-                                                sort_order = backupSceneCMD.Order
+                                                Argument = backupSceneCMD.CommandArg,
+                                                Command = cmd,
+                                                Device = d,
+                                                SortOrder = backupSceneCMD.Order
                                             });
                                             ImportedCmdCount++;
                                         }
@@ -162,26 +158,25 @@ namespace zVirtualScenes.Backup
                                 }
                                 else if (backupSceneCMD.CommandType == Command_Types.device_type_command)
                                 {
-                                    device d = context.devices.FirstOrDefault(o => o.node_id == backupSceneCMD.NodeID);
+                                    Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupSceneCMD.NodeID);
                                     if (d != null)
                                     {
-                                        device_type_commands cmd = d.device_types.device_type_commands.FirstOrDefault(o => o.name == backupSceneCMD.CommandName);
+                                        DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupSceneCMD.CommandName);
                                         if (cmd != null)
                                         {
-                                            s.scene_commands.Add(new scene_commands()
+                                            s.Commands.Add(new SceneCommand()
                                             {
-                                                arg = backupSceneCMD.CommandArg,
-                                                command_id = cmd.id,
-                                                command_type_id = (int)Command_Types.device_type_command,
-                                                device_id = d.id,
-                                                sort_order = backupSceneCMD.Order
+                                                Argument = backupSceneCMD.CommandArg,
+                                                Command = cmd,
+                                                Device = d,
+                                                SortOrder = backupSceneCMD.Order
                                             });
                                             ImportedCmdCount++;
                                         }
                                     }
                                 }
                             }
-                            context.scenes.Add(s);
+                            context.Scenes.Add(s);
                             ImportedCount++;
                         }
                         context.SaveChanges();
