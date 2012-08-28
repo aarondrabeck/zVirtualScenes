@@ -5,3 +5,11 @@ D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\EntityFramework.dll
 D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\EntityFramework.xml
 D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Entities.dll
 D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Entities.pdb
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\bin\Debug\zvs.Entities.dll.config
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\bin\Debug\zvs.Entities.dll
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\bin\Debug\zvs.Entities.pdb
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\bin\Debug\EntityFramework.dll
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\bin\Debug\EntityFramework.xml
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.csprojResolveAssemblyReference.cache
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.dll
+C:\Users\Rob\1\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.pdb
