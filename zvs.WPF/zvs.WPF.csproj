@@ -1,0 +1,480 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CC1028B3-3975-4BA4-BF79-42043BCADBFE}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>zvs.WPF</RootNamespace>
+    <AssemblyName>zVirtualScenes</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\output\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\output_release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>zvs256.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="ScintillaNET, Version=1.0.1601.23443, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\ScintillaNET v2.5\ScintillaNET.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Addin.Contract" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WPFToolkit.Extended">
+      <HintPath>.\WPFToolkit.Extended.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\NullableIntConverter.cs" />
+    <Compile Include="Editor\JSEditor.xaml.cs">
+      <DependentUpon>JSEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FatalErrorWindow.xaml.cs">
+      <DependentUpon>FatalErrorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NotifyIcon.cs" />
+    <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
+      <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SceneControls\AddEditBuiltinSceneCommand.xaml.cs">
+      <DependentUpon>AddEditBuiltinSceneCommand.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SceneControls\SceneProperties.xaml.cs">
+      <DependentUpon>SceneProperties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SceneControls\SceneCreator.xaml.cs">
+      <DependentUpon>SceneCreator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SceneControls\SceneProperyWindow.xaml.cs">
+      <DependentUpon>SceneProperyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScheduledTaskControls\ScheduledTaskCreator.xaml.cs">
+      <DependentUpon>ScheduledTaskCreator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SettingWindow.xaml.cs">
+      <DependentUpon>SettingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TriggerControls\JSTriggerEditorWindow.xaml.cs">
+      <DependentUpon>JSTriggerEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TriggerControls\TriggerEditorWindow.xaml.cs">
+      <DependentUpon>TriggerEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TriggerControls\TriggerGridUC.xaml.cs">
+      <DependentUpon>TriggerGridUC.xaml</DependentUpon>
+    </Compile>
+    <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceControls\DeviceProperties.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DeviceControls\DeviceCommands.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceControls\DeviceDataGridUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceControls\DeviceValues.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DeviceDetailsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DynamicActionControls\ButtonControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DynamicActionControls\CheckboxControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DynamicActionControls\ComboboxControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DynamicActionControls\StringControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="DynamicActionControls\NumericControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Editor\JSEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FatalErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Groups\ActivateGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Groups\GroupEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Groups\GroupNameEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SettingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriggerControls\JSTriggerEditorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="zvsMainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DeviceControls\DeviceProperties.xaml.cs">
+      <DependentUpon>DeviceProperties.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceControls\DeviceCommands.xaml.cs">
+      <DependentUpon>DeviceCommands.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceControls\DeviceDataGridUC.xaml.cs">
+      <DependentUpon>DeviceDataGridUC.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceControls\DeviceValues.xaml.cs">
+      <DependentUpon>DeviceValues.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DeviceDetailsWindow.xaml.cs">
+      <DependentUpon>DeviceDetailsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\ButtonControl.xaml.cs">
+      <DependentUpon>ButtonControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\CheckboxControl.xaml.cs">
+      <DependentUpon>CheckboxControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\ComboboxControl.xaml.cs">
+      <DependentUpon>ComboboxControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\StringControl.xaml.cs">
+      <DependentUpon>StringControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DynamicActionControls\NumericControl.xaml.cs">
+      <DependentUpon>NumericControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Groups\ActivateGroup.xaml.cs">
+      <DependentUpon>ActivateGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Groups\GroupEditor.xaml.cs">
+      <DependentUpon>GroupEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Groups\GroupNameEditor.xaml.cs">
+      <DependentUpon>GroupNameEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="zvsMainWindow.xaml.cs">
+      <DependentUpon>zvsMainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="PluginManager\PluginManagerWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\GridViewStyles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SceneControls\AddEditSceneCommand.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SceneControls\AddEditBuiltinSceneCommand.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SceneControls\SceneProperties.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SceneControls\SceneCreator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SceneControls\SceneProperyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScheduledTaskControls\ScheduledTaskCreator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriggerControls\TriggerEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TriggerControls\TriggerGridUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
+      <DependentUpon>PluginManagerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="App.config" />
+    <Resource Include="Images\zvs256.ico" />
+    <Resource Include="Images\zvs32.ico" />
+    <None Include="app.manifest" />
+    <None Include="packages.config" />
+    <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.db_info.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_propertys.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_property_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_property_values.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_types.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+DeviceValueAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventArgs.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers+TRIGGER_OPERATORS.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers+TRIGGER_TYPE.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.group.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.group_devices.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin_settings.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin_setting_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.program_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property_option.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property_value.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks+frequencys.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedEventArgs.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\20radio.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\20bulb.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\20controller.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\20doorlock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\20switch.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\20thermostat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\drag_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Plugin.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\drag_arrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\bulb.png" />
+    <Resource Include="Images\controler.png" />
+    <Resource Include="Images\doorlock.png" />
+    <Resource Include="Images\radio.png" />
+    <Resource Include="Images\switch.png" />
+    <Resource Include="Images\thermometer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\send_signal.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\save_check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\scene64.png" />
+    <Resource Include="Images\scene_run64.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\arrow_down.png" />
+    <Resource Include="Images\arrow_up.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\log.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\trigger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\scheduled_task.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\run.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\256zvsIcon.png" />
+    <Resource Include="Images\32zvsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="zvs256.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="SplashScreen1222.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\zvsLogoTextOnly.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ScintillaNET.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SciLexer.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="SciLexer64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\zvs.Entities\zvs.Entities.csproj">
+      <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
+      <Name>zvs.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\zvs.Processor\zvs.Processor.csproj">
+      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
+      <Name>zvs.Processor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

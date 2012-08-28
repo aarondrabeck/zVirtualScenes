@@ -5,14 +5,15 @@
 #define use_vc2010
 
 #define MyAppName "zVirtualScenes"
-#define MyAppVersion "3.4"
-#define MyAppPublisher "Drabeck Solutions"
-#define MyAppExeName "zVirtualScenesGUI.exe"
+#define MyAppVersion "3.5"
+#define MyAppPublisher "Nonce Labs"
+#define MyAppExeName "zVirtualScenes.exe"
 
 [Setup]                            
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
+PrivilegesRequired=admin
 AppId={{09FA2C8A-D475-4DC3-A895-107587BF4B90}
 AppMutex=zVirtualScenesGUIMutex
 AppName={#MyAppName}
@@ -26,12 +27,11 @@ DefaultGroupName={#MyAppName}
 UninstallDisplayIcon={app}\zVirtualScenesGUI.exe
 AllowNoIcons=yes
 ;OutputDir=;
-OutputBaseFilename={#MyAppName}_Setup_{#MyAppVersion}
+OutputBaseFilename={#MyAppName} Setup {#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 OutputDir=output
 
-PrivilegesRequired=admin
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
 
@@ -46,14 +46,10 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion           
 Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\WPFToolkit.Extended.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenesGUI.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenesGUI.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenesModel.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenesModel.dll.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zvsLocalDB-blank.sdf"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\upgrade.sql"; DestDir: "{app}"; Flags: ignoreversion
-
+Source: "..\output_release\zvs.zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\zVirtualScenes.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversion 
  
 
 Source: "..\output_release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
@@ -77,8 +73,8 @@ Source: "..\output_release\plugins\OpenZWavePlugin.dll.config"; DestDir: "{app}\
 Source: "..\output_release\plugins\SpeechPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\ZeroconfService.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\zVirtualScenes.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\zVirtualScenesModel.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\zvs.zVirtualScenes.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\zvs.Entities.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\htdocs\*"; DestDir: "{app}\plugins\htdocs"; Flags: ignoreversion recursesubdirs
 Source: "..\output_release\plugins\config\*"; DestDir: "{app}\plugins\config"; Flags: ignoreversion recursesubdirs  
 Source: "..\output_release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
@@ -93,7 +89,7 @@ Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: 
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: quicklaunchicon
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall
+Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall runascurrentuser 
 
 #include "scripts\products.iss"
 #include "scripts\products\stringversion.iss"

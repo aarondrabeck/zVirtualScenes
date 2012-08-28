@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel.Composition;
 using System.Windows.Forms;
-using zVirtualScenes;
+using zvs.Processor;
 
 using System.ComponentModel;
 using zvs.Entities;

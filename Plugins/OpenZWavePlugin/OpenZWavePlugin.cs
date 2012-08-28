@@ -14,7 +14,7 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Collections.Specialized;
-using zVirtualScenes;
+using zvs.Processor;
 
 using System.Diagnostics;
 using zvs.Entities;

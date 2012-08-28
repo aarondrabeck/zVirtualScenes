@@ -11,7 +11,7 @@ using System.Windows;
 using ControlThink.ZWave;
 using ControlThink.ZWave.Devices;
 using ControlThink.ZWave.Devices.Specific;
-using zVirtualScenes;
+using zvs.Processor;
 using zvs.Entities;
 
 

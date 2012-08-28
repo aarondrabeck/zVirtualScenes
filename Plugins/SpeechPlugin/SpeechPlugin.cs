@@ -3,7 +3,7 @@ using System.ComponentModel.Composition;
 using System.Speech.Synthesis;
 using System.Collections.Generic;
 using System.Linq;
-using zVirtualScenes;
+using zvs.Processor;
 
 using System.ComponentModel;
 using zvs.Entities;

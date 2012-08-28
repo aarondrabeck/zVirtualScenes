@@ -10,7 +10,7 @@ using System.Data;
 using System.ComponentModel;
 using System.Linq;
 using ZeroconfService;
-using zVirtualScenes;
+using zvs.Processor;
 using zvs.Entities;
 
 
@@ -127,8 +127,8 @@ namespace LightSwitchPlugin
             using (zvsContext context = new zvsContext())
             {
                 DeviceValue.DeviceValueDataChangedEvent +=DeviceValue_DeviceValueDataChangedEvent;
-                zVirtualScenes.PluginManager.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
-                zVirtualScenes.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
+                zvs.Processor.PluginManager.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
+                zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
                 OpenLightSwitchSocket();
             }
         }
@@ -136,8 +136,8 @@ namespace LightSwitchPlugin
         protected override void StopPlugin()
         {
             DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
-            zVirtualScenes.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
-            zVirtualScenes.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
+            zvs.Processor.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
+            zvs.Processor.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
             CloseLightSwitchSocket();
         }
 
