@@ -208,7 +208,7 @@ namespace zvs.Processor
                 {
                     JavaScriptCommand js = (JavaScriptCommand)sceneCommand.Command;
                     JavaScriptExecuter je = new JavaScriptExecuter();
-                    je.onJavaScriptExecuterComplete += (s, a) =>
+                    je.onComplete += (s, a) =>
                     {
                         if (a.Errors)
                             ExecutionErrors++;

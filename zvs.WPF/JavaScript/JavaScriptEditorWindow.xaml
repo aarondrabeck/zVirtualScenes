@@ -8,9 +8,11 @@
         Title="JavaScript Editor" Height="500" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
         WindowStyle="ToolWindow" Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs32.ico">
     <Window.Resources>
-        
+
+        <CollectionViewSource x:Key="jSResultViewSource" d:DesignSource="{d:DesignInstance {x:Type Editor:JSResult}, CreateList=True}"/>
+
     </Window.Resources>
-    <Grid >
+    <Grid DataContext="{StaticResource jSResultViewSource}" >
         <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
             <Rectangle.Fill>
                 <LinearGradientBrush EndPoint="0,0" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -21,7 +23,7 @@
 
         </Rectangle>
 
-        <Border Width="550" Height="Auto" Margin="22,78,22,62">
+        <Border Width="550" Height="Auto" Margin="22,78,22,173">
             <Editor:JSEditor x:Name="TriggerScriptEditor" > </Editor:JSEditor>
         </Border>
         
@@ -32,6 +34,14 @@
         <Button Name="OKBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,8" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="22,50,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
         <TextBox Name="CmdNameTxtBx" Margin="59,50,22,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17"/>
+
+        <DataGrid  x:Name="JSResultDataGrid"  Margin="22,309,22,47" Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
+                   HorizontalGridLinesBrush="#FFE2E2E2" 
+                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True" />
+            </DataGrid.Columns>
+        </DataGrid>
 
     </Grid>
 </Window>

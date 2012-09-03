@@ -101,6 +101,7 @@
     <Compile Include="FatalErrorWindow.xaml.cs">
       <DependentUpon>FatalErrorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="JavaScript\JSResult.cs" />
     <Compile Include="NotifyIcon.cs" />
     <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
       <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
@@ -372,6 +373,11 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedEventArgs.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities+onEntityChangedventHandler.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
+    <None Include="Properties\DataSources\zvs.WPF.JavaScript.JavaScriptAddRemove.datasource" />
+    <None Include="Properties\DataSources\zvs.WPF.JavaScript.JavaScriptEditorWindow.datasource" />
+    <None Include="Properties\DataSources\zvs.WPF.JavaScript.JavaScriptSelector.datasource" />
+    <None Include="Properties\DataSources\zvs.WPF.JavaScript.JSEditor.datasource" />
+    <None Include="Properties\DataSources\zvs.WPF.JavaScript.JSResult.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
