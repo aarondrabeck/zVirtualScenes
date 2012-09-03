@@ -99,7 +99,7 @@ namespace LightSwitchPlugin
                 DeviceProperty.AddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "SHOWINLSLIST",
-                    Name = "Show device in LightSwitch", 
+                    Name = "Show device in LightSwitch",
                     Description = "If enabled this device will show in the LightSwitch device tab.",
                     ValueType = DataType.BOOL,
                     Value = "true"
@@ -126,13 +126,13 @@ namespace LightSwitchPlugin
         {
             using (zvsContext context = new zvsContext())
             {
-                DeviceValue.DeviceValueDataChangedEvent +=DeviceValue_DeviceValueDataChangedEvent;
+                DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
                 zvs.Processor.PluginManager.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
                 zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
                 OpenLightSwitchSocket();
             }
         }
-        
+
         protected override void StopPlugin()
         {
             DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
@@ -281,7 +281,7 @@ namespace LightSwitchPlugin
                         LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, _port));
                         LightSwitchSocket.Listen(_max_conn);
                         LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                        WriteToLog(Urgency.INFO, "LightSwitch server started on port " + _port );                        
+                        WriteToLog(Urgency.INFO, "LightSwitch server started on port " + _port);
                         IsReady = true;
                     }
                 }
@@ -761,7 +761,7 @@ namespace LightSwitchPlugin
                                 string l = (Level == 255 ? "99" : Level.ToString());
                                 if (d.Type.Plugin.UniqueIdentifier == "OPENZWAVE")
                                 {
-                                    if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_BASIC",l , Client))
+                                    if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_BASIC", l, Client))
                                         return;
                                 }
                                 if (d.Type.Plugin.UniqueIdentifier == "THINKSTICK")
@@ -784,42 +784,33 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void ExecuteZVSCommand(int SceneID, Socket Client)
         {
-            using (zvsContext context = new zvsContext())
+            SceneRunner sr = new SceneRunner();
+            SceneRunner.onSceneRunEventHandler startHandler = null;
+            startHandler = (s, args) =>
             {
-                Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == SceneID);
-                if (scene != null)
+                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
                 {
+                    SceneRunner.onSceneRunBegin -= startHandler;
+                    BroadcastMessage("MSG~" + args.Details + Environment.NewLine);
+                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + args.Details);
 
-                    SceneRunner sr = new SceneRunner();
-                    SceneRunner.onSceneRunEventHandler startHandler = null;
-                    startHandler = (s, args) =>
+                    #region LISTEN FOR ENDING
+                    SceneRunner.onSceneRunEventHandler handler = null;
+                    handler = (se, end_args) =>
                     {
-                        if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
                         {
-                            SceneRunner.onSceneRunBegin -= startHandler;
-                            BroadcastMessage("MSG~" + args.Details + Environment.NewLine);
-                            WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + args.Details);
-
-                            #region LISTEN FOR ENDING
-                            SceneRunner.onSceneRunEventHandler handler = null;
-                            handler = (se, end_args) =>
-                            {
-                                if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                {
-                                    SceneRunner.onSceneRunComplete -= handler;
-                                    BroadcastMessage("MSG~" + end_args.Details + Environment.NewLine);
-                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + end_args.Details);
-                                }
-                            };
-                            SceneRunner.onSceneRunComplete += handler;
-                            #endregion
+                            SceneRunner.onSceneRunComplete -= handler;
+                            BroadcastMessage("MSG~" + end_args.Details + Environment.NewLine);
+                            WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + end_args.Details);
                         }
                     };
-                    SceneRunner.onSceneRunBegin += startHandler;
-                    sr.RunScene(scene.SceneId);
-
+                    SceneRunner.onSceneRunComplete += handler;
+                    #endregion
                 }
-            }
+            };
+            SceneRunner.onSceneRunBegin += startHandler;
+            sr.RunScene(SceneID);
         }
 
         private bool ExecuteDynamicCMD(zvsContext context, Device d, string cmdUniqueId, string arg, Socket Client)
@@ -854,7 +845,7 @@ namespace LightSwitchPlugin
                     string key = plugin + Mode;
 
                     if (ThermoTempCommandTranslations.ContainsKey(key))
-                    {                        
+                    {
                         if (ExecuteDynamicCMD(context, d, ThermoTempCommandTranslations[key], Temp.ToString(), Client))
                             return;
                     }
@@ -863,7 +854,8 @@ namespace LightSwitchPlugin
             BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Agian");
         }
 
-        private class zvsCMD {
+        private class zvsCMD
+        {
             public string CmdName;
             public string arg;
         }
@@ -896,7 +888,7 @@ namespace LightSwitchPlugin
                     string plugin = d.Type.Plugin.UniqueIdentifier;
                     string key = plugin + Mode;
 
-                    if(ThermoCommandTranslations.ContainsKey(key))
+                    if (ThermoCommandTranslations.ContainsKey(key))
                     {
                         zvsCMD cmd = ThermoCommandTranslations[key];
                         if (ExecuteDynamicCMD(context, d, cmd.CmdName, cmd.arg, Client))

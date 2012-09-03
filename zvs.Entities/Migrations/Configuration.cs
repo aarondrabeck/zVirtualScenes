@@ -6,11 +6,12 @@ namespace zvs.Context.Migrations
     using System.Linq;
     using zvs.Entities;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<zvsContext>
+    public class Configuration : DbMigrationsConfiguration<zvsContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
+            
         }
 
         protected override void Seed(zvsContext context)

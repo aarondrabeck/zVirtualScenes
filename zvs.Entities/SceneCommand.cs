@@ -128,7 +128,8 @@ namespace zvs.Entities
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    if (this.Command is BuiltinCommand)
+                    if (this.Command is BuiltinCommand || 
+                        this.Command is JavaScriptCommand)
                     {
                         return this.Command.Name;
                     }
@@ -226,6 +227,21 @@ namespace zvs.Entities
                                     return string.Format("{0} to '{1}'", bc.Name, this.Argument);
                             }
                         }
+                    }
+                    else if (this.Command is JavaScriptCommand)
+                    {
+                        JavaScriptCommand JSCmd = (JavaScriptCommand)this.Command;
+
+                        if(JSCmd.Script.Length == 0)
+                            return "Empty JavaScript Command";
+
+                        int len = 0;
+                        if(JSCmd.Script.Length < 10)
+                            len = JSCmd.Script.Length;
+                        else
+                            len = 10;
+
+                        return JSCmd.Script.Substring(0, len) + "...";
                     }
                     return string.Empty;
                 }

@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
 using zvs.Entities;
+using System.Data.Entity.Migrations;
+using zvs.Context.Migrations;
 
 
 namespace zvs.Processor
@@ -110,6 +112,10 @@ namespace zvs.Processor
 
             using (zvsContext context = new zvsContext())
             {
+                var configuration = new Configuration();
+                var migrator = new DbMigrator(configuration);
+                
+                migrator.Update();
                 context.Database.Initialize(true);
             }
 

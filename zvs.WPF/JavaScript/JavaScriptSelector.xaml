@@ -1,0 +1,18 @@
+﻿<Window x:Class="zvs.WPF.JavaScript.JavaScriptSelector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:DeviceControls="clr-namespace:zvs.WPF.DeviceControls"
+        Title="JavaScript Commands Add/Remove" Height="96.699" Width="655" Icon="/zVirtualScenes;component/Images/zvs32.ico"
+        WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" mc:Ignorable="d" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" ResizeMode="NoResize">
+    <Window.Resources>
+        <CollectionViewSource x:Key="CmdsViewSource" d:DesignSource="{d:DesignInstance my:JavaScriptCommand, CreateList=True}" />
+    </Window.Resources>
+    <Grid DataContext="{StaticResource CmdsViewSource}">
+        <ComboBox DisplayMemberPath="Name"  Name="JSCmbBx" VerticalAlignment="Top" Margin="83,18,142,0" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="CommandId"></ComboBox>
+        <Button Name="SelectBtn" Content="Select" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,19,72,0" Click="SelectBtn_Click_1"></Button>
+        <TextBlock HorizontalAlignment="Left" Name="textBlock1" Text="Command" VerticalAlignment="Top" Margin="12,20,0,0" />
+        <Button x:Name="CancelBtn" Content="Cancel" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,19,7,0" Click="CancelBtn_Click_1"/>
+    </Grid>
+</Window>

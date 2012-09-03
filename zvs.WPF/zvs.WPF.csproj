@@ -89,7 +89,13 @@
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
-    <Compile Include="Editor\JSEditor.xaml.cs">
+    <Compile Include="JavaScript\JavaScriptSelector.xaml.cs">
+      <DependentUpon>JavaScriptSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JavaScript\JavaScriptAddRemove.xaml.cs">
+      <DependentUpon>JavaScriptAddRemove.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="JavaScript\JSEditor.xaml.cs">
       <DependentUpon>JSEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="FatalErrorWindow.xaml.cs">
@@ -118,8 +124,8 @@
       <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SingleInstance.cs" />
-    <Compile Include="TriggerControls\JSTriggerEditorWindow.xaml.cs">
-      <DependentUpon>JSTriggerEditorWindow.xaml</DependentUpon>
+    <Compile Include="JavaScript\JavaScriptEditorWindow.xaml.cs">
+      <DependentUpon>JavaScriptEditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="TriggerControls\TriggerEditorWindow.xaml.cs">
       <DependentUpon>TriggerEditorWindow.xaml</DependentUpon>
@@ -171,7 +177,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Editor\JSEditor.xaml">
+    <Page Include="JavaScript\JavaScriptSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="JavaScript\JavaScriptAddRemove.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="JavaScript\JSEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -195,7 +209,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="TriggerControls\JSTriggerEditorWindow.xaml">
+    <Page Include="JavaScript\JavaScriptEditorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

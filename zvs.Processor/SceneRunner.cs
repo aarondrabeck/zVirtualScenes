@@ -204,6 +204,21 @@ namespace zvs.Processor
                     PluginManager.onProcessingCommandEnd += handler;
                     QueuedCommand.AddNewCommandCommand(new QueuedCommand.NewCommandArgs(b_cmd));
                 }
+                if (sceneCommand.Command is JavaScriptCommand)
+                {
+                    JavaScriptCommand js = (JavaScriptCommand)sceneCommand.Command;
+                    JavaScriptExecuter je = new JavaScriptExecuter();
+                    je.onJavaScriptExecuterComplete += (s, a) =>
+                    {
+                        if (a.Errors)
+                            ExecutionErrors++;
+
+                        ExecutedCommands++;
+                        ProcessNextCommand();
+                    };
+                    je.ExecuteScript(js.Script, context);
+                    
+                }
 
             }
             else

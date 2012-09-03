@@ -45,6 +45,8 @@ namespace zvs.Entities
 
         public DbSet<Group> Groups { get; set; }
 
+        public DbSet<JavaScriptCommand> JavaScriptCommands { get; set; }
+        
         public DbSet<Plugin> Plugins { get; set; }
         public DbSet<PluginSetting> PluginSettings { get; set; }
         public DbSet<PluginSettingOption> PluginSettingOptions { get; set; }
@@ -58,8 +60,6 @@ namespace zvs.Entities
         public DbSet<ScenePropertyValue> ScenePropertyValues { get; set; }
 
         public DbSet<ScheduledTask> ScheduledTasks { get; set; }
-
-        
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -82,6 +82,7 @@ namespace zvs.Entities
         public static event onEntityChangedventHandler onSceneCommandsChanged;
         public static event onEntityChangedventHandler onDeviceValueTriggersChanged;
         public static event onEntityChangedventHandler onScheduledTasksChanged;
+        public static event onEntityChangedventHandler onJavaScriptCommandsChanged;
 
 
         public static Dictionary<int, Action> EventsDictionary = new Dictionary<int, Action> {
@@ -111,7 +112,10 @@ namespace zvs.Entities
          {23, () => { if(onDeviceValueTriggersChanged != null) { onDeviceValueTriggersChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
          {24, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
          {25, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
-         {26, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
+         {26, () => { if(onScheduledTasksChanged != null) { onScheduledTasksChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}},
+         {27, () => { if(onJavaScriptCommandsChanged != null) { onJavaScriptCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Added)); }}},
+         {28, () => { if(onJavaScriptCommandsChanged != null) { onJavaScriptCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
+         {29, () => { if(onJavaScriptCommandsChanged != null) { onJavaScriptCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
         };
 
         public override int SaveChanges()
@@ -209,6 +213,17 @@ namespace zvs.Entities
 
             if (this.ChangeTracker.Entries<ScheduledTask>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
                 if (!EventsToTrigger.Contains(26)) { EventsToTrigger.Add(26); }
+
+            //JavaScript Commands
+            if (this.ChangeTracker.Entries<JavaScriptCommand>().Where(p => p.State == System.Data.EntityState.Added).Count() > 0)
+                if (!EventsToTrigger.Contains(27)) { EventsToTrigger.Add(27); }
+
+            if (this.ChangeTracker.Entries<JavaScriptCommand>().Where(p => p.State == System.Data.EntityState.Deleted).Count() > 0)
+                if (!EventsToTrigger.Contains(28)) { EventsToTrigger.Add(28); }
+
+            if (this.ChangeTracker.Entries<JavaScriptCommand>().Where(p => p.State == System.Data.EntityState.Modified).Count() > 0)
+                if (!EventsToTrigger.Contains(29)) { EventsToTrigger.Add(29); }
+
 
             //Save the changes to the Database
             int result = base.SaveChanges();

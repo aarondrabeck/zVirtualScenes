@@ -22,6 +22,7 @@ using System.Threading;
 using System.Diagnostics;
 using zvs.Processor.Backup;
 using zvs.Entities;
+using zvs.WPF.JavaScript;
 
 namespace zvs.WPF
 {
@@ -439,6 +440,13 @@ namespace zvs.WPF
             SettingWindow settingWindow = new SettingWindow();
             settingWindow.Owner = this;
             settingWindow.ShowDialog();
+        }
+
+        private void AddEditJSCmds_Click_1(object sender, RoutedEventArgs e)
+        {
+            JavaScriptAddRemove jsWindow = new JavaScriptAddRemove();
+            jsWindow.Owner = this;
+            jsWindow.ShowDialog();
         }        
     }
 }

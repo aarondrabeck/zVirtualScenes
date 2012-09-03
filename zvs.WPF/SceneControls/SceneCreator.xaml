@@ -192,8 +192,9 @@
                 <Expander Header="Add Commands" Grid.Row="1" Margin="10,5,10,10">
                     <Grid>
                         <DeviceControls:DeviceDataGridUC  x:Name="DevicesGrid" d:LayoutOverrides="GridBox" Height="250" Margin="5,5,150,5"  />
-                        <Button  Name="AddBuiltinCmd" Click="AddBuiltinCmd_Click_1" Content="Add Built-in Command" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Margin="0,0,0,5" Width="135" />
+                        <Button  Name="AddBuiltinCmd" Click="AddBuiltinCmd_Click_1" Content="Add Built-in Command" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Margin="0,0,0,5" Width="145" />
                         <TextBlock TextAlignment="Center" HorizontalAlignment="Right" Margin="0,37,0,0" TextWrapping="Wrap" Text="Drag and drop device to add them to scenes or add a built-in command with the button below." VerticalAlignment="Top" Height="80" Width="135"/>
+                        <Button  x:Name="AddJSCommand" Click="AddJSCommand_Click_1" Content="Add Javascript Command" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Margin="0,0,0,32" Width="145" />
                     </Grid>
                 </Expander>
                 <TextBlock FontWeight="Bold" FontSize="16" Margin="10,5,10,0" TextTrimming="CharacterEllipsis" Text="{Binding Name, StringFormat={}{0} Commands}" VerticalAlignment="Top"/>

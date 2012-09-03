@@ -16,49 +16,54 @@ using System.Windows.Shapes;
 using zvs.Entities;
 
 
-namespace zvs.WPF.TriggerControls
+namespace zvs.WPF.JavaScript
 {
     /// <summary>
     /// Interaction logic for JSTriggerEditorWindow.xaml
     /// </summary>
-    public partial class JSTriggerEditorWindow : Window
+    public partial class JavaScriptEditorWindow : Window
     {
-        private zvsContext context;
-       // private javascript_triggers trigger;
+        private zvsContext Context;
+        private JavaScriptCommand Command;
         public bool Canceled = true;
 
-        //public JSTriggerEditorWindow(javascript_triggers trigger, zvsContext context)
-        //{
-        //    this.context = context;
-        //    this.trigger = trigger;
-        //    InitializeComponent();
-        //}
+        public JavaScriptEditorWindow(zvsContext context, JavaScriptCommand command)
+        {
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                this.Context = context;
+                this.Command = command;
+                InitializeComponent();
+            }
+        }
 
-        ~JSTriggerEditorWindow()
+        ~JavaScriptEditorWindow()
         {
             Debug.WriteLine("TriggerEditorWindow Deconstructed.");
         }
 
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            //if(trigger.Script != null)
-            //    TriggerScriptEditor.Editor.AppendText(trigger.Script);
+            if (Command.Script != null)
+                TriggerScriptEditor.Editor.AppendText(Command.Script);
 
+            CmdNameTxtBx.Text = Command.Name;
             TriggerScriptEditor.Editor.KeyUp += Editor_KeyUp;
         }
 
         void Editor_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
         {
             if (e.KeyCode == System.Windows.Forms.Keys.F5)
-            {
                 Run();
-            }
         }
         private void Run()
         {
             string script = TriggerScriptEditor.Editor.Text;
-            string result = "";
-            if (!string.IsNullOrEmpty(script)) result = zvs.Processor.JSTriggerRunner.ExecuteScript(script);
+            if (!string.IsNullOrEmpty(script))
+            {
+                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter();
+                jse.ExecuteScript(script, Context);
+            }
 
         }
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -68,8 +73,8 @@ namespace zvs.WPF.TriggerControls
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-           // trigger.Script = TriggerScriptEditor.Editor.Text;
-
+            Command.Name = CmdNameTxtBx.Text;
+            Command.Script = TriggerScriptEditor.Editor.Text;
             Canceled = false;
             this.Close();
         }

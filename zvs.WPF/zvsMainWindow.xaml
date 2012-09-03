@@ -48,6 +48,11 @@
             <MenuItem Header="Built-in Commands">
                 <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
             </MenuItem>
+            <MenuItem Header="JavaScript Commands">
+                <MenuItem Name="AddEditJSCmds" Header="Add/Edit JavaScript Commands" Click="AddEditJSCmds_Click_1" />
+            </MenuItem>
+
+            
             <MenuItem Header="Tools">
                 <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
                 <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />

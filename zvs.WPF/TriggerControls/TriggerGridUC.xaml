@@ -34,12 +34,10 @@
             </Setter>
         </Style>
         <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:device_value_triggers}, CreateList=True}"/>
-        <CollectionViewSource x:Key="JSTriggerViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:javascript_triggers}, CreateList=True}"/>
     </UserControl.Resources>
 
     <Grid >
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" DataContext="{StaticResource device_value_triggersViewSource}">
@@ -101,56 +99,6 @@
                 </DataGrid.Columns>
             </DataGrid>
             <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Basic Trigger" HorizontalAlignment="Right" Margin="0,0,5,5" Width="116" VerticalAlignment="Bottom"/>
-        </Grid>
-        
-        <Grid Grid.Row="1" DataContext="{StaticResource JSTriggerViewSource}">
-            <Border  VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
-                <Border.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0.969"/>
-                        <GradientStop Color="#FFF2F3F5"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Javascript Triggers" VerticalAlignment="Center" Margin="5,0,0,0" />
-            </Border>
-            <DataGrid x:Name="JSTriggerGrid" ItemsSource="{Binding}" RowEditEnding="JSTriggerGrid_RowEditEnding"                  
-        	HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
-        	AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
-        	PreviewKeyDown="JSTriggerGrid_PreviewKeyDown" Margin="0,25,0,32" >
-                <DataGrid.Columns>
-
-                    <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserSort="False" CanUserResize="False" CanUserReorder="False" IsReadOnly="True">
-                        <DataGridTemplateColumn.CellTemplate >
-                            <DataTemplate>
-                                <Image x:Name="img" Width="35" Height="35" Source="/zVirtualScenes;component/Images/trigger.png" Margin="5,0" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <DataGridTextColumn MinWidth="200" Width="*" Header="Name" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
-        			FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="{x:Type TextBlock}">
-                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                                <Setter  Property="Margin" Value="5,0" />
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-
-                    <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding isEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" />
-
-                    <DataGridTemplateColumn x:Name="SettingsCol1" MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False">
-                        <DataGridTemplateColumn.CellTemplate >
-                            <DataTemplate>
-                                <Button x:Name="SettingBtn" Width="32" Height="32" Click="JSTrigger_SettingBtn_Click"  ToolTip="Device Details">
-                                    <Image Cursor="Hand"   Source="/zVirtualScenes;component/Images/settings.png" Margin="0,0,0,0"  />
-                                </Button>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
-            <Button Click="AddJSTriggerBtn_Click"  x:Name="AddJSTriggerBtn" Content="Add Javascript Trigger" HorizontalAlignment="Right" Width="139" VerticalAlignment="Bottom" Margin="0,0,5,5"/>
         </Grid>
     </Grid>
 </UserControl>

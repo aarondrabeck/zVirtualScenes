@@ -50,6 +50,8 @@
     <Compile Include="Command.cs" />
     <Compile Include="BuiltinCommand.cs" />
     <Compile Include="CommandOption.cs" />
+    <Compile Include="QueuedJavaScriptCommand.cs" />
+    <Compile Include="JavaScriptCommand.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ScheduledTask.cs" />
     <Compile Include="Enums\TaskFrequency.cs" />

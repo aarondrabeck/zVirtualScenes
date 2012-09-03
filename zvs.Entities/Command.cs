@@ -36,6 +36,7 @@ namespace zvs.Entities
                 {
                     _Name = value;
                     NotifyPropertyChanged("Name");
+                    NotifyPropertyChanged("Command");
                 }
             }
         }

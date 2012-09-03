@@ -71,7 +71,7 @@
     <Compile Include="DetectVCRedist.cs" />
     <Compile Include="Backup\BackupScene.cs" />
     <Compile Include="Backup\BackupDevice.cs" />
-    <Compile Include="JSTriggerRunner.cs" />
+    <Compile Include="JavaScriptExecuter.cs" />
     <Compile Include="Logger\Logger.cs" />
     <Compile Include="Logger\LogItem.cs" />
     <Compile Include="Logger\Urgency.cs" />

@@ -16,6 +16,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zvs.Processor;
 using zvs.Entities;
+using zvs.WPF.TriggerControls;
+using zvs.WPF.JavaScript;
 
 
 namespace zvs.WPF.SceneControls
@@ -53,12 +55,34 @@ namespace zvs.WPF.SceneControls
 
             SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
             zvsContext.onScenesChanged += zvsContext_onScenesChanged;
+            zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommandsChanged;
 
             if (SceneGrid.Items.Count > 0)
                 SceneGrid.SelectedIndex = 0;
 
             SceneGrid.Focus();
 
+        }
+
+        void zvsContext_onJavaScriptCommandsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                if (context != null)
+                {
+                    if (args.ChangeType == System.Data.EntityState.Added)
+                    {
+                        //Gets new devices
+                        context.JavaScriptCommands.ToList();
+                    }
+                    else
+                    {
+                        //Reloads context from DB when modifications happen
+                        foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                            ent.Reload();
+                    }
+                }
+            }));
         }
 
         void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
@@ -128,6 +152,7 @@ namespace zvs.WPF.SceneControls
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
             SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
+            zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
             zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
 
         }
@@ -647,6 +672,16 @@ namespace zvs.WPF.SceneControls
                             context.SaveChanges();
                         }
                     }
+                    else if (cmd.Command is JavaScriptCommand)
+                    {
+                        JavaScriptEditorWindow jsWindow = new JavaScriptEditorWindow(context, (JavaScriptCommand)cmd.Command);
+                        jsWindow.Owner = app.zvsWindow;
+
+                        if (jsWindow.ShowDialog() ?? false)
+                        {
+                            context.SaveChanges();
+                        }
+                    }
                 }
             }
         }
@@ -664,25 +699,48 @@ namespace zvs.WPF.SceneControls
             }
         }
 
+        private void AddJSCommand_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (SceneGrid.SelectedItem is Scene)
+            {
+                Scene selected_scene = (Scene)SceneGrid.SelectedItem;
+                if (selected_scene != null)
+                {
+                    SceneCmdsGrid.SelectedItems.Clear();
+                    SceneCommand cmd = new SceneCommand();
+
+
+                    int? max = selected_scene.Commands.Max(o => o.SortOrder);
+                    if (max.HasValue)
+                        cmd.SortOrder = max.Value + 1;
+                    else
+                        cmd.SortOrder = 0;
+
+                    JavaScriptSelector window = new JavaScriptSelector(null, context);
+                    window.Owner = app.zvsWindow;
+
+                    if (window.ShowDialog() ?? false)
+                    {
+                        if (selected_scene.isRunning)
+                        {
+                            ShowSceneEditWarning(selected_scene.Name);
+                        }
+                        else
+                        {
+                            if (window.SelectedCommand != null)
+                            {
+                                cmd.Command = window.SelectedCommand;
+                                selected_scene.Commands.Add(cmd);
+                                context.SaveChanges();
+
+                                SceneCmdsGrid.SelectedItems.Add(cmd);
+                            }
+                        }
+                        SceneCmdsGrid.Focus();
+                    }
+                }
+            }
+        }
     }
-
-    //public class IsValidScene : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-    //    {
-    //        if (value is int)
-    //        {
-    //            int id = (int)value;
-    //            if (id > 0)
-    //                return true;
-    //        }
-    //        return false;
-    //    }
-
-    //    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 }
 
