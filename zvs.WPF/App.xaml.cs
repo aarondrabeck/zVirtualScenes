@@ -5,19 +5,22 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 using System.IO;
-
 using zvs.Processor;
 using System.ComponentModel;
 using zvs.Processor.Triggers;
 using System.Diagnostics;
 using System.Text;
+using Microsoft.Shell;
+using System.Windows.Shell;
+using System.Reflection;
+using zvs.Entities;
 
 namespace zvs.WPF
 {
     /// <summary>
     /// interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application
+    public partial class App : Application, ISingleInstanceApp
     {
         public Core zvsCore;
         public ZVSTaskbarIcon taskbarIcon;
@@ -26,14 +29,120 @@ namespace zvs.WPF
         public Window firstWindow;
         System.Threading.Mutex zvsMutex = null;
 
+        [STAThread]
+        public static void Main()
+        {
+            if (SingleInstance<App>.InitializeAsFirstInstance("AdvancedJumpList"))
+            {
+                var application = new App();
+                application.Init();
+                application.Run();
+
+
+                // Allow single instance code to perform cleanup operations
+                SingleInstance<App>.Cleanup();
+            }
+        }
+
+        public void Init()
+        {
+            this.InitializeComponent();
+        }
+
+        public bool SignalExternalCommandLineArgs(IList<string> args)
+        {
+            if (args == null || args.Count == 0)
+                return true;
+            if ((args.Count > 2))
+            {
+                //the first index always contains the location of the exe so we need to check the second index
+                if ((args[1].ToLowerInvariant() == "-startscene"))
+                {
+                    int SceneId = 0;
+                    string SearchQuery = args[2].ToLower();
+
+                    using (zvsContext context = new zvsContext())
+                    {
+                        Scene scene = null;
+                        if (int.TryParse(SearchQuery, out SceneId))
+                            scene = context.Scenes.FirstOrDefault(s => s.SceneId == SceneId);
+                        else if (SearchQuery != null)
+                            scene = context.Scenes.FirstOrDefault(s => s.Name.ToLower().Equals(SearchQuery));
+
+                        if (scene != null)
+                        {
+
+                            SceneRunner sr = new SceneRunner();
+                            SceneRunner.onSceneRunEventHandler startHandler = null;
+                            startHandler = (s, a) =>
+                            {
+                                if (a.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                {
+                                    SceneRunner.onSceneRunBegin -= startHandler;
+
+                                    try
+                                    {
+                                        zvsCore.Dispatcher.Invoke(new Action(() =>
+                                        {
+                                            zvsCore.Logger.WriteToLog(Urgency.INFO,
+                                       string.Format(a.Details),
+                                       "Command Line");
+                                        }));
+                                    }
+                                    catch { }
+
+                                    #region LISTEN FOR ENDING
+                                    SceneRunner.onSceneRunEventHandler handler = null;
+                                    handler = (se, end_args) =>
+                                    {
+                                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                                        {
+                                            SceneRunner.onSceneRunComplete -= handler;
+
+                                            try
+                                            {
+                                                zvsCore.Dispatcher.Invoke(new Action(() =>
+                                                {
+                                                    zvsCore.Logger.WriteToLog(Urgency.INFO,
+                                       string.Format(end_args.Details),
+                                       "Command Line");
+                                                }));
+                                            }
+                                            catch { }
+
+                                        }
+                                    };
+                                    SceneRunner.onSceneRunComplete += handler;
+                                    #endregion
+                                }
+                            };
+                            SceneRunner.onSceneRunBegin += startHandler;
+                            sr.RunScene(scene.SceneId);
+                        }
+                        else
+                            try
+                            {
+                                zvsCore.Dispatcher.Invoke(new Action(() =>
+                                {
+                                    zvsCore.Logger.WriteToLog(Urgency.INFO,
+                               string.Format("Cannot find scene '{0}'", SearchQuery),
+                               "Command Line");
+                                }));
+                            }
+                            catch { }
+                    }
+                }
+            }
+            return true;
+        }
 
         protected override void OnStartup(StartupEventArgs e)
         {
             try
             {
-                zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");  
-                
-                Core.ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");              
+                zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");
+
+                Core.ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");
             }
             catch
             {

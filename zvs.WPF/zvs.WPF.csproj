@@ -42,9 +42,7 @@
     <ApplicationIcon>zvs256.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup />
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="EntityFramework, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -61,6 +59,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
@@ -82,10 +81,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
@@ -118,6 +117,7 @@
     <Compile Include="SettingWindow.xaml.cs">
       <DependentUpon>SettingWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SingleInstance.cs" />
     <Compile Include="TriggerControls\JSTriggerEditorWindow.xaml.cs">
       <DependentUpon>JSTriggerEditorWindow.xaml</DependentUpon>
     </Compile>
@@ -315,7 +315,6 @@
     <None Include="App.config" />
     <Resource Include="Images\zvs256.ico" />
     <Resource Include="Images\zvs32.ico" />
-    <None Include="app.manifest" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />

@@ -373,7 +373,6 @@ namespace zvs.Processor
             {
                 this.Core.Dispatcher.Invoke(new Action(() =>
                 {
-
                     Core.Logger.WriteToLog((Urgency)u, message, this.Name);
 
                 }));
