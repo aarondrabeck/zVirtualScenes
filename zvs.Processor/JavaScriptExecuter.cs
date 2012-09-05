@@ -56,6 +56,7 @@ namespace zvs.Processor
             engine.SetFunction("RunScene", new Action<double>(RunScene));
             engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommand));
             engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
+            engine.SetFunction("ReportProgress", new Action<string>(ReportProgress));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
             try
             {
@@ -97,6 +98,12 @@ namespace zvs.Processor
 
             if (!Async)
                 mutex.WaitOne();
+        }
+
+        //ReportProgress("Hello World!")
+        public void ReportProgress(string progress)
+        {
+            ReportProgress(progress);
         }
 
         protected void ReportProgress(string progress, params string[] args)
