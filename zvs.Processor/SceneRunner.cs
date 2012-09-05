@@ -13,6 +13,7 @@ namespace zvs.Processor
 {
     public class SceneRunner : IDisposable
     {
+        private string Source = string.Empty;
         private zvsContext context;
         private Scene _scene;
         private int ExecutionErrors = 0;
@@ -20,14 +21,19 @@ namespace zvs.Processor
         private List<SceneCommand> CommandsToExecute = new List<SceneCommand>();
         private BackgroundWorker worker = new BackgroundWorker();
         private bool hasExecuted = false;
+        private int SceneId = 0;
+        public Guid SceneRunnerGUID { get; private set; }
 
-        private Guid _SceneRunnerGUID = Guid.NewGuid();
-        public Guid SceneRunnerGUID
+        /// <summary>
+        /// Executes a scene asynchronously and reports progress.
+        /// </summary>
+        /// <param name="InvokersName"> Name of the person executing the scene.</param>
+        public SceneRunner(int sceneID, string source)
         {
-            get
-            {
-                return _SceneRunnerGUID;
-            }
+            this.SceneId = sceneID;
+            this.Source = source;
+            SceneRunnerGUID = Guid.NewGuid();
+            context = new zvsContext();
         }
 
         #region Events
@@ -38,33 +44,85 @@ namespace zvs.Processor
             public string Details { get; private set; }
             public int SceneID { get; private set; }
             public Guid SceneRunnerGUID { get; private set; }
+            public string Source { get; private set; }
 
-            public onSceneRunEventArgs(int SceneID, bool Errors, string Details, Guid SceneRunnerGUID)
+            public onSceneRunEventArgs(int SceneID, bool Errors, string Details, Guid SceneRunnerGUID, string source)
             {
                 this.SceneID = SceneID;
                 this.Errors = Errors;
                 this.Details = Details;
                 this.SceneRunnerGUID = SceneRunnerGUID;
+                this.Source = source;
+            }
+        }
+
+        public delegate void onReportProgressEventHandler(object sender, onReportProgressEventArgs args);
+        public class onReportProgressEventArgs : EventArgs
+        {
+            public int SceneID { get; private set; }
+            public string Progress { get; private set; }
+            public Guid SceneRunnerGUID { get; private set; }
+            public string Source { get; private set; }
+
+            public onReportProgressEventArgs(string progress, int sceneID, Guid sceneRunnerGUID, string source)
+            {
+                this.Progress = progress;
+                this.SceneID = sceneID;
+                this.SceneRunnerGUID = sceneRunnerGUID;
+                this.Source = source;
             }
         }
         /// <summary>
         /// Called when a scene has been called to be executed.
         /// </summary>
         public static event onSceneRunEventHandler onSceneRunBegin;
+        public event onSceneRunEventHandler onRunBegin;
+
+        /// <summary>
+        /// Called as a scene runner has progress to report.
+        /// </summary>
+        public static event onReportProgressEventHandler onSceneReportProgress;
+        public event onReportProgressEventHandler onReportProgress;
 
         /// <summary>
         /// Called when a scene is finished.
         /// </summary>
         public static event onSceneRunEventHandler onSceneRunComplete;
+        public event onSceneRunEventHandler onRunComplete;
+
         #endregion
 
-        public SceneRunner()
+        #region Event Helper Methods
+        private void ReportBegin(onSceneRunEventArgs arg)
         {
-            context = new zvsContext();
+            if (onSceneRunBegin != null)
+                onSceneRunBegin(this, arg);
+
+            if (onRunBegin != null)
+                onRunBegin(this, arg);
         }
 
+        private void ReportComplete(onSceneRunEventArgs arg)
+        {
+            if (onSceneRunComplete != null)
+                onSceneRunComplete(this, arg);
+
+            if (onRunComplete != null)
+                onRunComplete(this, arg);
+        }
+
+        private void ReportProgress(string progress)
+        {
+            if (onReportProgress != null)
+                onReportProgress(this, new onReportProgressEventArgs(progress, SceneId, SceneRunnerGUID, Source));
+
+            if (onSceneReportProgress != null)
+                onSceneReportProgress(this, new onReportProgressEventArgs(progress, SceneId, SceneRunnerGUID, Source));
+        }
+        #endregion
+
         //Methods
-        public void RunScene(int SceneID)
+        public void RunScene()
         {
             if (hasExecuted)
                 throw new Exception("Scene runners cannot be reused.");
@@ -72,33 +130,27 @@ namespace zvs.Processor
             hasExecuted = true;
             worker.DoWork += (sender, args) =>
             {
-                _scene = context.Scenes.FirstOrDefault(o => o.SceneId == SceneID);
+                _scene = context.Scenes.FirstOrDefault(o => o.SceneId == SceneId);
 
                 if (_scene == null)
                 {
-                    if (onSceneRunBegin != null)
-                        onSceneRunBegin(this, new onSceneRunEventArgs(SceneID, false, "Scene '" + SceneID + "' started.", SceneRunnerGUID));
-
-                    if (onSceneRunComplete != null)
-                        onSceneRunComplete(this, new onSceneRunEventArgs(SceneID, true, "Failed to run scene '" + SceneID + "' because it was not found in the database!", SceneRunnerGUID));
+                    ReportBegin(new onSceneRunEventArgs(SceneId, false, "Scene '" + SceneId + "' started.", SceneRunnerGUID, Source));
+                    ReportComplete(new onSceneRunEventArgs(SceneId, true, "Failed to run scene '" + SceneId + "' because it was not found in the database!", SceneRunnerGUID, Source));
                 }
 
 
-                if (onSceneRunBegin != null)
-                    onSceneRunBegin(this, new onSceneRunEventArgs(_scene.SceneId, false, "Scene '" + _scene.Name + "' started.", SceneRunnerGUID));
+                ReportBegin(new onSceneRunEventArgs(_scene.SceneId, false, "Scene '" + _scene.Name + "' started.", SceneRunnerGUID, Source));
 
 
                 if (_scene.isRunning)
                 {
-                    if (onSceneRunComplete != null)
-                        onSceneRunComplete(this, new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it is already running!", SceneRunnerGUID));
+                    ReportComplete(new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it is already running!", SceneRunnerGUID, Source));
                 }
                 else
                 {
                     if (_scene.Commands.Count < 1)
                     {
-                        if (onSceneRunComplete != null)
-                            onSceneRunComplete(this, new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!", SceneRunnerGUID));
+                        ReportComplete(new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!", SceneRunnerGUID, Source));
 
                         return;
                     }
@@ -114,6 +166,8 @@ namespace zvs.Processor
                 }
             };
             worker.RunWorkerAsync();
+
+
         }
 
         private void ProcessNextCommand()
@@ -208,6 +262,10 @@ namespace zvs.Processor
                 {
                     JavaScriptCommand js = (JavaScriptCommand)sceneCommand.Command;
                     JavaScriptExecuter je = new JavaScriptExecuter();
+                    je.onReportProgress += (s, a) =>
+                        {
+                            ReportProgress(a.Progress);
+                        };
                     je.onComplete += (s, a) =>
                     {
                         if (a.Errors)
@@ -216,8 +274,8 @@ namespace zvs.Processor
                         ExecutedCommands++;
                         ProcessNextCommand();
                     };
-                    je.ExecuteScript(js.Script, context);
-                    
+                    je.ExecuteScript(js.Script, context, Source);
+
                 }
 
             }
@@ -226,8 +284,7 @@ namespace zvs.Processor
                 _scene.isRunning = false;
                 context.SaveChanges();
 
-                if (onSceneRunComplete != null)
-                    onSceneRunComplete(this, new onSceneRunEventArgs(_scene.SceneId, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors), SceneRunnerGUID));
+                ReportComplete(new onSceneRunEventArgs(_scene.SceneId, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors), SceneRunnerGUID, Source));
 
             }
         }

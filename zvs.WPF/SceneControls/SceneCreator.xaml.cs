@@ -238,41 +238,8 @@ namespace zvs.WPF.SceneControls
                 var scene = (Scene)obj;
                 if (scene != null)
                 {
-
-                    SceneRunner sr = new SceneRunner();
-                    SceneRunner.onSceneRunEventHandler startHandler = null;
-                    startHandler = (s, args) =>
-                    {
-                        if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                        {
-                            SceneRunner.onSceneRunBegin -= startHandler;
-
-                            this.Dispatcher.Invoke(new Action(() =>
-                            {
-                                app.zvsCore.Logger.WriteToLog(Urgency.INFO, args.Details, Utils.ApplicationName + " GUI");
-                            }));
-
-                            #region LISTEN FOR ENDING
-                            SceneRunner.onSceneRunEventHandler handler = null;
-                            handler = (se, end_args) =>
-                            {
-                                if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                {
-                                    SceneRunner.onSceneRunComplete -= handler;
-
-                                    this.Dispatcher.Invoke(new Action(() =>
-                                    {
-                                        app.zvsCore.Logger.WriteToLog(Urgency.INFO, end_args.Details, Utils.ApplicationName + " GUI");
-                                    }));
-                                }
-                            };
-                            SceneRunner.onSceneRunComplete += handler;
-                            #endregion
-
-                        }
-                    };
-                    SceneRunner.onSceneRunBegin += startHandler;
-                    sr.RunScene(scene.SceneId);
+                    SceneRunner sr = new SceneRunner(scene.SceneId, Utils.ApplicationName + " GUI");
+                    sr.RunScene();
                 }
             }
         }

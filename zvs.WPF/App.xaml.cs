@@ -71,53 +71,8 @@ namespace zvs.WPF
 
                         if (scene != null)
                         {
-
-                            SceneRunner sr = new SceneRunner();
-                            SceneRunner.onSceneRunEventHandler startHandler = null;
-                            startHandler = (s, a) =>
-                            {
-                                if (a.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                {
-                                    SceneRunner.onSceneRunBegin -= startHandler;
-
-                                    try
-                                    {
-                                        zvsCore.Dispatcher.Invoke(new Action(() =>
-                                        {
-                                            zvsCore.Logger.WriteToLog(Urgency.INFO,
-                                       string.Format(a.Details),
-                                       "Command Line");
-                                        }));
-                                    }
-                                    catch { }
-
-                                    #region LISTEN FOR ENDING
-                                    SceneRunner.onSceneRunEventHandler handler = null;
-                                    handler = (se, end_args) =>
-                                    {
-                                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                        {
-                                            SceneRunner.onSceneRunComplete -= handler;
-
-                                            try
-                                            {
-                                                zvsCore.Dispatcher.Invoke(new Action(() =>
-                                                {
-                                                    zvsCore.Logger.WriteToLog(Urgency.INFO,
-                                       string.Format(end_args.Details),
-                                       "Command Line");
-                                                }));
-                                            }
-                                            catch { }
-
-                                        }
-                                    };
-                                    SceneRunner.onSceneRunComplete += handler;
-                                    #endregion
-                                }
-                            };
-                            SceneRunner.onSceneRunBegin += startHandler;
-                            sr.RunScene(scene.SceneId);
+                            SceneRunner sr = new SceneRunner(scene.SceneId, "Command Line");                            
+                            sr.RunScene();
                         }
                         else
                             try
@@ -185,6 +140,30 @@ namespace zvs.WPF
 
 
             taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
+
+            SceneRunner.onSceneRunBegin += (sender, args) =>
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    zvsCore.Logger.WriteToLog(args.Errors ? Urgency.ERROR : Urgency.INFO, args.Details, args.Source);
+                }));
+            };
+
+            SceneRunner.onSceneRunComplete += (sender, args) =>
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    zvsCore.Logger.WriteToLog(args.Errors ? Urgency.ERROR : Urgency.INFO, args.Details, args.Source);
+                }));
+            };
+
+            SceneRunner.onSceneReportProgress += (sender, args) =>
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    zvsCore.Logger.WriteToLog(Urgency.INFO, args.Progress, args.Source);
+                }));
+            };
 
             TriggerManager.onTriggerStart += (sender, args) =>
             {

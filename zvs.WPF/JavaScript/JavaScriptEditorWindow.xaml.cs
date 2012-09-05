@@ -102,7 +102,7 @@ namespace zvs.WPF.JavaScript
                     {
                         SetFeedBackText(args.Progress);
                     };
-                    jse.ExecuteScript(script, Context);
+                    jse.ExecuteScript(script, Context, "Test Button");
                 };
                 bw.RunWorkerAsync();
             }

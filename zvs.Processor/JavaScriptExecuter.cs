@@ -10,7 +10,8 @@ namespace zvs.Processor
 {
     public class JavaScriptExecuter
     {
-        private zvsContext Context; 
+        private zvsContext Context;
+        private string Source;
         #region Events
         public delegate void onJavaScriptExecuterEventHandler(object sender, JavaScriptExecuterEventArgs args);
         public class JavaScriptExecuterEventArgs : EventArgs
@@ -35,17 +36,17 @@ namespace zvs.Processor
                 this.Progress = progress;
             }
         }
+        public event onReportProgressEventHandler onReportProgress;
 
         /// <summary>
         /// Called when JavaScript executer is finished.
         /// </summary>
         public event onJavaScriptExecuterEventHandler onComplete;
-
-        public event onReportProgressEventHandler onReportProgress;
         #endregion
 
-        public void ExecuteScript(string Script, zvsContext context)
+        public void ExecuteScript(string Script, zvsContext context, string source)
         {
+            this.Source = source;
             this.Context = context;
             Jint.JintEngine engine = new Jint.JintEngine();
             engine.SetDebugMode(true);
@@ -62,7 +63,7 @@ namespace zvs.Processor
                 if (result != null)
                 {
                     if (onComplete != null)
-                         onComplete(this, new JavaScriptExecuterEventArgs(false, result.ToString()));
+                        onComplete(this, new JavaScriptExecuterEventArgs(false, result.ToString()));
                     return;
                 }
             }
@@ -74,7 +75,7 @@ namespace zvs.Processor
             }
 
             if (onComplete != null)
-                         onComplete(this, new JavaScriptExecuterEventArgs(false, "None"));            
+                onComplete(this, new JavaScriptExecuterEventArgs(false, "None"));
         }
 
         //Delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
@@ -88,14 +89,14 @@ namespace zvs.Processor
             t.Elapsed += (sender, e) =>
             {
                 t.Stop();
-                ExecuteScript(script, Context);
+                ExecuteScript(script, Context, "Test Button");
                 mutex.Set();
                 t.Dispose();
             };
             t.Start();
 
-            if(!Async)
-                 mutex.WaitOne();
+            if (!Async)
+                mutex.WaitOne();
         }
 
         protected void ReportProgress(string progress, params string[] args)
@@ -131,43 +132,23 @@ namespace zvs.Processor
 
 
                 //TODO: ReportProgress here
-                dc.Run(context, Value); 
+                dc.Run(context, Value);
             }
         }
 
         //RunScene(1);
         public void RunScene(double SceneID)
         {
+            ReportProgress(string.Format("Running JavaScript Command: RunScene({0})", SceneID));
             int sid = Convert.ToInt32(SceneID);
             AutoResetEvent mutex = new AutoResetEvent(false);
-            SceneRunner sr = new SceneRunner();
-            SceneRunner.onSceneRunEventHandler startHandler = null;
-            startHandler = (s, args) =>
+
+            SceneRunner sr = new SceneRunner(sid, "JavaScript");
+            sr.onRunComplete += (s, a) =>
             {
-                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                {
-                    SceneRunner.onSceneRunBegin -= startHandler;
-                    ReportProgress(args.Details);
-
-                    #region LISTEN FOR ENDING
-                    SceneRunner.onSceneRunEventHandler handler = null;
-                    handler = (se, end_args) =>
-                    {
-                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                        {
-                            ReportProgress(end_args.Details);
-                            SceneRunner.onSceneRunComplete -= handler;
-                            mutex.Set();
-                        }
-                    };
-                    SceneRunner.onSceneRunComplete += handler;
-                    #endregion
-                }
+                mutex.Set();
             };
-            SceneRunner.onSceneRunBegin += startHandler;
-
-            //TODO: This should be sync not async
-            sr.RunScene(sid);
+            sr.RunScene();
             mutex.WaitOne();
         }
     }

@@ -282,7 +282,7 @@ namespace zvs.Processor
             using (zvsContext context = new zvsContext())
             {
                 _task = context.ScheduledTasks.FirstOrDefault(o => o.ScheduledTaskId == task.ScheduledTaskId);
-                
+
                 if (_task == null)
                     return;
 
@@ -299,47 +299,26 @@ namespace zvs.Processor
                 }
                 else
                 {
-                    SceneRunner sr = new SceneRunner();
-
-                    SceneRunner.onSceneRunEventHandler startHandler = null;
-                    startHandler = (s, args) =>
-                    {
-                        if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                    SceneRunner sr = new SceneRunner(scene.SceneId, _task.Name);
+                    sr.onRunBegin += (s, a) =>
                         {
-                            SceneRunner.onSceneRunBegin -= startHandler;
-
                             if (onScheduledTaskBegin != null)
                             {
                                 onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
-                                    string.Format("Task '{0}' started. Result: {1}", _task.Name, args.Details)
+                                    string.Format("Task '{0}' started. Result: {1}", _task.Name, a.Details)
                                     , false));
                             }
-
-                            #region LISTEN FOR ENDING
-                            SceneRunner.onSceneRunEventHandler handler = null;
-                            handler = (se, end_args) =>
+                        };
+                    sr.onRunComplete += (s, a) =>
+                        {
+                            if (onScheduledTaskEnd != null)
                             {
-                                if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                {
-                                    SceneRunner.onSceneRunComplete -= handler;
-
-                                    if (onScheduledTaskEnd != null)
-                                    {
-                                        onScheduledTaskEnd(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
-                                            string.Format("Task '{0}' ended. Result: {1}", _task.Name, end_args.Details)
-                                            , end_args.Errors));
-                                    }
-                                }
-                            };
-                            SceneRunner.onSceneRunComplete += handler;
-                            #endregion
-                        }
-
-
-                    };
-                    SceneRunner.onSceneRunBegin += startHandler;
-
-                    sr.RunScene(scene.SceneId);
+                                onScheduledTaskEnd(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
+                                    string.Format("Task '{0}' ended. Result: {1}", _task.Name, a.Details)
+                                    , a.Errors));
+                            }
+                        };
+                    sr.RunScene();
                 }
             }
         }

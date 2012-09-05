@@ -128,24 +128,16 @@ namespace zvs.Processor.Triggers
 
         private void ActivateTriggerScene(DeviceValueTrigger trigger)
         {
-            SceneRunner sr = new SceneRunner();
-            SceneRunner.onSceneRunEventHandler startHandler = null;
-            startHandler = (s, args) =>
+            SceneRunner sr = new SceneRunner(trigger.Scene.SceneId, trigger.Name);
+            sr.onRunBegin += (s, a) =>
             {
-                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
+                if (onTriggerStart != null)
                 {
-                    SceneRunner.onSceneRunBegin -= startHandler;
-
-                    if (onTriggerStart != null)
-                    {
-                        onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
-                            string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.Scene.Name), false));
-                    }
+                    onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
+                        string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.Scene.Name), false));
                 }
             };
-            SceneRunner.onSceneRunBegin += startHandler;
-
-            sr.RunScene(trigger.Scene.SceneId);
+            sr.RunScene();
         }
     }
 }

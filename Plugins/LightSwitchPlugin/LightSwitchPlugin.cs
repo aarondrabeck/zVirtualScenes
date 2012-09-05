@@ -784,33 +784,16 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void ExecuteZVSCommand(int SceneID, Socket Client)
         {
-            SceneRunner sr = new SceneRunner();
-            SceneRunner.onSceneRunEventHandler startHandler = null;
-            startHandler = (s, args) =>
+            SceneRunner sr = new SceneRunner(SceneID, Client.RemoteEndPoint.ToString());
+            sr.onRunBegin += (s, a) =>
             {
-                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                {
-                    SceneRunner.onSceneRunBegin -= startHandler;
-                    BroadcastMessage("MSG~" + args.Details + Environment.NewLine);
-                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + args.Details);
-
-                    #region LISTEN FOR ENDING
-                    SceneRunner.onSceneRunEventHandler handler = null;
-                    handler = (se, end_args) =>
-                    {
-                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                        {
-                            SceneRunner.onSceneRunComplete -= handler;
-                            BroadcastMessage("MSG~" + end_args.Details + Environment.NewLine);
-                            WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] " + end_args.Details);
-                        }
-                    };
-                    SceneRunner.onSceneRunComplete += handler;
-                    #endregion
-                }
+                BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
             };
-            SceneRunner.onSceneRunBegin += startHandler;
-            sr.RunScene(SceneID);
+            sr.onRunComplete += (s, a) =>
+            {
+                BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
+            };
+            sr.RunScene();
         }
 
         private bool ExecuteDynamicCMD(zvsContext context, Device d, string cmdUniqueId, string arg, Socket Client)

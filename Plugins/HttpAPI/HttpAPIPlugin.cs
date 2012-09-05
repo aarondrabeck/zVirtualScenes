@@ -612,32 +612,8 @@ namespace HttpAPI
                     {
                         if (is_running)
                         {
-                            SceneRunner sr = new SceneRunner();
-                            SceneRunner.onSceneRunEventHandler startHandler = null;
-                            startHandler = (s, args) =>
-                            {
-                                if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                {
-                                    SceneRunner.onSceneRunBegin -= startHandler;
-                                    WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", ip, args.Details));
-
-                                    #region LISTEN FOR ENDING
-                                    SceneRunner.onSceneRunEventHandler handler = null;
-                                    handler = (se, end_args) =>
-                                    {
-                                        if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                        {
-                                            SceneRunner.onSceneRunComplete -= handler;
-                                            WriteToLog(Urgency.INFO, string.Format("[{0}] {1}", ip, end_args.Details));
-                                        }
-                                    };
-                                    SceneRunner.onSceneRunComplete += handler;
-                                    #endregion
-                                }
-                            };
-                            SceneRunner.onSceneRunBegin += startHandler;
-                            sr.RunScene(scene.SceneId);
-
+                            SceneRunner sr = new SceneRunner(sID, ip);
+                            sr.RunScene();
                             return new { success = true, desc = "Scene Started." };
                         }
 
@@ -647,6 +623,7 @@ namespace HttpAPI
                             db.SaveChanges();
                             return new { success = true, desc = "Scene Name Updated." };
                         }
+                        
                     }
                     else
                         return new { success = false, reason = "Scene not found." };

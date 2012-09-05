@@ -197,31 +197,8 @@ namespace NOAAPlugin
 
                             if (activate)
                             {
-                                SceneRunner sr = new SceneRunner();
-                                SceneRunner.onSceneRunEventHandler startHandler = null;
-                                startHandler = (s, args) =>
-                                {
-                                    if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                    {
-                                        SceneRunner.onSceneRunBegin -= startHandler;
-                                        WriteToLog(Urgency.INFO, "Sunrise: " + args.Details);
-
-                                        #region LISTEN FOR ENDING
-                                        SceneRunner.onSceneRunEventHandler handler = null;
-                                        handler = (se, end_args) =>
-                                        {
-                                            if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                            {
-                                                SceneRunner.onSceneRunComplete -= handler;
-                                                WriteToLog(Urgency.INFO, "Sunrise: " + end_args.Details);
-                                            }
-                                        };
-                                        SceneRunner.onSceneRunComplete += handler;
-                                        #endregion
-                                    }
-                                };
-                                SceneRunner.onSceneRunBegin += startHandler;
-                                sr.RunScene(scene.SceneId);
+                                SceneRunner sr = new SceneRunner(scene.SceneId, "Sunrise");
+                                sr.RunScene();
                             }
                         }
                         CalculateSunriseSet();
@@ -239,31 +216,8 @@ namespace NOAAPlugin
 
                             if (activate)
                             {
-                                SceneRunner sr = new SceneRunner();
-                                SceneRunner.onSceneRunEventHandler startHandler = null;
-                                startHandler = (s, args) =>
-                                {
-                                    if (args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                    {
-                                        SceneRunner.onSceneRunBegin -= startHandler;
-                                        WriteToLog(Urgency.INFO, "Sunset: " + args.Details);
-
-                                        #region LISTEN FOR ENDING
-                                        SceneRunner.onSceneRunEventHandler handler = null;
-                                        handler = (se, end_args) =>
-                                        {
-                                            if (end_args.SceneRunnerGUID == sr.SceneRunnerGUID)
-                                            {
-                                                SceneRunner.onSceneRunComplete -= handler;
-                                                WriteToLog(Urgency.INFO, "Sunset: " + end_args.Details);
-                                            }
-                                        };
-                                        SceneRunner.onSceneRunComplete += handler;
-                                        #endregion
-                                    }
-                                };
-                                SceneRunner.onSceneRunBegin += startHandler;
-                                sr.RunScene(scene.SceneId);
+                                SceneRunner sr = new SceneRunner(scene.SceneId, "Sunset");
+                                sr.RunScene();
                             }
                         }
                         CalculateSunriseSet();
