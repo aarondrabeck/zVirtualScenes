@@ -5,7 +5,7 @@
 #define use_vc2010
 
 #define MyAppName "zVirtualScenes"
-#define MyAppVersion "{#VERSION_NAME}"
+;#define MyAppVersion "{#VERSION_NAME}"
 #define MyAppPublisher "Nonce Labs"
 #define MyAppExeName "zVirtualScenes.exe"
 
