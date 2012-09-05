@@ -335,6 +335,8 @@ namespace OpenZWavePlugin
 
         public override void ProcessDeviceTypeCommand(QueuedDeviceTypeCommand cmd)
         {
+            WriteToLog(Urgency.INFO, string.Format("Argument:{0}, Command.ArgumentType:{1}, Command.Description:{2}, Command.Value:{3}, Device.DeviceId:{4}, Device.Type.UniqueIdentifier:{5}, Command.UniqueIdentifier:{6}",
+                cmd.Argument, cmd.Command.ArgumentType.ToString(), cmd.Command.Description, cmd.Command.Value, cmd.Device.DeviceId.ToString(), cmd.Device.Type.UniqueIdentifier, cmd.Command.UniqueIdentifier));
             if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
             {
                 switch (cmd.Command.UniqueIdentifier)
@@ -1033,6 +1035,7 @@ namespace OpenZWavePlugin
                                 if (verbosity > 4)
                                     WriteToLog(Urgency.INFO, "[Node Protocol Info] " + node.Label);
 
+                                
                                 switch (node.Label)
                                 {
                                     case "Toggle Switch":
@@ -1041,7 +1044,7 @@ namespace OpenZWavePlugin
                                     case "Binary Power Switch":
                                     case "Binary Scene Switch":
                                     case "Binary Toggle Remote Switch":
-                                        deviceName = "OpenZWave Switch " + node.ID;
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Switch " + node.ID) : node.Name);
                                         device_type = GetDeviceType("SWITCH", Context);
                                         break;
                                     case "Multilevel Toggle Remote Switch":
@@ -1050,14 +1053,14 @@ namespace OpenZWavePlugin
                                     case "Multilevel Switch":
                                     case "Multilevel Power Switch":
                                     case "Multilevel Scene Switch":
-                                        deviceName = "OpenZWave Dimmer " + node.ID;
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Dimmer " + node.ID) : node.Name);
                                         device_type = GetDeviceType("DIMMER", Context);
                                         break;
                                     case "Multiposition Motor":
                                     case "Motor Control Class A":
                                     case "Motor Control Class B":
                                     case "Motor Control Class C":
-                                        deviceName = "Variable Motor Control " + node.ID;
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("Variable Motor Control " + node.ID) : node.Name);
                                         device_type = GetDeviceType("DIMMER", Context);
                                         break;
                                     case "General Thermostat V2":
@@ -1067,7 +1070,7 @@ namespace OpenZWavePlugin
                                     case "Setpoint Thermostat":
                                     case "Setback Thermostat":
                                     case "Thermostat":
-                                        deviceName = "OpenZWave Thermostat " + node.ID;
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Thermostat " + node.ID) : node.Name);
                                         device_type = GetDeviceType("THERMOSTAT", Context);
                                         break;
                                     case "Remote Controller":
@@ -1077,6 +1080,7 @@ namespace OpenZWavePlugin
                                     case "Portable Installer Tool":
                                     case "Static Scene Controller":
                                     case "Static Installer Tool":
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Controller " + node.ID) : node.Name);
                                         deviceName = "OpenZWave Controller " + node.ID;
                                         device_type = GetDeviceType("CONTROLLER", Context);
                                         break;
@@ -1084,7 +1088,7 @@ namespace OpenZWavePlugin
                                     case "Advanced Door Lock":
                                     case "Door Lock":
                                     case "Entry Control":
-                                        deviceName = "OpenZWave Door Lock " + node.ID;
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Door Lock " + node.ID) : node.Name);
                                         device_type = GetDeviceType("DOORLOCK", Context);
                                         break;
                                     case "Alarm Sensor":
@@ -1100,7 +1104,7 @@ namespace OpenZWavePlugin
                                     case "Advanced Zensor Smoke Sensor":
                                     case "Routing Binary Sensor":
                                     case "Routing Multilevel Sensor":
-                                        deviceName = "OpenZWave Sensor " + node.ID;
+                                        deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Sensor " + node.ID) : node.Name);
                                         device_type = GetDeviceType("SENSOR", Context);
                                         break;
                                     default:
