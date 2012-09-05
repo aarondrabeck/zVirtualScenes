@@ -56,7 +56,7 @@ namespace zvs.Processor
             engine.SetFunction("RunScene", new Action<double>(RunScene));
             engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommand));
             engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
-            engine.SetFunction("ReportProgress", new Action<string>(ReportProgress));
+            engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
             try
             {
@@ -101,9 +101,11 @@ namespace zvs.Processor
         }
 
         //ReportProgress("Hello World!")
-        public void ReportProgress(string progress)
+        public void ReportProgressJS(string progress)
         {
-            ReportProgress(progress);
+
+            if (onReportProgress != null)
+                onReportProgress(this, new onReportProgressEventArgs(progress));
         }
 
         protected void ReportProgress(string progress, params string[] args)
