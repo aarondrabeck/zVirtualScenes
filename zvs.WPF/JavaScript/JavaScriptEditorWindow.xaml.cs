@@ -67,18 +67,12 @@ namespace zvs.WPF.JavaScript
                 TriggerScriptEditor.Editor.AppendText(Command.Script);
 
             CmdNameTxtBx.Text = Command.Name;
-            TriggerScriptEditor.Editor.KeyUp += Editor_KeyUp;
             System.Windows.Data.CollectionViewSource jSResultViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("jSResultViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
             jSResultViewSource.Source = Results;
         }
 
-        void Editor_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
-            if (e.KeyCode == System.Windows.Forms.Keys.F5)
-                Run();
-        }
-
+    
 
         private void Run()
         {
@@ -133,6 +127,42 @@ namespace zvs.WPF.JavaScript
         {
             if (!isRunning)
                 Run();
+        }
+
+        private void Image_MouseUp_1(object sender, MouseButtonEventArgs e)
+        {
+            var script = "RunScene('All On');\n";
+            TriggerScriptEditor.Editor.InsertText(script);   
+        }
+
+        private void Image_MouseUp_2(object sender, MouseButtonEventArgs e)
+        {
+            var script = "RunDeviceCommand('Office Light','Set Level', '99');\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void Image_MouseUp_3(object sender, MouseButtonEventArgs e)
+        {
+            var script = "RunDeviceCommand(1,'Set Level', '99');\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void Image_MouseUp_4(object sender, MouseButtonEventArgs e)
+        {
+            var script = "Delay(\"RunDeviceCommand('Office Light','Set Level', '99');\", 3000)\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void TriggerScriptEditor_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F5)
+            {
+                TestBtn_Click(TestBtn, null);
+            }
+            if (e.Key == Key.Escape)
+            {
+                CancelBtn_Click(null, null);
+            }
         }
     }
 }

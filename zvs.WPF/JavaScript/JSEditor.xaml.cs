@@ -25,7 +25,7 @@ namespace zvs.WPF.JavaScript
             InitializeComponent();
 
             SCEditor.ConfigurationManager.Language = "js";
-            SCEditor.Margins[0].Width = 20;
+            SCEditor.Margins[0].Width = 20;            
             this.Editor = SCEditor;
         }
         public ScintillaNET.Scintilla Editor { get; set; }

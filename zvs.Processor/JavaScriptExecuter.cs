@@ -54,6 +54,7 @@ namespace zvs.Processor
             engine.AllowClr = true;
             engine.SetParameter("zvsContext", context);
             engine.SetFunction("RunScene", new Action<double>(RunScene));
+            engine.SetFunction("RunScene", new Action<string>(RunScene));
             engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommand));
             engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
             engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
@@ -145,6 +146,21 @@ namespace zvs.Processor
             }
         }
 
+        public void RunScene(string SceneName)
+        {
+            using (zvsContext context = new zvsContext())
+            {
+                int s = (from S in context.Scenes
+                         where S.Name == SceneName
+                         select S.SceneId).FirstOrDefault();
+
+                if (s != null && s > 0)
+                {
+                    RunScene(s);
+                }
+            }
+
+        }
         //RunScene(1);
         public void RunScene(double SceneID)
         {

@@ -13,3 +13,11 @@ C:\Users\Rob\1\zvirtualscenes\zvs.Entities\bin\Debug\EntityFramework.xml
 C:\Users\Rob\1\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.csprojResolveAssemblyReference.cache
 C:\Users\Rob\1\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.dll
 C:\Users\Rob\1\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.pdb
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\bin\Debug\zvs.Entities.dll.config
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\bin\Debug\zvs.Entities.dll
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\bin\Debug\zvs.Entities.pdb
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\bin\Debug\EntityFramework.dll
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\bin\Debug\EntityFramework.xml
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.csprojResolveAssemblyReference.cache
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.dll
+C:\Users\Rob\source\zvirtualscenes\zvs.Entities\obj\Debug\zvs.Entities.pdb

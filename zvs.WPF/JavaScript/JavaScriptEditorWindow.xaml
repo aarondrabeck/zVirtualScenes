@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:zVirtualScenesModel="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
         mc:Ignorable="d" x:Class="zvs.WPF.JavaScript.JavaScriptEditorWindow"
-        Title="JavaScript Editor" Height="500" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
+        Title="JavaScript Editor" Height="700" Width="800" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" 
         WindowStyle="ToolWindow" Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs32.ico">
     <Window.Resources>
 
@@ -23,8 +23,8 @@
 
         </Rectangle>
 
-        <Border Width="550" Height="Auto" Margin="22,78,22,173">
-            <Editor:JSEditor x:Name="TriggerScriptEditor" > </Editor:JSEditor>
+        <Border Height="Auto" Margin="22,162,264,339">
+            <Editor:JSEditor x:Name="TriggerScriptEditor" Width="750" Margin="0,-33,-242,-167" KeyUp="TriggerScriptEditor_KeyUp" > </Editor:JSEditor>
         </Border>
         
         <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" Text="JavaScript Command" VerticalAlignment="Top"/>
@@ -33,9 +33,33 @@
         <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click"/>
         <Button Name="OKBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,8" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="22,50,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
-        <TextBox Name="CmdNameTxtBx" Margin="59,50,22,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17"/>
-
-        <DataGrid  x:Name="JSResultDataGrid"  Margin="22,309,22,47" Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
+        <Grid  Margin="22,80,22,540">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32"></RowDefinition>                
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+                <ColumnDefinition Width="5"></ColumnDefinition>
+                <ColumnDefinition Width="32"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Image Grid.Row="0" Grid.Column="0" Source="/zVirtualScenes;component/Images/scene_run64.png" MouseUp="Image_MouseUp_1" Stretch="Fill"  />
+            <Image Grid.Row="0" Grid.Column="1"  />
+            <Image Grid.Row="0" Grid.Column="2" Source="/zVirtualScenes;component/Images/switch.png" MouseUp="Image_MouseUp_2"  Stretch="Fill"   />
+            <Image Grid.Row="0" Grid.Column="3"  />
+            <Image Grid.Row="0" Grid.Column="4"   MouseUp="Image_MouseUp_4" Source="/zVirtualScenes;component/Images/small-icon-status.png"  Stretch="Fill"   />
+        </Grid>
+        <TextBox Name="CmdNameTxtBx" Margin="59,50,22,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25"/>
+        <DataGrid  x:Name="JSResultDataGrid"  Margin="22,507,22,47" Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
                    HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
             <DataGrid.Columns>
