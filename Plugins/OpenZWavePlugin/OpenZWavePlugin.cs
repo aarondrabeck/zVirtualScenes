@@ -31,7 +31,13 @@ namespace OpenZWavePlugin
         List<Node> m_nodeList = new List<Node>();
         private bool FinishedInitialPoll = false;
         private string LastEventNameValueId = "LEN1";
+
+        #if DEBUG
+        private int verbosity = 99;
+#else
         private int verbosity = 1;
+#endif
+
         private bool isShuttingDown = false;
         private bool _useHID = false;
         private string _comPort = "3";
@@ -335,8 +341,6 @@ namespace OpenZWavePlugin
 
         public override void ProcessDeviceTypeCommand(QueuedDeviceTypeCommand cmd)
         {
-            WriteToLog(Urgency.INFO, string.Format("Argument:{0}, Command.ArgumentType:{1}, Command.Description:{2}, Command.Value:{3}, Device.DeviceId:{4}, Device.Type.UniqueIdentifier:{5}, Command.UniqueIdentifier:{6}",
-                cmd.Argument, cmd.Command.ArgumentType.ToString(), cmd.Command.Description, cmd.Command.Value, cmd.Device.DeviceId.ToString(), cmd.Device.Type.UniqueIdentifier, cmd.Command.UniqueIdentifier));
             if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
             {
                 switch (cmd.Command.UniqueIdentifier)
@@ -1121,7 +1125,7 @@ namespace OpenZWavePlugin
                                     if (ozw_device == null)
                                     {
                                         ozw_device = new Device
-                                        {
+                                        {                                            
                                             NodeNumber = node.ID,
                                             Type = device_type,
                                             Name = deviceName,
