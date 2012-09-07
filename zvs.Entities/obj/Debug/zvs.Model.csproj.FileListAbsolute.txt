@@ -1,8 +1,0 @@
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\zvs.Model.dll.config
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\zvs.Model.dll
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\zvs.Model.pdb
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\EntityFramework.dll
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\bin\Debug\EntityFramework.xml
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Model.dll
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Model.pdb
-D:\Hobby\zvirtualscenes\trunk\zvs.Model\obj\Debug\zvs.Model.csprojResolveAssemblyReference.cache
