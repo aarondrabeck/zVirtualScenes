@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<Project DefaultTargets="Build-Debug" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
+	<Target Name="Build-Debug">
+		<MSBuild Projects="zVirtualScenes.sln" Targets="Rebuild" Properties="Configuration=Debug" />
+	</Target>
+
+	<Target Name="Build-Release">
+		<MSBuild Projects="zVirtualScenes.sln" Targets="Rebuild" Properties="Configuration=Release" />
+	</Target>
+		
+	<Target Name="Build-Release-Setup" DependsOnTargets="Build-Release">
+		<Exec Command="'C:\Program Files (x86)\Inno Setup 5\iscc.exe' 'setup\zvs IstallerCreator.iss' /v99"/>
+    </Target>
+	
+</Project>
+
