@@ -44,6 +44,11 @@ Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescrip
 
 [Files]
 Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion           
+Source: "..\output_release\Jint.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\SciLexer.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\SciLexer64.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\ScintillaNET.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\output_release\ScintillaNET.xml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\WPFToolkit.Extended.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\output_release\zvs.zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion

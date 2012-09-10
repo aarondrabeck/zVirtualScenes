@@ -29,7 +29,7 @@
         
         <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" Text="JavaScript Command" VerticalAlignment="Top"/>
         <Rectangle Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Fill="#FFF0F0F0" />
-        <Button Name="TestBtn" Content="Test" HorizontalAlignment="Right" Margin="0,0,497,8" VerticalAlignment="Bottom" Width="75" Click="TestBtn_Click"/>
+        <Button Name="TestBtn" Content="Test" Margin="10,0,0,8" VerticalAlignment="Bottom" Click="TestBtn_Click" HorizontalAlignment="Left" Width="75"/>
         <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click"/>
         <Button Name="OKBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,8" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
         <TextBlock HorizontalAlignment="Left" Margin="22,50,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
