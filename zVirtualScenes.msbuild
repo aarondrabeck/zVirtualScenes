@@ -9,7 +9,7 @@
 	</Target>
 		
 	<Target Name="Build-Release-Setup" DependsOnTargets="Build-Release">
-		<Exec Command="'C:\Program Files (x86)\Inno Setup 5\iscc.exe' 'setup\zvs IstallerCreator.iss' /v99"/>
+		<Exec Command="&quot;C:\Program Files (x86)\Inno Setup 5\iscc.exe&quot; &quot;setup\zvs IstallerCreator.iss&quot; /v99"/>
     </Target>
 	
 </Project>
