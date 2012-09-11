@@ -49,7 +49,11 @@ namespace zvs.Processor
                             Exception ex = reflectionEx.LoaderExceptions.FirstOrDefault();
                             if (ex != null)
                             {
-                                error = ex.StackTrace.ToString() +
+                                string errorMsg = !string.IsNullOrEmpty(ex.StackTrace)? ex.StackTrace.ToString() : string.Empty;
+                                if (string.IsNullOrEmpty(errorMsg) && !string.IsNullOrEmpty(ex.Message))
+                                    errorMsg = ex.Message;
+
+                                error = errorMsg +
                                     Environment.NewLine +
                                     Environment.NewLine +
                                     string.Format("This plug-in might not be compatible with {0}. Try removing the plug-in and re-launching the application. ", Utils.ApplicationNameAndVersion);
