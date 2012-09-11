@@ -14,7 +14,7 @@ namespace zvs.Entities
     public partial class JavaScriptCommand : Command
     {  
         private string _Script;
-        [StringLength(16384)]
+        [StringLength(4000)]
         public string Script
         {
             get
