@@ -19,7 +19,8 @@ namespace zvs.Entities
             this.Triggers = new ObservableCollection<DeviceValueTrigger>();
         }
         public int DeviceValueId { get; set; }
-       
+
+         [Required]
         public virtual Device Device { get; set; }
         public virtual ObservableCollection<DeviceValueTrigger> Triggers { get; set; }
 

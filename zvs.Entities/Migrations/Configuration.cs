@@ -11,6 +11,7 @@ namespace zvs.Context.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
             
         }
 

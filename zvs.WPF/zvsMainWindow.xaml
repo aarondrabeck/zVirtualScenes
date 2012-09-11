@@ -41,17 +41,19 @@
                 <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
 
             </MenuItem>
+            <MenuItem Header="Commands">
+                <MenuItem Header="Built-in">
+                    <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
+                </MenuItem>
+                <MenuItem Header="JavaScript">
+                    <MenuItem Name="AddEditJSCmds" Header="Add / Edit" Click="AddEditJSCmds_Click_1" />
+                </MenuItem>
+            </MenuItem>
             <MenuItem Header="Groups">
                 <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
                 <MenuItem Header="Group Editor" Click="MenuItem_Click" />
             </MenuItem>
-            <MenuItem Header="Built-in Commands">
-                <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-            </MenuItem>
-            <MenuItem Header="JavaScript Commands">
-                <MenuItem Name="AddEditJSCmds" Header="Add/Edit JavaScript Commands" Click="AddEditJSCmds_Click_1" />
-            </MenuItem>
-
+            
             
             <MenuItem Header="Tools">
                 <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />

@@ -12,7 +12,8 @@ namespace zvs.Entities
 {
     [Table("DeviceCommands", Schema = "ZVS")]
     public partial class DeviceCommand : Command
-    {  
+    {
+        [Required]
         public virtual Device Device { get; set; }
 
         public void Run(zvsContext context, string argument = "")

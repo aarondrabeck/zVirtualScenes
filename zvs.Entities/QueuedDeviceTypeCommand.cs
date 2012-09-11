@@ -12,6 +12,7 @@ namespace zvs.Entities
 {
     public partial class QueuedDeviceTypeCommand : QueuedCommand
     {
+        [Required]
         public virtual Device Device { get; set; }
 
         public static QueuedDeviceTypeCommand Create(DeviceTypeCommand dtc, Device d, string argument)

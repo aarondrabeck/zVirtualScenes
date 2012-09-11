@@ -33,6 +33,7 @@ namespace zvs.Entities
             }
         }
 
+        
         private DeviceValue _DeviceValue;
         public virtual DeviceValue DeviceValue
         {
