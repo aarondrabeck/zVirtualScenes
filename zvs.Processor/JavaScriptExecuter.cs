@@ -14,6 +14,7 @@ namespace zvs.Processor
         private string Source;
 
         public DeviceValueTrigger Trigger { get; set; }
+        public Scene Scene { get; set; }
         Logger log = new Logger();
 
         #region Events
@@ -70,11 +71,19 @@ namespace zvs.Processor
 
 
             if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
+            if (Scene != null) engine.SetParameter("Scene", this.Scene);
+            engine.SetParameter("HasTrigger", (this.Trigger!=null));
+            engine.SetParameter("HasScene", (this.Scene!=null));
+
+
             try
             {
                 object result = engine.Run(Script);
-                log.WriteToLog(Urgency.INFO, (result == null) ? "" : result.ToString(), typeof(JavaScriptExecuter).ToString());
+                string entry = string.Format("Script Result:{0}, Trigger Name:{1}, Scene Name:{2}", (result == null) ? "" : result.ToString(), (Trigger == null) ? "None" : Trigger.Name, (Scene == null) ? "None" : Scene.Name);
+                
+                log.WriteToLog(Urgency.INFO, entry, typeof(JavaScriptExecuter).ToString());
                 log.SaveLogToFile();
+                
 
                 if (result != null)
                 {

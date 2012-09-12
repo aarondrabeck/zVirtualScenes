@@ -268,6 +268,7 @@ namespace zvs.Processor
                     JavaScriptExecuter je = new JavaScriptExecuter();
 
                     je.Trigger = this.Trigger;
+                    je.Scene = this._scene;
 
                     je.onReportProgress += (s, a) =>
                         {
