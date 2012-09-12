@@ -64,10 +64,11 @@ namespace zvs.Processor
             engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
             engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
-            engine.SetFunction("error", new Action<string>(Error));
-            engine.SetFunction("info", new Action<string>(Info));
-            engine.SetFunction("log", new Action<string>(Info));
-            engine.SetFunction("warn", new Action<string>(Warning));
+            engine.SetFunction("error", new Action<object>(Error));
+            engine.SetFunction("info", new Action<object>(Info));
+            engine.SetFunction("log", new Action<object>(Info));
+            engine.SetFunction("warn", new Action<object>(Warning));
+            
 
 
             if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
@@ -182,17 +183,17 @@ namespace zvs.Processor
                 }
             }
         }
-        public void Error(string Message)
+        public void Error(object Message)
         {
-            log.WriteToLog(Urgency.ERROR, Message, typeof(JavaScriptExecuter).Name);
+            log.WriteToLog(Urgency.ERROR, Message.ToString(), typeof(JavaScriptExecuter).Name);
         }
-        public void Info(string Message)
+        public void Info(object Message)
         {
-            log.WriteToLog(Urgency.INFO, Message, typeof(JavaScriptExecuter).Name);
+            log.WriteToLog(Urgency.INFO, Message.ToString(), typeof(JavaScriptExecuter).Name);
         }
-        public void Warning(string Message)
+        public void Warning(object Message)
         {
-            log.WriteToLog(Urgency.WARNING, Message, typeof(JavaScriptExecuter).Name);
+            log.WriteToLog(Urgency.WARNING, Message.ToString(), typeof(JavaScriptExecuter).Name);
         }
         //RunScene(1);
         public void RunScene(double SceneID)
