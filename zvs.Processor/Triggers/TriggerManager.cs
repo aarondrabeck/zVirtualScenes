@@ -128,7 +128,7 @@ namespace zvs.Processor.Triggers
 
         private void ActivateTriggerScene(DeviceValueTrigger trigger)
         {
-            SceneRunner sr = new SceneRunner(trigger.Scene.SceneId, trigger.Name);
+            SceneRunner sr = new SceneRunner(trigger.Scene.SceneId, trigger.Name, trigger);
             sr.onRunBegin += (s, a) =>
             {
                 if (onTriggerStart != null)

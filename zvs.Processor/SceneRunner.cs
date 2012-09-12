@@ -23,17 +23,21 @@ namespace zvs.Processor
         private bool hasExecuted = false;
         private int SceneId = 0;
         public Guid SceneRunnerGUID { get; private set; }
+        public DeviceValueTrigger Trigger { get; set; }
 
         /// <summary>
         /// Executes a scene asynchronously and reports progress.
         /// </summary>
         /// <param name="InvokersName"> Name of the person executing the scene.</param>
-        public SceneRunner(int sceneID, string source)
+        public SceneRunner(int sceneID, string source, DeviceValueTrigger Trigger = null)
         {
             this.SceneId = sceneID;
             this.Source = source;
             SceneRunnerGUID = Guid.NewGuid();
             context = new zvsContext();
+            this.Trigger = Trigger;
+            
+
         }
 
         #region Events
@@ -262,6 +266,9 @@ namespace zvs.Processor
                 {
                     JavaScriptCommand js = (JavaScriptCommand)sceneCommand.Command;
                     JavaScriptExecuter je = new JavaScriptExecuter();
+
+                    je.Trigger = this.Trigger;
+
                     je.onReportProgress += (s, a) =>
                         {
                             ReportProgress(a.Progress);

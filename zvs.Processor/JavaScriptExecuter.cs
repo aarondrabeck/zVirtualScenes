@@ -12,6 +12,10 @@ namespace zvs.Processor
     {
         private zvsContext Context;
         private string Source;
+
+        public DeviceValueTrigger Trigger { get; set; }
+        Logger log = new Logger();
+
         #region Events
         public delegate void onJavaScriptExecuterEventHandler(object sender, JavaScriptExecuterEventArgs args);
         public class JavaScriptExecuterEventArgs : EventArgs
@@ -59,9 +63,19 @@ namespace zvs.Processor
             engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
             engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
+            engine.SetFunction("error", new Action<string>(Error));
+            engine.SetFunction("info", new Action<string>(Info));
+            engine.SetFunction("log", new Action<string>(Info));
+            engine.SetFunction("warn", new Action<string>(Warning));
+
+
+            if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
             try
             {
                 object result = engine.Run(Script);
+                log.WriteToLog(Urgency.INFO, (result == null) ? "" : result.ToString(), typeof(JavaScriptExecuter).ToString());
+                log.SaveLogToFile();
+
                 if (result != null)
                 {
                     if (onComplete != null)
@@ -75,7 +89,6 @@ namespace zvs.Processor
                     onComplete(this, new JavaScriptExecuterEventArgs(true, exc.ToString()));
                 return;
             }
-
             if (onComplete != null)
                 onComplete(this, new JavaScriptExecuterEventArgs(false, "None"));
         }
@@ -159,7 +172,18 @@ namespace zvs.Processor
                     RunScene(s);
                 }
             }
-
+        }
+        public void Error(string Message)
+        {
+            log.WriteToLog(Urgency.ERROR, Message, typeof(JavaScriptExecuter).Name);
+        }
+        public void Info(string Message)
+        {
+            log.WriteToLog(Urgency.INFO, Message, typeof(JavaScriptExecuter).Name);
+        }
+        public void Warning(string Message)
+        {
+            log.WriteToLog(Urgency.WARNING, Message, typeof(JavaScriptExecuter).Name);
         }
         //RunScene(1);
         public void RunScene(double SceneID)

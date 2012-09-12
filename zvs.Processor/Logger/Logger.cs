@@ -66,10 +66,18 @@ namespace zvs.Processor
             LOG = new ObservableCollection<LogItem>();
             _logConsole = true;
             _logFileName = "zVirtualScenes.log";
+
+#if DEBUG
+            _cacheMaxLogLines = 1000;
+            _cacheMinLogLines = 1;
+            _maxFileSize = 100;
+            _maxFileCount = 5;
+#else
             _cacheMaxLogLines = 1000;
             _cacheMinLogLines = 50;
             _maxFileSize = 100;
             _maxFileCount = 5;
+#endif
         }
 
         #region Properties
