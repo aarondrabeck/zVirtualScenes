@@ -111,8 +111,16 @@ namespace zvs.Processor
             string path = Script;
             if (!System.IO.File.Exists(path))
             {
-                path = string.Format("..\\Scripts\\{0}", Script);
-                if(System.IO.File.Exists(path)) Script = path;
+                path = string.Format("..\\scripts\\{0}", Script);
+                if (System.IO.File.Exists(path))
+                {
+                    Script = path;
+                }
+                else
+                {
+                    path = string.Format("scripts\\{0}", Script);
+                    if (System.IO.File.Exists(path)) Script = path;
+                }
             }
             if (System.IO.File.Exists(Script))
             {

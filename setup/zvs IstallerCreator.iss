@@ -82,6 +82,7 @@ Source: "..\output_release\plugins\zvs.zVirtualScenes.dll"; DestDir: "{app}\plug
 Source: "..\output_release\plugins\zvs.Entities.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\htdocs\*"; DestDir: "{app}\plugins\htdocs"; Flags: ignoreversion recursesubdirs
 Source: "..\output_release\plugins\config\*"; DestDir: "{app}\plugins\config"; Flags: ignoreversion recursesubdirs  
+Source: "..\output_release\scripts\*"; DestDir: "{app}\scripts"; Flags: ignoreversion recursesubdirs  
 Source: "..\output_release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
