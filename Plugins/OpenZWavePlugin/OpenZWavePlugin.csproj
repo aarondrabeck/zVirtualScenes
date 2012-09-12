@@ -37,6 +37,10 @@
     <Reference Include="EntityFramework">
       <HintPath>..\..\packages\EntityFramework.5.0.0-rc\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="OpenZWaveDotNet">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\OpenZWaveDotNet.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -101,10 +105,6 @@
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
       <Name>zvs.Processor</Name>
     </ProjectReference>
-    <ProjectReference Include="openzwave\dotnet\build\vs2010\OpenZWaveDotNet.vcxproj">
-      <Project>{0dd42424-b4ab-45c3-897c-774d1c5917c3}</Project>
-      <Name>OpenZWaveDotNet %28Visual Studio 2010%29</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -158,7 +158,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"$(ProjectDir)build\postbuild.bat" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
