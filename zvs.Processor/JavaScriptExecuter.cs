@@ -17,6 +17,8 @@ namespace zvs.Processor
         public Scene Scene { get; set; }
         Logger log = new Logger();
 
+        Jint.JintEngine engine = new Jint.JintEngine();
+
         #region Events
         public delegate void onJavaScriptExecuterEventHandler(object sender, JavaScriptExecuterEventArgs args);
         public class JavaScriptExecuterEventArgs : EventArgs
@@ -53,7 +55,6 @@ namespace zvs.Processor
         {
             this.Source = source;
             this.Context = context;
-            Jint.JintEngine engine = new Jint.JintEngine();
             engine.SetDebugMode(true);
             engine.DisableSecurity();
             engine.AllowClr = true;
@@ -68,7 +69,7 @@ namespace zvs.Processor
             engine.SetFunction("info", new Action<object>(Info));
             engine.SetFunction("log", new Action<object>(Info));
             engine.SetFunction("warn", new Action<object>(Warning));
-            
+            engine.SetFunction("require", new Action<string>(Require));
 
 
             if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
@@ -79,6 +80,9 @@ namespace zvs.Processor
 
             try
             {
+                //pull out import statements
+                //import them into the engine by running each script
+                //then run the engine as normal
                 object result = engine.Run(Script);
                 string entry = string.Format("Script Result:{0}, Trigger Name:{1}, Scene Name:{2}", (result == null) ? "" : result.ToString(), (Trigger == null) ? "None" : Trigger.Name, (Scene == null) ? "None" : Scene.Name);
                 
@@ -102,6 +106,28 @@ namespace zvs.Processor
             if (onComplete != null)
                 onComplete(this, new JavaScriptExecuterEventArgs(false, "None"));
         }
+        public void Require(string Script)
+        {
+            string path = Script;
+            if (!System.IO.File.Exists(path))
+            {
+                path = string.Format("..\\Scripts\\{0}", Script);
+                if(System.IO.File.Exists(path)) Script = path;
+            }
+            if (System.IO.File.Exists(Script))
+            {
+                string s = System.IO.File.ReadAllText(Script);
+                try
+                {
+                    engine.Run(s);
+                }
+                catch (Exception e)
+                {
+                    log.WriteToLog(Urgency.ERROR, "Error running script: " + Script + " : " + e.ToString(), typeof(JavaScriptExecuter).Name);
+                }
+            }
+        }
+
 
         //Delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
         public void Delay(string script, double time, bool Async)
@@ -185,15 +211,15 @@ namespace zvs.Processor
         }
         public void Error(object Message)
         {
-            log.WriteToLog(Urgency.ERROR, Message.ToString(), typeof(JavaScriptExecuter).Name);
+            if(Message!=null)  log.WriteToLog(Urgency.ERROR, Message.ToString(), typeof(JavaScriptExecuter).Name);
         }
         public void Info(object Message)
         {
-            log.WriteToLog(Urgency.INFO, Message.ToString(), typeof(JavaScriptExecuter).Name);
+            if (Message != null) log.WriteToLog(Urgency.INFO, Message.ToString(), typeof(JavaScriptExecuter).Name);
         }
         public void Warning(object Message)
         {
-            log.WriteToLog(Urgency.WARNING, Message.ToString(), typeof(JavaScriptExecuter).Name);
+            if (Message != null) log.WriteToLog(Urgency.WARNING, Message.ToString(), typeof(JavaScriptExecuter).Name);
         }
         //RunScene(1);
         public void RunScene(double SceneID)
