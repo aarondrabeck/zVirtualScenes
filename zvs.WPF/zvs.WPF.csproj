@@ -495,6 +495,7 @@
     <Content Include="scripts\gmail.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="scripts\helper.js" />
     <Content Include="scripts\settings.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
