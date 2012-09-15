@@ -184,7 +184,7 @@ namespace zvs.WPF.JavaScript
                     path = path.Replace(App.Path, ".");
                 }
 
-                var script = string.Format("require('{0}')\n", path);
+                var script = string.Format("require('{0}')\n", path.Replace("\\","\\\\"));
                 TriggerScriptEditor.Editor.InsertText(script);
             }
         }
