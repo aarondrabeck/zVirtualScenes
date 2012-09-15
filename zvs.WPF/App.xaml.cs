@@ -22,6 +22,7 @@ namespace zvs.WPF
     /// </summary>
     public partial class App : Application, ISingleInstanceApp
     {
+              
         public static string Path
         {
             get

@@ -51,6 +51,18 @@ namespace zvs.Processor
         public event onJavaScriptExecuterEventHandler onComplete;
         #endregion
 
+
+        //shell("wget.exe", "http://10.0.0.55/webcam/latest.jpg");
+        private System.Diagnostics.Process Shell(string Path, string Arguments)
+        {
+            return System.Diagnostics.Process.Start(Path, Arguments);
+        }
+
+        private string MapPath(string Path)
+        {
+            string root = System.IO.Path.GetDirectoryName(typeof(JavaScriptExecuter).Assembly.Location);
+            return System.IO.Path.Combine(root, Path);
+        }
         public void ExecuteScript(string Script, zvsContext context, string source)
         {
             this.Source = source;
@@ -58,19 +70,23 @@ namespace zvs.Processor
             engine.SetDebugMode(true);
             engine.DisableSecurity();
             engine.AllowClr = true;
+
             engine.SetParameter("zvsContext", context);
+            
             engine.SetFunction("RunScene", new Action<double>(RunScene));
             engine.SetFunction("RunScene", new Action<string>(RunScene));
             engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommand));
             engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
             engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
+            engine.SetFunction("progress", new Action<string>(ReportProgressJS));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
             engine.SetFunction("error", new Action<object>(Error));
             engine.SetFunction("info", new Action<object>(Info));
             engine.SetFunction("log", new Action<object>(Info));
             engine.SetFunction("warn", new Action<object>(Warning));
             engine.SetFunction("require", new Action<string>(Require));
-
+            engine.SetFunction("shell", new Func<string, string, System.Diagnostics.Process>(Shell));
+            engine.SetFunction("mappath", new Func<string, string>(MapPath));
 
             if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
             if (Scene != null) engine.SetParameter("Scene", this.Scene);
@@ -223,7 +239,11 @@ namespace zvs.Processor
         }
         public void Info(object Message)
         {
-            if (Message != null) log.WriteToLog(Urgency.INFO, Message.ToString(), typeof(JavaScriptExecuter).Name);
+            if (Message != null)
+            {
+                log.WriteToLog(Urgency.INFO, Message.ToString(), typeof(JavaScriptExecuter).Name);
+                ReportProgressJS(Message.ToString());
+            }
         }
         public void Warning(object Message)
         {
