@@ -493,6 +493,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\js.png" />
+    <Content Include="scripts\DelayScene.js" />
     <Content Include="scripts\DownloadFile.js" />
     <Content Include="scripts\gmail.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
