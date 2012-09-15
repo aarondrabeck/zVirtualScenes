@@ -72,7 +72,7 @@ namespace zvs.WPF.JavaScript
             jSResultViewSource.Source = Results;
         }
 
-    
+
 
         private void Run()
         {
@@ -92,7 +92,7 @@ namespace zvs.WPF.JavaScript
                         isRunning = false;
                         SetFeedBackText(string.Format("JavaScript executed {0} errors. {1}", args.Errors ? "with" : "without", args.Details));
                     };
-                    jse.onReportProgress+= (sender, args) =>
+                    jse.onReportProgress += (sender, args) =>
                     {
                         SetFeedBackText(args.Progress);
                     };
@@ -132,7 +132,7 @@ namespace zvs.WPF.JavaScript
         private void Image_MouseUp_1(object sender, MouseButtonEventArgs e)
         {
             var script = "RunScene('All On');\n";
-            TriggerScriptEditor.Editor.InsertText(script);   
+            TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void Image_MouseUp_2(object sender, MouseButtonEventArgs e)
@@ -162,6 +162,30 @@ namespace zvs.WPF.JavaScript
             if (e.Key == Key.Escape)
             {
                 CancelBtn_Click(null, null);
+            }
+        }
+
+        private void JS_IncludeMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+            ofd.CheckFileExists = true;
+            ofd.DefaultExt = "js";
+            ofd.InitialDirectory = App.Path;
+            ofd.Multiselect = true;
+            ofd.Title = "Choose a JavaScript file to include...";
+
+            ofd.ShowDialog(this);
+
+            if (!string.IsNullOrEmpty(ofd.FileName) && System.IO.File.Exists(ofd.FileName))
+            {
+                string path = ofd.FileName;
+                if (path.StartsWith(App.Path))
+                {
+                    path = path.Replace(App.Path, ".");
+                }
+
+                var script = string.Format("require('{0}')\n", path);
+                TriggerScriptEditor.Editor.InsertText(script);
             }
         }
     }

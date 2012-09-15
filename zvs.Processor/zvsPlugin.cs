@@ -371,11 +371,14 @@ namespace zvs.Processor
         {
             try
             {
-                this.Core.Dispatcher.Invoke(new Action(() =>
+                if (!this.Core.Dispatcher.HasShutdownStarted)
                 {
-                    Core.Logger.WriteToLog((Urgency)u, message, this.Name);
+                    this.Core.Dispatcher.Invoke(new Action(() =>
+                    {
+                        Core.Logger.WriteToLog((Urgency)u, message, this.Name);
 
-                }));
+                    }));
+                };
             }
             catch { }
         }

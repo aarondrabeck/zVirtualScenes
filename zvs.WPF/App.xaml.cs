@@ -22,6 +22,13 @@ namespace zvs.WPF
     /// </summary>
     public partial class App : Application, ISingleInstanceApp
     {
+        public static string Path
+        {
+            get
+            {
+                return System.IO.Path.GetDirectoryName(typeof(App).Assembly.Location);
+            }
+        }
         public Core zvsCore;
         public ZVSTaskbarIcon taskbarIcon;
         public bool isShuttingDown = false;

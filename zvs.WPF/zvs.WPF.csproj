@@ -492,6 +492,7 @@
     <Resource Include="Images\small-icon-status.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\js.png" />
     <Content Include="scripts\gmail.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
