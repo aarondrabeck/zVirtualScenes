@@ -32,22 +32,26 @@ namespace zvs.WPF.TriggerControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            //When in a tab control this will be called twice; when main window renders and when is visible.
+            //We only care about when it is visible
+            if (this.IsVisible)
             {
-                context = new zvsContext();
+                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                {
+                    context = new zvsContext();
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
-                context.DeviceValueTriggers.ToList();
-                myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
+                    //Load your data here and assign the result to the CollectionViewSource.
+                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
+                    context.DeviceValueTriggers.ToList();
+                    myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
 
-                ////Load your data here and assign the result to the CollectionViewSource.
-                //System.Windows.Data.CollectionViewSource JSTrigggerViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["JSTriggerViewSource"];
-                //context.javascript_triggersToList();
-                //JSTrigggerViewSource.Source = context.javascript_triggers.Local;
+                    ////Load your data here and assign the result to the CollectionViewSource.
+                    //System.Windows.Data.CollectionViewSource JSTrigggerViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["JSTriggerViewSource"];
+                    //context.javascript_triggersToList();
+                    //JSTrigggerViewSource.Source = context.javascript_triggers.Local;
+                }
+                zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
             }
-
-            zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
         }
 
         void zvsContext_onDeviceValueTriggersChanged(object sender, zvsContext.onEntityChangedEventArgs args)

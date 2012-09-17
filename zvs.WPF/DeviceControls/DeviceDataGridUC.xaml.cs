@@ -93,20 +93,25 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+             //When in a tab control this will be called twice; when main window renders and when is visible.
+            //We only care about when it is visible
+            if (this.IsVisible)
             {
-                context = new zvsContext();
+                // Do not load your data at design time.
+                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                {
+                    context = new zvsContext();
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                context.Devices.ToList();
-                myCollectionViewSource.Source = context.Devices.Local;
+                    //Load your data here and assign the result to the CollectionViewSource.
+                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+                    context.Devices.ToList();
+                    myCollectionViewSource.Source = context.Devices.Local;
+                }
+
+                zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
+                zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
+                zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
             }
-
-            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
-            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
         }
 
         void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)

@@ -33,28 +33,33 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            //Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+             //When in a tab control this will be called twice; when main window renders and when is visible.
+            //We only care about when it is visible
+            if (this.IsVisible)
             {
-                context = new zvsContext();
+                //Do not load your data at design time.
+                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                {
+                    context = new zvsContext();
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
-                myCollectionViewSource.Source = context.ScheduledTasks.Local;
+                    //Load your data here and assign the result to the CollectionViewSource.
+                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
+                    myCollectionViewSource.Source = context.ScheduledTasks.Local;
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource sceneViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                sceneViewSource.Source = context.Scenes.Local;
+                    //Load your data here and assign the result to the CollectionViewSource.
+                    System.Windows.Data.CollectionViewSource sceneViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
+                    sceneViewSource.Source = context.Scenes.Local;
 
-                context.ScheduledTasks.ToList();
-                context.Scenes.ToList();
+                    context.ScheduledTasks.ToList();
+                    context.Scenes.ToList();
+                }
+
+                zvsContext.onScenesChanged += zvsContext_onScenesChanged;
+                zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
+
+                if (ScheduledTaskDataGrid.Items.Count > 0)
+                    ScheduledTaskDataGrid.SelectedIndex = 0;
             }
-
-            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
-            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
-
-            if (ScheduledTaskDataGrid.Items.Count > 0)
-                ScheduledTaskDataGrid.SelectedIndex = 0;
         }       
 
         private void ScheduledTaskCreator_Unloaded_1(object sender, RoutedEventArgs e)

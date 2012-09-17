@@ -38,30 +38,34 @@ namespace zvs.WPF.SceneControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
-            //Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            //When in a tab control this will be called twice; when main window renders and when is visible.
+            //We only care about when it is visible
+            if (this.IsVisible)
             {
-                context.Devices.ToList();
-                context.Scenes.ToList();
-                SceneCollection = context.Scenes.Local;
+                context = new zvsContext();
+                //Do not load your data at design time.
+                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+                {
+                    context.Devices.ToList();
+                    context.Scenes.ToList();
+                    SceneCollection = context.Scenes.Local;
 
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                myCollectionViewSource.Source = context.Scenes.Local;
+                    //Load your data here and assign the result to the CollectionViewSource.
+                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
+                    myCollectionViewSource.Source = context.Scenes.Local;
+                }
+
+                DevicesGrid.MinimalistDisplay = false;
+
+                SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
+                zvsContext.onScenesChanged += zvsContext_onScenesChanged;
+                zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommandsChanged;
+
+                if (SceneGrid.Items.Count > 0)
+                    SceneGrid.SelectedIndex = 0;
+
+                SceneGrid.Focus();
             }
-
-            DevicesGrid.MinimalistDisplay = false;
-
-            SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
-            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
-            zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommandsChanged;
-
-            if (SceneGrid.Items.Count > 0)
-                SceneGrid.SelectedIndex = 0;
-
-            SceneGrid.Focus();
-
         }
 
         void zvsContext_onJavaScriptCommandsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
@@ -330,7 +334,7 @@ namespace zvs.WPF.SceneControls
 
                                 if (selected_scene.isRunning)
                                 {
-                                    ShowSceneEditWarning(selected_scene.Name);
+                                    ShowSceneEditWarning(selected_scene);
                                 }
                                 else
                                 {
@@ -362,10 +366,13 @@ namespace zvs.WPF.SceneControls
                     if (dgr.Item is Scene)
                     {
                         var scene = (Scene)dgr.Item;
-                        if (scene != null)
-                        {
-                            e.Handled = !DeleteSelectedScene(scene);
-                        }
+                        if (scene != null)                        
+                            DeleteScene(scene);
+                        
+                        //Issue 68 fixed
+
+                        //must be handled or else the GUI will attempt to delete...
+                        e.Handled = true;
                     }
                 }
             }
@@ -388,30 +395,78 @@ namespace zvs.WPF.SceneControls
             new_window.Show();
         }
 
-        private bool DeleteSelectedScene(Scene scene)
+        private void DeleteScene(Scene scene)
         {
-            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (scene.isRunning)
             {
-                if (scene.isRunning)
-                    ShowSceneEditWarning(scene.Name);
-                else
-                    context.Scenes.Local.Remove(scene);
-
-                context.SaveChanges();
-                SceneGrid.Focus();
-                return true;
+                ShowSceneEditWarning(scene);
+                return;
             }
 
-            return false;
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question)
+                == MessageBoxResult.Yes)
+            {
+
+                //Check for scene dependencies
+                //issue 67
+                foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.Scene.SceneId == scene.SceneId))
+                {
+                    MessageBoxResult result = MessageBox.Show(
+                        string.Format("Deleting scene '{0}' will disable trigger '{1}', would you like continue?",
+                                        scene.Name,
+                                        dvt.Name),
+                        "Scene Delete Warning",
+                        MessageBoxButton.YesNo);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        dvt.isEnabled = false;
+                        dvt.Scene = null;
+                        context.SaveChanges();
+                    }
+                    else
+                        return;
+                }
+
+                foreach (ScheduledTask scheduledTask in context.ScheduledTasks.Where(t => t.Scene.SceneId == scene.SceneId))
+                {
+                    MessageBoxResult result = MessageBox.Show(
+                        string.Format("Deleting scene '{0}' will disable scheduled task '{1}', would you like continue?",
+                                        scene.Name,
+                                        scheduledTask.Name),
+                        "Scene Delete Warning",
+                        MessageBoxButton.YesNo);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        scheduledTask.isEnabled = false;
+                        scheduledTask.Scene = null;
+                        context.SaveChanges();
+                    }
+                    else
+                        return;
+                }
+
+                context.Scenes.Local.Remove(scene);
+                context.SaveChanges();
+                SceneGrid.Focus();
+            }
         }
 
-        private void ShowSceneEditWarning(string scene_name)
+        private void ShowSceneEditWarning(Scene scene)
         {
-            MessageBox.Show(string.Format("Cannot edit scene '{0}' because it is running.", scene_name),
-                                  "Scene Edit Warning", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBox.Show(string.Format("Cannot edit scene '{0}' because it is running.", scene.Name),
+                                 "Scene Edit Warning", MessageBoxButton.OK);
         }
 
 
+        private void ShowSceneDeleteWarningForScheduledTasks(string sceneName, int sceneId)
+        {
+            var task = context.ScheduledTasks.FirstOrDefault(t => t.Scene.SceneId == sceneId);
+
+            MessageBox.Show(string.Format("Cannot delete scene '{0}' because it is required by scheduled task '{1}'.", sceneName, task.Name),
+                "Scene Delete Warning", MessageBoxButton.OK);
+        }
 
         private void SceneCmdsGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
@@ -595,7 +650,7 @@ namespace zvs.WPF.SceneControls
                     {
                         if (selected_scene.isRunning)
                         {
-                            ShowSceneEditWarning(selected_scene.Name);
+                            ShowSceneEditWarning(selected_scene);
                         }
                         else
                         {
@@ -690,7 +745,7 @@ namespace zvs.WPF.SceneControls
                     {
                         if (selected_scene.isRunning)
                         {
-                            ShowSceneEditWarning(selected_scene.Name);
+                            ShowSceneEditWarning(selected_scene);
                         }
                         else
                         {
