@@ -93,7 +93,7 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-             //When in a tab control this will be called twice; when main window renders and when is visible.
+            //When in a tab control this will be called twice; when main window renders and when is visible.
             //We only care about when it is visible
             if (this.IsVisible)
             {
@@ -245,9 +245,49 @@ namespace zvs.WPF.DeviceControls
                 {
                     Device d = context.Devices.FirstOrDefault(o => o.DeviceId == selectedDevice.DeviceId);
                     if (d != null)
-                        context.Devices.Remove(d);
+                    {
+                        //Check for device dependencies
+                        foreach (SceneCommand sceneCommand in context.SceneCommands.Where(t => t.Device.DeviceId == d.DeviceId))
+                        {
+                            MessageBoxResult result = MessageBox.Show(
+                                string.Format("Deleting device '{0}' will remove a scene command from '{1}', would you like continue?",
+                                                d.Name,
+                                                sceneCommand.Scene == null ? "unknown" : sceneCommand.Scene.Name),
+                                "Device Delete Warning",
+                                MessageBoxButton.YesNo);
+
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                context.SceneCommands.Local.Remove(sceneCommand);
+                                context.SaveChanges();
+                            }
+                            else
+                                return;
+                        }
+
+                        //Check for device dependencies
+                        foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.DeviceId == d.DeviceId))
+                        {
+                            MessageBoxResult result = MessageBox.Show(
+                                string.Format("Deleting device '{0}' will delete trigger '{1}', would you like continue?",
+                                                d.Name,
+                                                dvt.Name),
+                                "Device Delete Warning",
+                                MessageBoxButton.YesNo);
+
+                            if (result == MessageBoxResult.Yes)
+                            {
+                                context.DeviceValueTriggers.Local.Remove(dvt);
+                                context.SaveChanges();
+                            }
+                            else
+                                return;
+                        }
+
+                        context.Devices.Local.Remove(d);
+                        context.SaveChanges();
+                    }
                 }
-                context.SaveChanges();
             }
         }
 
@@ -341,8 +381,8 @@ namespace zvs.WPF.DeviceControls
                 ICollectionView view = myCollectionViewSource.View;
                 if (!string.IsNullOrEmpty(_searchstr))
                 {
-                    
-                   
+
+
                     view.Filter = new Predicate<object>(filter);
                 }
                 else

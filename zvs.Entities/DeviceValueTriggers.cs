@@ -141,7 +141,7 @@ namespace zvs.Entities
                 string trigger_op_name = Operator.ToString();
 
                 if (this.Scene == null || this.DeviceValue == null || this.DeviceValue.Device == null)
-                    return "UNKNOWN";
+                    return "Incomplete Trigger";
 
                 return string.Format("When '{0}' {1} is {2} {3} activate scene '{4}'", this.DeviceValue.Device.Name,
                                                                 this.DeviceValue.Name,
