@@ -60,8 +60,9 @@ Source: "..\output_release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignorever
 Source: "..\output_release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion           
 Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}\plugins"; Flags: ignoreversion   
-;Source: "..\output_release\plugins\GlobalHotKeyPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-;Source: "..\output_release\plugins\GlobalHotKeyPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\jabber-net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\JabberPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\plugins\JabberPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\Growl.Connector.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\Growl.CoreLibrary.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\GrowlPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
