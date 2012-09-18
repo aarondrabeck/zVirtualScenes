@@ -54,7 +54,7 @@ Name: "growl"; Description: "Growl Plug-in"; Types: full
 Name: "http"; Description: "HTTP API Plug-in"; Types: full
 Name: "lightswitch"; Description: "LightSwitch Server Plug-in"; Types: full
 Name: "noaa"; Description: "NOAA Plug-in"; Types: full
-Name: "openzwave"; Description: "OpenZWave Plug-in"; Types: full
+Name: "openzwave"; Description: "OpenZWave Plug-in"; Types: full compact
 Name: "controlthink"; Description: "ControlThink Plug-in"; Types: full
 Name: "speech"; Description: "Speech Plug-in"; Types: full
 
