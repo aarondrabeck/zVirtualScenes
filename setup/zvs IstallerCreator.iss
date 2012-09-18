@@ -42,51 +42,73 @@ Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 
-[Files]
-Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion           
-Source: "..\output_release\Jint.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\SciLexer.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\SciLexer64.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\ScintillaNET.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\ScintillaNET.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\WPFToolkit.Extended.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zvs.zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenes.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\output_release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversion 
- 
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "compact"; Description: "Compact installation"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
-Source: "..\output_release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion           
-Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}\plugins"; Flags: ignoreversion   
-Source: "..\output_release\plugins\jabber-net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\JabberPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\JabberPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\Growl.Connector.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\Growl.CoreLibrary.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\GrowlPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\GrowlPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\HttpAPI.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion 
-Source: "..\output_release\plugins\LightSwitchPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\LightSwitchPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\NOAAPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\NOAAPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\OpenZWaveDotNet.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\OpenZWavePlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\OpenZWavePlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\SpeechPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\ZeroconfService.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+[Components]
+Name: "core"; Description: "zVirtualScenes Core"; Types: full compact custom; Flags: fixed
+Name: "jabber"; Description: "Jabber Plug-in"; Types: full
+Name: "growl"; Description: "Growl Plug-in"; Types: full
+Name: "http"; Description: "HTTP API Plug-in"; Types: full
+Name: "lightswitch"; Description: "LightSwitch Server Plug-in"; Types: full
+Name: "noaa"; Description: "NOAA Plug-in"; Types: full
+Name: "openzwave"; Description: "OpenZWave Plug-in"; Types: full
+Name: "controlthink"; Description: "ControlThink Plug-in"; Types: full
+Name: "speech"; Description: "Speech Plug-in"; Types: full
+
+[Files]
+Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core     
+Source: "..\output_release\Jint.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\SciLexer.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\SciLexer64.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\ScintillaNET.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\ScintillaNET.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\WPFToolkit.Extended.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\zvs.zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\zVirtualScenes.exe"; DestDir: "{app}"; Flags: ignoreversion ; Components: core 
+Source: "..\output_release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ignoreversion; Components: core 
+Source: "..\output_release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversion; Components: core  
+Source: "..\output_release\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: core            
+Source: "..\output_release\EntityFramework.xml"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: core  
 Source: "..\output_release\plugins\zvs.zVirtualScenes.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\output_release\plugins\zvs.Entities.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\htdocs\*"; DestDir: "{app}\plugins\htdocs"; Flags: ignoreversion recursesubdirs
-Source: "..\output_release\plugins\config\*"; DestDir: "{app}\plugins\config"; Flags: ignoreversion recursesubdirs  
-Source: "..\output_release\scripts\*"; DestDir: "{app}\scripts"; Flags: ignoreversion recursesubdirs  
-Source: "..\output_release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
-Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\output_release\scripts\*"; DestDir: "{app}\scripts"; Flags: ignoreversion recursesubdirs 
+    
+Source: "..\output_release\plugins\jabber-net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber  
+Source: "..\output_release\plugins\JabberPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber  
+Source: "..\output_release\plugins\JabberPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber
+
+Source: "..\output_release\plugins\Growl.Connector.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
+Source: "..\output_release\plugins\Growl.CoreLibrary.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
+Source: "..\output_release\plugins\GrowlPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
+Source: "..\output_release\plugins\GrowlPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: growl
+
+Source: "..\output_release\plugins\HttpAPI.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: http
+Source: "..\output_release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: http 
+Source: "..\output_release\plugins\htdocs\*"; DestDir: "{app}\plugins\htdocs"; Flags: ignoreversion recursesubdirs ; Components: http
+
+Source: "..\output_release\plugins\LightSwitchPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: lightswitch
+Source: "..\output_release\plugins\LightSwitchPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: lightswitch
+Source: "..\output_release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: lightswitch
+
+Source: "..\output_release\plugins\NOAAPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: noaa
+Source: "..\output_release\plugins\NOAAPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: noaa
+
+Source: "..\output_release\plugins\OpenZWaveDotNet.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: openzwave
+Source: "..\output_release\plugins\OpenZWavePlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: openzwave
+Source: "..\output_release\plugins\OpenZWavePlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: openzwave
+Source: "..\output_release\plugins\ZeroconfService.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: openzwave
+Source: "..\output_release\plugins\config\*"; DestDir: "{app}\plugins\config"; Flags: ignoreversion recursesubdirs    ; Components: openzwave
+
+Source: "..\output_release\plugins\SpeechPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: speech
+Source: "..\output_release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: speech
+                                                                            
+Source: "..\output_release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: controlthink
+Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: controlthink
+Source: "..\output_release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: controlthink
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
