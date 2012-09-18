@@ -64,8 +64,11 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private void ScheduledTaskCreator_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
-            zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;   
+            if (this.IsVisible)
+            {
+                zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+                zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
+            }
         }
 
         void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)

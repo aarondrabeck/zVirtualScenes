@@ -185,9 +185,12 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
-            zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
-            zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;           
+            if (this.IsVisible)
+            {
+                zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
+                zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
+                zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
+            }
         }
 
         ////User Events

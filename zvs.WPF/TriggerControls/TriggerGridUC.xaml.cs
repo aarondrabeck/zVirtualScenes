@@ -77,7 +77,10 @@ namespace zvs.WPF.TriggerControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
+            if (this.IsVisible)
+            {
+                zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
+            }
         }
 
         private void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)

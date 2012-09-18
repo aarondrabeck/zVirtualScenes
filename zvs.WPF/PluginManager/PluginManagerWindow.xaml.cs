@@ -52,8 +52,13 @@ namespace zvs.WPF.PluginManager
                 //This will prevent plug-ins that are in the DB but not loaded from being configurable.
                 //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
 
+                //Get a list of loaded plug-ins
+                 var loadedPlugins = application.zvsCore.pluginManager.GetPlugins().ToList();
+                
                 context.Plugins.ToList();
-                zvsEntities2ViewSource.Source = context.Plugins.Local;
+
+                //Only load the plug-in options for the plug-ins that are currently loaded.
+                zvsEntities2ViewSource.Source = context.Plugins.Local.Where(o => loadedPlugins.Any(x => x.UniqueIdentifier == o.UniqueIdentifier));
             }
 
             zvsContext.onPluginsChanged += zvsContext_onPluginsChanged;

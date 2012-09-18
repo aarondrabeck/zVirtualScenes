@@ -155,10 +155,12 @@ namespace zvs.WPF.SceneControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
-            zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
-            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
-
+            if (this.IsVisible)
+            {
+                SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
+                zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
+                zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+            }
         }
 
         private void SortUp_Click_1(object sender, RoutedEventArgs e)
