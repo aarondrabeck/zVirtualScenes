@@ -66,7 +66,9 @@ helper = function() {
 			details += "LastHeardFrom: "+device.LastHeardFrom+"\n";
 			details += "CurrentLevelText: "+device.CurrentLevelText+"\n";
 			details += "CurrentLevelInt: "+device.CurrentLevelInt+"\n";
-			details += "Type: "+device.Type.Name+"\n";						
+			details += "Type: "+device.Type.Name+"\n";		
+			details += "Values: "+this.deviceValues(device)+"\n";		
+			
 		} else {			
 			details = "No device by that name: " + name;
 		}
@@ -88,7 +90,15 @@ helper = function() {
 		}
 		return "";
 	}
-	
+	this.deviceValues = function(device) {
+		var details = "";
+		if(typeof device == 'string') device = this.deviceByName(device);
+		for (var value in device.Values)
+		{	
+			details+= value.Name + " = " + value.Value + "\n";
+		}
+		return details;
+	}
 	
 	this.appPath = zvs.WPF.App.Path;	
 	this.hostDetails = zvs.WPF.App.GetHostDetails;
