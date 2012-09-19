@@ -69,7 +69,7 @@ namespace zvs.Processor
             this.Context = context;
             engine.SetDebugMode(true);
             engine.DisableSecurity();
-            engine.AllowClr = true;
+            engine.AllowClr = true;                     
 
             engine.SetParameter("zvsContext", context);
             
