@@ -16,6 +16,18 @@
 //
 //var details = h.deviceDetails("Master Bedroom");
 //log(details);
+//
+//Get a specific device
+//var d = h.deviceByName("Bar Lights");
+//
+//output some specific property
+//log(d.Name);
+//
+//get device value by name or specific device
+//log(h.getDeviceValue("Bar Lights", "Manufacturer Name"));
+//log(h.getDeviceValue(d, "Manufacturer Name"));
+
+
 helper = function() {
 	this.IsJavascriptCommand = function(cmd) {
 		return (cmd.hasOwnProperty("Script"));
@@ -40,18 +52,23 @@ helper = function() {
 		}
 		return;
 	}
-	this.deviceDetails = function(deviceName) {
+	this.deviceDetails = function(device) {
 		var details = "";
-		var dev = this.deviceByName(deviceName);
-		if(typeof dev != 'undefined') {
-			details += "Name: "+dev.Name+"\n";
-			details += "NodeNumber: "+dev.NodeNumber+"\n";
-			details += "LastHeardFrom: "+dev.LastHeardFrom+"\n";
-			details += "CurrentLevelText: "+dev.CurrentLevelText+"\n";
-			details += "CurrentLevelInt: "+dev.CurrentLevelInt+"\n";
-			details += "Type: "+dev.Type.Name+"\n";						
+		var name = device
+		if(typeof name == 'string') {
+			device = this.deviceByName(device);					
+		} else {
+			name = device.Name;
+		}
+		if(typeof device != 'undefined') {
+			details += "Name: "+device.Name+"\n";
+			details += "NodeNumber: "+device.NodeNumber+"\n";
+			details += "LastHeardFrom: "+device.LastHeardFrom+"\n";
+			details += "CurrentLevelText: "+device.CurrentLevelText+"\n";
+			details += "CurrentLevelInt: "+device.CurrentLevelInt+"\n";
+			details += "Type: "+device.Type.Name+"\n";						
 		} else {			
-			details = "No device by that name: " + deviceName;
+			details = "No device by that name: " + name;
 		}
 		return details;
 	}
@@ -61,6 +78,18 @@ helper = function() {
 		}
 		return;	
 	}	
+
+	this.getDeviceValue = function(device, valueName) {
+		if(typeof device == 'string') device = this.deviceByName(device);
+		for(var v in device.Values) {
+			if(v.Name == valueName){
+				return v.Value;
+			}
+		}
+		return "";
+	}
+	
+	
 	this.appPath = zvs.WPF.App.Path;	
 	this.hostDetails = zvs.WPF.App.GetHostDetails;
 	this.userName = System.Environment.UserName;
