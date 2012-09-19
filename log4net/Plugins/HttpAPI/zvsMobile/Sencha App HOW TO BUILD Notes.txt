@@ -1,0 +1,43 @@
+1. Install the sencha SDK
+2. Extract the latest version of sencha touch 2.X and OPEN COMMAND PROMPT FROM THAT PATH
+
+FIRST TIME SETUP ONLY:
+sencha app create zvsMobile D:\Hobby\zvirtualscenes\trunk\Plugins\HttpAPI\zvsMobile
+
+TO BUILD THE APP:
+http://dev.sencha.com/deploy/sencha-touch-2.0.1/docs/#!/guide/command
+
+COPY D:\Hobby\zvirtualscenes\trunk\Plugins\HttpAPI\zvsMobile\*
+TO LIVE HTDOCS FOLDER
+
+#  Make sure the current working directory is the application's directory you're deploying, 
+i.e 'cd /path/to/www/myapp'
+
+sencha app build testing
+
+D:\Hobby\zvirtualscenes\trunk\output_release\plugins\htdocs\sencha>sencha app build production
+[INFO] Deploying your application to D:\Hobby\zvirtualscenes\trunk\output_release\plugins\htdocs\sencha\build\production
+[INFO] Copied sdk/sencha-touch.js
+[INFO] Copied app.js
+[INFO] Copied resources/css/app.css
+[INFO] Copied resources/css/zvs.css
+[INFO] Copied resources/images
+[INFO] Copied resources/icons
+[INFO] Copied resources/startup
+[INFO] Resolving your application dependencies (http://10.1.0.61/sencha/index.html)
+[INFO] Found 229 dependencies. Concatenating all into 'D:\Hobby\zvirtualscenes\trunk\output_release\plugins\htdocs\sencha\bu
+ild\production\app.js'
+[INFO] Processed sdk/sencha-touch.js
+[INFO] Minifying sdk/sencha-touch.js
+[INFO] Processed app.js
+[INFO] Minifying app.js
+[INFO] Minifying resources/css/app.css
+[INFO] Minifying resources/css/zvs.css
+[INFO] Minified sdk/sencha-touch.js
+[INFO] Minified resources/css/zvs.css
+[INFO] Minified app.js
+[INFO] Minified resources/css/app.css
+[INFO] Generated app.json
+[INFO] Embedded microloader into index.html
+[INFO] Generating checksum for appCache item: index.html
+[INFO] Generated cache.manifest

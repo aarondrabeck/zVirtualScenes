@@ -1,0 +1,550 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="livetemplates.csharp.usevar">True</setting>
+      <setting name="SolutionAnalysisEnabled">True</setting>
+    </boolean>
+  </SettingsComponent>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="m_manager" priority="4" />
+      <Item value="DataTable`0" priority="23" />
+      <Item value="GetDataTable`0" priority="17" />
+      <Item value="dt" priority="25" />
+      <Item value="foreach" priority="16" />
+      <Item value="DataRow`0" priority="15" />
+      <Item value="in" priority="14" />
+      <Item value="properties" priority="2" />
+      <Item value="Insert`0" priority="0" />
+      <Item value="InsertGetId`0" priority="0" />
+      <Item value="objId" priority="11" />
+      <Item value="property" priority="0" />
+      <Item value="public" priority="64" />
+      <Item value="void" priority="27" />
+      <Item value="string" priority="75" />
+      <Item value="DatabaseControl`0" priority="34" />
+      <Item value="_plugin" priority="6" />
+      <Item value="objectTypeName" priority="0" />
+      <Item value="objectCommandName" priority="0" />
+      <Item value="objectCommand" priority="0" />
+      <Item value="API" priority="9" />
+      <Item value="switch" priority="6" />
+      <Item value="data" priority="5" />
+      <Item value="case" priority="14" />
+      <Item value="break" priority="11" />
+      <Item value="if" priority="59" />
+      <Item value="homeId" priority="0" />
+      <Item value="this" priority="5" />
+      <Item value="Convert`0" priority="6" />
+      <Item value="private" priority="18" />
+      <Item value="bool" priority="7" />
+      <Item value="_runCommands" priority="2" />
+      <Item value="false" priority="6" />
+      <Item value="true" priority="10" />
+      <Item value="while" priority="1" />
+      <Item value="commands" priority="1" />
+      <Item value="StopCommandThread`0" priority="0" />
+      <Item value="return" priority="28" />
+      <Item value="GetPlugins`0" priority="2" />
+      <Item value="Plugin`0" priority="1" />
+      <Item value="p" priority="11" />
+      <Item value="command" priority="20" />
+      <Item value="ThreadExceptionDialog`0" priority="0" />
+      <Item value="new" priority="11" />
+      <Item value="Thread" priority="0" />
+      <Item value="t" priority="1" />
+      <Item value="static" priority="35" />
+      <Item value="commandId" priority="5" />
+      <Item value="cmd" priority="9" />
+      <Item value="VCommand`0" priority="1" />
+      <Item value="IDictionary" priority="0" />
+      <Item value="Id" priority="0" />
+      <Item value="id" priority="7" />
+      <Item value="Command" priority="0" />
+      <Item value="ObjectId" priority="1" />
+      <Item value="objectid" priority="0" />
+      <Item value="Argument" priority="0" />
+      <Item value="argument" priority="0" />
+      <Item value="ObjectType" priority="0" />
+      <Item value="objectType" priority="0" />
+      <Item value="else" priority="12" />
+      <Item value="m_homeId" priority="1" />
+      <Item value="objectId" priority="27" />
+      <Item value="propertyName" priority="1" />
+      <Item value="int" priority="74" />
+      <Item value="GetObjectId`0" priority="4" />
+      <Item value="pluginId" priority="1" />
+      <Item value="VCommand" priority="0" />
+      <Item value="GetPluginId`0" priority="1" />
+      <Item value="APIName" priority="5" />
+      <Item value="newLevel" priority="1" />
+      <Item value="object" priority="2" />
+      <Item value="null" priority="6" />
+      <Item value="curValues" priority="0" />
+      <Item value="state" priority="3" />
+      <Item value="arg" priority="6" />
+      <Item value="NonQuery`0" priority="8" />
+      <Item value="IDataAdapter`0" priority="0" />
+      <Item value="evt" priority="3" />
+      <Item value="DatabaseCommon" priority="0" />
+      <Item value="GetObjectTypeId`0" priority="0" />
+      <Item value="objTypeId" priority="0" />
+      <Item value="objectTypeId" priority="3" />
+      <Item value="out" priority="2" />
+      <Item value="objTypeEventId" priority="0" />
+      <Item value="dr" priority="18" />
+      <Item value="scriptLine" priority="11" />
+      <Item value="actionObject" priority="0" />
+      <Item value="objectName" priority="2" />
+      <Item value="obj" priority="1" />
+      <Item value="zObject`0" priority="0" />
+      <Item value="zObjectId" priority="0" />
+      <Item value="lstObjects" priority="2" />
+      <Item value="pnlSettings" priority="12" />
+      <Item value="Height" priority="0" />
+      <Item value="INTEGER" priority="5" />
+      <Item value="propertyType" priority="1" />
+      <Item value="OutOfMemoryException`0" priority="0" />
+      <Item value="pType" priority="1" />
+      <Item value="PropertyType`0" priority="1" />
+      <Item value="Label`0" priority="1" />
+      <Item value="Label" priority="1" />
+      <Item value="lbl" priority="7" />
+      <Item value="TextBox`0" priority="1" />
+      <Item value="TextBox" priority="1" />
+      <Item value="tbx" priority="11" />
+      <Item value="objectSettingsForm1" priority="0" />
+      <Item value="objects" priority="0" />
+      <Item value="top" priority="4" />
+      <Item value="Button`0" priority="2" />
+      <Item value="Button" priority="0" />
+      <Item value="btn" priority="15" />
+      <Item value="_objectId" priority="2" />
+      <Item value="Logger`0" priority="6" />
+      <Item value="FormStartPosition`0" priority="0" />
+      <Item value="Log" priority="5" />
+      <Item value="UrgencyLevel`0" priority="4" />
+      <Item value="BindingList" priority="3" />
+      <Item value="LogItem`0" priority="2" />
+      <Item value="zv" priority="1" />
+      <Item value="lock" priority="1" />
+      <Item value="var" priority="0" />
+      <Item value="tempTest" priority="0" />
+      <Item value="item" priority="0" />
+      <Item value="BindingList&lt;LogItem&gt;" priority="0" />
+      <Item value="Masterlog" priority="2" />
+      <Item value="MasterDevices" priority="2" />
+      <Item value="dataListViewLog" priority="0" />
+      <Item value="tempLog" priority="1" />
+      <Item value="tempDevices" priority="1" />
+      <Item value="ObjectProperties" priority="0" />
+      <Item value="uc_object_properties_form1" priority="1" />
+      <Item value="ref" priority="0" />
+      <Item value="selecteddevice" priority="0" />
+      <Item value="Application`0" priority="0" />
+      <Item value="newSetting" priority="0" />
+      <Item value="propertyValue" priority="0" />
+      <Item value="Close`0" priority="1" />
+      <Item value="PropertiesLabel" priority="4" />
+      <Item value="sender" priority="1" />
+      <Item value="_loadedStates" priority="0" />
+      <Item value="tmrTick" priority="0" />
+      <Item value="DataTable" priority="0" />
+      <Item value="_masterEvents" priority="1" />
+      <Item value="ScriptEditor`0" priority="0" />
+      <Item value="scriptEditor" priority="1" />
+      <Item value="ScriptEditor" priority="0" />
+      <Item value="scriptId" priority="3" />
+      <Item value="_objects" priority="3" />
+      <Item value="cboObjects" priority="9" />
+      <Item value="_events" priority="1" />
+      <Item value="cboEvents" priority="3" />
+      <Item value="_scriptId" priority="2" />
+      <Item value="eventId" priority="1" />
+      <Item value="script" priority="1" />
+      <Item value="txtScript" priority="3" />
+      <Item value="MainForm`0" priority="0" />
+      <Item value="UpdateObjects" priority="0" />
+      <Item value="SpeechSynthesizer" priority="0" />
+      <Item value="_synth" priority="1" />
+      <Item value="txtScriptName" priority="0" />
+      <Item value="UpdateEventList`0" priority="0" />
+      <Item value="dataListEvents" priority="0" />
+      <Item value="MessageBox`0" priority="3" />
+      <Item value="YesNo" priority="1" />
+      <Item value="Question" priority="1" />
+      <Item value="Yes" priority="1" />
+      <Item value="UpdateScripts" priority="0" />
+      <Item value="abstract" priority="1" />
+      <Item value="GetPlugin`0" priority="1" />
+      <Item value="ForList" priority="1" />
+      <Item value="SQLCommand" priority="0" />
+      <Item value="showInList" priority="0" />
+      <Item value="HasRows`0" priority="1" />
+      <Item value="node" priority="0" />
+      <Item value="OK" priority="1" />
+      <Item value="Exclamation" priority="0" />
+      <Item value="ParamType`0" priority="13" />
+      <Item value="NONE" priority="4" />
+      <Item value="STRING" priority="0" />
+      <Item value="paramType" priority="3" />
+      <Item value="RichTextBoxScrollBars`0" priority="0" />
+      <Item value="String`0" priority="0" />
+      <Item value="uc_script_editor1" priority="0" />
+      <Item value="ObjectID" priority="0" />
+      <Item value="progressBar1" priority="0" />
+      <Item value="RichTextBoxLanguageOptions`0" priority="0" />
+      <Item value="zwObj" priority="0" />
+      <Item value="_zwObj" priority="0" />
+      <Item value="err" priority="1" />
+      <Item value="Thread`0" priority="0" />
+      <Item value="iterations" priority="0" />
+      <Item value="IsReady" priority="5" />
+      <Item value="stateOption" priority="4" />
+      <Item value="value" priority="2" />
+      <Item value="delegate" priority="0" />
+      <Item value="event" priority="0" />
+      <Item value="StateChangedEventHandler`0" priority="0" />
+      <Item value="StateChangedEvent" priority="0" />
+      <Item value="PluginManager`0" priority="0" />
+      <Item value="pm" priority="0" />
+      <Item value="ArgumentType" priority="0" />
+      <Item value="argumentType" priority="0" />
+      <Item value="CustomData1" priority="0" />
+      <Item value="customData1" priority="0" />
+      <Item value="CustomData2" priority="0" />
+      <Item value="customData2" priority="0" />
+      <Item value="arg_type" priority="0" />
+      <Item value="custom1" priority="1" />
+      <Item value="custom2" priority="1" />
+      <Item value="GroupEditor`0" priority="0" />
+      <Item value="GroupEditor" priority="0" />
+      <Item value="grpEditor" priority="0" />
+      <Item value="_groups" priority="2" />
+      <Item value="cboGroups" priority="4" />
+      <Item value="UpdateGroupsList`0" priority="2" />
+      <Item value="groupId" priority="5" />
+      <Item value="lstAdded" priority="1" />
+      <Item value="lstNotAdded" priority="2" />
+      <Item value="_added" priority="1" />
+      <Item value="_notAdded" priority="2" />
+      <Item value="OperationCanceledException`0" priority="0" />
+      <Item value="_groupId" priority="2" />
+      <Item value="UpdateObjectLists`0" priority="0" />
+      <Item value="txtNewGroup" priority="4" />
+      <Item value="btnNew" priority="0" />
+      <Item value="btnDelete" priority="0" />
+      <Item value="Error" priority="0" />
+      <Item value="groupName" priority="0" />
+      <Item value="ValueID" priority="0" />
+      <Item value="label" priority="0" />
+      <Item value="Value" priority="0" />
+      <Item value="PreviousValue" priority="0" />
+      <Item value="ValueControl`0" priority="1" />
+      <Item value="ValueCommon" priority="0" />
+      <Item value="cmdObj" priority="1" />
+      <Item value="Object" priority="2" />
+      <Item value="enum" priority="0" />
+      <Item value="CommandType`0" priority="3" />
+      <Item value="btnInfo`0" priority="0" />
+      <Item value="zVirtualScenesAPI" priority="1" />
+      <Item value="Structs" priority="1" />
+      <Item value="commandType" priority="1" />
+      <Item value="Param" priority="0" />
+      <Item value="param" priority="0" />
+      <Item value="CommandType" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Data.DataTable">
+      <Item value="Rows" priority="39" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesAPI.API">
+      <Item value="InstallObjectTypeCommand`0" priority="4" />
+      <Item value="GetObject`0" priority="0" />
+      <Item value="GetObjectProperty`0" priority="0" />
+      <Item value="GetState`0" priority="1" />
+      <Item value="NewObject`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Object">
+      <Item value="ToString`0" priority="53" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenZWaveDotNet.ZWManager">
+      <Item value="SetNodeOn`0" priority="0" />
+      <Item value="SetNodeLevel`0" priority="0" />
+      <Item value="RequestNodeState`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:OpenZWavePlugin.OpenZWavePlugin">
+      <Item value="m_homeId" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Convert">
+      <Item value="ToByte`0" priority="4" />
+      <Item value="ToInt32`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Data.DataRowCollection">
+      <Item value="Count" priority="9" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Threading.Thread">
+      <Item value="Sleep`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IEnumerable`1">
+      <Item value="GetEnumerator`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesAPI.Plugin">
+      <Item value="GetAPIName`0" priority="2" />
+      <Item value="ProcessCommand`0" priority="0" />
+      <Item value="Repoll`0" priority="1" />
+      <Item value="Enabled" priority="3" />
+      <Item value="IsReady" priority="2" />
+      <Item value="ListenForStateChanges" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Threading.Thread">
+      <Item value="Start`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesAPI.VCommand">
+      <Item value="Command" priority="0" />
+      <Item value="ObjectId" priority="3" />
+      <Item value="ObjectType" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.String">
+      <Item value="IsNullOrEmpty`0" priority="3" />
+      <Item value="Empty" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesCommon.DatabaseCommon.DatabaseControl">
+      <Item value="GetObjectId`0" priority="1" />
+      <Item value="GetObjectState`0" priority="0" />
+      <Item value="GetObjectProperty`0" priority="0" />
+      <Item value="GetObjects`0" priority="5" />
+      <Item value="GetObjectTypeId`0" priority="0" />
+      <Item value="AddCommand`0" priority="0" />
+      <Item value="GetEventScripts`0" priority="1" />
+      <Item value="GetScripts`0" priority="0" />
+      <Item value="NewPlugin`0" priority="0" />
+      <Item value="GetObjectByName`0" priority="1" />
+      <Item value="NewObject`0" priority="1" />
+      <Item value="NewObjectTypeCommand`0" priority="0" />
+      <Item value="GetPluginEnabled`0" priority="0" />
+      <Item value="GetCommandId`0" priority="0" />
+      <Item value="RemoveObjectFromGroup`0" priority="1" />
+      <Item value="GetObjectValues`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Int32">
+      <Item value="ToString`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Byte">
+      <Item value="ToString`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Int32">
+      <Item value="TryParse`0" priority="14" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesCommon.EventCommon.EventControl">
+      <Item value="EventTriggered`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.String">
+      <Item value="Split`0" priority="0" />
+      <Item value="Substring`0" priority="6" />
+      <Item value="IndexOf`0" priority="9" />
+      <Item value="LastIndexOf`0" priority="3" />
+      <Item value="Replace`0" priority="1" />
+      <Item value="ToString`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesAPI.zObject">
+      <Item value="zObjectID" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.ListBox">
+      <Item value="Items" priority="2" />
+      <Item value="SelectedIndex" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.ListBox+ObjectCollection">
+      <Item value="Add`0" priority="0" />
+      <Item value="Clear`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Panel">
+      <Item value="Top" priority="0" />
+      <Item value="Left" priority="0" />
+      <Item value="Width" priority="0" />
+      <Item value="Height" priority="0" />
+      <Item value="Controls" priority="8" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.UserControls.uc_object_settings_form">
+      <Item value="Width" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Control+ControlCollection">
+      <Item value="Clear`0" priority="0" />
+      <Item value="Add`0" priority="4" />
+      <Item value="Contains`0" priority="0" />
+      <Item value="ContainsKey`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesAPI.PropertyType">
+      <Item value="INTEGER" priority="0" />
+      <Item value="STRING" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Label">
+      <Item value="Text" priority="1" />
+      <Item value="Width" priority="1" />
+      <Item value="Top" priority="1" />
+      <Item value="Left" priority="2" />
+      <Item value="Height" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.TextBox">
+      <Item value="Name" priority="1" />
+      <Item value="Width" priority="0" />
+      <Item value="Top" priority="1" />
+      <Item value="Left" priority="1" />
+      <Item value="Height" priority="0" />
+      <Item value="Text" priority="8" />
+      <Item value="Visible" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.UserControls.uc_object_properties_form">
+      <Item value="UpdateObject`0" priority="1" />
+      <Item value="Save`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Button">
+      <Item value="Click" priority="1" />
+      <Item value="Left" priority="1" />
+      <Item value="Top" priority="0" />
+      <Item value="Text" priority="3" />
+      <Item value="Name" priority="5" />
+      <Item value="Width" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesCommon.Util.Logger">
+      <Item value="Log" priority="3" />
+      <Item value="WriteToLog`0" priority="4" />
+      <Item value="GetLog`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.ComponentModel.BindingList`1">
+      <Item value="Add`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.Forms.ObjectProperties">
+      <Item value="Close`0" priority="0" />
+      <Item value="Show`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Forms.Application">
+      <Item value="Exit`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.PluginSystem.PluginManager">
+      <Item value="StopCommandThread`0" priority="0" />
+      <Item value="GetPlugins`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Control">
+      <Item value="Text" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.Timer">
+      <Item value="Enabled" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:BrightIdeasSoftware.DataListView">
+      <Item value="DataSource" priority="1" />
+      <Item value="SelectedIndex" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.Forms.ScriptEditor">
+      <Item value="Show`0" priority="0" />
+      <Item value="scriptId" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.ComboBox">
+      <Item value="Items" priority="5" />
+      <Item value="SelectedIndex" priority="8" />
+      <Item value="Text" priority="1" />
+      <Item value="ControlAdded" priority="0" />
+      <Item value="SelectedItem" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.ComboBox+ObjectCollection">
+      <Item value="Clear`0" priority="2" />
+      <Item value="Add`0" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Speech.Synthesis.SpeechSynthesizer">
+      <Item value="Dispose`0" priority="0" />
+      <Item value="SpeakAsync`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesAPI.zCommand">
+      <Item value="Argument" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Forms.MessageBox">
+      <Item value="Show`0" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesCommon.Util.UrgencyLevel">
+      <Item value="ERROR" priority="2" />
+      <Item value="WARNING" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Forms.MessageBoxIcon">
+      <Item value="Error" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Windows.Forms.DialogResult">
+      <Item value="Cancel" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesAPI.ParamType">
+      <Item value="STRING" priority="2" />
+      <Item value="NONE" priority="1" />
+      <Item value="DECIMAL" priority="1" />
+      <Item value="INTEGER" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.UserControls.uc_script_editor">
+      <Item value="GetScript`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.RichTextBox">
+      <Item value="Text" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Windows.Forms.ProgressBar">
+      <Item value="Value" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.Structs.zwObject">
+      <Item value="Type_ID" priority="0" />
+      <Item value="Type" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesCommon.StateCommon.StateControl">
+      <Item value="StateChanged`0" priority="1" />
+      <Item value="StateChangedEvent" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.Forms.GroupEditor">
+      <Item value="Show`0" priority="0" />
+      <Item value="Close`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesCommon.ValueCommon.ValueControl">
+      <Item value="ValueChangedEvent" priority="3" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesAPI.Structs.Command">
+      <Item value="commandType" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@zVirtualScenesAPI.Structs.CommandType">
+      <Item value="Object" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:zVirtualScenesApplication.UserControls.btnInfo">
+      <Item value="Param" priority="0" />
+      <Item value="CommandType" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="90E854D0-AB37-4928-BF33-93B3553F33A9/f:Plugin.cs" caret="2237" fromTop="33" />
+      <File id="F9F697BB-3589-4FED-8E15-F15D16D56C91/f:LightSwitchPlugin.cs" caret="29247" fromTop="21" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Globals/f:GlobalMethods.cs" caret="113" fromTop="4" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:ActivateGroup.cs" caret="1223" fromTop="43" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:UserControls/f:uc_plugin_properties_form.cs" caret="2255" fromTop="26" />
+      <File id="4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66/f:SpeechPlugin.cs" caret="1177" fromTop="18" />
+      <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5973" fromTop="0" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="394" fromTop="13" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="89409" fromTop="46" />
+      <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5135" fromTop="27" />
+      <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5478" fromTop="32" />
+      <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="5900" fromTop="38" />
+      <File id="0A43D202-F903-44C8-83E3-03A3928E9480/f:OpenZWavePlugin.cs" caret="6231" fromTop="43" />
+      <File id="4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66/f:SpeechPlugin.cs" caret="1478" fromTop="26" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="67022" fromTop="26" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="67581" fromTop="25" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="69851" fromTop="42" />
+      <File id="7F7A1176-AAB8-4376-8915-57A4341E68E2/d:Forms/f:MainForm.cs" caret="17697" fromTop="20" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir IsNull="False">
+    </NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+</Configuration>
