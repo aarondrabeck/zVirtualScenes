@@ -1,1 +1,0 @@
-log(System.DateTime.Now);
