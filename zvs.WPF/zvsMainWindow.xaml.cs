@@ -23,6 +23,7 @@ using System.Diagnostics;
 using zvs.Processor.Backup;
 using zvs.Entities;
 using zvs.WPF.JavaScript;
+using zvs.Processor.Logging;
 
 namespace zvs.WPF
 {
@@ -34,6 +35,7 @@ namespace zvs.WPF
         private App app = (App)Application.Current;
         private zvsContext context;
         public WindowState lastOpenedWindowState = WindowState.Normal;
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<zvsMainWindow>();
 
         public zvsMainWindow()
         {
@@ -46,18 +48,25 @@ namespace zvs.WPF
             Debug.WriteLine("zvsMainWindow Deconstructed.");
         }
 
+
+        zvs.Processor.Logging.ObservableLog observableLog;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             context = new zvsContext();
+
+            observableLog = new zvs.Processor.Logging.ObservableLog(this.Dispatcher);
+            observableLog.Filter = "ALL";
+
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
-                myCollectionViewSource.Source = app.zvsCore.Logger.LOG;
 
+                myCollectionViewSource.Source = observableLog.Log;
             }
-            app.zvsCore.Logger.WriteToLog(Urgency.INFO, string.Format("{0} User Interface Loaded", Utils.ApplicationName), Utils.ApplicationName + " GUI");
+            log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
 
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
             //clear the existing sort order
@@ -77,16 +86,16 @@ namespace zvs.WPF
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
-
-            LogItem i = app.zvsCore.Logger.LOG.LastOrDefault();
-            if(i != null)
+            
+            LogItem i = observableLog.Log.LastOrDefault();
+            if (i != null)
             {
                 StatusBarDescriptionTxt.Text = i.Description;
                 StatusBarSourceTxt.Text = i.Source;
-                StatusBarUrgencyTxt.Text = i.Urgency.ToString();   
+                StatusBarUrgencyTxt.Text = i.Urgency.ToString();
             }
 
-            app.zvsCore.Logger.LOG.CollectionChanged += (s, a) =>
+             observableLog.Log.CollectionChanged += (s, a) =>
             {
                 if (a.NewItems != null && a.NewItems.Count > 0)
                 {
@@ -166,6 +175,10 @@ namespace zvs.WPF
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
                 myCollectionViewSource.Source = null;
             }
+            else
+            {
+                observableLog.Stop();
+            }
         }
 
         private void MainWindow_Closed_1(object sender, EventArgs e)
@@ -191,8 +204,16 @@ namespace zvs.WPF
         private void ViewLogsMI_Click_1(object sender, RoutedEventArgs e)
         {
             try
-            {
-                System.Diagnostics.Process.Start(Logger.LogPath);
+            {                
+                string logFile = zvs.Processor.Logging.LogManager.DefaultLogFile;
+                if (System.IO.File.Exists(logFile))
+                {
+                    System.Diagnostics.Process.Start(logFile);
+                }
+                else
+                {
+                    MessageBox.Show("Could not resolve the log file, make sure logging is configured correctly");
+                }
             }
             catch
             {
@@ -247,7 +268,7 @@ namespace zvs.WPF
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportDevicesAsyc(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -266,7 +287,7 @@ namespace zvs.WPF
             {
                 Backup.ImportDevicesAsyn(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -288,7 +309,7 @@ namespace zvs.WPF
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportScenesAsyc(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -307,7 +328,7 @@ namespace zvs.WPF
             {
                 Backup.ImportScenesAsyn(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -329,7 +350,7 @@ namespace zvs.WPF
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportTriggerAsyc(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -348,7 +369,7 @@ namespace zvs.WPF
             {
                 Backup.ImportTriggersAsyn(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -370,7 +391,7 @@ namespace zvs.WPF
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportGroupsAsyc(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -389,7 +410,7 @@ namespace zvs.WPF
             {
                 Backup.ImportGroupsAsyn(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result,Utils.ApplicationName + " GUI"); 
+                    log.Info(result);
                 });
             }
         }
@@ -411,7 +432,7 @@ namespace zvs.WPF
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 Backup.ExportScheduledTaskAsyc(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI");
+                    log.Info(result);
                 });
             }
         }
@@ -430,7 +451,7 @@ namespace zvs.WPF
             {
                 Backup.ImportScheduledTaskAsyn(dlg.FileName, (result) =>
                 {
-                    app.zvsCore.Logger.WriteToLog(Urgency.INFO, result, Utils.ApplicationName + " GUI");
+                    log.Info(result);
                 });
             }
         }

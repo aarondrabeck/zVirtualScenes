@@ -30,7 +30,7 @@ namespace NOAAPlugin
         private bool _isSunset = false;
         private DateTime _sunrise = DateTime.Now;
         private DateTime _sunset = DateTime.Now;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<NOAAPlugin>();
         public NOAAPlugin()
             : base("NOAA",
                "NOAA Plug-in",
@@ -105,7 +105,7 @@ namespace NOAAPlugin
 
         protected override void StartPlugin()
         {
-            WriteToLog(Urgency.INFO, string.Format("{0} started. Today's Sunrise: {1}, Today's Sunset: {2}", this.Name, _sunrise.ToString("T"), _sunset.ToString("T")));
+            log.InfoFormat("{0} started. Today's Sunrise: {1}, Today's Sunset: {2}", this.Name, _sunrise.ToString("T"), _sunset.ToString("T"));
 
             timerNOAA.Interval = 60000;
             timerNOAA.Elapsed += new ElapsedEventHandler(timerNOAA_Elapsed);
@@ -119,7 +119,7 @@ namespace NOAAPlugin
             timerNOAA.Elapsed -= new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = false;
 
-            WriteToLog(Urgency.INFO, this.Name + " stopped");
+            log.InfoFormat("{0} plug-in stopped.", this.Name);
 
             IsReady = false;
         }
@@ -144,7 +144,7 @@ namespace NOAAPlugin
             }
 
             CalculateSunriseSet();
-            WriteToLog(Urgency.INFO, string.Format("Lat/Long updated.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
+            log.Info(string.Format("Lat/Long updated.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
         }
                
         public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
@@ -188,7 +188,7 @@ namespace NOAAPlugin
                     Double MinsBetweenTimeSunrise = (_sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
-                        WriteToLog(Urgency.INFO, "It is now sunrise. Activating sunrise scenes.");
+                        log.Info("It is now sunrise. Activating sunrise scenes.");
                         foreach (Scene scene in context.Scenes)
                         {
                             string value = ScenePropertyValue.GetPropertyValue(context, scene, "ACTIVATE_SUNRISE");
@@ -207,7 +207,7 @@ namespace NOAAPlugin
                     Double MinsBetweenTimeSunset = (_sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                     {
-                        WriteToLog(Urgency.INFO, "It is now sunset. Activating sunrise scenes.");
+                        log.Info("It is now sunset. Activating sunrise scenes.");
                         foreach (Scene scene in context.Scenes)
                         {
                             string value = ScenePropertyValue.GetPropertyValue(context, scene, "ACTIVATE_SUNSET");
@@ -226,7 +226,7 @@ namespace NOAAPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.WARNING, "Error calculating Sunrise/Sunset. - " + ex.Message);
+                log.Warn("Error calculating Sunrise/Sunset. - " + ex.Message);
             }
         }
         #endregion

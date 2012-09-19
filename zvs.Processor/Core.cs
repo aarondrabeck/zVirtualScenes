@@ -19,7 +19,7 @@ namespace zvs.Processor
         public PluginManager pluginManager;
         public TriggerManager triggerManager;
         public ScheduledTaskManager scheduledTaskManager;
-        public Logger Logger;
+        Logging.ILog log;
         public Dispatcher Dispatcher;
 
         public Core(Dispatcher Dispatcher)
@@ -28,9 +28,9 @@ namespace zvs.Processor
             this.Dispatcher = Dispatcher;
 
             //Create a instance of the logger
-            Logger = new Logger();
+            log = Logging.LogManager.GetLogger<Core>();
 
-            Logger.WriteToLog(Urgency.INFO, "Starting Core Processor", Utils.ApplicationName);
+            log.InfoFormat("Starting Core Processor:{0}", Utils.ApplicationName);
 
             BackgroundWorker PluginBW = new BackgroundWorker();
             PluginBW.DoWork += (sender, args) =>

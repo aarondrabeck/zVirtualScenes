@@ -127,7 +127,7 @@ namespace OpenZWavePlugin.Forms
                 case ZWControllerState.InProgress:
                     {
                         // Tell the user that the controller has been found and the adding process is in progress.
-                        //Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " in progress...", "OPENZWAVE");
+                        //Logger.log.Info(_zwcontrollercommand.ToString() + " in progress...", "OPENZWAVE");
                         dlgText = "Please wait...";
                         buttonEnabled = false;
                         break;
@@ -136,7 +136,7 @@ namespace OpenZWavePlugin.Forms
                     {
                         // Tell the user that the controller has been successfully added.
                         // The command is now complete
-                        //Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " command complete.", "OPENZWAVE");
+                        //Logger.log.Info(_zwcontrollercommand.ToString() + " command complete.", "OPENZWAVE");
                         dlgText = "Command Completed OK.";
                         complete = true;
                         break;
@@ -145,21 +145,21 @@ namespace OpenZWavePlugin.Forms
                     {
                         // Tell the user that the controller addition process has failed.
                         // The command is now complete
-                        //Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " command failed.", "OPENZWAVE");
+                        //Logger.log.Info(_zwcontrollercommand.ToString() + " command failed.", "OPENZWAVE");
                         dlgText = "Command Failed.";
                         complete = true;
                         break;
                     }
                 case ZWControllerState.NodeOK:
                     {
-                        //Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " node has not failed.", "OPENZWAVE");
+                        //Logger.log.Info(_zwcontrollercommand.ToString() + " node has not failed.", "OPENZWAVE");
                         dlgText = "Node has not failed.";
                         complete = true;
                         break;
                     }
                 case ZWControllerState.NodeFailed:
                     {
-                       // Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " node has failed.", "OPENZWAVE");
+                       // Logger.log.Info(_zwcontrollercommand.ToString() + " node has failed.", "OPENZWAVE");
                         dlgText = "Node has failed.";
                         complete = true;
                         break;
@@ -228,11 +228,11 @@ namespace OpenZWavePlugin.Forms
                 // Cancel the operation
                 if (m_manager.CancelControllerCommand(_homeid))
                 {
-                   // Logger.WriteToLog(Urgency.INFO, _zwcontrollercommand.ToString() + " cancelled by user.", "OPENZWAVE");
+                   // Logger.log.Info(_zwcontrollercommand.ToString() + " cancelled by user.", "OPENZWAVE");
                 }
                 else
                 {
-                    //Logger.WriteToLog(Urgency.INFO, "Failed to cancel " + _zwcontrollercommand.ToString() + ".", "OPENZWAVE");
+                    //Logger.log.Info("Failed to cancel " + _zwcontrollercommand.ToString() + ".", "OPENZWAVE");
                 }
             }
 

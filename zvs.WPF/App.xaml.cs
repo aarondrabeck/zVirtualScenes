@@ -55,8 +55,11 @@ namespace zvs.WPF
         public void Init()
         {
             this.InitializeComponent();
-        }
+            zvs.Processor.Logging.LogManager.ConfigureLogging();
+            log = zvs.Processor.Logging.LogManager.GetLogger<App>();
 
+        }
+        zvs.Processor.Logging.ILog log;
         public bool SignalExternalCommandLineArgs(IList<string> args)
         {
             if (args == null || args.Count == 0)
@@ -87,9 +90,7 @@ namespace zvs.WPF
                             {
                                 zvsCore.Dispatcher.Invoke(new Action(() =>
                                 {
-                                    zvsCore.Logger.WriteToLog(Urgency.INFO,
-                               string.Format("Cannot find scene '{0}'", SearchQuery),
-                               "Command Line");
+                                    log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
                                 }));
                             }
                             catch { }
@@ -153,7 +154,15 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.Errors ? Urgency.ERROR : Urgency.INFO, args.Details, args.Source);
+                    if (args.Errors)
+                    {
+                        log.ErrorFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+                    }
+
                 }));
             };
 
@@ -161,7 +170,15 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.Errors ? Urgency.ERROR : Urgency.INFO, args.Details, args.Source);
+                    if (args.Errors)
+                    {
+                        log.ErrorFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+                    }
+
                 }));
             };
 
@@ -169,7 +186,7 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(Urgency.INFO, args.Progress, args.Source);
+                    log.InfoFormat("Progress:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Progress, args.SceneID, args.SceneRunnerGUID, args.Source);
                 }));
             };
 
@@ -177,7 +194,14 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Trigger Manager");
+                    if (args.hasErrors)
+                    {
+                        log.ErrorFormat("Details:{0}, TriggerID:{1}", args.Details, args.TriggerID);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, TriggerID:{1}", args.Details, args.TriggerID);
+                    }
                 }));
             };
 
@@ -185,7 +209,14 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Scheduled Task Manager");
+                    if (args.hasErrors)
+                    {
+                        log.ErrorFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
+                    }
                 }));
             };
 
@@ -193,7 +224,14 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Scheduled Task Manager");
+                    if (args.hasErrors)
+                    {
+                        log.ErrorFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
+                    }
                 }));
             };
 
@@ -201,7 +239,7 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(Urgency.INFO, args.Details, "Plug-in Manager");
+                    log.InfoFormat("Details:{0}, sender:{1}", args.Details, sender);
                 }));
             };
 
@@ -209,7 +247,14 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Plug-in Manager");
+                    if (args.hasErrors)
+                    {
+                        log.ErrorFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+                    }
                 }));
             };
 
@@ -217,7 +262,14 @@ namespace zvs.WPF
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    zvsCore.Logger.WriteToLog(args.hasErrors ? Urgency.ERROR : Urgency.INFO, args.Details, "Plug-in Manager");
+                    if (args.hasErrors)
+                    {
+                        log.ErrorFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+                    }
+                    else
+                    {
+                        log.InfoFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+                    }
                 }));
             };
 
@@ -226,14 +278,10 @@ namespace zvs.WPF
 
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+            log.Fatal(sender.ToString(), (System.Exception)e.ExceptionObject);
+
             App app = (App)Application.Current;
-
             string exception = GetHostDetails + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString();
-            //if (exception.Length > 4000)
-            //{
-            //    exception = exception.Substring(0, 4000);
-            //}
-
             FatalErrorWindow fWindow = new FatalErrorWindow(exception);
             fWindow.ShowDialog();
         }
@@ -265,7 +313,7 @@ namespace zvs.WPF
                 zvsWindow.Closed += (a, s) =>
                 {
                     zvsWindow = null;
-                    zvsCore.Logger.WriteToLog(Urgency.INFO, string.Format("{0} User Interface Unloaded", Utils.ApplicationName), Utils.ApplicationName + " GUI");
+                    log.InfoFormat("{0} User Interface Unloaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
                     isLoading = false;
                 };
                 zvsWindow.Show();
@@ -280,6 +328,8 @@ namespace zvs.WPF
         {
             if (zvsMutex != null)
                 zvsMutex.ReleaseMutex();
+
+            log.Info("Shutting down");
 
             Application.Current.Shutdown();
         }

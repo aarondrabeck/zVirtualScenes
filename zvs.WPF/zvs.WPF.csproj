@@ -330,6 +330,9 @@
     <None Include="App.config" />
     <Resource Include="Images\zvs256.ico" />
     <Resource Include="Images\zvs32.ico" />
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />

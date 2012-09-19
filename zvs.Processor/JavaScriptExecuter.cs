@@ -15,7 +15,7 @@ namespace zvs.Processor
 
         public DeviceValueTrigger Trigger { get; set; }
         public Scene Scene { get; set; }
-        Logger log = new Logger();
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
 
         Jint.JintEngine engine = new Jint.JintEngine();
 
@@ -101,10 +101,9 @@ namespace zvs.Processor
                 //then run the engine as normal
                 object result = engine.Run(Script);
                 string entry = string.Format("Script Result:{0}, Trigger Name:{1}, Scene Name:{2}", (result == null) ? "" : result.ToString(), (Trigger == null) ? "None" : Trigger.Name, (Scene == null) ? "None" : Scene.Name);
-                
-                log.WriteToLog(Urgency.INFO, entry, typeof(JavaScriptExecuter).ToString());
-                log.SaveLogToFile();
-                
+
+                log.Info(entry);
+
 
                 if (result != null)
                 {
@@ -147,7 +146,8 @@ namespace zvs.Processor
                 }
                 catch (Exception e)
                 {
-                    log.WriteToLog(Urgency.ERROR, "Error running script: " + Script + " : " + e.ToString(), typeof(JavaScriptExecuter).Name);
+                    log.Error("Error running script: " + Script, e);
+                    
                 }
             }
         }
@@ -235,19 +235,19 @@ namespace zvs.Processor
         }
         public void Error(object Message)
         {
-            if(Message!=null)  log.WriteToLog(Urgency.ERROR, Message.ToString(), typeof(JavaScriptExecuter).Name);
+            log.Error(Message);
         }
         public void Info(object Message)
         {
             if (Message != null)
             {
-                log.WriteToLog(Urgency.INFO, Message.ToString(), typeof(JavaScriptExecuter).Name);
+                log.Info(Message);
                 ReportProgressJS(Message.ToString());
             }
         }
         public void Warning(object Message)
         {
-            if (Message != null) log.WriteToLog(Urgency.WARNING, Message.ToString(), typeof(JavaScriptExecuter).Name);
+            log.Warn(Message);
         }
         //RunScene(1);
         public void RunScene(double SceneID)

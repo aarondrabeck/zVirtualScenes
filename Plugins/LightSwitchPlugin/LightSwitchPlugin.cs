@@ -31,7 +31,7 @@ namespace LightSwitchPlugin
         private bool _sort_list = true;
         private int _port = 9909;
         private int _max_conn = 50;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<LightSwitchPlugin>();
         public LightSwitchPlugin()
             : base("LIGHTSWITCH",
                "LightSwitch Plug-in",
@@ -196,7 +196,7 @@ namespace LightSwitchPlugin
                 }
                 catch (Exception ex)
                 {
-                    WriteToLog(Urgency.ERROR, ex.Message);
+                    log.Fatal(ex);
                 }
             }
             else
@@ -281,13 +281,13 @@ namespace LightSwitchPlugin
                         LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, _port));
                         LightSwitchSocket.Listen(_max_conn);
                         LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                        WriteToLog(Urgency.INFO, "LightSwitch server started on port " + _port);
+                        log.Info("LightSwitch server started on port " + _port);
                         IsReady = true;
                     }
                 }
                 catch (SocketException e)
                 {
-                    WriteToLog(Urgency.ERROR, "Socket Failed to Open - " + e);
+                    log.Error("Socket Failed to Open - " + e);
                 }
             }
         }
@@ -305,7 +305,7 @@ namespace LightSwitchPlugin
                         client.Close();
                     }
                 }
-                WriteToLog(Urgency.INFO, "LightSwitch server stopped");
+                log.Info("LightSwitch server stopped");
                 isActive = false;
                 IsReady = false;
             }
@@ -325,7 +325,7 @@ namespace LightSwitchPlugin
                 lock (LightSwitchClients)
                     LightSwitchClients.Add(LightSwitchClientsSocket);
 
-                WriteToLog(Urgency.INFO, "Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
+                log.Info("Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
 
                 // Send a welcome message to client                
                 string msg = "LightSwitch zVirtualScenes Plug-in (Active Connections " + LightSwitchClients.Count + ")" + Environment.NewLine;
@@ -342,7 +342,7 @@ namespace LightSwitchPlugin
             }
             catch (SocketException e)
             {
-                WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
+                log.Error("Socket Exception: " + e);
             }
             catch (Exception)
             { }
@@ -368,7 +368,7 @@ namespace LightSwitchPlugin
             }
             catch (SocketException e)
             {
-                WriteToLog(Urgency.ERROR, "Socket Exception: " + e);
+                log.Error("Socket Exception: " + e);
             }
         }
 
@@ -407,7 +407,7 @@ namespace LightSwitchPlugin
                         string data = new string(chars);
 
                         if (_verbose)
-                            WriteToLog(Urgency.INFO, "Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
+                            log.Info("Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
 
                         string[] commands = data.Split('\n');
 
@@ -442,7 +442,7 @@ namespace LightSwitchPlugin
                                         {
                                             socketData.m_verified = true;
                                             SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
-                                            WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
+                                            log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
                                         }
                                         else
                                         {
@@ -464,7 +464,7 @@ namespace LightSwitchPlugin
 
                                     else if (cmd.StartsWith("ALIST"))  //DEVICES, SCENES AND ZONES.
                                     {
-                                        WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
+                                        log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
 
                                         sendDeviceList(LightSwitchClientSocket);
 
@@ -476,7 +476,7 @@ namespace LightSwitchPlugin
                                     }
                                     else if (cmd.StartsWith("LIST")) //DEVICES
                                     {
-                                        WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
+                                        log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
 
                                         sendDeviceList(LightSwitchClientSocket);
 
@@ -490,7 +490,7 @@ namespace LightSwitchPlugin
                                     }
                                     else if (cmd.StartsWith("ZLIST")) //ZONES
                                     {
-                                        WriteToLog(Urgency.INFO, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested zone/group list.");
+                                        log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested zone/group list.");
 
                                         SendZoneList(LightSwitchClientSocket);
                                         SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
@@ -522,7 +522,7 @@ namespace LightSwitchPlugin
                                                 if (zvs_cmd != null)
                                                 {
                                                     string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.Name, g.Name);
-                                                    WriteToLog(Urgency.INFO, result);
+                                                    log.Info(result);
                                                     BroadcastMessage("MSG~" + result + Environment.NewLine);
 
                                                     zvs_cmd.Run(context, g.GroupId.ToString());
@@ -559,20 +559,20 @@ namespace LightSwitchPlugin
             }
             catch (ObjectDisposedException)
             {
-                WriteToLog(Urgency.ERROR, "OnDataReceived - Socket has been closed");
+                log.Error("OnDataReceived - Socket has been closed");
             }
             catch (SocketException se)
             {
                 if (se.ErrorCode == 10054) // Error code for Connection reset by peer
-                    WriteToLog(Urgency.ERROR, "Client " + socketData.m_clientNumber + " Disconnected.");
+                    log.Error("Client " + socketData.m_clientNumber + " Disconnected.");
                 else
-                    WriteToLog(Urgency.ERROR, "SocketException - " + se.Message);
+                    log.Error("SocketException - " + se.Message);
 
                 DisconnectClientSocket(socketData);
             }
             catch (Exception e)
             {
-                WriteToLog(Urgency.ERROR, "[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
+                log.Error("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
 
                 //SEND ERROR TO CLIENT
                 SendMessagetoClientsSocket(LightSwitchClientSocket, "ERR~" + e.Message + Environment.NewLine);
@@ -750,7 +750,7 @@ namespace LightSwitchPlugin
                                 if (cmd != null)
                                 {
                                     string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.Name, d.Name);
-                                    WriteToLog(Urgency.INFO, result);
+                                    log.Info(result);
                                     cmd.Run(context, d, string.Empty);
                                     return;
                                 }
@@ -802,7 +802,7 @@ namespace LightSwitchPlugin
             if (cmd != null)
             {
                 string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.Name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.Name);
-                WriteToLog(Urgency.INFO, result);
+                log.Info(result);
                 cmd.Run(context, arg);
                 return true;
             }
@@ -885,7 +885,7 @@ namespace LightSwitchPlugin
                                 DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETENERGYMODE");
                                 if (cmd != null)
                                 {
-                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
+                                    log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
                                     cmd.Run(context, d, string.Empty);
                                     return;
                                 }
@@ -896,7 +896,7 @@ namespace LightSwitchPlugin
                                 DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETCONFORTMODE");
                                 if (cmd != null)
                                 {
-                                    WriteToLog(Urgency.INFO, "[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
+                                    log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
                                     cmd.Run(context, d, string.Empty);
                                     return;
                                 }
@@ -929,14 +929,14 @@ namespace LightSwitchPlugin
                         catch (SocketException se)
                         {
                             if (_verbose)
-                                WriteToLog(Urgency.ERROR, "Socket Exception: " + se.Message);
+                                log.Error("Socket Exception: " + se.Message);
 
                             return;
                         }
                     }
 
                 if (_verbose)
-                    WriteToLog(Urgency.INFO, "SENT TO ALL - " + msg);
+                    log.Info("SENT TO ALL - " + msg);
 
             }
         }
@@ -960,12 +960,12 @@ namespace LightSwitchPlugin
                     catch (SocketException se)
                     {
                         if (_verbose)
-                            WriteToLog(Urgency.ERROR, "Socket Exception: " + se.Message);
+                            log.Error("Socket Exception: " + se.Message);
                     }
                 }
 
                 if (_verbose)
-                    WriteToLog(Urgency.INFO, "SENT - " + msg);
+                    log.Info("SENT - " + msg);
 
             }
         }
@@ -989,13 +989,13 @@ namespace LightSwitchPlugin
                 catch (SocketException se)
                 {
                     if (_verbose)
-                        WriteToLog(Urgency.ERROR, "Socket Exception: " + se.Message);
+                        log.Error("Socket Exception: " + se.Message);
                 }
             }
 
 
             if (_verbose)
-                WriteToLog(Urgency.INFO, "SENT " + msg);
+                log.Info("SENT " + msg);
 
         }
 
@@ -1013,7 +1013,7 @@ namespace LightSwitchPlugin
             }
             catch (Exception e)
             {
-                WriteToLog(Urgency.INFO, "Socket Disconnect: " + e);
+                log.Info("Socket Disconnect: " + e);
             }
         }
 
@@ -1065,12 +1065,12 @@ namespace LightSwitchPlugin
 
         void publishService_DidPublishService(NetService service)
         {
-            WriteToLog(Urgency.INFO, String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name));
+            log.Info(String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name));
         }
 
         void publishService_DidNotPublishService(NetService service, DNSServiceException ex)
         {
-            WriteToLog(Urgency.ERROR, ex.Message);
+            log.Error(ex.Message);
         }
 
         #endregion

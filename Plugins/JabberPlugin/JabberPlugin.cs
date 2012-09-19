@@ -26,7 +26,7 @@ namespace JabberPlugin
         private List<string> SendToList = new List<string>();
         //private bool UseSSL = true;
         private int Port = 5222;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JabberPlugin>();
         public JabberPlugin()
             : base("JABBER",
                "Jabber/Gtalk Plug-in",
@@ -217,7 +217,7 @@ namespace JabberPlugin
             DeviceValue.DeviceValueDataChangedEvent += new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
             Connect();
             IsReady = true;
-            WriteToLog(Urgency.INFO, this.Name + " plug-in started.");
+            log.InfoFormat("{0} plug-in started.", this.Name);
         }
 
         protected override void StopPlugin()
@@ -225,7 +225,7 @@ namespace JabberPlugin
             DeviceValue.DeviceValueDataChangedEvent -= new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
             Disconnect();
             IsReady = false;
-            WriteToLog(Urgency.INFO, this.Name + " plug-in stopped.");
+            log.InfoFormat("{0} plug-in stopped.", this.Name);
         }
 
         private void Connect()
@@ -244,7 +244,7 @@ namespace JabberPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, ex.Message);
+                log.Fatal(ex);
             }
         }
 
@@ -293,8 +293,8 @@ namespace JabberPlugin
         public override void DeactivateGroup(int groupID) { }
 
         private bool j_OnInvalidCertificate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors)
-        {
-            WriteToLog(Urgency.WARNING, "Invalid Certificate");
+        {            
+            log.Warn("Invalid Certificate");
             return true;
         }
 
@@ -315,44 +315,44 @@ namespace JabberPlugin
         private void jabberClient1_OnAuthError(object sender, System.Xml.XmlElement rp)
         {
             if (rp.Name == "failure")
-                WriteToLog(Urgency.WARNING, "Invalid username or password.");
+                log.Warn("Invalid username or password.");
         }
 
         private void jabberClient1_OnAuthenticate(object sender)
         {
-            WriteToLog(Urgency.INFO, "Jabber connected using " + j.User);
+            log.Info("Jabber connected using " + j.User);
             j.Presence(jabber.protocol.client.PresenceType.available, "I am a " + Utils.ApplicationNameAndVersion + " server.", ":chat", 0);
             isActive = true;
         }
 
         private void jabberClient1_OnError(object sender, Exception ex)
         {
-            WriteToLog(Urgency.ERROR, ex.Message);
+            log.Error(ex.Message);
         }
 
         private void jabberClient1_OnDisconnect(object sender)
         {
-            WriteToLog(Urgency.INFO, "Jabber disconnected");
+            log.Info("Jabber disconnected");
         }
 
         private void jabberClient1_OnMessage(object sender, jabber.protocol.client.Message msg)
         {
             if (Verbose)
-                WriteToLog(Urgency.INFO, "[" + msg.From.User + "] says : " + msg.Body + "\n");
+                log.Info("[" + msg.From.User + "] says : " + msg.Body + "\n");
         }
 
         private void j_OnWriteText(object sender, string txt)
         {
             if (txt == " ") return;
             if (Verbose)
-                WriteToLog(Urgency.INFO, "SENT: " + txt);
+                log.Info("SENT: " + txt);
         }
 
         private void j_OnReadText(object sender, string txt)
         {
             if (txt == " ") return;  // ignore keep-alive spaces
             if (Verbose)
-                WriteToLog(Urgency.INFO, "RECV: " + txt);
+                log.Info("RECV: " + txt);
         }
 
     }

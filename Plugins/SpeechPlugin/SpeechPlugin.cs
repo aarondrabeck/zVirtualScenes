@@ -14,7 +14,7 @@ namespace SpeechPlugin
     public class SpeechPlugin : zvsPlugin
     {
         private SpeechSynthesizer _synth;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<SpeechPlugin>();
         public SpeechPlugin()
             : base("SPEECH",
                "Speech Announce Plug-in",
@@ -55,7 +55,7 @@ namespace SpeechPlugin
         {
             _synth = new SpeechSynthesizer();
             DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
-            WriteToLog(Urgency.INFO, this.Name + " started");
+            log.Info( this.Name + " started");
             _synth.SpeakAsync("Speech Started!");
             IsReady = true;
         }
@@ -63,7 +63,7 @@ namespace SpeechPlugin
         protected override void StopPlugin()
         {
             DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
-            WriteToLog(Urgency.INFO, this.Name + " stopped");
+            log.Info( this.Name + " stopped");
             _synth.Dispose();
             IsReady = false;
         }

@@ -14,6 +14,8 @@ namespace zvs.Processor
         public string Description { get; private set; }
         public Core Core { get; set; }
 
+        Logging.ILog log = Logging.LogManager.GetLogger<zvsPlugin>();
+
         public bool IsRunning { get; private set; }
         public bool IsReady { get; protected set; }
         public bool ListenForStateChanges { get; protected set; }
@@ -182,9 +184,9 @@ namespace zvs.Processor
                         this.Core.Dispatcher.Invoke(new Action(() =>
                         {
                             if (!String.IsNullOrEmpty(prev_value))
-                                Core.Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed from {2} to {3}.", device_name, dv.Name, prev_value, dv.Value), "EVENT");
+                                log.InfoFormat("{0} {1} changed from {2} to {3}.", device_name, dv.Name, prev_value, dv.Value);//event
                             else
-                                Core.Logger.WriteToLog(Urgency.INFO, string.Format("{0} {1} changed to {2}.", device_name, dv.Name, dv.Value), "EVENT");
+                                log.InfoFormat("{0} {1} changed to {2}.", device_name, dv.Name, dv.Value); //event
                         }));
 
                         //Call Event
@@ -196,7 +198,7 @@ namespace zvs.Processor
             {
                 this.Core.Dispatcher.Invoke(new Action(() =>
                 {
-                    Core.Logger.WriteToLog(Urgency.WARNING, string.Format("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", dv.Name, dv.DeviceValueId), "EVENT");
+                    log.InfoFormat("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", dv.Name, dv.DeviceValueId);//, "EVENT"); 
                 }));
             }
 
@@ -367,21 +369,6 @@ namespace zvs.Processor
             }
         }
 
-        public void WriteToLog(Urgency u, string message)
-        {
-            try
-            {
-                if (!this.Core.Dispatcher.HasShutdownStarted)
-                {
-                    this.Core.Dispatcher.Invoke(new Action(() =>
-                    {
-                        Core.Logger.WriteToLog((Urgency)u, message, this.Name);
-
-                    }));
-                };
-            }
-            catch { }
-        }
 
         public void SettingsChange(PluginSetting ps)
         {

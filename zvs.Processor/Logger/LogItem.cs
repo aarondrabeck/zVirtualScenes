@@ -1,11 +1,11 @@
+﻿
 ﻿using System;
 
-namespace zvs.Processor
-{    
+namespace zvs.Processor.Logging
+{
     public class LogItem
     {
         public DateTime Datetime { get; set; }
-
         public string DatetimeLog
         {
             get
@@ -13,24 +13,21 @@ namespace zvs.Processor
                 return this.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt");
             }
         }
-        
         public string Description { get; set; }
-
-        public Urgency Urgency { get; set; }
-
-        public string Source {get; set;}
+        public string Source { get; set; }
+        public string Urgency { get; set; }
 
         public LogItem()
         {
             Datetime = DateTime.Now;
         }
 
-        public LogItem(Urgency urgency, string desc, string source)
+        public LogItem(log4net.Core.LoggingEvent Event)
         {
-            Datetime = DateTime.Now;
-            Urgency = urgency;
-            Description = desc;
-            Source = source;
+            Datetime = Event.TimeStamp;
+            Urgency = Event.Level.ToString();
+            Description = Event.RenderedMessage;
+            Source = Event.LoggerName;
         }
 
         public override string ToString()

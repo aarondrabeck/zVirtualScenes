@@ -26,7 +26,7 @@ namespace GrowlPlugin
 
         public const string NOTIFY_DEVICE_VALUE_CHANGE = "DEVICE_VALUE_CHANGE";
         public GrowlConnector GrowlConnector = new GrowlConnector();
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<GrowlPlugin>();
         public override void Initialize()
         {
             using (zvsContext context = new zvsContext())
@@ -45,7 +45,7 @@ namespace GrowlPlugin
         protected override void StartPlugin()
         {
 
-            WriteToLog(Urgency.INFO, this.Name + " started");
+            log.Info(this.Name + " started");
             DeviceValue.DeviceValueDataChangedEvent +=DeviceValue_DeviceValueDataChangedEvent;
             RegisterGrowl(); 
 
@@ -81,7 +81,7 @@ namespace GrowlPlugin
 
         protected override void StopPlugin()
         {
-            WriteToLog(Urgency.INFO, this.Name + " stopped");
+            log.InfoFormat("{0}  stopped", this.Name);
             DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
             IsReady = false;
         }
@@ -105,7 +105,7 @@ namespace GrowlPlugin
                 //string[] resourcenames = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames();
                 //foreach (string rname in resourcenames)
                 //{
-                //    API.WriteToLog(Urgency.INFO, rname);
+                //    API.log.Info(rname);
                 //}
 
                 Growl.Connector.Application application = new Growl.Connector.Application("zVirtualScenes");
@@ -117,11 +117,11 @@ namespace GrowlPlugin
 
                
                 GrowlConnector.Register(application, new NotificationType[] { DeviceValueChange });
-                WriteToLog(Urgency.INFO, "Registered Growl interface.");
+                log.Info("Registered Growl interface.");
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error registering Growl. " + ex.Message);
+                log.Error("Error registering Growl.", ex);
             }
         }
     }

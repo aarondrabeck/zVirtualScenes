@@ -24,7 +24,7 @@ namespace ThinkStickHIDPlugin
         private List<ZWaveDevice> _CTDevices = new List<ZWaveDevice>();
         private Window CommandDialogWindow = null;
         private bool isPolling = true;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<ThinkStickPlugin>();
         public ThinkStickPlugin()
             : base("THINKSTICK",
                "ThinkStick HID Plug-in",
@@ -96,7 +96,7 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception e)
             {
-                WriteToLog(Urgency.ERROR, string.Format("Failed to connect. {0}", e.Message));
+                log.Error(string.Format("Failed to connect. {0}", e.Message));
                 IsReady = false;
             }
         }
@@ -114,7 +114,7 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception e)
             {
-                WriteToLog(Urgency.ERROR, string.Format("Failed to disconnect. {0}", e.Message));
+                log.Fatal(string.Format("Failed to disconnect. {0}", e.Message), e);
                 IsReady = false;
             }
         }
@@ -229,7 +229,7 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
+                log.Error("Error sending command. " + ex.Message);
             }
         }
 
@@ -361,7 +361,7 @@ namespace ThinkStickHIDPlugin
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
+                log.Error("Error sending command. " + ex.Message);
             }
         }
 
@@ -402,7 +402,7 @@ namespace ThinkStickHIDPlugin
                             }
                             catch (Exception ex)
                             {
-                                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
+                                log.Error("Error sending command. " + ex.Message);
                             }
 
                         }
@@ -436,7 +436,7 @@ namespace ThinkStickHIDPlugin
                             }
                             catch (Exception ex)
                             {
-                                WriteToLog(Urgency.ERROR, "Error sending command. " + ex.Message);
+                                log.Error("Error sending command. " + ex.Message);
                             }
                         }
 
@@ -456,12 +456,12 @@ namespace ThinkStickHIDPlugin
 
         private void CTController_LevelChanged(object sender, ZWaveController.LevelChangedEventArgs e)
         {
-            WriteToLog(Urgency.INFO, "Level changed global: " + e.Level + e.OriginDevice.NodeID);
+            log.Info("Level changed global: " + e.Level + e.OriginDevice.NodeID);
         }
 
         private void CTController_ControllerNotResponding(object sender, EventArgs e)
         {
-            WriteToLog(Urgency.INFO, "ControlThink HID USB Controller not responding.  Attempting to disconnect...");
+            log.Info("ControlThink HID USB Controller not responding.  Attempting to disconnect...");
             try
             {
                 CTController.Disconnect();
@@ -473,20 +473,20 @@ namespace ThinkStickHIDPlugin
 
         private void CTController_Connected(object sender, EventArgs e)
         {
-            WriteToLog(Urgency.INFO, "Initializing: Driver with Home ID 0x" + CTController.HomeID + "...");
-            WriteToLog(Urgency.INFO, "Initializing: Getting devices...");
+            log.Info("Initializing: Driver with Home ID 0x" + CTController.HomeID + "...");
+            log.Info("Initializing: Getting devices...");
             DiscoverDevices();
-            WriteToLog(Urgency.INFO, "Initializing: Subscribing to events...");
+            log.Info("Initializing: Subscribing to events...");
             SubscribeEvents();
-            WriteToLog(Urgency.INFO, "Initializing: Setting polling intervals...");
+            log.Info("Initializing: Setting polling intervals...");
             SetPollingIntervals();
             IsReady = true;
-            WriteToLog(Urgency.INFO, "Initializing Complete. Plugin Ready.");
+            log.Info("Initializing Complete. Plugin Ready.");
 
             isPolling = true;
-            WriteToLog(Urgency.INFO, "Polling each device...");
+            log.Info("Polling each device...");
             ManuallyPollDevices();
-            WriteToLog(Urgency.INFO, "Polling Complete.");
+            log.Info("Polling Complete.");
             isPolling = false;
         }
 
@@ -494,7 +494,7 @@ namespace ThinkStickHIDPlugin
         {
             IsReady = false;
             UnSubscribeEvents();
-            WriteToLog(Urgency.INFO, "Disconnected: Plug-in shutdown.");
+            log.Info("Disconnected: Plug-in shutdown.");
         }
 
         private void UnSubscribeEvents()
@@ -809,7 +809,7 @@ namespace ThinkStickHIDPlugin
                             }
                             catch (Exception e)
                             {
-                                WriteToLog(Urgency.ERROR, "Error getting supported thermostat fan modes. " + e.Message);
+                                log.Error("Error getting supported thermostat fan modes. " + e.Message);
                             }
 
                             DefineOrUpdateDeviceCommand(dc, context);
@@ -848,7 +848,7 @@ namespace ThinkStickHIDPlugin
                             }
                             catch (Exception e)
                             {
-                                WriteToLog(Urgency.ERROR, "Error getting supported thermostat modes. " + e.Message);
+                                log.Error("Error getting supported thermostat modes. " + e.Message);
                             }
 
                             DefineOrUpdateDeviceCommand(dc2, context);
@@ -919,7 +919,7 @@ namespace ThinkStickHIDPlugin
                             }
                             catch (Exception e)
                             {
-                                WriteToLog(Urgency.ERROR, "Error getting supported thermostat setpoints. " + e.Message);
+                                log.Error("Error getting supported thermostat setpoints. " + e.Message);
                             }
                             #endregion
 
@@ -943,11 +943,11 @@ namespace ThinkStickHIDPlugin
                             //catch (NotSupportedException ex)
                             //{
                             //    //live status is not supported.
-                            //    WriteToLog(Urgency.ERROR, "Live status is not supported. " + ex.Message);
+                            //    log.Error("Live status is not supported. " + ex.Message);
                             //}
                             //catch (Exception ex)
                             //{
-                            //    WriteToLog(Urgency.ERROR, "Live status error. " + ex.Message);
+                            //    log.Error("Live status error. " + ex.Message);
                             //}
                         }
                         else if (CTDevice is BinarySensor || CTDevice is MultilevelSensor)
@@ -1021,7 +1021,7 @@ namespace ThinkStickHIDPlugin
                             }
                             catch (Exception ex)
                             {
-                                WriteToLog(Urgency.ERROR, "Error setting polling. " + ex.Message);
+                                log.Error("Error setting polling. " + ex.Message);
                             }
 
                             #region Repoll Value and Command
@@ -1086,7 +1086,7 @@ namespace ThinkStickHIDPlugin
                     }
                     catch (Exception e)
                     {
-                        WriteToLog(Urgency.ERROR, string.Format("Polling error on node {0}. {1}", CTDevice.NodeID, e.Message));
+                        log.Error(string.Format("Polling error on node {0}. {1}", CTDevice.NodeID, e.Message));
                     }
                 }
 
@@ -1110,7 +1110,7 @@ namespace ThinkStickHIDPlugin
                     }
                     catch (Exception e)
                     {
-                        WriteToLog(Urgency.ERROR, string.Format("Polling error on node {0}. {1}", CTDevice.NodeID, e.Message));
+                        log.Error(string.Format("Polling error on node {0}. {1}", CTDevice.NodeID, e.Message));
                     }
                 }
             }
@@ -1132,7 +1132,7 @@ namespace ThinkStickHIDPlugin
                         context.SaveChanges();
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "Thermostat set back Changed on DEVICE NOT FOUND:" + e.Level.ToString());
+                        log.Error("Thermostat set back Changed on DEVICE NOT FOUND:" + e.Level.ToString());
                 }
             }
         }
@@ -1152,7 +1152,7 @@ namespace ThinkStickHIDPlugin
                         context.SaveChanges();
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "ThermostatSetpoint Changed on DEVICE NOT FOUND:" + e.ThermostatSetpointType.ToString());
+                        log.Error("ThermostatSetpoint Changed on DEVICE NOT FOUND:" + e.ThermostatSetpointType.ToString());
                 }
             }
         }
@@ -1175,7 +1175,7 @@ namespace ThinkStickHIDPlugin
                         UpdateDeviceValue(dev.DeviceId, "TEMPERATURE", e.ThermostatTemperature.ToFahrenheit().ToString(), context);
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "TEMPERATURE Changed on DEVICE NOT FOUND:" + e.ThermostatTemperature.ToFahrenheit());
+                        log.Error("TEMPERATURE Changed on DEVICE NOT FOUND:" + e.ThermostatTemperature.ToFahrenheit());
                 }
             }
         }
@@ -1195,7 +1195,7 @@ namespace ThinkStickHIDPlugin
                         context.SaveChanges();
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "OPERATING_STATE Changed on DEVICE NOT FOUND:" + e.ThermostatOperatingState);
+                        log.Error("OPERATING_STATE Changed on DEVICE NOT FOUND:" + e.ThermostatOperatingState);
                 }
             }
         }
@@ -1215,7 +1215,7 @@ namespace ThinkStickHIDPlugin
                         context.SaveChanges();
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "MODE Changed on DEVICE NOT FOUND:" + e.ThermostatMode);
+                        log.Error("MODE Changed on DEVICE NOT FOUND:" + e.ThermostatMode);
                 }
             }
         }
@@ -1235,7 +1235,7 @@ namespace ThinkStickHIDPlugin
                         context.SaveChanges();
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "FAN_STATE Changed on DEVICE NOT FOUND:" + e.ThermostatFanState);
+                        log.Error("FAN_STATE Changed on DEVICE NOT FOUND:" + e.ThermostatFanState);
                 }
             }
         }
@@ -1255,7 +1255,7 @@ namespace ThinkStickHIDPlugin
                         context.SaveChanges();
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "ThermostatFanMode Changed on DEVICE NOT FOUND:" + e.ThermostatFanMode);
+                        log.Error("ThermostatFanMode Changed on DEVICE NOT FOUND:" + e.ThermostatFanMode);
                 }
             }
         }
@@ -1316,7 +1316,7 @@ namespace ThinkStickHIDPlugin
                         }
                     }
                     else
-                        WriteToLog(Urgency.ERROR, "Level Changed on DEVICE NOT FOUND:" + e.Level);
+                        log.Error("Level Changed on DEVICE NOT FOUND:" + e.Level);
                 }
             }
         }
@@ -1341,7 +1341,7 @@ namespace ThinkStickHIDPlugin
 
                     }
                     else
-                        WriteToLog(Urgency.INFO, "Level Changed on DEVICE NOT FOUND:" + e.Level);
+                        log.Info("Level Changed on DEVICE NOT FOUND:" + e.Level);
                 }
             }
         }
@@ -1356,7 +1356,7 @@ namespace ThinkStickHIDPlugin
             bw.RunWorkerCompleted += (s, e) =>
                 {
                     if (e.Error != null)
-                        WriteToLog(Urgency.INFO, "Level Changed error:" + e.Error);
+                        log.Info("Level Changed error:" + e.Error);
                 };
             bw.RunWorkerAsync();
         }

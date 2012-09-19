@@ -35,7 +35,7 @@ namespace HttpAPI
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
         private int _port = 9999;
         private bool _isCookieAuthEnabled = true;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<HttpAPIPlugin>();
         public HttpAPIPlugin()
             : base("HttpAPI",
                "HttpAPI Plug-in",
@@ -123,7 +123,7 @@ namespace HttpAPI
                 httplistener = new HttpListener();
                 if (!HttpListener.IsSupported)
                 {
-                    WriteToLog(Urgency.ERROR, "Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
+                    log.Fatal("Windows XP SP2 or Server 2003 is required to use the HttpListener class.");
                     return;
                 }
 
@@ -140,12 +140,12 @@ namespace HttpAPI
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
 
                     this.IsReady = true;
-                    WriteToLog(Urgency.INFO, string.Format("HTTP server started on port {0}", _port));
+                    log.Info(string.Format("HTTP server started on port {0}", _port));
                 }
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error while starting. " + ex.Message);
+                log.Error("Error while starting. " + ex.Message);
             }
         }
 
@@ -156,13 +156,13 @@ namespace HttpAPI
                 if (httplistener != null && httplistener.IsListening)
                 {
                     httplistener.Stop();
-                    WriteToLog(Urgency.INFO, "HTTP server stopped");
+                    log.Info("HTTP server stopped");
                     this.IsReady = false;
                 }
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, "Error while shutting down. " + ex.Message);
+                log.Error("Error while shutting down. " + ex.Message);
             }
         }
 
@@ -210,7 +210,7 @@ namespace HttpAPI
             }
             catch (Exception ex)
             {
-                WriteToLog(Urgency.ERROR, ex.Message);
+                log.Error(ex.Message);
             }
         }
 
@@ -244,7 +244,7 @@ namespace HttpAPI
                 if (context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString(); };
 
                 if (_verbose)
-                    WriteToLog(Urgency.INFO, string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
+                    log.Info(string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
 
                 //doesnt have valid cookies 
                 if (context.Request.Cookies.Count == 0 || (context.Request.Cookies.Count > 0 && context.Request.Cookies["zvs"] != null && context.Request.Cookies["zvs"].Value != CookieValue.ToString()))
@@ -256,7 +256,7 @@ namespace HttpAPI
 
                     if (!allowed && _isCookieAuthEnabled)
                     {
-                        WriteToLog(Urgency.INFO, string.Format("[{0}] was denied access to '{1}'", ip, context.Request.RawUrl));
+                        log.Info(string.Format("[{0}] was denied access to '{1}'", ip, context.Request.RawUrl));
                         sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", context);
                         return;
                     }
@@ -387,26 +387,28 @@ namespace HttpAPI
             string ip = string.Empty;
             if (request.RemoteEndPoint != null && request.RemoteEndPoint.Address != null) { ip = request.RemoteEndPoint.Address.ToString(); };
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
-            {
-                List<object> logEntries = new List<object>();
 
-                foreach (LogItem entry in Core.Logger.LOG.OrderByDescending(o => o.Datetime).Take(30))
-                {
-                    var LogEntry = new
-                    {
-                        id = Core.Logger.LOG.IndexOf(entry),
-                        DateTime = entry.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt"),
-                        Description = entry.Description,
-                        Source = entry.Source,
-                        Urgency = entry.Urgency.ToString()
-                    };
+            //TODO: Read from the in memory logger if available
+            //if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
+            //{
+            //    List<object> logEntries = new List<object>();
 
-                    logEntries.Add(LogEntry);
-                }
+            //    foreach (LogItem entry in Core.Logger.LOG.OrderByDescending(o => o.Datetime).Take(30))
+            //    {
+            //        var LogEntry = new
+            //        {
+            //            id = Core.Logger.LOG.IndexOf(entry),
+            //            DateTime = entry.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt"),
+            //            Description = entry.Description,
+            //            Source = entry.Source,
+            //            Urgency = entry.Urgency.ToString()
+            //        };
 
-                return new { success = true, logentries = logEntries.ToArray() };
-            }
+            //        logEntries.Add(LogEntry);
+            //    }
+
+            //    return new { success = true, logentries = logEntries.ToArray() };
+            //}
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
@@ -765,7 +767,7 @@ namespace HttpAPI
                                             cmd = d.Commands.FirstOrDefault(c => c.CommandId == c_id);
                                         if (cmd != null)
                                         {
-                                            WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.Name));
+                                            log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             cmd.Run(context, arg);
                                             return new { success = true };
                                         }
@@ -786,7 +788,7 @@ namespace HttpAPI
                                         if (cmd != null)
                                         {
 
-                                            WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.Name));
+                                            log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             cmd.Run(context, d, arg);
 
                                             return new { success = true };
@@ -850,7 +852,7 @@ namespace HttpAPI
 
                     if (cmd != null)
                     {
-                        WriteToLog(Urgency.INFO, string.Format("[{0}] Running command {1}", ip, cmd.Name));
+                        log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                         cmd.Run(context, arg);
                         return new { success = true };
                     }
@@ -859,7 +861,7 @@ namespace HttpAPI
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logout") && request.HttpMethod == "POST")
             {
-                WriteToLog(Urgency.INFO, string.Format("[{0}] Logged out.", ip));
+                log.Info(string.Format("[{0}] Logged out.", ip));
                 Cookie c = new Cookie("zvs", "No Access");
                 c.Expires = DateTime.Today.AddDays(-5);
                 c.Domain = "";
@@ -894,13 +896,13 @@ namespace HttpAPI
                         c.Path = "/";
                         response.Cookies.Add(c);
 
-                        WriteToLog(Urgency.INFO, string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, request.UserAgent));
+                        log.Info(string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, request.UserAgent));
 
                         return new { success = true };
                     }
                     else
                     {
-                        WriteToLog(Urgency.INFO, string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], request.UserAgent));
+                        log.Info(string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], request.UserAgent));
                         return new { success = false };
                     }
                 }
