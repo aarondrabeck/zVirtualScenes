@@ -6,6 +6,12 @@
 //log(h.appPath);
 //log(h.hostDetails);
 //log(h.userName);
+//log(h.applicationName);
+//log(h.applicationVersion);
+//log(h.appPath);
+//log(h.applicationNameAndVersion);
+//log(h.appDataPath);
+//log(h.DBNamePlusFullPath);
 //
 //
 //var details = h.deviceDetails("Master Bedroom");
@@ -58,4 +64,13 @@ helper = function() {
 	this.appPath = zvs.WPF.App.Path;	
 	this.hostDetails = zvs.WPF.App.GetHostDetails;
 	this.userName = System.Environment.UserName;
+	
+	this.applicationName = zvs.Processor.Utils.ApplicationName;
+	this.applicationVersion = zvs.Processor.Utils.ApplicationVersion;
+	this.applicationNameAndVersion = zvs.Processor.Utils.ApplicationNameAndVersion;
+	this.appDataPath = zvs.Processor.Utils.AppDataPath;
+	this.DBNamePlusFullPath = zvs.Processor.Utils.DBNamePlusFullPath;
+
+
+	
 }
