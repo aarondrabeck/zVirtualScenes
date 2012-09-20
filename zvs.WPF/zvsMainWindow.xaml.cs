@@ -41,6 +41,9 @@ namespace zvs.WPF
         {
             InitializeComponent();
 
+            observableLog = new zvs.Processor.Logging.ObservableLog(this.Dispatcher);
+            observableLog.Filter = "ALL";
+
         }
 
         ~zvsMainWindow()
@@ -55,8 +58,6 @@ namespace zvs.WPF
         {
             context = new zvsContext();
 
-            observableLog = new zvs.Processor.Logging.ObservableLog(this.Dispatcher);
-            observableLog.Filter = "ALL";
 
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
