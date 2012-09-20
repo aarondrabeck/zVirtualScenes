@@ -496,12 +496,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\js.png" />
-    <Content Include="scripts\DelayScene.js" />
-    <Content Include="scripts\DownloadFile.js" />
+    <Content Include="scripts\DelayScene.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scripts\DownloadFile.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="scripts\gmail.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="scripts\helper.js" />
+    <Content Include="scripts\helper.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="scripts\settings.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
