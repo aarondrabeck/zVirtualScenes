@@ -57,11 +57,12 @@ namespace zvs.WPF
             this.InitializeComponent();
             zvs.Processor.Logging.LogManager.ConfigureLogging();
             log = zvs.Processor.Logging.LogManager.GetLogger<App>();
-
+            //Application.Current.Properties;
         }
         zvs.Processor.Logging.ILog log;
         public bool SignalExternalCommandLineArgs(IList<string> args)
         {
+            
             if (args == null || args.Count == 0)
                 return true;
             if ((args.Count > 2))

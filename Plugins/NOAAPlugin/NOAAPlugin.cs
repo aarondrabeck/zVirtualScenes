@@ -18,6 +18,11 @@ namespace NOAAPlugin
     [Export(typeof(zvsPlugin))]
     public class NOAAPlugin : zvsPlugin
     {
+        public DateTime Sunrise { get { return _sunrise; } }
+        public DateTime Sunset { get { return _sunset; } }
+        public Double Lat { get { return _Lat; } }
+        public Double Long { get { return _Long; } }
+
         public volatile bool isActive;
         private System.Timers.Timer timerNOAA = new System.Timers.Timer();
         private Double _Lat = 30.6772222222222;
@@ -99,7 +104,7 @@ namespace NOAAPlugin
                 Double.TryParse(GetSettingValue("DELAY_SUNSET", context), out _SunsetDelay);
                 Double.TryParse(GetSettingValue("LAT", context), out _Lat);
                 Double.TryParse(GetSettingValue("LOG", context), out _Long);
-                CalculateSunriseSet();
+                CalculateSunriseSet();             
             }
         }
 

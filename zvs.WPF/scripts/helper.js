@@ -1,8 +1,13 @@
-//usage 
+////usage 
+////import the library
+
+
 //require("helper.js");
-////
+
+////create an instance of our helper class
 //var h = new helper();
 
+////now you have access to many application specific variables
 //log(h.appPath);
 //log(h.hostDetails);
 //log(h.userName);
@@ -12,23 +17,65 @@
 //log(h.applicationNameAndVersion);
 //log(h.appDataPath);
 //log(h.DBNamePlusFullPath);
-//
-//
+
+
+////you also have acess to devices
 //var details = h.deviceDetails("Master Bedroom");
 //log(details);
-//
-//Get a specific device
+
+////Get a specific device
 //var d = h.deviceByName("Bar Lights");
-//
-//output some specific property
+
+////output some specific property of a device
 //log(d.Name);
-//
-//get device value by name or specific device
+
+////get device value by name or specific device
 //log(h.getDeviceValue("Bar Lights", "Manufacturer Name"));
 //log(h.getDeviceValue(d, "Manufacturer Name"));
 
 
-helper = function() {
+
+////get all of the plugins, iterate over and show properties
+//var plugins = h.getPlugins();
+//for(var p in plugins) {
+//	log(p.Name + ":" + p.UniqueIdentifier + ":" + p.isEnabled + ":" + p.Description);
+//}
+
+
+//grab the noaa plugin, output specific plugin properties (lat, long, sunrise, sunset only available in builds later than 3.8.5)
+//var noaa = h.getPlugin("NOAA");
+//log(noaa.isDark());
+//log(noaa.Sunrise);
+//log(noaa.Sunset);
+//log(noaa.Lat);
+//log(noaa.Long);
+
+
+helper = function() {	
+	this.appPath = zvs.WPF.App.Path;	
+	this.hostDetails = zvs.WPF.App.GetHostDetails;
+	this.userName = System.Environment.UserName;
+	
+	this.applicationName = zvs.Processor.Utils.ApplicationName;
+	this.applicationVersion = zvs.Processor.Utils.ApplicationVersion;
+	this.applicationNameAndVersion = zvs.Processor.Utils.ApplicationNameAndVersion;
+	this.appDataPath = zvs.Processor.Utils.AppDataPath;
+	this.DBNamePlusFullPath = zvs.Processor.Utils.DBNamePlusFullPath;
+	this.app = System.Windows.Application.Current;
+	this.core = this.app.zvsCore;
+	this.pluginManager = this.core.pluginManager;
+	this.triggerManager = this.core.triggerManager;
+	this.scheduledTaskManager = this.core.scheduledTaskManager;
+
+	this.getPlugins = function() {
+		if(typeof this.pluginManager !='undefined') return this.pluginManager.GetPlugins();
+		return;
+	}
+	this.getPlugin = function(uniqueIdentifier) {
+		if(typeof this.pluginManager !='undefined') return this.pluginManager.GetPlugin(uniqueIdentifier);
+		return;
+	}
+
 	this.IsJavascriptCommand = function(cmd) {
 		return (cmd.hasOwnProperty("Script"));
 	}
@@ -99,17 +146,4 @@ helper = function() {
 		}
 		return details;
 	}
-	
-	this.appPath = zvs.WPF.App.Path;	
-	this.hostDetails = zvs.WPF.App.GetHostDetails;
-	this.userName = System.Environment.UserName;
-	
-	this.applicationName = zvs.Processor.Utils.ApplicationName;
-	this.applicationVersion = zvs.Processor.Utils.ApplicationVersion;
-	this.applicationNameAndVersion = zvs.Processor.Utils.ApplicationNameAndVersion;
-	this.appDataPath = zvs.Processor.Utils.AppDataPath;
-	this.DBNamePlusFullPath = zvs.Processor.Utils.DBNamePlusFullPath;
-
-
-	
 }
