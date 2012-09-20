@@ -146,4 +146,41 @@ helper = function() {
 		}
 		return details;
 	}
+	this.builtinCommands = function() {
+		return zvsContext.BuiltinCommands;
+	}
+
+	this.builtinCommand = function(name) {
+		var c = this.builtinCommands();
+		for (var cmd in c) {
+			if(cmd.Name == name || cmd.UniqueIdentifier == name) return cmd;
+		}
+		return;
+	}
+	this.runBuiltinCommand = function(cmd, arg) {
+		if(typeof cmd == 'string') {
+			cmd = this.builtinCommand(cmd);
+		}
+		if(typeof cmd !='undefined') {
+			cmd.Run(zvsContext, arg);
+		}
+	}
+	this.repollAll = function () {
+	    return this.runBuiltinCommand("REPOLL_ALL");
+	}
+	this.repollDevice = function (dev) {
+	    if (typeof dev != 'number') dev = dev.DeviceId;
+	    return this.runBuiltinCommand("REPOLL_ME", dev);
+	}
+	this.groupOn = function (group) {
+	    return this.runBuiltinCommand("GROUP_ON", group);
+	}
+	this.groupOff = function (group) {
+	    return this.runBuiltinCommand("GROUP_OFF", group);
+	}
+	this.timeDelayScene = function (delay) {
+	    return this.runBuiltinCommand("TIMEDELAY", delay);
+	}
+
+
 }
