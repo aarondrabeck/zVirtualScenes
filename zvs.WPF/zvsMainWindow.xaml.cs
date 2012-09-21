@@ -41,18 +41,46 @@ namespace zvs.WPF
         {
             InitializeComponent();
 
-            observableLog = new zvs.Processor.Logging.ObservableLog(this.Dispatcher);
-            observableLog.Filter = "ALL";
+            EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
 
         }
+
+        void EventedLog_OnLogItemArrived(List<LogItem> NewItems)
+        {
+            if (!this.Dispatcher.HasShutdownStarted)
+            {
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        logSource.Clear();
+                        foreach (var item in NewItems)
+                        {
+                            logSource.Add(item);
+                        }
+                        var entry = NewItems.LastOrDefault();
+                        if (entry != null)
+                        {
+                            StatusBarDescriptionTxt.Text = entry.Description;
+                            StatusBarSourceTxt.Text = entry.Source;
+                            StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }));
+            }
+        }
+
 
         ~zvsMainWindow()
         {
-            Debug.WriteLine("zvsMainWindow Deconstructed.");
+            log.Info("zvsMainWindow Deconstructed.");
         }
+        private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
 
-
-        zvs.Processor.Logging.ObservableLog observableLog;
+        //zvs.Processor.Logging.ObservableLog observableLog;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -65,7 +93,7 @@ namespace zvs.WPF
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
 
-                myCollectionViewSource.Source = observableLog.Log;
+                myCollectionViewSource.Source = logSource;
             }
             log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
 
@@ -87,28 +115,7 @@ namespace zvs.WPF
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
-            
-            LogItem i = observableLog.Log.LastOrDefault();
-            if (i != null)
-            {
-                StatusBarDescriptionTxt.Text = i.Description;
-                StatusBarSourceTxt.Text = i.Source;
-                StatusBarUrgencyTxt.Text = i.Urgency.ToString();
-            }
-
-             observableLog.Log.CollectionChanged += (s, a) =>
-            {
-                if (a.NewItems != null && a.NewItems.Count > 0)
-                {
-                    LogItem entry = (LogItem)a.NewItems[0];
-                    this.Dispatcher.Invoke(new Action(() =>
-                        {
-                            StatusBarDescriptionTxt.Text = entry.Description;
-                            StatusBarSourceTxt.Text = entry.Source;
-                            StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
-                        }));
-                }
-            };
+           
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -178,7 +185,7 @@ namespace zvs.WPF
             }
             else
             {
-                observableLog.Stop();
+                //observableLog.Stop();
             }
         }
 

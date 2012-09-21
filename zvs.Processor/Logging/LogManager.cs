@@ -25,6 +25,7 @@ namespace zvs.Processor.Logging
                 System.IO.FileInfo configFile = new System.IO.FileInfo(filename);
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(configFile);
             }
+            EventedLog.Enabled = true;
         }
         public static Logging.ILog GetLogger<T>()
         {

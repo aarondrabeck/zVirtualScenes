@@ -79,11 +79,12 @@
     <Compile Include="Backup\BackupScene.cs" />
     <Compile Include="Backup\BackupDevice.cs" />
     <Compile Include="JavaScriptExecuter.cs" />
-    <Compile Include="Logger\ILog.cs" />
-    <Compile Include="Logger\Log4netLogger.cs" />
-    <Compile Include="Logger\LogItem.cs" />
-    <Compile Include="Logger\LogManager.cs" />
-    <Compile Include="Logger\ObservableLog.cs" />
+    <Compile Include="Logging\EventedLog.cs" />
+    <Compile Include="Logging\ILog.cs" />
+    <Compile Include="Logging\Log4netLogger.cs" />
+    <Compile Include="Logging\LogItem.cs" />
+    <Compile Include="Logging\LogManager.cs" />
+    <Compile Include="Logging\ObservableLog.cs" />
     <Compile Include="zvsPlugin.cs" />
     <Compile Include="SceneRunner.cs" />
     <Compile Include="ScheduledTaskManager.cs" />
