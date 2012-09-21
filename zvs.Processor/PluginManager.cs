@@ -57,8 +57,10 @@ namespace zvs.Processor
                     BackgroundWorker pluginInitializer = new BackgroundWorker();
                     pluginInitializer.DoWork += (object sender, DoWorkEventArgs e) =>
                     {
+                        string msg = string.Format("Initializing '{0}'", p2.Name);
+                        Core.log.Info(msg);
                         if (onPluginInitialized != null)
-                            onPluginInitialized(this, new onPluginInitializedEventArgs(string.Format("Initializing '{0}'", p2.Name)));
+                            onPluginInitialized(this, new onPluginInitializedEventArgs(msg));
 
                         p2.Initialize();
                         p2.Start();
