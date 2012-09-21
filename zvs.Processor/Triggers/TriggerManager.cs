@@ -8,31 +8,60 @@ using zvs.Entities;
 
 namespace zvs.Processor.Triggers
 {
-    public class TriggerManager : IDisposable
+    internal class TriggerManager : IDisposable
     {
+        private Core Core;
         #region Events
-        public delegate void onTriggerStartEventHandler(object sender, onTriggerStartEventArgs args);
-        public class onTriggerStartEventArgs : EventArgs
+        public delegate void onTriggerBeginEventHandler(object sender, onTriggerEventArgs args);
+        public delegate void onTriggerEndEventHandler(object sender, onTriggerEventArgs args);
+        public class onTriggerEventArgs : EventArgs
         {
             public string Details { get; private set; }
             public int TriggerID { get; private set; }
-            public bool hasErrors { get; private set; }
+            public bool Errors { get; private set; }
 
-            public onTriggerStartEventArgs(int TriggerID, string Details, bool hasErrors)
+            public onTriggerEventArgs(int TriggerID, string Details, bool hasErrors)
             {
                 this.TriggerID = TriggerID;
                 this.Details = Details;
-                this.hasErrors = hasErrors;
+                this.Errors = hasErrors;
             }
         }
         /// <summary>
         /// Called when a scene has been called to be executed.
         /// </summary>
-        public static event onTriggerStartEventHandler onTriggerStart;
+        public static event onTriggerBeginEventHandler onTriggerBegin;
+        public static event onTriggerEndEventHandler onTriggerEnd;
+
+        private void TriggerBegin(onTriggerEventArgs args)
+        {
+            string msg = string.Format("{0}, TriggerID:{1}", args.Details, args.TriggerID);
+            if (args.Errors)
+                Core.log.Error(msg);
+            else
+                Core.log.Info(msg);
+
+            if (onTriggerBegin != null)
+                onTriggerBegin(this, args);
+        }
+
+        private void TriggerEnd(onTriggerEventArgs args)
+        {
+            string msg = string.Format("{0}, TriggerID:{1}", args.Details, args.TriggerID);
+            if (args.Errors)
+                Core.log.Error(msg);
+            else
+                Core.log.Info(msg);
+
+            if (onTriggerEnd != null)
+                onTriggerEnd(this, args);
+        }
+
         #endregion
 
-        public TriggerManager()
+        public TriggerManager(Core core)
         {
+            Core = core;
             DeviceValue.DeviceValueDataChangedEvent += new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
         }
 
@@ -78,9 +107,9 @@ namespace zvs.Processor.Triggers
                                         }
                                         else
                                         {
-                                            if (onTriggerStart != null)
+                                            if (onTriggerBegin != null)
                                             {
-                                                onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
+                                                onTriggerBegin(this, new onTriggerEventArgs(trigger.DeviceValueTriggerId,
                                                     string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
                                             }
                                         }
@@ -100,9 +129,9 @@ namespace zvs.Processor.Triggers
                                         }
                                         else
                                         {
-                                            if (onTriggerStart != null)
+                                            if (onTriggerBegin != null)
                                             {
-                                                onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
+                                                onTriggerBegin(this, new onTriggerEventArgs(trigger.DeviceValueTriggerId,
                                                     string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
                                             }
                                         }
@@ -128,16 +157,23 @@ namespace zvs.Processor.Triggers
 
         private void ActivateTriggerScene(DeviceValueTrigger trigger)
         {
-            SceneRunner sr = new SceneRunner(trigger.Scene.SceneId, trigger.Name, trigger);
-            sr.onRunBegin += (s, a) =>
+            using (zvsContext context = new zvsContext())
             {
-                if (onTriggerStart != null)
+                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                if (cmd != null)
                 {
-                    onTriggerStart(this, new onTriggerStartEventArgs(trigger.DeviceValueTriggerId,
-                        string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.Scene.Name), false));
+                    TriggerBegin(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                                string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.Scene.Name), false));
+
+                    CommandProcessor cp = new CommandProcessor(Core);
+                    cp.onProcessingCommandEnd += (s, a) =>
+                    {
+                        TriggerEnd(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                                string.Format("Trigger '{0}' ended.", trigger.Name), false));
+                    };
+                    cp.RunBuiltinCommand(context, cmd, trigger.Scene.SceneId.ToString());
                 }
-            };
-            sr.RunScene();
+            }
         }
     }
 }

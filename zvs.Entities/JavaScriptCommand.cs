@@ -31,13 +31,5 @@ namespace zvs.Entities
                 }
             }
         }
-
-        
-
-        public void Run(zvsContext context, string argument = "")
-        {
-            QueuedJavaScriptCommand cmd = new QueuedJavaScriptCommand { Command = this };
-            cmd.Run(context);
-        }
     }
 }

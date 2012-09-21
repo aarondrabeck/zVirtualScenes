@@ -12,26 +12,5 @@ namespace zvs.Entities
 {
     public partial class QueuedBuiltinCommand : QueuedCommand
     {   
-        //Methods
-        public void Run(zvsContext context)
-        {
-            Run(this, context);
-        }
-
-        public static QueuedBuiltinCommand Create(BuiltinCommand command, string argument)
-        {
-            return new QueuedBuiltinCommand()
-            {
-                Command = command,
-                Argument = argument
-            };
-        }
-
-        public static void Run(QueuedBuiltinCommand cmd, zvsContext context)
-        {
-            context.QueuedCommands.Add(cmd);
-            context.SaveChanges();
-            QueuedCommand.AddNewCommandCommand(new NewCommandArgs(cmd));
-        } 
     }
 }

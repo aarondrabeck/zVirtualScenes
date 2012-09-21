@@ -127,8 +127,8 @@ namespace LightSwitchPlugin
             using (zvsContext context = new zvsContext())
             {
                 DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
-                zvs.Processor.PluginManager.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
-                zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
+               // zvs.Processor.CommandProcessor.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
+               // zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
                 OpenLightSwitchSocket();
             }
         }
@@ -136,8 +136,8 @@ namespace LightSwitchPlugin
         protected override void StopPlugin()
         {
             DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
-            zvs.Processor.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
-            zvs.Processor.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
+            //zvs.Processor.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
+            //zvs.Processor.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
             CloseLightSwitchSocket();
         }
 
@@ -243,27 +243,27 @@ namespace LightSwitchPlugin
 
         }
 
-        void PluginManager_onProcessingCommandEnd(object sender, PluginManager.onProcessingCommandEventArgs args)
-        {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (s, a) =>
-            {
-                if (args.hasErrors)
-                    BroadcastMessage("ERR~" + args.Details + Environment.NewLine);
-            };
-            bw.RunWorkerAsync();
-        }
+        //void PluginManager_onProcessingCommandEnd(object sender, onProcessingCommandEventArgs args)
+        //{
+        //    BackgroundWorker bw = new BackgroundWorker();
+        //    bw.DoWork += (s, a) =>
+        //    {
+        //        if (args.hasErrors)
+        //            BroadcastMessage("ERR~" + args.Details + Environment.NewLine);
+        //    };
+        //    bw.RunWorkerAsync();
+        //}
 
-        void PluginManager_onProcessingCommandBegin(object sender, PluginManager.onProcessingCommandEventArgs args)
-        {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (s, a) =>
-            {
-                if (args.hasErrors)
-                    BroadcastMessage("ERR~" + args.Details + Environment.NewLine);
-            };
-            bw.RunWorkerAsync();
-        }
+        //void PluginManager_onProcessingCommandBegin(object sender, PluginManager.onProcessingCommandEventArgs args)
+        //{
+        //    BackgroundWorker bw = new BackgroundWorker();
+        //    bw.DoWork += (s, a) =>
+        //    {
+        //        if (args.hasErrors)
+        //            BroadcastMessage("ERR~" + args.Details + Environment.NewLine);
+        //    };
+        //    bw.RunWorkerAsync();
+        //}
 
         /// <summary>
         /// Starts listening for LightSwitch clients. 
@@ -525,7 +525,8 @@ namespace LightSwitchPlugin
                                                     log.Info(result);
                                                     BroadcastMessage("MSG~" + result + Environment.NewLine);
 
-                                                    zvs_cmd.Run(context, g.GroupId.ToString());
+                                                    CommandProcessor cp = new CommandProcessor(Core);
+                                                    cp.RunBuiltinCommand(context, zvs_cmd, g.GroupId.ToString());
                                                 }
                                             }
 
@@ -751,7 +752,8 @@ namespace LightSwitchPlugin
                                 {
                                     string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.Name, d.Name);
                                     log.Info(result);
-                                    cmd.Run(context, d, string.Empty);
+                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    cp.RunDeviceTypeCommand(context, cmd, d);
                                     return;
                                 }
                                 break;
@@ -784,16 +786,23 @@ namespace LightSwitchPlugin
         /// <param name="Client">Clients Socket.</param>
         private void ExecuteZVSCommand(int SceneID, Socket Client)
         {
-            SceneRunner sr = new SceneRunner(SceneID, Client.RemoteEndPoint.ToString());
-            sr.onRunBegin += (s, a) =>
+            using (zvsContext context = new zvsContext())
             {
-                BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
-            };
-            sr.onRunComplete += (s, a) =>
-            {
-                BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
-            };
-            sr.RunScene();
+                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                if (cmd != null)
+                {
+                    CommandProcessor cp = new CommandProcessor(Core);
+                    cp.onProcessingCommandBegin += (s, a) =>
+                    {
+                        BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
+                    };
+                    cp.onProcessingCommandEnd += (s, a) =>
+                    {
+                        BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
+                    };
+                    cp.RunBuiltinCommand(context, cmd, SceneID.ToString());
+                }
+            }            
         }
 
         private bool ExecuteDynamicCMD(zvsContext context, Device d, string cmdUniqueId, string arg, Socket Client)
@@ -803,7 +812,8 @@ namespace LightSwitchPlugin
             {
                 string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.Name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.Name);
                 log.Info(result);
-                cmd.Run(context, arg);
+                CommandProcessor cp = new CommandProcessor(Core);
+                cp.RunDeviceCommand(context, cmd, arg);
                 return true;
             }
             return false;
@@ -886,7 +896,8 @@ namespace LightSwitchPlugin
                                 if (cmd != null)
                                 {
                                     log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
-                                    cmd.Run(context, d, string.Empty);
+                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    cp.RunDeviceTypeCommand(context, cmd, d);
                                     return;
                                 }
                                 break;
@@ -897,7 +908,8 @@ namespace LightSwitchPlugin
                                 if (cmd != null)
                                 {
                                     log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
-                                    cmd.Run(context, d, string.Empty);
+                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    cp.RunDeviceTypeCommand(context, cmd, d);
                                     return;
                                 }
                                 break;

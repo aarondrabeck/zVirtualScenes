@@ -14,11 +14,5 @@ namespace zvs.Entities
     public partial class DeviceTypeCommand : Command
     {
         public virtual DeviceType DeviceType { get; set; }
-
-        public void Run(zvsContext context, Device Device, string Argument = "")
-        {
-            QueuedDeviceTypeCommand cmd = new QueuedDeviceTypeCommand { Command = this, Argument = Argument, Device = Device };
-            cmd.Run(context);
-        }
     }
 }

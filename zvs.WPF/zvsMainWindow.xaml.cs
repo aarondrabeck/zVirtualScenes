@@ -201,7 +201,10 @@ namespace zvs.WPF
         {
             BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ALL");
             if (cmd != null)
-                cmd.Run(context);
+            {
+                CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                cp.RunBuiltinCommand(context, cmd);
+            }
         }
 
         private void ExitMI_Click_1(object sender, RoutedEventArgs e)

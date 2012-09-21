@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zvs.WPF.DynamicActionControls;
 using zvs.Entities;
+using zvs.Processor;
 
 
 namespace zvs.WPF.DeviceControls
@@ -23,6 +24,7 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceCommands : UserControl
     {
+        App app = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/send_signal.png"));
         private zvsContext context;
         private int DeviceID = 0;
@@ -62,8 +64,8 @@ namespace zvs.WPF.DeviceControls
                             {
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
-                                    QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, "");
-                                    QueuedDeviceCommand.Run(cmd, context);
+                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    cp.RunDeviceCommand(context, d_cmd);
                                 }, icon);
                                 DeviceCommandsStkPnl.Children.Add(bc);
                                 break;
@@ -80,8 +82,8 @@ namespace zvs.WPF.DeviceControls
 
                                 CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
-                                    QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, isChecked.ToString());
-                                    QueuedDeviceCommand.Run(cmd, context);
+                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    cp.RunDeviceCommand(context, d_cmd, isChecked.ToString());
                                 }, icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
@@ -103,8 +105,8 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
-                                        QueuedDeviceCommand.Run(cmd, context);
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceCommand(context, d_cmd, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -127,8 +129,8 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
-                                        QueuedDeviceCommand.Run(cmd, context);
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceCommand(context, d_cmd, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -151,8 +153,8 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
-                                        QueuedDeviceCommand.Run(cmd, context);
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceCommand(context, d_cmd, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -175,8 +177,8 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
-                                        QueuedDeviceCommand.Run(cmd, context);
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceCommand(context, d_cmd, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -199,8 +201,8 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
-                                        QueuedDeviceCommand.Run(cmd, context);
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceCommand(context, d_cmd, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -223,8 +225,8 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        QueuedDeviceCommand cmd = QueuedDeviceCommand.Create(d_cmd, value);
-                                        QueuedDeviceCommand.Run(cmd, context);
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceCommand(context, d_cmd, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -245,8 +247,8 @@ namespace zvs.WPF.DeviceControls
                             {
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
-                                    QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, "");
-                                    QueuedDeviceTypeCommand.Run(qdtc, context);
+                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    cp.RunDeviceTypeCommand(context, device_type_command, d);
                                 },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(bc);
@@ -264,8 +266,8 @@ namespace zvs.WPF.DeviceControls
 
                                 CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
-                                    QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, isChecked.ToString());
-                                    QueuedDeviceTypeCommand.Run(qdtc, context);                                    
+                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    cp.RunDeviceTypeCommand(context, device_type_command, d, isChecked.ToString());
                                 },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -288,8 +290,8 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
-                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceTypeCommand(context, device_type_command, d, value);
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -312,8 +314,8 @@ namespace zvs.WPF.DeviceControls
                                    NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
-                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceTypeCommand(context, device_type_command, d, value);
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -336,8 +338,8 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
-                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceTypeCommand(context, device_type_command, d, value);
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -360,8 +362,8 @@ namespace zvs.WPF.DeviceControls
                                    NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
-                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceTypeCommand(context, device_type_command, d, value);
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -383,8 +385,8 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
-                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceTypeCommand(context, device_type_command, d, value);
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -407,8 +409,8 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     (value) =>
                                     {
-                                        QueuedDeviceTypeCommand qdtc = QueuedDeviceTypeCommand.Create(device_type_command, d, value);
-                                        QueuedDeviceTypeCommand.Run(qdtc, context); 
+                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        cp.RunDeviceTypeCommand(context, device_type_command, d, value);
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);

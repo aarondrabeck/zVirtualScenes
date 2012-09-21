@@ -25,7 +25,7 @@ namespace zvs.WPF.JavaScript
     /// </summary>
     public partial class JavaScriptEditorWindow : Window
     {
-
+        private App app = (App)Application.Current;
         private zvsContext Context;
         private JavaScriptCommand Command;
         public bool Canceled = true;
@@ -85,8 +85,9 @@ namespace zvs.WPF.JavaScript
                 {
                     isRunning = true;
                     SetFeedBackText("Executing JavaScript...");
-
-                    zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter();
+                    
+                    //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
+                    zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(app.zvsCore);
                     jse.onComplete += (sender, args) =>
                     {
                         isRunning = false;
@@ -96,7 +97,7 @@ namespace zvs.WPF.JavaScript
                     {
                         SetFeedBackText(args.Progress);
                     };
-                    jse.ExecuteScript(script, Context, "Test Button");
+                    jse.ExecuteScript(script, Context);
                 };
                 bw.RunWorkerAsync();
             }

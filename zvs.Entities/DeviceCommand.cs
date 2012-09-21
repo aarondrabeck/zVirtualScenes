@@ -15,11 +15,6 @@ namespace zvs.Entities
     {
         [Required]
         public virtual Device Device { get; set; }
-
-        public void Run(zvsContext context, string argument = "")
-        {
-            QueuedDeviceCommand cmd = new QueuedDeviceCommand { Command = this, Argument = argument, Device = this.Device };
-            cmd.Run(context);
-        }
+               
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zvs.Entities;
+using zvs.Processor;
 
 
 namespace zvs.WPF.DeviceControls
@@ -22,6 +23,7 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceValues : UserControl
     {
+        private App app = (App)Application.Current;
         private zvsContext context;
         private int DeviceID = 0;
         private Device d;
@@ -85,7 +87,10 @@ namespace zvs.WPF.DeviceControls
             {
                 BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ME");
                 if (cmd != null)
-                    cmd.Run(context, d.DeviceId.ToString());
+                {
+                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                    cp.RunBuiltinCommand(context, cmd, d.DeviceId.ToString());
+                }
             }
         }
     }

@@ -11,24 +11,25 @@ using zvs.Entities;
 
 namespace zvs.Processor
 {
-    public class ScheduledTaskManager : IDisposable
+    internal class ScheduledTaskManager : IDisposable
     {
+        private Core Core;
         private List<ScheduledTask> scheduledTasks = new List<ScheduledTask>();
         private Timer TaskTimer;
 
         #region Events
-        public delegate void onScheduledTaskEventHandler(object sender, onScheduledTaskStartEventArgs args);
-        public class onScheduledTaskStartEventArgs : EventArgs
+        public delegate void onScheduledTaskEventHandler(object sender, onScheduledTaskEventArgs args);
+        public class onScheduledTaskEventArgs : EventArgs
         {
             public string Details { get; private set; }
             public int TaskID { get; private set; }
-            public bool hasErrors { get; private set; }
+            public bool Errors { get; private set; }
 
-            public onScheduledTaskStartEventArgs(int TaskID, string Details, bool hasErrors)
+            public onScheduledTaskEventArgs(int TaskID, string Details, bool hasErrors)
             {
                 this.TaskID = TaskID;
                 this.Details = Details;
-                this.hasErrors = hasErrors;
+                this.Errors = hasErrors;
             }
         }
         /// <summary>
@@ -38,8 +39,33 @@ namespace zvs.Processor
         public static event onScheduledTaskEventHandler onScheduledTaskEnd;
         #endregion
 
-        public ScheduledTaskManager()
+        private void ScheduledTaskBegin(onScheduledTaskEventArgs args)
         {
+            string msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
+            if (args.Errors)
+                Core.log.Error(msg);
+            else
+                Core.log.Info(msg);
+
+            if (onScheduledTaskBegin != null)
+                onScheduledTaskBegin(this, args);
+        }
+
+        private void ScheduledTaskEnd(onScheduledTaskEventArgs args)
+        {
+            string msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
+            if (args.Errors)
+                Core.log.Error(msg);
+            else
+                Core.log.Info(msg);
+
+            if (onScheduledTaskEnd != null)
+                onScheduledTaskEnd(this, args);
+        }
+
+        public ScheduledTaskManager(Core core)
+        {
+            Core = core;
             using (zvsContext context = new zvsContext())
             {
                 lock (scheduledTasks)
@@ -286,39 +312,31 @@ namespace zvs.Processor
                 if (_task == null)
                     return;
 
+                //TODO: RUN ANY COMMAND HERE
                 scene = context.Scenes.FirstOrDefault(s => s.SceneId == _task.Scene.SceneId);
 
                 if (scene == null)
                 {
-                    if (onScheduledTaskBegin != null)
-                    {
-                        onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
-                            string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", _task.Name, _task.Scene.SceneId)
-                            , true));
-                    }
+                    ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                            string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", _task.Name, _task.Scene.SceneId), true));
+
                 }
                 else
                 {
-                    SceneRunner sr = new SceneRunner(scene.SceneId, _task.Name);
-                    sr.onRunBegin += (s, a) =>
-                        {
-                            if (onScheduledTaskBegin != null)
-                            {
-                                onScheduledTaskBegin(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
-                                    string.Format("Task '{0}' started. Result: {1}", _task.Name, a.Details)
-                                    , false));
-                            }
-                        };
-                    sr.onRunComplete += (s, a) =>
-                        {
-                            if (onScheduledTaskEnd != null)
-                            {
-                                onScheduledTaskEnd(this, new onScheduledTaskStartEventArgs(_task.ScheduledTaskId,
-                                    string.Format("Task '{0}' ended. Result: {1}", _task.Name, a.Details)
-                                    , a.Errors));
-                            }
-                        };
-                    sr.RunScene();
+                   
+                    BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                    if (cmd != null)
+                    {
+                        ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                                    string.Format("Task '{0}' started.", _task.Name), false));
+                        CommandProcessor cp = new CommandProcessor(Core);
+                        cp.onProcessingCommandEnd += (s, a) =>
+                         {
+                             ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                                     string.Format("Task '{0}' ended.", _task.Name), a.Errors));
+                         };
+                        cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                    }
                 }
             }
         }

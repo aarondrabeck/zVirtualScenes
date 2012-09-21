@@ -32,11 +32,5 @@ namespace zvs.Entities
             }
             context.SaveChanges();
         }
-
-        public void Run(zvsContext context, string argument = "")
-        {
-            QueuedBuiltinCommand cmd = new QueuedBuiltinCommand { Command = this, Argument = argument };
-            cmd.Run(context);
-        }
     }
 }

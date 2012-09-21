@@ -10,13 +10,11 @@ namespace zvs.Processor
 {
     public class JavaScriptExecuter
     {
+        private Core Core;
         private zvsContext Context;
-        private string Source;
-
         public DeviceValueTrigger Trigger { get; set; }
         public Scene Scene { get; set; }
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
-
         Jint.JintEngine engine = new Jint.JintEngine();
 
         #region Events
@@ -51,6 +49,10 @@ namespace zvs.Processor
         public event onJavaScriptExecuterEventHandler onComplete;
         #endregion
 
+        public JavaScriptExecuter(Core core)
+        {
+            Core = core;
+        }
 
         //shell("wget.exe", "http://10.0.0.55/webcam/latest.jpg");
         private System.Diagnostics.Process Shell(string Path, string Arguments)
@@ -62,9 +64,8 @@ namespace zvs.Processor
         {
             return System.IO.Path.Combine(zvs.Processor.Utils.AppPath, Path);
         }
-        public void ExecuteScript(string Script, zvsContext context, string source)
-        {
-            this.Source = source;
+        public void ExecuteScript(string Script, zvsContext context)
+        {           
             this.Context = context;
             engine.SetDebugMode(true);
             engine.DisableSecurity();
@@ -163,7 +164,7 @@ namespace zvs.Processor
             t.Elapsed += (sender, e) =>
             {
                 t.Stop();
-                ExecuteScript(script, Context, "Test Button");
+                ExecuteScript(script, Context);
                 mutex.Set();
                 t.Dispose();
             };
@@ -176,7 +177,6 @@ namespace zvs.Processor
         //ReportProgress("Hello World!")
         public void ReportProgressJS(string progress)
         {
-
             if (onReportProgress != null)
                 onReportProgress(this, new onReportProgressEventArgs(progress));
         }
@@ -212,9 +212,9 @@ namespace zvs.Processor
                 if (dc == null)
                     return; //TODO: ReportProgress here
 
-
+                CommandProcessor cp = new CommandProcessor(Core);
+                cp.RunDeviceCommand(context, dc, Value);
                 //TODO: ReportProgress here
-                dc.Run(context, Value);
             }
         }
 
@@ -222,13 +222,13 @@ namespace zvs.Processor
         {
             using (zvsContext context = new zvsContext())
             {
-                int s = (from S in context.Scenes
+                int? s = (from S in context.Scenes
                          where S.Name == SceneName
                          select S.SceneId).FirstOrDefault();
 
-                if (s != null && s > 0)
+                if (s.HasValue && s > 0)
                 {
-                    RunScene(s);
+                    RunScene(s.Value);
                 }
             }
         }
@@ -252,16 +252,22 @@ namespace zvs.Processor
         public void RunScene(double SceneID)
         {
             ReportProgress(string.Format("Running JavaScript Command: RunScene({0})", SceneID));
-            int sid = Convert.ToInt32(SceneID);
             AutoResetEvent mutex = new AutoResetEvent(false);
 
-            SceneRunner sr = new SceneRunner(sid, "JavaScript");
-            sr.onRunComplete += (s, a) =>
+            using (zvsContext context = new zvsContext())
             {
-                mutex.Set();
-            };
-            sr.RunScene();
-            mutex.WaitOne();
+                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                if (cmd != null)
+                {
+                    CommandProcessor cp = new CommandProcessor(Core);               
+                    cp.onProcessingCommandEnd += (s, a) =>
+                    {
+                        mutex.Set();
+                    };
+                    cp.RunBuiltinCommand(context, cmd, SceneID.ToString());
+                    mutex.WaitOne();
+                }
+            }
         }
     }
 }

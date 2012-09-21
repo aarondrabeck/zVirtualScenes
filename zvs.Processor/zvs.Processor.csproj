@@ -75,6 +75,7 @@
     <Compile Include="Backup\BackupTrigger.cs" />
     <Compile Include="Backup\BackupGroup.cs" />
     <Compile Include="Backup\BackupScheduledTask.cs" />
+    <Compile Include="CommandProcessor.cs" />
     <Compile Include="DetectVCRedist.cs" />
     <Compile Include="Backup\BackupScene.cs" />
     <Compile Include="Backup\BackupDevice.cs" />

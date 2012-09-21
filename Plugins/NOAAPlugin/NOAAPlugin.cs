@@ -104,7 +104,7 @@ namespace NOAAPlugin
                 Double.TryParse(GetSettingValue("DELAY_SUNSET", context), out _SunsetDelay);
                 Double.TryParse(GetSettingValue("LAT", context), out _Lat);
                 Double.TryParse(GetSettingValue("LOG", context), out _Long);
-                CalculateSunriseSet();             
+                CalculateSunriseSet();
             }
         }
 
@@ -151,7 +151,7 @@ namespace NOAAPlugin
             CalculateSunriseSet();
             log.Info(string.Format("Lat/Long updated.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
         }
-               
+
         public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
 
         public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
@@ -202,8 +202,12 @@ namespace NOAAPlugin
 
                             if (activate)
                             {
-                                SceneRunner sr = new SceneRunner(scene.SceneId, "Sunrise");
-                                sr.RunScene();
+                                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                                if (cmd != null)
+                                {
+                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                                }
                             }
                         }
                         CalculateSunriseSet();
@@ -221,8 +225,12 @@ namespace NOAAPlugin
 
                             if (activate)
                             {
-                                SceneRunner sr = new SceneRunner(scene.SceneId, "Sunset");
-                                sr.RunScene();
+                                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                                if (cmd != null)
+                                {
+                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                                }
                             }
                         }
                         CalculateSunriseSet();

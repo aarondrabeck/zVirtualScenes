@@ -237,8 +237,12 @@ namespace zvs.WPF.SceneControls
                 var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    SceneRunner sr = new SceneRunner(scene.SceneId, Utils.ApplicationName + " GUI");
-                    sr.RunScene();
+                    BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                    if (cmd != null)
+                    {
+                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                        cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                    }
                 }
             }
         }

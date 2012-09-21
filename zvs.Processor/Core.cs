@@ -17,10 +17,12 @@ namespace zvs.Processor
     public class Core
     {
         public PluginManager pluginManager;
-        public TriggerManager triggerManager;
-        public ScheduledTaskManager scheduledTaskManager;
-        Logging.ILog log;
+        private TriggerManager triggerManager;
+        private ScheduledTaskManager scheduledTaskManager;
+        public Logging.ILog log;
         public Dispatcher Dispatcher;
+
+
 
         public Core(Dispatcher Dispatcher)
         {
@@ -31,6 +33,68 @@ namespace zvs.Processor
             log = Logging.LogManager.GetLogger<Core>();
 
             log.InfoFormat("Starting Core Processor:{0}", Utils.ApplicationName);
+
+            #region Install Base Commands and Properties
+            using (zvsContext context = new zvsContext())
+            {
+                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                {
+                    UniqueIdentifier = "REPOLL_ME",
+                    Name = "Re-poll Device",
+                    ArgumentType = DataType.INTEGER,
+                    Description = "This will force a re-poll on an object."
+                }, context);
+
+                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                {
+                    UniqueIdentifier = "REPOLL_ALL",
+                    Name = "Re-poll all Devices",
+                    ArgumentType = DataType.NONE,
+                    Description = "This will force a re-poll on all objects."
+                }, context);
+
+                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                {
+                    UniqueIdentifier = "GROUP_ON",
+                    Name = "Turn Group On",
+                    ArgumentType = DataType.STRING,
+                    Description = "Activates a group."
+                }, context);
+
+                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                {
+                    UniqueIdentifier = "GROUP_OFF",
+                    Name = "Turn Group Off",
+                    ArgumentType = DataType.STRING,
+                    Description = "Deactivates a group."
+                }, context);
+
+                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                {
+                    UniqueIdentifier = "TIMEDELAY",
+                    Name = "Scene Time Delay (sec)",
+                    ArgumentType = DataType.INTEGER,
+                    Description = "Pauses a scene execution for x seconds."
+                }, context);
+
+                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                {
+                    UniqueIdentifier = "RUN_SCENE",
+                    Name = "Run Scene",
+                    ArgumentType = DataType.INTEGER,
+                    Description = "Argument = SceneId"
+                }, context);
+
+                DeviceProperty.AddOrEdit(new DeviceProperty
+                {
+                    UniqueIdentifier = "ENABLEPOLLING",
+                    Name = "Enable polling for this device.",
+                    Value = "false", //default value
+                    ValueType = DataType.BOOL,
+                    Description = "Toggles automatic polling for a device."
+                }, context);
+            }
+            #endregion
 
             BackgroundWorker PluginBW = new BackgroundWorker();
             PluginBW.DoWork += (sender, args) =>
@@ -70,8 +134,8 @@ namespace zvs.Processor
             PluginBW.RunWorkerAsync();
 
 
-            triggerManager = new TriggerManager();
-            scheduledTaskManager = new ScheduledTaskManager();
+            triggerManager = new TriggerManager(this);
+            scheduledTaskManager = new ScheduledTaskManager(this);
 
             //Install Program Options
             using (zvsContext context = new zvsContext())

@@ -41,23 +41,5 @@ namespace zvs.Entities
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
 
-        public static event NewCommandEventHandler NewCommandCommand;
-        public delegate void NewCommandEventHandler(object sender, NewCommandArgs args);
-
-        public static void AddNewCommandCommand(NewCommandArgs args)
-        {
-            if (NewCommandCommand != null)
-                NewCommandCommand(null, args);
-        }
-
-        public class NewCommandArgs
-        {
-            public NewCommandArgs(QueuedCommand command)
-            {
-                Command = command;
-            }
-
-            public QueuedCommand Command { private set; get; }
-        }
     }
 }

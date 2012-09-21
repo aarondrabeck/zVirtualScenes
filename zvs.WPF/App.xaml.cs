@@ -22,7 +22,6 @@ namespace zvs.WPF
     /// </summary>
     public partial class App : Application, ISingleInstanceApp
     {
-              
         public Core zvsCore;
         public ZVSTaskbarIcon taskbarIcon;
         public bool isShuttingDown = false;
@@ -77,8 +76,12 @@ namespace zvs.WPF
 
                         if (scene != null)
                         {
-                            SceneRunner sr = new SceneRunner(scene.SceneId, "Command Line");                            
-                            sr.RunScene();
+                            BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                            if (cmd != null)
+                            {
+                                CommandProcessor cp = new CommandProcessor(zvsCore);
+                                cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                            }
                         }
                         else
                             try
@@ -100,7 +103,6 @@ namespace zvs.WPF
             try
             {
                 zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");
-
                 Core.ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");
             }
             catch
@@ -145,128 +147,128 @@ namespace zvs.WPF
 
             taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
 
-            SceneRunner.onSceneRunBegin += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.Errors)
-                    {
-                        log.ErrorFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
-                    }
+            //SceneRunner.onSceneRunBegin += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.Errors)
+            //        {
+            //            log.ErrorFormat("{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+            //        }
 
-                }));
-            };
+            //    }));
+            //};
 
-            SceneRunner.onSceneRunComplete += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.Errors)
-                    {
-                        log.ErrorFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
-                    }
+            //SceneRunner.onSceneRunComplete += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.Errors)
+            //        {
+            //            log.ErrorFormat("{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Details, args.SceneID, args.SceneRunnerGUID, args.Source);
+            //        }
 
-                }));
-            };
+            //    }));
+            //};
 
-            SceneRunner.onSceneReportProgress += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    log.InfoFormat("Progress:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Progress, args.SceneID, args.SceneRunnerGUID, args.Source);
-                }));
-            };
+            //SceneRunner.onSceneReportProgress += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        log.InfoFormat("Progress:{0}, SceneID:{1}, SceneRunnerGUID:{2}, Source:{3}, ", args.Progress, args.SceneID, args.SceneRunnerGUID, args.Source);
+            //    }));
+            //};
 
-            TriggerManager.onTriggerStart += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.hasErrors)
-                    {
-                        log.ErrorFormat("Details:{0}, TriggerID:{1}", args.Details, args.TriggerID);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, TriggerID:{1}", args.Details, args.TriggerID);
-                    }
-                }));
-            };
+            //TriggerManager.onTriggerStart += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.hasErrors)
+            //        {
+            //            log.ErrorFormat("{0}, TriggerID:{1}", args.Details, args.TriggerID);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, TriggerID:{1}", args.Details, args.TriggerID);
+            //        }
+            //    }));
+            //};
 
-            ScheduledTaskManager.onScheduledTaskBegin += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.hasErrors)
-                    {
-                        log.ErrorFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
-                    }
-                }));
-            };
+            //ScheduledTaskManager.onScheduledTaskBegin += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.hasErrors)
+            //        {
+            //            log.ErrorFormat("{0}, TaskID:{1}", args.Details, args.TaskID);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, TaskID:{1}", args.Details, args.TaskID);
+            //        }
+            //    }));
+            //};
 
-            ScheduledTaskManager.onScheduledTaskEnd += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.hasErrors)
-                    {
-                        log.ErrorFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, TaskID:{1}", args.Details, args.TaskID);
-                    }
-                }));
-            };
+            //ScheduledTaskManager.onScheduledTaskEnd += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.hasErrors)
+            //        {
+            //            log.ErrorFormat("{0}, TaskID:{1}", args.Details, args.TaskID);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, TaskID:{1}", args.Details, args.TaskID);
+            //        }
+            //    }));
+            //};
 
             zvs.Processor.PluginManager.onPluginInitialized += (sender, args) =>
             {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
-                    log.InfoFormat("Details:{0}, sender:{1}", args.Details, sender);
+                    log.InfoFormat("{0}, sender:{1}", args.Details, sender);
                 }));
             };
 
-            zvs.Processor.PluginManager.onProcessingCommandBegin += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.hasErrors)
-                    {
-                        log.ErrorFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
-                    }
-                }));
-            };
+            //zvs.Processor.PluginManager.onProcessingCommandBegin += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.hasErrors)
+            //        {
+            //            log.ErrorFormat("{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+            //        }
+            //    }));
+            //};
 
-            zvs.Processor.PluginManager.onProcessingCommandEnd += (sender, args) =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (args.hasErrors)
-                    {
-                        log.ErrorFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
-                    }
-                    else
-                    {
-                        log.InfoFormat("Details:{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
-                    }
-                }));
-            };
+            //zvs.Processor.PluginManager.onProcessingCommandEnd += (sender, args) =>
+            //{
+            //    this.Dispatcher.Invoke(new Action(() =>
+            //    {
+            //        if (args.hasErrors)
+            //        {
+            //            log.ErrorFormat("{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+            //        }
+            //        else
+            //        {
+            //            log.InfoFormat("{0}, CommandQueueID:{1}", args.Details, args.CommandQueueID);
+            //        }
+            //    }));
+            //};
 
             base.OnStartup(e);
         }

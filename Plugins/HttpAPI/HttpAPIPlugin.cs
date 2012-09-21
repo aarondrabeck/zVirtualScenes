@@ -606,26 +606,30 @@ namespace HttpAPI
                 bool.TryParse(postData["is_running"], out is_running);
                 string name = postData["name"];
 
-                using (zvsContext db = new zvsContext())
+                using (zvsContext context = new zvsContext())
                 {
-                    Scene scene = db.Scenes.FirstOrDefault(s => s.SceneId == sID);
+                    Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == sID);
 
                     if (scene != null)
                     {
                         if (is_running)
                         {
-                            SceneRunner sr = new SceneRunner(sID, ip);
-                            sr.RunScene();
+                            BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                            if (cmd != null)
+                            {
+                                CommandProcessor cp = new CommandProcessor(Core);
+                                cp.RunBuiltinCommand(context, cmd, sID.ToString());
+                            }
                             return new { success = true, desc = "Scene Started." };
                         }
 
                         if (!string.IsNullOrEmpty(name))
                         {
                             scene.Name = name;
-                            db.SaveChanges();
+                            context.SaveChanges();
                             return new { success = true, desc = "Scene Name Updated." };
                         }
-                        
+
                     }
                     else
                         return new { success = false, reason = "Scene not found." };
@@ -768,7 +772,8 @@ namespace HttpAPI
                                         if (cmd != null)
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
-                                            cmd.Run(context, arg);
+                                            CommandProcessor cp = new CommandProcessor(Core);
+                                            cp.RunDeviceCommand(context, cmd, arg);
                                             return new { success = true };
                                         }
                                         else
@@ -789,7 +794,8 @@ namespace HttpAPI
                                         {
 
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
-                                            cmd.Run(context, d, arg);
+                                            CommandProcessor cp = new CommandProcessor(Core);
+                                            cp.RunDeviceTypeCommand(context, cmd, d, arg);
 
                                             return new { success = true };
                                         }
@@ -853,7 +859,9 @@ namespace HttpAPI
                     if (cmd != null)
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
-                        cmd.Run(context, arg);
+                        CommandProcessor cp = new CommandProcessor(Core);
+                        cp.RunBuiltinCommand(context, cmd, arg);
+
                         return new { success = true };
                     }
                 }

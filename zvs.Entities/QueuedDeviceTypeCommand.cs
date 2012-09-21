@@ -14,28 +14,5 @@ namespace zvs.Entities
     {
         [Required]
         public virtual Device Device { get; set; }
-
-        public static QueuedDeviceTypeCommand Create(DeviceTypeCommand dtc, Device d, string argument)
-        {
-            return new QueuedDeviceTypeCommand()
-            {
-                Device = d,                
-                Command = dtc,
-                Argument = argument
-            };
-        }
-
-        //Methods
-        public void Run(zvsContext context)
-        {
-            Run(this, context);
-        }
-
-        public static void Run(QueuedDeviceTypeCommand cmd, zvsContext context)
-        {
-            context.QueuedCommands.Add(cmd);
-            context.SaveChanges();
-            QueuedCommand.AddNewCommandCommand(new NewCommandArgs(cmd));
-        }    
     }
 }

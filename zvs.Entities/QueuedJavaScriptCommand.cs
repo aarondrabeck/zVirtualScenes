@@ -12,25 +12,5 @@ namespace zvs.Entities
 {
     public partial class QueuedJavaScriptCommand : QueuedCommand
     {   
-        //Methods
-        public void Run(zvsContext context)
-        {
-            Run(this, context);
-        }
-
-        public static QueuedJavaScriptCommand Create(JavaScriptCommand command)
-        {
-            return new QueuedJavaScriptCommand()
-            {
-                Command = command
-            };
-        }
-
-        public static void Run(QueuedJavaScriptCommand cmd, zvsContext context)
-        {
-            context.QueuedCommands.Add(cmd);
-            context.SaveChanges();
-            QueuedCommand.AddNewCommandCommand(new NewCommandArgs(cmd));
-        } 
     }
 }

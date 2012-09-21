@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
+using zvs.Processor;
 
 
 namespace zvs.WPF.Groups
@@ -22,6 +23,7 @@ namespace zvs.WPF.Groups
     /// </summary>
     public partial class ActivateGroup : Window
     {
+        private App app = (App)Application.Current;
         private zvsContext context;
         private bool isLoaded = false;
 
@@ -89,7 +91,10 @@ namespace zvs.WPF.Groups
             {
                 BuiltinCommand group_on_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_ON");
                 if (group_on_cmd != null)
-                    group_on_cmd.Run(context, g.GroupId.ToString());
+                {
+                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                    cp.RunBuiltinCommand(context, group_on_cmd, g.GroupId.ToString());
+                }
             }
         }
 
@@ -98,9 +103,12 @@ namespace zvs.WPF.Groups
             Group g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
             {
-                BuiltinCommand group_on_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_OFF");
-                if (group_on_cmd != null)
-                    group_on_cmd.Run(context, g.GroupId.ToString());
+                BuiltinCommand group_off_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_OFF");
+                if (group_off_cmd != null)
+                {
+                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                    cp.RunBuiltinCommand(context, group_off_cmd, g.GroupId.ToString());
+                }
             }
         }
 
