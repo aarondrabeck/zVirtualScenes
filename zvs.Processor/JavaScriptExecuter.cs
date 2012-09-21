@@ -12,8 +12,6 @@ namespace zvs.Processor
     {
         private Core Core;
         private zvsContext Context;
-        public DeviceValueTrigger Trigger { get; set; }
-        public Scene Scene { get; set; }
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
         Jint.JintEngine engine = new Jint.JintEngine();
 
@@ -41,12 +39,50 @@ namespace zvs.Processor
                 this.Progress = progress;
             }
         }
+
         public event onReportProgressEventHandler onReportProgress;
 
         /// <summary>
         /// Called when JavaScript executer is finished.
         /// </summary>
-        public event onJavaScriptExecuterEventHandler onComplete;
+        public event onJavaScriptExecuterEventHandler onExecuteScriptEnd;
+
+        /// <summary>
+        /// Called when JavaScript executer begins.
+        /// </summary>
+        public event onJavaScriptExecuterEventHandler onExecuteScriptBegin;
+
+        private void ReportBegin(JavaScriptExecuterEventArgs args)
+        {
+            if (args.Errors)
+                Core.log.Error(args.Details);
+            else
+                Core.log.Info(args.Details);
+
+            if (onExecuteScriptBegin != null)
+                onExecuteScriptBegin(this, args);
+        }
+
+        private void ReportEnd(JavaScriptExecuterEventArgs args)
+        {
+            if (args.Errors)
+                Core.log.Error(args.Details);
+            else
+                Core.log.Info(args.Details);
+
+            if (onExecuteScriptEnd != null)
+                onExecuteScriptEnd(this, args);
+        }
+
+        private void ReportProgress(string progress, params object[] args)
+        {
+            string msg = string.Format(progress, args);
+            Core.log.Error(msg);
+
+            if (onReportProgress != null)
+                onReportProgress(this, new onReportProgressEventArgs(msg));
+        }
+
         #endregion
 
         public JavaScriptExecuter(Core core)
@@ -65,18 +101,19 @@ namespace zvs.Processor
             return System.IO.Path.Combine(zvs.Processor.Utils.AppPath, Path);
         }
         public void ExecuteScript(string Script, zvsContext context)
-        {           
+        {
+            ReportBegin(new JavaScriptExecuterEventArgs(false, "JavaScript executor started (debug mode = true)"));
             this.Context = context;
             engine.SetDebugMode(true);
             engine.DisableSecurity();
-            engine.AllowClr = true;                     
+            engine.AllowClr = true;
 
             engine.SetParameter("zvsContext", context);
-            
-            engine.SetFunction("RunScene", new Action<double>(RunScene));
-            engine.SetFunction("RunScene", new Action<string>(RunScene));
-            engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommand));
-            engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommand));
+
+            engine.SetFunction("RunScene", new Action<double>(RunSceneJS));
+            engine.SetFunction("RunScene", new Action<string>(RunSceneJS));
+            engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommandJS));
+            engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
             engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("progress", new Action<string>(ReportProgressJS));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
@@ -88,11 +125,10 @@ namespace zvs.Processor
             engine.SetFunction("shell", new Func<string, string, System.Diagnostics.Process>(Shell));
             engine.SetFunction("mappath", new Func<string, string>(MapPath));
 
-            if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
-            if (Scene != null) engine.SetParameter("Scene", this.Scene);
-            engine.SetParameter("HasTrigger", (this.Trigger!=null));
-            engine.SetParameter("HasScene", (this.Scene!=null));
-
+            // if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
+            //if (Scene != null) engine.SetParameter("Scene", this.Scene);
+            // engine.SetParameter("HasTrigger", (this.Trigger!=null));
+            // engine.SetParameter("HasScene", (this.Scene!=null));
 
             try
             {
@@ -100,26 +136,19 @@ namespace zvs.Processor
                 //import them into the engine by running each script
                 //then run the engine as normal
                 object result = engine.Run(Script);
-                string entry = string.Format("Script Result:{0}, Trigger Name:{1}, Scene Name:{2}", (result == null) ? "" : result.ToString(), (Trigger == null) ? "None" : Trigger.Name, (Scene == null) ? "None" : Scene.Name);
-
-                log.Info(entry);
-
 
                 if (result != null)
                 {
-                    if (onComplete != null)
-                        onComplete(this, new JavaScriptExecuterEventArgs(false, result.ToString()));
+                    ReportEnd(new JavaScriptExecuterEventArgs(true, string.Format("JavaScript executed without errors. {0}", result.ToString())));
                     return;
                 }
             }
             catch (Exception exc)
             {
-                if (onComplete != null)
-                    onComplete(this, new JavaScriptExecuterEventArgs(true, exc.ToString()));
+                ReportEnd(new JavaScriptExecuterEventArgs(true,string.Format("JavaScript executed with errors. {0}", exc.ToString())));
                 return;
             }
-            if (onComplete != null)
-                onComplete(this, new JavaScriptExecuterEventArgs(false, "None"));
+            ReportEnd(new JavaScriptExecuterEventArgs(false, "JavaScript executed without errors"));
         }
         public void Require(string Script)
         {
@@ -147,11 +176,10 @@ namespace zvs.Processor
                 catch (Exception e)
                 {
                     log.Error("Error running script: " + Script, e);
-                    
+
                 }
             }
         }
-
 
         //Delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
         public void Delay(string script, double time, bool Async)
@@ -177,61 +205,59 @@ namespace zvs.Processor
         //ReportProgress("Hello World!")
         public void ReportProgressJS(string progress)
         {
-            if (onReportProgress != null)
-                onReportProgress(this, new onReportProgressEventArgs(progress));
-        }
-
-        protected void ReportProgress(string progress, params string[] args)
-        {
-            if (onReportProgress != null)
-                onReportProgress(this, new onReportProgressEventArgs(string.Format(progress, args)));
+            ReportProgress(progress);
         }
 
         //RunDeviceCommand('Office Light','Set Level', '99');
-        public void RunDeviceCommand(string DeviceName, string CommandName, string Value)
+        public void RunDeviceCommandJS(string DeviceName, string CommandName, string Value)
         {
-            using (zvsContext context = new zvsContext())
+            ReportProgress(string.Format("Running JavaScript Command: RunDeviceCommand({0},{1},{2})", DeviceName, CommandName, Value));
+
+            Device d = null;
+            using (zvsContext context = new zvsContext())            
+                d = context.Devices.FirstOrDefault(o => o.Name == DeviceName);
+
+            if (d == null)
             {
-                Device d = context.Devices.FirstOrDefault(o => o.Name == DeviceName);
-                if (d != null)
-                    RunDeviceCommand(d.DeviceId, CommandName, Value);//TODO: ReportProgress here
+                ReportProgress("Cannot find device {0}", DeviceName);
+                return;
             }
+
+            RunDeviceCommand(d.DeviceId, CommandName, Value);//TODO: ReportProgress here
         }
 
         //RunDeviceCommand(7,'Set Level', '99');
-        public void RunDeviceCommand(double DeviceId, string CommandName, string Value)
+        public void RunDeviceCommandJS(double DeviceId, string CommandName, string Value)
+        {
+            ReportProgress(string.Format("Running JavaScript Command: RunDeviceCommand({0},{1},{2})", DeviceId, CommandName, Value));
+            RunDeviceCommand(DeviceId, CommandName, Value);
+        }
+
+        private void RunDeviceCommand(double DeviceId, string CommandName, string Value)
         {
             int dId = Convert.ToInt32(DeviceId);
             using (zvsContext context = new zvsContext())
             {
                 Device device = context.Devices.Find(dId);
                 if (device == null)
-                    return; //TODO: ReportProgress here
+                {
+                    ReportProgress("Cannot find device with DeviceId of {0}", dId);
+                    return;
+                }
 
                 DeviceCommand dc = device.Commands.FirstOrDefault(o => o.Name == CommandName);
                 if (dc == null)
-                    return; //TODO: ReportProgress here
+                {
+                    ReportProgress("Cannot find device command '{0}'", CommandName);
+                    return;
+                }
 
                 CommandProcessor cp = new CommandProcessor(Core);
                 cp.RunDeviceCommand(context, dc, Value);
-                //TODO: ReportProgress here
             }
         }
 
-        public void RunScene(string SceneName)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                int? s = (from S in context.Scenes
-                         where S.Name == SceneName
-                         select S.SceneId).FirstOrDefault();
 
-                if (s.HasValue && s > 0)
-                {
-                    RunScene(s.Value);
-                }
-            }
-        }
         public void Error(object Message)
         {
             log.Error(Message);
@@ -248,18 +274,39 @@ namespace zvs.Processor
         {
             log.Warn(Message);
         }
+
+        //RunScene("Energy Save");
+        public void RunSceneJS(string SceneName)
+        {
+            ReportProgress(string.Format("Running JavaScript Command: RunScene({0})", SceneName));
+            Scene s = null;
+            using (zvsContext context = new zvsContext())
+                s = context.Scenes.FirstOrDefault(o => o.Name == SceneName);
+                
+            if (s == null)
+            {
+                ReportProgress("Cannot find scene {0}", SceneName);
+                return;
+            }
+            RunScene(s.SceneId);
+        }
+
         //RunScene(1);
-        public void RunScene(double SceneID)
+        public void RunSceneJS(double SceneID)
         {
             ReportProgress(string.Format("Running JavaScript Command: RunScene({0})", SceneID));
-            AutoResetEvent mutex = new AutoResetEvent(false);
+            RunScene(SceneID);
+        }
 
+        public void RunScene(double SceneID)
+        {
+            AutoResetEvent mutex = new AutoResetEvent(false);
             using (zvsContext context = new zvsContext())
             {
                 BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
                 if (cmd != null)
                 {
-                    CommandProcessor cp = new CommandProcessor(Core);               
+                    CommandProcessor cp = new CommandProcessor(Core);
                     cp.onProcessingCommandEnd += (s, a) =>
                     {
                         mutex.Set();

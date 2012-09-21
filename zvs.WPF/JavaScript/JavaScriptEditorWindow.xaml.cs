@@ -72,8 +72,6 @@ namespace zvs.WPF.JavaScript
             jSResultViewSource.Source = Results;
         }
 
-
-
         private void Run()
         {
             Results.Clear();
@@ -88,10 +86,14 @@ namespace zvs.WPF.JavaScript
                     
                     //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
                     zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(app.zvsCore);
-                    jse.onComplete += (sender, args) =>
+                    jse.onExecuteScriptBegin += (sender, args) =>
+                    {
+                        SetFeedBackText(args.Details);
+                    };
+                    jse.onExecuteScriptEnd += (sender, args) =>
                     {
                         isRunning = false;
-                        SetFeedBackText(string.Format("JavaScript executed {0} errors. {1}", args.Errors ? "with" : "without", args.Details));
+                        SetFeedBackText(args.Details);
                     };
                     jse.onReportProgress += (sender, args) =>
                     {

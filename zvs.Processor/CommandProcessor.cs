@@ -491,11 +491,8 @@ namespace zvs.Processor
             if (cmd == null)
             {
                 ProcessingCommandBegin(new onProcessingCommandEventArgs(false, string.Format("Processing device type command id {0}", cmd.QueuedCommandId), cmd.QueuedCommandId));
-
                 ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process device type command id {0}. Could not locate queued command in database.", cmd.QueuedCommandId), cmd.QueuedCommandId));
-
                 context.Dispose();
-
                 return;
             }
 
@@ -510,31 +507,9 @@ namespace zvs.Processor
             JavaScriptCommand js = (JavaScriptCommand)cmd.Command;
             JavaScriptExecuter je = new JavaScriptExecuter(Core);
 
-            //TODO: MIGHT NEED TO RETHINK THIS, EXECUTIONS ARE anonymous
-            //je.Trigger = this.Trigger;
-            //je.Scene = this._scene;
-
-            je.onReportProgress += (s, a) =>
-            {
-                //ReportProgress(a.Progress);
-            };
-            je.onComplete += (s, a) =>
+            je.onExecuteScriptEnd += (s, a) =>
             {
                 if (a.Errors)
-                {
-
-                    string err_str = string.Format("Failed to process JavaScript command #{0} '{1}'. Removing command from queue...",
-                cmd.QueuedCommandId,
-                cmd.Command.Name);
-
-                    ProcessingCommandEnd(new onProcessingCommandEventArgs(true, err_str, cmd.QueuedCommandId));
-
-                    context.QueuedCommands.Remove(cmd);
-                    context.SaveChanges();
-                    context.Dispose();
-                    return;
-                }
-                else
                 {
                     string details = string.Format("Finished processing JavaScript command #{0} ({1} with arg '{2}')",
                                                        cmd.QueuedCommandId,
@@ -542,7 +517,6 @@ namespace zvs.Processor
                                                         cmd.Argument);
 
                     ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.QueuedCommandId));
-
 
                     context.QueuedCommands.Remove(cmd);
                     context.SaveChanges();
