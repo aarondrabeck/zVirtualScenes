@@ -22,6 +22,13 @@ namespace zvs.Processor
                 return "zVirtualScenes";
             }
         }
+        public static string AppPath
+        {
+            get
+            {
+                return System.IO.Path.GetDirectoryName(typeof(Utils).Assembly.Location);
+            }
+        }
 
         public static string ApplicationVersion
         {
@@ -50,7 +57,7 @@ namespace zvs.Processor
             get
             {
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string path = Path.Combine(appData, @"zVirtualScenes");
+                string path = System.IO.Path.Combine(appData, @"zVirtualScenes");
                 if (!Directory.Exists(path))
                 {
                     try { Directory.CreateDirectory(path); }

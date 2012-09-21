@@ -52,7 +52,7 @@
 
 
 helper = function() {	
-	this.appPath = zvs.WPF.App.Path;	
+    this.appPath = zvs.Processor.Utils.AppPath;
 	this.hostDetails = zvs.WPF.App.GetHostDetails;
 	this.userName = System.Environment.UserName;
 	

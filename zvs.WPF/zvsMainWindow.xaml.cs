@@ -49,9 +49,9 @@ namespace zvs.WPF
         {
             if (!this.Dispatcher.HasShutdownStarted)
             {
-                this.Dispatcher.Invoke(new Action(() =>
+                try
                 {
-                    try
+                    this.Dispatcher.Invoke(new Action(() =>
                     {
                         logSource.Clear();
                         foreach (var item in NewItems)
@@ -65,11 +65,11 @@ namespace zvs.WPF
                             StatusBarSourceTxt.Text = entry.Source;
                             StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
                         }
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }));
+                    }));
+                }
+                catch (Exception)
+                {
+                }
             }
         }
 

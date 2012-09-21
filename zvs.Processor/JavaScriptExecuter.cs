@@ -60,8 +60,7 @@ namespace zvs.Processor
 
         private string MapPath(string Path)
         {
-            string root = System.IO.Path.GetDirectoryName(typeof(JavaScriptExecuter).Assembly.Location);
-            return System.IO.Path.Combine(root, Path);
+            return System.IO.Path.Combine(zvs.Processor.Utils.AppPath, Path);
         }
         public void ExecuteScript(string Script, zvsContext context, string source)
         {

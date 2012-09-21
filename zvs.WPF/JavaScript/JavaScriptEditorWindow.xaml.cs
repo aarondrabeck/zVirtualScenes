@@ -170,7 +170,7 @@ namespace zvs.WPF.JavaScript
             Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.CheckFileExists = true;
             ofd.DefaultExt = "js";
-            ofd.InitialDirectory = App.Path;
+            ofd.InitialDirectory = zvs.Processor.Utils.AppPath;
             ofd.Multiselect = true;
             ofd.Title = "Choose a JavaScript file to include...";
 
@@ -179,9 +179,9 @@ namespace zvs.WPF.JavaScript
             if (!string.IsNullOrEmpty(ofd.FileName) && System.IO.File.Exists(ofd.FileName))
             {
                 string path = ofd.FileName;
-                if (path.StartsWith(App.Path))
+                if (path.StartsWith(zvs.Processor.Utils.AppPath))
                 {
-                    path = path.Replace(App.Path, ".");
+                    path = path.Replace(zvs.Processor.Utils.AppPath, ".");
                 }
 
                 var script = string.Format("require('{0}')\n", path.Replace("\\","\\\\"));
