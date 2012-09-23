@@ -33,7 +33,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:device_value_triggers}, CreateList=True}"/>
+        <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:DeviceValueTrigger}, CreateList=True}"/>
     </UserControl.Resources>
 
     <Grid >
@@ -48,7 +48,7 @@
                         <GradientStop Color="#FFF2F3F5"/>
                     </LinearGradientBrush>
                 </Border.Background>
-                <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Basic Triggers" VerticalAlignment="Center" Margin="5,0,0,0" />
+                <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Triggers" VerticalAlignment="Center" Margin="5,0,0,0" />
             </Border>
             <DataGrid x:Name="TriggerGrid" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
                   HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
@@ -74,7 +74,8 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn MinWidth="200" Width="*" Header="Trigger" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" Binding="{Binding TriggerDescription}" IsReadOnly="True"   >
+                    <DataGridTextColumn Width="Auto" MinWidth="25"  Header="Trigger" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
+                                        FontSize="14" Binding="{Binding TriggerDescription, StringFormat={}When {0} then}" IsReadOnly="True"   >
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter  Property="TextTrimming" Value="CharacterEllipsis" />
@@ -82,6 +83,24 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
+
+                    <DataGridTextColumn Width="*" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
+                                        Binding="{Binding Path=StoredCommand.Summary, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  
+                                        IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
+                        <DataGridTextColumn.ElementStyle>
+
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="TextWrapping" Value="NoWrap" />
+                                <Setter Property="Padding" Value="5,0,0,0"/>
+                                <Setter Property="Height" Value="20" />
+                                <Setter Property="TextTrimming"  Value="CharacterEllipsis"/>
+                                <Setter Property="ToolTip"  Value="{Binding Path=StoredCommand.ActionDescription, Mode=OneWay}"/>
+                                <Setter Property="Padding" Value="5,0,0,0"/>
+                            </Style>
+
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
 
                     <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding isEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
 

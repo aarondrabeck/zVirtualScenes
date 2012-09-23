@@ -247,23 +247,12 @@ namespace zvs.WPF.DeviceControls
                     if (d != null)
                     {
                         //Check for device dependencies
-                        foreach (SceneCommand sceneCommand in context.SceneCommands.Where(t => t.Device.DeviceId == d.DeviceId))
+                        foreach (StoredCommand storedCommand in context.StoredCommands.Where(t => t.Device.DeviceId == d.DeviceId))
                         {
-                            MessageBoxResult result = MessageBox.Show(
-                                string.Format("Deleting device '{0}' will remove a scene command from '{1}', would you like continue?",
-                                                d.Name,
-                                                sceneCommand.Scene == null ? "unknown" : sceneCommand.Scene.Name),
-                                "Device Delete Warning",
-                                MessageBoxButton.YesNo);
-
-                            if (result == MessageBoxResult.Yes)
-                            {
-                                context.SceneCommands.Local.Remove(sceneCommand);
-                                context.SaveChanges();
-                            }
-                            else
-                                return;
+                            StoredCommand.RemoveDependencies(context, storedCommand);
+                            context.StoredCommands.Local.Remove(storedCommand);
                         }
+                        context.SaveChanges();
 
                         //Check for device dependencies
                         foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.DeviceId == d.DeviceId))

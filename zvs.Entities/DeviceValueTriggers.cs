@@ -15,19 +15,19 @@ namespace zvs.Entities
     {
         public int DeviceValueTriggerId { get; set; }
 
-        private Scene _Scene;
-        public virtual Scene Scene
+        private StoredCommand _StoredCommand;
+        public virtual StoredCommand StoredCommand
         {
             get
             {
-                return _Scene;
+                return _StoredCommand;
             }
             set
             {
-                if (value != _Scene)
+                if (value != _StoredCommand)
                 {
-                    _Scene = value;
-                    NotifyPropertyChanged("Scene");
+                    _StoredCommand = value;
+                    NotifyPropertyChanged("StoredCommand");
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -140,14 +140,14 @@ namespace zvs.Entities
             {
                 string trigger_op_name = Operator.ToString();
 
-                if (this.Scene == null || this.DeviceValue == null || this.DeviceValue.Device == null)
+                if (this.StoredCommand == null || this.DeviceValue == null || this.DeviceValue.Device == null)
                     return "Incomplete Trigger";
 
-                return string.Format("When '{0}' {1} is {2} {3} activate scene '{4}'", this.DeviceValue.Device.Name,
+                return string.Format("'{0}' {1} is {2} {3}", this.DeviceValue.Device.Name,
                                                                 this.DeviceValue.Name,
                                                                 trigger_op_name,
-                                                                this.Value,
-                                                                this.Scene.Name);
+                                                                this.Value
+                                                                );
             }
         }
     }

@@ -45,7 +45,6 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <CollectionViewSource x:Key="ScheduledTaskViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:ScheduledTask}, CreateList=True}"/>
-        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:Scene}, CreateList=True}"/>
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
@@ -65,8 +64,6 @@
                   CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single" 
                   PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
                   SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFF9F9F9" Margin="0,25,0,0" >
-
-
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn MaxWidth="45" MinWidth="45" Width="45"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
@@ -99,10 +96,10 @@
                 <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource dataFromEnum}}"   SelectedItem="{Binding Frequency, UpdateSourceTrigger=PropertyChanged}" 
                           VerticalAlignment="Top" Margin="10,149,0,0" HorizontalAlignment="Left" Width="176" SelectionChanged="FrequencyCmbBx_SelectionChanged" LostFocus="LostFocus_SaveChanges"></ComboBox>
 
-                <TextBlock Text="Activate Scene" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,81,0,0"/>
-                <ComboBox x:Name="SceneCmbBx_Copy" SelectedItem="{Binding Scene, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="10,99,0,0" HorizontalAlignment="Left" 
-                          Width="325" DisplayMemberPath="Name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" LostFocus="LostFocus_SaveChanges" />
+                <TextBlock Text="Command to Run" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,81,0,0"/>
 
+                <TextBlock x:Name="CommandSummary" FontSize="14" Height="20" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding StoredCommand.Summary, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="144,100,25,0"/>
+                <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" VerticalAlignment="Top" Width="116" Click="AddUpdateCommand_Click" Margin="12,100,0,0" />
 
                 <TextBlock Text="Start Time" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,35,0,0"/>
                 <xctk:DateTimePicker  Value="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="10,54,0,0" Width="325" LostFocus="LostFocus_SaveChanges" />

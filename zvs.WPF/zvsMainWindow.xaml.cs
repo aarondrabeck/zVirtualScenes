@@ -479,6 +479,6 @@ namespace zvs.WPF
             JavaScriptAddRemove jsWindow = new JavaScriptAddRemove();
             jsWindow.Owner = this;
             jsWindow.ShowDialog();
-        }        
+        }       
     }
 }

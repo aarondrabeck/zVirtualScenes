@@ -163,7 +163,8 @@ namespace zvs.Processor.Triggers
                 if (cmd != null)
                 {
                     TriggerBegin(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
-                                string.Format("Trigger '{0}' caused scene '{1}' to activate.", trigger.Name, trigger.Scene.Name), false));
+                                string.Format("Trigger '{0}' caused  '{1}'", trigger.Name, trigger.StoredCommand.ActionDescription), false));
+
 
                     CommandProcessor cp = new CommandProcessor(Core);
                     cp.onProcessingCommandEnd += (s, a) =>
@@ -171,7 +172,7 @@ namespace zvs.Processor.Triggers
                         TriggerEnd(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
                                 string.Format("Trigger '{0}' ended.", trigger.Name), false));
                     };
-                    cp.RunBuiltinCommand(context, cmd, trigger.Scene.SceneId.ToString());
+                    cp.RunStoredCommand(context, trigger.StoredCommand);
                 }
             }
         }

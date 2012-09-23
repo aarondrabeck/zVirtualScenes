@@ -14,6 +14,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
+using zvs.WPF.Commands;
 
 
 namespace zvs.WPF.TriggerControls
@@ -51,10 +52,6 @@ namespace zvs.WPF.TriggerControls
             OperatorCmboBx.ItemsSource = Enum.GetValues(typeof(TriggerOperator));
             OperatorCmboBx.SelectedIndex = 0;
 
-            System.Windows.Data.CollectionViewSource sceneViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("sceneViewSource")));
-            // Load data by setting the CollectionViewSource.Source property:
-            sceneViewSource.Source = context.Scenes.Local;
-
             //Set presets
             if (trigger.DeviceValue != null)
             {
@@ -64,20 +61,20 @@ namespace zvs.WPF.TriggerControls
                 if (trigger.DeviceValue != null)
                     ValueCmboBx.SelectedItem = trigger.DeviceValue;
             }
-            
+
             try
             {
                 OperatorCmboBx.Text = Enum.GetName(typeof(TriggerOperator), trigger.Operator);
             }
             catch { }
-            
+
             if (trigger.Value != null)
                 ValueTxtBx.Text = trigger.Value;
 
-            if (trigger.Scene != null)
-            {                
-                SceneCmbBx.SelectedItem = trigger.Scene;
-            }
+            if (trigger.StoredCommand != null)
+                CommandSummary.Text = string.Format("{0} '{1}'", trigger.StoredCommand.ActionableObject, trigger.StoredCommand.ActionDescription);
+            else
+                CommandSummary.Text =  "No command selected.";
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -115,20 +112,14 @@ namespace zvs.WPF.TriggerControls
                 trigger.DeviceValue = dv;
             }
 
-            Scene s = (Scene)SceneCmbBx.SelectedItem;
-            if (s == null)
+            if (trigger.StoredCommand == null)
             {
-                SceneCmbBx.Focus();
-                SceneCmbBx.BorderBrush = new SolidColorBrush(Colors.Red);
+                AddUpdateCommand.Focus();
+                AddUpdateCommand.BorderBrush = new SolidColorBrush(Colors.Red);
                 ColorAnimation anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
-                ValueCmboBx.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
+                AddUpdateCommand.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 e.Handled = false;
-
                 return;
-            }
-            else
-            {
-                trigger.Scene = s;
             }
 
             if (string.IsNullOrEmpty(ValueTxtBx.Text))
@@ -150,6 +141,36 @@ namespace zvs.WPF.TriggerControls
 
             Canceled = false;
             this.Close();
+        }
+
+        private void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
+        {
+            //Create a Stored Command if there is not one...
+            StoredCommand newSC = new StoredCommand();
+
+            //Send it to the command builder to get filled with a command
+            CommandBuilder cbWindow ;
+            if (trigger.StoredCommand == null)
+                cbWindow = new CommandBuilder(context, newSC);
+            else
+                cbWindow = new CommandBuilder(context, trigger.StoredCommand);
+           
+            cbWindow.Owner = this;
+
+            if (cbWindow.ShowDialog() ?? false)
+            {
+                if (trigger.StoredCommand == null) //if this was a new command, assign it.
+                    trigger.StoredCommand = newSC;
+                else
+                    trigger.StoredCommand = trigger.StoredCommand;
+
+                context.SaveChanges();
+            }
+
+            if (trigger.StoredCommand != null)
+                CommandSummary.Text = string.Format("{0} '{1}'", trigger.StoredCommand.ActionableObject, trigger.StoredCommand.ActionDescription);
+            else
+                CommandSummary.Text = "No command selected.";
         }
     }
 }

@@ -38,7 +38,8 @@ namespace zvs.Processor.Backup
                     triggerBackup.Enabled = trigger.isEnabled;
                     triggerBackup.DeviceValueName = trigger.DeviceValue.Name;
                     triggerBackup.NodeID = trigger.DeviceValue.Device.NodeNumber;
-                    triggerBackup.sceneName = trigger.Scene.Name;
+                    //TODO: Backup Script
+                    //triggerBackup.sceneName = trigger..Name;
                     triggerBackup.trigger_operator = (int?)trigger.Operator;
                     triggerBackup.value = trigger.Value;
                     triggers.Add(triggerBackup);
@@ -96,7 +97,8 @@ namespace zvs.Processor.Backup
                                     trigger.DeviceValue = dv;
                                     trigger.isEnabled = backupTrigger.Enabled;
                                     trigger.Name = backupTrigger.Name;
-                                    trigger.Scene = s;
+                                    //TODO: Fix
+                                   // trigger.Scene = s;
                                     trigger.Operator = (TriggerOperator)backupTrigger.trigger_operator;
                                     trigger.Value = backupTrigger.value;
                                     context.DeviceValueTriggers.Add(trigger);

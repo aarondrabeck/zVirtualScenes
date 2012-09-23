@@ -58,6 +58,11 @@ namespace zvs.WPF.Commands
             if (DevicesCmboBox.Items.Count > 0)
                 DevicesCmboBox.SelectedIndex = 0;
 
+            //When creating new commands, we sometimes pass in the device but no the command.
+            //if this is the case, select the device.
+            if (StoredCommand.Device != null)
+                DevicesCmboBox.SelectedItem = StoredCommand.Device;
+
             //If we are editing, ie. we get passed a StoredCommand with data, 
             //preselect the correct tab and item.
             if (StoredCommand.Command is DeviceCommand ||
@@ -66,9 +71,6 @@ namespace zvs.WPF.Commands
                 DeviceTab.IsSelected = true;
                 if (StoredCommand.Device != null)
                 {
-                    //Preselect device
-                    DevicesCmboBox.SelectedItem = StoredCommand.Device;
-
                     //Preselect device command
                     if (StoredCommand.Command != null)
                     {
@@ -144,7 +146,7 @@ namespace zvs.WPF.Commands
 
                         //Lookup the device involved in the command
                         int deviceID = 0;
-                        if (int.TryParse(SelectedBuiltinArg, out deviceID))
+                        if (int.TryParse(StoredCommand.Argument, out deviceID))
                         {
                             Device d = Context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
                             if (d != null)
@@ -185,7 +187,7 @@ namespace zvs.WPF.Commands
 
                         //Lookup the group involved in the command
                         int groupID = 0;
-                        if (int.TryParse(SelectedBuiltinArg, out groupID))
+                        if (int.TryParse(StoredCommand.Argument, out groupID))
                         {
                             Group g = Context.Groups.FirstOrDefault(o => o.GroupId == groupID);
                             if (g != null)
@@ -225,12 +227,13 @@ namespace zvs.WPF.Commands
 
                         //Try to match supplied arg (sceneID) with a scene
                         int sceneID = 0;
-                        if (int.TryParse(SelectedBuiltinArg, out sceneID))
+                        if (int.TryParse(StoredCommand.Argument, out sceneID))
                         {
                             Scene s = Context.Scenes.FirstOrDefault(o => o.SceneId == sceneID);
                             if (s != null)
                             {
                                 default_value = s.Name;
+                                SelectedBuiltinArg = s.SceneId.ToString();
                             }
                         }
 
@@ -267,6 +270,7 @@ namespace zvs.WPF.Commands
                         {
                             case DataType.NONE:
                                 {
+                                    SelectedBuiltinArg = string.Empty;
                                     BuiltinArgSckPnl.Children.Add(new TextBlock()
                                     {
                                         Text = "None",
@@ -278,7 +282,7 @@ namespace zvs.WPF.Commands
                                 {
                                     //get the current value from the value table list
                                     bool DefaultValue = false;
-                                    bool.TryParse(SelectedBuiltinArg, out DefaultValue);
+                                    bool.TryParse(StoredCommand.Argument, out DefaultValue);
                                     SelectedBuiltinArg = DefaultValue.ToString();
 
                                     CheckboxControl control = new CheckboxControl(selected_cmd.Name,
@@ -294,8 +298,8 @@ namespace zvs.WPF.Commands
                             case DataType.DECIMAL:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(SelectedBuiltinArg))
-                                        DefaultValue = SelectedBuiltinArg;
+                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                        DefaultValue = StoredCommand.Argument;
                                     SelectedBuiltinArg = DefaultValue;
 
                                     NumericControl control = new NumericControl(selected_cmd.Name,
@@ -313,8 +317,8 @@ namespace zvs.WPF.Commands
                             case DataType.INTEGER:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(SelectedBuiltinArg))
-                                        DefaultValue = SelectedBuiltinArg;
+                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                        DefaultValue = StoredCommand.Argument;
                                     SelectedBuiltinArg = DefaultValue;
 
                                     NumericControl control = new NumericControl(selected_cmd.Name,
@@ -332,8 +336,8 @@ namespace zvs.WPF.Commands
                             case DataType.BYTE:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(SelectedBuiltinArg))
-                                        DefaultValue = SelectedBuiltinArg;
+                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                        DefaultValue = StoredCommand.Argument;
                                     SelectedBuiltinArg = DefaultValue;
 
                                     NumericControl control = new NumericControl(selected_cmd.Name,
@@ -351,8 +355,8 @@ namespace zvs.WPF.Commands
                             case DataType.SHORT:
                                 {
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(SelectedBuiltinArg))
-                                        DefaultValue = SelectedBuiltinArg;
+                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                        DefaultValue = StoredCommand.Argument;
                                     SelectedBuiltinArg = DefaultValue;
 
                                     NumericControl control = new NumericControl(selected_cmd.Name,
@@ -372,8 +376,8 @@ namespace zvs.WPF.Commands
                                 {
                                     //get the current value from the value table list
                                     string DefaultValue = "0";
-                                    if (!string.IsNullOrEmpty(SelectedBuiltinArg))
-                                        DefaultValue = SelectedBuiltinArg;
+                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                        DefaultValue = StoredCommand.Argument;
                                     SelectedBuiltinArg = DefaultValue;
 
                                     StringControl control = new StringControl(selected_cmd.Name,
@@ -395,8 +399,8 @@ namespace zvs.WPF.Commands
                                     if (option != null)
                                         DefaultValue = option;
 
-                                    if (!string.IsNullOrEmpty(SelectedBuiltinArg))
-                                        DefaultValue = SelectedBuiltinArg;
+                                    if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                        DefaultValue = StoredCommand.Argument;
                                     SelectedBuiltinArg = DefaultValue;
 
                                     ComboboxControl control = new ComboboxControl(selected_cmd.Name,
@@ -533,7 +537,7 @@ namespace zvs.WPF.Commands
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
-                                if (!bool.TryParse(StoredCommand.Argument, out DefaultValue))
+                                if (!bool.TryParse(StoredCommand.Argument, out DefaultValue) )
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
@@ -554,23 +558,17 @@ namespace zvs.WPF.Commands
                         case DataType.DECIMAL:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                decimal DefaultValue = 0;
+                                if (!decimal.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        decimal.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
@@ -583,23 +581,17 @@ namespace zvs.WPF.Commands
                         case DataType.INTEGER:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                int DefaultValue = 0;
+                                if (!int.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        int.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                    NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
@@ -612,23 +604,17 @@ namespace zvs.WPF.Commands
                         case DataType.SHORT:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                short DefaultValue = 0;
+                                if (!short.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        short.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
@@ -641,23 +627,17 @@ namespace zvs.WPF.Commands
                         case DataType.BYTE:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                byte DefaultValue = 0;
+                                if (!byte.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        byte.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                    NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
@@ -670,7 +650,8 @@ namespace zvs.WPF.Commands
                         case DataType.STRING:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0"; if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                string DefaultValue = "0"; 
+                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
                                 {
                                     DefaultValue = StoredCommand.Argument;
                                 }
@@ -748,14 +729,11 @@ namespace zvs.WPF.Commands
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
-
                                 if (!bool.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
                                         bool.TryParse(dv.Value, out DefaultValue);
-                                    }
                                 }
                                 SelectedDeviceArg = DefaultValue.ToString();
 
@@ -770,24 +748,18 @@ namespace zvs.WPF.Commands
                         case DataType.DECIMAL:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                decimal DefaultValue = 0;
+                                if (!decimal.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        decimal.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
 
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
@@ -800,23 +772,17 @@ namespace zvs.WPF.Commands
                         case DataType.INTEGER:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                int DefaultValue = 0;
+                                if (!int.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        int.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
@@ -829,23 +795,17 @@ namespace zvs.WPF.Commands
                         case DataType.BYTE:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                byte DefaultValue = 0;
+                                if (!byte.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        byte.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
@@ -858,23 +818,17 @@ namespace zvs.WPF.Commands
                         case DataType.SHORT:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
-                                {
-                                    DefaultValue = StoredCommand.Argument;
-                                }
-                                else
+                                short DefaultValue = 0;
+                                if (!short.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
-                                    {
-                                        DefaultValue = dv.Value;
-                                    }
+                                        short.TryParse(dv.Value, out DefaultValue);
                                 }
-                                SelectedDeviceArg = DefaultValue;
+                                SelectedDeviceArg = DefaultValue.ToString();
                                 NumericControl control = new NumericControl(d_cmd.Name,
                                     d_cmd.Description,
-                                    DefaultValue,
+                                    DefaultValue.ToString(),
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
@@ -889,7 +843,7 @@ namespace zvs.WPF.Commands
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
+                                if (!string.IsNullOrEmpty(StoredCommand.Argument) )
                                 {
                                     DefaultValue = StoredCommand.Argument;
                                 }

@@ -26,8 +26,6 @@ namespace zvs.Entities
                 {
                     _Script = value;
                     NotifyPropertyChanged("Script");
-                    NotifyPropertyChanged("ActionDescription");
-                    NotifyPropertyChanged("ActionableObject");
                 }
             }
         }

@@ -3,11 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:zvsEntities="clr-namespace:zvs.Entities;assembly=zvs.Entities" mc:Ignorable="d" x:Class="zvs.WPF.TriggerControls.TriggerEditorWindow"
-        Title="Trigger Editor" Height="300" Width="572" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" WindowStyle="ToolWindow" Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs32.ico">
+        Title="Trigger Editor" Height="282" Width="572" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" WindowStyle="ToolWindow" Loaded="Window_Loaded_1" Icon="/zVirtualScenes;component/Images/zvs32.ico">
     <Window.Resources>
         <CollectionViewSource x:Key="deviceViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:Device}, CreateList=True}"/>
         <CollectionViewSource x:Key="deviceDeviceValueViewSource" Source="{Binding Values, Source={StaticResource deviceViewSource}}"/>
-        <CollectionViewSource x:Key="sceneViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:Scene}, CreateList=True}"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource deviceViewSource}">
         <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
@@ -35,12 +34,13 @@
             </Rectangle.Fill>
 
         </Rectangle>
-        <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,131,0,0" TextWrapping="Wrap" Text="Select a scene to activate " VerticalAlignment="Top"/>
-        <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="10,180,0,0" TextWrapping="Wrap" Text="Activate" VerticalAlignment="Top"/>
-        <ComboBox x:Name="SceneCmbBx"  HorizontalAlignment="Left" Margin="75,178,0,0" VerticalAlignment="Top" Width="170" DisplayMemberPath="Name" ItemsSource="{Binding Source={StaticResource sceneViewSource}}" SelectedValuePath="Name"/>
+        <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,131,0,0" TextWrapping="Wrap" Text="Select a command to run" VerticalAlignment="Top"/>
+        <TextBlock Name="CommandSummary" Height="20" FontSize="14" Margin="141,174,10,0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="" VerticalAlignment="Top"/>
+        <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" Margin="10,174,0,0" VerticalAlignment="Top" Width="116" Click="AddUpdateCommand_Click" />
+
         <Rectangle Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Fill="#FFF0F0F0" />
         <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click"/>
         <Button Name="OKBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,8" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
-
+        
     </Grid>
 </Window>

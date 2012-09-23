@@ -88,6 +88,9 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Commands\CommandBuilder.xaml.cs">
+      <DependentUpon>CommandBuilder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
     <Compile Include="JavaScript\JavaScriptSelector.xaml.cs">
       <DependentUpon>JavaScriptSelector.xaml</DependentUpon>
@@ -103,12 +106,6 @@
     </Compile>
     <Compile Include="JavaScript\JSResult.cs" />
     <Compile Include="NotifyIcon.cs" />
-    <Compile Include="SceneControls\AddEditSceneCommand.xaml.cs">
-      <DependentUpon>AddEditSceneCommand.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SceneControls\AddEditBuiltinSceneCommand.xaml.cs">
-      <DependentUpon>AddEditBuiltinSceneCommand.xaml</DependentUpon>
-    </Compile>
     <Compile Include="SceneControls\SceneProperties.xaml.cs">
       <DependentUpon>SceneProperties.xaml</DependentUpon>
     </Compile>
@@ -135,6 +132,10 @@
       <DependentUpon>TriggerGridUC.xaml</DependentUpon>
     </Compile>
     <Page Include="AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Commands\CommandBuilder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -273,14 +274,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SceneControls\AddEditSceneCommand.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="SceneControls\AddEditBuiltinSceneCommand.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="SceneControls\SceneProperties.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -330,6 +323,8 @@
     <None Include="App.config" />
     <Resource Include="Images\zvs256.ico" />
     <Resource Include="Images\zvs32.ico" />
+    <Resource Include="Images\JavaScriptIcon.png" />
+    <Resource Include="Images\multipleIcon.png" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

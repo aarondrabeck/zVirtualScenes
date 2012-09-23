@@ -66,6 +66,35 @@ namespace zvs.Processor
 
 
         //public Methods 
+        public void RunStoredCommand(zvsContext context, StoredCommand storedCommand)
+        {
+            if (storedCommand == null)
+            {
+                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
+                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. StoredCommand is null.", 0));
+            }
+
+            if (storedCommand.Command == null)
+            {
+                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
+                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. StoredCommand command is null.", 0));
+            }
+
+            if (storedCommand.Command is DeviceCommand)
+                RunDeviceCommand(context, (DeviceCommand)storedCommand.Command, storedCommand.Argument);
+            else if (storedCommand.Command is DeviceTypeCommand)
+                RunDeviceTypeCommand(context, (DeviceTypeCommand)storedCommand.Command, storedCommand.Device, storedCommand.Argument);
+            else if (storedCommand.Command is JavaScriptCommand)
+                RunJavaScriptCommand(context, (JavaScriptCommand)storedCommand.Command, storedCommand.Argument);
+            else if (storedCommand.Command is BuiltinCommand)
+                RunBuiltinCommand(context, (BuiltinCommand)storedCommand.Command, storedCommand.Argument);
+            else
+            {
+                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
+                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. Command type unknown.",0));
+            }
+        }
+
         public void RunDeviceCommand(zvsContext context, DeviceCommand deviceCommand, string argument = "")
         {
             QueuedDeviceCommand qdc = new QueuedDeviceCommand

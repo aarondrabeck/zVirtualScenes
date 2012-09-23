@@ -167,18 +167,7 @@ namespace zvs.Processor
             if (ExecutedCommands < CommandsToExecute.Count)
             {
                 SceneCommand sceneCommand = CommandsToExecute[ExecutedCommands];
-                               
-                if (sceneCommand.Command is DeviceCommand)
-                    cp.RunDeviceCommand(context, (DeviceCommand)sceneCommand.Command, sceneCommand.Argument);
-                
-                if (sceneCommand.Command is DeviceTypeCommand)
-                    cp.RunDeviceTypeCommand(context, (DeviceTypeCommand)sceneCommand.Command, sceneCommand.Device, sceneCommand.Argument);
-
-                if (sceneCommand.Command is BuiltinCommand)
-                    cp.RunBuiltinCommand(context, (BuiltinCommand)sceneCommand.Command, sceneCommand.Argument);
-
-                if (sceneCommand.Command is JavaScriptCommand)
-                    cp.RunJavaScriptCommand(context, (JavaScriptCommand)sceneCommand.Command, sceneCommand.Argument);
+                cp.RunStoredCommand(context, sceneCommand.StoredCommand);
             }
             else
             {

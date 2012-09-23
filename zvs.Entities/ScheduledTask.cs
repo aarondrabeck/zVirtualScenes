@@ -15,7 +15,23 @@ namespace zvs.Entities
     {
         public int ScheduledTaskId { get; set; }
 
-        public virtual Scene Scene { get; set; }
+        private StoredCommand _StoredCommand;
+        public virtual StoredCommand StoredCommand
+        {
+            get
+            {
+                return _StoredCommand;
+            }
+            set
+            {
+                if (value != _StoredCommand)
+                {
+                    _StoredCommand = value;
+                    NotifyPropertyChanged("StoredCommand");
+                    NotifyPropertyChanged("TriggerDescription");
+                }
+            }
+        }
 
         private TaskFrequency _Frequency;
         public TaskFrequency Frequency

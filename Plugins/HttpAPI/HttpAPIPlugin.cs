@@ -575,8 +575,8 @@ namespace HttpAPI
                         {
                             s_cmds.Add(new
                             {
-                                device = sc.ActionableObject,
-                                action = sc.ActionDescription,
+                                device = sc.StoredCommand.ActionableObject,
+                                action = sc.StoredCommand.ActionDescription,
                                 order = (sc.SortOrder + 1)
                             });
                         }

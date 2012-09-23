@@ -51,24 +51,25 @@ namespace zvs.Processor.Backup
                     foreach (SceneCommand scmd in s.Commands)
                     {
                         BackupSceneCMD SceneCmdBackup = new BackupSceneCMD();
-                        SceneCmdBackup.CommandArg = scmd.Argument;
-                        SceneCmdBackup.Order = scmd.SortOrder;
-                        SceneCmdBackup.CommandName = scmd.Command.UniqueIdentifier;
+                       //TODO: BACKUP SCRIPT 
+                        //SceneCmdBackup.CommandArg = scmd.Argument;
+                        //SceneCmdBackup.Order = scmd.SortOrder;
+                        //SceneCmdBackup.CommandName = scmd.Command.UniqueIdentifier;
 
-                        if (scmd.Command is BuiltinCommand)
-                        {
-                            SceneCmdBackup.CommandType = Command_Types.builtin;
-                        }
-                        else if (scmd.Command is DeviceTypeCommand)
-                        {
-                            SceneCmdBackup.CommandType = Command_Types.device_type_command;
-                            SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
-                        }
-                        else if (scmd.Command is DeviceCommand)
-                        {
-                            SceneCmdBackup.CommandType = Command_Types.device_command;
-                            SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
-                        }
+                        //if (scmd.Command is BuiltinCommand)
+                        //{
+                        //    SceneCmdBackup.CommandType = Command_Types.builtin;
+                        //}
+                        //else if (scmd.Command is DeviceTypeCommand)
+                        //{
+                        //    SceneCmdBackup.CommandType = Command_Types.device_type_command;
+                        //    SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
+                        //}
+                        //else if (scmd.Command is DeviceCommand)
+                        //{
+                        //    SceneCmdBackup.CommandType = Command_Types.device_command;
+                        //    SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
+                        //}
 
                         SceneBackup.Commands.Add(SceneCmdBackup);
                         CmdCount++;
@@ -130,8 +131,9 @@ namespace zvs.Processor.Backup
                                     {
                                         s.Commands.Add(new SceneCommand()
                                         {
-                                            Argument = backupSceneCMD.CommandArg,
-                                            Command = cmd,
+                                            //TODO: FIX
+                                            //Argument = backupSceneCMD.CommandArg,
+                                            //Command = cmd,
                                             SortOrder = backupSceneCMD.Order
                                         });
                                         ImportedCmdCount++;
@@ -147,9 +149,10 @@ namespace zvs.Processor.Backup
                                         {
                                             s.Commands.Add(new SceneCommand()
                                             {
-                                                Argument = backupSceneCMD.CommandArg,
-                                                Command = cmd,
-                                                Device = d,
+                                                //TODO: FIX
+                                                //Argument = backupSceneCMD.CommandArg,
+                                                //Command = cmd,
+                                                //Device = d,
                                                 SortOrder = backupSceneCMD.Order
                                             });
                                             ImportedCmdCount++;
@@ -166,9 +169,10 @@ namespace zvs.Processor.Backup
                                         {
                                             s.Commands.Add(new SceneCommand()
                                             {
-                                                Argument = backupSceneCMD.CommandArg,
-                                                Command = cmd,
-                                                Device = d,
+                                                //TODO: FIX
+                                                //Argument = backupSceneCMD.CommandArg,
+                                                //Command = cmd,
+                                                //Device = d,
                                                 SortOrder = backupSceneCMD.Order
                                             });
                                             ImportedCmdCount++;

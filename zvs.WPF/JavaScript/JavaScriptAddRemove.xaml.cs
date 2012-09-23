@@ -98,7 +98,7 @@ namespace zvs.WPF.JavaScript
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             JavaScriptCommand jsCommand = new JavaScriptCommand();
-            jsCommand.Name = "New JavaScript Command";
+            jsCommand.Name = "My JavaScript";
             JavaScriptEditorWindow window = new JavaScriptEditorWindow(context, jsCommand);
             window.Owner = this;
 
@@ -125,13 +125,24 @@ namespace zvs.WPF.JavaScript
                 MessageBox.Show("Are you sure you want to delete the '" + jsCommand.Name + "' command?",
                                 "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
+                foreach (QueuedCommand qc in context.QueuedCommands.Where(o => o.Command.CommandId == jsCommand.CommandId))
+                {
+                    context.QueuedCommands.Local.Remove(qc);
+                }
+                context.SaveChanges();
+
+                foreach (StoredCommand sc in context.StoredCommands.Where(o => o.Command.CommandId == jsCommand.CommandId).ToList())
+                {
+                    StoredCommand.RemoveDependencies(context, sc);
+                }
+
                 //Delete the Command from each Scene it is user
                 foreach (SceneCommand sc in context.SceneCommands)
                 {
-                    if(sc.Command == jsCommand)
+                    if (sc.StoredCommand.Command == jsCommand)
                         sc.Scene.Commands.Remove(sc);
                 }
-                
+
                 context.JavaScriptCommands.Local.Remove(jsCommand);
                 context.SaveChanges();
 

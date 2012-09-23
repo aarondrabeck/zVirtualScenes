@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zvs.Entities;
+using zvs.WPF.Commands;
 
 
 namespace zvs.WPF.ScheduledTaskControls
@@ -25,6 +26,7 @@ namespace zvs.WPF.ScheduledTaskControls
     public partial class ScheduledTaskCreator : UserControl
     {
         private zvsContext context;
+        private App app = (App)Application.Current;
 
         public ScheduledTaskCreator()
         {
@@ -46,15 +48,9 @@ namespace zvs.WPF.ScheduledTaskControls
                     System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
                     myCollectionViewSource.Source = context.ScheduledTasks.Local;
 
-                    //Load your data here and assign the result to the CollectionViewSource.
-                    System.Windows.Data.CollectionViewSource sceneViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                    sceneViewSource.Source = context.Scenes.Local;
-
                     context.ScheduledTasks.ToList();
-                    context.Scenes.ToList();
                 }
 
-                zvsContext.onScenesChanged += zvsContext_onScenesChanged;
                 zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
 
                 if (ScheduledTaskDataGrid.Items.Count > 0)
@@ -66,7 +62,6 @@ namespace zvs.WPF.ScheduledTaskControls
         {
             if (this.IsVisible)
             {
-                zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
                 zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
             }
         }
@@ -91,28 +86,7 @@ namespace zvs.WPF.ScheduledTaskControls
                 }
             }));
         }
-
-        void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == System.Data.EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.Scenes.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<Scene>())
-                            ent.Reload();
-                    }
-                }
-            }));
-        }
-
+        
         private void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
@@ -329,6 +303,32 @@ namespace zvs.WPF.ScheduledTaskControls
         private void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
         {
             context.SaveChanges();
+        }
+
+        private void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
+        {
+            ScheduledTask st = (ScheduledTask)ScheduledTaskDataGrid.SelectedItem;
+            //Create a Stored Command if there is not one...
+            StoredCommand newSC = new StoredCommand();
+
+            //Send it to the command builder to get filled with a command
+            CommandBuilder cbWindow;
+            if (st.StoredCommand == null)
+                cbWindow = new CommandBuilder(context, newSC);
+            else
+                cbWindow = new CommandBuilder(context, st.StoredCommand);
+
+            cbWindow.Owner = app.zvsWindow;
+
+            if (cbWindow.ShowDialog() ?? false)
+            {
+                if (st.StoredCommand == null) //if this was a new command, assign it.
+                    st.StoredCommand = newSC;
+                else
+                    st.StoredCommand = st.StoredCommand;
+
+                context.SaveChanges();
+            }
         }        
     }
 }

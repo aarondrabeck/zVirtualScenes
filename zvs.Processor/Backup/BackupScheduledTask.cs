@@ -75,7 +75,8 @@ namespace zvs.Processor.Backup
                 foreach (ScheduledTask t in context.ScheduledTasks)
                 {
                     BackupScheduledTask task = new BackupScheduledTask();
-                    task.sceneName = t.Scene.Name;
+                    //TODO: BACKUP SCRIPT
+                    //task.sceneName = t.Scene.Name;
                     task.Frequency = (int)t.Frequency;
                     task.friendly_name = t.Name;
                     task.isEnabled = t.isEnabled;
@@ -173,7 +174,7 @@ namespace zvs.Processor.Backup
                             if (s != null)
                             {
                                 ScheduledTask task = new ScheduledTask();
-                                task.Scene = s;
+                               //TODO:FIX
                                 task.Frequency = (TaskFrequency)t.Frequency;
                                 task.Name = t.friendly_name;
                                 task.isEnabled = t.isEnabled;

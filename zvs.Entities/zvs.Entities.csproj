@@ -50,6 +50,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="BuiltinCommand.cs" />
     <Compile Include="CommandOption.cs" />
+    <Compile Include="StoredCommand.cs" />
     <Compile Include="QueuedJavaScriptCommand.cs" />
     <Compile Include="JavaScriptCommand.cs" />
     <Compile Include="Migrations\Configuration.cs" />

@@ -18,6 +18,7 @@ using zvs.Processor;
 using zvs.Entities;
 using zvs.WPF.TriggerControls;
 using zvs.WPF.JavaScript;
+using zvs.WPF.Commands;
 
 
 namespace zvs.WPF.SceneControls
@@ -42,7 +43,6 @@ namespace zvs.WPF.SceneControls
             //Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                context.Devices.ToList();
                 context.Scenes.ToList();
                 SceneCollection = context.Scenes.Local;
 
@@ -50,8 +50,6 @@ namespace zvs.WPF.SceneControls
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
                 myCollectionViewSource.Source = context.Scenes.Local;
             }
-
-            DevicesGrid.MinimalistDisplay = false;
 
             SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
             zvsContext.onScenesChanged += zvsContext_onScenesChanged;
@@ -269,10 +267,13 @@ namespace zvs.WPF.SceneControls
                             {
                                 new_scene.Commands.Add(new SceneCommand
                                 {
-                                    Argument = sc.Argument,
-                                    Command = sc.Command,
-                                    SortOrder = sc.SortOrder,
-                                    Device = sc.Device
+                                    StoredCommand = new StoredCommand
+                                    {
+                                        Argument = sc.StoredCommand.Argument,
+                                        Command = sc.StoredCommand.Command,
+                                        Device = sc.StoredCommand.Device
+                                    },
+                                    SortOrder = sc.SortOrder
                                 });
                                 SceneGrid.Focus();
                             }
@@ -315,21 +316,27 @@ namespace zvs.WPF.SceneControls
                             if (d2 == null)
                                 continue;
 
-                            SceneCommand scene_command = new SceneCommand
-                            {
-                                Device = d2
-                            };
+                            //Create a Stored Command.
+                            //pre-fill the device with users dropped device.
+                            StoredCommand sc = new StoredCommand();
+                            sc.Device = d2;
 
-                            AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, scene_command);
-                            sceneCmdWindow.Owner = app.zvsWindow;
+                            //Send it to the command builder to get filled with a command
+                            CommandBuilder cbWindow = new CommandBuilder(context, sc);
+                            cbWindow.Owner = app.zvsWindow;
 
-                            if (sceneCmdWindow.ShowDialog() ?? false)
+                            if (cbWindow.ShowDialog() ?? false)
                             {
+                                //Create the scene command
+                                SceneCommand newSceneCommand = new SceneCommand();
+                                //Set Command
+                                newSceneCommand.StoredCommand = sc;
+                                //Set Order
                                 int? max = selected_scene.Commands.Max(o => o.SortOrder);
                                 if (max.HasValue)
-                                    scene_command.SortOrder = max.Value + 1;
+                                    newSceneCommand.SortOrder = max.Value + 1;
                                 else
-                                    scene_command.SortOrder = 0;
+                                    newSceneCommand.SortOrder = 0;
 
                                 if (selected_scene.isRunning)
                                 {
@@ -337,9 +344,9 @@ namespace zvs.WPF.SceneControls
                                 }
                                 else
                                 {
-                                    selected_scene.Commands.Add(scene_command);
+                                    selected_scene.Commands.Add(newSceneCommand);
                                     context.SaveChanges();
-                                    SceneCmdsGrid.SelectedItems.Add(scene_command);
+                                    SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                                 }
                             }
                         }
@@ -358,18 +365,20 @@ namespace zvs.WPF.SceneControls
             if (dg != null)
             {
                 DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
-                if (e.Key == Key.Delete && !dgr.IsEditing)
+                if (e.Key == Key.Delete )
                 {
-                    e.Handled = true;
-
-                    if (dgr.Item is Scene)
-                    {
-                        var scene = (Scene)dgr.Item;
-                        if (scene != null)
-                        {
-                            e.Handled = !DeleteSelectedScene(scene);
-                        }
-                    }
+                     e.Handled = true;
+                     if (!dgr.IsEditing)
+                     {
+                         if (dgr.Item is Scene)
+                         {
+                             var scene = (Scene)dgr.Item;
+                             if (scene != null)
+                             {
+                                 DeleteSelectedScene(scene);
+                             }
+                         }
+                     }
                 }
             }
         }
@@ -573,81 +582,25 @@ namespace zvs.WPF.SceneControls
             //END TODO
         }
 
-        private void AddBuiltinCmd_Click_1(object sender, RoutedEventArgs e)
-        {
-            if (SceneGrid.SelectedItem is Scene)
-            {
-                Scene selected_scene = (Scene)SceneGrid.SelectedItem;
-                if (selected_scene != null)
-                {
-                    SceneCmdsGrid.SelectedItems.Clear();
-
-                    SceneCommand cmd = new SceneCommand();
-
-
-                    int? max = selected_scene.Commands.Max(o => o.SortOrder);
-                    if (max.HasValue)
-                        cmd.SortOrder = max.Value + 1;
-                    else
-                        cmd.SortOrder = 0;
-
-                    AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
-                    window.Owner = app.zvsWindow;
-
-                    if (window.ShowDialog() ?? false)
-                    {
-                        if (selected_scene.isRunning)
-                        {
-                            ShowSceneEditWarning(selected_scene.Name);
-                        }
-                        else
-                        {
-                            selected_scene.Commands.Add(cmd);
-                            context.SaveChanges();
-
-                            SceneCmdsGrid.SelectedItems.Add(cmd);
-                        }
-                        SceneCmdsGrid.Focus();
-                    }
-                }
-            }
-        }
-
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneCommand)
             {
                 var cmd = (SceneCommand)obj;
-                if (cmd != null)
+                if (cmd != null && cmd.StoredCommand != null)
                 {
-                    if (cmd.Command is BuiltinCommand)
-                    {
-                        AddEditBuiltinSceneCommand window = new AddEditBuiltinSceneCommand(context, cmd);
-                        window.Owner = app.zvsWindow;
+                    //Send it to the command builder to get edited
+                    CommandBuilder cbWindow = new CommandBuilder(context, cmd.StoredCommand);
+                    cbWindow.Owner = app.zvsWindow;
 
-                        if (window.ShowDialog() ?? false)
+                    if (cbWindow.ShowDialog() ?? false)
+                    {
+                        if (cmd.Scene.isRunning)
                         {
-                            context.SaveChanges();
+                            ShowSceneEditWarning(cmd.Scene.Name);
                         }
-                    }
-                    else if (cmd.Command is DeviceCommand ||
-                        cmd.Command is DeviceTypeCommand)
-                    {
-                        AddEditSceneCommand sceneCmdWindow = new AddEditSceneCommand(context, cmd);
-                        sceneCmdWindow.Owner = app.zvsWindow;
-
-                        if (sceneCmdWindow.ShowDialog() ?? false)
-                        {
-                            context.SaveChanges();
-                        }
-                    }
-                    else if (cmd.Command is JavaScriptCommand)
-                    {
-                        JavaScriptEditorWindow jsWindow = new JavaScriptEditorWindow(context, (JavaScriptCommand)cmd.Command);
-                        jsWindow.Owner = app.zvsWindow;
-
-                        if (jsWindow.ShowDialog() ?? false)
+                        else
                         {
                             context.SaveChanges();
                         }
@@ -699,7 +652,7 @@ namespace zvs.WPF.SceneControls
                         {
                             if (window.SelectedCommand != null)
                             {
-                                cmd.Command = window.SelectedCommand;
+                                cmd.StoredCommand.Command = window.SelectedCommand;
                                 selected_scene.Commands.Add(cmd);
                                 context.SaveChanges();
 
@@ -707,6 +660,51 @@ namespace zvs.WPF.SceneControls
                             }
                         }
                         SceneCmdsGrid.Focus();
+                    }
+                }
+            }
+        }
+
+        private void AddCommand_Click(object sender, RoutedEventArgs e)
+        {
+            if (SceneGrid.SelectedItem is Scene)
+            {
+                Scene selected_scene = (Scene)SceneGrid.SelectedItem;
+                if (selected_scene != null)
+                {
+                    SceneCmdsGrid.SelectedItems.Clear();
+                    SceneCommand cmd = new SceneCommand();
+
+                    //Create a Stored Command.
+                    StoredCommand sc = new StoredCommand();
+
+                    //Send it to the command builder to get filled with a command
+                    CommandBuilder cbWindow = new CommandBuilder(context, sc);
+                    cbWindow.Owner = app.zvsWindow;
+
+                    if (cbWindow.ShowDialog() ?? false)
+                    {
+                        //Create the scene command
+                        SceneCommand newSceneCommand = new SceneCommand();
+                        //Set Command
+                        newSceneCommand.StoredCommand = sc;
+                        //Set Order
+                        int? max = selected_scene.Commands.Max(o => o.SortOrder);
+                        if (max.HasValue)
+                            newSceneCommand.SortOrder = max.Value + 1;
+                        else
+                            newSceneCommand.SortOrder = 0;
+
+                        if (selected_scene.isRunning)
+                        {
+                            ShowSceneEditWarning(selected_scene.Name);
+                        }
+                        else
+                        {
+                            selected_scene.Commands.Add(newSceneCommand);
+                            context.SaveChanges();
+                            SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
+                        }
                     }
                 }
             }

@@ -302,42 +302,38 @@ namespace zvs.Processor
 
         private void RunTask(ScheduledTask task)
         {
-            Scene scene = null;
             ScheduledTask _task = null;
 
             using (zvsContext context = new zvsContext())
             {
                 _task = context.ScheduledTasks.FirstOrDefault(o => o.ScheduledTaskId == task.ScheduledTaskId);
-
                 if (_task == null)
-                    return;
-
-                //TODO: RUN ANY COMMAND HERE
-                scene = context.Scenes.FirstOrDefault(s => s.SceneId == _task.Scene.SceneId);
-
-                if (scene == null)
                 {
                     ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
-                            string.Format("Scheduled task '{0}' Failed to find scene ID '{1}'.", _task.Name, _task.Scene.SceneId), true));
+                          string.Format("Scheduled task '{0}' started.", task.ScheduledTaskId), true));
 
+                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                          string.Format("Scheduled task '{0}' has been deleted.", task.ScheduledTaskId), true));
+                    return;
                 }
-                else
+
+                ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                          string.Format("Scheduled task '{0}' started.", _task.Name), true));
+
+                if (_task.StoredCommand == null)
                 {
-                   
-                    BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
-                    if (cmd != null)
-                    {
-                        ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
-                                    string.Format("Task '{0}' started.", _task.Name), false));
-                        CommandProcessor cp = new CommandProcessor(Core);
-                        cp.onProcessingCommandEnd += (s, a) =>
-                         {
-                             ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
-                                     string.Format("Task '{0}' ended.", _task.Name), a.Errors));
-                         };
-                        cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
-                    }
+                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                          string.Format("Scheduled task '{0}'. No command to run.", _task.Name), true));
+                    return;
                 }
+
+                CommandProcessor cp = new CommandProcessor(Core);
+                cp.onProcessingCommandEnd += (s, a) =>
+                {
+                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                            string.Format("Task '{0}' ended.", _task.Name), false));
+                };
+                cp.RunStoredCommand(context, _task.StoredCommand);
             }
         }
 

@@ -11,7 +11,7 @@ namespace zvs.Entities
     /// <summary>
     /// TO UPDATE WITH CODE FIRST:
     /// 
-    /// UPDATE-DATABASE -ProjectName zvs.Context -verbose
+    /// UPDATE-DATABASE -ProjectName zvs.Entities -verbose
     /// 
     /// optional: -force  (force's changes if they require dataloss)
     /// optional: -script (only creates SQL, does not apply to DB)
@@ -21,7 +21,7 @@ namespace zvs.Entities
     public partial class zvsContext : DbContext
     {
         public zvsContext()
-            : base("zvsDBEFCF")
+            : base("zvsDBEFCF4")
         {
 
         }
@@ -61,6 +61,8 @@ namespace zvs.Entities
 
         public DbSet<ScheduledTask> ScheduledTasks { get; set; }
 
+        public DbSet<StoredCommand> StoredCommands { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -69,6 +71,18 @@ namespace zvs.Entities
             .HasMany(c => c.Groups)
             .WithMany(a => a.Devices)
             .Map(m => m.ToTable("DeviceToGroups", schemaName: "ZVS"));
+
+            modelBuilder.Entity<DeviceValueTrigger>()
+                    .HasOptional(s => s.StoredCommand)
+                    .WithOptionalPrincipal(a => a.DeviceValueTrigger)
+                    .WillCascadeOnDelete();
+
+            modelBuilder.Entity<ScheduledTask>()
+                   .HasOptional(s => s.StoredCommand)
+                   .WithOptionalPrincipal(a => a.ScheduledTask)
+                   .WillCascadeOnDelete();
+
+           
         }
         public delegate void onEntityChangedventHandler(object sender, onEntityChangedEventArgs args);
 
