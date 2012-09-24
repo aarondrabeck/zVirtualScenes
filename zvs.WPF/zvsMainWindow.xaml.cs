@@ -41,8 +41,16 @@ namespace zvs.WPF
         {
             InitializeComponent();
 
-            EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
+            context = new zvsContext();
 
+            // Do not load your data at design time.
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
+
+                myCollectionViewSource.Source = logSource;
+            }            
         }
 
         void EventedLog_OnLogItemArrived(List<LogItem> NewItems)
@@ -61,9 +69,9 @@ namespace zvs.WPF
                         var entry = NewItems.LastOrDefault();
                         if (entry != null)
                         {
-                            StatusBarDescriptionTxt.Text = entry.Description;
-                            StatusBarSourceTxt.Text = entry.Source;
-                            StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
+                           // StatusBarDescriptionTxt.Text = entry.Description;
+                           // StatusBarSourceTxt.Text = entry.Source;
+                            //StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
                         }
                     }));
                 }
@@ -73,28 +81,17 @@ namespace zvs.WPF
             }
         }
 
-
         ~zvsMainWindow()
         {
-            log.Info("zvsMainWindow Deconstructed.");
+            Console.WriteLine("zvsMainWindow Deconstructed.");
         }
+
         private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
-
-        //zvs.Processor.Logging.ObservableLog observableLog;
-
+        
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
-
-
-            // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
-
-                myCollectionViewSource.Source = logSource;
-            }
+            EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
+            
             log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
 
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
@@ -115,8 +112,12 @@ namespace zvs.WPF
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
-           
         }
+
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;
+        }   
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -182,10 +183,9 @@ namespace zvs.WPF
 
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
                 myCollectionViewSource.Source = null;
-            }
-            else
-            {
-                //observableLog.Stop();
+
+                EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;
+                log = null;
             }
         }
 
@@ -479,6 +479,8 @@ namespace zvs.WPF
             JavaScriptAddRemove jsWindow = new JavaScriptAddRemove();
             jsWindow.Owner = this;
             jsWindow.ShowDialog();
-        }       
+        }
+
+            
     }
 }

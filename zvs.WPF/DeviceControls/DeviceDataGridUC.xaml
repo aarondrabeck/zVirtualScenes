@@ -7,7 +7,7 @@
              d:DesignHeight="300" d:DesignWidth="300" 
              xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities"
              Loaded="UserControl_Loaded" 
-             PreviewMouseRightButtonDown="UserControl_PreviewMouseRightButtonDown" Unloaded="UserControl_Unloaded_1" >
+           Unloaded="UserControl_Unloaded_1" >
     <UserControl.Resources>
         <Style x:Key="Body_Content_DataGrid_Centering"
         TargetType="{x:Type DataGridCell}">

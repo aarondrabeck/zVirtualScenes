@@ -49,7 +49,7 @@ namespace zvs.WPF
             this.InitializeComponent();
             zvs.Processor.Logging.LogManager.ConfigureLogging();
             log = zvs.Processor.Logging.LogManager.GetLogger<App>();
-
+           
             log.Info("Init Complete");
         }
         zvs.Processor.Logging.ILog log;
@@ -159,9 +159,7 @@ namespace zvs.WPF
             FatalErrorWindow fWindow = new FatalErrorWindow(exception);
             fWindow.ShowDialog();
         }
-
-
-
+        
         public static string GetHostDetails
         {
             get
@@ -204,7 +202,7 @@ namespace zvs.WPF
                 zvsMutex.ReleaseMutex();
 
             log.Info("Shutting down");
-
+            log = null;
             Application.Current.Shutdown();
         }
 

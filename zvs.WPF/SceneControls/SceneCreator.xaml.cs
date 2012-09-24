@@ -35,21 +35,28 @@ namespace zvs.WPF.SceneControls
         public SceneCreator()
         {
             InitializeComponent();
-        }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
-        {
             context = new zvsContext();
+
             //Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                context.Scenes.ToList();
                 SceneCollection = context.Scenes.Local;
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
                 myCollectionViewSource.Source = context.Scenes.Local;
             }
+        }
+
+        ~SceneCreator()
+        {
+            Console.WriteLine("SceneCreator Deconstructed");
+        }
+
+        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            context.Scenes.ToList();
 
             SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
             zvsContext.onScenesChanged += zvsContext_onScenesChanged;
@@ -59,10 +66,17 @@ namespace zvs.WPF.SceneControls
                 SceneGrid.SelectedIndex = 0;
 
             SceneGrid.Focus();
-
         }
 
-        void zvsContext_onJavaScriptCommandsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
+        private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
+        {
+            if (SceneCollection != null) 
+                SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
+            zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
+            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+        }
+
+        private void zvsContext_onJavaScriptCommandsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -83,7 +97,7 @@ namespace zvs.WPF.SceneControls
             }));
         }
 
-        void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
+        private void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -104,7 +118,7 @@ namespace zvs.WPF.SceneControls
             }));
         }
 
-        void SceneCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void SceneCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             Console.WriteLine("SceneCollection_CollectionChanged");
 
@@ -145,13 +159,6 @@ namespace zvs.WPF.SceneControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 context.SaveChanges();
             }
-        }
-
-        private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
-        {
-            if (SceneCollection != null) SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
-            zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
-            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
         }
 
         private void SortUp_Click_1(object sender, RoutedEventArgs e)
@@ -365,20 +372,20 @@ namespace zvs.WPF.SceneControls
             if (dg != null)
             {
                 DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
-                if (e.Key == Key.Delete )
+                if (e.Key == Key.Delete)
                 {
-                     e.Handled = true;
-                     if (!dgr.IsEditing)
-                     {
-                         if (dgr.Item is Scene)
-                         {
-                             var scene = (Scene)dgr.Item;
-                             if (scene != null)
-                             {
-                                 DeleteSelectedScene(scene);
-                             }
-                         }
-                     }
+                    e.Handled = true;
+                    if (!dgr.IsEditing)
+                    {
+                        if (dgr.Item is Scene)
+                        {
+                            var scene = (Scene)dgr.Item;
+                            if (scene != null)
+                            {
+                                DeleteSelectedScene(scene);
+                            }
+                        }
+                    }
                 }
             }
         }

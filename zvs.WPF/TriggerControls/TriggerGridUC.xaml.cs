@@ -28,33 +28,34 @@ namespace zvs.WPF.TriggerControls
         public TriggerGridUC()
         {
             InitializeComponent();
-        }
-
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
-        {
-            //When in a tab control this will be called twice; when main window renders and when is visible.
-            //We only care about when it is visible
-            if (this.IsVisible)
-            {
                 if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
                 {
                     context = new zvsContext();
 
                     //Load your data here and assign the result to the CollectionViewSource.
                     System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
-                    context.DeviceValueTriggers.ToList();
+                   
                     myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
-
-                    ////Load your data here and assign the result to the CollectionViewSource.
-                    //System.Windows.Data.CollectionViewSource JSTrigggerViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["JSTriggerViewSource"];
-                    //context.javascript_triggersToList();
-                    //JSTrigggerViewSource.Source = context.javascript_triggers.Local;
                 }
-                zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
-            }
         }
 
-        void zvsContext_onDeviceValueTriggersChanged(object sender, zvsContext.onEntityChangedEventArgs args)
+         ~TriggerGridUC()
+        {
+            Console.WriteLine("TriggerGridUC Deconstructed");
+        }
+
+        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            context.DeviceValueTriggers.ToList();
+            zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
+        }
+
+        private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
+        {
+            zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
+        }
+
+        private void zvsContext_onDeviceValueTriggersChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
@@ -73,14 +74,6 @@ namespace zvs.WPF.TriggerControls
                     }
                 }
             }));
-        }
-
-        private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
-        {
-            if (this.IsVisible)
-            {
-                zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
-            }
         }
 
         private void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)

@@ -31,39 +31,34 @@ namespace zvs.WPF.ScheduledTaskControls
         public ScheduledTaskCreator()
         {
             InitializeComponent();
+
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                context = new zvsContext();
+
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
+                myCollectionViewSource.Source = context.ScheduledTasks.Local;
+            }
+        }
+
+        ~ScheduledTaskCreator()
+        {
+            Console.WriteLine("ScheduledTaskCreator Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-             //When in a tab control this will be called twice; when main window renders and when is visible.
-            //We only care about when it is visible
-            if (this.IsVisible)
-            {
-                //Do not load your data at design time.
-                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-                {
-                    context = new zvsContext();
-
-                    //Load your data here and assign the result to the CollectionViewSource.
-                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
-                    myCollectionViewSource.Source = context.ScheduledTasks.Local;
-
-                    context.ScheduledTasks.ToList();
-                }
-
-                zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
-
-                if (ScheduledTaskDataGrid.Items.Count > 0)
-                    ScheduledTaskDataGrid.SelectedIndex = 0;
-            }
-        }       
+            context.ScheduledTasks.ToList();
+            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
+            
+            if (ScheduledTaskDataGrid.Items.Count > 0)
+                ScheduledTaskDataGrid.SelectedIndex = 0;
+        }
 
         private void ScheduledTaskCreator_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            if (this.IsVisible)
-            {
-                zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
-            }
+            zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
         }
 
         void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)
@@ -86,7 +81,7 @@ namespace zvs.WPF.ScheduledTaskControls
                 }
             }));
         }
-        
+
         private void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
@@ -299,7 +294,7 @@ namespace zvs.WPF.ScheduledTaskControls
             ThirtyfirstChkBx.IsChecked = false;
             context.SaveChanges();
         }
-        
+
         private void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
         {
             context.SaveChanges();
@@ -329,6 +324,6 @@ namespace zvs.WPF.ScheduledTaskControls
 
                 context.SaveChanges();
             }
-        }        
+        }
     }
 }

@@ -30,6 +30,21 @@ namespace zvs.WPF.DeviceControls
         public DeviceDataGridUC()
         {
             InitializeComponent();
+
+            // Do not load your data at design time.
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                context = new zvsContext();
+
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+                myCollectionViewSource.Source = context.Devices.Local;
+            }
+        }
+
+        ~DeviceDataGridUC()
+        {
+            Console.WriteLine("DeviceDataGridUC Deconstructed");
         }
 
         private bool _ShowMore = false;
@@ -93,25 +108,14 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            //When in a tab control this will be called twice; when main window renders and when is visible.
-            //We only care about when it is visible
-            if (this.IsVisible)
+            // Do not load your data at design time.
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                // Do not load your data at design time.
-                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-                {
-                    context = new zvsContext();
-
-                    //Load your data here and assign the result to the CollectionViewSource.
-                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                    context.Devices.ToList();
-                    myCollectionViewSource.Source = context.Devices.Local;
-                }
-
-                zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-                zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
-                zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
+                context.Devices.ToList();
             }
+            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
+            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
+            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
         }
 
         void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
@@ -185,55 +189,12 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            if (this.IsVisible)
-            {
-                zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
-                zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
-                zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
-            }
+            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
+            zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
+            zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
         }
 
         ////User Events
-
-        private void UserControl_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            //if (_MinimalistDisplay)
-            //{
-            //    ////Context Menus
-            //    if (DeviceGrid.SelectedItems.Count > 0)
-            //    {
-            //        device[] SelectedItemsCopy = new device[DeviceGrid.SelectedItems.Count];
-            //        DeviceGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
-
-            //        ContextMenu menu = new ContextMenu();
-
-            //        MenuItem delete = new MenuItem();
-            //        delete.Header = "Remove " + (DeviceGrid.SelectedItems.Count > 1 ? DeviceGrid.SelectedItems.Count + " Devices" : "Device");
-            //        delete.Click += (s, args) =>
-            //        {
-            //            if (
-            //           MessageBox.Show("Are you sure you want to delete the selected devices?",
-            //                           "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            //            {
-            //                foreach (device selectedDevice in SelectedItemsCopy)
-            //                {
-            //                    device d = context.Devices.FirstOrDefault(o => o.id == selectedDevice.id);
-            //                    if (d != null)
-            //                        context.Devices.Remove(d);
-            //                }
-
-            //                context.SaveChanges();
-            //            }
-            //        };
-
-            //        menu.Items.Add(delete);
-            //        ContextMenu = menu;
-            //    }
-            //    else
-            //        ContextMenu = null;
-            //}
-        }
-
         private void DeleteSelectedItems()
         {
             if (DeviceGrid.SelectedItems.Count > 0)

@@ -10,7 +10,7 @@
     xmlns:TriggerControl="clr-namespace:zvs.WPF.TriggerControls"
     xmlns:ScheduledTaskControls="clr-namespace:zvs.WPF.ScheduledTaskControls"
     x:Class="zvs.WPF.zvsMainWindow"
-        Title="MainWindow"  MinWidth="800" MinHeight="570" Closed="MainWindow_Closed_1" Loaded="Window_Loaded" Icon="Images/32zvsIcon.png" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1" StateChanged="Window_StateChanged_1" WindowStartupLocation="CenterScreen">
+        Title="MainWindow"  MinWidth="800" MinHeight="570" Closed="MainWindow_Closed_1" Unloaded="Window_Unloaded" Loaded="Window_Loaded" Icon="Images/32zvsIcon.png" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1" StateChanged="Window_StateChanged_1" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="{x:Type ListViewItem}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -53,8 +53,8 @@
                 <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
                 <MenuItem Header="Group Editor" Click="MenuItem_Click" />
             </MenuItem>
-            
-            
+
+
             <MenuItem Header="Tools">
                 <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
                 <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
@@ -102,6 +102,7 @@
                     <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
                 </Grid>
             </TabItem>
+
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -161,10 +162,6 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-
-
         </TabControl>
-
-
     </DockPanel>
 </Window>
