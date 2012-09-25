@@ -28,31 +28,37 @@ namespace zvs.WPF.TriggerControls
         public TriggerGridUC()
         {
             InitializeComponent();
-                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-                {
-                    context = new zvsContext();
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                context = new zvsContext();
+                
 
-                    //Load your data here and assign the result to the CollectionViewSource.
-                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
-                   
-                    myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
-                }
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
+
+                myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
+                 context.DeviceValueTriggers.ToList();
+            }
+            zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
         }
 
-         ~TriggerGridUC()
+        ~TriggerGridUC()
         {
             Console.WriteLine("TriggerGridUC Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context.DeviceValueTriggers.ToList();
-            zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
+            Window parent = Window.GetWindow(this);
+            //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
+            if (parent == null || !parent.IsActive)
+            {
+                zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
+            }
         }
 
         private void zvsContext_onDeviceValueTriggersChanged(object sender, zvsContext.onEntityChangedEventArgs args)

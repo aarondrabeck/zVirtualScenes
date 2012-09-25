@@ -41,12 +41,12 @@ namespace zvs.Processor.Logging
                         }
                         else
                         {
-                            logWatcher.Resume();
+                            //logWatcher.Resume();
                         }
                     }
                     else
                     {
-                        logWatcher.Suspend();
+                        logWatcher.Abort();
                     }
                 }
             }

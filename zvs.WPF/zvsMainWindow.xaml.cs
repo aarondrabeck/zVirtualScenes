@@ -277,7 +277,7 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportDevicesAsyc(dlg.FileName, (result) =>
+                Backup.ExportDevicesAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -296,7 +296,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportDevicesAsyn(dlg.FileName, (result) =>
+                Backup.ImportDevicesAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -318,7 +318,7 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportScenesAsyc(dlg.FileName, (result) =>
+                Backup.ExportScenesAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -337,7 +337,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportScenesAsyn(dlg.FileName, (result) =>
+                Backup.ImportScenesAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -359,7 +359,7 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportTriggerAsyc(dlg.FileName, (result) =>
+                Backup.ExportTriggerAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -378,7 +378,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportTriggersAsyn(dlg.FileName, (result) =>
+                Backup.ImportTriggersAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -400,7 +400,7 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportGroupsAsyc(dlg.FileName, (result) =>
+                Backup.ExportGroupsAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -419,7 +419,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportGroupsAsyn(dlg.FileName, (result) =>
+                Backup.ImportGroupsAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -441,7 +441,7 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportScheduledTaskAsyc(dlg.FileName, (result) =>
+                Backup.ExportScheduledTaskAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -460,7 +460,48 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportScheduledTaskAsyn(dlg.FileName, (result) =>
+                Backup.ImportScheduledTaskAsync(dlg.FileName, (result) =>
+                {
+                    log.Info(result);
+                });
+            }
+        }
+
+        private void ImportJSMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.FileName = "JSCommandsBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            bool? r = dlg.ShowDialog();
+
+            if (r ?? true)
+            {
+                Backup.ImportJavaScriptAsync(dlg.FileName, (result) =>
+                {
+                    log.Info(result);
+                });
+            }
+        }
+
+        private void ExportJSMI_Click_1(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            dlg.FileName = "JSCommandsBackup"; // Default file name
+            dlg.DefaultExt = ".zvs"; // Default file extension
+            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
+
+            // Show open file dialog box
+            bool? r = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (r ?? true)
+            {
+                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
+                Backup.ExportJavaScriptAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -480,6 +521,8 @@ namespace zvs.WPF
             jsWindow.Owner = this;
             jsWindow.ShowDialog();
         }
+
+       
 
             
     }

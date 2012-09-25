@@ -39,7 +39,10 @@ namespace zvs.WPF.ScheduledTaskControls
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
                 myCollectionViewSource.Source = context.ScheduledTasks.Local;
+
+                context.ScheduledTasks.ToList();
             }
+            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
         }
 
         ~ScheduledTaskCreator()
@@ -49,16 +52,18 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context.ScheduledTasks.ToList();
-            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
-            
             if (ScheduledTaskDataGrid.Items.Count > 0)
                 ScheduledTaskDataGrid.SelectedIndex = 0;
         }
 
         private void ScheduledTaskCreator_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
+            Window parent = Window.GetWindow(this);
+            //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
+            if (parent == null || !parent.IsActive)
+            {
+                zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
+            }
         }
 
         void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)

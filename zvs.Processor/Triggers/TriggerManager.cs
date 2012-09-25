@@ -89,7 +89,7 @@ namespace zvs.Processor.Triggers
                                     {
                                         if (dv.Value.Equals(trigger.Value))
                                         {
-                                            ActivateTriggerScene(trigger);
+                                            ActivateTrigger(context, trigger);
                                         }
                                         break;
                                     }
@@ -102,7 +102,7 @@ namespace zvs.Processor.Triggers
                                         {
                                             if (deviceValue > triggerValue)
                                             {
-                                                ActivateTriggerScene(trigger);
+                                                ActivateTrigger(context, trigger);
                                             }
                                         }
                                         else
@@ -124,7 +124,7 @@ namespace zvs.Processor.Triggers
                                         if (double.TryParse(dv.Value, out deviceValue) && double.TryParse(trigger.Value, out triggerValue))
                                         {
                                             if (deviceValue < triggerValue)
-                                                ActivateTriggerScene(trigger);
+                                                ActivateTrigger(context, trigger);
 
                                         }
                                         else
@@ -142,7 +142,7 @@ namespace zvs.Processor.Triggers
                                     {
                                         if (!dv.Value.Equals(trigger.Value))
                                         {
-                                            ActivateTriggerScene(trigger);
+                                            ActivateTrigger(context, trigger);
                                         }
                                         break;
                                     }
@@ -155,26 +155,18 @@ namespace zvs.Processor.Triggers
             bw.RunWorkerAsync();
         }
 
-        private void ActivateTriggerScene(DeviceValueTrigger trigger)
+        private void ActivateTrigger(zvsContext context, DeviceValueTrigger trigger)
         {
-            using (zvsContext context = new zvsContext())
+            TriggerBegin(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                        string.Format("Trigger '{0}' caused  '{1}'", trigger.Name, trigger.StoredCommand.ActionDescription), false));
+
+            CommandProcessor cp = new CommandProcessor(Core);
+            cp.onProcessingCommandEnd += (s, a) =>
             {
-                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
-                if (cmd != null)
-                {
-                    TriggerBegin(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
-                                string.Format("Trigger '{0}' caused  '{1}'", trigger.Name, trigger.StoredCommand.ActionDescription), false));
-
-
-                    CommandProcessor cp = new CommandProcessor(Core);
-                    cp.onProcessingCommandEnd += (s, a) =>
-                    {
-                        TriggerEnd(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
-                                string.Format("Trigger '{0}' ended.", trigger.Name), false));
-                    };
-                    cp.RunStoredCommand(context, trigger.StoredCommand);
-                }
-            }
+                TriggerEnd(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                        string.Format("Trigger '{0}' ended.", trigger.Name), false));
+            };
+            cp.RunStoredCommand(context, trigger.StoredCommand);
         }
     }
 }

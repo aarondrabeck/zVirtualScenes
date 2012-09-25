@@ -13,24 +13,24 @@ namespace zvs.Processor.Backup
     public partial class Backup
     {
         [Serializable]
-        public class BackupGroup
+        public class GroupBackup
         {
             public string Name;
-            public List<int> NodeIds = new List<int>();
+            public List<int> NodeNumbers = new List<int>();
         }       
 
-        public static void ExportGroupsAsyc(string PathFileName, Action<string> Callback)
+        public static void ExportGroupsAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupGroup> groups = new List<BackupGroup>();
+            List<GroupBackup> groups = new List<GroupBackup>();
             using (zvsContext context = new zvsContext())
             {
                 foreach (Group group in context.Groups)
                 {
-                    BackupGroup backupGroup = new BackupGroup();
+                    GroupBackup backupGroup = new GroupBackup();
                     backupGroup.Name = group.Name;
 
                     foreach (Device d in group.Devices)
-                        backupGroup.NodeIds.Add(d.NodeNumber);
+                        backupGroup.NodeNumbers.Add(d.NodeNumber);
 
                     groups.Add(backupGroup);
                 }               
@@ -40,7 +40,7 @@ namespace zvs.Processor.Backup
             try
             {
                 stream = File.Open(PathFileName, FileMode.Create);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<BackupGroup>));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<GroupBackup>));
                 xmlSerializer.Serialize(stream, groups);
                 stream.Close();
 
@@ -57,9 +57,9 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportGroupsAsyn(string PathFileName, Action<string> Callback)
+        public static void ImportGroupsAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupGroup> groups = new List<BackupGroup>();
+            List<GroupBackup> groups = new List<GroupBackup>();
             int ImportedCount = 0;
 
             FileStream myFileStream = null;
@@ -68,18 +68,18 @@ namespace zvs.Processor.Backup
                 if (File.Exists(PathFileName))
                 {
                     //Open the file written above and read values from it.       
-                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<BackupGroup>));
+                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<GroupBackup>));
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
-                    groups = (List<BackupGroup>)ScenesSerializer.Deserialize(myFileStream);                    
+                    groups = (List<GroupBackup>)ScenesSerializer.Deserialize(myFileStream);                    
 
                     using (zvsContext context = new zvsContext())
                     {
-                        foreach (BackupGroup backupGroup in groups)
+                        foreach (GroupBackup backupGroup in groups)
                         {
                             Group g = new Group();
                             g.Name = backupGroup.Name;
 
-                            foreach (int NodeID in backupGroup.NodeIds) 
+                            foreach (int NodeID in backupGroup.NodeNumbers) 
                             {
                                 Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == NodeID);
                                 if (d != null)

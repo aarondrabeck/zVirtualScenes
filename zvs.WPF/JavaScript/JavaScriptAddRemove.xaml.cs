@@ -99,6 +99,7 @@ namespace zvs.WPF.JavaScript
         {
             JavaScriptCommand jsCommand = new JavaScriptCommand();
             jsCommand.Name = "My JavaScript";
+            jsCommand.UniqueIdentifier = Guid.NewGuid().ToString();
             JavaScriptEditorWindow window = new JavaScriptEditorWindow(context, jsCommand);
             window.Owner = this;
 

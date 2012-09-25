@@ -72,9 +72,9 @@ namespace zvs.Processor
                 BuiltinCommand.AddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "TIMEDELAY",
-                    Name = "Scene Time Delay (sec)",
+                    Name = "Time Delay (sec)",
                     ArgumentType = DataType.INTEGER,
-                    Description = "Pauses a scene execution for x seconds."
+                    Description = "Pauses a execution for x seconds."
                 }, context);
 
                 BuiltinCommand.AddOrEdit(new BuiltinCommand

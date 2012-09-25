@@ -30,7 +30,6 @@ namespace zvs.WPF.DeviceControls
         public DeviceDataGridUC()
         {
             InitializeComponent();
-
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -39,7 +38,12 @@ namespace zvs.WPF.DeviceControls
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
                 myCollectionViewSource.Source = context.Devices.Local;
+                context.Devices.ToList();
             }
+
+            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
+            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
+            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
         }
 
         ~DeviceDataGridUC()
@@ -108,14 +112,6 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                context.Devices.ToList();
-            }
-            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
-            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
         }
 
         void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
@@ -189,9 +185,33 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
-            zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
-            zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
+            Window parent = Window.GetWindow(this);
+            //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
+            if (parent == null || !parent.IsActive)
+            {
+                zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
+                zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
+                zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
+            }
+        }
+
+        public static Window FindParentWindow(DependencyObject child)
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+
+            //CHeck if this is the end of the tree
+            if (parent == null) return null;
+
+            Window parentWindow = parent as Window;
+            if (parentWindow != null)
+            {
+                return parentWindow;
+            }
+            else
+            {
+                //use recursion until it reaches a Window
+                return FindParentWindow(parent);
+            }
         }
 
         ////User Events

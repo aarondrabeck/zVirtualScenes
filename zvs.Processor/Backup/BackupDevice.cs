@@ -13,23 +13,23 @@ namespace zvs.Processor.Backup
     public partial class Backup
     {
         [Serializable]
-        public class BackupDevice
+        public class DeviceBackup
         {
-            public string FreindlyName;
-            public int NodeID;
+            public string Name;
+            public int NodeNumber;
         }
 
-        public static void ExportDevicesAsyc(string PathFileName, Action<string> Callback)
+        public static void ExportDevicesAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupDevice> devices = new List<BackupDevice>();
+            List<DeviceBackup> devices = new List<DeviceBackup>();
             using (zvsContext context = new zvsContext())
             {
                 foreach (Device d in context.Devices)
                 {
-                    devices.Add(new BackupDevice()
+                    devices.Add(new DeviceBackup()
                     {
-                        NodeID = d.NodeNumber,
-                        FreindlyName = d.Name
+                        NodeNumber = d.NodeNumber,
+                        Name = d.Name
                     });
                 }
             }
@@ -38,7 +38,7 @@ namespace zvs.Processor.Backup
             try
             {
                 stream = File.Open(PathFileName, FileMode.Create);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<BackupDevice>));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<DeviceBackup>));
                 xmlSerializer.Serialize(stream, devices);
                 Callback(string.Format("Exported {0} device names to '{1}'", devices.Count, Path.GetFileName(PathFileName)));
             }
@@ -53,9 +53,9 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportDevicesAsyn(string PathFileName, Action<string> Callback)
+        public static void ImportDevicesAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupDevice> devices = new List<BackupDevice>();
+            List<DeviceBackup> devices = new List<DeviceBackup>();
             int ImportedCount = 0;
 
             FileStream myFileStream = null;
@@ -64,18 +64,18 @@ namespace zvs.Processor.Backup
                 if (File.Exists(PathFileName))
                 {
                     //Open the file written above and read values from it.       
-                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<BackupDevice>));
+                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<DeviceBackup>));
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
-                    devices = (List<BackupDevice>)ScenesSerializer.Deserialize(myFileStream);
+                    devices = (List<DeviceBackup>)ScenesSerializer.Deserialize(myFileStream);
                    
                     using (zvsContext context = new zvsContext())
                     {
                         foreach (Device d in context.Devices)
                         {
-                            BackupDevice dev = devices.FirstOrDefault(o => o.NodeID == d.NodeNumber);
+                            DeviceBackup dev = devices.FirstOrDefault(o => o.NodeNumber == d.NodeNumber);
                             if (dev != null)
                             {
-                                d.Name = dev.FreindlyName;
+                                d.Name = dev.Name;
                                 ImportedCount++;
                             }
                         }

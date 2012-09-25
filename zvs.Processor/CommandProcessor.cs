@@ -91,7 +91,7 @@ namespace zvs.Processor
             else
             {
                 ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. Command type unknown.",0));
+                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. Command type unknown.", 0));
             }
         }
 

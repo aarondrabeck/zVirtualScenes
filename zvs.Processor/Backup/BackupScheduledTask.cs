@@ -13,11 +13,11 @@ namespace zvs.Processor.Backup
     public partial class Backup
     {
         [Serializable]
-        public class BackupScheduledTask
+        public class ScheduledTaskBackup
         {
             public int? Frequency;
-            public string friendly_name;
-            public string sceneName;
+            public string Name;
+            public StoredCMDBackup StoredCommand;
             public bool isEnabled;
             public bool? RecurDay01;
             public bool? RecurDay02;
@@ -67,18 +67,17 @@ namespace zvs.Processor.Backup
             public DateTime? startTime;
         }
 
-        public static void ExportScheduledTaskAsyc(string PathFileName, Action<string> Callback)
+        public static void ExportScheduledTaskAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupScheduledTask> tasks = new List<BackupScheduledTask>();
+            List<ScheduledTaskBackup> tasks = new List<ScheduledTaskBackup>();
             using (zvsContext context = new zvsContext())
             {
                 foreach (ScheduledTask t in context.ScheduledTasks)
                 {
-                    BackupScheduledTask task = new BackupScheduledTask();
-                    //TODO: BACKUP SCRIPT
-                    //task.sceneName = t.Scene.Name;
+                    ScheduledTaskBackup task = new ScheduledTaskBackup();
+                    task.StoredCommand = (StoredCMDBackup)t.StoredCommand;
                     task.Frequency = (int)t.Frequency;
-                    task.friendly_name = t.Name;
+                    task.Name = t.Name;
                     task.isEnabled = t.isEnabled;
                     task.RecurDay01 = t.RecurDay01;
                     task.RecurDay02 = t.RecurDay02;
@@ -134,7 +133,7 @@ namespace zvs.Processor.Backup
             try
             {
                 stream = File.Open(PathFileName, FileMode.Create);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<BackupScheduledTask>));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ScheduledTaskBackup>));
                 xmlSerializer.Serialize(stream, tasks);
                 stream.Close();
                 Callback(string.Format("Exported {0} scheduled tasks to '{1}'", tasks.Count, Path.GetFileName(PathFileName)));
@@ -150,9 +149,9 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportScheduledTaskAsyn(string PathFileName, Action<string> Callback)
+        public static void ImportScheduledTaskAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupScheduledTask> tasks = new List<BackupScheduledTask>();
+            List<ScheduledTaskBackup> tasks = new List<ScheduledTaskBackup>();
             int ImportedCount = 0;
 
             FileStream myFileStream = null;
@@ -161,74 +160,68 @@ namespace zvs.Processor.Backup
                 if (File.Exists(PathFileName))
                 {
                     //Open the file written above and read values from it.       
-                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<BackupScheduledTask>));
+                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<ScheduledTaskBackup>));
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
-                    tasks = (List<BackupScheduledTask>)ScenesSerializer.Deserialize(myFileStream);
-                    
+                    tasks = (List<ScheduledTaskBackup>)ScenesSerializer.Deserialize(myFileStream);
+
                     using (zvsContext context = new zvsContext())
                     {
-                        foreach (BackupScheduledTask t in tasks)
+                        foreach (ScheduledTaskBackup t in tasks)
                         {
-                            Scene s = context.Scenes.FirstOrDefault(o => o.Name == t.sceneName);
+                            ScheduledTask task = new ScheduledTask();
+                            task.StoredCommand = StoredCMDBackup.RestoreStoredCommand(context, t.StoredCommand);
+                            task.Frequency = (TaskFrequency)t.Frequency;
+                            task.Name = t.Name;
+                            task.isEnabled = t.isEnabled;
+                            task.RecurDay01 = t.RecurDay01;
+                            task.RecurDay02 = t.RecurDay02;
+                            task.RecurDay03 = t.RecurDay03;
+                            task.RecurDay04 = t.RecurDay04;
+                            task.RecurDay05 = t.RecurDay05;
+                            task.RecurDay06 = t.RecurDay06;
+                            task.RecurDay07 = t.RecurDay07;
+                            task.RecurDay08 = t.RecurDay08;
+                            task.RecurDay09 = t.RecurDay09;
+                            task.RecurDay10 = t.RecurDay10;
+                            task.RecurDay11 = t.RecurDay11;
+                            task.RecurDay12 = t.RecurDay12;
+                            task.RecurDay13 = t.RecurDay13;
+                            task.RecurDay14 = t.RecurDay14;
+                            task.RecurDay15 = t.RecurDay15;
+                            task.RecurDay16 = t.RecurDay16;
+                            task.RecurDay17 = t.RecurDay17;
+                            task.RecurDay18 = t.RecurDay18;
+                            task.RecurDay19 = t.RecurDay19;
+                            task.RecurDay20 = t.RecurDay20;
+                            task.RecurDay21 = t.RecurDay21;
+                            task.RecurDay22 = t.RecurDay22;
+                            task.RecurDay23 = t.RecurDay23;
+                            task.RecurDay24 = t.RecurDay24;
+                            task.RecurDay25 = t.RecurDay25;
+                            task.RecurDay26 = t.RecurDay26;
+                            task.RecurDay27 = t.RecurDay27;
+                            task.RecurDay28 = t.RecurDay28;
+                            task.RecurDay29 = t.RecurDay29;
+                            task.RecurDay30 = t.RecurDay30;
+                            task.RecurDay31 = t.RecurDay31;
+                            task.RecurDayofMonth = t.RecurDayofMonth;
+                            task.RecurDays = t.RecurDays;
+                            task.RecurEven = t.RecurEven;
+                            task.RecurFriday = t.RecurFriday;
+                            task.RecurMonday = t.RecurMonday;
+                            task.RecurSaturday = t.RecurSaturday;
+                            task.RecurMonth = t.RecurMonth;
+                            task.RecurSeconds = t.RecurSeconds;
+                            task.RecurSunday = t.RecurSunday;
+                            task.RecurThursday = t.RecurThursday;
+                            task.RecurTuesday = t.RecurTuesday;
+                            task.RecurWednesday = t.RecurWednesday;
+                            task.RecurWeeks = t.RecurWeeks;
+                            task.SortOrder = t.sortOrder;
+                            task.StartTime = t.startTime;
 
-                            if (s != null)
-                            {
-                                ScheduledTask task = new ScheduledTask();
-                               //TODO:FIX
-                                task.Frequency = (TaskFrequency)t.Frequency;
-                                task.Name = t.friendly_name;
-                                task.isEnabled = t.isEnabled;
-                                task.RecurDay01 = t.RecurDay01;
-                                task.RecurDay02 = t.RecurDay02;
-                                task.RecurDay03 = t.RecurDay03;
-                                task.RecurDay04 = t.RecurDay04;
-                                task.RecurDay05 = t.RecurDay05;
-                                task.RecurDay06 = t.RecurDay06;
-                                task.RecurDay07 = t.RecurDay07;
-                                task.RecurDay08 = t.RecurDay08;
-                                task.RecurDay09 = t.RecurDay09;
-                                task.RecurDay10 = t.RecurDay10;
-                                task.RecurDay11 = t.RecurDay11;
-                                task.RecurDay12 = t.RecurDay12;
-                                task.RecurDay13 = t.RecurDay13;
-                                task.RecurDay14 = t.RecurDay14;
-                                task.RecurDay15 = t.RecurDay15;
-                                task.RecurDay16 = t.RecurDay16;
-                                task.RecurDay17 = t.RecurDay17;
-                                task.RecurDay18 = t.RecurDay18;
-                                task.RecurDay19 = t.RecurDay19;
-                                task.RecurDay20 = t.RecurDay20;
-                                task.RecurDay21 = t.RecurDay21;
-                                task.RecurDay22 = t.RecurDay22;
-                                task.RecurDay23 = t.RecurDay23;
-                                task.RecurDay24 = t.RecurDay24;
-                                task.RecurDay25 = t.RecurDay25;
-                                task.RecurDay26 = t.RecurDay26;
-                                task.RecurDay27 = t.RecurDay27;
-                                task.RecurDay28 = t.RecurDay28;
-                                task.RecurDay29 = t.RecurDay29;
-                                task.RecurDay30 = t.RecurDay30;
-                                task.RecurDay31 = t.RecurDay31;
-                                task.RecurDayofMonth = t.RecurDayofMonth;
-                                task.RecurDays = t.RecurDays;
-                                task.RecurEven = t.RecurEven;
-                                task.RecurFriday = t.RecurFriday;
-                                task.RecurMonday = t.RecurMonday;
-                                task.RecurSaturday = t.RecurSaturday;
-                                task.RecurMonth = t.RecurMonth;
-                                task.RecurSeconds = t.RecurSeconds;
-                                task.RecurSunday = t.RecurSunday;
-                                task.RecurThursday = t.RecurThursday;
-                                task.RecurTuesday = t.RecurTuesday;
-                                task.RecurWednesday = t.RecurWednesday;
-                                task.RecurWeeks = t.RecurWeeks;
-                                task.SortOrder = t.sortOrder;
-                                task.StartTime = t.startTime;
-
-                                context.ScheduledTasks.Add(task);
-                                ImportedCount++;
-
-                            }
+                            context.ScheduledTasks.Add(task);
+                            ImportedCount++;
                         }
                         context.SaveChanges();
                     }

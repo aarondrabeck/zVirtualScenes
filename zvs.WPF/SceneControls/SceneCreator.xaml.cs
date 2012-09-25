@@ -46,7 +46,12 @@ namespace zvs.WPF.SceneControls
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
                 myCollectionViewSource.Source = context.Scenes.Local;
+                context.Scenes.ToList();
+                
             }
+            SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
+            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
+            zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommandsChanged;
         }
 
         ~SceneCreator()
@@ -56,12 +61,6 @@ namespace zvs.WPF.SceneControls
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context.Scenes.ToList();
-
-            SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
-            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
-            zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommandsChanged;
-
             if (SceneGrid.Items.Count > 0)
                 SceneGrid.SelectedIndex = 0;
 
@@ -70,10 +69,15 @@ namespace zvs.WPF.SceneControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            if (SceneCollection != null) 
-                SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
-            zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
-            zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+            Window parent = Window.GetWindow(this);
+            //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
+            if (parent == null || !parent.IsActive)
+            {
+                if (SceneCollection != null)
+                    SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
+                zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
+                zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+            }
         }
 
         private void zvsContext_onJavaScriptCommandsChanged(object sender, zvsContext.onEntityChangedEventArgs args)

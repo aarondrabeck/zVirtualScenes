@@ -13,64 +13,35 @@ namespace zvs.Processor.Backup
     public partial class Backup
     {
         [Serializable]
-        public class BackupScene
+        public class SceneBackup
         {
-            public string FreindlyName;
-            public List<BackupSceneCMD> Commands = new List<BackupSceneCMD>();
-        }
-
-        public enum Command_Types
-        {
-            unknown = 0,
-            builtin = 1,
-            device_command = 2,
-            device_type_command = 3
+            public string Name;
+            public List<SceneCMDBackup> Commands = new List<SceneCMDBackup>();
         }
 
         [Serializable]
-        public class BackupSceneCMD
+        public class SceneCMDBackup
         {
-            public Command_Types CommandType;
-            public string CommandName;
-            public string CommandArg;
+            public StoredCMDBackup StoredCommand;
             public int? Order;
-            public int NodeID;
         }
 
-        public static void ExportScenesAsyc(string PathFileName, Action<string> Callback)
+        public static void ExportScenesAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupScene> scenes = new List<BackupScene>();
+            List<SceneBackup> scenes = new List<SceneBackup>();
             int CmdCount = 0;
             using (zvsContext context = new zvsContext())
             {
                 foreach (Scene s in context.Scenes)
                 {
-                    BackupScene SceneBackup = new BackupScene();
-                    SceneBackup.FreindlyName = s.Name;
+                    SceneBackup SceneBackup = new SceneBackup();
+                    SceneBackup.Name = s.Name;
 
                     foreach (SceneCommand scmd in s.Commands)
                     {
-                        BackupSceneCMD SceneCmdBackup = new BackupSceneCMD();
-                       //TODO: BACKUP SCRIPT 
-                        //SceneCmdBackup.CommandArg = scmd.Argument;
-                        //SceneCmdBackup.Order = scmd.SortOrder;
-                        //SceneCmdBackup.CommandName = scmd.Command.UniqueIdentifier;
-
-                        //if (scmd.Command is BuiltinCommand)
-                        //{
-                        //    SceneCmdBackup.CommandType = Command_Types.builtin;
-                        //}
-                        //else if (scmd.Command is DeviceTypeCommand)
-                        //{
-                        //    SceneCmdBackup.CommandType = Command_Types.device_type_command;
-                        //    SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
-                        //}
-                        //else if (scmd.Command is DeviceCommand)
-                        //{
-                        //    SceneCmdBackup.CommandType = Command_Types.device_command;
-                        //    SceneCmdBackup.NodeID = scmd.Device.NodeNumber;
-                        //}
-
+                        SceneCMDBackup SceneCmdBackup = new SceneCMDBackup();
+                        SceneCmdBackup.Order = scmd.SortOrder;
+                        SceneCmdBackup.StoredCommand = (StoredCMDBackup)scmd.StoredCommand;
                         SceneBackup.Commands.Add(SceneCmdBackup);
                         CmdCount++;
                     }
@@ -82,7 +53,7 @@ namespace zvs.Processor.Backup
             try
             {
                 stream = File.Open(PathFileName, FileMode.Create);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<BackupScene>));
+                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<SceneBackup>));
                 xmlSerializer.Serialize(stream, scenes);
                 stream.Close();
                 Callback(string.Format("Exported {0} scenes and {1} scene commands to '{2}'", scenes.Count, CmdCount, Path.GetFileName(PathFileName)));
@@ -98,9 +69,9 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportScenesAsyn(string PathFileName, Action<string> Callback)
+        public static void ImportScenesAsync(string PathFileName, Action<string> Callback)
         {
-            List<BackupScene> scenes = new List<BackupScene>();
+            List<SceneBackup> scenes = new List<SceneBackup>();
             FileStream myFileStream = null;
 
             try
@@ -108,76 +79,30 @@ namespace zvs.Processor.Backup
                 if (File.Exists(PathFileName))
                 {
                     //Open the file written above and read values from it.       
-                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<BackupScene>));
+                    XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<SceneBackup>));
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
-                    scenes = (List<BackupScene>)ScenesSerializer.Deserialize(myFileStream);
-                   
+                    scenes = (List<SceneBackup>)ScenesSerializer.Deserialize(myFileStream);
+
                     int ImportedCount = 0;
                     int ImportedCmdCount = 0;
 
                     using (zvsContext context = new zvsContext())
                     {
-                        foreach (BackupScene backupScene in scenes)
+                        foreach (SceneBackup backupScene in scenes)
                         {
                             Scene s = new Scene();
-                            s.Name = backupScene.FreindlyName;
+                            s.Name = backupScene.Name;
 
-                            foreach (BackupSceneCMD backupSceneCMD in backupScene.Commands)
+                            foreach (SceneCMDBackup backupSceneCMD in backupScene.Commands)
                             {
-                                if (backupSceneCMD.CommandType == Command_Types.builtin)
+                                StoredCommand sc = StoredCMDBackup.RestoreStoredCommand(context, backupSceneCMD.StoredCommand);
+                                if (sc != null)
                                 {
-                                    BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(o => o.UniqueIdentifier == backupSceneCMD.CommandName);
-                                    if (cmd != null)
+                                    s.Commands.Add(new SceneCommand()
                                     {
-                                        s.Commands.Add(new SceneCommand()
-                                        {
-                                            //TODO: FIX
-                                            //Argument = backupSceneCMD.CommandArg,
-                                            //Command = cmd,
-                                            SortOrder = backupSceneCMD.Order
-                                        });
-                                        ImportedCmdCount++;
-                                    }
-                                }
-                                else if (backupSceneCMD.CommandType == Command_Types.device_command)
-                                {
-                                    Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupSceneCMD.NodeID);
-                                    if (d != null)
-                                    {
-                                        DeviceCommand cmd = d.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupSceneCMD.CommandName);
-                                        if (cmd != null)
-                                        {
-                                            s.Commands.Add(new SceneCommand()
-                                            {
-                                                //TODO: FIX
-                                                //Argument = backupSceneCMD.CommandArg,
-                                                //Command = cmd,
-                                                //Device = d,
-                                                SortOrder = backupSceneCMD.Order
-                                            });
-                                            ImportedCmdCount++;
-                                        }
-                                    }
-                                }
-                                else if (backupSceneCMD.CommandType == Command_Types.device_type_command)
-                                {
-                                    Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupSceneCMD.NodeID);
-                                    if (d != null)
-                                    {
-                                        DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupSceneCMD.CommandName);
-                                        if (cmd != null)
-                                        {
-                                            s.Commands.Add(new SceneCommand()
-                                            {
-                                                //TODO: FIX
-                                                //Argument = backupSceneCMD.CommandArg,
-                                                //Command = cmd,
-                                                //Device = d,
-                                                SortOrder = backupSceneCMD.Order
-                                            });
-                                            ImportedCmdCount++;
-                                        }
-                                    }
+                                        StoredCommand = sc,
+                                        SortOrder = backupSceneCMD.Order
+                                    });
                                 }
                             }
                             context.Scenes.Add(s);

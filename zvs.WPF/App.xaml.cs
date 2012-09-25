@@ -27,7 +27,8 @@ namespace zvs.WPF
         public bool isShuttingDown = false;
         public zvsMainWindow zvsWindow = null;
         public Window firstWindow;
-        System.Threading.Mutex zvsMutex = null;
+        private System.Threading.Mutex zvsMutex = null;
+        private zvs.Processor.Logging.ILog log;
 
         [STAThread]
         public static void Main()
@@ -37,7 +38,6 @@ namespace zvs.WPF
                 var application = new App();
                 application.Init();
                 application.Run();
-
 
                 // Allow single instance code to perform cleanup operations
                 SingleInstance<App>.Cleanup();
@@ -50,9 +50,9 @@ namespace zvs.WPF
             zvs.Processor.Logging.LogManager.ConfigureLogging();
             log = zvs.Processor.Logging.LogManager.GetLogger<App>();
            
-            log.Info("Init Complete");
+            log.Info("Init Complete");            
         }
-        zvs.Processor.Logging.ILog log;
+        
         public bool SignalExternalCommandLineArgs(IList<string> args)
         {
             
@@ -88,7 +88,7 @@ namespace zvs.WPF
                             {
                                 zvsCore.Dispatcher.Invoke(new Action(() =>
                                 {
-                                    log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
+                                   log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
                                 }));
                             }
                             catch { }
@@ -152,7 +152,7 @@ namespace zvs.WPF
 
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            log.Fatal(sender.ToString(), (System.Exception)e.ExceptionObject);
+           log.Fatal(sender.ToString(), (System.Exception)e.ExceptionObject);
 
             App app = (App)Application.Current;
             string exception = GetHostDetails + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString();
@@ -187,6 +187,7 @@ namespace zvs.WPF
                     zvsWindow = null;
                     log.InfoFormat("{0} User Interface Unloaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
                     isLoading = false;
+                    
                 };
                 zvsWindow.Show();
             }
@@ -202,7 +203,9 @@ namespace zvs.WPF
                 zvsMutex.ReleaseMutex();
 
             log.Info("Shutting down");
-            log = null;
+
+            zvs.Processor.Logging.EventedLog.Enabled = false;
+
             Application.Current.Shutdown();
         }
 
