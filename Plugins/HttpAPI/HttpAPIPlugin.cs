@@ -240,6 +240,11 @@ namespace HttpAPI
             // Obtain a response object
             using (System.Net.HttpListenerResponse response = context.Response)
             {
+                //enabling CORS for HTTP clients and cross domain access
+                response.Headers.Add("Access-Control-Allow-Credentials", "true");
+                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                response.Headers.Add("Access-Control-Origin", "*");
+
                 string ip = string.Empty;
                 if (context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString(); };
 
