@@ -885,7 +885,7 @@ namespace OpenZWavePlugin
                                                         {
                                                             System.Timers.Timer t = new System.Timers.Timer();
                                                             timers.Add(d.NodeNumber, t);
-                                                            t.Interval = 2000;
+                                                            t.Interval = 3500;
                                                             t.Elapsed += (sender, e) =>
                                                             {
                                                                 m_manager.RefreshNodeInfo(m_homeId, (byte)d.NodeNumber);
