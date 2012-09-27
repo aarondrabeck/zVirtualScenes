@@ -120,7 +120,8 @@ namespace zvs.WPF
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;
-        }   
+            zvs.Processor.Logging.EventedLog.OnLogItemsCleared -= EventedLog_OnLogItemsCleared;
+        }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
