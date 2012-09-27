@@ -396,9 +396,13 @@ namespace HttpAPI
 
             //TODO: Read from the in memory logger if available
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
-            {
-                List<object> logEntries = new List<object>();
+            {                
                 return new { success = true, logentries = zvs.Processor.Logging.EventedLog.Items.OrderByDescending(o => o.Datetime).Take(30).ToArray() };
+            }
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "DELETE")
+            {
+                zvs.Processor.Logging.EventedLog.Clear();
+                return new { success = true };
             }
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")

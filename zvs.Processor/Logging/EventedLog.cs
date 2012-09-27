@@ -13,6 +13,9 @@ namespace zvs.Processor.Logging
     {
         public delegate void LogItemArrived(List<LogItem> NewItems);
         public static event LogItemArrived OnLogItemArrived;
+        public delegate void LogItemsCleared();
+        public static event LogItemsCleared OnLogItemsCleared;
+
         private static log4net.Appender.MemoryAppender logger;
         private static bool _Enabled = true;
         private static object _lock = new object();
@@ -55,6 +58,7 @@ namespace zvs.Processor.Logging
         {
             items.Clear();
             logger.Clear();
+            if (OnLogItemsCleared != null) OnLogItemsCleared();
         }
         private static Thread logWatcher;
 

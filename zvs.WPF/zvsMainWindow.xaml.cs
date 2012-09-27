@@ -50,8 +50,11 @@ namespace zvs.WPF
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
 
                 myCollectionViewSource.Source = logSource;
-            }            
+            }
+            zvs.Processor.Logging.EventedLog.OnLogItemsCleared += EventedLog_OnLogItemsCleared;
+            
         }
+
 
         void EventedLog_OnLogItemArrived(List<LogItem> NewItems)
         {
@@ -525,10 +528,13 @@ namespace zvs.WPF
         private void ClearLogsMI_Click(object sender, RoutedEventArgs e)
         {
             zvs.Processor.Logging.EventedLog.Clear();
-            logSource.Clear();
+            
         }
 
-       
+        void EventedLog_OnLogItemsCleared()
+        {
+            logSource.Clear();
+        }
 
             
     }
