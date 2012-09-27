@@ -59,6 +59,7 @@
 
             <MenuItem Header="Tools">
                 <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
+                <MenuItem Header="Clear Logs" Name="ClearLogsMI"   Click="ClearLogsMI_Click" />
                 <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                 <Separator />
                 <MenuItem Header="Plugin Manager" Click="MenuItem_Click_1" />

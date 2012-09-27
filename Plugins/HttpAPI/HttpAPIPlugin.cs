@@ -242,7 +242,7 @@ namespace HttpAPI
             {
                 //enabling CORS for HTTP clients and cross domain access
                 response.Headers.Add("Access-Control-Allow-Credentials", "true");
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                response.Headers.Add("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
                 response.Headers.Add("Access-Control-Origin", "*");
 
                 string ip = string.Empty;

@@ -522,6 +522,12 @@ namespace zvs.WPF
             jsWindow.ShowDialog();
         }
 
+        private void ClearLogsMI_Click(object sender, RoutedEventArgs e)
+        {
+            zvs.Processor.Logging.EventedLog.Clear();
+            logSource.Clear();
+        }
+
        
 
             

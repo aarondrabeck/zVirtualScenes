@@ -51,6 +51,11 @@ namespace zvs.Processor.Logging
                 }
             }
         }
+        public static void Clear()
+        {
+            items.Clear();
+            logger.Clear();
+        }
         private static Thread logWatcher;
 
         static EventedLog()
