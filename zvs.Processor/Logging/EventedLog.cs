@@ -61,6 +61,7 @@ namespace zvs.Processor.Logging
         static EventedLog()
         {
         }
+        public static List<LogItem> Items { get { return items; } }
         static List<LogItem> items = new List<LogItem>();
         public static void LogWatcher()
         {

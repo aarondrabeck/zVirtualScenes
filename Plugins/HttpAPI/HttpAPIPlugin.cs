@@ -21,6 +21,7 @@ using System.Collections.Specialized;
 using System.Net.Mime;
 using zvs.Processor;
 using zvs.Entities;
+using zvs.Processor.Logging;
 
 
 namespace HttpAPI
@@ -394,26 +395,11 @@ namespace HttpAPI
 
 
             //TODO: Read from the in memory logger if available
-            //if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
-            //{
-            //    List<object> logEntries = new List<object>();
-
-            //    foreach (LogItem entry in Core.Logger.LOG.OrderByDescending(o => o.Datetime).Take(30))
-            //    {
-            //        var LogEntry = new
-            //        {
-            //            id = Core.Logger.LOG.IndexOf(entry),
-            //            DateTime = entry.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt"),
-            //            Description = entry.Description,
-            //            Source = entry.Source,
-            //            Urgency = entry.Urgency.ToString()
-            //        };
-
-            //        logEntries.Add(LogEntry);
-            //    }
-
-            //    return new { success = true, logentries = logEntries.ToArray() };
-            //}
+            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
+            {
+                List<object> logEntries = new List<object>();
+                return new { success = true, logentries = zvs.Processor.Logging.EventedLog.Items.OrderByDescending(o => o.Datetime).Take(30).ToArray() };
+            }
 
             if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
             {
