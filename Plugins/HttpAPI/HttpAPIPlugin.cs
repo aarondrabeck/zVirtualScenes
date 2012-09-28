@@ -217,6 +217,9 @@ namespace HttpAPI
 
         public void HttpListenerCallback(IAsyncResult result)
         {
+            try
+            {
+
             HttpListener listener = (HttpListener)result.AsyncState;
             HttpListenerContext context = null;
 
@@ -284,12 +287,16 @@ namespace HttpAPI
 
                                 response.ContentType = "application/json;charset=utf-8";
                                 response.StatusCode = (int)HttpStatusCode.OK;
-                                MemoryStream stream = new MemoryStream();
-                                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toJSON(result_obj, context.Request.QueryString["callback"]));
-                                stream.Write(buffer, 0, buffer.Length);
-                                byte[] bytes = stream.ToArray();
-                                response.OutputStream.Write(bytes, 0, bytes.Length);
-                                stream.Close();
+                                using (MemoryStream stream = new MemoryStream())
+                                {
+                                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toJSON(result_obj, context.Request.QueryString["callback"]));
+                                    stream.Write(buffer, 0, buffer.Length);
+                                    byte[] bytes = stream.ToArray();
+                                    if (response.OutputStream != null && response.OutputStream.CanWrite)
+                                    {
+                                        response.OutputStream.Write(bytes, 0, bytes.Length);
+                                    }
+                                }
                                 break;
                             }
                         case "xml":
@@ -298,12 +305,16 @@ namespace HttpAPI
                                 response.StatusCode = (int)HttpStatusCode.OK;
                                 XElement xml = result_obj.ToXml();
                                 string xmlstring = xml.ToString();
-                                MemoryStream stream = new MemoryStream();
-                                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(xmlstring);
-                                stream.Write(buffer, 0, buffer.Length);
-                                byte[] bytes = stream.ToArray();
-                                response.OutputStream.Write(bytes, 0, bytes.Length);
-                                stream.Close();
+                                using (MemoryStream stream = new MemoryStream())
+                                {
+                                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(xmlstring);
+                                    stream.Write(buffer, 0, buffer.Length);
+                                    byte[] bytes = stream.ToArray();
+                                    if (response.OutputStream != null && response.OutputStream.CanWrite)
+                                    {
+                                        response.OutputStream.Write(bytes, 0, bytes.Length);
+                                    }
+                                }
                                 break;
                             }
                     }
@@ -362,10 +373,16 @@ namespace HttpAPI
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("HTTAPI ERROR: {0}", e.Message);
+                            log.Error(e);
                         }
                     }
                 }
+            }
+
+            }
+            catch (Exception e)
+            {
+                log.Fatal(e);
             }
         }
 

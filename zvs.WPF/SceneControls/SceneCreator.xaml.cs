@@ -31,7 +31,7 @@ namespace zvs.WPF.SceneControls
         private zvsContext context;
         private ObservableCollection<Scene> SceneCollection;
         private App app = (App)Application.Current;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<SceneCreator>();
         public SceneCreator()
         {
             InitializeComponent();
@@ -56,7 +56,7 @@ namespace zvs.WPF.SceneControls
 
         ~SceneCreator()
         {
-            Console.WriteLine("SceneCreator Deconstructed");
+            log.Info("SceneCreator Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
@@ -124,7 +124,7 @@ namespace zvs.WPF.SceneControls
 
         private void SceneCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            Console.WriteLine("SceneCollection_CollectionChanged");
+            log.Info("SceneCollection_CollectionChanged");
 
             //Give the new items a sort order
             if (e.NewItems != null)

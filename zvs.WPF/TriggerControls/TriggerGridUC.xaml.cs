@@ -22,6 +22,7 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerGridUC : UserControl
     {
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<TriggerGridUC>();
         private zvsContext context;
         private App app = (App)Application.Current;
 
@@ -44,7 +45,7 @@ namespace zvs.WPF.TriggerControls
 
         ~TriggerGridUC()
         {
-            Console.WriteLine("TriggerGridUC Deconstructed");
+            log.Info("TriggerGridUC Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)

@@ -27,7 +27,7 @@ namespace zvs.WPF.ScheduledTaskControls
     {
         private zvsContext context;
         private App app = (App)Application.Current;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<ScheduledTaskCreator>();
         public ScheduledTaskCreator()
         {
             InitializeComponent();
@@ -47,7 +47,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
         ~ScheduledTaskCreator()
         {
-            Console.WriteLine("ScheduledTaskCreator Deconstructed");
+            log.Info("ScheduledTaskCreator Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)

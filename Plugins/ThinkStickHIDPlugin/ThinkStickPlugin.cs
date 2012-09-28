@@ -1292,7 +1292,7 @@ namespace ThinkStickHIDPlugin
                                 //only allow each device to re-poll 1 time.
                                 if (timers.Contains(dev.NodeNumber))
                                 {
-                                    Console.WriteLine(string.Format("Timer {0} restarted.", dev.NodeNumber));
+                                    log.Info(string.Format("Timer {0} restarted.", dev.NodeNumber));
                                     System.Timers.Timer t = (System.Timers.Timer)timers[dev.NodeNumber];
                                     t.Stop();
                                     t.Start();
@@ -1306,11 +1306,11 @@ namespace ThinkStickHIDPlugin
                                     {
                                         ManuallyPollDevice(CTDimmer);
                                         t.Stop();
-                                        Console.WriteLine(string.Format("Timer {0} Elapsed.", dev.NodeNumber));
+                                        log.Info(string.Format("Timer {0} Elapsed.", dev.NodeNumber));
                                         timers.Remove(dev.NodeNumber);
                                     };
                                     t.Start();
-                                    Console.WriteLine(string.Format("Timer {0} started.", dev.NodeNumber));
+                                    log.Info(string.Format("Timer {0} started.", dev.NodeNumber));
                                 }
                             }
                         }

@@ -26,7 +26,7 @@ namespace zvs.WPF.DeviceControls
     public partial class DeviceDataGridUC : UserControl
     {
         private zvsContext context;
-
+        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<DeviceDataGridUC>();
         public DeviceDataGridUC()
         {
             InitializeComponent();
@@ -48,7 +48,7 @@ namespace zvs.WPF.DeviceControls
 
         ~DeviceDataGridUC()
         {
-            Console.WriteLine("DeviceDataGridUC Deconstructed");
+            log.Info("DeviceDataGridUC Deconstructed");
         }
 
         private bool _ShowMore = false;

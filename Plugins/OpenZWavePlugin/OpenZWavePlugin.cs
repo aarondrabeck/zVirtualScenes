@@ -876,7 +876,7 @@ namespace OpenZWavePlugin
                                                         //only allow each device to re-poll 1 time.
                                                         if (timers.Contains(d.NodeNumber))
                                                         {
-                                                            Console.WriteLine(string.Format("Timer {0} restarted.", d.DeviceId));
+                                                            log.Info(string.Format("Timer {0} restarted.", d.DeviceId));
                                                             System.Timers.Timer t = (System.Timers.Timer)timers[d.NodeNumber];
                                                             t.Stop();
                                                             t.Start();
@@ -890,11 +890,11 @@ namespace OpenZWavePlugin
                                                             {
                                                                 m_manager.RefreshNodeInfo(m_homeId, (byte)d.NodeNumber);
                                                                 t.Stop();
-                                                                Console.WriteLine(string.Format("Timer {0} Elapsed.", d.NodeNumber));
+                                                                log.Info(string.Format("Timer {0} Elapsed.", d.NodeNumber));
                                                                 timers.Remove(d.NodeNumber);
                                                             };
                                                             t.Start();
-                                                            Console.WriteLine(string.Format("Timer {0} started.", d.NodeNumber));
+                                                            log.Info(string.Format("Timer {0} started.", d.NodeNumber));
                                                         }
                                                     }
                                                 }
