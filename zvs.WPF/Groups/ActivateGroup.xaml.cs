@@ -34,6 +34,7 @@ namespace zvs.WPF.Groups
 
         ~ActivateGroup()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("ActivateGroup Deconstructed.");
         }
 

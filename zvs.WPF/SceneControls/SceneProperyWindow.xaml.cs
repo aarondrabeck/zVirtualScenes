@@ -32,6 +32,7 @@ namespace zvs.WPF.SceneControls
 
         ~ScenePropertiesWindow()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("ScenePropertiesWindow Deconstructed.");
         }
 

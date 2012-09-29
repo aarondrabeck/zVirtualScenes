@@ -16,6 +16,7 @@ using System.ComponentModel;
 
 using System.Collections.ObjectModel;
 using zvs.Entities;
+using System.Diagnostics;
 
 
 namespace zvs.WPF.DeviceControls
@@ -26,7 +27,6 @@ namespace zvs.WPF.DeviceControls
     public partial class DeviceDataGridUC : UserControl
     {
         private zvsContext context;
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<DeviceDataGridUC>();
         public DeviceDataGridUC()
         {
             InitializeComponent();
@@ -48,7 +48,8 @@ namespace zvs.WPF.DeviceControls
 
         ~DeviceDataGridUC()
         {
-            log.Info("DeviceDataGridUC Deconstructed");
+            //Cannot write to log here, it has been disposed. 
+            Debug.WriteLine("DeviceDataGridUC Deconstructed");
         }
 
         private bool _ShowMore = false;

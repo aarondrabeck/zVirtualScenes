@@ -86,7 +86,8 @@ namespace zvs.WPF
 
         ~zvsMainWindow()
         {
-            log.Info("zvsMainWindow Deconstructed.");
+            //Cannot write to log here, it has been disposed. 
+            Debug.WriteLine("zvsMainWindow Deconstructed.");
         }
 
         private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();

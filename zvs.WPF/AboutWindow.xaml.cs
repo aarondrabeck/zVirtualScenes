@@ -28,6 +28,7 @@ namespace zvs.WPF
 
         ~AboutWindow()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("AboutWindow Deconstructed.");
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,6 @@ namespace zvs.WPF.ScheduledTaskControls
     {
         private zvsContext context;
         private App app = (App)Application.Current;
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<ScheduledTaskCreator>();
         public ScheduledTaskCreator()
         {
             InitializeComponent();
@@ -47,7 +47,8 @@ namespace zvs.WPF.ScheduledTaskControls
 
         ~ScheduledTaskCreator()
         {
-            log.Info("ScheduledTaskCreator Deconstructed");
+            //Cannot write to log here, it has been disposed. 
+            Debug.WriteLine("ScheduledTaskCreator Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)

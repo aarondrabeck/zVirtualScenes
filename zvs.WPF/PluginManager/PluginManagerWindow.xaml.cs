@@ -35,6 +35,7 @@ namespace zvs.WPF.PluginManager
 
         ~PluginManagerWindow()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("PluginManagerWindow Deconstructed.");
         }
 

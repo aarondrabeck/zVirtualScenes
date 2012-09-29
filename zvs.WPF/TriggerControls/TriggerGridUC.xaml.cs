@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,6 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerGridUC : UserControl
     {
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<TriggerGridUC>();
         private zvsContext context;
         private App app = (App)Application.Current;
 
@@ -45,7 +45,8 @@ namespace zvs.WPF.TriggerControls
 
         ~TriggerGridUC()
         {
-            log.Info("TriggerGridUC Deconstructed");
+            //Cannot write to log here, it has been disposed. 
+            Debug.WriteLine("TriggerGridUC Deconstructed");
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)

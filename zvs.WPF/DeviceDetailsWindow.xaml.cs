@@ -34,6 +34,7 @@ namespace zvs.WPF
 
         ~DeviceDetailsWindow()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("DeviceDetailsWindow Deconstructed.");
         }
 

@@ -36,6 +36,7 @@ namespace zvs.WPF.JavaScript
 
         ~JavaScriptSelector()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("JavaScriptSelector Deconstructed.");
         }
 

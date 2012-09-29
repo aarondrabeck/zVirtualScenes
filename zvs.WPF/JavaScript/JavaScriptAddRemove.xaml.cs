@@ -33,6 +33,7 @@ namespace zvs.WPF.JavaScript
 
         ~JavaScriptAddRemove()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("JavaScriptAddRemove Deconstructed.");
         }
 

@@ -33,6 +33,7 @@ namespace zvs.WPF.Groups
 
         ~GroupEditor()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("GroupEditor Deconstructed.");
         }
 

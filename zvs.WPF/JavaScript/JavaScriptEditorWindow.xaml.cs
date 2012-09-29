@@ -58,6 +58,7 @@ namespace zvs.WPF.JavaScript
 
         ~JavaScriptEditorWindow()
         {
+            //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("TriggerEditorWindow Deconstructed.");
         }
 
