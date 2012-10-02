@@ -32,10 +32,10 @@ namespace HttpAPI
         public volatile bool isActive;
         bool _verbose = true;
         private Guid CookieValue;
+        private List<string> IssuedTokens = new List<string>();
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
         private int _port = 9999;
-        private bool _isCookieAuthEnabled = true;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<HttpAPIPlugin>();
         public HttpAPIPlugin()
             : base("HttpAPI",
@@ -74,15 +74,6 @@ namespace HttpAPI
                     Description = "Writes all server client communication to the log for debugging."
                 }, context);
 
-                DefineOrUpdateSetting(new PluginSetting
-                {
-                    UniqueIdentifier = "EnableAuth",
-                    Name = "Enable Authentication",
-                    Value = true.ToString(),
-                    ValueType = DataType.BOOL,
-                    Description = "WARNING: Use caution when disabling this! Not recommended!"
-                }, context);
-
                 DeviceProperty.AddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "HTTPAPI_SHOW",
@@ -102,7 +93,6 @@ namespace HttpAPI
                 }, context);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
-                bool.TryParse(GetSettingValue("EnableAuth", context), out _isCookieAuthEnabled);
                 int.TryParse(GetSettingValue("PORT", context), out _port);
             }
         }
@@ -183,10 +173,6 @@ namespace HttpAPI
                 if (this.Enabled)
                     StartHTTP();
             }
-            else if (settingUniqueIdentifier == "EnableAuth")
-            {
-                bool.TryParse(settingValue, out _isCookieAuthEnabled);
-            }
         }
 
         public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
@@ -198,6 +184,18 @@ namespace HttpAPI
         public override void ActivateGroup(int groupID) { }
 
         public override void DeactivateGroup(int groupID) { }
+
+        /// <summary>
+        /// <para>128 bytes X 8  = 1024 bits = 2^1024 key space</para>
+        /// </summary>
+        /// <returns></returns>
+        private static string GenerateRandomToken()
+        {
+            RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
+            byte[] randomBytes = new byte[128];
+            random.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
+        }
 
         private void HttpListen(object state)
         {
@@ -215,169 +213,227 @@ namespace HttpAPI
             }
         }
 
+        private bool hasVaildCookie(HttpListenerContext httpListenerContext)
+        {
+            if (httpListenerContext.Request.Cookies.Count > 0 &&
+               httpListenerContext.Request.Cookies["zvs"] != null &&
+               httpListenerContext.Request.Cookies["zvs"].Value != CookieValue.ToString())
+                return true;
+
+            return false;
+        }
+
+        private string IssueNewToken()
+        {
+            string token = GenerateRandomToken();
+            IssuedTokens.Add(token);
+            return token;
+        }
+
+        private bool hasVaildToken(HttpListenerContext httpListenerContext)
+        {
+            string UserToken = httpListenerContext.Request.Headers["zvstoken"];
+
+            if (string.IsNullOrEmpty(UserToken))
+                return false;
+
+            if (IssuedTokens.Contains(UserToken))
+                return true;
+
+            return false;
+        }
+
         public void HttpListenerCallback(IAsyncResult result)
         {
             try
             {
 
-            HttpListener listener = (HttpListener)result.AsyncState;
-            HttpListenerContext context = null;
+                HttpListener listener = (HttpListener)result.AsyncState;
+                HttpListenerContext httpListenerContext = null;
 
-            if (listener == null) return;
+                if (listener == null) return;
 
-            try
-            {
-                context = listener.EndGetContext(result);
-            }
-            catch
-            {
-                return;
-            }
-            finally
-            {
-                listenForNextRequest.Set();
-            }
-
-            if (context == null)
-                return;
-
-            // Obtain a response object
-            using (System.Net.HttpListenerResponse response = context.Response)
-            {
-                //enabling CORS for HTTP clients and cross domain access
-                response.Headers.Add("Access-Control-Allow-Credentials", "true");
-                response.Headers.Add("Access-Control-Allow-Origin", context.Request.Headers["Origin"]);
-                response.Headers.Add("Access-Control-Origin", "*");
-
-                string ip = string.Empty;
-                if (context.Request.RemoteEndPoint != null && context.Request.RemoteEndPoint.Address != null) { ip = context.Request.RemoteEndPoint.Address.ToString(); };
-
-                if (_verbose)
-                    log.Info(string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, context.Request.HttpMethod, context.Request.RawUrl, context.Request.UserAgent));
-
-                //doesnt have valid cookies 
-                if (context.Request.Cookies.Count == 0 || (context.Request.Cookies.Count > 0 && context.Request.Cookies["zvs"] != null && context.Request.Cookies["zvs"].Value != CookieValue.ToString()))
+                try
                 {
-                    bool allowed = false;
-                    if (!context.Request.RawUrl.ToLower().StartsWith("/api")) { allowed = true; }
-                    if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("login") && (context.Request.HttpMethod == "POST" || context.Request.HttpMethod == "GET")) { allowed = true; }
-                    if (context.Request.Url.Segments.Length == 3 && context.Request.Url.Segments[2].ToLower().StartsWith("logout") && context.Request.HttpMethod == "POST") { allowed = true; }
+                    httpListenerContext = listener.EndGetContext(result);
+                }
+                catch
+                {
+                    return;
+                }
+                finally
+                {
+                    listenForNextRequest.Set();
+                }
 
-                    if (!allowed && _isCookieAuthEnabled)
+                if (httpListenerContext == null)
+                    return;
+
+                // Obtain a response object
+                using (System.Net.HttpListenerResponse response = httpListenerContext.Response)
+                {
+                    //enabling CORS for HTTP clients and cross domain access
+                    response.Headers.Add("Access-Control-Allow-Credentials", "true");
+                    response.Headers.Add("Access-Control-Allow-Origin", httpListenerContext.Request.Headers["Origin"]);
+                    response.Headers.Add("Access-Control-Origin", "*");
+                    response.Headers.Add("Access-Control-Allow-Methods", "HEAD, GET, POST, PUT, DELETE, OPTIONS");
+                    response.Headers.Add("Access-Control-Max-Age", "3628800");
+                    response.Headers.Add("Access-Control-Allow-Headers", httpListenerContext.Request.Headers["Access-Control-Request-Headers"] + ", zvstoken");
+
+                    string ip = string.Empty;
+                    if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
+
+                    if (_verbose)
+                        log.Info(string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, httpListenerContext.Request.HttpMethod, httpListenerContext.Request.RawUrl, httpListenerContext.Request.UserAgent));
+
+
+                    //CORS OPTION REQUEST
+                    if (httpListenerContext.Request.HttpMethod == "OPTIONS")
                     {
-                        log.Info(string.Format("[{0}] was denied access to '{1}'", ip, context.Request.RawUrl));
-                        sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", context);
+                        sendResponse((int)HttpStatusCode.OK, "202 OK", "", httpListenerContext);
                         return;
                     }
-                }
 
-                if (context.Request.Url.Segments.Length > 2 && context.Request.Url.Segments[1].ToLower().Equals("api/"))
-                {
-                    object result_obj = GetResponse(context.Request, response);
-
-                    //Serialize depending type
-                    string RespondWith = "json";
-                    if (!string.IsNullOrEmpty(context.Request.QueryString["type"]) && context.Request.QueryString["type"].Trim().ToLower() == "xml")
-                        RespondWith = "xml";
-
-                    switch (RespondWith)
+                    if (!hasVaildToken(httpListenerContext) && !hasVaildCookie(httpListenerContext))
                     {
-                        case "json":
-                            {
+                        //If a user does not have a token or cookie, only allow certain things....
+                        bool allowed = false;
 
-                                response.ContentType = "application/json;charset=utf-8";
-                                response.StatusCode = (int)HttpStatusCode.OK;
-                                using (MemoryStream stream = new MemoryStream())
-                                {
-                                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toJSON(result_obj, context.Request.QueryString["callback"]));
-                                    stream.Write(buffer, 0, buffer.Length);
-                                    byte[] bytes = stream.ToArray();
-                                    if (response.OutputStream != null && response.OutputStream.CanWrite)
-                                    {
-                                        response.OutputStream.Write(bytes, 0, bytes.Length);
-                                    }
-                                }
-                                break;
-                            }
-                        case "xml":
-                            {
-                                response.ContentType = "text/xml;charset=utf-8";
-                                response.StatusCode = (int)HttpStatusCode.OK;
-                                XElement xml = result_obj.ToXml();
-                                string xmlstring = xml.ToString();
-                                using (MemoryStream stream = new MemoryStream())
-                                {
-                                    byte[] buffer = System.Text.Encoding.UTF8.GetBytes(xmlstring);
-                                    stream.Write(buffer, 0, buffer.Length);
-                                    byte[] bytes = stream.ToArray();
-                                    if (response.OutputStream != null && response.OutputStream.CanWrite)
-                                    {
-                                        response.OutputStream.Write(bytes, 0, bytes.Length);
-                                    }
-                                }
-                                break;
-                            }
+                        if (!httpListenerContext.Request.RawUrl.ToLower().StartsWith("/api"))
+                        {
+                            allowed = true;
+                        }
+
+                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
+                            && (httpListenerContext.Request.HttpMethod == "POST" ||
+                            httpListenerContext.Request.HttpMethod == "GET"))
+                        {
+                            allowed = true;
+                        }
+
+                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") &&
+                            httpListenerContext.Request.HttpMethod == "POST")
+                        {
+                            allowed = true;
+                        }
+
+                        if (!allowed)
+                        {
+                            log.Info(string.Format("[{0}] was denied access to '{1}'", ip, httpListenerContext.Request.RawUrl));
+                            sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", httpListenerContext);
+                            return;
+                        }
                     }
-                }
-                else
-                {
-                    string htdocs_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"plugins\htdocs");
 
-                    string relative_file_path = context.Request.Url.LocalPath.Replace("/", @"\");
-                    if (context.Request.RawUrl.Equals("/"))
-                        relative_file_path = @"\index.htm";
-
-                    FileInfo f = new FileInfo(htdocs_path + relative_file_path);
-
-                    if (!f.Exists)
+                    if (httpListenerContext.Request.Url.Segments.Length > 2 && httpListenerContext.Request.Url.Segments[1].ToLower().Equals("api/"))
                     {
-                        sendResponse((int)HttpStatusCode.NotFound, "404 Not Found", "The resource requested does not exist.", context);
+                        object result_obj = GetResponse(httpListenerContext);
+
+                        //Serialize depending type
+                        string RespondWith = "json";
+                        if (!string.IsNullOrEmpty(httpListenerContext.Request.QueryString["type"]) && httpListenerContext.Request.QueryString["type"].Trim().ToLower() == "xml")
+                            RespondWith = "xml";
+
+                        switch (RespondWith)
+                        {
+                            case "json":
+                                {
+
+                                    response.ContentType = "application/json;charset=utf-8";
+                                    response.StatusCode = (int)HttpStatusCode.OK;
+                                    using (MemoryStream stream = new MemoryStream())
+                                    {
+                                        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(toJSON(result_obj, httpListenerContext.Request.QueryString["callback"]));
+                                        stream.Write(buffer, 0, buffer.Length);
+                                        byte[] bytes = stream.ToArray();
+                                        if (response.OutputStream != null && response.OutputStream.CanWrite)
+                                        {
+                                            response.OutputStream.Write(bytes, 0, bytes.Length);
+                                        }
+                                    }
+                                    break;
+                                }
+                            case "xml":
+                                {
+                                    response.ContentType = "text/xml;charset=utf-8";
+                                    response.StatusCode = (int)HttpStatusCode.OK;
+                                    XElement xml = result_obj.ToXml();
+                                    string xmlstring = xml.ToString();
+                                    using (MemoryStream stream = new MemoryStream())
+                                    {
+                                        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(xmlstring);
+                                        stream.Write(buffer, 0, buffer.Length);
+                                        byte[] bytes = stream.ToArray();
+                                        if (response.OutputStream != null && response.OutputStream.CanWrite)
+                                        {
+                                            response.OutputStream.Write(bytes, 0, bytes.Length);
+                                        }
+                                    }
+                                    break;
+                                }
+                        }
                     }
                     else
                     {
-                        string contentType = string.Empty;
-                        response.StatusCode = (int)HttpStatusCode.OK;
-                        switch (f.Extension.ToLower())
+                        string htdocs_path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"plugins\htdocs");
+
+                        string relative_file_path = httpListenerContext.Request.Url.LocalPath.Replace("/", @"\");
+                        if (httpListenerContext.Request.RawUrl.Equals("/"))
+                            relative_file_path = @"\index.htm";
+
+                        FileInfo f = new FileInfo(htdocs_path + relative_file_path);
+
+                        if (!f.Exists)
                         {
-                            case ".js": contentType = "application/javascript"; break;
-                            case ".css": contentType = "text/css"; break;
-                            case ".manifest": contentType = "text/cache-manifest"; break;
-
-                            //images
-                            case ".gif": contentType = MediaTypeNames.Image.Gif; break;
-                            case ".jpg":
-                            case ".jpeg": contentType = MediaTypeNames.Image.Jpeg; break;
-                            case ".tiff": contentType = MediaTypeNames.Image.Tiff; break;
-                            case ".png": contentType = "image/png"; break;
-                            case ".ico": contentType = "image/ico"; break;
-
-                            // application
-                            case ".pdf": contentType = MediaTypeNames.Application.Pdf; break;
-                            case ".zip": contentType = MediaTypeNames.Application.Zip; break;
-
-                            // text
-                            case ".htm":
-                            case ".html": contentType = MediaTypeNames.Text.Html; break;
-                            case ".txt": contentType = MediaTypeNames.Text.Plain; break;
-                            case ".xml": contentType = MediaTypeNames.Text.Xml; break;
-                            default: contentType = MediaTypeNames.Application.Octet; break;
+                            sendResponse((int)HttpStatusCode.NotFound, "404 Not Found", "The resource requested does not exist.", httpListenerContext);
                         }
+                        else
+                        {
+                            string contentType = string.Empty;
+                            response.StatusCode = (int)HttpStatusCode.OK;
+                            switch (f.Extension.ToLower())
+                            {
+                                case ".js": contentType = "application/javascript"; break;
+                                case ".css": contentType = "text/css"; break;
+                                case ".manifest": contentType = "text/cache-manifest"; break;
 
-                        response.ContentType = contentType;
-                        byte[] buffer = File.ReadAllBytes(f.ToString());
-                        response.ContentLength64 = buffer.Length;
-                        try
-                        {
-                            using (var s = response.OutputStream)
-                                s.Write(buffer, 0, buffer.Length);
-                        }
-                        catch (Exception e)
-                        {
-                            log.Error(e);
+                                //images
+                                case ".gif": contentType = MediaTypeNames.Image.Gif; break;
+                                case ".jpg":
+                                case ".jpeg": contentType = MediaTypeNames.Image.Jpeg; break;
+                                case ".tiff": contentType = MediaTypeNames.Image.Tiff; break;
+                                case ".png": contentType = "image/png"; break;
+                                case ".ico": contentType = "image/ico"; break;
+
+                                // application
+                                case ".pdf": contentType = MediaTypeNames.Application.Pdf; break;
+                                case ".zip": contentType = MediaTypeNames.Application.Zip; break;
+
+                                // text
+                                case ".htm":
+                                case ".html": contentType = MediaTypeNames.Text.Html; break;
+                                case ".txt": contentType = MediaTypeNames.Text.Plain; break;
+                                case ".xml": contentType = MediaTypeNames.Text.Xml; break;
+                                default: contentType = MediaTypeNames.Application.Octet; break;
+                            }
+
+                            response.ContentType = contentType;
+                            byte[] buffer = File.ReadAllBytes(f.ToString());
+                            response.ContentLength64 = buffer.Length;
+                            try
+                            {
+                                using (var s = response.OutputStream)
+                                    s.Write(buffer, 0, buffer.Length);
+                            }
+                            catch (Exception e)
+                            {
+                                log.Error(e);
+                            }
                         }
                     }
                 }
-            }
 
             }
             catch (Exception e)
@@ -397,7 +453,6 @@ namespace HttpAPI
 
             byte[] headerData = System.Text.Encoding.ASCII.GetBytes(data.ToString());
 
-            context.Response.ContentType = "text/html";
             context.Response.StatusCode = statusCode;
 
             //context.Response.AddHeader("Content-Length: ", headerData.Length.ToString());
@@ -405,24 +460,24 @@ namespace HttpAPI
             context.Response.Close();
         }
 
-        private object GetResponse(HttpListenerRequest request, HttpListenerResponse response)
+        private object GetResponse(HttpListenerContext httpListenerContext)
         {
             string ip = string.Empty;
-            if (request.RemoteEndPoint != null && request.RemoteEndPoint.Address != null) { ip = request.RemoteEndPoint.Address.ToString(); };
+            if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
 
 
             //TODO: Read from the in memory logger if available
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "GET")
-            {                
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logentries") && httpListenerContext.Request.HttpMethod == "GET")
+            {
                 return new { success = true, logentries = zvs.Processor.Logging.EventedLog.Items.OrderByDescending(o => o.Datetime).Take(30).ToArray() };
             }
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logentries") && request.HttpMethod == "DELETE")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logentries") && httpListenerContext.Request.HttpMethod == "DELETE")
             {
                 zvs.Processor.Logging.EventedLog.Clear();
                 return new { success = true };
             }
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("devices") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("devices") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
                 using (zvsContext context = new zvsContext())
@@ -452,10 +507,10 @@ namespace HttpAPI
                 return new { success = true, devices = devices.ToArray() };
             }
 
-            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("device/") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 int id = 0;
-                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsContext context = new zvsContext())
@@ -508,10 +563,10 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") && request.Url.Segments[4].ToLower().StartsWith("values") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 5 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") && httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("values") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 int id = 0;
-                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsContext context = new zvsContext())
@@ -544,7 +599,7 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("scenes") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("scenes") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 using (zvsContext context = new zvsContext())
                 {
@@ -571,10 +626,10 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("scene/") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 int sID = 0;
-                int.TryParse(request.Url.Segments[3], out sID);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3], out sID);
 
                 using (zvsContext context = new zvsContext())
                 {
@@ -607,12 +662,12 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("scene/") && request.HttpMethod == "POST")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("scene/") && httpListenerContext.Request.HttpMethod == "POST")
             {
-                NameValueCollection postData = GetPostData(request);
+                NameValueCollection postData = GetPostData(httpListenerContext.Request);
 
                 int sID = 0;
-                int.TryParse(request.Url.Segments[3], out sID);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3], out sID);
 
                 bool is_running = false;
                 bool.TryParse(postData["is_running"], out is_running);
@@ -648,7 +703,7 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("groups") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("groups") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 using (zvsContext db = new zvsContext())
                 {
@@ -664,11 +719,11 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 4 && request.Url.Segments[2].ToLower().Equals("group/") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("group/") && httpListenerContext.Request.HttpMethod == "GET")
             {
 
                 int gID = 0;
-                int.TryParse(request.Url.Segments[3], out gID);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3], out gID);
 
                 using (zvsContext db = new zvsContext())
                 {
@@ -699,11 +754,11 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 5 && request.Url.Segments[2].ToLower().Equals("device/") &&
-                request.Url.Segments[4].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 5 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
+                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("commands") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 int id = 0;
-                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsContext db = new zvsContext())
@@ -745,17 +800,17 @@ namespace HttpAPI
                 }
             }
 
-            if ((request.Url.Segments.Length == 5 || request.Url.Segments.Length == 6) && request.Url.Segments[2].ToLower().Equals("device/") &&
-                request.Url.Segments[4].ToLower().StartsWith("command") && request.HttpMethod == "POST")
+            if ((httpListenerContext.Request.Url.Segments.Length == 5 || httpListenerContext.Request.Url.Segments.Length == 6) && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
+                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("command") && httpListenerContext.Request.HttpMethod == "POST")
             {
-                NameValueCollection postData = GetPostData(request);
+                NameValueCollection postData = GetPostData(httpListenerContext.Request);
 
                 int c_id = 0;
-                if (request.Url.Segments.Length == 6)
-                    int.TryParse(request.Url.Segments[5].Replace("/", ""), out c_id);
+                if (httpListenerContext.Request.Url.Segments.Length == 6)
+                    int.TryParse(httpListenerContext.Request.Url.Segments[5].Replace("/", ""), out c_id);
 
                 int id = 0;
-                int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
                     using (zvsContext context = new zvsContext())
@@ -828,7 +883,7 @@ namespace HttpAPI
 
             //TODO: add search for commands per device ID.
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("commands") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("commands") && httpListenerContext.Request.HttpMethod == "GET")
             {
                 List<object> bi_commands = new List<object>();
                 using (zvsContext context = new zvsContext())
@@ -847,16 +902,16 @@ namespace HttpAPI
                 }
             }
 
-            if ((request.Url.Segments.Length == 3 || request.Url.Segments.Length == 4) && request.Url.Segments[2].ToLower().StartsWith("command") && request.HttpMethod == "POST")
+            if ((httpListenerContext.Request.Url.Segments.Length == 3 || httpListenerContext.Request.Url.Segments.Length == 4) && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("command") && httpListenerContext.Request.HttpMethod == "POST")
             {
-                NameValueCollection postData = GetPostData(request);
+                NameValueCollection postData = GetPostData(httpListenerContext.Request);
                 string arg = postData["arg"];
                 string cmdUniqId = postData["name"];
                 string Name = postData["friendlyname"];
 
                 int id = 0;
-                if (request.Url.Segments.Length == 4)
-                    int.TryParse(request.Url.Segments[3].Replace("/", ""), out id);
+                if (httpListenerContext.Request.Url.Segments.Length == 4)
+                    int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
 
                 using (zvsContext context = new zvsContext())
                 {
@@ -879,50 +934,55 @@ namespace HttpAPI
                 }
             }
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("logout") && request.HttpMethod == "POST")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") && httpListenerContext.Request.HttpMethod == "POST")
             {
                 log.Info(string.Format("[{0}] Logged out.", ip));
                 Cookie c = new Cookie("zvs", "No Access");
                 c.Expires = DateTime.Today.AddDays(-5);
                 c.Domain = "";
                 c.Path = "/";
-                response.Cookies.Add(c);
+                httpListenerContext.Response.Cookies.Add(c);
 
                 return new { success = true, isLoggedIn = false };
             }
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login") && httpListenerContext.Request.HttpMethod == "GET")
             {
-                bool isLoggedin = false;
+                bool isLoggedin;
 
-                if (_isCookieAuthEnabled)
-                    isLoggedin = (request.Cookies.Count > 0 && request.Cookies["zvs"] != null && request.Cookies["zvs"].Value == CookieValue.ToString());
-                else
+                if (hasVaildCookie(httpListenerContext) || hasVaildToken(httpListenerContext))
                     isLoggedin = true;
+                else
+                    isLoggedin = false;
 
                 return new { success = true, isLoggedIn = isLoggedin };
             }
 
-            if (request.Url.Segments.Length == 3 && request.Url.Segments[2].ToLower().StartsWith("login") && request.HttpMethod == "POST")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login") && httpListenerContext.Request.HttpMethod == "POST")
             {
-                NameValueCollection postData = GetPostData(request);
+                NameValueCollection postData = GetPostData(httpListenerContext.Request);
                 using (zvsContext context = new zvsContext())
                 {
                     if (postData["password"] == GetSettingValue("PASSWORD", context))
                     {
+                        Uri orgin = new Uri(httpListenerContext.Request.Headers["Origin"]);
+
                         Cookie c = new Cookie("zvs", CookieValue.ToString());
                         c.Expires = DateTime.Today.AddDays(5);
-                        c.Domain = "";
+                        c.Domain = "";// httpListenerContext.Request.Headers["Host"]; //orgin.Authority;
                         c.Path = "/";
-                        response.Cookies.Add(c);
+                        httpListenerContext.Response.Cookies.Add(c);
 
-                        log.Info(string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, request.UserAgent));
+                        //Create a token 
+                        string token = IssueNewToken();
+                        httpListenerContext.Response.Headers.Add("zvstoken", token);
+                        log.Info(string.Format("[{0}] Login succeeded. UserAgent '{1}'", ip, httpListenerContext.Request.UserAgent));
 
-                        return new { success = true };
+                        return new { success = true, zvstoken = token };
                     }
                     else
                     {
-                        log.Info(string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], request.UserAgent));
+                        log.Info(string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], httpListenerContext.Request.UserAgent));
                         return new { success = false };
                     }
                 }

@@ -3,22 +3,23 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "zvsMobile", "Plugins\HttpAPI\zvsMobile\", "{70D227B3-E2F1-4CAC-ABDD-DD711F4DFFC6}"
 	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/zvsMobile"
 		Debug.AspNetCompiler.PhysicalPath = "Plugins\HttpAPI\zvsMobile\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\zvsMobile\"
 		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.VirtualPath = "/zvsMobile"
-		Release.AspNetCompiler.Debug = "False"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/zvsMobile"
 		Release.AspNetCompiler.PhysicalPath = "Plugins\HttpAPI\zvsMobile\"
 		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\zvsMobile\"
 		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.VirtualPath = "/zvsMobile"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "3171"
+		VWDVirtualPath = "/"
 	EndProjectSection
 EndProject
 Global

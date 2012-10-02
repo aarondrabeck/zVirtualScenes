@@ -4,7 +4,7 @@ Ext.define('zvsMobile.view.SceneList', {
     xtype: 'SceneList',
     config: {
         cls: 'SceneListItem',
-        store: SceneStore,
+        store: 'Scenes',
         scrollable: 'vertical',
         ui: 'round',
         scrollToTopOnRefresh: false,

@@ -3,18 +3,7 @@
     xtype: 'SettingsViewPort',
     requires: ['zvsMobile.view.SettingsLogIn',
                    'zvsMobile.view.SettingsLogOut'],
-    initialize: function () {
-        this.callParent(arguments);
-        this.getEventDispatcher().addListener('element', '#SettingsViewPort', 'swipe', this.onTouchPadEvent, this);
-    },
-    onTouchPadEvent: function (e, target, options, eventController) {
-        if (e.direction === 'right' && e.distance > 50 && zvsMobile.tabPanel.getTabBar().getComponent(2)._disabled != true) {
-            zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(2));
-        }
-    },
-
     constructor: function (config) {
-        
         Ext.apply(config || {}, {
             items: [
                     {
@@ -39,10 +28,12 @@
                                 zvsMobile.tabPanel.getTabBar().getComponent(3).setDisabled(false);
 
                                 //Get data
-                                DeviceStore.load();
-                                SceneStore.load();
-                                GroupStore.load();
-                                LogEntryStore.load();
+
+                                Ext.getStore('Devices').load();
+                                Ext.getStore('Scenes').load();
+                                Ext.getStore('Groups').load();
+                                Ext.getStore('LogEntries').load();
+
 
                                 //Change view to the device list
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(0));
@@ -60,6 +51,24 @@
                         xtype: 'LogOut',
                         listeners: {
                             loggedOut: function () {
+                                //Load the settings
+                                appSettingsStore = Ext.getStore('appSettingsStore');
+                                appSettingsStore.load();
+
+                                //SET URL FROM LOCAL STORAGE
+                                var BaseURLRecord = appSettingsStore.findRecord('SettingName', 'BaseURL');
+                                if (BaseURLRecord != null) {
+                                    var APIURL_textfield = Ext.getCmp('APIURL_textfield');
+                                    APIURL_textfield.setValue(BaseURLRecord.get('Value'));
+                                }
+
+                                //SET PASSWORD
+                                var Password = appSettingsStore.findRecord('SettingName', 'Password');
+                                if (Password != null) {
+                                    var passwordTxtBox = Ext.getCmp('loginPanel_password');
+                                    passwordTxtBox.setValue(Password.get('Value'));
+                                }
+
                                 //activate the login screen and disable all the tabs...
                                 var logInPanel = Ext.getCmp('SettingsViewPort').items.items[1];
                                 Ext.getCmp('SettingsViewPort').setActiveItem(logInPanel);
@@ -69,10 +78,15 @@
                                 zvsMobile.tabPanel.getTabBar().getComponent(3).setDisabled(true);
 
                                 zvsMobile.tabPanel.getTabBar().getComponent(0).fireEvent('tap', zvsMobile.tabPanel.getTabBar().getComponent(4));
+                            },
+                            attemptAutoLogin: function () {
+                                console.log("AUTOLOGIN");
+                                var submitButton = Ext.getCmp('submitButton');
+                                submitButton._handler.call(submitButton.scope, submitButton, Ext.EventObject());
+
                             }
                         }
-                    }
-                    ],
+                    }],
             listeners: {
                 activate: function () {
                     if (zvsMobile.app.BaseURL() != '') {
@@ -81,6 +95,9 @@
                             method: 'GET',
                             params: {
                                 u: Math.random()
+                            },
+                            headers: {
+                                'zvstoken': zvsMobile.app.getToken()
                             },
                             success: function (response, opts) {
 
@@ -114,3 +131,4 @@
                 layout: 'card'
             }
 });
+

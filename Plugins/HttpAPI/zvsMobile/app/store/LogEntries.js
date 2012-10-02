@@ -6,10 +6,6 @@
 	}
 });
 
-LogEntryStore = Ext.create('zvsMobile.store.LogEntries', {
-    id: 'LogEntryStore',
-    requires: ['zvsMobile.store.LogEntries']
-});
 
 
 

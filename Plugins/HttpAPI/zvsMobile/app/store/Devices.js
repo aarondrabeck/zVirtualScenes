@@ -6,10 +6,6 @@
     }
 });
 
-var DeviceStore = Ext.create('zvsMobile.store.Devices', {
-    id: 'DeviceStore',
-    requires: ['zvsMobile.store.Devices']
-});
 
 
 

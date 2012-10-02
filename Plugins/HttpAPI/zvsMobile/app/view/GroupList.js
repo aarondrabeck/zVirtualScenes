@@ -4,7 +4,7 @@ Ext.define('zvsMobile.view.GroupList', {
     xtype: 'GroupList',
     config: {
         cls: 'GroupList',
-        store: GroupStore,
+        store: 'Groups',
         scrollable: 'vertical',
         ui: 'round',
         scrollToTopOnRefresh: false,

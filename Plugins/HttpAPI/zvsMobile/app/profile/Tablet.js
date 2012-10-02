@@ -18,11 +18,13 @@ Ext.define('zvsMobile.profile.Tablet', {
 
             //see if they are logged in 
             Ext.Ajax.request({
-                
                 url: zvsMobile.app.BaseURL() + '/login',
                 method: 'GET',
                 params: {
                     u: Math.random()
+                },
+                headers: {
+                    'zvstoken': zvsMobile.app.getToken()
                 },
                 success: function (response, opts) {
                     if (response.responseText != '') {
@@ -32,9 +34,11 @@ Ext.define('zvsMobile.profile.Tablet', {
                             zvsMobile.app.SetStoreProxys();
                             var settings = Ext.getCmp('SettingsViewPort');//zvsMobile.tabPanel.items.items[4];
                             settings.items.items[1].fireEvent('loggedIn');
+                           
                         }
                         else {
                             zvsMobile.app.fireEvent('ShowLoginScreen');
+                           
                         }
                     }
                     else {

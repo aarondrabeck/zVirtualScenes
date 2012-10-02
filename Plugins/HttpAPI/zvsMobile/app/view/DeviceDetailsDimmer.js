@@ -1,6 +1,6 @@
 Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
     extend: 'Ext.Panel',
-    requires: ['Ext.field.Slider', 'Ext.data.proxy.JsonP'],
+    requires: ['Ext.field.Slider'],
     xtype: 'DeviceDetailsDimmer',
 
     constructor: function (config) {
@@ -11,7 +11,9 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
             xtype: 'panel',
             layout: 'vbox',
             scrollable: 'vertical',
-            items: [{
+            items: [
+
+                {
                 xtype: 'panel',
                 id: 'dimmerDetailsTPL',
                 tpl: new Ext.XTemplate(
@@ -54,6 +56,9 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                                 Ext.Ajax.request({
                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                     method: 'POST',
+                                    headers: {
+                                        'zvstoken': zvsMobile.app.getToken()
+                                    },
                                     params: {
                                         u: Math.random(),
                                         name: cmd,
@@ -86,6 +91,9 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                     Ext.Ajax.request({
                         url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
+                        headers: {
+                            'zvstoken': zvsMobile.app.getToken()
+                        },
                         params: {
                             u: Math.random(),
                             name: 'REPOLL_ME',
@@ -113,7 +121,7 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
                 }
             }
         });
-        this.callOverridden([config]);
+        this.callSuper([config]);
     },
     delayedReload: function () {
         var self = this;
@@ -134,17 +142,23 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
         //Get Device Details			
         console.log('AJAX: GetDeviceDetails');
 
-        Ext.data.JsonP.request({
+        Ext.Ajax.request({
             url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
-            callbackKey: 'callback',
+            method: 'GET',
             params: {
                 u: Math.random()
             },
-            success: function (result) {
-                //Send data to panel TPL                            
-                detailsTPL.setData(result.details);
-                //Update meter levels 
-                self.UpdateLevel(result.details.level);
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
+            },
+            success: function (response) {
+                var result = JSON.parse(response.responseText);
+                if (result.success) {
+                    //Send data to panel TPL                            
+                    detailsTPL.setData(result.details);
+                    //Update meter levels 
+                    self.UpdateLevel(result.details.level);
+                }
             }
         });
     },
@@ -172,7 +186,7 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
         detailsTPL.setData(data);
 
         //Update the store 
-        data = DeviceStore.data.items;
+        data = Ext.getStore('Devices').data.items;
         for (i = 0, len = data.length; i < len; i++) {
             if (data[i].data.id === detailsTPL._data.id) {
 
@@ -191,7 +205,7 @@ Ext.define('zvsMobile.view.DeviceDetailsDimmer', {
 
             }
         }
-        DeviceStore.add(data);
+        Ext.getStore('Devices').add(data);
 
         //Refresh the DEvice list
         Ext.getCmp('DeviceList').refresh();

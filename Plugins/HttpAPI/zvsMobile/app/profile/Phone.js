@@ -20,14 +20,15 @@ Ext.define('zvsMobile.profile.Phone', {
         zvsMobile.tabPanel = Ext.create('zvsMobile.view.phone.Main');
 
         if (zvsMobile.app.BaseURL() != '') {
-
-            zvsMobile.app.SetStoreProxys();
             //see if they are logged in 
             Ext.Ajax.request({
                 url: zvsMobile.app.BaseURL() + '/login',
                 method: 'GET',
                 params: {
                     u: Math.random()
+                },
+                headers: {
+                    'zvstoken': zvsMobile.app.getToken()
                 },
                 success: function (response, opts) {
                     if (response.responseText != '') {

@@ -4,7 +4,7 @@ Ext.define('zvsMobile.view.DeviceList', {
     xtype: 'DeviceList',
     config: {
         cls: 'DeviceListItem',
-        store: DeviceStore,
+        store: 'Devices',
         scrollable: 'vertical',
         ui: 'round',
         scrollToTopOnRefresh: false,

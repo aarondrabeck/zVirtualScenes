@@ -1,7 +1,6 @@
 ﻿Ext.define('zvsMobile.view.SettingsLogOut', {
         extend: 'Ext.Panel',
         xtype: 'LogOut',
-
         constructor: function (config) {
             var self = this;
             Ext.apply(config || {}, {
@@ -24,10 +23,27 @@
                                 params: {
                                     u: Math.random()
                                 },
+                                headers: {
+                                    'zvstoken': zvsMobile.app.getToken()
+                                },
                                 success: function (response, opts) {
                                     var result = JSON.parse(response.responseText);
                                     if (result.success) {
+
+                                        //Set token in local storage to null
+                                        appSettingsStore = Ext.getStore('appSettingsStore');
+                                        var tokenRecord = appSettingsStore.findRecord('SettingName', 'zvstoken');
+                                        if (tokenRecord != null) {
+                                            tokenRecord.set('Value', null);
+                                            appSettingsStore.sync();
+                                        }
+                                        else {
+                                            appSettingsStore.add({ SettingName: 'zvstoken', Value: null });
+                                            appSettingsStore.sync();
+                                        }
+
                                         self.fireEvent('loggedOut');
+                                       
                                     }
                                     else {
                                         Ext.Msg.alert('Logout failed.', 'Please try again.');

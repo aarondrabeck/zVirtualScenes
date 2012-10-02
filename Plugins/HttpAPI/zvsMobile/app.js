@@ -1,13 +1,20 @@
+//<debug>
+Ext.Loader.setPath({
+    'Ext': 'touch/src',
+    'zvsMobile': 'app'
+});
+
 Ext.application({
     name: 'zvsMobile',
 
     requires: [
-        'Ext.MessageBox'
+        'Ext.MessageBox','zvsMobile.store.Settings'
     ],
 
-    profiles: ['Phone', 'Tablet'],
-    stores: ['Settings', 'Devices', 'Groups', 'Scenes', 'LogEntries'],
+    
+    profiles: ['Phone', 'Tablet'],    
     views: ['SettingsViewPort', 'LogViewPort'],
+    stores: ['Settings', 'Devices', 'Groups', 'Scenes', 'LogEntries'],
 
     icon: {
         '57': 'resources/icons/Icon.png',
@@ -31,7 +38,18 @@ Ext.application({
         ShowLoginScreen: function () {
             var settings = Ext.getCmp('SettingsViewPort');//  zvsMobile.tabPanel.items.items[5];
             settings.items.items[2].fireEvent('loggedOut');
+            settings.items.items[2].fireEvent('attemptAutoLogin');
+        }
+    },
+    getToken: function () {
+        appSettingsStore = Ext.getStore('appSettingsStore');
 
+        var tokenRecord = appSettingsStore.findRecord('SettingName', 'zvstoken');
+        if (tokenRecord === null) {
+            return ''; //TODO: Redirect to login screen here
+        }
+        else {
+            return tokenRecord.data.Value;
         }
     },
     BaseURL: function () {
@@ -46,10 +64,13 @@ Ext.application({
         }
     },
     SetStoreProxys: function () {
-        DeviceStore = Ext.getStore('DeviceStore');
+        DeviceStore = Ext.getStore('Devices');
         DeviceStore.setProxy({
-            type: 'jsonp',
+            type: 'ajax',
             url: zvsMobile.app.BaseURL() + '/Devices/',
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
+            },
             extraParams: {
                 u: Math.random()
             },
@@ -61,13 +82,17 @@ Ext.application({
             },
             callbackParam: 'callback'
         });
-        
-        GroupStore = Ext.getStore('GroupStore');
+
+        GroupStore = Ext.getStore('Groups');
         GroupStore.setProxy({
-            type: 'jsonp',
+            type: 'ajax',
             url: zvsMobile.app.BaseURL() + '/Groups/',
+            withCredentials: true,
             extraParams: {
                 u: Math.random()
+            },
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
             },
             reader: {
                 type: 'json',
@@ -78,12 +103,15 @@ Ext.application({
             callbackParam: 'callback'
         });
 
-        SceneStore = Ext.getStore('SceneStore');
+        SceneStore = Ext.getStore('Scenes');
         SceneStore.setProxy({
-            type: 'scripttag',
+            type: 'ajax',
             url: zvsMobile.app.BaseURL() + '/Scenes/',
             extraParams: {
                 u: Math.random()
+            },
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
             },
             reader: {
                 type: 'json',
@@ -95,12 +123,16 @@ Ext.application({
             callbackParam: 'callback'
         });
 
-        LogEntryStore = Ext.getStore('LogEntryStore');
+        LogEntryStore = Ext.getStore('LogEntries');
         LogEntryStore.setProxy({
-            type: 'scripttag',
+            type: 'ajax',
             url: zvsMobile.app.BaseURL() + '/LogEntries/',
+            withCredentials: true,
             extraParams: {
                 u: Math.random()
+            },
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
             },
             reader: {
                 type: 'json',
@@ -113,7 +145,7 @@ Ext.application({
         });
     },
 
-    launch: function() {
+    launch: function () {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
 
@@ -121,11 +153,11 @@ Ext.application({
         Ext.Viewport.add(Ext.create('zvsMobile.view.Main'));
     },
 
-    onUpdated: function() {
+    onUpdated: function () {
         Ext.Msg.confirm(
             "Application Update",
             "zvsMobile has just successfully been updated to the latest version. Reload now?",
-            function(buttonId) {
+            function (buttonId) {
                 if (buttonId === 'yes') {
                     window.location.reload();
                 }

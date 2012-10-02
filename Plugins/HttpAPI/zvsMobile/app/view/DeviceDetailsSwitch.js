@@ -43,6 +43,9 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                                 Ext.Ajax.request({
                                     url: zvsMobile.app.BaseURL() + '/device/' + self.deviceID + '/command/',
                                     method: 'POST',
+                                    headers: {
+                                        'zvstoken': zvsMobile.app.getToken()
+                                    },
                                     params: {
                                         u: Math.random(),
                                         name: toggleValue > 0 ? 'TURNON' : 'TURNOFF',
@@ -76,6 +79,9 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                     Ext.Ajax.request({
                         url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
+                        headers: {
+                            'zvstoken': zvsMobile.app.getToken()
+                        },
                         params: {
                             u: Math.random(),
                             name: 'REPOLL_ME',
@@ -101,7 +107,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                 }
             }
         });
-        this.callOverridden([config]);
+        this.callSuper([config]); 
     },
     delayedReload: function () {
         var self = this;
@@ -119,18 +125,24 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
 
         //Get Device Details			
         console.log('AJAX: GetDeviceDetails');
-        Ext.data.JsonP.request({
+        Ext.Ajax.request({
             url: zvsMobile.app.BaseURL() + '/device/' + deviceId,
-            callbackKey: 'callback',
+            method: 'GET',
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
+            },
             params: {
                 u: Math.random()
             },
-            success: function (result) {
-                //Send data to panel TPL                            
-                switchDetailsTPL.setData(result.details);
+            success: function (response) {
+                var result = JSON.parse(response.responseText);
+                if (result.success) {
+                    //Send data to panel TPL                            
+                    switchDetailsTPL.setData(result.details);
 
-                //Update meter levels 
-                self.UpdateLevel(result.details.level);
+                    //Update meter levels 
+                    self.UpdateLevel(result.details.level);
+                }               
             }
         });
     },
@@ -148,7 +160,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
         switchDetailsTPL.setData(data);
 
         //Update the store 
-        data = DeviceStore.data.items;
+        data = Ext.getStore('Devices').data.items;
         for (i = 0, len = data.length; i < len; i++) {
             if (data[i].data.id === switchDetailsTPL._data.id) {
                 data[i].data.level = value;
@@ -156,7 +168,7 @@ Ext.define('zvsMobile.view.DeviceDetailsSwitch', {
                 data[i].data.on_off = value > 0 ? 'ON' : 'OFF';
             }
         }
-        DeviceStore.add(data);
+        Ext.getStore('Devices').add(data);
         //Refresh the DEvice list
         Ext.getCmp('DeviceList').refresh();
     }

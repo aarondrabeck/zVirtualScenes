@@ -6,10 +6,6 @@
 	}
 });
 
-SceneStore = Ext.create('zvsMobile.store.Scenes', {
-    id: 'SceneStore',
-    requires: ['zvsMobile.store.Scenes']
-});
 
 
 

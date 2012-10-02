@@ -29,6 +29,9 @@
                     Ext.Ajax.request({
                         url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
+                        headers: {
+                            'zvstoken': zvsMobile.app.getToken()
+                        },
                         params: {
                             u: Math.random(),
                             name: 'GROUP_ON',
@@ -55,6 +58,9 @@
                     Ext.Ajax.request({
                         url: zvsMobile.app.BaseURL() + '/commands/',
                         method: 'POST',
+                        headers: {
+                            'zvstoken': zvsMobile.app.getToken()
+                        },
                         params: {
                             u: Math.random(),
                             name: 'GROUP_OFF',
@@ -105,12 +111,12 @@
 
             }]
         });
-        this.callOverridden([config]);
+        this.callSuper([config]);
     },
     config: {
         layout: 'vbox',
         scrollable: 'vertical'
-    },    
+    },
     loadGroup: function (groupID) {
         var self = this;
         self.groupId = groupID;
@@ -118,16 +124,22 @@
         //Get Device Details			
         console.log('AJAX: GetgroupDetails');
 
-        Ext.data.JsonP.request({
+        Ext.Ajax.request({
             url: zvsMobile.app.BaseURL() + '/group/' + self.groupId,
-            callbackKey: 'callback',
+            method: 'GET',
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
+            },
             params: {
                 u: Math.random()
             },
-            success: function (result) {
-                //Send data to panel TPL              
-                Ext.getCmp('groupDetailsTPL').setData(result);
-                Ext.getCmp('groupStatusTPL').setData(result);
+            success: function (response) {
+                var result = JSON.parse(response.responseText);
+                if (result.success) {
+                    //Send data to panel TPL              
+                    Ext.getCmp('groupDetailsTPL').setData(result);
+                    Ext.getCmp('groupStatusTPL').setData(result);
+                }
             }
         });
     }

@@ -4,7 +4,7 @@ Ext.define('zvsMobile.view.LogList', {
     xtype: 'LogList',
     config: {
         cls: 'LogList',
-        store: LogEntryStore,
+        store: 'LogEntries',
         scrollable: 'vertical',
         ui: 'round',
         scrollToTopOnRefresh: false,

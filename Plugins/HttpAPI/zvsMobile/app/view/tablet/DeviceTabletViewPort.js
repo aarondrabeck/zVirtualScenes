@@ -5,13 +5,8 @@ Ext.define('zvsMobile.view.tablet.DeviceTabletViewPort', {
                 'zvsMobile.view.DeviceDetailsDimmer',
                 'zvsMobile.view.DeviceDetailsSwitch',
                 'zvsMobile.view.DeviceDetailsThermo'],
-    initialize: function () {
-        this.callParent(arguments);
-        //   this.getEventDispatcher().addListener('element', '#DeviceViewPort', 'swipe', this.onTouchPadEvent, this);
-    },
     config:
 	    {
-	        //fullscreen: true,
 	        layout: 'hbox',
 	        items: [
                     {
@@ -83,10 +78,9 @@ Ext.define('zvsMobile.view.tablet.DeviceTabletViewPort', {
                              title: 'Device Details',
                              scrollable: false
                          }
-		                 ]
+                        ]
                     }
 
-                    ]
+	        ]
 	    }
 });
-   

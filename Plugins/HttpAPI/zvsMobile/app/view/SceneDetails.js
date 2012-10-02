@@ -34,6 +34,9 @@
                     Ext.Ajax.request({
                         url: zvsMobile.app.BaseURL() + '/scene/' + self.sceneId,
                         method: 'POST',
+                        headers: {
+                            'zvstoken': zvsMobile.app.getToken()
+                        },
                         params: {
                             is_running: true
                         },
@@ -45,13 +48,13 @@
                                 SceneStatusTPL.setData(SceneStatusTPL._data);
 
                                 //Update the store 
-                                data = SceneStore.data.items;
+                                data = Ext.getStore('Scenes').data.items;
                                 for (i = 0, len = data.length; i < len; i++) {
                                     if (data[i].data.id === SceneStatusTPL._data.scene.id) {
                                         data[i].data.is_running = true;
                                     }
                                 }
-                                SceneStore.add(data);
+                                Ext.getStore('Scenes').add(data);
                                 //Refresh the DEvice list
                                 Ext.getCmp('SceneList').refresh();
 
@@ -103,7 +106,7 @@
                     )
             }]
         });
-        this.callOverridden([config]);
+        this.callSuper([config]);
     },
     config: {
         layout: 'vbox',
@@ -116,20 +119,26 @@
         }
         self.RepollTimer = setTimeout(function () {
             self.loadScene(self.sceneId);
-            SceneStore.load();
+            Ext.getStore('Scenes').load();
         },5000);
     }, loadScene: function (sceneId) {
         var self = this;
         self.sceneId = sceneId;
         //Get Device Details			
         console.log('AJAX: GetSceneDetails');
-        Ext.data.JsonP.request({
+        Ext.Ajax.request({
             url: zvsMobile.app.BaseURL() + '/scene/' + sceneId,
-            callbackKey: 'callback',
+            method: 'GET',
             params: {
                 u: Math.random()
             },
-            success: function (result) {               
+            headers: {
+                'zvstoken': zvsMobile.app.getToken()
+            },
+            success: function (response) {
+                var result = JSON.parse(response.responseText);
+                if (result.success) {
+                
                 //Send data to panel TPL     
                 var ScenesDetailsTPL = Ext.getCmp('ScenesDetailsTPL');
                 var SceneStatusTPL = Ext.getCmp('SceneStatusTPL');
@@ -137,16 +146,17 @@
                 ScenesDetailsTPL.setData(result);
 
                 //Update the store 
-                data = SceneStore.data.items;
+                data = Ext.getStore('Scenes').data.items;
                 for (i = 0, len = data.length; i < len; i++) {
                     if (data[i].data.id === SceneStatusTPL._data.scene.id) {
                         data[i].data.is_running = result.scene.is_running;
                     }
                 }
-                SceneStore.add(data);
+                Ext.getStore('Scenes').add(data);
                 //Refresh the DEvice list
                 Ext.getCmp('SceneList').refresh();
                 Ext.getCmp('SceneActiveResult').setHtml('');
+                }
             }
         });
     }

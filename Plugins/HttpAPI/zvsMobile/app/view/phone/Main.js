@@ -1,7 +1,6 @@
 Ext.define('zvsMobile.view.phone.Main', {
     extend: 'zvsMobile.view.Main',
     xtype: 'mainview',
-
     config: {
         fullscreen: true,
         tabBar: {

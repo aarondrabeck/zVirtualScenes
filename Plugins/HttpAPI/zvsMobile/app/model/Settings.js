@@ -10,7 +10,6 @@
         proxy: {
             type: 'localstorage',
             id: 'zvs-settings'
-        }
-
+        }       
     }
 });
