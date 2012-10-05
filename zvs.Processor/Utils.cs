@@ -67,6 +67,18 @@ namespace zvs.Processor
             }
         }
 
+        public static bool DebugMode
+        {
+            get
+            {
+#if DEBUG
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+
         public static string DBName = "zvsDBEFCF4.sdf";
         public static string DBNamePlusFullPath = Path.Combine(AppDataPath, DBName);
 

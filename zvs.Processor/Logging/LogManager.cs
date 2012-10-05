@@ -19,7 +19,10 @@ namespace zvs.Processor.Logging
             System.Uri.TryCreate(dll, UriKind.RelativeOrAbsolute, out u);
 
             System.IO.FileInfo fi = new System.IO.FileInfo(u.LocalPath);
-            string filename = System.IO.Path.Combine(fi.Directory.FullName, "log4net.config");
+            string file = "log4net.config";
+            if (Utils.DebugMode) file = "log4net.config";
+            
+            string filename = System.IO.Path.Combine(fi.Directory.FullName, file);
             if (System.IO.File.Exists(filename))
             {
                 System.IO.FileInfo configFile = new System.IO.FileInfo(filename);

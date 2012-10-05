@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using zvs.WPF.DynamicActionControls;
 using zvs.Entities;
 using zvs.Processor;
+using zvs.Processor.Logging;
 
 
 namespace zvs.WPF.DeviceControls
@@ -24,6 +25,7 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceCommands : UserControl
     {
+        ILog log = LogManager.GetLogger<DeviceCommands>();
         App app = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/send_signal.png"));
         private zvsContext context;
