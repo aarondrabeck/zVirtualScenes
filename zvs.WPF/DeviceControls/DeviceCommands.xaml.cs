@@ -66,6 +66,8 @@ namespace zvs.WPF.DeviceControls
                             {
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
+                                    log.InfoFormat("d_cmd.ArgumentType.ToString():{0}, d_cmd.CommandId:{1}, d_cmd.CustomData1:{2}, d_cmd.CustomData2:{3}, d_cmd.Description:{4}, d_cmd.Device.Name:{5}, d_cmd.Help:{6}, d_cmd.Name:{7}, d_cmd.Options.Count:{8}, d_cmd.UniqueIdentifier:{9}, d_cmd.Value:{10}", 
+                                        d_cmd.ArgumentType.ToString(), d_cmd.CommandId, d_cmd.CustomData1, d_cmd.CustomData2, d_cmd.Description, d_cmd.Device.Name, d_cmd.Help, d_cmd.Name, d_cmd.Options.Count, d_cmd.UniqueIdentifier, d_cmd.Value);
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
                                     cp.RunDeviceCommand(context, d_cmd);
                                 }, icon);

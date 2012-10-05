@@ -20,7 +20,7 @@ namespace zvs.Processor.Logging
 
             System.IO.FileInfo fi = new System.IO.FileInfo(u.LocalPath);
             string file = "log4net.config";
-            if (Utils.DebugMode) file = "log4net.config";
+            if (Utils.DebugMode) file = "log4net.debug.config";
             
             string filename = System.IO.Path.Combine(fi.Directory.FullName, file);
             if (System.IO.File.Exists(filename))
