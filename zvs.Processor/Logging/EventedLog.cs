@@ -78,7 +78,7 @@ namespace zvs.Processor.Logging
                     items.Add(new LogItem(e));
                 }
                 logger.Clear();
-                if (items.Count > 0 && OnLogItemArrived != null) OnLogItemArrived(items);
+                if (events.Length > 0 && OnLogItemArrived != null) OnLogItemArrived(items);
                 // nap for a while, don't need the events on the millisecond.  
                 Thread.Sleep(1000);
 
