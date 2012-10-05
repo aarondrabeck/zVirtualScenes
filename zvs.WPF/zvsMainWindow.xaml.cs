@@ -72,9 +72,9 @@ namespace zvs.WPF
                         var entry = NewItems.LastOrDefault();
                         if (entry != null)
                         {
-                           // StatusBarDescriptionTxt.Text = entry.Description;
-                           // StatusBarSourceTxt.Text = entry.Source;
-                            //StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
+                            StatusBarDescriptionTxt.Text = entry.Description;
+                            StatusBarSourceTxt.Text = entry.Source;
+                            StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
                         }
                     }));
                 }
