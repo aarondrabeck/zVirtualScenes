@@ -33,12 +33,6 @@ namespace OpenZWavePlugin
         private string LastEventNameValueId = "LEN1";
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<OpenZWavePlugin>();
 
-        #if DEBUG
-        private int verbosity = 99;
-#else
-        private int verbosity = 1;
-#endif
-
         private bool isShuttingDown = false;
         private bool _useHID = false;
         private string _comPort = "3";
@@ -224,13 +218,13 @@ namespace OpenZWavePlugin
         {
             if (isShuttingDown)
             {
-                log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
+                log.DebugFormat("{0} driver cannot start because it is still shutting down", this.Name);
                 return;
             }
 
             try
             {
-                log.InfoFormat("OpenZwave driver starting on {0}", _useHID ? "HID" : "COM" + _comPort);
+                log.DebugFormat("OpenZwave driver starting on {0}", _useHID ? "HID" : "COM" + _comPort);
 
                 // Environment.CurrentDirectory returns wrong directory in Service environment so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
@@ -293,7 +287,7 @@ namespace OpenZWavePlugin
                 }
 
                 isShuttingDown = false;
-                log.Info("OpenZwave driver stopped");
+                log.DebugFormat("OpenZwave driver stopped");
             }
         }
 
@@ -678,8 +672,7 @@ namespace OpenZWavePlugin
                             Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == node.ID);
                             if (d != null)
                             {
-                                if (verbosity > 4)
-                                    log.Info("[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
+                                    log.Debug("[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
 
                                 //Values are 'unknown' at this point so don't report a value change. 
                                 DefineOrUpdateDeviceValue(new DeviceValue
@@ -781,8 +774,7 @@ namespace OpenZWavePlugin
                             ZWValueID vid = m_notification.GetValueID();
                             Value val = node.GetValue(vid);
 
-                            if (verbosity > 4)
-                                log.Info("[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
+                                log.Debug("[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
 
                             node.RemoveValue(val);
                             //TODO: Remove from values and command table
@@ -811,8 +803,8 @@ namespace OpenZWavePlugin
                         string data = GetValue(vid);
                         //m_manager.GetValueAsString(vid, out data);                          
 
-                        if (verbosity > 4)
-                            log.Info("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
+                        
+                            log.Debug("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
 
 
                         using (zvsContext Context = new zvsContext())
@@ -973,8 +965,7 @@ namespace OpenZWavePlugin
 
                 case ZWNotification.Type.Group:
                     {
-                        if (verbosity > 4)
-                            log.Info("[Group]"); ;
+                            log.Debug("[Group]"); ;
                         break;
                     }
 
@@ -989,8 +980,7 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                        if (verbosity > 4)
-                            log.Info("[NodeAdded] ID:" + node.ID.ToString() + " Added");
+                            log.Debug("[NodeAdded] ID:" + node.ID.ToString() + " Added");
                         //}
                         break;
                     }
@@ -1003,8 +993,7 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                        if (verbosity > 4)
-                            log.Info("[NodeNew] ID:" + node.ID.ToString() + " Added");
+                            log.Debug("[NodeNew] ID:" + node.ID.ToString() + " Added");
                         break;
                     }
 
@@ -1014,8 +1003,7 @@ namespace OpenZWavePlugin
                         {
                             if (node.ID == m_notification.GetNodeId())
                             {
-                                if (verbosity > 4)
-                                    log.Info("[NodeRemoved] ID:" + node.ID.ToString());
+                                    log.Debug("[NodeRemoved] ID:" + node.ID.ToString());
                                 m_nodeList.Remove(node);
                                 break;
                             }
@@ -1037,8 +1025,8 @@ namespace OpenZWavePlugin
 
                             if (node != null)
                             {
-                                if (verbosity > 4)
-                                    log.Info("[Node Protocol Info] " + node.Label);
+                                
+                                    log.Debug("[Node Protocol Info] " + node.Label);
 
                                 
                                 switch (node.Label)
@@ -1114,8 +1102,7 @@ namespace OpenZWavePlugin
                                         break;
                                     default:
                                         {
-                                            if (verbosity > 2)
-                                                log.Info("[Node Label] " + node.Label);
+                                                log.Debug("[Node Label] " + node.Label);
                                             break;
                                         }
                                 }
@@ -1236,8 +1223,7 @@ namespace OpenZWavePlugin
                                 }
                             }
                         }
-                        if (verbosity > 3)
-                            log.Info("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
+                            log.Debug("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
                         break;
                     }
@@ -1249,8 +1235,8 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            if (verbosity > 4)
-                                log.Info(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
+                            
+                                log.Debug(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
 
                             using (zvsContext Context = new zvsContext())
                             {
@@ -1284,8 +1270,8 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            if (verbosity > 4)
-                                log.Info("[PollingDisabled] Node:" + node.ID);
+
+                            log.Debug("[PollingDisabled] Node:" + node.ID);
                         }
 
                         break;
@@ -1297,8 +1283,8 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            if (verbosity > 4)
-                                log.Info("[PollingEnabled] Node:" + node.ID);
+                            
+                                log.Debug("[PollingEnabled] Node:" + node.ID);
                         }
                         break;
                     }
@@ -1308,7 +1294,7 @@ namespace OpenZWavePlugin
 
                         m_homeId = m_notification.GetHomeId();
 
-                        log.Info("Initializing...driver with Home ID 0x" + m_homeId);
+                        log.Debug("Initializing...driver with Home ID 0x" + m_homeId);
 
                         break;
                     }
@@ -1330,8 +1316,8 @@ namespace OpenZWavePlugin
                                 Context.SaveChanges();
                             }
 
-                            if (verbosity > 0)
-                                log.Info("[NodeQueriesComplete] node " + node.ID + " query complete.");
+
+                            log.Info("[NodeQueriesComplete] node " + node.ID + " query complete.");
                         }
 
                         break;
@@ -1354,7 +1340,7 @@ namespace OpenZWavePlugin
                         }
 
 
-                        log.Info("Ready:  All nodes queried. Plug-in now ready.");
+                        log.Debug("Ready:  All nodes queried. Plug-in now ready.");
                         IsReady = true;
 
                         FinishedInitialPoll = true;
@@ -1377,7 +1363,7 @@ namespace OpenZWavePlugin
                             }
                         }
 
-                        log.Info("Ready:  Awake nodes queried (but not some sleeping nodes).");
+                        log.Debug("Ready:  Awake nodes queried (but not some sleeping nodes).");
                         IsReady = true;
 
                         FinishedInitialPoll = true;

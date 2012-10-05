@@ -281,7 +281,10 @@ namespace HttpAPI
                     response.Headers.Add("Access-Control-Allow-Headers", httpListenerContext.Request.Headers["Access-Control-Request-Headers"] + ", zvstoken");
 
                     string ip = string.Empty;
-                    if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
+                    if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null)
+                    {
+                        ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString();
+                    }
 
                     if (_verbose)
                         log.Info(string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, httpListenerContext.Request.HttpMethod, httpListenerContext.Request.RawUrl, httpListenerContext.Request.UserAgent));
@@ -294,38 +297,40 @@ namespace HttpAPI
                         return;
                     }
 
-                    if (!hasVaildToken(httpListenerContext) && !hasVaildCookie(httpListenerContext))
-                    {
-                        //If a user does not have a token or cookie, only allow certain things....
-                        bool allowed = false;
+                    //if (!hasVaildToken(httpListenerContext) && !hasVaildCookie(httpListenerContext))
+                    //{
+                    //    //If a user does not have a token or cookie, only allow certain things....
+                    //    bool allowed = false;
+                    //    string reason = "";
 
-                        if (!httpListenerContext.Request.RawUrl.ToLower().StartsWith("/api"))
-                        {
-                            allowed = true;
-                        }
+                    //    if (!httpListenerContext.Request.RawUrl.ToLower().StartsWith("/api"))
+                    //    {
+                    //        allowed = true;
+                    //    }
+                    //    else
+                    //    {
+                    //        reason = "Non API Call";
+                    //    }
 
-                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
-                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
-                            && (httpListenerContext.Request.HttpMethod == "POST" ||
-                            httpListenerContext.Request.HttpMethod == "GET"))
-                        {
-                            allowed = true;
-                        }
+                    //    if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                    //        httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
+                    //        && (httpListenerContext.Request.HttpMethod == "POST" ||
+                    //        httpListenerContext.Request.HttpMethod == "GET"))
+                    //    {
+                    //        allowed = true;
+                    //    }
+                    //    else
+                    //    {
+                    //        reason = "Invalid Login call";
+                    //    }
 
-                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
-                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") &&
-                            httpListenerContext.Request.HttpMethod == "POST")
-                        {
-                            allowed = true;
-                        }
-
-                        if (!allowed)
-                        {
-                            log.Info(string.Format("[{0}] was denied access to '{1}'", ip, httpListenerContext.Request.RawUrl));
-                            sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", httpListenerContext);
-                            return;
-                        }
-                    }
+                    //    if (!allowed)
+                    //    {
+                    //        log.WarnFormat("[{0}] was denied access to '{1}', because:{2}", ip, httpListenerContext.Request.RawUrl, reason);
+                    //        sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", httpListenerContext);
+                    //        return;
+                    //    }
+                    //}
 
                     if (httpListenerContext.Request.Url.Segments.Length > 2 && httpListenerContext.Request.Url.Segments[1].ToLower().Equals("api/"))
                     {
@@ -965,11 +970,17 @@ namespace HttpAPI
                 {
                     if (postData["password"] == GetSettingValue("PASSWORD", context))
                     {
-                        Uri orgin = new Uri(httpListenerContext.Request.Headers["Origin"]);
+                        Uri origin;
+                        bool hasOrigin = Uri.TryCreate(httpListenerContext.Request.Headers["Origin"], UriKind.RelativeOrAbsolute, out origin);
+                        
+                        if (!hasOrigin)
+                        {
+                            hasOrigin = Uri.TryCreate( httpListenerContext.Request.Headers["Host"], UriKind.RelativeOrAbsolute, out origin);
+                        }
 
                         Cookie c = new Cookie("zvs", CookieValue.ToString());
                         c.Expires = DateTime.Today.AddDays(5);
-                        c.Domain = "";// httpListenerContext.Request.Headers["Host"]; //orgin.Authority;
+                        if(hasOrigin) c.Domain = origin.Authority;
                         c.Path = "/";
                         httpListenerContext.Response.Cookies.Add(c);
 
