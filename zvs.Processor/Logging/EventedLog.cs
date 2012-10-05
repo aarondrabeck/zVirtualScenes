@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using log4net.Appender;
 using log4net.Core;
 using zvs.Processor.Logging;
 
@@ -34,13 +35,17 @@ namespace zvs.Processor.Logging
                     {
                         if (logger == null)
                         {
-                            logger = new log4net.Appender.MemoryAppender();
-                            log4net.Config.BasicConfigurator.Configure(logger);
+                            var l = LogManager.FindMemoryLogger();
+                            if (l != null)
+                            {
+                                logger = (MemoryAppender)l;
+                                    //log4net.Config.BasicConfigurator.Configure(logger);
 
-                            // Since there are no events to catch on logging, we dedicate  
-                            // a thread to watching for logging events  
-                            logWatcher = new Thread(new ThreadStart(LogWatcher));
-                            logWatcher.Start();
+                                // Since there are no events to catch on logging, we dedicate  
+                                    // a thread to watching for logging events  
+                                logWatcher = new Thread(new ThreadStart(LogWatcher));
+                                logWatcher.Start();
+                            }
                         }
                         else
                         {

@@ -34,7 +34,21 @@ namespace zvs.Processor.Logging
         {
             return new Logging.log4netLogger<T>();
         }
-
+        public static object FindMemoryLogger()
+        {
+            foreach (ILoggerRepository r in log4net.LogManager.GetAllRepositories())
+            {
+                foreach (IAppender ap in r.GetAppenders())
+                {
+                    var rf = (ap as MemoryAppender);
+                    if (rf != null)
+                    {
+                        if (rf.Name == "UIMemoryAppender") return rf;
+                    }
+                }
+            }
+            return null;
+        }
         public static string DefaultLogFile
         {
             get

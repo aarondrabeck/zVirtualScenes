@@ -49,7 +49,7 @@ namespace zvs.WPF
             this.InitializeComponent();
             zvs.Processor.Logging.LogManager.ConfigureLogging();
             log = zvs.Processor.Logging.LogManager.GetLogger<App>();
-           
+
             log.Info("Init Complete");            
         }
         
