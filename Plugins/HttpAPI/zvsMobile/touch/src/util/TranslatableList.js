@@ -22,7 +22,7 @@ Ext.define('Ext.util.TranslatableList', {
 
             if (item && !item._list_hidden) {
                 translateY = y + offset;
-                offset += item._height;
+                offset += item.$height;
                 item.translate(0, translateY);
             }
         }

@@ -91,72 +91,11 @@ Ext.define('Ext.draw.Surface', {
     defaultIdPrefix: 'ext-surface-',
 
     /**
-     * @private
+     *
      */
     devicePixelRatio: window.devicePixelRatio,
 
-
     statics: {
-        /**
-         * Create and return a new concrete Surface instance appropriate for the current environment.
-         * @param {Object} config Initial configuration for the Surface instance.
-         * @return {Ext.draw.Surface}
-         */
-        create: function (config) {
-            return Ext.create("Ext.draw.engine.Canvas", config);
-        },
-
-        /**
-         * Saves the passed surface array based on the config parameters.
-         *
-         * Used in {@link Ext.chart.AbstractChart#save}
-         *
-         * @param {Object} config The config object for the export generation.
-         * @param {String} config.type The export type. Supported types:
-         *
-         * - 'image/png': Returns the chart as PNG (default).
-         * - 'image/jpeg': Returns the chart as JPEG.
-         * - 'svg': Returns the chart's Svg-String.
-         *
-         * @param {Array} surfaces The surfaces that should be saved.
-         * @return {Object}
-         */
-        save: function (config, surfaces) {
-            var surfacesList = [],
-                series = [],
-                overlays = [],
-                others = [],
-                axes = [],
-                exportEngine = 'Image';
-
-            for (var i in surfaces) {
-
-                if (surfaces.hasOwnProperty(i)) {
-                    // TODO better implementation
-                    if (i === 'main') {
-                        surfacesList.push(surfaces[i]);
-                    } else if (i.indexOf('Overlay') !== -1) {
-                        overlays.push(surfaces[i]);
-                    } else if (i.indexOf('Numeric') !== -1) {
-                        axes.push(surfaces[i]);
-                    } else if (i.indexOf('series') !== -1) {
-                        series.push(surfaces[i]);
-                    } else {
-                        others.push(surfaces[i]);
-                    }
-                }
-            }
-
-            surfacesList = surfacesList.concat(axes, series, overlays, others);
-
-            // check type and if canvas is supported
-            if (config.type === 'svg' || (!document.createElement('canvas').getContext)) {
-                exportEngine = 'Svg';
-            }
-
-            return Ext.draw.engine[exportEngine + 'Exporter'].generate(config, surfacesList);
-        },
-
         /**
          * Stably sort the list of sprites by their zIndex.
          * TODO: Improve the performance. Reduce gc impact.
@@ -220,6 +159,44 @@ Ext.define('Ext.draw.Surface', {
 
     dirtyPredecessor: 0,
 
+    constructor: function (config) {
+        var me = this;
+
+        me.predecessors = [];
+        me.successors = [];
+        me.pendingRenderFrame = false;
+
+        me.callSuper([config]);
+        me.matrix = new Ext.draw.Matrix();
+        me.inverseMatrix = me.matrix.inverse(me.inverseMatrix);
+        me.resetTransform();
+    },
+
+    /**
+     * Round the number to align the pixels on device.
+     * @param num
+     * @return {Number}
+     */
+    roundPixel: function (num) {
+        return Math.round(this.devicePixelRatio * num) / this.devicePixelRatio;
+    },
+
+    /**
+     * Mark the surface to render after another surface is updated.
+     * @param surface
+     */
+    waitFor: function (surface) {
+        var me = this,
+            predecessors = me.predecessors;
+        if (!Ext.Array.contains(predecessors, surface)) {
+            predecessors.push(surface);
+            surface.successors.push(me);
+            if (surface._dirty) {
+                me.dirtyPredecessor++;
+            }
+        }
+    },
+
     setDirty: function (dirty) {
         if (this._dirty !== dirty) {
             var successors = this.successors, successor,
@@ -240,26 +217,6 @@ Ext.define('Ext.draw.Surface', {
         }
     },
 
-    getDirty: function () {
-        return this._dirty;
-    },
-
-    roundPixel: function (num) {
-        return Math.round(this.devicePixelRatio * num) / this.devicePixelRatio;
-    },
-
-    constructor: function (config) {
-        var me = this;
-
-        me.predecessors = [];
-        me.successors = [];
-        me.pendingRenderFrame = false;
-        
-        me.callSuper([config]);
-        me.resetTransform();
-        me.matrix = new Ext.draw.Matrix();
-    },
-
     applyElement: function (newElement, oldElement) {
         if (oldElement) {
             oldElement.set(newElement);
@@ -276,28 +233,6 @@ Ext.define('Ext.draw.Surface', {
             background = { fillStyle: background };
         }
         return Ext.factory(background, Ext.draw.sprite.Rect, oldBackground);
-    },
-
-    /**
-     * @private
-     * Normalize a delegated single event from the main container to each sprite and sprite group
-     */
-    processEvent: function (name, e) {
-        var me = this,
-            sprite = me.getSpriteForEvent(e);
-
-        if (sprite) {
-            sprite.fireEvent(name, sprite, e);
-        }
-        me.fireEvent.apply(me, arguments);
-    },
-
-    /**
-     * @protected - For a given event, find the Sprite corresponding to it if any.
-     * @return {Ext.draw.sprite.Sprite} The sprite instance, or null if none found.
-     */
-    getSpriteForEvent: function (e) {
-        return null;
     },
 
     applyRegion: function (region, oldRegion) {
@@ -343,9 +278,12 @@ Ext.define('Ext.draw.Surface', {
         me.setDirty(true);
     },
 
+    /**
+     * Reset the matrix of the surface.
+     */
     resetTransform: function () {
-        this.matrix = new Ext.draw.Matrix();
-        this.inverseMatrix = new Ext.draw.Matrix();
+        this.matrix.set(1, 0, 0, 1, 0, 0);
+        this.inverseMatrix.set(1, 0, 0, 1, 0, 0);
         this.setDirty(true);
     },
 
@@ -354,234 +292,6 @@ Ext.define('Ext.draw.Surface', {
             component.element.dom.appendChild(this.element.dom);
         }
     },
-
-    // @private
-    applyItems: function (items, oldItems) {
-        var result;
-
-        if (items instanceof Ext.draw.Group) {
-            result = items;
-        } else {
-            result = new Ext.draw.Group({surface: this});
-            result.autoDestroy = true;
-            result.addAll(this.prepareItems(items));
-        }
-        this.setDirty(true);
-        return result;
-    },
-
-    // @private
-    prepareItems: function (items) {
-        items = [].concat(items);
-        // Make sure defaults are applied and item is initialized
-        var me = this,
-            item, i, ln, j,
-            removeSprite = function (sprite) {
-                this.remove(sprite, false);
-            };
-
-        for (i = 0, ln = items.length; i < ln; i++) {
-            item = items[i];
-            if (!(item instanceof Ext.draw.sprite.Sprite)) {
-                // Temporary, just take in configs...
-                item = items[i] = me.createItem(item);
-            }
-            for (j = 0; j < item.group.length; j++) {
-                me.getGroup(item.group[i]).add(item);
-            }
-            item.on('beforedestroy', removeSprite, me);
-        }
-        return items;
-    },
-
-    //@private Creates an item and appends it to the surface. Called
-    //as an internal method when calling `add`.
-    createItem: function (config) {
-        var sprite = Ext.create(config.xclass || 'sprite.' + config.type, config);
-        return sprite;
-    },
-
-    /**
-     * @deprecated Use the `sprite.getBBox(isWithoutTransform)` directly.
-     * @param sprite
-     * @param isWithoutTransform
-     * @return {Object}
-     */
-    getBBox: function (sprite, isWithoutTransform) {
-        return sprite.getBBox(isWithoutTransform);
-    },
-
-
-    // Empty the surface (without touching the sprites.)
-    clear: Ext.emptyFn,
-
-    orderByZIndex: function () {
-        var me = this,
-            items = me.getItems().items,
-            dirtyZIndex = false,
-            i, ln;
-
-        if (me.getDirty()) {
-            for (i = 0, ln = items.length; i < ln; i++) {
-                if (items[i].attr.dirtyZIndex) {
-                    dirtyZIndex = true;
-                    break;
-                }
-            }
-            if (dirtyZIndex) {
-                //sort by zIndex
-                Ext.draw.Surface.stableSort(items);
-                this.setDirty(true);
-            }
-        }
-    },
-
-    repaint: function () {
-        var me = this;
-        me.repaint = Ext.emptyFn;
-        setTimeout(function () {
-            delete me.repaint;
-            me.element.repaint();
-        }, 1);
-    },
-
-    /**
-     * Triggers the re-rendering of the canvas.
-     */
-    renderFrame: function () {
-        if (!this.element) {
-            return;
-        }
-        if (this.dirtyPredecessor > 0) {
-            this.pendingRenderFrame = true;
-        }
-
-        var me = this,
-            region = this.getRegion(),
-            background = me.getBackground(),
-            items = me.getItems().items,
-            item, i, ln, textPositionStart;
-
-        // Cannot render before the surface is placed.
-        if (!region) {
-            return;
-        }
-
-        if (!me.textDivs) {
-            me.textDivs = [];
-        }
-        me.textPosition = 0;
-
-        // This will also check the dirty flags of the sprites.
-        me.orderByZIndex();
-        if (me.getDirty()) {
-            me.clear();
-            me.clearTransform();
-
-            if (background) {
-                me.renderSprite(background);
-            }
-
-            for (i = 0, ln = items.length; i < ln; i++) {
-                item = items[i];
-                item.applyTransformations();
-                item.attr.dirtyZIndex = false;
-                textPositionStart = me.textPosition;
-                me.renderSprite(item);
-                item.attr.textPositionCount = me.textPosition - textPositionStart;
-            }
-
-            me.setDirty(false);
-
-            for (i = me.textPosition, ln = me.textDivs.length; i < ln; i++) {
-                me.textDivs[i].setStyle({'display': 'none'});
-            }
-        }
-    },
-
-    renderSprite: Ext.emptyFn,
-
-    applyGroups: function (groups, oldGroups) {
-        var result = new Ext.util.MixedCollection();
-
-        if (groups instanceof Ext.util.MixedCollection) {
-            result = groups;
-        } else {
-            result.addAll(groups);
-        }
-        if (oldGroups) {
-            oldGroups.each(function (group) {
-                if (!result.contains()) {
-                    group.destroy();
-                }
-            });
-        }
-        this.setDirty(true);
-        return result;
-    },
-
-    createGroup: function (id) {
-        var group = this.getGroups().get(id);
-
-        if (!group) {
-            group = new Ext.draw.Group({surface: this});
-            group.id = id || Ext.id(null, 'ext-surface-group-');
-            this.getGroups().add(group);
-        }
-        this.setDirty(true);
-        return group;
-    },
-
-    /**
-     * Mark the surface to render after another surface is updated.
-     * @param surface
-     */
-    waitFor: function (surface) {
-        var me = this,
-            predecessors = me.predecessors;
-        if (!Ext.Array.contains(predecessors, surface)) {
-            predecessors.push(surface);
-            surface.successors.push(me);
-            if (surface._dirty) {
-                me.dirtyPredecessor++;
-            }
-        }
-    },
-
-    removeGroup: function (group) {
-        if (Ext.isString(group)) {
-            group = this.getGroups().get(group);
-        }
-        if (group) {
-            this.getGroups().remove(group);
-            group.destroy();
-        }
-        this.setDirty(true);
-    },
-    /**
-     * Returns a new group or an existent group associated with the current surface.
-     * The group returned is a {@link Ext.draw.Group} group.
-     *
-     * For example:
-     *
-     *      var spriteGroup = drawComponent.surface.getGroup('someGroupId');
-     *
-     * @param {String} id The unique identifier of the group.
-     * @return {Object} The {@link Ext.draw.Group}.
-     */
-    getGroup: function (id) {
-        var group;
-        if (typeof id === "string") {
-            group = this.getGroups().get(id);
-            if (!group) {
-                group = this.createGroup(id);
-            }
-        } else {
-            group = id;
-        }
-        return group;
-    },
-
     /**
      * Add a Sprite to the surface.
      * You can put any number of object as parameter.
@@ -680,15 +390,243 @@ Ext.define('Ext.draw.Surface', {
         this.dirtyZIndex = true;
     },
 
-    //force will force the method to return a value.
-    getShadowOptions: function (force) {
-        return {
-            shadowOffsetX: 2,
-            //http://code.google.com/p/android/issues/detail?id=16025
-            shadowOffsetY: Ext.os.is('Android') ? -2 : 2,
-            shadowBlur: 3,
-            shadowColor: '#444'
-        };
+    // @private
+    applyItems: function (items, oldItems) {
+        var result;
+
+        if (items instanceof Ext.draw.Group) {
+            result = items;
+        } else {
+            result = new Ext.draw.Group({surface: this});
+            result.autoDestroy = true;
+            result.addAll(this.prepareItems(items));
+        }
+        this.setDirty(true);
+        return result;
+    },
+
+    /**
+     * @private
+     */
+    prepareItems: function (items) {
+        items = [].concat(items);
+        // Make sure defaults are applied and item is initialized
+        var me = this,
+            item, i, ln, j,
+            removeSprite = function (sprite) {
+                this.remove(sprite, false);
+            };
+
+        for (i = 0, ln = items.length; i < ln; i++) {
+            item = items[i];
+            if (!(item instanceof Ext.draw.sprite.Sprite)) {
+                // Temporary, just take in configs...
+                item = items[i] = me.createItem(item);
+            }
+            for (j = 0; j < item.group.length; j++) {
+                me.getGroup(item.group[i]).add(item);
+            }
+            item.on('beforedestroy', removeSprite, me);
+        }
+        return items;
+    },
+
+    applyGroups: function (groups, oldGroups) {
+        var result;
+
+        if (groups instanceof Ext.util.MixedCollection) {
+            result = groups;
+        } else {
+            result = new Ext.util.MixedCollection();
+            result.addAll(groups);
+        }
+        if (oldGroups) {
+            oldGroups.each(function (group) {
+                if (!result.contains()) {
+                    group.destroy();
+                }
+            });
+            oldGroups.destroy();
+        }
+        this.setDirty(true);
+        return result;
+    },
+
+    /**
+     * @deprecated Do not use groups directly
+     * Returns a new group or an existent group associated with the current surface.
+     * The group returned is a {@link Ext.draw.Group} group.
+     *
+     * For example:
+     *
+     *      var spriteGroup = drawComponent.surface.getGroup('someGroupId');
+     *
+     * @param {String} id The unique identifier of the group.
+     * @return {Ext.draw.Group} The group.
+     */
+    getGroup: function (id) {
+        var group;
+        if (typeof id === "string") {
+            group = this.getGroups().get(id);
+            if (!group) {
+                group = this.createGroup(id);
+            }
+        } else {
+            group = id;
+        }
+        return group;
+    },
+
+    /**
+     * @private
+     * @deprecated Do not use groups directly
+     * @param id
+     * @return {Ext.draw.Group} The group.
+     */
+    createGroup: function (id) {
+        var group = this.getGroups().get(id);
+
+        if (!group) {
+            group = new Ext.draw.Group({surface: this});
+            group.id = id || Ext.id(null, 'ext-surface-group-');
+            this.getGroups().add(group);
+        }
+        this.setDirty(true);
+        return group;
+    },
+
+    /**
+     * @private
+     * @deprecated Do not use groups directly
+     * @param group
+     */
+    removeGroup: function (group) {
+        if (Ext.isString(group)) {
+            group = this.getGroups().get(group);
+        }
+        if (group) {
+            this.getGroups().remove(group);
+            group.destroy();
+        }
+        this.setDirty(true);
+    },
+
+    /**
+     * @private Creates an item and appends it to the surface. Called
+     * as an internal method when calling `add`.
+     */
+    createItem: function (config) {
+        var sprite = Ext.create(config.xclass || 'sprite.' + config.type, config);
+        return sprite;
+    },
+
+    /**
+     * @deprecated Use the `sprite.getBBox(isWithoutTransform)` directly.
+     * @param sprite
+     * @param isWithoutTransform
+     * @return {Object}
+     */
+    getBBox: function (sprite, isWithoutTransform) {
+        return sprite.getBBox(isWithoutTransform);
+    },
+
+    /**
+     * Empty the surface content (without touching the sprites.)
+     */
+    clear: Ext.emptyFn,
+
+    /**
+     * @private
+     * Order the items by their z-index if any of that has been changed since last sort.
+     */
+    orderByZIndex: function () {
+        var me = this,
+            items = me.getItems().items,
+            dirtyZIndex = false,
+            i, ln;
+
+        if (me.getDirty()) {
+            for (i = 0, ln = items.length; i < ln; i++) {
+                if (items[i].attr.dirtyZIndex) {
+                    dirtyZIndex = true;
+                    break;
+                }
+            }
+            if (dirtyZIndex) {
+                // sort by zIndex
+                Ext.draw.Surface.stableSort(items);
+                this.setDirty(true);
+            }
+        }
+    },
+
+    /**
+     * Force the element to redraw.
+     */
+    repaint: function () {
+        var me = this;
+        me.repaint = Ext.emptyFn;
+        setTimeout(function () {
+            delete me.repaint;
+            me.element.repaint();
+        }, 1);
+    },
+
+    /**
+     * Triggers the re-rendering of the canvas.
+     */
+    renderFrame: function () {
+        if (!this.element) {
+            return;
+        }
+        if (this.dirtyPredecessor > 0) {
+            this.pendingRenderFrame = true;
+        }
+
+        var me = this,
+            region = this.getRegion(),
+            background = me.getBackground(),
+            items = me.getItems().items,
+            item, i, ln;
+
+        // Cannot render before the surface is placed.
+        if (!region) {
+            return;
+        }
+
+        // This will also check the dirty flags of the sprites.
+        me.orderByZIndex();
+        if (me.getDirty()) {
+            me.clear();
+            me.clearTransform();
+
+            if (background) {
+                me.renderSprite(background);
+            }
+
+            for (i = 0, ln = items.length; i < ln; i++) {
+                item = items[i];
+                item.applyTransformations();
+                item.attr.dirtyZIndex = false;
+                me.renderSprite(item);
+                item.attr.textPositionCount = me.textPosition;
+            }
+
+            me.setDirty(false);
+        }
+    },
+
+    /**
+     * @private
+     * Renders a single sprite into the surface.
+     * Do not call it from outside `renderFrame` method.
+     *
+     * @param {Ext.draw.sprite.Sprite} sprite The Sprite to be rendered.
+     */
+    renderSprite: Ext.emptyFn,
+
+    getDirty: function () {
+        return this._dirty;
     },
 
     /**
@@ -702,9 +640,9 @@ Ext.define('Ext.draw.Surface', {
     destroy: function () {
         var me = this;
         me.removeAll();
-        me.setGroups([]);
         me.setBackground(null);
-        me.getItems().destroy();
+        me.setGroups([]);
+        me.getGroups().destroy();
         me.predecessors = null;
         me.successors = null;
         me.callSuper();

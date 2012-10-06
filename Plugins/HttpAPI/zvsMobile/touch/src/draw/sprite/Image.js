@@ -1,5 +1,8 @@
 /**
- *
+ * @class Ext.draw.sprite.Image
+ * @extends Ext.draw.sprite.Rect
+ * 
+ * A sprite that represents an image.
  */
 Ext.define("Ext.draw.sprite.Image", {
     extend: "Ext.draw.sprite.Rect",
@@ -12,6 +15,9 @@ Ext.define("Ext.draw.sprite.Image", {
     inheritableStatics: {
         def: {
             processors: {
+                /**
+                 * @cfg {String} src The image source of the sprite.
+                 */
                 src: 'string'
             },
             defaults: {
@@ -32,7 +38,8 @@ Ext.define("Ext.draw.sprite.Image", {
             width = attr.width,
             height = attr.height,
             loadingStub = Ext.draw.sprite.Image.imageLoaders[src],
-            imageLoader;
+            imageLoader,
+            i;
 
         if (loadingStub && loadingStub.done) {
             mat.toContext(ctx);
@@ -48,7 +55,6 @@ Ext.define("Ext.draw.sprite.Image", {
             imageLoader.width = width;
             imageLoader.height = height;
             imageLoader.onload = function () {
-                var i;
                 if (!loadingStub.done) {
                     loadingStub.done = true;
                     for (i = 0; i < loadingStub.pendingSprites.length; i++) {

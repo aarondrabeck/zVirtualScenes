@@ -230,7 +230,7 @@ Ext.define('Ext.data.proxy.JsonP', {
         };
     },
 
-    // inherit docs
+    // @inheritdoc
     setException: function(operation, response) {
         operation.setException(operation.getRequest().getJsonP().errorType);
     },
@@ -239,7 +239,7 @@ Ext.define('Ext.data.proxy.JsonP', {
     /**
      * Generates a url based on a given Ext.data.Request object. Adds the params and callback function name to the url
      * @param {Ext.data.Request} request The request object.
-     * @return {String} The url
+     * @return {String} The url.
      */
     buildUrl: function(request) {
         var me      = this,
@@ -277,7 +277,7 @@ Ext.define('Ext.data.proxy.JsonP', {
     },
 
     /**
-     * Aborts the current server request if one is currently running
+     * Aborts the current server request if one is currently running.
      */
     abort: function() {
         var lastRequest = this.lastRequest;

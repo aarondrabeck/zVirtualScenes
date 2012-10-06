@@ -7,7 +7,7 @@ IF EXIST "sencha" (RMDIR htdocs /s /q)
 md "sencha"
 CD %1
 xcopy /Y /s "..\..\Plugins\HttpAPI\htdocs\*" "htdocs\*"
-xcopy /Y /s "..\..\Plugins\HttpAPI\zvsMobile\build\path\production\*" "htdocs\sencha\*"
+xcopy /Y /s "..\..\Plugins\HttpAPI\zvsMobile\build\zvsMobile\production\*" "htdocs\sencha\*"
 
 
 

@@ -89,7 +89,7 @@ Ext.define('Ext.TitleBar', {
         'Ext.Spacer'
     ],
 
-    // private
+    // @private
     isToolbar: true,
 
     config: {

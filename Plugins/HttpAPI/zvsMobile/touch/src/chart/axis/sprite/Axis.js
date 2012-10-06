@@ -14,7 +14,6 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
             processors: {
                 grid: 'bool',
                 axisLine: 'bool',
-                labelInSpan: 'bool',
                 minorTicks: 'bool',
                 minorTickSize: 'number',
                 majorTicks: 'bool',
@@ -23,12 +22,17 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
                 startGap: 'number',
                 endGap: 'number',
                 visibleRange: 'data',
-                position: 'string',
+                position: 'enums(left,right,top,bottom,angular,radial)',
                 minStepSize: 'number',
                 estStepSize: 'number',
                 titleOffset: 'number',
+                textPadding: 'number',
                 min: 'number',
                 max: 'number',
+                centerX: 'number',
+                centerY: 'number',
+                radius: 'number',
+                baseRotation: 'number',
                 data: 'default',
                 enlargeEstStepSizeByText: 'bool'
             },
@@ -36,7 +40,6 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
             defaults: {
                 grid: false,
                 axisLine: true,
-                labelInSpan: false,
                 minorTicks: false,
                 minorTickSize: 3,
                 majorTicks: true,
@@ -45,13 +48,18 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
                 startGap: 0,
                 endGap: 0,
                 visibleRange: [0, 1],
-                position: 'left',
+                position: '',
                 minStepSize: 0,
                 estStepSize: 42,
                 min: 0,
                 max: 1,
+                centerX: 0,
+                centerY: 0,
+                radius: 1,
+                baseRotation: 0,
                 data: null,
                 titleOffset: 0,
+                textPadding: 5,
                 // Override default
                 strokeStyle: 'black',
                 enlargeEstStepSizeByText: false
@@ -64,6 +72,7 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
                 axisLine: 'bbox,layout',
                 min: 'layout',
                 max: 'layout',
+                length: 'layout',
                 minStepSize: 'layout',
                 estStepSize: 'layout',
                 data: 'layout',
@@ -77,7 +86,6 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
             }
         }
     },
-
 
     config: {
 
@@ -96,6 +104,8 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
 
     thickness: 0,
 
+    stepSize: 0,
+
     getBBox: function () { return null; },
 
     doLayout: function () {
@@ -112,41 +122,30 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
         }
     },
 
-    iterate: function (snaps) {
-        var start = snaps.min < snaps.from ? -1 : 0,
-            stop = snaps.max > snaps.to ? snaps.steps + 1 : snaps.steps,
-            iterator = {
-                current: start,
-                hasNext: function () {
-                    return this.current <= stop;
-                },
-                get: function () {
-                    if (this.current < 0) {
-                        return snaps.min;
-                    }
-                    if (this.current > snaps.steps) {
-                        return snaps.max;
-                    }
-                    return snaps.get(this.current);
-                },
-                step: function () {
-                    this.current++;
-                }
-            };
+    iterate: function (snaps, fn) {
+        var i, position;
         if (snaps.getLabel) {
-            iterator.getLabel = function () {
-                if (this.current < 0) {
-                    return snaps.getLabel(snaps.min);
-                }
-                if (this.current > snaps.steps) {
-                    return snaps.getLabel(snaps.max);
-                }
-                return snaps.getLabel(this.current);
-            };
+            if (snaps.min < snaps.from) {
+                fn.call(this, snaps.min, snaps.getLabel(snaps.min), -1, snaps);
+            }
+            for (i = 0; i <= snaps.steps; i++) {
+                fn.call(this, snaps.get(i), snaps.getLabel(i), i, snaps);
+            }
+            if (snaps.max > snaps.to) {
+                fn.call(this, snaps.max, snaps.getLabel(snaps.max), snaps.steps + 1, snaps);
+            }
         } else {
-            iterator.getLabel = iterator.get;
+            if (snaps.min < snaps.from) {
+                fn.call(this, snaps.min, snaps.min, -1, snaps);
+            }
+            for (i = 0; i <= snaps.steps; i++) {
+                position = snaps.get(i);
+                fn.call(this, position, position, i, snaps);
+            }
+            if (snaps.max > snaps.to) {
+                fn.call(this, snaps.max, snaps.max, snaps.steps + 1, snaps);
+            }
         }
-        return iterator;
     },
 
     renderTicks: function (surface, ctx, layout, clipRegion) {
@@ -154,7 +153,7 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
             attr = me.attr,
             docked = attr.position,
             matrix = attr.matrix,
-            halfLineWidth = 0.5 * (attr.lineWidth || 1),
+            halfLineWidth = 0.5 * attr.lineWidth,
             xx = matrix.getXX(),
             dx = matrix.getDX(),
             yy = matrix.getYY(),
@@ -162,38 +161,50 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
             majorTicks = layout.majorTicks,
             majorTickSize = attr.majorTickSize,
             minorTicks = layout.minorTicks,
-            minorTickSize = attr.minorTickSize,
-            i, step, it, position, ln;
+            minorTickSize = attr.minorTickSize;
 
         if (majorTicks) {
             switch (docked) {
                 case 'right':
-                    for (it = me.iterate(majorTicks); it.hasNext(); it.step()) {
-                        position = surface.roundPixel(it.get() * yy + dy) - halfLineWidth;
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        position = surface.roundPixel(position * yy + dy) + halfLineWidth;
                         ctx.moveTo(0, position);
                         ctx.lineTo(majorTickSize, position);
-                    }
+                    });
                     break;
                 case 'left':
-                    for (it = me.iterate(majorTicks); it.hasNext(); it.step()) {
-                        position = surface.roundPixel(it.get() * yy + dy) - halfLineWidth;
-                        ctx.moveTo(clipRegion[2] - 1 - majorTickSize, position);
-                        ctx.lineTo(clipRegion[2] - 1, position);
-                    }
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        position = surface.roundPixel(position * yy + dy) + halfLineWidth;
+                        ctx.moveTo(clipRegion[2] - majorTickSize, position);
+                        ctx.lineTo(clipRegion[2], position);
+                    });
                     break;
                 case 'bottom':
-                    for (it = me.iterate(majorTicks); it.hasNext(); it.step()) {
-                        position = surface.roundPixel(it.get() * xx + dx) - halfLineWidth;
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        position = surface.roundPixel(position * xx + dx) - halfLineWidth;
                         ctx.moveTo(position, 0);
                         ctx.lineTo(position, majorTickSize);
-                    }
+                    });
                     break;
                 case 'top':
-                    for (it = me.iterate(majorTicks); it.hasNext(); it.step()) {
-                        position = surface.roundPixel(it.get() * xx + dx) - halfLineWidth;
-                        ctx.moveTo(position, clipRegion[3] - 1);
-                        ctx.lineTo(position, clipRegion[3] - 1 - majorTickSize);
-                    }
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        position = surface.roundPixel(position * xx + dx) - halfLineWidth;
+                        ctx.moveTo(position, clipRegion[3]);
+                        ctx.lineTo(position, clipRegion[3] - majorTickSize);
+                    });
+                    break;
+                case 'angular':
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        position = position / (attr.max + 1) * Math.PI * 2 + attr.baseRotation;
+                        ctx.moveTo(
+                            attr.centerX + (attr.length) * Math.cos(position),
+                            attr.centerY + (attr.length) * Math.sin(position)
+                        );
+                        ctx.lineTo(
+                            attr.centerX + (attr.length + majorTickSize) * Math.cos(position),
+                            attr.centerY + (attr.length + majorTickSize) * Math.sin(position)
+                        );
+                    });
                     break;
             }
         }
@@ -202,118 +213,176 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
     renderLabels: function (surface, ctx, layout, clipRegion) {
         var me = this,
             attr = me.attr,
-            halfLineWidth = 0.5 * (attr.lineWidth || 1),
-            titleOffset = attr.titleOffset,
+            halfLineWidth = 0.5 * attr.lineWidth,
             docked = attr.position,
             matrix = attr.matrix,
+            textPadding = attr.textPadding,
             xx = matrix.getXX(),
             dx = matrix.getDX(),
             yy = matrix.getYY(),
             dy = matrix.getDY(),
             thickness = 0,
             majorTicks = layout.majorTicks,
-            vertical = docked === 'left' || docked === 'right',
-            padding = Math.max(attr.majorTickSize || 0, attr.minorTickSize || 0),
+            padding = Math.max(attr.majorTickSize, attr.minorTickSize) + attr.lineWidth,
             label = this.getLabel(), font,
-            labelText,
+            lastLabelText = null,
             textSize = 0, textCount = 0,
             segmenter = layout.segmenter,
-            renderer = this.getRenderer() || function (x) {return x + '';},
-            labelInverseMatrix, lastBBox = null, bbox, fly, text,
-            it, position;
-
+            renderer = this.getRenderer(),
+            labelInverseMatrix, lastBBox = null, bbox, fly, text;
         if (majorTicks && label && !label.attr.hidden) {
             font = label.attr.font;
             if (ctx.font !== font) {
                 ctx.font = font;
             } // This can profoundly improve performance.
-            label.setAttributesCanonical({translationX: 0, translationY: 0});
+            label.setAttributes({translationX: 0, translationY: 0}, true, true);
             label.applyTransformations();
             labelInverseMatrix = label.attr.inverseMatrix.elements.slice(0);
             switch (docked) {
                 case 'left':
-                    label.setAttributesCanonical({
+                    label.setAttributes({
                         textAlign: 'center',
                         textBaseline: 'middle',
-                        translationX: surface.roundPixel(clipRegion[2] - 1 - padding + dx) - halfLineWidth - me.thickness / 2
-                    });
+                        translationX: surface.roundPixel(clipRegion[2] - padding + dx) - halfLineWidth - me.thickness / 2
+                    }, true, true);
                     break;
                 case 'right':
-                    label.setAttributesCanonical({
+                    label.setAttributes({
                         textAlign: 'center',
                         textBaseline: 'middle',
                         translationX: surface.roundPixel(padding + dx) - halfLineWidth + me.thickness / 2
-                    });
+                    }, true, true);
                     break;
                 case 'top':
-                    label.setAttributesCanonical({
+                    label.setAttributes({
                         textAlign: 'center',
                         textBaseline: 'middle',
-                        translationY: surface.roundPixel(clipRegion[3] - 1 - padding) - halfLineWidth - me.thickness / 2
-                    });
+                        translationY: surface.roundPixel(clipRegion[3] - padding) - halfLineWidth - me.thickness / 2
+                    }, true, true);
                     break;
                 case 'bottom':
-                    label.setAttributesCanonical({
+                    label.setAttributes({
                         textAlign: 'center',
                         textBaseline: 'middle',
                         translationY: surface.roundPixel(padding) - halfLineWidth + me.thickness / 2
-                    });
+                    }, true, true);
+                    break;
+                case 'radial' :
+                    label.setAttributes({
+                        textAlign: 'center',
+                        textBaseline: 'middle',
+                        translationX: attr.centerX
+                    }, true, true);
+                    break;
+                case 'angular':
+                    label.setAttributes({
+                        textAlign: 'center',
+                        textBaseline: 'middle',
+                        translationY: attr.centerY
+                    }, true, true);
                     break;
             }
 
             // TODO: there are better ways to detect collision.
-            if (vertical) {
-                for (it = this.iterate(majorTicks); it.hasNext(); it.step()) {
-                    position = it.get();
-                    labelText = it.getLabel();
+            if (docked === 'left' || docked === 'right') {
+                me.iterate(majorTicks, function (position, labelText, i) {
                     if (labelText === undefined) {
-                        continue;
+                        return;
                     }
-                    text = renderer.call(this, segmenter.renderer(labelText, layout), layout);
-                    label.setAttributesCanonical({
-                        text: text ? text.toString() : '',
+                    text = renderer ? renderer.call(this, labelText, layout, lastLabelText) : segmenter.renderer(labelText, layout, lastLabelText);
+                    lastLabelText = labelText;
+                    label.setAttributes({
+                        text: String(text),
                         translationY: surface.roundPixel(position * yy + dy)
-                    });
+                    }, true, true);
                     label.applyTransformations();
                     thickness = Math.max(thickness, label.getBBox().width + padding);
                     if (thickness <= me.thickness) {
                         fly = Ext.draw.Matrix.fly(label.attr.matrix.elements.slice(0));
                         bbox = fly.prepend.apply(fly, labelInverseMatrix).transformBBox(label.getBBox(true));
-                        if (lastBBox && !Ext.draw.Draw.isBBoxIntersect(bbox, lastBBox)) {
-                            continue;
+                        if (lastBBox && !Ext.draw.Draw.isBBoxIntersect(bbox, lastBBox, textPadding)) {
+                            return;
                         }
                         surface.renderSprite(label);
                         lastBBox = bbox;
                         textSize += bbox.height;
                         textCount++;
                     }
-                }
-            } else {
-                for (it = this.iterate(majorTicks); it.hasNext(); it.step()) {
-                    position = it.get();
-                    labelText = it.getLabel();
+                });
+            } else if (docked === 'top' || docked === 'bottom') {
+                me.iterate(majorTicks, function (position, labelText, i) {
                     if (labelText === undefined) {
-                        continue;
+                        return;
                     }
-                    text = renderer.call(this, segmenter.renderer(labelText, layout), layout);
-                    label.setAttributesCanonical({
-                        text: text ? text.toString() : '',
+                    text = renderer ? renderer.call(this, labelText, layout, lastLabelText) : segmenter.renderer(labelText, layout, lastLabelText);
+                    lastLabelText = labelText;
+                    label.setAttributes({
+                        text: String(text),
                         translationX: surface.roundPixel(position * xx + dx)
-                    });
+                    }, true, true);
                     label.applyTransformations();
                     thickness = Math.max(thickness, label.getBBox().height + padding);
                     if (thickness <= me.thickness) {
                         fly = Ext.draw.Matrix.fly(label.attr.matrix.elements.slice(0));
                         bbox = fly.prepend.apply(fly, labelInverseMatrix).transformBBox(label.getBBox(true));
-                        if (lastBBox && !Ext.draw.Draw.isBBoxIntersect(bbox, lastBBox)) {
-                            continue;
+                        if (lastBBox && !Ext.draw.Draw.isBBoxIntersect(bbox, lastBBox, textPadding)) {
+                            return;
                         }
                         surface.renderSprite(label);
                         lastBBox = bbox;
                         textSize += bbox.width;
                         textCount++;
                     }
-                }
+                });
+            } else if (docked === 'radial') {
+                me.iterate(majorTicks, function (position, labelText, i) {
+                    if (labelText === undefined) {
+                        return;
+                    }
+                    text = renderer ? renderer.call(this, labelText, layout, lastLabelText) : segmenter.renderer(labelText, layout, lastLabelText);
+                    lastLabelText = labelText;
+                    if (typeof text !== 'undefined') {
+                        label.setAttributes({
+                            text: String(text),
+                            translationY: attr.centerY - surface.roundPixel(position) / attr.max * attr.length
+                        }, true, true);
+                        label.applyTransformations();
+                        bbox = label.attr.matrix.transformBBox(label.getBBox(true));
+                        if (lastBBox && !Ext.draw.Draw.isBBoxIntersect(bbox, lastBBox)) {
+                            return;
+                        }
+                        surface.renderSprite(label);
+                        lastBBox = bbox;
+                        textSize += bbox.width;
+                        textCount++;
+                    }
+                });
+            } else if (docked === 'angular') {
+                me.iterate(majorTicks, function (position, labelText, i) {
+                    if (labelText === undefined) {
+                        return;
+                    }
+                    text = renderer ? renderer.call(this, labelText, layout, lastLabelText) : segmenter.renderer(labelText, layout, lastLabelText);
+                    lastLabelText = labelText;
+
+                    if (typeof text !== 'undefined') {
+                        var angle = position / (attr.max + 1) * Math.PI * 2 + attr.baseRotation;
+                        label.setAttributes({
+                            text: String(text),
+                            translationX: attr.centerX + (attr.length + 10) * Math.cos(angle),
+                            translationY: attr.centerY + (attr.length + 10) * Math.sin(angle)
+                        }, true, true);
+                        label.applyTransformations();
+                        bbox = label.attr.matrix.transformBBox(label.getBBox(true));
+                        if (lastBBox && !Ext.draw.Draw.isBBoxIntersect(bbox, lastBBox)) {
+                            return;
+                        }
+                        surface.renderSprite(label);
+                        lastBBox = bbox;
+                        textSize += bbox.width;
+                        textCount++;
+                    }
+                });
             }
 
             if (attr.enlargeEstStepSizeByText && textCount) {
@@ -325,7 +394,7 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
                 }
             }
 
-            if (me.thickness !== thickness) {
+            if (Math.abs(me.thickness - (thickness)) > 1) {
                 me.thickness = thickness;
                 attr.bbox.plain.dirty = true;
                 attr.bbox.transform.dirty = true;
@@ -334,34 +403,32 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
         }
     },
 
-    doThicknessChanged: function () {
-        var axis = this.getAxis();
-        if (axis) {
-            axis.onThicknessChanged();
-        }
-    },
-
     renderAxisLine: function (surface, ctx, layout, clipRegion) {
         var me = this,
             attr = me.attr,
+            halfWidth = attr.lineWidth * 0.5,
             docked = attr.position;
         if (attr.axisLine) {
             switch (docked) {
                 case 'left':
-                    ctx.moveTo(clipRegion[2] - 1.5, -attr.endGap);
-                    ctx.lineTo(clipRegion[2] - 1.5, attr.length + attr.startGap);
+                    ctx.moveTo(clipRegion[2] - halfWidth, -attr.endGap);
+                    ctx.lineTo(clipRegion[2] - halfWidth, attr.length + attr.startGap);
                     break;
                 case 'right':
-                    ctx.moveTo(0.5, -attr.endGap);
-                    ctx.lineTo(0.5, attr.length + attr.startGap);
+                    ctx.moveTo(halfWidth, -attr.endGap);
+                    ctx.lineTo(halfWidth, attr.length + attr.startGap);
                     break;
                 case 'bottom':
-                    ctx.moveTo(-attr.startGap, 0.5);
-                    ctx.lineTo(attr.length + attr.endGap, 0.5);
+                    ctx.moveTo(-attr.startGap, halfWidth);
+                    ctx.lineTo(attr.length + attr.endGap, halfWidth);
                     break;
                 case 'top':
-                    ctx.moveTo(-attr.startGap, clipRegion[3] - 1.5);
-                    ctx.lineTo(attr.length + attr.endGap, clipRegion[3] - 1.5);
+                    ctx.moveTo(-attr.startGap, clipRegion[3] - halfWidth);
+                    ctx.lineTo(attr.length + attr.endGap, clipRegion[3] - halfWidth);
+                    break;
+                case 'angular':
+                    ctx.moveTo(attr.centerX + attr.length, attr.centerY);
+                    ctx.arc(attr.centerX, attr.centerY, attr.length, 0, Math.PI * 2, true);
                     break;
             }
         }
@@ -377,38 +444,77 @@ Ext.define("Ext.chart.axis.sprite.Axis", {
             dy = matrix.getDY(),
             position = attr.position,
             majorTicks = layout.majorTicks,
-            i, it, anchor, lastAnchor;
+            anchor, j, lastAnchor;
         if (attr.grid) {
             if (majorTicks) {
                 if (position === 'left' || position === 'right') {
                     lastAnchor = attr.min * yy + dy;
-                    for (i = 0, it = me.iterate(majorTicks); it.hasNext(); it.step(), i++) {
-                        anchor = it.get() * yy + dy;
-                        me.putMarker('horizontal', {
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        anchor = position * yy + dy;
+                        me.putMarker('horizontal-' + (i % 2 ? 'odd' : 'even'), {
                             y: anchor,
                             height: lastAnchor - anchor
-                        }, i);
+                        }, j = i, true);
                         lastAnchor = anchor;
-                    }
-                } else {
+                    });
+                    j++;
+                    anchor = 0;
+                    me.putMarker('horizontal-' + (j % 2 ? 'odd' : 'even'), {
+                        y: anchor,
+                        height: lastAnchor - anchor
+                    }, j, true);
+                } else if (position === 'top' || position === 'bottom') {
                     lastAnchor = attr.min * xx + dx;
-                    for (i = 0, it = me.iterate(majorTicks); it.hasNext(); it.step(), i++) {
-                        anchor = it.get() * xx + dx;
-                        me.putMarker('vertical', {
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        anchor = position * xx + dx;
+                        me.putMarker('vertical-' + (i % 2 ? 'odd' : 'even'), {
                             x: anchor,
                             width: lastAnchor - anchor
-                        }, i);
+                        }, j = i, true);
                         lastAnchor = anchor;
-                    }
+                    });
+                    j++;
+                    anchor = attr.length;
+                    me.putMarker('vertical-' + (j % 2 ? 'odd' : 'even'), {
+                        x: anchor,
+                        width: lastAnchor - anchor
+                    }, j, true);
+                } else if (position === 'radial') {
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        anchor = position / attr.max * attr.length;
+                        me.putMarker('angular-' + (i % 2 ? 'odd' : 'even'), {
+                            scalingX: anchor,
+                            scalingY: anchor
+                        }, i, true);
+                        lastAnchor = anchor;
+                    });
+                } else if (position === 'angular') {
+                    me.iterate(majorTicks, function (position, labelText, i) {
+                        anchor = position / (attr.max + 1) * Math.PI * 2 + attr.baseRotation;
+                        me.putMarker('radial-' + (i % 2 ? 'odd' : 'even'), {
+                            rotationRads: anchor,
+                            rotationCenterX: 0,
+                            rotationCenterY: 0,
+                            scalingX: attr.length,
+                            scalingY: attr.length
+                        }, i, true);
+                        lastAnchor = anchor;
+                    });
                 }
             }
+        }
+    },
+
+    doThicknessChanged: function () {
+        var axis = this.getAxis();
+        if (axis) {
+            axis.onThicknessChanged();
         }
     },
 
     render: function (surface, ctx, clipRegion) {
         var me = this,
             layout = me.getLayoutContext();
-
         if (layout) {
             ctx.beginPath();
             me.renderTicks(surface, ctx, layout, clipRegion);

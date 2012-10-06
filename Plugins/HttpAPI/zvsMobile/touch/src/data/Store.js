@@ -689,6 +689,8 @@ Ext.define('Ext.data.Store', {
         // </deprecated>
 
         this.initConfig(config);
+
+        this.callParent(arguments);
     },
 
     /**
@@ -813,6 +815,7 @@ Ext.define('Ext.data.Store', {
             if (proxy instanceof Ext.data.proxy.Memory) {
                 proxy.setData(data);
                 me.load();
+                return;
             } else {
                 // We make it silent because we don't want to fire a refresh event
                 me.removeAll(true);
@@ -1019,9 +1022,8 @@ Ext.define('Ext.data.Store', {
      * @return {Ext.data.Model[]} The model instances that were added.
      */
     add: function(records) {
-        //accept both a single-argument array of records, or any number of record arguments
         if (!Ext.isArray(records)) {
-            records = Array.prototype.slice.apply(arguments);
+            records = Array.prototype.slice.call(arguments);
         }
 
         return this.insert(this.data.length, records);
@@ -1576,8 +1578,9 @@ Ext.define('Ext.data.Store', {
             ln = data.length;
 
         data.filter({
-            filterFn: fn,
-            scope: scope
+            filterFn: function(record) {
+                return fn.call(scope || me, record, record.getId())
+            }
         });
 
         this.fireEvent('filter', this, data, data.getFilters());

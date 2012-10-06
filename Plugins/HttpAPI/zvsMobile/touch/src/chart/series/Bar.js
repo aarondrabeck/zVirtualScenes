@@ -1,6 +1,6 @@
 /**
  * TODO: Finish documentation
- *
+ * @extends Ext.chart.series.StackedCartesian
  */
 Ext.define('Ext.chart.series.Bar', {
 
@@ -10,19 +10,33 @@ Ext.define('Ext.chart.series.Bar', {
     type: 'bar',
     seriesType: 'barSeries',
 
-    requires: ['Ext.chart.series.sprite.Bar'],
+    requires: [
+        'Ext.chart.series.sprite.Bar',
+        'Ext.draw.sprite.Rect'
+    ],
 
     config: {
-        highlightCfg: {
-            lineWidth: 3,
-            stroke: '#55c',
-            opacity: 0.8,
-            color: '#f00'
+        itemInstancing: {
+            type: 'rect',
+            fx: {
+                customDuration: {
+                    x: 0,
+                    y: 0,
+                    width: 0,
+                    height: 0,
+                    radius: 0
+                }
+            }
         }
     },
 
-    getSprites: function () {
-        var sprites = this.callSuper(arguments),
+    updateXAxis: function (axis) {
+        axis.setLabelInSpan(true);
+        this.callSuper(arguments);
+    },
+
+    updateStacked: function (stacked) {
+        var sprites = this.getSprites(),
             attrs = {}, i, ln = sprites.length;
 
         if (this.getStacked()) {
@@ -38,6 +52,6 @@ Ext.define('Ext.chart.series.Bar', {
                 sprites[i].setAttributes(attrs);
             }
         }
-        return sprites;
+        this.callSuper(arguments);
     }
 });

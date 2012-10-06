@@ -42,7 +42,7 @@
  *         }],
  *         series: [{
  *             type: 'scatter',
- *             markerConfig: {
+ *             marker: {
  *                 radius: 5,
  *                 size: 5
  *             },
@@ -51,7 +51,7 @@
  *             yField: 'data2'
  *         }, {
  *             type: 'scatter',
- *             markerConfig: {
+ *             marker: {
  *                 radius: 5,
  *                 size: 5
  *             },
@@ -63,7 +63,7 @@
  *
  * In this configuration we add three different categories of scatter series. Each of them is bound to a different field of the same data store,
  * `data1`, `data2` and `data3` respectively. All x-fields for the series must be the same field, in this case `name`.
- * Each scatter series has a different styling configuration for markers, specified by the `markerConfig` object. Finally we set the left axis as
+ * Each scatter series has a different styling configuration for markers, specified by the `marker` object. Finally we set the left axis as
  * axis to show the current values of the elements.
  *
  */
@@ -71,42 +71,29 @@ Ext.define('Ext.chart.series.Scatter', {
 
     extend: 'Ext.chart.series.Cartesian',
 
-    uses: ['Ext.chart.Shape'],
-
     alias: 'series.scatter',
-    
+
     type: 'scatter',
     seriesType: 'scatterSeries',
 
     requires: [
         'Ext.chart.series.sprite.Scatter'
     ],
-    
+
     config: {
-        /**
-         * @cfg {Boolean} showMarkers
-         * Whether markers should be displayed at the data points along the line. If true,
-         * then the {@link #markerConfig} config item will determine the markers' styling.
-         */
-        showMarkers: true,
+        itemInstancing: {
+            fx: {
+                customDuration: {
+                    translationX: 0,
+                    translationY: 0
+                }
+            }
+        }
+    },
 
-        /**
-         * @cfg {Object} markerConfig
-         * The display style for the markers. Only used if {@link #showMarkers} is true.
-         * The markerConfig is a configuration object containing the same set of properties defined in
-         * the Sprite class. For example, if we were to set red circles as markers to the line series we could
-         * pass the object:
-         *
-         <pre><code>
-         markerConfig: {
-             type: 'circle',
-             radius: 4,
-             'fill': '#f00'
-         }
-         </code></pre>
-
-         */
-        markerConfig: {}
+    applyMarker: function (marker) {
+        this.getItemInstancing();
+        this.setItemInstancing(marker);
     }
 });
 

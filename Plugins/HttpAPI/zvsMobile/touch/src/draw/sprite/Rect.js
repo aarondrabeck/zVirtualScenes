@@ -1,5 +1,22 @@
 /**
+ * @class Ext.draw.sprite.Rect
+ * @extends Ext.draw.sprite.Path
  *
+ * A sprite that represents a rectangle.
+ *
+ *     @example preview miniphone
+ *     var component = new Ext.draw.Component({
+ *       items: [{
+ *         type: 'rect',
+ *         x: 50,
+ *         y: 50,
+ *         width: 50,
+ *         height: 50,
+ *         fillStyle: 'blue'
+ *       }]
+ *     });
+ *     Ext.Viewport.setLayout('fit');
+ *     Ext.Viewport.add(component);
  */
 Ext.define("Ext.draw.sprite.Rect", {
     extend: "Ext.draw.sprite.Path",
@@ -8,10 +25,29 @@ Ext.define("Ext.draw.sprite.Rect", {
     inheritableStatics: {
         def: {
             processors: {
+                /**
+                 * @cfg {Number} x The position of the sprite on the x-axis.
+                 */
                 x: 'number',
+
+                /**
+                 * @cfg {Number} y The position of the sprite on the y-axis.
+                 */
                 y: 'number',
+
+                /**
+                 * @cfg {Number} width The width of the sprite.
+                 */
                 width: 'number',
+
+                /**
+                 * @cfg {Number} height The height of the sprite.
+                 */
                 height: 'number',
+
+                /**
+                 * @cfg {Number} radius The radius of the rounded corners.
+                 */
                 radius: 'number'
             },
             aliases: {
@@ -46,7 +82,7 @@ Ext.define("Ext.draw.sprite.Rect", {
         this.attr.matrix.transformBBox(plain, this.attr.radius, transform);
     },
 
-    drawPath: function (path, attr) {
+    updatePath: function (path, attr) {
         var x = attr.x,
             y = attr.y,
             width = attr.width,

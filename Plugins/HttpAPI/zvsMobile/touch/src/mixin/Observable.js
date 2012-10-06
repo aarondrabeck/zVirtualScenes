@@ -774,7 +774,7 @@ Ext.define('Ext.mixin.Observable', {
      * @private
      * Creates an event handling function which re-fires the event from this object as the passed event name.
      * @param newName
-     * @returns {Function}
+     * @return {Function}
      */
     createEventRelayer: function(newName){
         return function() {

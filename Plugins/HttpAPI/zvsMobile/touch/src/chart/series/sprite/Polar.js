@@ -18,7 +18,9 @@ Ext.define("Ext.chart.series.sprite.Polar", {
                 endAngle: "number",
                 startRho: "number",
                 endRho: "number",
-                baseRotation: "number"
+                baseRotation: "number",
+                labels: 'default',
+                labelOverflowPadding: 'number'
             },
             defaults: {
                 dataY: null,
@@ -30,7 +32,9 @@ Ext.define("Ext.chart.series.sprite.Polar", {
                 endAngle: Math.PI,
                 startRho: 0,
                 endRho: 150,
-                baseRotation: 0
+                baseRotation: 0,
+                labels: null,
+                labelOverflowPadding: 10
             },
             dirtyTriggers: {
                 dataX: 'bbox',
@@ -47,6 +51,11 @@ Ext.define("Ext.chart.series.sprite.Polar", {
         }
     },
 
+    config: {
+        dataItems: null,
+        field: null
+    },
+    
     updatePlainBBox: function (plain) {
         var attr = this.attr;
         plain.x = attr.centerX - attr.endRho;

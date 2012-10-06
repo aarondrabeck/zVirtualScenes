@@ -32,7 +32,7 @@
  *
  * [getting_started]: #!/guide/getting_started
  */
-Ext.setVersion('touch', '2.1.0-beta3');
+Ext.setVersion('touch', '2.1.0-rc1');
 
 Ext.apply(Ext, {
     /**
@@ -289,6 +289,9 @@ Ext.apply(Ext, {
             },
             elementSize: {
                 xclass: 'Ext.event.publisher.ElementSize'
+            },
+            seriesItemEvents: {
+                xclass: 'Ext.chart.series.ItemPublisher'
             }
         },
 
@@ -326,7 +329,7 @@ Ext.apply(Ext, {
     /**
      * This indicate the start timestamp of current cycle.
      * It is only reliable during dom-event-initiated cycles and
-     * {@link Ext.draw.fx.Frame} initiated cycles.
+     * {@link Ext.draw.Animator} initiated cycles.
      */
     frameStartTime: +new Date(),
 
@@ -443,6 +446,7 @@ Ext.apply(Ext, {
      *         startupImage: {
      *             '320x460': 'resources/startup/320x460.jpg',
      *             '640x920': 'resources/startup/640x920.png',
+     *             '640x1096': 'resources/startup/640x1096.png',
      *             '768x1004': 'resources/startup/768x1004.png',
      *             '748x1024': 'resources/startup/748x1024.png',
      *             '1536x2008': 'resources/startup/1536x2008.png',
@@ -458,6 +462,7 @@ Ext.apply(Ext, {
      *
      * - 320x460: Non-retina iPhone, iPod touch, and all Android devices
      * - 640x920: Retina iPhone and iPod touch
+     * - 640x1096: iPhone 5 and iPod touch (fifth generation)
      * - 768x1004: Non-retina iPad (first and second generation) in portrait orientation
      * - 748x1024: Non-retina iPad (first and second generation) in landscape orientation
      * - 1536x2008: Retina iPad (third generation) in portrait orientation
@@ -641,7 +646,12 @@ Ext.apply(Ext, {
             statusBarStyle = config.statusBarStyle,
             devicePixelRatio = window.devicePixelRatio || 1;
 
-        addMeta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no');
+        if (navigator.standalone) {
+            addMeta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0');
+        }
+        else {
+            addMeta('viewport', 'initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0');
+        }
         addMeta('apple-mobile-web-app-capable', 'yes');
         addMeta('apple-touch-fullscreen', 'yes');
 
@@ -723,7 +733,11 @@ Ext.apply(Ext, {
         else {
             // Retina iPhone, iPod touch with iOS version >= 4.3
             if (devicePixelRatio >= 2 && Ext.os.version.gtEq('4.3')) {
-                addStartupImage(startupImage['640x920']);
+                if (Ext.os.is.iPhone5) {
+                    addStartupImage(startupImage['640x1096']);
+                } else {
+                    addStartupImage(startupImage['640x920']);
+                }
 
                 // Retina iPhone and iPod touch
                 if ('114' in icon) {
@@ -828,6 +842,7 @@ Ext.apply(Ext, {
      *         startupImage: {
      *             '320x460': 'resources/startup/320x460.jpg',
      *             '640x920': 'resources/startup/640x920.png',
+     *             '640x1096': 'resources/startup/640x1096.png',
      *             '768x1004': 'resources/startup/768x1004.png',
      *             '748x1024': 'resources/startup/748x1024.png',
      *             '1536x2008': 'resources/startup/1536x2008.png',
@@ -843,6 +858,7 @@ Ext.apply(Ext, {
      *
      * - 320x460: Non-retina iPhone, iPod touch, and all Android devices
      * - 640x920: Retina iPhone and iPod touch
+     * - 640x1096: iPhone 5 and iPod touch (fifth generation)
      * - 768x1004: Non-retina iPad (first and second generation) in portrait orientation
      * - 748x1024: Non-retina iPad (first and second generation) in landscape orientation
      * - 1536x2008: Retina iPad (third generation) in portrait orientation

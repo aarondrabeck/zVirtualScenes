@@ -87,6 +87,7 @@
  *     });
  */
 Ext.define('Ext.draw.sprite.Sprite', {
+    alias: 'sprite.sprite',
 
     mixins: {
         observable: 'Ext.mixin.Observable'
@@ -106,35 +107,130 @@ Ext.define('Ext.draw.sprite.Sprite', {
     inheritableStatics: {
         def: {
             processors: {
+                /**
+                 * @cfg {Color} strokeStyle The color of the stroke.
+                 */
                 strokeStyle: "color",
+
+                /**
+                 * @cfg {Color} fillStyle The color of the shadow.
+                 */
                 fillStyle: "color",
+
+                /**
+                 * @cfg {Number} strokeOpacity The opacity of the stroke. Limited from 0 to 1.
+                 */
                 strokeOpacity: "limited01",
+
+                /**
+                 * @cfg {Number} fillOpacity The opacity of the fill. Limited from 0 to 1.
+                 */
                 fillOpacity: "limited01",
 
+                /**
+                 * @cfg {Number} lineWidth The width of the line stroke.
+                 */
                 lineWidth: "number",
+
+                /**
+                 * @cfg {String} lineCap The style of the line caps.
+                 */
                 lineCap: "enums(butt,round,square)",
+
+                /**
+                 * @cfg {String} lineCap The style of the line join.
+                 */
                 lineJoin: "enums(round,bevel,miter)",
+
+                /**
+                 * @cfg {Number} miterLimit Sets the distance between the inner corner and the outer corner where two lines meet.
+                 */
                 miterLimit: "number",
 
+                /**
+                 * @cfg {Color} shadowColor The color of the shadow.
+                 */
                 shadowColor: "color",
+
+                /**
+                 * @cfg {Number} shadowOffsetX The offset of the sprite's shadow on the x-axis.
+                 */
                 shadowOffsetX: "number",
+
+                /**
+                 * @cfg {Number} shadowOffsetY The offset of the sprite's shadow on the y-axis.
+                 */
                 shadowOffsetY: "number",
+
+                /**
+                 * @cfg {Number} shadowBlur The amount blur used on the shadow.
+                 */
                 shadowBlur: "number",
 
+                /**
+                 * @cfg {Number} globalAlpha The opacity of the sprite. Limited from 0 to 1.
+                 */
                 globalAlpha: "limited01",
                 globalCompositeOperation: "enums(source-over,destination-over,source-in,destination-in,source-out,destination-out,source-atop,destination-atop,lighter,xor,copy)",
+
+                /**
+                 * @cfg {Boolean} hidden Determines whether or not the sprite is hidden.
+                 */
                 hidden: "bool",
+
+                /**
+                 * @cfg {Boolean} transformFillStroke Determines whether the fill and stroke are affected by sprite transformations.
+                 */
                 transformFillStroke: "bool",
+
+                /**
+                 * @cfg {Number} zIndex The stacking order of the sprite.
+                 */
                 zIndex: "number",
 
+                /**
+                 * @cfg {Number} translationX The translation of the sprite on the x-axis.
+                 */
                 translationX: "number",
+
+                /**
+                 * @cfg {Number} translationY The translation of the sprite on the y-axis.
+                 */
                 translationY: "number",
+
+                /**
+                 * @cfg {Number} rotationRads The degree of rotation of the sprite.
+                 */
                 rotationRads: "number",
+
+                /**
+                 * @cfg {Number} rotationCenterX The central coordinate of the sprite's scale operation on the x-axis.
+                 */
                 rotationCenterX: "number",
+
+                /**
+                 * @cfg {Number} rotationCenterY The central coordinate of the sprite's rotate operation on the y-axis.
+                 */
                 rotationCenterY: "number",
+
+                /**
+                 * @cfg {Number} scalingX The scaling of the sprite on the x-axis.
+                 */
                 scalingX: "number",
+
+                /**
+                 * @cfg {Number} scalingY The scaling of the sprite on the y-axis.
+                 */
                 scalingY: "number",
+
+                /**
+                 * @cfg {Number} scalingCenterX The central coordinate of the sprite's scale operation on the x-axis.
+                 */
                 scalingCenterX: "number",
+
+                /**
+                 * @cfg {Number} scalingCenterY The central coordinate of the sprite's scale operation on the y-axis.
+                 */
                 scalingCenterY: "number"
             },
 
@@ -164,6 +260,18 @@ Ext.define('Ext.draw.sprite.Sprite', {
                 hidden: false,
                 zIndex: 0,
 
+                strokeStyle: "none",
+                fillStyle: "none",
+                lineWidth: 1,
+                lineCap: "butt",
+                lineJoin: "miter",
+                miterLimit: 1,
+
+                shadowColor: "none",
+                shadowOffsetX: 0,
+                shadowOffsetY: 0,
+                shadowBlur: 0,
+                
                 globalAlpha: 1,
                 strokeOpacity: 1,
                 fillOpacity: 1,
@@ -243,116 +351,8 @@ Ext.define('Ext.draw.sprite.Sprite', {
     },
 
     config: {
-        parent: null,
-        skipFx: false
+        parent: null
     },
-
-    /**
-     * @cfg {String} type The type of the sprite. Possible options are 'circle', 'path', 'rect', 'text', 'square', 'image'
-     */
-
-    /**
-     * @cfg {Number} width Used in rectangle sprites, the width of the rectangle
-     */
-
-    /**
-     * @cfg {Number} height Used in rectangle sprites, the height of the rectangle
-     */
-
-    /**
-     * @cfg {Number} size Used in square sprites, the dimension of the square
-     */
-
-    /**
-     * @cfg {Number} radius Used in circle sprites, the radius of the circle
-     */
-
-    /**
-     * @cfg {Number} x The position along the x-axis
-     */
-
-    /**
-     * @cfg {Number} y The position along the y-axis
-     */
-
-    /**
-     * @cfg {Array} path Used in path sprites, the path of the sprite written in SVG-like path syntax
-     */
-
-    /**
-     * @cfg {Number} opacity The opacity of the sprite
-     */
-
-    /**
-     * @cfg {String} fill The fill color
-     */
-
-    /**
-     * @cfg {String} stroke The stroke color
-     */
-
-    /**
-     * @cfg {Number} stroke-width The width of the stroke
-     */
-
-    /**
-     * @cfg {String} font Used with text type sprites. The full font description. Uses the same syntax as the CSS font parameter
-     */
-
-    /**
-     * @cfg {String} text Used with text type sprites. The text itself
-     */
-
-    /**
-     * @cfg {String/Array} group The group that this sprite belongs to, or an array of groups. Only relevant when added to a
-     * {@link Ext.draw.Surface}
-     */
-
-    /**
-     * @event beforedestroy
-     */
-    /**
-     * @event destroy
-     */
-    /**
-     * @event render
-     */
-    /**
-     * @event mousedown
-     */
-    /**
-     * @event mouseup
-     */
-    /**
-     * @event mouseover
-     */
-    /**
-     * @event mouseout
-     */
-    /**
-     * @event mousemove
-     */
-    /**
-     * @event click
-     */
-    /**
-     * @event rightclick
-     */
-    /**
-     * @event mouseenter
-     */
-    /**
-     * @event mouseleave
-     */
-    /**
-     * @event touchstart
-     */
-    /**
-     * @event touchmove
-     */
-    /**
-     * @event touchend
-     */
 
     onClassExtended: function (Class, member) {
         var initCfg = Class.superclass.self.def.initialConfig,
@@ -376,7 +376,6 @@ Ext.define('Ext.draw.sprite.Sprite', {
             groups = [].concat(config.group || []),
             i, ln;
 
-        config = config || {};
         me.id = config.id || Ext.id(null, 'ext-sprite-');
         me.group = new Array(groups.length);
 
@@ -386,8 +385,10 @@ Ext.define('Ext.draw.sprite.Sprite', {
 
         me.attr = {};
         me.initConfig(config);
-        me.prepareModifiers();
+        var modifiers = Ext.Array.from(config.modifiers, true);
+        me.prepareModifiers(modifiers);
         me.initializeAttributes();
+        me.setAttributes(me.self.def.getDefaults(), true);
         me.setAttributes(config);
     },
 
@@ -403,30 +404,46 @@ Ext.define('Ext.draw.sprite.Sprite', {
         }
     },
 
-    prepareModifiers: function () {
+    addModifier: function (modifier, reinitializeAttributes) {
+        var me = this;
+        if (!(modifier instanceof Ext.draw.modifier.Modifier)) {
+            modifier = Ext.factory(modifier, null, null, 'modifier');
+        }
+        modifier.setSprite(this);
+        if (modifier.preFx || modifier.config && modifier.config.preFx) {
+            if (me.fx.getPrevious()) {
+                me.fx.getPrevious().setNext(modifier);
+            }
+            modifier.setNext(me.fx);
+        } else {
+            me.topModifier.getPrevious().setNext(modifier);
+            modifier.setNext(me.topModifier);
+        }
+        if (reinitializeAttributes) {
+            me.initializeAttributes();
+        }
+        return modifier;
+    },
+
+    prepareModifiers: function (additionalModifiers) {
         // Set defaults
         var me = this,
-            skipFx = me.getSkipFx();
+            modifier, i, ln;
 
         me.topModifier = new Ext.draw.modifier.Target({sprite: me});
-        me.preFxModifiers = [];
-        if (!skipFx) {
-            // Link modifiers
-            me.fx = new Ext.draw.modifier.Animation({sprite: me});
-            me.fx.setNext(me.topModifier);
+
+        // Link modifiers
+        me.fx = new Ext.draw.modifier.Animation({sprite: me});
+        me.fx.setNext(me.topModifier);
+
+        for (i = 0, ln = additionalModifiers.length; i < ln; i++) {
+            me.addModifier(additionalModifiers[i], false);
         }
     },
 
     initializeAttributes: function () {
         var me = this;
         me.topModifier.prepareAttributes(me.attr);
-        me.setAttributesCanonical(me.self.def.getDefaults());
-    },
-
-    pushPreFxModifier: function (modifier) {
-        modifier.beforeAttach(this);
-        this.preFxModifiers.push(modifier);
-        modifier.setNext(this.fx);
     },
 
     updateDirtyFlags: function (attrs) {
@@ -457,29 +474,38 @@ Ext.define('Ext.draw.sprite.Sprite', {
         }
     },
 
-    setAttributes: function (changes) {
+    /**
+     * Set attributes of the sprite.
+     *
+     * @param {Object} changes The content of the change.
+     * @param {Boolean} [bypassNormalization] `true` to avoid normalization of the given changes.
+     * @param {Boolean} [avoidCopy] `true` to avoid copying the `changes` object.
+     * The content of object may be destroyed.
+     */
+    setAttributes: function (changes, bypassNormalization, avoidCopy) {
         var attributes = this.attr;
-        this.topModifier.pushDown(attributes, this.self.def.normalize(changes));
+        if (bypassNormalization) {
+            if (avoidCopy) {
+                this.topModifier.pushDown(attributes, changes);
+            } else {
+                this.topModifier.pushDown(attributes, Ext.apply({}, changes));
+            }
+        } else {
+            this.topModifier.pushDown(attributes, this.self.def.normalize(changes));
+        }
     },
 
     /**
      * Set attributes of the sprite, assuming the names and values have already been
      * normalized.
      *
+     * @deprecated Use setAttributes directy with bypassNormalization argument being `true`.
      * @param {Object} changes The content of the change.
      * @param {Boolean} [avoidCopy] `true` to avoid copying the `changes` object.
      * The content of object may be destroyed.
      */
-    setAttributesCanonical: function (changes, avoidCopy) {
-        var attributes = this.attr;
-        // TODO: Try to find a way to avoid this copy.
-        // `this.topModifier.pushDown` will change the object,
-        // That's way we need this copy now.
-        if (avoidCopy) {
-            this.topModifier.pushDown(attributes, changes);
-        } else {
-            this.topModifier.pushDown(attributes, Ext.apply({}, changes));
-        }
+    setAttributesBypassingNormalization: function (changes, avoidCopy) {
+        return this.setAttributes(changes, true, avoidCopy);
     },
 
     /**
@@ -508,7 +534,6 @@ Ext.define('Ext.draw.sprite.Sprite', {
             return transform;
         }
     },
-
 
     /**
      * @protected
@@ -667,17 +692,28 @@ Ext.define('Ext.draw.sprite.Sprite', {
      */
     render: Ext.emptyFn,
 
+    repaint: function () {
+        var parent = this.getParent();
+        while (parent && !(parent instanceof Ext.draw.Surface)) {
+            parent = parent.getParent();
+        }
+        if (parent) {
+            parent.renderFrame();
+        }
+    },
+
     /**
      * Removes the sprite and clears all listeners.
      */
     destroy: function () {
-        var me = this, modifier = me.topModifier, curr;
+        var me = this, modifier = me.topModifier, curr; 
         while (modifier) {
             curr = modifier;
             modifier = modifier.getPrevious();
             curr.destroy();
         }
-
+        delete me.attr;
+        
         me.destroy = Ext.emptyFn;
         if (me.fireEvent('beforedestroy', me) !== false) {
             me.fireEvent('destroy', me);

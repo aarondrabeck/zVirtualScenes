@@ -1,5 +1,8 @@
 /**
- *
+ * @class Ext.draw.sprite.Sector
+ * @extends Ext.draw.sprite.Path
+ * 
+ * A sprite representing a pie slice.
  */
 Ext.define("Ext.draw.sprite.Sector", {
     extend: "Ext.draw.sprite.Path",
@@ -8,12 +11,39 @@ Ext.define("Ext.draw.sprite.Sector", {
     inheritableStatics: {
         def: {
             processors: {
+                /**
+                 * @cfg {Number} centerX The center coordinate of the sprite on the x-axis.
+                 */
                 centerX: "number",
+
+                /**
+                 * @cfg {Number} centerY The center coordinate of the sprite on the y-axis.
+                 */
                 centerY: "number",
+
+                /**
+                 * @cfg {Number} startAngle The starting angle of the sprite.
+                 */
                 startAngle: "number",
+
+                /**
+                 * @cfg {Number} endAngle The ending angle of the sprite.
+                 */
                 endAngle: "number",
+
+                /**
+                 * @cfg {Number} startRho The starting point of the radius of the sprite.
+                 */
                 startRho: "number",
+
+                /**
+                 * @cfg {Number} endRho The ending point of the radius of the sprite.
+                 */
                 endRho: "number",
+
+                /**
+                 * @cfg {Number} margin The margin of the sprite from the center of pie.
+                 */
                 margin: "number"
             },
             aliases: {
@@ -41,7 +71,7 @@ Ext.define("Ext.draw.sprite.Sector", {
         }
     },
 
-    drawPath: function (path, attr) {
+    updatePath: function (path, attr) {
         var startAngle = Math.min(attr.startAngle, attr.endAngle),
             endAngle = Math.max(attr.startAngle, attr.endAngle),
             midAngle = (startAngle + endAngle) * 0.5,

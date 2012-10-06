@@ -7,7 +7,7 @@
  * As with all other series, the Line Series must be appended in the *series* Chart array configuration. See the Chart
  * documentation for more information. A typical configuration object for the line series could be:
  *
- *     @example preview miniphone
+ *     @example preview
  *     var store = new Ext.data.JsonStore({
  *         fields: ['name', 'data1', 'data2', 'data3', 'data4', 'data5'],
  *         data: [
@@ -99,40 +99,12 @@ Ext.define('Ext.chart.series.Line', {
         'Ext.chart.series.sprite.Line'
     ],
 
-    uses: [
-        'Ext.chart.Shape'
-    ],
-
     config: {
         /**
          * @cfg {Number} selectionTolerance
          * The offset distance from the cursor position to the line series to trigger events (then used for highlighting series, etc).
          */
         selectionTolerance: 20,
-
-        /**
-         * @cfg {Boolean} showMarkers
-         * Whether markers should be displayed at the data points along the line. If `true`,
-         * then the {@link #markerConfig} config item will determine the markers' styling.
-         */
-        showMarkers: true,
-
-        /**
-         * @cfg {Object} markerConfig
-         * The display style for the markers. Only used if `{@link #showMarkers}` is `true`.
-         * The `markerConfig` is a configuration object containing the same set of properties defined in
-         * the Sprite class. For example, if we were to set red circles as markers to the line series we could
-         * pass the object:
-         *
-         *     markerConfig: {
-         *         type: 'circle',
-         *         radius: 4,
-         *         'fill': '#f00'
-         *     }
-         */
-        markerConfig: {
-            zIndex: 40
-        },
 
         /**
          * @cfg {Object} style

@@ -538,6 +538,10 @@
     opacity: 0.5;
   }
 
+  .x-android-4 .x-scroll-indicator {
+    opacity: 1;
+  }
+
   .x-scroll-indicator.default {
     @include border-top-radius(3px);
     @include border-bottom-radius(3px);
@@ -561,7 +565,6 @@
 
   .x-scroll-indicator.csstransform {
     background: none;
-  /*-webkit-transition: opacity 0.2s ease-out;*/
 
     > * {
       position: absolute;

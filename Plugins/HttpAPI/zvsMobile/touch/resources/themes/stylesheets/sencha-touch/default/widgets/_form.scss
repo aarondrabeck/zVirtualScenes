@@ -623,11 +623,11 @@ $form-scrollable-fields: '.x-field-slider, .x-field-toggle';
   // for select fields
   .x-field-select {
     position: relative;
+    z-index: 1;
 
     .x-component-outer {
       &:after {
         @include selectmark($form-light);
-        z-index: 2;
       }
 
       &:before,
@@ -643,7 +643,6 @@ $form-scrollable-fields: '.x-field-slider, .x-field-toggle';
         bottom: 0;
         @if $include-border-radius { @include border-right-radius($form-fieldset-radius); }
         @if $include-highlights { background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(rgba($form-field-bg-color, 0)), color-stop(.5, rgba($form-field-bg-color, 1))); }
-        z-index: 1;
       }
     }
   }

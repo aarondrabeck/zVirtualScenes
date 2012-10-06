@@ -57,52 +57,7 @@ Ext.define('Ext.draw.Component', {
         cls: 'x-draw-component',
 
         /**
-         * @cfg {Array} gradients (optional) Define a set of gradients that can be used as `fill` property in sprites.
-         * The gradients array is an array of objects with the following properties:
-         *
-         * - `id`: {@link String} - The unique name of the gradient.
-         * - `angle`: {@link Number} - (Optional) The angle of the gradient in degrees.
-         * - `stops`: {@link Object} - An object with numbers as keys (from 0 to 100) and style objects as values.
-         * 
-         * For example:
-         *
-         *     gradients: [{
-         *         id: 'gradientId',
-         *         angle: 45,
-         *         stops: {
-         *             0: {
-         *                 color: '#555'
-         *             },
-         *             100: {
-         *                 color: '#ddd'
-         *             }
-         *         }
-         *     }, {
-         *         id: 'gradientId2',
-         *         angle: 0,
-         *         stops: {
-         *             0: {
-         *                 color: '#590'
-         *             },
-         *             20: {
-         *               color: '#599'
-         *             },
-         *             100: {
-         *                 color: '#ddd'
-         *             }
-         *         }
-         *     }]
-         *
-         * Then the sprites can use `gradientId` and `gradientId2` by setting the fill attributes to those ids, for example:
-         *
-         *     sprite.setAttributes({
-         *         fill: 'url(#gradientId)'
-         *     }, true);
-         */
-        gradients: [],
-
-        /**
-         * @deprecated 2.1.0 Please implement custom resize event handler.
+         * @deprecated 2.2.0 Please implement custom resize event handler.
          * Resize the draw component by the content size of the main surface.
          *
          * __Note:__ It is applied only when there is only one surface.
@@ -110,7 +65,7 @@ Ext.define('Ext.draw.Component', {
         autoSize: false,
 
         /**
-         * @deprecated 2.1.0 Please implement custom resize event handler.
+         * @deprecated 2.2.0 Please implement custom resize event handler.
          * Pan/Zoom the content in main surface to fit the component size.
          *
          * __Note:__ It is applied only when there is only one surface.
@@ -118,12 +73,17 @@ Ext.define('Ext.draw.Component', {
         viewBox: false,
 
         /**
-         * @deprecated 2.1.0 Please implement custom resize event handler.
+         * @deprecated 2.2.0 Please implement custom resize event handler.
          * Fit the main surface to the size of component.
          *
          * __Note:__ It is applied only when there is only one surface.
          */
         fitSurface: true,
+
+        /**
+         * @cfg {Function} [resizeHandler] The resize function that can be configured to have a behavior.
+         */
+        resizeHandler: null,
 
         background: null,
 
@@ -138,7 +98,7 @@ Ext.define('Ext.draw.Component', {
             delete config.items;
         }
         this.callSuper(arguments);
-        this.frameCallbackId = Ext.draw.fx.Frame.addFrameCallback('renderFrame', this);
+        this.frameCallbackId = Ext.draw.Animator.addFrameCallback('renderFrame', this);
     },
 
     initialize: function () {
@@ -153,6 +113,9 @@ Ext.define('Ext.draw.Component', {
         if (!sprites) {
             return;
         }
+
+        sprites = Ext.Array.from(sprites);
+
         var ln = sprites.length,
             i, surface;
 
@@ -202,23 +165,35 @@ Ext.define('Ext.draw.Component', {
     },
 
     onResize: function () {
-        this.fireEvent('resize', this);
-        //<deprecated product=touch since=2.1>
         var me = this,
-            size = me.element.getSize(),
-            surfaces = me.getItems(),
+            size = me.element.getSize();
+        me.fireEvent('resize', me, size);
+        if (me.getResizeHandler()) {
+            me.getResizeHandler().call(me, size);
+        } else {
+            me.resizeHandler(size);
+        }
+        me.renderFrame();
+        me.onPlaceWatermark();
+    },
+
+    resizeHandler: function (size) {
+        var me = this;
+
+        //<deprecated product=touch since=2.2>
+        var surfaces = me.getItems(),
             surface, bbox, mat, zoomX, zoomY, zoom;
 
         if (surfaces.length === 1) {
             surface = surfaces.get(0);
-            if (this.getAutoSize()) {
+            if (me.getAutoSize()) {
                 bbox = surface.getItems().getBBox();
                 mat = new Ext.draw.Matrix();
                 mat.prepend(1, 0, 0, 1, -bbox.x, -bbox.y);
                 surface.matrix = mat;
                 surface.inverseMatrix = mat.inverse();
                 surface.setRegion([0, 0, bbox.width, bbox.height]);
-            } else if (this.getViewBox()) {
+            } else if (me.getViewBox()) {
                 bbox = surface.getItems().getBBox();
                 zoomX = size.width / bbox.width;
                 zoomY = size.height / bbox.height;
@@ -231,51 +206,22 @@ Ext.define('Ext.draw.Component', {
                 surface.matrix = mat;
                 surface.inverseMatrix = mat.inverse();
                 surface.setRegion([0, 0, size.width, size.height]);
-            } else if (this.getFitSurface()) {
+            } else if (me.getFitSurface()) {
                 surface.setRegion([0, 0, size.width, size.height]);
             }
-        } else if (this.getFitSurface()) {
-            this.getItems().each(function (surface) {
-                surface.setRegion([0, 0, size.width, size.height]);
-            });
+        } else if (!me.getFitSurface()) {
+            return;
         }
         //</deprecated>
-        this.renderFrame();
-        this.onPlaceWatermark();
-    },
 
-    applySurfaces: function (newSurfaces, oldSurfaces) {
-        oldSurfaces = oldSurfaces || new Ext.util.MixedCollection();
-        var oldItems = oldSurfaces.items.slice(0),
-            newIds = {},
-            i, id;
-        if (Ext.isObject(newSurfaces)) {
-            newSurfaces = [].concat(newSurfaces);
-        }
-        if (Ext.isArray(newSurfaces)) {
-            for (i = 0; i < newSurfaces.length; i++) {
-                newSurfaces[i] = Ext.factory(newSurfaces[i], this.engine, oldSurfaces.get(newSurfaces[i].id));
-                newSurfaces[i].setParent(this);
-                newIds[newSurfaces[i].id] = newSurfaces[i];
-            }
-        }
-        for (i = 0; i < oldItems.length; i++) {
-            if (!newIds[oldItems[i].id]) {
-                oldSurfaces.remove(oldItems[i]);
-            } else {
-                delete newIds[oldItems[i].id];
-            }
-        }
-        for (id in newIds) {
-            oldSurfaces.add(newIds[id]);
-        }
-        this.fireEvent('surfaceschanged', this, oldSurfaces);
-        return oldSurfaces;
+        me.getItems().each(function (surface) {
+            surface.setRegion([0, 0, size.width, size.height]);
+        });
     },
 
     /**
-     *
-     * @param [id]
+     * Get a surface by the given id or create one if it doesn't exist.
+     * @param {String} [id="main"]
      * @return {Ext.draw.Surface}
      */
     getSurface: function (id) {
@@ -307,7 +253,6 @@ Ext.define('Ext.draw.Component', {
         for (i = 0, ln = surfaces.length; i < ln; i++) {
             surfaces.items[i].renderFrame();
         }
-
         //<deprecated product=touch since=2.2>
         // TODO: Throw a deprecation message
         if (surfaces.length === 1 && me.getAutoSize()) {
@@ -318,7 +263,7 @@ Ext.define('Ext.draw.Component', {
     },
 
     destroy: function () {
-        Ext.draw.fx.Frame.removeFrameCallback(this.frameCallbackId);
+        Ext.draw.Animator.removeFrameCallback(this.frameCallbackId);
         this.callSuper();
     }
 }, function () {

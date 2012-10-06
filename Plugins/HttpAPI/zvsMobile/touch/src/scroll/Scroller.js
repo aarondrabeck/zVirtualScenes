@@ -87,7 +87,7 @@ Ext.define('Ext.scroll.Scroller', {
 
     config: {
         /**
-         * @cfg
+         * @cfg element
          * @private
          */
         element: null,
@@ -100,7 +100,7 @@ Ext.define('Ext.scroll.Scroller', {
         direction: 'auto',
 
         /**
-         * @cfg
+         * @cfg fps
          * @private
          */
         fps: 'auto',
@@ -161,7 +161,7 @@ Ext.define('Ext.scroll.Scroller', {
         },
 
         /**
-         * @cfg
+         * @cfg bounceEasing
          * @private
          */
         bounceEasing: {
@@ -169,37 +169,37 @@ Ext.define('Ext.scroll.Scroller', {
         },
 
         /**
-         * @cfg
+         * @cfg outOfBoundRestrictFactor
          * @private
          */
         outOfBoundRestrictFactor: 0.5,
 
         /**
-         * @cfg
+         * @cfg startMomentumResetTime
          * @private
          */
         startMomentumResetTime: 300,
 
         /**
-         * @cfg
+         * @cfg maxAbsoluteVelocity
          * @private
          */
         maxAbsoluteVelocity: 6,
 
         /**
-         * @cfg
+         * @cfg containerSize
          * @private
          */
         containerSize: 'auto',
 
         /**
-         * @cfg
+         * @cfg size
          * @private
          */
         size: 'auto',
 
         /**
-         * @cfg
+         * @cfg autoRefresh
          * @private
          */
         autoRefresh: true,
@@ -238,7 +238,7 @@ Ext.define('Ext.scroll.Scroller', {
         },
 
         /**
-         * @cfg
+         * @cfg slotSnapOffset
          * @private
          */
         slotSnapOffset: {
@@ -275,6 +275,10 @@ Ext.define('Ext.scroll.Scroller', {
      */
     constructor: function(config) {
         var element = config && config.element;
+
+        if (Ext.os.is.Android4 && !Ext.browser.is.Chrome) {
+            this.onDrag = Ext.Function.createThrottled(this.onDrag, 20, this);
+        }
 
         this.listeners = {
             scope: this,
@@ -627,7 +631,7 @@ Ext.define('Ext.scroll.Scroller', {
             return {
                 x: snapSize,
                 y: snapSize
-            }
+            };
         }
 
         return snapSize;
@@ -638,7 +642,7 @@ Ext.define('Ext.scroll.Scroller', {
             return {
                 x: snapOffset,
                 y: snapOffset
-            }
+            };
         }
 
         return snapOffset;

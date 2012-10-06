@@ -232,7 +232,7 @@ Ext.define('Ext.chart.interactions.CrossZoom', {
                     surface.remove(me.selectionRect);
                 });
             }
-            
+
             this.selectionRect = null;
             surface.renderFrame();
             me.sync();
@@ -275,10 +275,12 @@ Ext.define('Ext.chart.interactions.CrossZoom', {
     undoZoom: function () {
         var zoomMap = this.zoomHistory.pop(),
             axes = this.getChart().getAxes();
-        for (var i = 0; i < axes.length; i++) {
-            var axis = axes[i];
-            if (zoomMap[axis.getId()]) {
-                axis.setVisibleRange(zoomMap[axis.getId()]);
+        if (zoomMap) {
+            for (var i = 0; i < axes.length; i++) {
+                var axis = axes[i];
+                if (zoomMap[axis.getId()]) {
+                    axis.setVisibleRange(zoomMap[axis.getId()]);
+                }
             }
         }
         this.getUndoButton().setDisabled(this.zoomHistory.length === 0);

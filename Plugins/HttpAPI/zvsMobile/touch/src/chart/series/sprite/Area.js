@@ -29,6 +29,8 @@ Ext.define("Ext.chart.series.sprite.Area", {
             dx = matrix.elements[4],
             yy = matrix.elements[3],
             dy = matrix.elements[5],
+            surfaceMatrix = me.surfaceMatrix,
+            markerCfg = {},
             start = Math.max(0, this.binarySearch(clip[0])),
             end = Math.min(dataX.length - 1, this.binarySearch(clip[2]) + 1);
         ctx.beginPath();
@@ -81,12 +83,18 @@ Ext.define("Ext.chart.series.sprite.Area", {
                 y = dataY[i] * yy + dy;
                 ctx.lineTo(x, lastY);
                 ctx.lineTo(x, lastY = y);
+                markerCfg.translationX = surfaceMatrix.x(x, y);
+                markerCfg.translationY = surfaceMatrix.y(x, y);
+                me.putMarker("markers", markerCfg, i, !attr.renderer);
             }
         } else {
             for (i = start; i <= end; i++) {
                 x = dataX[i] * xx + dx;
                 y = dataY[i] * yy + dy;
                 ctx.lineTo(x, y);
+                markerCfg.translationX = surfaceMatrix.x(x, y);
+                markerCfg.translationY = surfaceMatrix.y(x, y);
+                me.putMarker("markers", markerCfg, i, !attr.renderer);
             }
         }
         ctx.stroke();

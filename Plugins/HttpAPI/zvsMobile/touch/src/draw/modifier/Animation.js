@@ -8,7 +8,8 @@ Ext.define("Ext.draw.modifier.Animation", {
         observable: 'Ext.mixin.Observable'
     },
     requires: [
-        'Ext.draw.fx.TimingFunctions'
+        'Ext.draw.TimingFunctions',
+        'Ext.draw.Animator'
     ],
     extend: 'Ext.draw.modifier.Modifier',
     alias: 'modifier.animation',
@@ -27,18 +28,19 @@ Ext.define("Ext.draw.modifier.Animation", {
          * Default duration time (ms).
          */
         duration: 0,
-        specialEasings: {},
-        specialDuration: {}
+        customEasings: {},
+        customDuration: {}
     },
 
     constructor: function () {
-        this.callSuper(arguments);
-        this.animating = 0;
-        this.animatingPool = [];
         this.anyAnimation = false;
         this.anySpecialAnimations = false;
+        this.animating = 0;
+        this.animatingPool = [];
+        this.callSuper(arguments);
     },
 
+    // Inherited
     prepareAttributes: function (attr) {
         if (!attr.hasOwnProperty('timers')) {
             attr.animating = false;
@@ -51,10 +53,122 @@ Ext.define("Ext.draw.modifier.Animation", {
         }
     },
 
+
+    updateSprite: function (sprite) {
+        // Apply the config that was configured in the sprite.
+        this.setConfig(sprite.config.fx);
+    },
+    
     updateDuration: function (duration) {
         this.anyAnimation = duration > 0;
     },
 
+    applyEasing: function (easing) {
+        if (typeof easing === 'string') {
+            return Ext.draw.TimingFunctions.easingMap[easing];
+        } else {
+            return easing;
+        }
+    },
+
+    applyCustomEasings: function (newCustomEasing, oldCustomEasing) {
+        oldCustomEasing = oldCustomEasing || {};
+        var attr, attrs, easing, i, ln;
+
+        for (attr in newCustomEasing) {
+            easing = newCustomEasing[attr];
+            attrs = attr.split(',');
+            if (typeof easing === 'string') {
+                easing = Ext.draw.TimingFunctions.easingMap[easing];
+            }
+            for (i = 0, ln = attrs.length; i < ln; i++) {
+                oldCustomEasing[attrs[i]] = easing;
+            }
+        }
+        return oldCustomEasing;
+    },
+
+    /**
+     * Set special easings on the given attributes.
+     * @param attrs
+     * @param easing
+     */
+    setEasingOn: function (attrs, easing) {
+        attrs = Ext.Array.from(attrs).slice();
+        var customEasing = {},
+            i = 0,
+            ln = attrs.length;
+
+        for (; i < ln; i++) {
+            customEasing[attrs[i]] = easing;
+        }
+        this.setDurationEasings(customEasing);
+    },
+
+    /**
+     * Remove special easings on the given attributes.
+     * @param attrs
+     */
+    clearEasingOn: function (attrs) {
+        attrs = Ext.Array.from(attrs, true);
+        var i = 0, ln = attrs.length;
+        for (; i < ln; i++) {
+            delete this._customEasing[attrs[i]];
+        }
+    },
+
+    applyCustomDuration: function (newCustomDuration, oldCustomDuration) {
+        oldCustomDuration = oldCustomDuration || {};
+        var attr, duration, attrs, i, ln, anySpecialAnimations = this.anySpecialAnimations;
+
+        for (attr in newCustomDuration) {
+            duration = newCustomDuration[attr];
+            attrs = attr.split(',');
+            anySpecialAnimations = true;
+
+            for (i = 0, ln = attrs.length; i < ln; i++) {
+                oldCustomDuration[attrs[i]] = duration;
+            }
+        }
+        this.anySpecialAnimations = anySpecialAnimations;
+        return oldCustomDuration;
+    },
+
+    /**
+     * Set special duration on the given attributes.
+     * @param attrs
+     * @param duration
+     */
+    setDurationOn: function (attrs, duration) {
+        attrs = Ext.Array.from(attrs).slice();
+        var customDurations = {},
+            i = 0,
+            ln = attrs.length;
+
+        for (; i < ln; i++) {
+            customDurations[attrs[i]] = duration;
+        }
+        this.setCustomDuration(customDurations);
+    },
+
+    /**
+     * Remove special easings on the given attributes.
+     * @param attrs
+     */
+    clearDurationOn: function (attrs) {
+        attrs = Ext.Array.from(attrs, true);
+        var i = 0, ln = attrs.length;
+
+        for (; i < ln; i++) {
+            delete this._customDuration[attrs[i]];
+        }
+    },
+
+    /**
+     * @private
+     * @param attributes
+     * @param animating
+     */
     setAnimating: function (attributes, animating) {
         var me = this,
             i, j;
@@ -64,7 +178,7 @@ Ext.define("Ext.draw.modifier.Animation", {
             if (animating) {
                 me.animatingPool.push(attributes);
                 if (me.animating === 0) {
-                    Ext.draw.fx.Pool.add(me);
+                    Ext.draw.Animator.add(me);
                 }
                 me.animating++;
             } else {
@@ -78,90 +192,8 @@ Ext.define("Ext.draw.modifier.Animation", {
         }
     },
 
-    applyEasing: function (easing) {
-        if (typeof easing === 'string') {
-            return Ext.draw.fx.TimingFunctions.EasingMap[easing];
-        } else {
-            return easing;
-        }
-    },
-
-    applySpecialEasings: function (newSpecialEasing, oldSpecialEasing) {
-        oldSpecialEasing = oldSpecialEasing || {};
-        var attr, attrs, easing, i, ln;
-
-        for (attr in newSpecialEasing) {
-            easing = newSpecialEasing[attr];
-            attrs = attr.split(',');
-            if (typeof easing === 'string') {
-                easing = Ext.draw.fx.TimingFunctions.EasingMap[easing];
-            }
-            for (i = 0, ln = attrs.length; i < ln; i++) {
-                oldSpecialEasing[attrs[i]] = easing;
-            }
-        }
-        return oldSpecialEasing;
-    },
-
-    setEasingOn: function (attrs, easing) {
-        attrs = Ext.Array.from(attrs).slice();
-        var specialEasing = {},
-            i = 0,
-            ln = attrs.length;
-
-        for (; i < ln; i++) {
-            specialEasing[attrs[i]] = easing;
-        }
-        this.setSpecialEasings(specialEasing);
-    },
-
-    clearEasingOn: function (attrs) {
-        attrs = Ext.Array.from(attrs, true);
-        var i = 0, ln = attrs.length;
-        for (; i < ln; i++) {
-            delete this._specialEasing[attrs[i]];
-        }
-    },
-
-    applySpecialDuration: function (newSpecialDuration, oldSpecialDuration) {
-        oldSpecialDuration = oldSpecialDuration || {};
-        var attr, duration, attrs, i, ln, anySpecialAnimations = this.anySpecialAnimations;
-
-        for (attr in newSpecialDuration) {
-            duration = newSpecialDuration[attr];
-            attrs = attr.split(',');
-            anySpecialAnimations = true;
-            
-            for (i = 0, ln = attrs.length; i < ln; i++) {
-                oldSpecialDuration[attrs[i]] = duration;
-            }
-        }
-        this.anySpecialAnimations = anySpecialAnimations;
-        return oldSpecialDuration;
-    },
-
-    setDurationOn: function (attrs, duration) {
-        attrs = Ext.Array.from(attrs).slice();
-        var specialDurations = {},
-            i = 0,
-            ln = attrs.length;
-
-        for (; i < ln; i++) {
-            specialDurations[attrs[i]] = duration;
-        }
-        this.setSpecialDuration(specialDurations);
-    },
-    
-    clearDurationOn: function (attrs) {
-        attrs = Ext.Array.from(attrs, true);
-        var i = 0, ln = attrs.length;
-
-        for (; i < ln; i++) {
-            delete this._specialDuration[attrs[i]];
-        }
-    },
-
     /**
+     * @private
      * Set the attr with given easing and duration.
      * @param {Object} attr The attributes collection.
      * @param {Object} changes The changes that popped up from lower modifier.
@@ -172,8 +204,8 @@ Ext.define("Ext.draw.modifier.Animation", {
             parsers = this._sprite.self.def._animationProcessors,
             defaultEasing = this._easing,
             defaultDuration = this._duration,
-            specialDuration = this._specialDuration,
-            specialEasings = this._specialEasings,
+            customDuration = this._customDuration,
+            customEasings = this._customEasings,
             anySpecial = this.anySpecialAnimations,
             any = this.anyAnimation || anySpecial,
             original = attr.animationOriginal,
@@ -187,7 +219,10 @@ Ext.define("Ext.draw.modifier.Animation", {
             for (name in changes) {
                 if (attr[name] === changes[name]) {
                     delete changes[name];
+                } else {
+                    attr[name] = changes[name];
                 }
+                delete original[name];
                 delete timers[name];
             }
             return changes;
@@ -204,11 +239,11 @@ Ext.define("Ext.draw.modifier.Animation", {
                     duration = defaultDuration;
                     if (anySpecial) {
                         // Deducing the easing function and duration
-                        if (name in specialEasings) {
-                            easing = specialEasings[name];
+                        if (name in customEasings) {
+                            easing = customEasings[name];
                         }
-                        if (name in specialDuration) {
-                            duration = specialDuration[name];
+                        if (name in customDuration) {
+                            duration = customDuration[name];
                         }
                     }
 
@@ -262,6 +297,8 @@ Ext.define("Ext.draw.modifier.Animation", {
     },
 
     /**
+     * @private
+     *
      * Update attributes to current value according to current animation time.
      * This method will not effect the values of lower layers, but may delete a
      * value from it.
@@ -276,7 +313,7 @@ Ext.define("Ext.draw.modifier.Animation", {
             any = false,
             original = attr.animationOriginal,
             timers = attr.timers,
-            now = Ext.draw.fx.Frame.animationTime(),
+            now = Ext.draw.Animator.animationTime(),
             name, timer, delta;
 
         // If updated in the same frame, return.
@@ -288,8 +325,10 @@ Ext.define("Ext.draw.modifier.Animation", {
             timer = timers[name];
             if (!timer.start) {
                 timer.start = now;
+                delta = 0;
+            } else {
+                delta = (now - timer.start) / timer.duration;
             }
-            delta = (now - timer.start) / timer.duration;
             if (delta >= 1) {
                 changes[name] = original[name];
                 delete original[name];
@@ -304,11 +343,13 @@ Ext.define("Ext.draw.modifier.Animation", {
         return changes;
     },
 
+    // Inherited
     pushDown: function (attr, changes) {
         changes = Ext.draw.modifier.Modifier.prototype.pushDown.call(this, attr.animationOriginal, changes);
         return this.setAttrs(attr, changes);
     },
 
+    // Inherited
     popUp: function (attr, changes) {
         attr = attr.upperLevel;
         changes = this.setAttrs(attr, changes);
@@ -319,27 +360,26 @@ Ext.define("Ext.draw.modifier.Animation", {
         }
     },
 
+    // This is called as an animated object in `Ext.draw.Animator`.
     step: function () {
         var me = this,
             pool = me.animatingPool.slice(),
+            attributes,
             i, ln;
 
         for (i = 0, ln = pool.length; i < ln; i++) {
-            me.stepAttributes(pool[i]);
-        }
-    },
+            attributes = pool[i];
+            var changes = this.updateAttributes(attributes),
+                name;
 
-    stepAttributes: function (attributes) {
-        var changes = this.updateAttributes(attributes),
-            name;
-
-        // Looking for anything in changes
-        //noinspection LoopStatementThatDoesntLoopJS
-        for (name in changes) {
-            if (this._next) {
-                this._next.popUp(attributes, changes);
+            // Looking for anything in changes
+            //noinspection LoopStatementThatDoesntLoopJS
+            for (name in changes) {
+                if (this._next) {
+                    this._next.popUp(attributes, changes);
+                }
+                break;
             }
-            break;
         }
     }
 });

@@ -265,7 +265,7 @@ Ext.define('Ext.mixin.Sortable', {
 
     /**
      * This updates the cached sortFn based on the current sorters.
-     * @return {Function} sortFn The generated sort function.
+     * @return {Function} The generated sort function.
      * @private
      */
     updateSortFn: function() {
@@ -296,7 +296,7 @@ Ext.define('Ext.mixin.Sortable', {
 
     /**
      * Returns an up to date sort function.
-     * @return {Function} sortFn The sort function.
+     * @return {Function} The sort function.
      */
     getSortFn: function() {
         if (this.dirtySortFn) {
@@ -307,8 +307,8 @@ Ext.define('Ext.mixin.Sortable', {
 
     /**
      * This method will sort an array based on the currently configured {@link #sorters}.
-     * @param {Array} data The array you want to have sorted
-     * @return {Array} data The array you passed after it is sorted
+     * @param {Array} data The array you want to have sorted.
+     * @return {Array} The array you passed after it is sorted.
      */
     sort: function(data) {
         Ext.Array.sort(data, this.getSortFn());
@@ -320,7 +320,7 @@ Ext.define('Ext.mixin.Sortable', {
      * on the current sorters.
      * @param {Array} items The array that you want to insert the item into.
      * @param {Mixed} item The item that you want to insert into the items array.
-     * @returns {Number} index The index for the given item in the given array based on the current sorters.
+     * @return {Number} The index for the given item in the given array based on the current sorters.
      */
     findInsertionIndex: function(items, item, sortFn) {
         var start = 0,

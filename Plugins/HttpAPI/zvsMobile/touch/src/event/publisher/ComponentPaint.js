@@ -10,7 +10,8 @@ Ext.define('Ext.event.publisher.ComponentPaint', {
     handledEvents: ['erased'],
 
     eventNames: {
-        painted: 'painted'
+        painted: 'painted',
+        erased: 'erased'
     },
 
     constructor: function() {

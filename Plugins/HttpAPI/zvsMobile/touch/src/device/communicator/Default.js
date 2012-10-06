@@ -14,7 +14,7 @@
  *             // Do something with the base64-encoded `dataUri` string
  *         },
  *         function(errorMessage) {
- *    
+ *
  *         },
  *         callbackScope,
  *         {
@@ -23,9 +23,9 @@
  *             height: 500
  *         }
  *     );
- * 
+ *
  * Internally, `Ext.device.Communicator.send()` will then be invoked with the following argument:
- * 
+ *
  *     Ext.device.Communicator.send({
  *         command: 'Camera#capture',
  *         callbacks: {
@@ -41,23 +41,23 @@
  *         width: 500,
  *         height: 500
  *     });
- * 
+ *
  * Which will then be transformed into a HTTP GET request, sent to native shell's local
  * HTTP server with the following parameters:
- * 
+ *
  *     ?quality=75&width=500&height=500&command=Camera%23capture&onSuccess=3&onError=5
- * 
+ *
  * Notice that `onSuccess` and `onError` have been converted into string ids (`3` and `5`
  * respectively) and maintained by `Ext.device.Communicator`.
- * 
+ *
  * Whenever the requested operation finishes, `Ext.device.Communicator.invoke()` simply needs
  * to be executed from the native shell with the corresponding ids given before. For example:
- * 
+ *
  *     Ext.device.Communicator.invoke('3', ['DATA_URI_OF_THE_CAPTURED_IMAGE_HERE']);
- * 
+ *
  * will invoke the original `onSuccess` callback under the given scope. (`callbackScope`), with
  * the first argument of 'DATA_URI_OF_THE_CAPTURED_IMAGE_HERE'
- * 
+ *
  * Note that `Ext.device.Communicator` maintains the uniqueness of each function callback and
  * its scope object. If subsequent calls to `Ext.device.Communicator.send()` have the same
  * callback references, the same old ids will simply be reused, which guarantee the best possible
@@ -164,7 +164,7 @@ Ext.define('Ext.device.communicator.Default', {
     doSend: function(args) {
         var xhr = new XMLHttpRequest();
 
-        xhr.open('GET', this.SERVER_URL + '?' + Ext.Object.toQueryString(args), false);
+        xhr.open('GET', this.SERVER_URL + '?' + Ext.Object.toQueryString(args) + '&_dc=' + new Date().getTime(), false);
 
         // wrap the request in a try/catch block so we can check if any errors are thrown and attempt to call any
         // failure/callback functions if defined

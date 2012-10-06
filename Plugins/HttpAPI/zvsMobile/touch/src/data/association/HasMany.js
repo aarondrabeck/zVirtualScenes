@@ -180,7 +180,13 @@ Ext.define('Ext.data.association.HasMany', {
          * @cfg {Boolean} autoLoad
          * `true` to automatically load the related store from a remote source when instantiated.
          */
-        autoLoad: false
+        autoLoad: false,
+
+        /**
+         * @cfg {Boolean} autoSync
+         * true to automatically synchronize the related store with the remote source
+         */
+        autoSync: false
     },
 
     constructor: function(config) {
@@ -267,47 +273,76 @@ Ext.define('Ext.data.association.HasMany', {
             foreignKey      = me.getForeignKey(),
             primaryKey      = me.getPrimaryKey(),
             filterProperty  = me.getFilterProperty(),
-            autoLoad        = me.getAutoLoad();
+            autoLoad        = me.getAutoLoad(),
+            autoSync        = me.getAutoSync();
 
         return function() {
-            var me = this,
-                config, filter,
-                modelDefaults = {};
+            var record = this,
+                config, filter, store,
+                modelDefaults = {},
+                listeners = {
+                    addrecords: me.onAddRecords,
+                    removerecords: me.onRemoveRecords,
+                    scope: me
+                };
 
-            if (me[storeName] === undefined) {
+            if (record[storeName] === undefined) {
                 if (filterProperty) {
                     filter = {
                         property  : filterProperty,
-                        value     : me.get(filterProperty),
+                        value     : record.get(filterProperty),
                         exactMatch: true
                     };
                 } else {
                     filter = {
                         property  : foreignKey,
-                        value     : me.get(primaryKey),
+                        value     : record.get(primaryKey),
                         exactMatch: true
                     };
                 }
 
-                modelDefaults[foreignKey] = me.get(primaryKey);
+                modelDefaults[foreignKey] = record.get(primaryKey);
 
                 config = Ext.apply({}, storeConfig, {
                     model        : associatedModel,
                     filters      : [filter],
                     remoteFilter : true,
-                    modelDefaults: modelDefaults
+                    autoSync     : autoSync,
+                    modelDefaults: modelDefaults,
+                    listeners    : listeners
                 });
 
-                me[storeName] = Ext.create('Ext.data.Store', config);
+                store = record[storeName] = Ext.create('Ext.data.Store', config);
+                store.boundTo = record;
+
                 if (autoLoad) {
-                    me[storeName].load(function(records, operation) {
-                        association.updateInverseInstances(me);
-                    });
+                    record[storeName].load();
                 }
             }
 
-            return me[storeName];
+            return record[storeName];
         };
+    },
+
+    onAddRecords: function(store, records) {
+        var ln = records.length,
+            id = store.boundTo.getId(),
+            i, record;
+
+        for (i = 0; i < ln; i++) {
+            record = records[i];
+            record.set(this.getForeignKey(), id);
+        }
+        this.updateInverseInstances(store.boundTo);
+    },
+
+    onRemoveRecords: function(store, records) {
+        var ln = records.length,
+            i, record;
+        for (i = 0; i < ln; i++) {
+            record = records[i];
+            record.set(this.getForeignKey(), null);
+        }
     },
 
     updateStore: function(store) {
@@ -326,7 +361,6 @@ Ext.define('Ext.data.association.HasMany', {
             records = reader.read(associationData).getRecords();
 
         store.add(records);
-        this.updateInverseInstances(record);
     },
 
     updateInverseInstances: function(record) {

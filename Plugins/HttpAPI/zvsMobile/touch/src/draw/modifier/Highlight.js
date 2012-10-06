@@ -5,27 +5,25 @@
 Ext.define("Ext.draw.modifier.Highlight", {
     extend: 'Ext.draw.modifier.Modifier',
     alias: 'modifier.highlight',
+
     config: {
         enabled: false,
-        highlightStyle: {}
+        highlightStyle: null
     },
+
+    preFx: true,
 
     applyHighlightStyle: function (style, oldStyle) {
         oldStyle = oldStyle || {};
         if (this.getSprite()) {
             Ext.apply(oldStyle, this.getSprite().self.def.normalize(style));
+        } else {
+            Ext.apply(oldStyle, style);
         }
         return oldStyle;
     },
 
-    updateSprites: function (sprite, oldSprite) {
-        if (sprite) {
-            if (this.getHighlightStyle()) {
-                this._style = sprite.self.def.normalize(this.getHighlightStyle());
-            }
-        }
-    },
-
+    // Inherited
     prepareAttributes: function (attr) {
         if (!attr.hasOwnProperty('highlightOriginal')) {
             attr.highlighted = false;
@@ -34,6 +32,44 @@ Ext.define("Ext.draw.modifier.Highlight", {
         if (this._previous) {
             this._previous.prepareAttributes(attr.highlightOriginal);
         }
+    },
+
+    updateSprite: function (sprite, oldSprite) {
+        if (sprite) {
+            if (this.getHighlightStyle()) {
+                this._highlightStyle = sprite.self.def.normalize(this.getHighlightStyle());
+            }
+            this.setHighlightStyle(sprite.config.highlightCfg);
+        }
+
+        // Before attaching to a sprite, register the highlight related
+        // attributes to its definition.
+        //
+        // TODO(zhangbei): Unfortunately this will effect all the sprites of the same type.
+        // As the redundant attributes would not effect performance, it is not yet a big problem.
+        var def = sprite.self.def;
+        this.setSprite(sprite);
+        def.setConfig({
+            defaults: {
+                highlighted: false
+            },
+
+            processors: {
+                highlighted: 'bool'
+            },
+
+            aliases: {
+                "highlight": "highlighted",
+                "highlighting": "highlighted"
+            },
+
+            dirtyFlags: {
+            },
+
+            updaters: {
+
+            }
+        });
     },
 
     filterChanges: function (attr, changes) {
@@ -52,9 +88,18 @@ Ext.define("Ext.draw.modifier.Highlight", {
             }
         }
 
+        for (name in changes) {
+            if (name !== 'highlighted' && original[name] === changes[name]) {
+                // If it's highlighted, then save the changes to lower level
+                // on overridden attributes.
+                delete changes[name];
+            }
+        }
+
         return changes;
     },
 
+    // Inherited
     pushDown: function (attr, changes) {
         var style = this.getHighlightStyle(),
             original = attr.highlightOriginal,
@@ -62,7 +107,6 @@ Ext.define("Ext.draw.modifier.Highlight", {
 
         if (changes.hasOwnProperty('highlighted')) {
             oldHighlighted = changes.highlighted;
-
             // Hide `highlighted` and `highlightStyle` to underlying modifiers.
             delete changes.highlighted;
 
@@ -107,39 +151,9 @@ Ext.define("Ext.draw.modifier.Highlight", {
         return changes;
     },
 
+    // Inherited
     popUp: function (attr, changes) {
         changes = this.filterChanges(attr, changes);
         Ext.draw.modifier.Modifier.prototype.popUp.call(this, attr, changes);
-    },
-
-    beforeAttach: function (sprite) {
-        // Before attaching to a sprite, register the highlight related
-        // attributes to its definition.
-        //
-        // TODO(zhangbei): Unfortunately this will effect all the sprites of the same type.
-        // As the redundant attributes would not effect performance, it is not yet a big problem.
-        var def = sprite.self.def;
-        this.setSprite(sprite);
-        def.setConfig({
-            defaults: {
-                highlighted: false
-            },
-
-            processors: {
-                highlighted: 'bool'
-            },
-
-            aliases: {
-                "highlight": "highlighted",
-                "highlighting": "highlighted"
-            },
-
-            dirtyFlags: {
-            },
-
-            updaters: {
-
-            }
-        });
     }
 });

@@ -27,89 +27,39 @@
          * @param {Number} [alpha=1] (optional) Alpha component (0..1)
          */
         constructor: function (red, green, blue, alpha) {
+            this.setRGB(red, green, blue, alpha);
+        },
+
+        setRGB: function (red, green, blue, alpha) {
             var me = this;
-            if (red < 0) {
-                red = 0;
-            }
-            if (red > 255) {
-                red = 255;
-            }
-            me.r = red;
-
-            if (green < 0) {
-                green = 0;
-            }
-            if (green > 255) {
-                green = 255;
-            }
-            me.g = green;
-
-            if (blue < 0) {
-                blue = 0;
-            }
-            if (blue > 255) {
-                blue = 255;
-            }
-            me.b = blue;
+            me.r = Math.min(255, Math.max(0, red));
+            me.g = Math.min(255, Math.max(0, green));
+            me.b = Math.min(255, Math.max(0, blue));
             if (alpha === undefined) {
                 me.a = 1;
             } else {
-                me.a = alpha;
-                if (me.a > 1) {
-                    me.a = 1;
-                }
-                if (me.a < 0) {
-                    me.a = 0;
-                }
+                me.a = Math.min(1, Math.max(0, alpha));
             }
         },
 
         /**
-         * Get the red component of the color, in the range 0..255.
+         * Returns the gray value (0 to 255) of the color.
+         *
+         * The gray value is calculated using the formula r*0.3 + g*0.59 + b*0.11.
+         *
          * @return {Number}
          */
-        getRed: function () {
-            return this.r;
+        getGrayscale: function () {
+            // http://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
+            return this.r * 0.3 + this.g * 0.59 + this.b * 0.11;
         },
-
-        /**
-         * Get the green component of the color, in the range 0..255.
-         * @return {Number}
-         */
-        getGreen: function () {
-            return this.g;
-        },
-
-        /**
-         * Get the blue component of the color, in the range 0..255.
-         * @return {Number}
-         */
-        getBlue: function () {
-            return this.b;
-        },
-
-        /**
-         * Get the blue component of the color, in the range 0..255.
-         * @return {Number}
-         */
-        getAlpha: function () {
-            return this.a;
-        },
-
-        /**
-         * Get the RGB values.
-         * @return {Array}
-         */
-        getRGB: function () {
-            var me = this;
-            return [me.r, me.g, me.b];
-        },
-
+        
         /**
          * Get the equivalent HSL components of the color.
+         * @param {Array} [target] Optional array to receive the values.
          * @return {Array}
          */
-        getHSL: function () {
+        getHSL: function (target) {
             var me = this,
                 r = me.r / 255,
                 g = me.g / 255,
@@ -138,7 +88,69 @@
                     h -= 360;
                 }
             }
-            return [h, s, l];
+            if (target) {
+                target[0] = h;
+                target[1] = s;
+                target[2] = l;
+            } else {
+                target = [h, s, l];
+            }
+            return target;
+        },
+
+        /**
+         * Set current color based on the specified HSL values.
+         *
+         * @param {Number} h Hue component (0..359)
+         * @param {Number} s Saturation component (0..1)
+         * @param {Number} l Lightness component (0..1)
+         * @return this
+         */
+        setHSL: function (h, s, l) {
+            var c, x, m,
+                abs = Math.abs,
+                floor = Math.floor;
+            h = (h % 360 + 360 ) % 360;
+            s = s > 1 ? 1 : s < 0 ? 0 : s;
+            l = l > 1 ? 1 : l < 0 ? 0 : l;
+            if (s === 0 || h === null) {
+                l *= 255;
+                this.setRGB(l, l, l);
+            }
+            else {
+                // http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+                // C is the chroma
+                // X is the second largest component
+                // m is the lightness adjustment
+                h /= 60;
+                c = s * (1 - abs(2 * l - 1));
+                x = c * (1 - abs(h - 2 * floor(h / 2) - 1));
+                m = l - c / 2;
+                m *= 255;
+                c *= 255;
+                x *= 255;
+                switch (floor(h)) {
+                    case 0:
+                        this.setRGB(c + m, x + m, m);
+                        break;
+                    case 1:
+                        this.setRGB(x + m, c + m, m);
+                        break;
+                    case 2:
+                        this.setRGB(m, c + m, x + m);
+                        break;
+                    case 3:
+                        this.setRGB(m, x + m, c + m);
+                        break;
+                    case 4:
+                        this.setRGB(x + m, m, c + m);
+                        break;
+                    case 5:
+                        this.setRGB(c + m, m, x + m);
+                        break;
+                }
+            }
+            return this;
         },
 
         /**
@@ -146,7 +158,7 @@
          * @param {Number} [factor=0.2] Lighter factor (0..1).
          * @return {Ext.draw.Color}
          */
-        getLighter: function (factor) {
+        createLighter: function (factor) {
             var hsl = this.getHSL();
             factor = factor || this.lightnessFactor;
             // COMPAT Ext.util.Numbers -> Ext.Number
@@ -156,7 +168,7 @@
             } else if (hsl[2] < 0) {
                 hsl[2] = 0;
             }
-            return this.fromHSL(hsl[0], hsl[1], hsl[2]);
+            return Ext.draw.Color.fromHSL(hsl[0], hsl[1], hsl[2]);
         },
 
         /**
@@ -164,9 +176,9 @@
          * @param {Number} [factor=0.2] Darker factor (0..1).
          * @return {Ext.draw.Color}
          */
-        getDarker: function (factor) {
+        createDarker: function (factor) {
             factor = factor || this.lightnessFactor;
-            return this.getLighter(-factor);
+            return this.createLighter(-factor);
         },
 
         /**
@@ -184,8 +196,6 @@
                 g = (g.length === 1) ? '0' + g : g;
                 b = (b.length === 1) ? '0' + b : b;
                 return ['#', r, g, b].join('');
-            } else if (this.a === 0) {
-                return 'none';
             } else {
                 return 'rgba(' + [Math.round(this.r), Math.round(this.g), Math.round(this.b), this.a].join(',') + ')';
             }
@@ -223,21 +233,22 @@
         },
 
         /**
-         * Parse the string and create a new color.
+         * Parse the string and set current color.
          *
          * Supported formats: '#rrggbb', '#rgb', and 'rgb(r,g,b)'.
          *
          * If the string is not recognized, an `undefined` will be returned instead.
          *
          * @param {String} str Color in string.
-         * @return {Ext.draw.Color/undefined}
+         * @return this
          */
-        fromString: function (str) {
+        setFromString: function (str) {
             var values, r, g, b, a = 1,
                 parse = parseInt;
 
             if (str === 'none') {
-                return new Ext.draw.Color(0, 0, 0, 0);
+                this.r = this.g = this.b = this.a = 0;
+                return this;
             }
 
             if ((str.length === 4 || str.length === 7) && str.substr(0, 1) === '#') {
@@ -263,85 +274,43 @@
                 b = +values[3];
                 a = +values[4];
             } else {
-                return Ext.draw.Color.fromName(str);
-            }
-            return (typeof r === 'undefined') ? undefined : new Ext.draw.Color(r, g, b, a);
-        },
-
-        /**
-         * Returns the gray value (0 to 255) of the color.
-         *
-         * The gray value is calculated using the formula r*0.3 + g*0.59 + b*0.11.
-         *
-         * @return {Number}
-         */
-        getGrayscale: function () {
-            // http://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale
-            return this.r * 0.3 + this.g * 0.59 + this.b * 0.11;
-        },
-
-        /**
-         * Create a new color based on the specified HSL values.
-         *
-         * @param {Number} h Hue component (0..359)
-         * @param {Number} s Saturation component (0..1)
-         * @param {Number} l Lightness component (0..1)
-         * @return {Ext.draw.Color}
-         */
-        fromHSL: function (h, s, l) {
-            var C, X, m, rgb = [],
-                abs = Math.abs,
-                floor = Math.floor;
-            h = (h % 360 + 360 ) % 360;
-            s = s > 1 ? 1 : s < 0 ? 0 : s;
-            l = l > 1 ? 1 : l < 0 ? 0 : l;
-            if (s === 0 || h === null) {
-                // achromatic
-                rgb = [l, l, l];
-            }
-            else {
-                // http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
-                // C is the chroma
-                // X is the second largest component
-                // m is the lightness adjustment
-                h /= 60;
-                C = s * (1 - abs(2 * l - 1));
-                X = C * (1 - abs(h - 2 * floor(h / 2) - 1));
-                m = l - C / 2;
-                switch (floor(h)) {
-                    case 0:
-                        rgb = [C, X, 0];
-                        break;
-                    case 1:
-                        rgb = [X, C, 0];
-                        break;
-                    case 2:
-                        rgb = [0, C, X];
-                        break;
-                    case 3:
-                        rgb = [0, X, C];
-                        break;
-                    case 4:
-                        rgb = [X, 0, C];
-                        break;
-                    case 5:
-                        rgb = [C, 0, X];
-                        break;
+                if (Ext.draw.Color.ColorList.hasOwnProperty(str.toLowerCase())) {
+                    return this.setFromString(Ext.draw.Color.ColorList[str.toLowerCase()]);
                 }
-                rgb = [rgb[0] + m, rgb[1] + m, rgb[2] + m];
             }
-            return new Ext.draw.Color(rgb[0] * 255, rgb[1] * 255, rgb[2] * 255);
+            if (typeof r === 'undefined') {
+                return this;
+            }
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
+            return this;
         }
     }, function () {
-        var prototype = this.prototype;
         var flyColor = new this();
+
+        //<deprecated product=touch since=2.2>
+        this.createAlias({
+            "getLighter": "createLighter",
+            "getDarker": "createDarker"
+        });
+        //</deprecated>
+
         // TODO(zhangbei): do we have a better way to convert color names to rgb?
         this.addStatics({
             fly: function (r, g, b, a) {
-                flyColor.r = Math.min(255, Math.max(0, r));
-                flyColor.g = Math.min(255, Math.max(0, g));
-                flyColor.b = Math.min(255, Math.max(0, b));
-                flyColor.a = Math.min(1, Math.max(0, a));
+                switch (arguments.length) {
+                    case 1:
+                        flyColor.setFromString(r);
+                        break;
+                    case 3:
+                    case 4:
+                        flyColor.setRGB(r, g, b, a);
+                        break;
+                    default:
+                        return null;
+                }
                 return flyColor;
             },
 
@@ -357,7 +326,7 @@
                 "honeydew": "#f0fff0", "hotpink": "#ff69b4",
                 "indianred ": "#cd5c5c", "indigo ": "#4b0082", "ivory": "#fffff0", "khaki": "#f0e68c",
                 "lavender": "#e6e6fa", "lavenderblush": "#fff0f5", "lawngreen": "#7cfc00", "lemonchiffon": "#fffacd", "lightblue": "#add8e6", "lightcoral": "#f08080", "lightcyan": "#e0ffff", "lightgoldenrodyellow": "#fafad2",
-                "lightgrey": "#d3d3d3", "lightgreen": "#90ee90", "lightpink": "#ffb6c1", "lightsalmon": "#ffa07a", "lightseagreen": "#20b2aa", "lightskyblue": "#87cefa", "lightslategray": "#778899", "lightsteelblue": "#b0c4de",
+                "lightgray": "#d3d3d3", "lightgrey": "#d3d3d3", "lightgreen": "#90ee90", "lightpink": "#ffb6c1", "lightsalmon": "#ffa07a", "lightseagreen": "#20b2aa", "lightskyblue": "#87cefa", "lightslategray": "#778899", "lightsteelblue": "#b0c4de",
                 "lightyellow": "#ffffe0", "lime": "#00ff00", "limegreen": "#32cd32", "linen": "#faf0e6",
                 "magenta": "#ff00ff", "maroon": "#800000", "mediumaquamarine": "#66cdaa", "mediumblue": "#0000cd", "mediumorchid": "#ba55d3", "mediumpurple": "#9370d8", "mediumseagreen": "#3cb371", "mediumslateblue": "#7b68ee",
                 "mediumspringgreen": "#00fa9a", "mediumturquoise": "#48d1cc", "mediumvioletred": "#c71585", "midnightblue": "#191970", "mintcream": "#f5fffa", "mistyrose": "#ffe4e1", "moccasin": "#ffe4b5",
@@ -371,21 +340,12 @@
                 "wheat": "#f5deb3", "white": "#ffffff", "whitesmoke": "#f5f5f5",
                 "yellow": "#ffff00", "yellowgreen": "#9acd32"
             },
-            fromHSL: function () {
-                return prototype.fromHSL.apply(prototype, arguments);
+
+            fromHSL: function (h, s, l) {
+                return (new this(0, 0, 0, 0)).setHSL(h, s, l);
             },
-            fromString: function () {
-                return prototype.fromString.apply(prototype, arguments);
-            },
-            fromName: function (name) {
-                if (this.ColorList[name.toLowerCase()]) {
-                    return this.fromString(this.ColorList[name.toLowerCase()]);
-                } else {
-                    return null;
-                }
-            },
-            toHex: function (color) {
-                return prototype.toHex(color);
+            fromString: function (string) {
+                return (new this(0, 0, 0, 0)).setFromString(string);
             },
             create: function (arg) {
                 if (arg instanceof this) {
@@ -397,7 +357,7 @@
                 } else if (arguments.length > 2) {
                     return new Ext.draw.Color(arguments[0], arguments[1], arguments[2], arguments[3]);
                 } else {
-                    return 'none';
+                    return new Ext.draw.Color(0, 0, 0, 0);
                 }
             }
         });

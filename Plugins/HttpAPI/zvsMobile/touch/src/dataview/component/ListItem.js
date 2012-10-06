@@ -118,9 +118,7 @@ Ext.define('Ext.dataview.component.ListItem', {
         var body = this.getBody(),
             currentRecord = body.getRecord();
 
-        if (currentRecord === record) {
-            body.updateRecord(record);
-        } else {
+        if (currentRecord !== record) {
             body.setRecord(record);
         }
 

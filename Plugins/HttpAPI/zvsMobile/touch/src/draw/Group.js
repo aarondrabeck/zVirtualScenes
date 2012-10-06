@@ -1,8 +1,10 @@
 /**
- * A collection of sprites.
- * TODO: Finish documentation.
+ * @deprecated 2.2 
+ * A collection of sprites that delegates sprite functions to its elements.
  * 
- * Avoid using this multiple groups in a surface as it is error prone. The group notion may be remove in future releases.
+ * Avoid using this multiple groups in a surface as it is error prone.
+ * The group notion may be remove in future releases.
+ * 
  */
 Ext.define("Ext.draw.Group", {
     mixins: {

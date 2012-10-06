@@ -82,8 +82,10 @@ $include-button-highlights: $include-highlights !default;
     }
   }
 
-  .x-button-round {
-    @if $include-border-radius { @include border-radius($button-height/2); }
+  @if $include-border-radius {
+    .x-button-round {
+      @include border-radius($button-height/2);
+    }
   }
 
   // Button icon alignment
@@ -348,8 +350,10 @@ $include-button-highlights: $include-highlights !default;
     @include toolbar-button($color, $gradient);
   }
 
-  .x-button.x-button-#{$ui-label}-round {
-    @extend .x-button-round;
+  @if $include-border-radius {
+    .x-button.x-button-#{$ui-label}-round {
+      @extend .x-button-round;
+    }
   }
 
   .x-button.x-button-#{$ui-label}-small {

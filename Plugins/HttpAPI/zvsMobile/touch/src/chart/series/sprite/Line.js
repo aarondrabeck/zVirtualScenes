@@ -18,11 +18,28 @@ Ext.define("Ext.chart.series.sprite.Line", {
                 step: false,
                 transformFillStroke: true,
                 preciseStroke: false
+            },
+
+            dirtyTriggers: {
+                dataX: 'dataX,bbox,smooth',
+                dataY: 'dataY,bbox,smooth',
+                smooth: 'smooth'
+            },
+
+            updaters: {
+                "smooth": function (attr) {
+                    if (attr.smooth && attr.dataX && attr.dataY) {
+                        this.smoothX = Ext.draw.Draw.spline(attr.dataX);
+                        this.smoothY = Ext.draw.Draw.spline(attr.dataY);
+                    } else {
+                        delete this.smoothX;
+                        delete this.smoothY;
+                    }
+                }
             }
         }
     },
 
-    requires: ['Ext.draw.RMQ'],
     list: null,
 
     updatePlainBBox: function (plain) {
@@ -37,22 +54,31 @@ Ext.define("Ext.chart.series.sprite.Line", {
 
     drawStroke: function (surface, ctx, list) {
         var attr = this.attr,
+            matrix = attr.matrix,
+            xx = matrix.getXX(),
+            yy = matrix.getYY(),
+            dx = matrix.getDX(),
+            dy = matrix.getDY(),
             smooth = attr.smooth,
             step = attr.step,
-            i;
+            start = list[2],
+            smoothX = this.smoothX,
+            smoothY = this.smoothY,
+            i, j;
         ctx.beginPath();
         if (smooth) {
-            ctx.moveTo(list[0], list[1]);
-            for (i = 3; i < list.length; i += 3) {
+            ctx.moveTo(smoothX[start * 3] * xx + dx, smoothY[start * 3] * yy + dy);
+            for (i = 0, j = start * 3 + 1; i < list.length; i += 3, j += 3) {
                 ctx.bezierCurveTo(
-                    (list[i - 2] + list[i]) / 2, list[i - 1],
-                    (list[i - 2] + list[i]) / 2, list[i + 1],
-                    list[i], list[i + 1]);
+                    smoothX[j] * xx + dx, smoothY[j] * yy + dy,
+                    smoothX[j + 1] * xx + dx, smoothY[j + 1] * yy + dy,
+                    list[i + 3], list[i + 4]
+                );
             }
         } else if (step) {
             ctx.moveTo(list[0], list[1]);
             for (i = 3; i < list.length; i += 3) {
-                ctx.lineTo(list[i], list[i - 1]);
+                ctx.lineTo(list[i], list[i - 2]);
                 ctx.lineTo(list[i], list[i + 1]);
             }
         } else {
@@ -82,6 +108,7 @@ Ext.define("Ext.chart.series.sprite.Line", {
             maxXs = aggregates.maxX,
             minYs = aggregates.minY,
             maxYs = aggregates.maxY,
+            idx = aggregates.startIdx,
             left = region[0],
             right = region[0] + region[2],
             top = region[1],
@@ -96,13 +123,13 @@ Ext.define("Ext.chart.series.sprite.Line", {
                 maxY = maxYs[i];
 
             if (minX < maxX) {
-                list.push(minX * xx + dx, minY * yy + dy, i);
-                list.push(maxX * xx + dx, maxY * yy + dy, i);
+                list.push(minX * xx + dx, minY * yy + dy, idx[i]);
+                list.push(maxX * xx + dx, maxY * yy + dy, idx[i]);
             } else if (minX > maxX) {
-                list.push(maxX * xx + dx, maxY * yy + dy, i);
-                list.push(minX * xx + dx, minY * yy + dy, i);
+                list.push(maxX * xx + dx, maxY * yy + dy, idx[i]);
+                list.push(minX * xx + dx, minY * yy + dy, idx[i]);
             } else {
-                list.push(maxX * xx + dx, maxY * yy + dy, i);
+                list.push(maxX * xx + dx, maxY * yy + dy, idx[i]);
             }
             first = false;
         }
@@ -111,11 +138,12 @@ Ext.define("Ext.chart.series.sprite.Line", {
             for (i = 0; i < list.length; i += 3) {
                 x = list[i];
                 y = list[i + 1];
-                if (left <= x && x <= right && top <= y && y <= bottom) {
-                    markerCfg.translationX = surfaceMatrix.x(x, y);
-                    markerCfg.translationY = surfaceMatrix.y(x, y);
-                    me.putMarker('items', markerCfg, list[i + 2]);
+                if (attr.renderer) {
+                    attr.renderer.call(this, markerCfg, this, i, this.getDataItems().items[i]);
                 }
+                markerCfg.translationX = surfaceMatrix.x(x, y);
+                markerCfg.translationY = surfaceMatrix.y(x, y);
+                me.putMarker("markers", markerCfg, list[i + 2], !attr.renderer);
             }
             me.drawStroke(surface, ctx, list);
             ctx.lineTo(dataX[dataX.length - 1] * xx + dx + pixel, dataY[dataY.length - 1] * yy + dy);

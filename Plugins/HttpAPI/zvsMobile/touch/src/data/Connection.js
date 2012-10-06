@@ -526,8 +526,9 @@ Ext.define('Ext.data.Connection', {
 
 
         disableCache = options.disableCaching !== false ? (options.disableCaching || me.getDisableCaching()) : false;
-        // if the method is get append date to prevent caching
-        if (method === 'GET' && disableCache) {
+
+        // append date to prevent caching
+        if (disableCache) {
             url = Ext.urlAppend(url, (options.disableCachingParam || me.getDisableCachingParam()) + '=' + (new Date().getTime()));
         }
 

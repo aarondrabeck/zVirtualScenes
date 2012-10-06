@@ -20,19 +20,21 @@ Ext.define("Ext.chart.Markers", {
         }
     },
 
-    putMarkerFor: function (category, markerAttr, index) {
+    putMarkerFor: function (category, markerAttr, index, canonical, keepRevision) {
         category = category || 'default';
 
         var me = this,
             map = me.map[category] || (me.map[category] = {});
         if (index in map) {
-            me.setAttributesFor(map[index], markerAttr);
+            me.setAttributesFor(map[index], markerAttr, canonical);
         } else {
             map[index] = me.instances.length;
-            me.createInstance(markerAttr);
+            me.createInstance(markerAttr, null, canonical);
         }
         me.instances[map[index]].category = category;
-        me.instances[map[index]].revision = me.revisions[category] || (me.revisions[category] = 1);
+        if (!keepRevision) {
+            me.instances[map[index]].revision = me.revisions[category] || (me.revisions[category] = 1);
+        }
     },
 
     /**
@@ -63,7 +65,7 @@ Ext.define("Ext.chart.Markers", {
         template.preRender(surface, ctx, clipRegion);
         template.useAttributes(ctx);
         for (i = 0; i < ln; i++) {
-            if (instances[i].revision !== revisions[instances[i].category]) {
+            if (instances[i].hidden || instances[i].revision !== revisions[instances[i].category]) {
                 continue;
             }
             ctx.save();

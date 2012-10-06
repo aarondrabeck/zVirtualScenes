@@ -3,7 +3,7 @@
  */
 Ext.define("Ext.chart.series.sprite.Aggregative", {
     extend: 'Ext.chart.series.sprite.Cartesian',
-    requires: ['Ext.draw.RMQ', 'Ext.draw.LimitedCache', 'Ext.draw.SegmentTree'],
+    requires: ['Ext.draw.LimitedCache', 'Ext.draw.SegmentTree'],
     inheritableStatics: {
         def: {
             processors: {

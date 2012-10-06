@@ -1,7 +1,9 @@
 /**
  * Utility class to calculate [affine transformation](http://en.wikipedia.org/wiki/Affine_transformation) matrix.
  *
- * This class is compatible with SVGMatrix except using Number as its components rather than floats.
+ * This class is compatible with SVGMatrix except:
+ *   1. Ext.draw.Matrix operations are not read only.
+ *   2. Using Number as its components rather than floats.
  */
 Ext.define('Ext.draw.Matrix', {
 
@@ -23,15 +25,13 @@ Ext.define('Ext.draw.Matrix', {
                 dy = y1 - y0,
                 dxp = x1p - x0p,
                 dyp = y1p - y0p,
-                r = dx * dx + dy * dy,
+                r = 1 / (dx * dx + dy * dy),
                 a = dx * dxp + dy * dyp,
                 b = dxp * dy - dx * dyp,
-                c = -(dx * dxp * x0) - dy * dyp * x0 - dxp * dy * y0 + dx * dyp * y0,
-                d = -(dxp * dy) + dx * dyp,
-                e = dx * dxp + dy * dyp,
-                f = dxp * dy * x0 - dx * dyp * x0 - dx * dxp * y0 - dy * dyp * y0;
+                c = -a * x0 - b * y0,
+                f = b * x0 - a * y0;
 
-            return new this(a / r, d / r, b / r, e / r, c / r + x0p, f / r + y0p);
+            return new this(a * r, -b * r, b * r, a * r, c * r + x0p, f * r + y0p);
         },
 
         /**
@@ -64,7 +64,6 @@ Ext.define('Ext.draw.Matrix', {
 
             return new this(scale, 0, 0, scale, cxp - scale * cx, cyp - scale * cy);
         },
-
 
         /**
          * @static
@@ -182,7 +181,7 @@ Ext.define('Ext.draw.Matrix', {
      * @param dy Offset of y.
      * @return {Ext.draw.Matrix} this
      */
-    postpend: function (xx, xy, yx, yy, dx, dy) {
+    append: function (xx, xy, yx, yy, dx, dy) {
         var elements = this.elements,
             xx0 = elements[0],
             xy0 = elements[1],
@@ -208,8 +207,8 @@ Ext.define('Ext.draw.Matrix', {
      * @param {Ext.draw.Matrix} matrix
      * @return {Ext.draw.Matrix} this
      */
-    postpendMatrix: function (matrix) {
-        return this.postpend.apply(this, matrix.elements);
+    appendMatrix: function (matrix) {
+        return this.append.apply(this, matrix.elements);
     },
 
     /**
@@ -257,7 +256,7 @@ Ext.define('Ext.draw.Matrix', {
         c *= rDim;
         d *= rDim;
         if (target) {
-            target.elements = [d, -b, -c, a, c * f - d * e, b * e - a * f];
+            target.set(d, -b, -c, a, c * f - d * e, b * e - a * f);
             return target;
         } else {
             return new Ext.draw.Matrix(d, -b, -c, a, c * f - d * e, b * e - a * f);
@@ -276,7 +275,7 @@ Ext.define('Ext.draw.Matrix', {
         if (prepend) {
             return this.prepend(1, 0, 0, 1, x, y);
         } else {
-            return this.postpend(1, 0, 0, 1, x, y);
+            return this.append(1, 0, 0, 1, x, y);
         }
     },
 
@@ -307,7 +306,7 @@ Ext.define('Ext.draw.Matrix', {
         if (prepend) {
             return me.prepend(sx, 0, 0, sy, scx - scx * sx, scy - scy * sy);
         } else {
-            return me.postpend(sx, 0, 0, sy, scx - scx * sx, scy - scy * sy);
+            return me.append(sx, 0, 0, sy, scx - scx * sx, scy - scy * sy);
         }
     },
 
@@ -336,7 +335,7 @@ Ext.define('Ext.draw.Matrix', {
                 rcy - cos * rcy - rcx * sin
             );
         } else {
-            return me.postpend(
+            return me.append(
                 cos, sin,
                 -sin, cos,
                 rcx - cos * rcx + rcy * sin,
@@ -361,7 +360,7 @@ Ext.define('Ext.draw.Matrix', {
         if (prepend) {
             return me.prepend(cos, sin, -sin, cos, 0, 0);
         } else {
-            return me.postpend(cos, sin, -sin, cos, 0, 0);
+            return me.append(cos, sin, -sin, cos, 0, 0);
         }
     },
 
@@ -378,7 +377,7 @@ Ext.define('Ext.draw.Matrix', {
      * @return {Ext.draw.Matrix} this
      */
     flipX: function () {
-        return this.postpend(-1, 0, 0, 1, 0, 0);
+        return this.append(-1, 0, 0, 1, 0, 0);
     },
 
     /**
@@ -386,7 +385,7 @@ Ext.define('Ext.draw.Matrix', {
      * @return {Ext.draw.Matrix} this
      */
     flipY: function () {
-        return this.postpend(1, 0, 0, -1, 0, 0);
+        return this.append(1, 0, 0, -1, 0, 0);
     },
 
     /**
@@ -395,7 +394,7 @@ Ext.define('Ext.draw.Matrix', {
      * @return {Ext.draw.Matrix} this
      */
     skewX: function (angle) {
-        return this.postpend(1, Math.tan(angle), 0, -1, 0, 0);
+        return this.append(1, Math.tan(angle), 0, -1, 0, 0);
     },
 
     /**
@@ -404,7 +403,7 @@ Ext.define('Ext.draw.Matrix', {
      * @return {Ext.draw.Matrix} this
      */
     skewY: function (angle) {
-        return this.postpend(1, 0, Math.tan(angle), -1, 0, 0);
+        return this.append(1, 0, Math.tan(angle), -1, 0, 0);
     },
 
     /**
@@ -430,7 +429,6 @@ Ext.define('Ext.draw.Matrix', {
             newDy = elements[5],
             r = x2y * y2x - x2x * y2y;
 
-
         comp.b = devicePixelRatio * x2y / x2x;
         comp.c = devicePixelRatio * y2x / y2y;
         comp.d = devicePixelRatio;
@@ -454,7 +452,6 @@ Ext.define('Ext.draw.Matrix', {
             newDx = elements[4],
             newDy = elements[5],
             yxOnXx = y2x / x2x;
-
 
         comp.b = devicePixelRatio * x2y / x2x;
         comp.c = devicePixelRatio * yxOnXx;
@@ -497,7 +494,6 @@ Ext.define('Ext.draw.Matrix', {
     get: function (i, j) {
         return +this.elements[i + j * 2].toFixed(4);
     },
-
 
     /**
      * Transform a point to a new array.
@@ -646,15 +642,6 @@ Ext.define('Ext.draw.Matrix', {
     },
 
     /**
-     * Get an array of offsets with dx and dy component of the matrix.
-     * The numbers are rounded to keep only 4 decimals.
-     * @return {Array}
-     */
-    offset: function () {
-        return [this.elements[4].toFixed(4), this.elements[5].toFixed(4)];
-    },
-
-    /**
      * Apply the matrix to a drawing context.
      * @param {Object} ctx
      * @return {Ext.draw.Matrix} this
@@ -682,25 +669,21 @@ Ext.define('Ext.draw.Matrix', {
     },
 
     /**
-     * Get the x and y scales of the matrix.
-     * @return {Array}
-     */
-    getScales: function () {
-        var elements = this.elements;
-
-        return [
-            Math.sqrt(elements[0] * elements[0] + elements[2] * elements[2]),
-            Math.sqrt(elements[1] * elements[1] + elements[3] * elements[3])
-        ];
-    },
-
-    /**
      * Get the x scale of the matrix.
      * @return {Number}
      */
-    getScale: function () {
+    getScaleX: function () {
         var elements = this.elements;
         return Math.sqrt(elements[0] * elements[0] + elements[2] * elements[2]);
+    },
+
+    /**
+     * Get the y scale of the matrix.
+     * @return {Number}
+     */
+    getScaleY: function () {
+        var elements = this.elements;
+        return Math.sqrt(elements[1] * elements[1] + elements[3] * elements[3]);
     },
 
     /**
@@ -756,60 +739,41 @@ Ext.define('Ext.draw.Matrix', {
      * @return {Object}
      */
     split: function () {
-        function norm(a) {
-            return a[0] * a[0] + a[1] * a[1];
-        }
-
-        function normalize(a) {
-            var mag = Math.sqrt(norm(a));
-            a[0] /= mag;
-            a[1] /= mag;
-        }
-
-        var elements = this.elements,
+        var el = this.elements,
+            xx = el[0],
+            xy = el[1],
+            yx = el[2],
+            yy = el[3],
             out = {
-                translateX: elements[4],
-                translateY: elements[5]
-            },
-            row;
-
-        // scale and shear
-        row = [
-            [elements[0], elements[2]],
-            [elements[1], elements[3]]
-        ];
-        out.scaleX = Math.sqrt(norm(row[0]));
-        out.scaleY = Math.sqrt(norm(row[1]));
-
-        normalize(row[0]);
-        normalize(row[1]);
-        out.shear = row[0][0] * row[1][0] + row[0][1] * row[1][1];
+                translateX: el[4],
+                translateY: el[5]
+            };
+        out.scaleX = Math.sqrt(xx * xx + yx * yx);
+        out.shear = (xx * xy + yx * yy) / out.scaleX;
+        xy -= out.shear * xx;
+        yy -= out.shear * yx;
+        out.scaleY = Math.sqrt(xy * xy + yy * yy);
         out.shear /= out.scaleY;
-
-        // rotation
-        out.rotation = -Math.atan2(row[0][1], row[0][0]);
-
+        out.rotation = -Math.atan2(yx / out.scaleX, xy / out.scaleY);
         out.isSimple = Math.abs(out.shear) < 1e-9 && (!out.rotation || Math.abs(out.scaleX - out.scaleY) < 1e-9);
-
         return out;
     }
 }, function () {
+    function registerName(properties, name, i) {
+        properties[name] = {
+            get: function () {
+                return this.elements[i];
+            },
+            set: function (val) {
+                this.elements[i] = val;
+            }
+        };
+    }
+
+    // Compatibility with SVGMatrix
+    // https://developer.mozilla.org/en/DOM/SVGMatrix
     if (Object.defineProperties) {
         var properties = {};
-
-        function registerName(properties, name, i) {
-            properties[name] = {
-                get: function () {
-                    return this.elements[i];
-                },
-                set: function (val) {
-                    this.elements[i] = val;
-                }
-            };
-        }
-
-        // Compatible with SVGMatrix
-        // https://developer.mozilla.org/en/DOM/SVGMatrix
         /**
          * @property {Number} a Get x-to-x component of the matrix. Avoid using it for performance consideration.
          * Use {@link #getXX} instead.
@@ -823,16 +787,20 @@ Ext.define('Ext.draw.Matrix', {
         registerName(properties, 'e', 4);
         registerName(properties, 'f', 5);
         Object.defineProperties(this.prototype, properties);
-
-        /**
-         * Postpend a matrix onto the current.
-         *
-         * __Note:__ The given transform will come before the current one.
-         *
-         * @method
-         * @param {Ext.draw.Matrix} matrix
-         * @return {Ext.draw.Matrix} this
-         */
-        this.prototype.multiply = this.prototype.postpendMatrix;
     }
+
+    /**
+     * Postpend a matrix onto the current.
+     *
+     * __Note:__ The given transform will come before the current one.
+     *
+     * @method
+     * @param {Ext.draw.Matrix} matrix
+     * @return {Ext.draw.Matrix} this
+     */
+    this.prototype.multiply = this.prototype.appendMatrix;
+    // <deprecated product=touch since=2.2>
+    this.prototype.postpend = this.prototype.append;
+    this.prototype.postpendMatrix = this.prototype.appendMatrix;
+    // </deprecated>
 });

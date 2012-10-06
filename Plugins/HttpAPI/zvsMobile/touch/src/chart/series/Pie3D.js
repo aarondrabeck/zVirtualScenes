@@ -3,7 +3,7 @@
  */
 Ext.define('Ext.chart.series.Pie3D', {
     requires: ['Ext.chart.series.sprite.Pie3DPart'],
-    extend: 'Ext.chart.series.Series',
+    extend: 'Ext.chart.series.Polar',
     type: 'pie3d',
     seriesType: 'pie3d',
     alias: 'series.pie3d',
@@ -53,34 +53,26 @@ Ext.define('Ext.chart.series.Pie3D', {
     },
 
     updateColors: function (colorSet) {
-        var subStyle = this.getSubStyle();
-        if (!subStyle) {
-            this.setSubStyle({});
-            subStyle = this.getSubStyle();
-        }
-        subStyle.baseColor = colorSet;
+        this.setSubStyle({baseColor: colorSet});
     },
-
-    updateRegion: function (region) {
-        var me = this,
-            zoom = 1,
-            distortion = me.getDistortion(),
-            thickness = me.getThickness(),
-            height = thickness + region[2] * distortion + 100;
-        if (height > region[3]) {
-            zoom = region[3] / height;
+    
+    doUpdateStyles: function () {
+        var sprites = this.getSprites(),
+            i = 0, j = 0, ln = sprites && sprites.length;
+        for (; i < ln; i += 5, j++) {
+            sprites[i].setAttributes(this.getStyleByIndex(j));
+            sprites[i + 1].setAttributes(this.getStyleByIndex(j));
+            sprites[i + 2].setAttributes(this.getStyleByIndex(j));
+            sprites[i + 3].setAttributes(this.getStyleByIndex(j));
+            sprites[i + 4].setAttributes(this.getStyleByIndex(j));
         }
-        me.radius = zoom * region[2] / 2;
-        me.thickness = thickness * zoom;
-        me.centerX = region[2] / 2;
-        me.centerY = (-me.thickness + region[3]) / 2;
     },
 
     processData: function () {
         var me = this,
             chart = me.getChart(),
             animation = chart && chart.getAnimate(),
-            store = me.getActualStore(),
+            store = me.getStore(),
             items = store.getData().items,
             length = items.length,
             field = me.getField(),
@@ -122,25 +114,29 @@ Ext.define('Ext.chart.series.Pie3D', {
         var me = this,
             chart = this.getChart(),
             surface = me.getSurface(),
-            store = me.getActualStore();
+            store = me.getStore();
         if (!store) {
             return [];
         }
         var items = store.getData().items,
             length = items.length,
             animation = chart && chart.getAnimate(),
+            region = chart.getMainRegion() || [0, 0, 1, 1],
             rotation = me.getRotation(),
+            center = me.getCenter(),
+            offsetX = me.getOffsetX(),
+            offsetY = me.getOffsetY(),
+            radius = Math.min((region[3] - me.getThickness() * 2) / me.getDistortion(), region[2]) / 2,
             commonAttributes = {
-                centerX: me.centerX,
-                centerY: me.centerY,
-                endRho: me.radius,
-                startRho: me.radius * me.getDonut() / 100,
-                thickness: me.thickness,
+                centerX: center[0] + offsetX,
+                centerY: center[1] + offsetY - me.getThickness() / 2,
+                endRho: radius,
+                startRho: radius * me.getDonut() / 100,
+                thickness: me.getThickness(),
                 distortion: me.getDistortion()
             }, sliceAttributes, twoPie = Math.PI * 2,
             topSprite, startSprite, endSprite, innerSideSprite, outerSideSprite,
             i;
-
 
         for (i = 0; i < length; i++) {
             sliceAttributes = Ext.apply({}, this.getStyleByIndex(i), commonAttributes);
@@ -194,19 +190,19 @@ Ext.define('Ext.chart.series.Pie3D', {
                 endSprite = me.sprites[i * 5 + 2];
                 innerSideSprite = me.sprites[i * 5 + 3];
                 outerSideSprite = me.sprites[i * 5 + 4];
+                if (animation) {
+                    topSprite.fx.setConfig(animation);
+                    startSprite.fx.setConfig(animation);
+                    endSprite.fx.setConfig(animation);
+                    innerSideSprite.fx.setConfig(animation);
+                    outerSideSprite.fx.setConfig(animation);
+                }
+                topSprite.setAttributes(sliceAttributes);
+                startSprite.setAttributes(sliceAttributes);
+                endSprite.setAttributes(sliceAttributes);
+                innerSideSprite.setAttributes(sliceAttributes);
+                outerSideSprite.setAttributes(sliceAttributes);
             }
-            if (animation) {
-                topSprite.fx.setConfig(animation);
-                startSprite.fx.setConfig(animation);
-                endSprite.fx.setConfig(animation);
-                innerSideSprite.fx.setConfig(animation);
-                outerSideSprite.fx.setConfig(animation);
-            }
-            topSprite.setAttributes(sliceAttributes);
-            startSprite.setAttributes(sliceAttributes);
-            endSprite.setAttributes(sliceAttributes);
-            innerSideSprite.setAttributes(sliceAttributes);
-            outerSideSprite.setAttributes(sliceAttributes);
         }
 
         for (i *= 5; i < me.sprites.length; i++) {

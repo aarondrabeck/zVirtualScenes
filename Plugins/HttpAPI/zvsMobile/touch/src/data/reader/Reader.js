@@ -207,7 +207,7 @@ Ext.define('Ext.data.reader.Reader', {
 
     mixins: ['Ext.mixin.Observable'],
 
-    // private
+    // @private
     isReader: true,
 
     config: {
@@ -239,7 +239,7 @@ Ext.define('Ext.data.reader.Reader', {
         successProperty: 'success',
 
         /**
-         * @cfg {String} messageProperty
+         * @cfg {String} messageProperty (optional)
          * The name of the property which contains a response message. This property is optional.
          */
         messageProperty: null,
@@ -786,7 +786,8 @@ Ext.define('Ext.data.reader.Reader', {
     // </deprecated>
 }, function() {
     Ext.apply(this.prototype, {
-        // Private. Empty ResultSet to return when response is falsy (null|undefined|empty string)
+        // @private
+        // Empty ResultSet to return when response is falsy (null|undefined|empty string)
         nullResultSet: new Ext.data.ResultSet({
             total  : 0,
             count  : 0,

@@ -77,13 +77,7 @@ Ext.define("Ext.draw.gradient.Radial", {
         return circle;
     },
 
-    /**
-     * @protected
-     * Generate a linear gradient according to the
-     * @param ctx
-     * @param bbox
-     * @return {Object}
-     */
+    // Inherited
     generateGradient: function (ctx, bbox) {
         var start = this.getStart(),
             end = this.getEnd(),

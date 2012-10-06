@@ -399,7 +399,7 @@ Ext.define('Ext.XTemplateCompiler', {
         else if (name.substr(0, 7) == "parent.") {
             v = name;
         }
-        // compound Javascript property name (e.g., "foo.bar")
+        // compound JavaScript property name (e.g., "foo.bar")
         else if (isNaN(name) && name.indexOf('-') == -1 && name.indexOf('.') != -1) {
             v = "values." + name;
         }

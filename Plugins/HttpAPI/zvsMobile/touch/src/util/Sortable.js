@@ -8,12 +8,19 @@
  * {@link Ext.data.Store} or {@link Ext.data.TreeStore}.
  */
 Ext.define("Ext.util.Sortable", {
+    extend: 'Ext.mixin.Mixin',
     /**
      * @property {Boolean} isSortable
      * Flag denoting that this object is sortable. Always `true`.
      * @readonly
      */
     isSortable: true,
+    
+    mixinConfig: {
+        hooks: {
+            destroy: 'destroy'
+        }
+    },
     
     /**
      * @property {String} defaultSortDirection
@@ -233,5 +240,10 @@ Ext.define("Ext.util.Sortable", {
     
     getSorters: function() {
         return this.sorters.items;
+    },
+    
+    destroy: function () {
+        this.callSuper();
+        Ext.destroy(this.sorters);
     }
 });

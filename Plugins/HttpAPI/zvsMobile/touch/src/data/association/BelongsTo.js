@@ -253,42 +253,65 @@ Ext.define('Ext.data.association.BelongsTo', {
      */
     createSetter: function() {
         var me = this,
-            foreignKey = me.getForeignKey();
+            foreignKey = me.getForeignKey(),
+            associatedModel = me.getAssociatedModel(),
+            currentOwner, newOwner, store;
 
         //'this' refers to the Model instance inside this function
         return function(value, options, scope) {
-            var inverse = me.getInverseAssociation();
+            var inverse = me.getInverseAssociation(),
+                record = this;
 
             // If we pass in an instance, pull the id out
             if (value && value.isModel) {
                 value = value.getId();
             }
-            this.set(foreignKey, value);
 
             if (Ext.isFunction(options)) {
                 options = {
                     callback: options,
-                    scope: scope || this
+                    scope: scope || record
                 };
             }
 
+            // Remove the current belongsToInstance
+            delete record[me.getInstanceName()];
+
+            currentOwner = Ext.data.Model.cache[Ext.data.Model.generateCacheId(associatedModel.modelName, this.get(foreignKey))];
+            newOwner     = Ext.data.Model.cache[Ext.data.Model.generateCacheId(associatedModel.modelName, value)];
+
+            record.set(foreignKey, value);
+
             if (inverse) {
-                value = Ext.data.Model.cache[Ext.data.Model.generateCacheId(inverse.getOwnerModel().modelName, value)];
-                if (value) {
+                // We first add it to the new owner so that the record wouldnt be destroyed if it was the last store it was in
+                if (newOwner) {
                     if (inverse.getType().toLowerCase() === 'hasmany') {
-                        var store = value[inverse.getName()]();
-                        store.add(this);
+                        store = newOwner[inverse.getName()]();
+                        store.add(record);
                     } else {
-                        value[inverse.getInstanceName()] = this;
+                        newOwner[inverse.getInstanceName()] = record;
+                    }
+                }
+
+                if (currentOwner) {
+                    if (inverse.getType().toLowerCase() === 'hasmany') {
+                        store = currentOwner[inverse.getName()]();
+                        store.remove(record);
+                    } else {
+                        delete value[inverse.getInstanceName()];
                     }
                 }
             }
 
-            if (Ext.isObject(options)) {
-                return this.save(options);
+            if (newOwner) {
+                record[me.getInstanceName()] = newOwner;
             }
 
-            return this;
+            if (Ext.isObject(options)) {
+                return record.save(options);
+            }
+
+            return record;
         };
     },
 

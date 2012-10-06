@@ -290,21 +290,11 @@ Ext.define('Ext.field.DatePicker', {
      * Listener to the tap event of the mask element. Shows the internal DatePicker component when the button has been tapped.
      */
     onMaskTap: function() {
-        var component = this.getComponent();
         if (this.getDisabled()) {
             return false;
         }
 
-        if (this.getReadOnly()) {
-            return false;
-        }
-
-        if (Ext.os.is.Android4) {
-            component.input.dom.focus();
-        }
-        component.input.dom.blur();
-
-        this.getPicker().show();
+        this.onFocus();
 
         return false;
     },
@@ -347,6 +337,24 @@ Ext.define('Ext.field.DatePicker', {
 
     reset: function() {
         this.setValue(this.originalValue);
+    },
+
+    onFocus: function(e) {
+        var component = this.getComponent();
+        this.fireEvent('focus', this, e);
+
+        if (Ext.os.is.Android4) {
+            component.input.dom.focus();
+        }
+        component.input.dom.blur();
+
+        if (this.getReadOnly()) {
+            return false;
+        }
+
+        this.isFocused = true;
+
+        this.getPicker().show();
     },
 
     // @private

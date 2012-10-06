@@ -13,7 +13,7 @@ Ext.define("Ext.chart.axis.layout.Layout", {
     processData: function (series) {
         var me = this,
             axis = me.getAxis(),
-            direction = axis.getCategory(),
+            direction = axis.getDirection(),
             boundSeries = axis.boundSeries,
             i, ln, item;
         if (series) {

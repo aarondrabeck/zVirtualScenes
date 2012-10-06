@@ -6,6 +6,7 @@
  */
 
 Ext.define('Ext.chart.CartesianChart', {
+    extend: 'Ext.chart.AbstractChart',
     alternateClassName: 'Ext.chart.Chart',
     requires: ['Ext.chart.grid.HorizontalGrid', 'Ext.chart.grid.VerticalGrid'],
     config: {
@@ -17,30 +18,10 @@ Ext.define('Ext.chart.CartesianChart', {
 
         innerRegion: [0, 0, 1, 1]
     },
-
-    extend: 'Ext.chart.AbstractChart',
     xtype: 'chart',
     alias: 'Ext.chart.Chart',
 
-    getGridSprite: function (category) {
-        if (category === 'horizontal') {
-            if (!this.horizontalGridSprite) {
-                this.horizontalGridSprite = new Ext.chart.grid.HorizontalGrid({});
-                this.getSurface('grid').add(this.horizontalGridSprite);
-            }
-            return this.horizontalGridSprite;
-        }
-
-        if (category === 'vertical') {
-            if (!this.verticalGridSprite) {
-                this.verticalGridSprite = new Ext.chart.grid.VerticalGrid({});
-                this.getSurface('grid').add(this.verticalGridSprite);
-            }
-            return this.verticalGridSprite;
-        }
-    },
-
-    getCategoryForAxis: function (position) {
+    getDirectionForAxis: function (position) {
         var flipXY = this.getFlipXY();
         if (position === 'left' || position === 'right') {
             if (flipXY) {
@@ -72,14 +53,14 @@ Ext.define('Ext.chart.CartesianChart', {
                 height = size.height,
                 insetPadding = me.getInsetPadding(),
                 innerPadding = me.getInnerPadding(),
-                surface, overlaySurface,
+                surface,
                 shrinkBox = {
                     top: insetPadding.top,
                     left: insetPadding.left,
                     right: insetPadding.right,
                     bottom: insetPadding.bottom
                 },
-                gridSurface = me.getSurface('grid'),
+                gridSurface,
                 mainRegion, innerWidth, innerHeight,
                 elements, floating, matrix, i, ln,
                 flipXY = me.getFlipXY();
@@ -95,16 +76,16 @@ Ext.define('Ext.chart.CartesianChart', {
                 thickness = axis.getThickness();
                 switch (axis.getPosition()) {
                     case 'top':
-                        axisSurface.setRegion([0, shrinkBox.top, width, thickness + 1]);
+                        axisSurface.setRegion([0, shrinkBox.top, width, thickness]);
                         break;
                     case 'bottom':
-                        axisSurface.setRegion([0, height - (shrinkBox.bottom + thickness) - 1, width, thickness + 1]);
+                        axisSurface.setRegion([0, height - (shrinkBox.bottom + thickness), width, thickness]);
                         break;
                     case 'left':
-                        axisSurface.setRegion([shrinkBox.left, 0, thickness + 1, height]);
+                        axisSurface.setRegion([shrinkBox.left, 0, thickness, height]);
                         break;
                     case 'right':
-                        axisSurface.setRegion([width - (shrinkBox.right + thickness) - 1, 0, thickness + 1, height]);
+                        axisSurface.setRegion([width - (shrinkBox.right + thickness), 0, thickness, height]);
                         break;
                 }
                 if (!floating) {
@@ -112,18 +93,18 @@ Ext.define('Ext.chart.CartesianChart', {
                 }
             }
 
-            innerWidth = width - shrinkBox.left - shrinkBox.right;
-            innerHeight = height - shrinkBox.top - shrinkBox.bottom;
+            width -= shrinkBox.left + shrinkBox.right;
+            height -= shrinkBox.top + shrinkBox.bottom;
 
-            mainRegion = [shrinkBox.left, shrinkBox.top, innerWidth, innerHeight];
+            mainRegion = [shrinkBox.left, shrinkBox.top, width, height];
 
             shrinkBox.left += innerPadding.left;
             shrinkBox.top += innerPadding.top;
             shrinkBox.right += innerPadding.right;
             shrinkBox.bottom += innerPadding.bottom;
 
-            innerWidth = width - shrinkBox.left - shrinkBox.right;
-            innerHeight = height - shrinkBox.top - shrinkBox.bottom;
+            innerWidth = width - innerPadding.left - innerPadding.right;
+            innerHeight = height - innerPadding.top - innerPadding.bottom;
 
             me.setInnerRegion([shrinkBox.left, shrinkBox.top, innerWidth, innerHeight]);
 
@@ -133,9 +114,13 @@ Ext.define('Ext.chart.CartesianChart', {
 
             me.setMainRegion(mainRegion);
             me.getSurface('main').setRegion(mainRegion);
-            gridSurface.setRegion(mainRegion);
-            gridSurface.matrix.set(1, 0, 0, 1, innerPadding.left, innerPadding.top);
-            gridSurface.matrix.inverse(gridSurface.inverseMatrix);
+
+            for (i = 0, ln = me.surfaceMap.grid && me.surfaceMap.grid.length; i < ln; i++) {
+                gridSurface = me.surfaceMap.grid[i];
+                gridSurface.setRegion(mainRegion);
+                gridSurface.matrix.set(1, 0, 0, 1, innerPadding.left, innerPadding.top);
+                gridSurface.matrix.inverse(gridSurface.inverseMatrix);
+            }
 
             for (i = 0; i < axes.length; i++) {
                 axis = axes[i];
@@ -177,17 +162,14 @@ Ext.define('Ext.chart.CartesianChart', {
         }
     },
 
-    /**
-     * @inheritdoc
-     */
     redraw: function () {
         var me = this,
             series = me.getSeries(),
             axes = me.getAxes(),
             region = me.getMainRegion(),
-            innerWidth, innerHeight, surface,
+            innerWidth, innerHeight,
             innerPadding = me.getInnerPadding(),
-            left, right, top, bottom, dx, dy, cx, cy, i, j,
+            left, right, top, bottom, i, j,
             sprites, range, xRange, yRange, isSide, attr,
             axisX, axisY, visibleRange,
             flipXY = me.getFlipXY();
@@ -243,7 +225,7 @@ Ext.define('Ext.chart.CartesianChart', {
             }
             sprites = series[i].getSprites();
             for (j = 0; j < sprites.length; j++) {
-                sprites[j].setAttributesCanonical(attr);
+                sprites[j].setAttributes(attr);
             }
         }
 
@@ -285,14 +267,11 @@ Ext.define('Ext.chart.CartesianChart', {
                 };
             }
             for (j = 0; j < sprites.length; j++) {
-                sprites[j].setAttributesCanonical(attr);
+                sprites[j].setAttributes(attr);
             }
         }
         me.renderFrame();
-    },
-
-    onThicknessChanged: function () {
-        this.performLayout();
+        me.callSuper(arguments);
     },
 
     onPlaceWatermark: function () {

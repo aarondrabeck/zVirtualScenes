@@ -124,6 +124,11 @@ Ext.define('Ext.Media', {
         muted: false
     },
 
+    constructor: function() {
+        this.mediaEvents = {};
+        this.callSuper(arguments);
+    },
+
     initialize: function() {
         var me = this;
         me.callParent();
@@ -136,36 +141,24 @@ Ext.define('Ext.Media', {
         });
 
         me.addMediaListener({
-            canplay      : 'onCanPlay',
-            play         : 'onPlay',
-            pause        : 'onPause',
-            ended        : 'onEnd',
-            volumechange : 'onVolumeChange',
-            timeupdate   : 'onTimeUpdate'
+            canplay: 'onCanPlay',
+            play: 'onPlay',
+            pause: 'onPause',
+            ended: 'onEnd',
+            volumechange: 'onVolumeChange',
+            timeupdate: 'onTimeUpdate'
         });
     },
 
     addMediaListener: function(event, fn) {
-        var me   = this,
-            dom  = me.media.dom,
+        var me = this,
+            dom = me.media.dom,
             bind = Ext.Function.bind;
 
-        if (!Ext.isObject(event)) {
-            var oldEvent = event;
-            event = {};
-            event[oldEvent] = fn;
-        }
-
         Ext.Object.each(event, function(e, fn) {
-            if (typeof fn !== 'function') {
-                fn = me[fn];
-            }
-
-            if (typeof fn == 'function') {
-                fn = bind(fn, me);
-
-                dom.addEventListener(e, fn);
-            }
+            fn = bind(me[fn], me);
+            me.mediaEvents[e] = fn;
+            dom.addEventListener(e, fn);
         });
     },
 
@@ -341,17 +334,14 @@ Ext.define('Ext.Media', {
     },
 
     destroy: function() {
-        var me = this;
-        Ext.Object.each(event, function(e, fn) {
-            if (typeof fn !== 'function') {
-                fn = me[fn];
-            }
+        var me = this,
+            dom  = me.media.dom,
+            mediaEvents = me.mediaEvents;
 
-            if (typeof fn == 'function') {
-                fn = bind(fn, me);
-
-                dom.removeEventListener(e, fn);
-            }
+        Ext.Object.each(mediaEvents, function(event, fn) {
+            dom.removeEventListener(event, fn);
         });
+
+        this.callSuper();
     }
 });

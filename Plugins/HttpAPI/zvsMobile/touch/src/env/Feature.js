@@ -314,6 +314,28 @@ Ext.define('Ext.env.Feature', {
          */
         ClassList: function() {
             return "classList" in this.getTestElement();
+        },
+
+        /**
+         * @member Ext.feature.has
+         * @property {Boolean}ClassList
+         * True if LocalStorage is supported and can be written to.
+         * False if LocalStorage is not supported or cannot be written to.
+         */
+        LocalStorage : function() {
+            var supported = false;
+
+            try {
+                if ('localStorage' in window && window['localStorage'] !== null) {
+                    //this should throw an error in private browsing mode in iOS
+                    localStorage.setItem('sencha-localstorage-test', 'test success');
+                    //clean up if setItem worked
+                    localStorage.removeItem('sencha-localstorage-test');
+                    supported = true;
+                }
+            } catch ( e ) {}
+
+            return supported;
         }
     });
 

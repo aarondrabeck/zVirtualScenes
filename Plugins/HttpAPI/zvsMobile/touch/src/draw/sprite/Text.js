@@ -1,12 +1,28 @@
 /**
+ * @class Ext.draw.sprite.Text
+ * @extends Ext.draw.sprite.Sprite
  *
+ * A sprite that represents text.
+ *
+ *     @example preview miniphone
+ *     var component = new Ext.draw.Component({
+ *       items: [{
+ *         type: 'text',
+ *         x: 50,
+ *         y: 50,
+ *         text: 'Sencha',
+ *         fontSize: 18,
+ *         fillStyle: 'blue'
+ *       }]
+ *     });
+ *     Ext.Viewport.setLayout('fit');
+ *     Ext.Viewport.add(component);
  */
 Ext.define("Ext.draw.sprite.Text", {
     extend: "Ext.draw.sprite.Sprite",
     requires: ['Ext.draw.TextMeasurer'],
     alias: 'sprite.text',
     type: 'text',
-    divBased: false,
     lineBreakRe: /\n/g,
     inheritableStatics: {
         shortHand1Re: /'(.*)'/g,
@@ -15,9 +31,24 @@ Ext.define("Ext.draw.sprite.Text", {
         shortHand4Re: /\$\$\$\$/g,
         def: {
             processors: {
+                /**
+                 * @cfg {Number} x The position of the sprite on the x-axis.
+                 */
                 x: "number",
+
+                /**
+                 * @cfg {Number} y The position of the sprite on the y-axis.
+                 */
                 y: "number",
+
+                /**
+                 * @cfg {String} text The text represented in the sprite.
+                 */
                 text: "string",
+
+                /**
+                 * @cfg {String/Number} fontSize The size of the font displayed.
+                 */
                 fontSize: function (n) {
                     if (!isNaN(n)) {
                         return +n + 'px';
@@ -25,30 +56,20 @@ Ext.define("Ext.draw.sprite.Text", {
                         return n;
                     }
                 },
-                fontStyle: (function (fontStyles) {
-                    return function (n) {
-                        if (!n) {
-                            return "";
-                        } else if (n === 'normal') {
-                            return '';
-                        } else if (!Ext.isString(n)) {
-                            return undefined;
-                        } else if (n in fontStyles) {
-                            return n;
-                        }
-                    };
-                })({"normal": true, "italic": true, "oblique": true}),
-                fontVariant: (function (fontVariants) {
-                    return function (n) {
-                        if (!n) {
-                            return "";
-                        } else if (n === 'normal') {
-                            return '';
-                        } else if (n in fontVariants) {
-                            return n;
-                        }
-                    };
-                })({"normal": true, "small-caps": true}),
+
+                /**
+                 * @cfg {String} fontStyle The style of the font displayed. {normal, italic, oblique}
+                 */
+                fontStyle: "enums(,italic,oblique)",
+
+                /**
+                 * @cfg {String} fontVariant The variant of the font displayed. {normal, small-caps}
+                 */
+                fontVariant: "enums(,small-caps)",
+
+                /**
+                 * @cfg {String} fontWeight The weight of the font displayed. {normal, bold, bolder, lighter}
+                 */
                 fontWeight: (function (fontWeights) {
                     return function (n) {
                         if (!n) {
@@ -65,7 +86,15 @@ Ext.define("Ext.draw.sprite.Text", {
                         }
                     };
                 })({"normal": true, "bold": true, "bolder": true, "lighter": true}),
+
+                /**
+                 * @cfg {String} fontFamily The family of the font displayed.
+                 */
                 fontFamily: "string",
+
+                /**
+                 * @cfg {String} textAlign The alignment of the text displayed. {left, right, center, start, end}
+                 */
                 textAlign: (function (textAligns) {
                     return function (n) {
                         if (n === 'middle') {
@@ -79,6 +108,10 @@ Ext.define("Ext.draw.sprite.Text", {
                         }
                     };
                 })({"left": true, "right": true, "center": true, "start": true, "end": true}),
+
+                /**
+                 * @cfg {String} textBaseline The baseline of the text displayed. {top, hanging, middle, alphabetic, ideographic, bottom}
+                 */
                 textBaseline: (function (textBaselines) {
                     return function (n) {
                         if (n === false) {
@@ -90,6 +123,10 @@ Ext.define("Ext.draw.sprite.Text", {
                         }
                     };
                 })({"top": true, "hanging": true, "middle": true, "alphabetic": true, "ideographic": true, "bottom": true}),
+
+                /**
+                 * @cfg {String} font The font displayed.
+                 */
                 font: "string"
             },
             aliases: {
@@ -122,8 +159,8 @@ Ext.define("Ext.draw.sprite.Text", {
                 fontSize: 'font,bbox',
                 fontFamily: 'font,bbox',
                 font: 'font-short-hand,bbox,canvas',
-                textBaseline: 'bbox,canvas',
-                textAlign: 'bbox,canvas',
+                textBaseline: 'bbox',
+                textAlign: 'bbox',
                 x: "bbox",
                 y: "bbox",
                 text: "bbox"
@@ -152,7 +189,7 @@ Ext.define("Ext.draw.sprite.Text", {
                                 attrs.fontFamily = part.replace(Ext.draw.sprite.Text.shortHand4Re, ' ');
                             }
                         }
-                        this.setAttributesCanonical(attrs);
+                        this.setAttributesBypassingNormalization(attrs);
                     };
                 })({
                     "italic": "fontStyles",
@@ -185,7 +222,7 @@ Ext.define("Ext.draw.sprite.Text", {
                     if (attrs.fontFamily) {
                         font += attrs.fontFamily + ' ';
                     }
-                    this.setAttributesCanonical({
+                    this.setAttributesBypassingNormalization({
                         font: font.substr(0, font.length - 1)
                     });
                 }
@@ -244,20 +281,7 @@ Ext.define("Ext.draw.sprite.Text", {
     },
 
     setText: function (text) {
-        this.setAttributesCanonical({text: text});
-    },
-
-    useAttributes: function (ctx) {
-        var me = this,
-            attr = me.attr,
-            font = attr.font;
-
-        if (font !== ctx.font) {
-            ctx.font = font;
-        }
-        ctx.textAlign = attr.textAlign;
-        ctx.textBaseline = attr.textBaseline;
-        Ext.draw.sprite.Sprite.prototype.useAttributes.call(this, ctx);
+        this.setAttributesBypassingNormalization({text: text});
     },
 
     setElementStyles: function (element, styles) {
@@ -275,63 +299,23 @@ Ext.define("Ext.draw.sprite.Text", {
         var attr = this.attr,
             mat = Ext.draw.Matrix.fly(attr.matrix.elements.slice(0)),
             bbox = this.getBBox(true),
-            lineBreakRe = this.lineBreakRe,
-            parent, div, x, y, i, lines, style;
+            x, y, i, lines;
         if (attr.text.length === 0) {
             return;
         }
-        if ((surface instanceof Ext.draw.engine.Svg) || this.divBased) {
-            parent = surface.element;
-            div = surface.textDivs[surface.textPosition];
-            if (!div) {
-                div = Ext.Element.create({
-                    style: {
-                        "position": "absolute",
-                        "left": 0,
-                        "top": 0,
-                        "width": bbox.width,
-                        "text-align": attr.textAlign,
-                        "overflow": 'visible',
-                        "white-space": 'nowrap',
-                        "font": attr.font
-                    }
-                });
-                parent.append(div);
-                surface.textDivs[surface.textPosition] = div;
-            }
 
-            mat.postpend(1, 0, 0, 1, bbox.x, bbox.y);
-            mat.prependMatrix(surface.matrix);
-            div.setHtml(attr.text.replace(lineBreakRe, '<br/>'));
-            div.dom.style.display = attr.hidden ? "none" : "block";
-            this.setElementStyles(div, {
-                font: attr.font,
-                left: '0px',
-                top: '0px',
-                color: attr.fillStyle,
-                webkitTransformOrigin: "0% 0%",
-                webkitTransform: mat.toSvg()
-            });
-            surface.textPosition++;
-        } else {
-            lines = attr.text.split('\n');
-            x = attr.x;
-            y = attr.y;
-            mat.toContext(ctx);
-            if (ctx.strokeStyle !== 'rgba(0, 0, 0, 0)') {
-                for (i = 0; i < lines.length; i++) {
-                    ctx.strokeText(lines[i], x, y + bbox.height / lines.length * i);
-                }
-            }
+        lines = attr.text.split('\n');
+        // Simulate textBaseline and textAlign.
+        x = attr.bbox.plain.x;
+        y = attr.bbox.plain.y;
+        mat.toContext(ctx);
+        for (i = 0; i < lines.length; i++) {
             if (ctx.fillStyle !== 'rgba(0, 0, 0, 0)') {
-                for (i = 0; i < lines.length; i++) {
-                    ctx.fillText(lines[i], x, y + bbox.height / lines.length * i);
-                }
+                ctx.fillText(lines[i], x, y + bbox.height / lines.length * i);
+            }
+            if (ctx.strokeStyle !== 'rgba(0, 0, 0, 0)') {
+                ctx.strokeText(lines[i], x, y + bbox.height / lines.length * i);
             }
         }
-    }
-}, function () {
-    if (Ext.os.is.Android && !Ext.browser.is.Chrome) {
-        this.prototype.divBased = true;
     }
 });

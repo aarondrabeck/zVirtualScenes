@@ -1,35 +1,31 @@
 /**
+ * @class
+ * @extends Ext.draw.Surface
+ *
  * Provides specific methods to draw with 2D Canvas element.
  */
 Ext.define('Ext.draw.engine.Canvas', {
-
-    splitThreshold: 1800,
-
     extend: 'Ext.draw.Surface',
-
     config: {
         highPrecision: false
     },
-
-    uses: [
-        'Ext.draw.fx.Frame'
-    ],
-
+    requires: ['Ext.draw.Animator'],
     statics: {
-        contextOverrides: { fill: function () {
-            var fillStyle = this.fillStyle,
-                fillOpacity = this.fillOpacity,
-                rgba = 'rgba(0, 0, 0, 0)',
-                rgba0 = 'rgba(0, 0, 0, 0.0)',
-                alpha = this.globalAlpha;
-            if (fillStyle !== rgba && fillStyle !== rgba0 && fillOpacity !== 0) {
-                if (fillOpacity !== 1) {
-                    this.globalAlpha = alpha * fillOpacity;
+        contextOverrides: {
+            fill: function () {
+                var fillStyle = this.fillStyle,
+                    fillOpacity = this.fillOpacity,
+                    rgba = 'rgba(0, 0, 0, 0)',
+                    rgba0 = 'rgba(0, 0, 0, 0.0)',
+                    alpha = this.globalAlpha;
+                if (fillStyle !== rgba && fillStyle !== rgba0 && fillOpacity !== 0) {
+                    if (fillOpacity !== 1) {
+                        this.globalAlpha = alpha * fillOpacity;
+                    }
+                    this.__proto__.fill.call(this);
                 }
-                this.__proto__.fill.call(this);
-            }
-            this.globalAlpha = fillOpacity;
-        },
+                this.globalAlpha = alpha;
+            },
 
             stroke: function () {
                 var strokeStyle = this.strokeStyle,
@@ -43,7 +39,7 @@ Ext.define('Ext.draw.engine.Canvas', {
                     }
                     this.__proto__.stroke.call(this);
                 }
-                this.globalAlpha = opacity;
+                this.globalAlpha = alpha;
             },
 
             fillStroke: function (attr, transformFillStroke) {
@@ -87,7 +83,6 @@ Ext.define('Ext.draw.engine.Canvas', {
                     }
                 }
             },
-
 
             ellipse: function (cx, cy, rx, ry, rotation, start, end, anticlockwise) {
                 var cos = Math.cos(rotation),
@@ -135,6 +130,8 @@ Ext.define('Ext.draw.engine.Canvas', {
         }
     },
 
+    splitThreshold: 1800,
+
     getElementConfig: function () {
         return {
             reference: 'element',
@@ -154,6 +151,9 @@ Ext.define('Ext.draw.engine.Canvas', {
         };
     },
 
+    /**
+     * @private
+     */
     createCanvas: function () {
         var canvas = Ext.Element.create({
                 tag: 'canvas',
@@ -168,8 +168,12 @@ Ext.define('Ext.draw.engine.Canvas', {
 
         this.devicePixelRatio /= backingStoreRatio;
 
+        if (ctx.ellipse) {
+            delete Ext.draw.engine.Canvas.contextOverrides.ellipse;
+        }
+
         Ext.apply(ctx, Ext.draw.engine.Canvas.contextOverrides);
-        
+
         if (this.getHighPrecision()) {
             this.enablePrecisionCompensation(ctx);
         } else {
@@ -314,7 +318,7 @@ Ext.define('Ext.draw.engine.Canvas', {
                 this.updatePrecisionCompensate();
             },
             transform: function (x2x, x2y, y2x, y2y, newDx, newDy) {
-                matrix.postpend(x2x, x2y, y2x, y2y, newDx, newDy);
+                matrix.append(x2x, x2y, y2x, y2y, newDx, newDy);
                 this.updatePrecisionCompensate();
             },
             scale: function (sx, sy) {
@@ -417,23 +421,24 @@ Ext.define('Ext.draw.engine.Canvas', {
     updateRegion: function (region) {
         this.callSuper([region]);
 
-        var l = Math.floor(region[0]),
+        var me = this,
+            l = Math.floor(region[0]),
             t = Math.floor(region[1]),
             r = Math.ceil(region[0] + region[2]),
             b = Math.ceil(region[1] + region[3]),
-            devicePixelRatio = this.devicePixelRatio,
+            devicePixelRatio = me.devicePixelRatio,
             w = r - l,
             h = b - t,
-            splitThreshold = Math.round(this.splitThreshold / devicePixelRatio),
+            splitThreshold = Math.round(me.splitThreshold / devicePixelRatio),
             splits = Math.ceil(w / splitThreshold),
-            activeCanvases = this.activeCanvases,
+            activeCanvases = me.activeCanvases,
             i, offsetX, dom, leftWidth;
 
         for (i = 0, offsetX = 0; i < splits; i++, offsetX += splitThreshold) {
-            if (i >= this.canvases.length) {
-                this.createCanvas();
+            if (i >= me.canvases.length) {
+                me.createCanvas();
             }
-            dom = this.canvases[i].dom;
+            dom = me.canvases[i].dom;
             dom.style.left = offsetX + 'px';
             if (h * devicePixelRatio !== dom.height) {
                 dom.height = h * devicePixelRatio;
@@ -444,18 +449,19 @@ Ext.define('Ext.draw.engine.Canvas', {
                 dom.width = leftWidth * devicePixelRatio;
                 dom.style.width = leftWidth + 'px';
             }
-            this.applyDefaults(this.contexts[i]);
+            me.applyDefaults(me.contexts[i]);
         }
 
         for (; i < activeCanvases; i++) {
-            dom = this.canvases[i].dom;
+            dom = me.canvases[i].dom;
             dom.width = 0;
             dom.height = 0;
         }
-        this.activeCanvases = splits;
-        this.clear();
+        me.activeCanvases = splits;
+        me.clear();
     },
 
+    // Inherited
     clearTransform: function () {
         var me = this,
             activeCanvases = me.activeCanvases,
@@ -470,18 +476,14 @@ Ext.define('Ext.draw.engine.Canvas', {
 
     },
 
-    /**
-     * Renders a single sprite into the canvas (without clearing the canvas).
-     *
-     * @param {Ext.draw.sprite.Sprite} sprite The Sprite to be rendered.
-     */
+    // Inherited
     renderSprite: function (sprite) {
         var me = this,
             region = me._region,
             surfaceMatrix = me.matrix,
             parent = sprite._parent,
             matrix = Ext.draw.Matrix.fly([1, 0, 0, 1, 0, 0]),
-            bbox, tbox, i, offsetX, ctx, width, left = 0, top = 0, right = region[2], bottom = region[3];
+            bbox, i, offsetX, ctx, width, left = 0, top, right = region[2], bottom;
 
         while (parent && (parent !== me)) {
             matrix.prependMatrix(parent.matrix || parent.attr && parent.attr.matrix);
@@ -493,13 +495,12 @@ Ext.define('Ext.draw.engine.Canvas', {
             bbox = matrix.transformBBox(bbox);
         }
 
-        // Clear dirty flags that aren't used by the Canvas renderer
-        sprite.setDirty(false);
+        sprite.preRender(me);
+
         if (sprite.attr.hidden || sprite.attr.globalAlpha === 0) {
+            sprite.setDirty(false);
             return;
         }
-
-        sprite.preRender(this);
 
         top = 0;
         bottom = top + region[3];
@@ -524,23 +525,21 @@ Ext.define('Ext.draw.engine.Canvas', {
             // Set attributes to context.
             sprite.useAttributes(ctx);
             // Render shape
-            sprite.render(this, ctx, [left, top, width, bottom - top]);
+            sprite.render(me, ctx, [left, top, width, bottom - top]);
             ctx.restore();
         }
+        sprite.setDirty(false);
     },
 
     applyDefaults: function (ctx) {
         ctx.strokeStyle = 'rgba(0,0,0,0)';
         ctx.fillStyle = 'rgba(0,0,0,0)';
         ctx.textAlign = 'start';
-        ctx.textBaseline = 'alphabetic';
+        ctx.textBaseline = 'top';
         ctx.miterLimit = 1;
     },
 
-    /**
-     * @private
-     * Clears the canvas.
-     */
+    // Inherited
     clear: function () {
         var me = this,
             activeCanvases = this.activeCanvases,
@@ -569,10 +568,9 @@ Ext.define('Ext.draw.engine.Canvas', {
      * Destroys the Canvas element and prepares it for Garbage Collection.
      */
     destroy: function () {
-        var me = this, i = 0, ln = me.canvases.length;
-        delete me.ctx;
-        delete me.zIndex;
-        for (; i < ln; i++) {
+        var me = this,
+            i, ln = me.canvases.length;
+        for (i = 0; i < ln; i++) {
             me.contexts[i] = null;
             me.canvases[i].destroy();
             me.canvases[i] = null;
@@ -584,5 +582,7 @@ Ext.define('Ext.draw.engine.Canvas', {
 }, function () {
     if (Ext.os.is.Android4 && Ext.browser.is.Chrome) {
         this.prototype.splitThreshold = 3000;
+    } else if (Ext.os.is.Android) {
+        this.prototype.splitThreshold = 1e10;
     }
 });

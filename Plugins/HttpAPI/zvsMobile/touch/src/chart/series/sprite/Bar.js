@@ -11,41 +11,28 @@ Ext.define("Ext.chart.series.sprite.Bar", {
                 minBarWidth: 'number',
                 maxBarWidth: 'number',
                 minGapWidth: 'number',
-                groupCount: 'number',
-                groupOffset: 'number',
-                inGroupGapWidth: 'number'
+                radius: 'number',
+                inGroupGapWidth: 'number',
+                renderer: 'default'
             },
             defaults: {
                 minBarWidth: 2,
-                maxBarWidth: 30,
+                maxBarWidth: Infinity,
                 minGapWidth: 5,
-                groupCount: 1,
-                groupOffset: 0,
                 inGroupGapWidth: 3,
-                transformFillStroke: true
+                radius: 0,
+                transformFillStroke: true,
+                renderer: null
             }
         }
-    },
-
-    preRender: function (surface) {
-        var parent = this.getParent(),
-            matrix = new Ext.draw.Matrix(),
-            region = surface.getRegion();
-        while (parent && parent.attr && parent.attr.matrix) {
-            matrix.prependMatrix(parent.attr.matrix);
-            parent = parent.getParent();
-        }
-        matrix.prependMatrix(parent.matrix);
-        this.surfaceMatrix = matrix;
-        this.callSuper(arguments);
     },
 
     // TODO: design this more carefully
     drawLabel: function (text, dataX, dataStartY, dataY, labelId) {
         var me = this,
-            attr = this.attr,
-            labelCfg = this.labelCfg || (this.labelCfg = {}),
-            surfaceMatrix = this.surfaceMatrix,
+            attr = me.attr,
+            labelCfg = me.labelCfg || (me.labelCfg = {}),
+            surfaceMatrix = me.surfaceMatrix,
             labelX, labelY,
             labelOverflowPadding = attr.labelOverflowPadding,
             halfWidth,
@@ -65,6 +52,9 @@ Ext.define("Ext.chart.series.sprite.Bar", {
         labelCfg.calloutVertical = !attr.flipXY;
 
         halfWidth = (labelBox.width / 2 + labelOverflowPadding);
+        if (dataStartY > dataY) {
+            halfWidth = -halfWidth;
+        }
         labelX = dataX;
         labelY = dataY - halfWidth;
         labelCfg.x = surfaceMatrix.x(labelX, labelY);
@@ -77,7 +67,10 @@ Ext.define("Ext.chart.series.sprite.Bar", {
         labelY = dataY;
         labelCfg.calloutStartX = surfaceMatrix.x(labelX, labelY);
         labelCfg.calloutStartY = surfaceMatrix.y(labelX, labelY);
-        if (dataY - dataStartY > halfWidth * 2) {
+        if (dataStartY > dataY) {
+            halfWidth = -halfWidth;
+        }
+        if (Math.abs(dataY - dataStartY) > halfWidth * 2) {
             labelCfg.callout = 0;
         } else {
             labelCfg.callout = 1;
@@ -85,7 +78,23 @@ Ext.define("Ext.chart.series.sprite.Bar", {
         me.putMarker('labels', labelCfg, labelId);
     },
 
+    drawBar: function (ctx, surface, clip, left, top, right, bottom, index) {
+        var itemCfg = this.itemCfg || (this.itemCfg = {});
+        itemCfg.x = left;
+        itemCfg.y = top;
+        itemCfg.width = right - left;
+        itemCfg.height = bottom - top;
+        itemCfg.radius = this.attr.radius;
+        if (this.attr.renderer) {
+            this.attr.renderer.call(this, itemCfg, this, index, this.getDataItems().items[index]);
+        }
+        this.putMarker("items", itemCfg, index, !this.attr.renderer);
+    },
+
     renderClipped: function (surface, ctx, clip) {
+        if (this.cleanRedraw) {
+            return;
+        }
         var me = this,
             attr = me.attr,
             dataX = attr.dataX,
@@ -95,14 +104,15 @@ Ext.define("Ext.chart.series.sprite.Bar", {
             groupCount = attr.groupCount,
             groupOffset = attr.groupOffset - (groupCount - 1) * 0.5,
             inGroupGapWidth = attr.inGroupGapWidth,
-            startY, y, labelId,
-            lineWidth = ctx.lineWidth || 1,
+            yLow, yHi,
+            lineWidth = ctx.lineWidth,
             matrix = attr.matrix,
-            maxBarWidth = (dataX[dataX.length - 1] - dataX[0]) / (dataX.length - 1) * matrix.getXX() - lineWidth - attr.minGapWidth,
+            count = (dataX[dataX.length - 1] - dataX[0]) / (dataX.length - 1) || 1,
+            maxBarWidth = count * matrix.getXX() - attr.minGapWidth,
             barWidth = surface.roundPixel(Math.max(attr.minBarWidth, (Math.min(maxBarWidth, attr.maxBarWidth) - inGroupGapWidth * (groupCount - 1)) / groupCount)),
             surfaceMatrix = this.surfaceMatrix,
-            mid, left, right, bottom, top, i, center,
-            halfLineWidth = 0.5 * (attr.lineWidth || 1),
+            left, right, bottom, top, i, center,
+            halfLineWidth = 0.5 * attr.lineWidth,
             xx = matrix.elements[0],
             dx = matrix.elements[4],
             yy = matrix.elements[3],
@@ -111,33 +121,25 @@ Ext.define("Ext.chart.series.sprite.Bar", {
             end = Math.min(dataX.length - 1, Math.ceil(clip[2])),
             drawMarkers = dataText && !!this.getBoundMarker("labels");
 
-        ctx.beginPath();
-
         for (i = start; i <= end; i++) {
+            yLow = dataStartY ? dataStartY[i] : 0;
+            yHi = dataY[i];
+
             center = dataX[i] * xx + dx + groupOffset * (barWidth + inGroupGapWidth);
-            mid = surface.roundPixel(center);
-            left = surface.roundPixel(center - barWidth * 0.5) + halfLineWidth;
-            right = surface.roundPixel(center + barWidth * 0.5) - halfLineWidth;
-            startY = dataStartY ? dataStartY[i] : 0;
-            y = dataY[i];
-            top = surface.roundPixel(y * yy + lineWidth + dy);
-            bottom = surface.roundPixel(startY * yy + lineWidth + dy);
-            ctx.moveTo(left, surface.roundPixel(startY * yy + lineWidth + dy) - halfLineWidth);
-            ctx.lineTo(left, top - halfLineWidth);
-            ctx.lineTo(right, top - halfLineWidth);
-            ctx.lineTo(right, surface.roundPixel(startY * yy + lineWidth + dy) - halfLineWidth);
-            ctx.lineTo(left, surface.roundPixel(startY * yy + lineWidth + dy) - halfLineWidth);
+            left = surface.roundPixel(center - barWidth / 2) + halfLineWidth;
+            top = surface.roundPixel(yHi * yy + lineWidth + dy);
+            right = surface.roundPixel(center + barWidth / 2) - halfLineWidth;
+            bottom = surface.roundPixel(yLow * yy + lineWidth + dy);
 
-            labelId = attr.attributeId + '-' + i;
-            if (drawMarkers) {
-                this.drawLabel(dataText[i], mid, bottom, top, labelId);
+            me.drawBar(ctx, surface, clip, left, top - halfLineWidth, right, bottom - halfLineWidth, i);
+
+            if (drawMarkers && dataText[i]) {
+                this.drawLabel(dataText[i], center, bottom, top, i);
             }
-            me.putMarker('items', {
-                translationX: surfaceMatrix.x(mid, top),
-                translationY: surfaceMatrix.y(mid, top)
-            }, labelId);
+            me.putMarker("markers", {
+                translationX: surfaceMatrix.x(center, top),
+                translationY: surfaceMatrix.y(center, top)
+            }, i, true);
         }
-
-        ctx.fillStroke(attr);
     }
 });

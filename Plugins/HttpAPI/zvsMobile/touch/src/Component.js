@@ -849,6 +849,23 @@ Ext.define('Ext.Component', {
      */
 
     /**
+     * @event painted
+     * @inheritdoc Ext.dom.Element#painted
+     */
+
+    /**
+     * @event erased
+     * Fires when the component is no longer displayed in the DOM.  Listening to this event will
+     * degrade performance not recommend for general use.
+     * @param {Ext.Component} this The component instance
+     */
+
+    /**
+     * @event resize
+     * @inheritdoc Ext.dom.Element#resize
+     */
+
+    /**
      * @private
      */
     listenerOptionsRegex: /^(?:delegate|single|delay|buffer|args|prepend|element)$/,
@@ -2239,14 +2256,6 @@ Ext.define('Ext.Component', {
             return this[options.element].doAddListener(name, fn, scope || this, options, order);
         }
         if (name == 'painted' || name == 'resize') {
-            /**
-             * @event painted
-             * @inheritdoc Ext.dom.Element#painted
-             */
-            /**
-             * @event resize
-             * @inheritdoc Ext.dom.Element#resize
-             */
             return this.element.doAddListener(name, fn, scope || this, options, order);
         }
 
@@ -2546,9 +2555,9 @@ Ext.define('Ext.Component', {
         Ext.destroy(this.innerHtmlElement);
         this.setRecord(null);
 
-        Ext.ComponentManager.unregister(this);
+        this.callSuper();
 
-        this.callParent();
+        Ext.ComponentManager.unregister(this);
     }
 
     // Convert old properties in data into a config object

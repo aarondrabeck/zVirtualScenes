@@ -792,22 +792,12 @@ Ext.define('Ext.dataview.DataView', {
     },
 
     onBeforeLoad: function() {
-        var scrollable = this.getScrollable();
-        if (scrollable) {
-            scrollable.getScroller().stopAnimation();
-        }
-
         var loadingText = this.getLoadingText();
-        if (loadingText) {
+        if (loadingText && this.isPainted()) {
             this.setMasked({
                 xtype: 'loadmask',
                 message: loadingText
             });
-
-            //disable scrolling while it is masked
-            if (scrollable) {
-                scrollable.getScroller().setDisabled(true);
-            }
         }
 
         this.hideEmptyText();
@@ -837,16 +827,10 @@ Ext.define('Ext.dataview.DataView', {
     },
 
     onLoad: function(store) {
-        var scrollable = this.getScrollable();
-
         //remove any masks on the store
         this.hasLoadedStore = true;
         this.setMasked(false);
 
-        //enable the scroller again
-        if (scrollable) {
-            scrollable.getScroller().setDisabled(false);
-        }
         if (!store.getCount()) {
             this.showEmptyText();
         }

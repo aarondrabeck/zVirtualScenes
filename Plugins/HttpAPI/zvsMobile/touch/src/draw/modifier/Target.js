@@ -10,6 +10,8 @@ Ext.define("Ext.draw.modifier.Target", {
     statics: {
         uniqueId: 0
     },
+
+    // Inherited
     prepareAttributes: function (attr) {
         if (this._previous) {
             this._previous.prepareAttributes(attr);
@@ -29,6 +31,11 @@ Ext.define("Ext.draw.modifier.Target", {
         }
     },
 
+    /**
+     * @private
+     * @param attr
+     * @param changes
+     */
     setDirtyFlags: function (attr, changes) {
         Ext.apply(attr, changes);
         var sprite = this._sprite,
@@ -78,12 +85,14 @@ Ext.define("Ext.draw.modifier.Target", {
 
         sprite.setDirty(true);
     },
-
+    
+    // Inherited
     popUp: function (attributes, changes) {
         this.setDirtyFlags(attributes, changes);
         this._sprite.updateDirtyFlags(attributes);
     },
-
+    
+    // Inherited
     pushDown: function (attr, changes) {
         if (this._previous) {
             changes = this._previous.pushDown(attr, changes);

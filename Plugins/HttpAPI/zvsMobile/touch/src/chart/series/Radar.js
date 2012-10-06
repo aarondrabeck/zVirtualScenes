@@ -39,8 +39,7 @@
  *             xField: 'name',
  *             yField: 'data3',
  *             showInLegend: true,
- *             showMarkers: true,
- *             markerConfig: {
+ *             marker: {
  *                 radius: 5,
  *                 size: 5
  *             },
@@ -52,9 +51,8 @@
  *             type: 'radar',
  *             xField: 'name',
  *             yField: 'data2',
- *             showMarkers: true,
  *             showInLegend: true,
- *             markerConfig: {
+ *             marker: {
  *                 radius: 5,
  *                 size: 5
  *             },
@@ -66,9 +64,8 @@
  *             type: 'radar',
  *             xField: 'name',
  *             yField: 'data5',
- *             showMarkers: true,
  *             showInLegend: true,
- *             markerConfig: {
+ *             marker: {
  *                 radius: 5,
  *                 size: 5
  *             },
@@ -79,9 +76,6 @@
  *         }]
  *     });
  *
- * In this configuration we add three series to the chart. Each of these series is bound to the same categories field, `name` but bound to different properties for each category,
- * `data1`, `data2` and `data3` respectively. All series display markers by having `showMarkers` enabled. The configuration for the markers of each series can be set by adding properties onto
- * the markerConfig object. Finally we override some theme styling properties by adding properties to the `style` object.
  *
  */
 Ext.define('Ext.chart.series.Radar', {
@@ -89,7 +83,7 @@ Ext.define('Ext.chart.series.Radar', {
     type: "radar",
     seriesType: 'radar',
     alias: 'series.radar',
-    requires: ['Ext.chart.series.sprite.Radar'],
+    requires: ['Ext.chart.series.Cartesian', 'Ext.chart.series.sprite.Radar'],
     /**
      * @cfg {Object} style
      * An object containing styles for overriding series styles from theming.
@@ -97,98 +91,100 @@ Ext.define('Ext.chart.series.Radar', {
 
     config: {
 
-        /**
-         * @cfg {String} xField
-         * The store record field name for the labels used in the radar series.
-         */
-        xField: null,
-
-        /**
-         * @cfg {Object} yField
-         * The store record field name for the deflection of the graph in the radar series.
-         */
-        yField: null
     },
 
-    processData: function () {
-        var me = this,
-            store = me.getActualStore(),
-            items = store.getData().items,
-            length = items.length,
-            xField = me.getXField(),
-            yField = me.getYField();
-        
-        if (!store || items.length === 0) {
-            return;
-        }
-        
-        var item = items[0],
-            x = +item.get(xField),
-            y = +item.get(yField),
-            minX = x, maxX = x,
-            minY = y, maxY = y,
-            dataX = [], dataY = [];
-        // TODO: rewrite this with axis coordination.
-        for (var i = 1; i < length; i++) {
-            item = items[i];
-            x = +item.get(xField);
-            y = +item.get(yField);
-            if (minX > x) {
-                minX = x;
-            } else if (maxX < x) {
-                maxX = x;
-            }
-            if (minY > y) {
-                minY = y;
-            } else if (maxY < y) {
-                maxY = y;
-            }
-            dataX.push(x);
-            dataY.push(y);
-        }
-        me.dataRange = [minX, minY, maxX, maxY];
+    updateAngularAxis: function (axis) {
+        axis.processData(this);
+    },
 
-        me.getSprites()[0].setAttributes({
-            dataRange: me.dataRange,
-            dataX: dataX,
-            dataY: dataY
+    updateRadialAxis: function (axis) {
+        axis.processData(this);
+    },
+
+    coordinateX: function () {
+        return this.coordinate('X', 0, 2);
+    },
+
+    coordinateY: function () {
+        return this.coordinate('Y', 1, 2);
+    },
+
+    updateCenter: function (center) {
+        this.setStyle({
+            translationX: center[0] + this.getOffsetX(),
+            translationY: center[1] + this.getOffsetY()
         });
+        this.doUpdateStyles();
     },
 
-    getSprites: function () {
+    updateRadius: function (radius) {
+        this.setStyle({
+            endRho: radius
+        });
+        this.doUpdateStyles();
+    },
+
+    updateRotation: function (rotation) {
+        this.setStyle({
+            rotationRads: rotation
+        });
+        this.doUpdateStyles();
+    },
+
+    updateTotalAngle: function (totalAngle) {
+        this.processData();
+    },
+
+    getItemForPoint: function (x, y) {
         var me = this,
-            chart = this.getChart(),
-            surface = me.getSurface(),
-            animation = chart && chart.getAnimate(),
-            sprites = this.sprites,
-            sprite = sprites[0],
-            radius = me.getRadius(),
-            center = me.getCenter(),
-            offsetX = me.getOffsetX(),
-            offsetY = me.getOffsetY();
+            sprite = me.sprites && me.sprites[0],
+            attr = sprite.attr,
+            dataX = attr.dataX,
+            dataY = attr.dataY,
+            centerX = attr.centerX,
+            centerY = attr.centerY,
+            dataRange = attr.dataRange,
+            minX = dataRange[0],
+            maxX = dataRange[2],
+            maxY = dataRange[3],
+            endRho = attr.endRho,
+            startRho = attr.startRho,
+            baseRotation = attr.baseRotation,
+            i, length = dataX.length,
+            store = me.getStore(),
+            marker = me.getMarker(),
+            item, th, r;
 
-        if (!chart) {
-            return [];
+        if (sprite && marker) {
+            for (i = 0; i < length; i++) {
+                th = (dataX[i] - minX) / (maxX - minX + 1) * 2 * Math.PI + baseRotation;
+                r = dataY[i] / maxY * (endRho - startRho) + startRho;
+                if (Math.abs(centerX + Math.cos(th) * r - x) < 22 && Math.abs(centerY + Math.sin(th) * r - y) < 22) {
+                    item = {
+                        series: this,
+                        sprite: sprite,
+                        index: i,
+                        record: store.getData().items[i],
+                        field: store.getFields().items[i]
+                    };
+                    return item;
+                }
+            }
         }
-        if (!sprite) {
-            sprite = surface.add({type: 'radar'});
-            me.sprites.push(sprite);
-        }
-        if (animation) {
-            sprite.fx.setConfig(animation);
-            sprite.setAttributes(Ext.applyIf({
-                centerX: center[0] + offsetX,
-                centerY: center[1] + offsetY,
-                startRho: 0,
-                endRho: radius
-            }, this.getStyle()));
-        }
+        return this.callSuper(arguments);
+    },
 
-        if (me.getMarker()) {
-            sprite.bindMarker('items', me.getMarker());
-        }
+    getXRange: function () {
+        return [this.dataRange[0], this.dataRange[2]];
+    },
 
-        return me.sprites;
+    getYRange: function () {
+        return [this.dataRange[1], this.dataRange[3]];
     }
+}, function () {
+    var klass = this;
+    // TODO: [HACK] Steal from cartesian series.
+    klass.prototype.onAxesChanged = Ext.chart.series.Cartesian.prototype.onAxesChanged;
+    klass.prototype.getSprites = Ext.chart.series.Cartesian.prototype.getSprites;
 });
 

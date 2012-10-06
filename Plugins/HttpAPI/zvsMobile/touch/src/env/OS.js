@@ -76,7 +76,8 @@ Ext.define('Ext.env.OS', {
      * - iOS
      * - iPad
      * - iPhone
-     * - iPod,
+     * - iPhone5 (also true for 4in iPods).
+     * - iPod
      * - Android
      * - WebOS
      * - BlackBerry
@@ -185,6 +186,11 @@ Ext.define('Ext.env.OS', {
                     this.setFlag(item, (name === item));
                 }
             }
+        }
+
+        // Detect if the device is the iPhone 5.
+        if (this.name == "iOS" && window.screen.height == 568) {
+            this.setFlag('iPhone5');
         }
 
         return this;

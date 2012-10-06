@@ -37,8 +37,8 @@ Ext.define('Ext.chart.interactions.Abstract', {
      */
     throttleGap: 0,
 
-    stopAnimationBeforeSync: true,
-    
+    stopAnimationBeforeSync: false,
+
     constructor: function (config) {
         var me = this;
         me.initConfig(config);
@@ -106,7 +106,7 @@ Ext.define('Ext.chart.interactions.Abstract', {
      */
     addChartListener: function () {
         var me = this,
-            chart = me.getChart().element,
+            chart = me.getChart(),
             gestures = me.getGestures(),
             gesture, fn;
         me.listeners = me.listeners || {};
@@ -115,9 +115,13 @@ Ext.define('Ext.chart.interactions.Abstract', {
             chart.on(
                 name,
                 // wrap the handler so it does not fire if the event is locked by another interaction
-                me.listeners[name] = function () {
+                me.listeners[name] = function (e) {
                     var locks = me.getLocks();
                     if (!(name in locks) || locks[name] === me) {
+                        if (e && e.stopPropagation) {
+                            e.stopPropagation();
+                            e.preventDefault();
+                        }
                         return (Ext.isFunction(fn) ? fn : me[fn]).apply(this, arguments);
                     }
                 },

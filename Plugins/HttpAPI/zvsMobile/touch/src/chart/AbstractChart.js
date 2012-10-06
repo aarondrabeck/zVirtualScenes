@@ -39,7 +39,9 @@ Ext.define('Ext.chart.AbstractChart', {
         'Ext.chart.series.Series',
         'Ext.chart.interactions.Abstract',
         'Ext.chart.axis.Axis',
-        'Ext.data.StoreManager'
+        'Ext.data.StoreManager',
+        'Ext.chart.Legend',
+        'Ext.data.Store'
     ],
     /**
      * @event beforerefresh
@@ -238,6 +240,10 @@ Ext.define('Ext.chart.AbstractChart', {
     // @ignore
     viewBox: false,
 
+    delegationRegex: /^item([a-z]+)$/i,
+
+    domEvents: /click|focus|blur|paste|input|mousemove|mousedown|mouseup|mouseover|mouseout|keyup|keydown|keypress|submit|pinch|pinchstart|pinchend|touchstart|touchend|rotate|rotatestart|rotateend|drag|dragstart|dragend|tap|doubletap|singletap/,
+
     config: {
 
         /**
@@ -277,8 +283,8 @@ Ext.define('Ext.chart.AbstractChart', {
         series: [],
 
         /**
-         * @cfg {Ext.chart.axis.Axis} axes
-         * Array of {@link Ext.chart.axis.Axis Axis} instances or config objects. For example:
+         * @cfg {Ext.chart.axis.Abstract} axes
+         * Array of {@link Ext.chart.axis.Abstract Axis} instances or config objects. For example:
          *
          *     axes: [{
          *         type: 'Numeric',
@@ -296,6 +302,11 @@ Ext.define('Ext.chart.AbstractChart', {
          *     }]
          */
         axes: [],
+
+        /**
+         * @cfg {Ext.chart.Legend} legend
+         */
+        legend: null,
 
         /**
          * @cfg {String} theme (optional) The name of the theme to be used. A theme defines the colors and
@@ -433,18 +444,20 @@ Ext.define('Ext.chart.AbstractChart', {
          * @private
          * Override value
          */
-        fitSurface: false
+        fitSurface: false,
+
+        /**
+         * @private
+         * Override value
+         */
+        resizeHandler: null,
+
+        highlightItem: null
     },
 
     resizing: 0,
     delayThicknessChanged: false,
     thicknessChanged: false,
-
-    /**
-     *
-     * @param {String} category
-     */
-    getGridSprite: Ext.emptyFn,
 
     /**
      * @private The z-indexes to use for the various surfaces
@@ -507,6 +520,17 @@ Ext.define('Ext.chart.AbstractChart', {
         }
     },
 
+    scheduleLayout: function () {
+        if (!this.scheduledLayoutId) {
+            this.scheduledLayoutId = Ext.draw.Animator.schedule('doScheduleLayout', this);
+        }
+    },
+
+    doScheduleLayout: function () {
+        this.scheduledLayoutId = null;
+        this.performLayout();
+    },
+
     getAnimate: function () {
         if (this.resizing) {
             return {
@@ -517,22 +541,64 @@ Ext.define('Ext.chart.AbstractChart', {
         }
     },
 
+    constructor: function () {
+        var me = this;
+        me.itemListeners = {};
+        me.surfaceMap = {};
+        me.legendStore = new Ext.data.Store({
+            storeId: this.getId() + '-legendStore',
+            fields: [
+                'id', 'name', 'mark', 'disabled', 'series', 'index'
+            ]
+        });
+        me.callSuper(arguments);
+        me.refreshLegendStore();
+        me.getLegendStore().on('updaterecord', 'onUpdateLegendStore', me);
+    },
+
+    getLegendStore: function () {
+        return this.legendStore;
+    },
+
+    refreshLegendStore: function () {
+        if (this.getLegendStore()) {
+            var i, ln,
+                series = this.getSeries(), seriesItem,
+                legendData = [];
+            if (series) {
+                for (i = 0, ln = series.length; i < ln; i++) {
+                    seriesItem = series[i];
+                    if (seriesItem.getShowInLegend()) {
+                        seriesItem.provideLegendInfo(legendData);
+                    }
+                }
+            }
+            this.getLegendStore().setData(legendData);
+        }
+    },
+
+    onUpdateLegendStore: function (store, record) {
+        var series = this.getSeries(), seriesItem;
+        if (record && series) {
+            seriesItem = series.map[record.get('series')];
+            if (seriesItem) {
+                seriesItem.setHiddenByIndex(record.get('index'), record.get('disabled'));
+                this.redraw();
+            }
+        }
+    },
+
     initialized: function () {
         var me = this;
         me.callSuper();
         me.getSurface('main');
         me.getSurface('overlay');
-        me.getSurface('grid');
         me.applyStyles();
     },
 
-
-    onResize: function () {
-        this.fireEvent('resize', this);
-        var size = this.element.getSize();
+    resizeHandler: function (size) {
         this.getSurface('overlay').setRegion([0, 0, size.width, size.height]);
         this.performLayout();
-        this.onPlaceWatermark();
     },
 
     applyMainRegion: function (newRegion, region) {
@@ -560,6 +626,11 @@ Ext.define('Ext.chart.AbstractChart', {
         if (type in zIndexes) {
             surface.element.setStyle('zIndex', zIndexes[type]);
         }
+        if (!me.surfaceMap[type]) {
+            me.surfaceMap[type] = [];
+        }
+        surface.type = type;
+        me.surfaceMap[type].push(surface);
         return surface;
     },
 
@@ -603,16 +674,15 @@ Ext.define('Ext.chart.AbstractChart', {
         return result;
     },
 
-    updateAxes: function (n, o) {
-        var i, ln, j, ln2, axis, sprites;
-        for (i = 0, ln = n.length; i < ln; i++) {
-            axis = n[i];
+    updateAxes: function (newAxes) {
+        var i, ln, axis;
+        for (i = 0, ln = newAxes.length; i < ln; i++) {
+            axis = newAxes[i];
             axis.setChart(this);
         }
     },
 
     applySeries: function (newSeries, oldSeries) {
-        this.getSurface('main');
         this.getAxes();
         if (!oldSeries) {
             oldSeries = [];
@@ -620,7 +690,7 @@ Ext.define('Ext.chart.AbstractChart', {
         }
         var me = this,
             result = [],
-            i, ln, series, oldMap = oldSeries.map;
+            i, ln, series, oldMap = oldSeries.map, oldSeriesItem;
         result.map = {};
         newSeries = Ext.Array.from(newSeries, true);
         for (i = 0, ln = newSeries.length; i < ln; i++) {
@@ -628,11 +698,34 @@ Ext.define('Ext.chart.AbstractChart', {
             if (!series) {
                 continue;
             }
-            series = Ext.factory(series, null, oldSeries.map[series.getId && series.getId() || series.id], 'series');
-            if (series) {
-                result.push(series);
-                result.map[series.getId()] = series;
+            oldSeriesItem = oldSeries.map[series.getId && series.getId() || series.id];
+            if (series instanceof Ext.chart.series.Series) {
+                if (oldSeriesItem !== series) {
+                    // Replacing
+                    if (oldSeriesItem) {
+                        oldSeriesItem.destroy();
+                    }
+                    me.addItemListenersToSeries(series);
+                }
+                series.setChart(this);
+            } else if (Ext.isObject(series)) {
+                if (oldSeriesItem) {
+                    // Update
+                    oldSeriesItem.setConfig(series);
+                    series = oldSeriesItem;
+                } else {
+                    if (Ext.isString(series)) {
+                        series = Ext.create(series.xclass || ("series." + series), {chart: this});
+                    } else {
+                        series.chart = this;
+                        series = Ext.create(series.xclass || ("series." + series.type), series);
+                    }
+                    me.addItemListenersToSeries(series);
+                }
             }
+
+            result.push(series);
+            result.map[series.getId()] = series;
         }
 
         for (i in oldMap) {
@@ -643,13 +736,37 @@ Ext.define('Ext.chart.AbstractChart', {
         return result;
     },
 
-    updateSeries: function (newSeries, oldSeries) {
-        var i, ln, j, ln2, series, sprites;
-        for (i = 0, ln = newSeries.length; i < ln; i++) {
-            series = newSeries[i];
-            series.setChart(this);
+    applyLegend: function (newLegend, oldLegend) {
+        return Ext.factory(newLegend, Ext.chart.Legend, oldLegend);
+    },
+
+    updateLegend: function (legend) {
+        if (legend) {
+            // On create
+            legend.setStore(this.getLegendStore());
+            if (!legend.getDocked()) {
+                legend.setDocked('bottom');
+            }
+            if (this.getParent()) {
+                this.getParent().add(legend);
+            }
         }
+    },
+
+    setParent: function (parent) {
+        this.callSuper(arguments);
+        if (parent && this.getLegend()) {
+            parent.add(this.getLegend());
+        }
+    },
+
+    updateSeries: function (newSeries, oldSeries) {
         this.fireEvent('serieschanged', this, newSeries, oldSeries);
+        var i, ln, seriesItem;
+        for (i = 0, ln = newSeries.length; i < ln; i++) {
+            seriesItem = newSeries[i];
+        }
+        this.refreshLegendStore();
     },
 
     applyInteractions: function (interations, oldInterations) {
@@ -703,16 +820,17 @@ Ext.define('Ext.chart.AbstractChart', {
 
     /**
      * Redraw the chart. If animations are set this will animate the chart too.
-     * @param {Boolean} [resize] flag which changes the default origin points of the chart for animations.
      */
     redraw: function () {
-
+        this.fireEvent('redraw');
     },
 
     getEventXY: function (e) {
         e = (e.changedTouches && e.changedTouches[0]) || e.event || e.browserEvent || e;
-        var me = this, xy = me.element.getXY();
-        return [e.pageX - xy[0], e.pageY - xy[1]];
+        var me = this,
+            xy = me.element.getXY(),
+            region = me.getMainRegion();
+        return [e.pageX - xy[0] - region[0], e.pageY - xy[1] - region[1]];
     },
 
     /**
@@ -763,13 +881,16 @@ Ext.define('Ext.chart.AbstractChart', {
         return items;
     },
 
+    onThicknessChanged: function () {
+        this.scheduleLayout();
+    },
+
     // @private
     onRefresh: function () {
         var region = this.getMainRegion(),
             axes = this.getAxes(),
             store = this.getStore(),
-            series = this.getSeries(),
-            i;
+            series = this.getSeries();
         if (!store || !axes || !series || !region) {
             return;
         }
@@ -782,6 +903,29 @@ Ext.define('Ext.chart.AbstractChart', {
      */
     bindStore: function (store) {
         this.setStore(store);
+    },
+
+    applyHighlightItem: function (newHighlightItem, oldHighlightItem) {
+        if (newHighlightItem === oldHighlightItem) {
+            return;
+        }
+        if (Ext.isObject(newHighlightItem) && Ext.isObject(oldHighlightItem)) {
+            if (newHighlightItem.sprite === oldHighlightItem.sprite &&
+                newHighlightItem.index === oldHighlightItem.index
+                ) {
+                return;
+            }
+        }
+        return newHighlightItem;
+    },
+
+    updateHighlightItem: function (newHighlightItem, oldHighlightItem) {
+        if (oldHighlightItem) {
+            oldHighlightItem.series.setAttributesForItem(oldHighlightItem, {highlighted: false});
+        }
+        if (newHighlightItem) {
+            newHighlightItem.series.setAttributesForItem(newHighlightItem, {highlighted: true});
+        }
     },
 
     /**
@@ -807,31 +951,111 @@ Ext.define('Ext.chart.AbstractChart', {
      * @param {Boolean} skipRedraw If `true`, redrawing of the chart will be skipped.
      */
     reset: function (skipRedraw) {
-        var me = this;
+        var me = this,
+            i, ln,
+            axes = me.getAxes(), axis,
+            series = me.getSeries(), seriesItem;
 
-        me.getAxes().each(function (axis) {
+        for (i = 0, ln = axes.length; i < ln; i++) {
+            axis = axes[i];
             if (axis.reset) {
                 axis.reset();
             }
-        });
+        }
 
-        me.getSeries().each(function (series) {
-            if (series.reset) {
-                series.reset();
+        for (i = 0, ln = series.length; i < ln; i++) {
+            seriesItem = series[i];
+            if (seriesItem.reset) {
+                seriesItem.reset();
             }
-        });
+        }
 
         if (!skipRedraw) {
             me.redraw();
         }
     },
 
+    addItemListenersToSeries: function (series) {
+        for (var name in this.itemListeners) {
+            var listenerMap = this.itemListeners[name], i, ln;
+            for (i = 0, ln = listenerMap.length; i < ln; i++) {
+                series.addListener.apply(series, listenerMap[i]);
+            }
+        }
+    },
+
+    addItemListener: function (name, fn, scope, options, order) {
+        var listenerMap = this.itemListeners[name] || (this.itemListeners[name] = []),
+            series = this.getSeries(), seriesItem,
+            i, ln;
+        listenerMap.push([name, fn, scope, options, order]);
+        if (series) {
+            for (i = 0, ln = series.length; i < ln; i++) {
+                seriesItem = series[i];
+                seriesItem.addListener(name, fn, scope, options, order);
+            }
+        }
+    },
+
+    remoteItemListener: function (name, fn, scope, options, order) {
+        var listenerMap = this.itemListeners[name],
+            series = this.getSeries(), seriesItem,
+            i, ln;
+        if (listenerMap) {
+            for (i = 0, ln = listenerMap.length; i < ln; i++) {
+                if (listenerMap[i].fn === fn) {
+                    listenerMap.splice(i, 1);
+                    if (series) {
+                        for (i = 0, ln = series.length; i < ln; i++) {
+                            seriesItem = series[i];
+                            seriesItem.removeListener(name, fn, scope, options, order);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    },
+
+    doAddListener: function (name, fn, scope, options, order) {
+        if (name.match(this.delegationRegex)) {
+            return this.addItemListener(name, fn, scope || this, options, order);
+        } else if (name.match(this.domEvents)) {
+            return this.element.doAddListener.apply(this.element, arguments);
+        } else {
+            return this.callSuper(arguments);
+        }
+    },
+
+    doRemoveListener: function (name, fn, scope, options, order) {
+        if (name.match(this.delegationRegex)) {
+            return this.remoteItemListener(name, fn, scope || this, options, order);
+        } else if (name.match(this.domEvents)) {
+            return this.element.doRemoveListener.apply(this.element, arguments);
+        } else {
+            return this.callSuper(arguments);
+        }
+    },
+
+    onItemRemove: function (item) {
+        this.callSuper(arguments);
+        if (this.surfaceMap) {
+            Ext.Array.remove(this.surfaceMap[item.type], item);
+            if (this.surfaceMap[item.type].length === 0) {
+                delete this.surfaceMap[item.type];
+            }
+        }
+    },
+
     // @private remove gently.
     destroy: function () {
-        var me = this;
-        me.setSeries([]);
-        me.setAxes([]);
-        me.setInteractions([]);
+        var me = this,
+            emptyArray = [];
+        me.surfaceMap = null;
+        me.setHighlightItem(null);
+        me.setSeries(emptyArray);
+        me.setAxes(emptyArray);
+        me.setInteractions(emptyArray);
         me.setStore(null);
         Ext.Viewport.un('orientationchange', me.redraw, me);
         this.callSuper(arguments);

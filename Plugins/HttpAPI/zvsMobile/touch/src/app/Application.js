@@ -157,6 +157,7 @@
  *         {@link #startupImage}: {
  *             '320x460': 'resources/startup/320x460.jpg',
  *             '640x920': 'resources/startup/640x920.png',
+ *             '640x1096': 'resources/startup/640x1096.png',
  *             '768x1004': 'resources/startup/768x1004.png',
  *             '748x1024': 'resources/startup/748x1024.png',
  *             '1536x2008': 'resources/startup/1536x2008.png',
@@ -235,6 +236,7 @@ Ext.define('Ext.app.Application', {
          *         startupImage: {
          *             '320x460': 'resources/startup/320x460.jpg',
          *             '640x920': 'resources/startup/640x920.png',
+         *             '640x1096': 'resources/startup/640x1096.png',
          *             '768x1004': 'resources/startup/768x1004.png',
          *             '748x1024': 'resources/startup/748x1024.png',
          *             '1536x2008': 'resources/startup/1536x2008.png',
@@ -250,6 +252,7 @@ Ext.define('Ext.app.Application', {
          *
          * - 320x460: Non-retina iPhone, iPod touch, and all Android devices
          * - 640x920: Retina iPhone and iPod touch
+         * - 640x1096: iPhone 5 and iPod touch (fifth generation)
          * - 768x1004: Non-retina iPad (first and second generation) in portrait orientation
          * - 748x1024: Non-retina iPad (first and second generation) in landscape orientation
          * - 1536x2008: Retina iPad (third generation) in portrait orientation

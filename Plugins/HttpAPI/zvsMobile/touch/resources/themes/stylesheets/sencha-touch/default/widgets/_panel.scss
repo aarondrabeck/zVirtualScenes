@@ -24,7 +24,6 @@ $panel-border-radius: .3em;
 
       .x-panel-inner,
       > .x-body {
-        padding: 6px;
         z-index: 1;
         background-color: #fff;
         @if $include-border-radius { @include border_radius($panel-border-radius); }
@@ -34,8 +33,13 @@ $panel-border-radius: .3em;
     .x-panel.x-floating > .x-dock,
     .x-msgbox > .x-dock,
     .x-form.x-floating > .x-dock {
-      margin: 6px;
       z-index: 1;
+    }
+
+    .x-panel.x-floating > .x-dock.x-sized,
+    .x-msgbox > .x-dock.x-sized,
+    .x-form.x-floating > .x-dock.x-sized {
+      margin: 6px;
     }
 
     $anchor-height: .7em;

@@ -272,65 +272,77 @@ namespace HttpAPI
                 // Obtain a response object
                 using (System.Net.HttpListenerResponse response = httpListenerContext.Response)
                 {
-                    //enabling CORS for HTTP clients and cross domain access
-                    response.Headers.Add("Access-Control-Allow-Credentials", "true");
-                    response.Headers.Add("Access-Control-Allow-Origin", httpListenerContext.Request.Headers["Origin"]);
-                    response.Headers.Add("Access-Control-Origin", "*");
-                    response.Headers.Add("Access-Control-Allow-Methods", "HEAD, GET, POST, PUT, DELETE, OPTIONS");
-                    response.Headers.Add("Access-Control-Max-Age", "3628800");
-                    response.Headers.Add("Access-Control-Allow-Headers", httpListenerContext.Request.Headers["Access-Control-Request-Headers"] + ", zvstoken");
-
                     string ip = string.Empty;
-                    if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null)
-                    {
-                        ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString();
-                    }
+                    if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
 
                     if (_verbose)
                         log.Info(string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, httpListenerContext.Request.HttpMethod, httpListenerContext.Request.RawUrl, httpListenerContext.Request.UserAgent));
 
 
+
+                    #region enabling CORS for HTTP clients and cross domain access
+                    string origin = httpListenerContext.Request.Headers["Origin"];
+                    if (string.IsNullOrEmpty(origin) || origin == "null")
+                        response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    else
+                        response.Headers.Add("Access-Control-Allow-Origin", origin);
+
                     //CORS OPTION REQUEST
                     if (httpListenerContext.Request.HttpMethod == "OPTIONS")
                     {
-                        sendResponse((int)HttpStatusCode.OK, "202 OK", "", httpListenerContext);
+
+                        string requestHeaders = httpListenerContext.Request.Headers["Access-Control-Request-Headers"];
+                        response.Headers.Add("Access-Control-Allow-Methods", "HEAD, GET, POST, PUT, DELETE, OPTIONS");
+                        response.Headers.Add("Access-Control-Max-Age", "3628800");
+                        response.Headers.Add("Access-Control-Allow-Headers", requestHeaders);
+
+                        httpListenerContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                        httpListenerContext.Response.Close();
                         return;
+                        //sendResponse((int)HttpStatusCode.OK, "202 OK", "", httpListenerContext);
+                        // return;
                     }
+                    #endregion
 
-                    //if (!hasVaildToken(httpListenerContext) && !hasVaildCookie(httpListenerContext))
-                    //{
-                    //    //If a user does not have a token or cookie, only allow certain things....
-                    //    bool allowed = false;
-                    //    string reason = "";
 
-                    //    if (!httpListenerContext.Request.RawUrl.ToLower().StartsWith("/api"))
-                    //    {
-                    //        allowed = true;
-                    //    }
-                    //    else
-                    //    {
-                    //        reason = "Non API Call";
-                    //    }
+                    if (!hasVaildToken(httpListenerContext) && !hasVaildCookie(httpListenerContext))
+                    {
+                        //If a user does not have a token or cookie, only allow certain things....
+                        bool allowed = false;
+                        string reason = string.Empty;
 
-                    //    if (httpListenerContext.Request.Url.Segments.Length == 3 &&
-                    //        httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
-                    //        && (httpListenerContext.Request.HttpMethod == "POST" ||
-                    //        httpListenerContext.Request.HttpMethod == "GET"))
-                    //    {
-                    //        allowed = true;
-                    //    }
-                    //    else
-                    //    {
-                    //        reason = "Invalid Login call";
-                    //    }
+                        if (!httpListenerContext.Request.RawUrl.ToLower().StartsWith("/api"))
+                        {
+                            allowed = true;
+                        }
+                        else
+                        {
+                            reason = "Only certain API calls are allowed without credentials.";
+                        }
 
-                    //    if (!allowed)
-                    //    {
-                    //        log.WarnFormat("[{0}] was denied access to '{1}', because:{2}", ip, httpListenerContext.Request.RawUrl, reason);
-                    //        sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", httpListenerContext);
-                    //        return;
-                    //    }
-                    //}
+                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
+                            && (httpListenerContext.Request.HttpMethod == "POST" ||
+                            httpListenerContext.Request.HttpMethod == "GET"))
+                        {
+                            allowed = true;
+                        }
+                        
+                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") &&
+                            httpListenerContext.Request.HttpMethod == "POST")
+                        {
+                            allowed = true;
+                        }
+                        
+                        reason = "Only login and logout API calls are allowed.";
+                        if (!allowed)
+                        {
+                            log.WarnFormat("[{0}] was denied access to '{1}' because:{2}", ip, httpListenerContext.Request.RawUrl, reason);
+                            sendResponse((int)HttpStatusCode.NonAuthoritativeInformation, "203 Access Denied", "You do not have permission to access this resource.", httpListenerContext);
+                            return;
+                        }
+                    }
 
                     if (httpListenerContext.Request.Url.Segments.Length > 2 && httpListenerContext.Request.Url.Segments[1].ToLower().Equals("api/"))
                     {
@@ -970,17 +982,9 @@ namespace HttpAPI
                 {
                     if (postData["password"] == GetSettingValue("PASSWORD", context))
                     {
-                        Uri origin;
-                        bool hasOrigin = Uri.TryCreate(httpListenerContext.Request.Headers["Origin"], UriKind.RelativeOrAbsolute, out origin);
-                        
-                        if (!hasOrigin)
-                        {
-                            hasOrigin = Uri.TryCreate( httpListenerContext.Request.Headers["Host"], UriKind.RelativeOrAbsolute, out origin);
-                        }
-
                         Cookie c = new Cookie("zvs", CookieValue.ToString());
                         c.Expires = DateTime.Today.AddDays(5);
-                        if(hasOrigin) c.Domain = origin.Authority;
+                        c.Domain = "";// httpListenerContext.Request.Headers["Host"]; //orgin.Authority;
                         c.Path = "/";
                         httpListenerContext.Response.Cookies.Add(c);
 

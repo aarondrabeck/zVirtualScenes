@@ -211,6 +211,7 @@ Ext.define('Ext.MessageBox', {
 
         Ext.applyIf(config, {
             docked: 'top',
+            minHeight: '1.3em',
             cls   : this.getBaseCls() + '-title'
         });
 

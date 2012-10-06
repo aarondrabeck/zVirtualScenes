@@ -1,5 +1,8 @@
 /**
+ * @private
+ * @class Ext.draw.sprite.AttributeParser
  *
+ * Parsers used for sprite attributes.
  */
 Ext.define("Ext.draw.sprite.AttributeParser", {
     singleton: true,
@@ -9,14 +12,17 @@ Ext.define("Ext.draw.sprite.AttributeParser", {
     "default": function (n) {
         return n;
     },
+    
     string: function (n) {
         return String(n);
     },
+    
     number: function (n) {
         if (!isNaN(n)) {
             return n;
         }
     },
+    
     angle: function (n) {
         if (!isNaN(n)) {
             n %= Math.PI * 2;
@@ -29,6 +35,7 @@ Ext.define("Ext.draw.sprite.AttributeParser", {
             return n;
         }
     },
+    
     data: function (n) {
         if (Ext.isArray(n)) {
             return n.slice();
@@ -36,9 +43,11 @@ Ext.define("Ext.draw.sprite.AttributeParser", {
             return new Float32Array(n);
         }
     },
+    
     bool: function (n) {
         return !!n;
     },
+    
     color: function (n) {
         if (n instanceof Ext.draw.Color) {
             return n.toString();
@@ -47,14 +56,7 @@ Ext.define("Ext.draw.sprite.AttributeParser", {
         } else if (!n) {
             return 'none';
         } else if (Ext.isString(n)) {
-            if (n.substr(0, 3) === 'url') {
-                var match = n.match(Ext.draw.sprite.AttributeParser.attributeRe);
-                if (match) {
-                    return this.getSurface().getGradient(match[1]).getGradient();
-                }
-            } else {
-                return n;
-            }
+            return n;
         } else if (n.type === 'linear') {
             return Ext.create('Ext.draw.gradient.Linear', n);
         } else if (n.type === 'radial') {
@@ -69,9 +71,11 @@ Ext.define("Ext.draw.sprite.AttributeParser", {
             return isNaN(n) ? undefined : Math.min(Math.max(+n, low), hi);
         });
     },
+    
     limited01: function (n) {
         return isNaN(n) ? undefined : Math.min(Math.max(+n, 0), 1);
     },
+    
     enums: function () {
         var enums = {},
             args = Array.prototype.slice.call(arguments, 0),

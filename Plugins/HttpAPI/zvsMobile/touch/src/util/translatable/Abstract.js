@@ -16,7 +16,7 @@ Ext.define('Ext.util.translatable.Abstract', {
 
         easingY: null,
 
-        fps: 60
+        fps: Ext.os.is.Android4 ? 50 : 60
     },
 
     /**
@@ -98,15 +98,14 @@ Ext.define('Ext.util.translatable.Abstract', {
             this.stopAnimation();
         }
 
-        if (typeof x == 'number') {
+        if (!isNaN(x) && typeof x == 'number') {
             this.x = x;
         }
 
-        if (typeof y == 'number') {
+        if (!isNaN(y) && typeof y == 'number') {
             this.y = y;
         }
-
-        return this.doTranslate(x, y);
+        this.doTranslate(x, y);
     },
 
     translateAxis: function(axis, value, animation) {
@@ -127,10 +126,12 @@ Ext.define('Ext.util.translatable.Abstract', {
         this.activeEasingY = easingY;
 
         this.isAnimating = true;
-        this.animationTimer = setInterval(this.doAnimationFrame, this.animationInterval);
+        this.lastX = null;
+        this.lastY = null;
+
+        this.animationFrameId = requestAnimationFrame(this.doAnimationFrame);
 
         this.fireEvent('animationstart', this, this.x, this.y);
-
         return this;
     },
 
@@ -174,46 +175,59 @@ Ext.define('Ext.util.translatable.Abstract', {
     },
 
     doAnimationFrame: function() {
-        var easingX = this.activeEasingX,
-            easingY = this.activeEasingY,
+        var me = this,
+            easingX = me.activeEasingX,
+            easingY = me.activeEasingY,
+            now = Date.now(),
             x, y;
 
-        if (!this.isAnimating) {
+        this.animationFrameId = requestAnimationFrame(this.doAnimationFrame);
+
+        if (!me.isAnimating) {
             return;
         }
 
+        me.lastRun = now;
+
         if (easingX === null && easingY === null) {
-            this.stopAnimation();
+            me.stopAnimation();
             return;
         }
 
         if (easingX !== null) {
-            this.x = x = Math.round(easingX.getValue());
+            me.x = x = Math.round(easingX.getValue());
 
             if (easingX.isEnded) {
-                this.activeEasingX = null;
-                this.fireEvent('axisanimationend', this, 'x', x);
+                me.activeEasingX = null;
+                me.fireEvent('axisanimationend', me, 'x', x);
             }
         }
         else {
-            x = this.x;
+            x = me.x;
         }
 
         if (easingY !== null) {
-            this.y = y = Math.round(easingY.getValue());
+            me.y = y = Math.round(easingY.getValue());
 
             if (easingY.isEnded) {
-                this.activeEasingY = null;
-                this.fireEvent('axisanimationend', this, 'y', y);
+                me.activeEasingY = null;
+                me.fireEvent('axisanimationend', me, 'y', y);
             }
         }
         else {
-            y = this.y;
+            y = me.y;
         }
 
-        this.doTranslate(x, y);
-        this.fireEvent('animationframe', this, x, y);
+        if (me.lastX !== x || me.lastY !== y) {
+            me.doTranslate(x, y);
+
+            me.lastX = x;
+            me.lastY = y;
+        }
+
+        me.fireEvent('animationframe', me, x, y);
     },
+
 
     stopAnimation: function() {
         if (!this.isAnimating) {
@@ -225,7 +239,7 @@ Ext.define('Ext.util.translatable.Abstract', {
 
         this.isAnimating = false;
 
-        clearInterval(this.animationTimer);
+        cancelAnimationFrame(this.animationFrameId);
         this.fireEvent('animationend', this, this.x, this.y);
     },
 

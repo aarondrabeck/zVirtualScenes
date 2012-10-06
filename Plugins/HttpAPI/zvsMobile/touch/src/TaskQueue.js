@@ -1,3 +1,34 @@
+(function() {
+    var lastTime = 0,
+        vendors = ['ms', 'moz', 'webkit', 'o'],
+        ln = vendors.length,
+        i, vendor;
+
+    for (i = 0; i < ln && !window.requestAnimationFrame; ++i) {
+        vendor = vendors[i];
+        window.requestAnimationFrame = window[vendor + 'RequestAnimationFrame'];
+        window.cancelAnimationFrame = window[vendor + 'CancelAnimationFrame'] || window[vendor + 'CancelRequestAnimationFrame'];
+    }
+
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = function(callback, element) {
+            var currTime = new Date().getTime(),
+                timeToCall = Math.max(0, 16 - (currTime - lastTime)),
+                id = window.setTimeout(function() {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+            lastTime = currTime + timeToCall;
+            return id;
+        };
+    }
+
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = function(id) {
+            clearTimeout(id);
+        };
+    }
+}());
+
 /**
  * @private
  * Handle batch read / write of DOMs, currently used in SizeMonitor + PaintMonitor
@@ -14,8 +45,6 @@ Ext.define('Ext.TaskQueue', {
         this.writeQueue = [];
 
         this.run = Ext.Function.bind(this.run, this);
-        this.doRequest = ('webkitRequestAnimationFrame' in window) ? this.doRequestAnimationFrame : this.doRequestTimeout;
-//        this.doRequest = this.doRequestTimeout;
     },
 
     requestRead: function(fn, scope, args) {
@@ -33,16 +62,8 @@ Ext.define('Ext.TaskQueue', {
             this.pending = true;
             this.mode = mode;
 
-            this.doRequest();
+            requestAnimationFrame(this.run);
         }
-    },
-
-    doRequestAnimationFrame: function() {
-        webkitRequestAnimationFrame(this.run);
-    },
-
-    doRequestTimeout: function() {
-        setTimeout(this.run, 1);
     },
 
     run: function() {
@@ -52,11 +73,6 @@ Ext.define('Ext.TaskQueue', {
             writeQueue = this.writeQueue,
             request = null,
             queue;
-//
-//        if (this.lastTime) {
-//            console.log(Date.now() - this.lastTime);
-//        }
-//        this.lastTime = Date.now();
 
         if (this.mode) {
             queue = readQueue;
@@ -83,11 +99,15 @@ Ext.define('Ext.TaskQueue', {
             fn = task[0];
             scope = task[1];
 
+            if (typeof fn == 'string') {
+                fn = scope[fn];
+            }
+
             if (task.length > 2) {
-                scope[fn].apply(scope, task[2]);
+                fn.apply(scope, task[2]);
             }
             else {
-                scope[fn].call(scope);
+                fn.call(scope);
             }
         }
 

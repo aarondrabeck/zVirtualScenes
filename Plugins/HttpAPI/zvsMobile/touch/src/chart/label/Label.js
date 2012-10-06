@@ -39,15 +39,19 @@ Ext.define("Ext.chart.label.Label", {
         }
     },
 
+    config: {
+        fx: {
+            customDuration: {
+                callout: 200
+            }
+        }
+    },
+
     prepareModifiers: function () {
         this.callSuper(arguments);
         this.calloutModifier = new Ext.chart.label.Callout({sprite: this});
         this.fx.setNext(this.calloutModifier);
         this.calloutModifier.setNext(this.topModifier);
-    },
-
-    preRender: function () {
-        this.callSuper(arguments);
     },
 
     render: function (surface, ctx, clipRegion) {

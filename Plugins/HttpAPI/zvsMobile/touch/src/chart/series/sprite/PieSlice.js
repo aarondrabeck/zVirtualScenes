@@ -8,26 +8,16 @@ Ext.define("Ext.chart.series.sprite.PieSlice", {
     inheritableStatics: {
         def: {
             processors: {
+                doCallout: 'bool',
                 label: 'string',
                 labelOverflowPadding: 'number'
             },
             defaults: {
+                doCallout: true,
                 label: '',
                 labelOverflowPadding: 10
             }
         }
-    },
-
-    preRender: function (surface) {
-        var parent = this.getParent(),
-            matrix = new Ext.draw.Matrix();
-        while (parent && parent.attr && parent.attr.matrix) {
-            matrix.prependMatrix(parent.attr.matrix);
-            parent = parent.getParent();
-        }
-        matrix.prependMatrix(parent.matrix);
-        this.surfaceMatrix = matrix;
-        this.callSuper(arguments);
     },
 
     render: function (ctx, surface, clipRegion) {
@@ -52,6 +42,8 @@ Ext.define("Ext.chart.series.sprite.PieSlice", {
             labelCfg = this.labelCfg || (this.labelCfg = {}),
             labelBox, x, y;
 
+        surfaceMatrix.appendMatrix(attr.matrix);
+
         x = centerX + Math.cos(midAngle) * midRho;
         y = centerY + Math.sin(midAngle) * midRho;
         labelCfg.x = surfaceMatrix.x(x, y);
@@ -70,13 +62,17 @@ Ext.define("Ext.chart.series.sprite.PieSlice", {
         labelCfg.rotationRads = midAngle + Math.atan2(surfaceMatrix.y(1, 0) - surfaceMatrix.y(0, 0), surfaceMatrix.x(1, 0) - surfaceMatrix.x(0, 0));
         labelCfg.text = attr.label;
         labelCfg.calloutColor = this.attr.fillStyle;
-        labelCfg.globalAlpha = attr.globalAlpha;
+        labelCfg.globalAlpha = attr.globalAlpha * attr.fillOpacity;
 
         this.putMarker('labels', labelCfg, this.attr.attributeId);
 
         labelBox = this.getMarkerBBox('labels', this.attr.attributeId, true);
         if (labelBox) {
-            this.putMarker('labels', {callout: 1 - this.sliceContainsLabel(attr, labelBox)}, this.attr.attributeId);
+            if (attr.doCallout) {
+                this.putMarker('labels', {callout: 1 - +this.sliceContainsLabel(attr, labelBox)}, this.attr.attributeId);
+            } else {
+                this.putMarker('labels', {globalAlpha: +this.sliceContainsLabel(attr, labelBox)}, this.attr.attributeId);
+            }
         }
     },
 
@@ -91,7 +87,7 @@ Ext.define("Ext.chart.series.sprite.PieSlice", {
         }
         l1 = Math.sqrt(attr.endRho * attr.endRho - outer * outer);
         l2 = Math.sqrt(attr.endRho * attr.endRho - inner * inner);
-        l3 = Math.tan(Math.abs(attr.endAngle - attr.startAngle) / 2) * inner;
+        l3 = Math.abs(Math.tan(Math.abs(attr.endAngle - attr.startAngle) / 2)) * inner;
         if (bbox.height + padding * 2 > Math.min(l1, l2, l3) * 2) {
             return 0;
         }

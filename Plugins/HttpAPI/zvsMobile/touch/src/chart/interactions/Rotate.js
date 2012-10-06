@@ -22,44 +22,47 @@ Ext.define('Ext.chart.interactions.Rotate', {
 
     getGestures: function () {
         var gestures = {};
-        gestures['rotate'] = 'onRotate';
-        gestures['rotateend'] = 'onRotate';
-        gestures['dragstart'] = 'onGestureStart';
-        gestures['drag'] = 'onGesture';
-        gestures['dragend'] = 'onGesture';
+        gestures.rotate = 'onRotate';
+        gestures.rotateend = 'onRotate';
+        gestures.dragstart = 'onGestureStart';
+        gestures.drag = 'onGesture';
+        gestures.dragend = 'onGesture';
         return gestures;
     },
 
     getAngle: function (e) {
         var me = this,
             chart = me.getChart(),
-            xy = chart.element.getXY(),
+            xy = chart.getEventXY(e),
             center = chart.getCenter();
-        return Math.atan2(e.pageY - xy[1] - center[1], e.pageX - xy[0] - center[0]);
+        return Math.atan2(xy[1] - center[1],
+            xy[0] - center[0]);
     },
 
     onGestureStart: function (e) {
         this.angle = this.getAngle(e);
-        this.oldRotations = null;
+        this.oldRotations = {};
     },
 
     onGesture: function (e) {
         var me = this,
             chart = me.getChart(),
-            angle = this.getAngle(e),
+            angle = this.getAngle(e) - this.angle,
+            axes = chart.getAxes(), axis,
             series = chart.getSeries(), seriesItem,
+            center = chart.getCenter(),
             oldRotations = this.oldRotations,
-            i, ln;
-        if (!oldRotations) {
-            oldRotations = this.oldRotations = {};
-            for (i = 0, ln = series.length; i < ln; i++) {
-                seriesItem = series[i];
-                oldRotations[seriesItem.getId()] = seriesItem.getRotation();
-            }
+            oldRotation, i, ln;
+        for (i = 0, ln = axes.length; i < ln; i++) {
+            axis = axes[i];
+            oldRotation = oldRotations[axis.getId()] || (oldRotations[axis.getId()] = axis.getRotation());
+            axis.setRotation(angle + oldRotation);
         }
+
         for (i = 0, ln = series.length; i < ln; i++) {
             seriesItem = series[i];
-            seriesItem.setRotation(oldRotations[seriesItem.getId()] + angle - me.angle);
+            oldRotation = oldRotations[seriesItem.getId()] || (oldRotations[seriesItem.getId()] = seriesItem.getRotation());
+            seriesItem.setRotation(angle + oldRotation);
         }
         me.sync();
     },

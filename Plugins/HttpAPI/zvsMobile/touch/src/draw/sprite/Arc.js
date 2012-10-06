@@ -1,3 +1,25 @@
+/**
+ * @class Ext.draw.sprite.Arc
+ * @extend Ext.draw.sprite.Circle
+ * 
+ *  A sprite that represents a circular arc.
+ *
+ *     @example preview miniphone
+ *     var component = new Ext.draw.Component({
+ *       items: [{
+ *         type: 'arc',
+ *         cx: 100,
+ *         cy: 100,
+ *         r: 25,
+ *         fillStyle: 'blue',
+ *         startAngle: 0,
+ *         endAngle: Math.PI,
+ *         anticlockwise: true
+ *       }]
+ *     });
+ *     Ext.Viewport.setLayout('fit');
+ *     Ext.Viewport.add(component);
+ */
 Ext.define("Ext.draw.sprite.Arc", {
     extend: "Ext.draw.sprite.Circle",
     alias: 'sprite.arc',
@@ -5,8 +27,19 @@ Ext.define("Ext.draw.sprite.Arc", {
     inheritableStatics: {
         def: {
             processors: {
+                /**
+                 * @cfg {Number} startAngle The beginning angle of the arc.
+                 */
                 startAngle: "number",
+
+                /**
+                 * @cfg {Number} endAngle The ending angle of the arc.
+                 */
                 endAngle: "number",
+
+                /**
+                 * @cfg {Boolean} anticlockwise Determines whether or not the arc is drawn clockwise.
+                 */
                 anticlockwise: "bool"
             },
             aliases: {
@@ -28,7 +61,7 @@ Ext.define("Ext.draw.sprite.Arc", {
         }
     },
 
-    drawPath: function (path, attr) {
+    updatePath: function (path, attr) {
         path.arc(attr.cx, attr.cy, attr.r, attr.startAngle, attr.endAngle, attr.anticlockwise);
     }
 });

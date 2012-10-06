@@ -71,28 +71,9 @@ Ext.define('Ext.chart.series.Pie', {
     ],
     type: 'pie',
     alias: 'series.pie',
+    seriesType: 'pieslice',
 
     config: {
-
-        highlightCfg: {
-            margin: 20
-        },
-
-
-        /**
-         * @cfg {String} angleField (required)
-         * The store record field name to be used for the pie angles.
-         * The values bound to this field name must be positive real numbers.
-         */
-        field: false,
-
-        /**
-         * @cfg {String} lengthField
-         * The store record field name to be used for the pie slice lengths.
-         * The values bound to this field name must be positive real numbers.
-         */
-        lengthField: false,
-
         /**
          * @cfg {String} labelField
          * The store record field name to be used for the pie slice labels.
@@ -105,148 +86,246 @@ Ext.define('Ext.chart.series.Pie', {
          */
         donut: false,
 
-        rotation: 0
+        /**
+         * @cfg {String} field
+         * @deprecated Use xField directly
+         */
+        field: null,
+
+        rotation: 0,
+
+        totalAngle: Math.PI * 2,
+
+        hidden: [],
+
+        style: {
+
+        }
     },
 
-    processData: function () {
+    directions: ['X'],
+
+    setField: function (f) {
+        return this.setXField(f);
+    },
+
+    getField: function () {
+        return this.getXField();
+    },
+
+    updateLabelData: function () {
         var me = this,
-            store = me.getActualStore(),
+            store = me.getStore(),
+            items = store.getData().items,
+            sprites = me.getSprites(),
+            labelField = me.getLabelField(),
+            i, ln, labels;
+        if (sprites.length > 0 && labelField) {
+            labels = [];
+            for (i = 0, ln = items.length; i < ln; i++) {
+                labels.push(items[i].get(labelField));
+            }
+            for (i = 0, ln = sprites.length; i < ln; i++) {
+                sprites[i].setAttributes({label: labels[i]});
+            }
+        }
+    },
+
+    coordinateX: function () {
+        var me = this,
+            store = me.getStore(),
             items = store.getData().items,
             length = items.length,
-            field = me.getField(),
-            labelField = me.getLabelField(),
-            value, sum = 0, ratio,
+            field = me.getXField(),
+            value, sum = 0,
+            hidden = me.getHidden(),
             summation = [], i,
-            sprites = this.getSprites(),
-            sprite = sprites[0],
-            twoPie = Math.PI * 2,
-            lastAngle;
+            lastAngle = 0,
+            totalAngle = me.getTotalAngle(),
+            sprites = me.getSprites();
 
-        if (!sprite) {
+        if (!sprites) {
             return;
         }
 
         for (i = 0; i < length; i++) {
             value = items[i].get(field);
-            sum += value;
+            if (!hidden[i]) {
+                sum += value;
+            }
             summation[i] = sum;
+            if (i >= hidden.length) {
+                hidden[i] = false;
+            }
         }
+
         if (sum === 0) {
             return;
         }
-        ratio = 2 * Math.PI / sum;
+        sum = totalAngle / sum;
         for (i = 0; i < length; i++) {
-            summation[i] *= ratio;
-        }
-
-        for (i = 0, lastAngle = 0; i < length; i++) {
-            sprite.setAttributesFor(i, {
-                globalAlpha: 1,
+            sprites[i].setAttributes({
                 startAngle: lastAngle,
-                endAngle: summation[i]
-            });
-            lastAngle = summation[i];
-        }
-
-        // Hide the others
-        for (i = length; i < sprite.instances.length; i++) {
-            sprite.setAttributesFor(i, {
-                globalAlpha: 0,
-                startAngle: twoPie,
-                endAngle: twoPie
+                endAngle: lastAngle = summation[i] * sum,
+                globalAlpha: 1
             });
         }
-
-        if (labelField) {
-            for (i = 0, lastAngle = 0; i < length; i++) {
-                sprite.setAttributesFor(i, {
-                    label: String(items[i].get(labelField))
-                });
-            }
-            for (i = length; i < sprites.length; i++) {
-                sprite.setAttributesFor(i, {
-                    label: ''
-                });
-            }
+        for (; i < me.sprites.length; i++) {
+            sprites[i].setAttributes({
+                startAngle: totalAngle,
+                endAngle: totalAngle,
+                globalAlpha: 0
+            });
         }
+        me.getChart().refreshLegendStore();
+    },
+
+    updateCenter: function (center) {
+        this.setStyle({
+            translationX: center[0] + this.getOffsetX(),
+            translationY: center[1] + this.getOffsetY()
+        });
+        this.doUpdateStyles();
+    },
+
+    updateRadius: function (radius) {
+        this.setStyle({
+            startRho: radius * this.getDonut() * 0.01, // Percentage
+            endRho: radius
+        });
+        this.doUpdateStyles();
+    },
+
+    updateDonut: function (donut) {
+        var radius = this.getRadius();
+        this.setStyle({
+            startRho: radius * donut * 0.01, // Percentage
+            endRho: radius
+        });
+        this.doUpdateStyles();
+    },
+
+    updateRotation: function (rotation) {
+        this.setStyle({
+            rotationRads: rotation
+        });
+        this.doUpdateStyles();
+    },
+
+    updateTotalAngle: function (totalAngle) {
+        this.processData();
     },
 
     getSprites: function () {
         var me = this,
             chart = this.getChart(),
-            surface = me.getSurface(),
-            store = me.getActualStore();
+            store = me.getStore();
         if (!chart || !store) {
             return[];
         }
+        me.getColors();
+        me.getSubStyle();
         var items = store.getData().items,
             length = items.length,
             animation = chart && chart.getAnimate(),
             center = me.getCenter(),
             offsetX = me.getOffsetX(),
             offsetY = me.getOffsetY(),
-            radius = me.getRadius(),
-            donut = me.getDonut(),
-            rotation = me.getRotation(),
-            twoPie = 2 * Math.PI,
-            sprite = me.sprites[0], i, style;
-
-        if (!sprite) {
-            sprite = surface.add({
-                type: 'instancing',
-                translationX: center[0] + offsetX,
-                translationY: center[1] + offsetY,
-                rotationRads: rotation
-            });
-
-            sprite.setTemplate({
-                type: 'pieslice',
-                centerX: 0,
-                centerY: 0,
-                startRho: radius * donut * 0.01, // Percentage
-                endRho: radius,
-                startAngle: twoPie,
-                endAngle: twoPie
-            });
-
-            me.sprites.push(sprite);
-            if (me.getLabel()) {
-                me.getLabel().setAttributes({
-                    translationX: center[0] + offsetX,
-                    translationY: center[1] + offsetY,
-                    rotationRads: rotation,
-                    labelOverflowPadding: this.getLabelOverflowPadding()
-                });
-                me.getLabel().getTemplate().fx.setSpecialDuration({'callout': 200});
-                sprite.getTemplate().bindMarker('labels', me.getLabel());
-            }
-
-            sprite.getTemplate().fx.setConfig(animation);
-        } else {
-            sprite.setAttributes({
-                translationX: center[0] + offsetX,
-                translationY: center[1] + offsetY,
-                rotationRads: rotation
-            });
-            sprite.getTemplate().fx.setConfig(animation);
-            sprite.getTemplate().setAttributes({
-                centerX: 0,
-                centerY: 0,
-                startRho: radius * donut * 0.01, // Percentage
-                endRho: radius
-            });
-        }
+            sprites = me.sprites, sprite,
+            i, spriteCreated = false;
 
         for (i = 0; i < length; i++) {
-            style = Ext.apply({}, this.getStyleByIndex(i));
-            if (sprite.instances.length <= i) {
-                sprite.createInstance(style);
-            } else {
-                sprite.setAttributesFor(i, style);
+            sprite = sprites[i];
+            if (!sprite) {
+                sprite = me.createSprite();
+                if (me.getHighlightCfg()) {
+                    sprite.config.highlightCfg = me.getHighlightCfg();
+                    sprite.addModifier('highlight', true);
+                }
+                if (me.getLabelField()) {
+                    me.getLabel().setAttributes({
+                        translationX: center[0] + offsetX,
+                        translationY: center[1] + offsetY,
+                        labelOverflowPadding: this.getLabelOverflowPadding()
+                    });
+                    me.getLabel().getTemplate().fx.setCustomDuration({'callout': 200});
+                    sprite.bindMarker('labels', me.getLabel());
+                }
+                sprite.setAttributes(this.getStyleByIndex(i));
+                spriteCreated = true;
+            }
+            sprite.fx.setConfig(animation);
+        }
+        if (spriteCreated) {
+            me.doUpdateStyles();
+        }
+        return me.sprites;
+    },
+
+    betweenAngle: function (x, a, b) {
+        b -= a;
+        x -= a;
+        x %= Math.PI * 2;
+        b %= Math.PI * 2;
+        x += Math.PI * 2;
+        b += Math.PI * 2;
+        x %= Math.PI * 2;
+        b %= Math.PI * 2;
+        return x < b;
+    },
+
+    getItemForPoint: function (x, y) {
+        var me = this,
+            sprites = me.getSprites();
+        if (sprites) {
+            var center = me.getCenter(),
+                offsetX = me.getOffsetX(),
+                offsetY = me.getOffsetY(),
+                originalX = x - center[0] + offsetX,
+                originalY = y - center[1] + offsetY,
+                store = me.getStore(),
+                donut = me.getDonut(),
+                items = store.getData().items,
+                direction = Math.atan2(originalY, originalX) - me.getRotation(),
+                donutLimit = Math.sqrt(originalX * originalX + originalY * originalY),
+                endRadius = me.getRadius(),
+                startRadius = donut / 100 * endRadius,
+                i, ln, attr;
+
+            for (i = 0, ln = items.length; i < ln; i++) {
+                // Fortunately, the id of items equals the index of it in instances list.
+                attr = sprites[i].attr;
+                if (startRadius + attr.margin <= donutLimit && donutLimit + attr.margin <= endRadius) {
+                    if (this.betweenAngle(direction, attr.startAngle, attr.endAngle)) {
+                        return {
+                            series: this,
+                            sprite: sprites[i],
+                            index: i,
+                            record: items[i],
+                            field: this.getXField()
+                        };
+                    }
+                }
             }
         }
+    },
 
-        return me.sprites;
+    provideLegendInfo: function (target) {
+        var store = this.getStore();
+        if (store) {
+            var items = store.getData().items,
+                labelField = this.getLabelField(),
+                hidden = this.getHidden();
+            for (var i = 0; i < items.length; i++) {
+                target.push({
+                    name: labelField ? String(items[i].get(labelField)) : this.getId(),
+                    mark: this.getStyleByIndex(i).fillStyle || this.getStyleByIndex(i).strokeStyle || 'black',
+                    disabled: hidden[i],
+                    series: this.getId(),
+                    index: i
+                });
+            }
+        }
     }
 });
 

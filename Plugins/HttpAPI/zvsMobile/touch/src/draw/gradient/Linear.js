@@ -20,13 +20,7 @@ Ext.define("Ext.draw.gradient.Linear", {
         this.clearCache();
     },
 
-    /**
-     * @protected
-     * Generate a linear gradient according to the.
-     * @param ctx
-     * @param bbox
-     * @return {Object}
-     */
+    // Inherited
     generateGradient: function (ctx, bbox) {
         var angle = Ext.draw.Draw.rad(this.getDegrees()),
             cos = Math.cos(angle),

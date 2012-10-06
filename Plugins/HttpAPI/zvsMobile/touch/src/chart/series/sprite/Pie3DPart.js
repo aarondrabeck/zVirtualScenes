@@ -55,7 +55,7 @@ Ext.define("Ext.chart.series.sprite.Pie3DPart", {
             },
             updaters: {
                 "partColor": function (attrs) {
-                    var color = Ext.draw.Color.create(attrs.baseColor),
+                    var color = Ext.draw.Color.fly(attrs.baseColor),
                         fillStyle;
                     switch (attrs.part) {
                         case 'top':
@@ -67,7 +67,7 @@ Ext.define("Ext.chart.series.sprite.Pie3DPart", {
                                 stops: [
                                     {
                                         offset: 0,
-                                        color: color.getDarker(0.3).toString()
+                                        color: color.createDarker(0.3).toString()
                                     },
                                     {
                                         offset: 0.3,
@@ -75,20 +75,20 @@ Ext.define("Ext.chart.series.sprite.Pie3DPart", {
                                     },
                                     {
                                         offset: 0.8,
-                                        color: color.getLighter(0.2).toString()
+                                        color: color.createLighter(0.2).toString()
                                     },
                                     {
                                         offset: 1,
-                                        color: color.getDarker(0.4).toString()
+                                        color: color.createDarker(0.4).toString()
                                     }
                                 ]
                             });
                             break;
                         case 'start':
-                            fillStyle = color.getDarker(0.3).toString();
+                            fillStyle = color.createDarker(0.3).toString();
                             break;
                         case 'end':
-                            fillStyle = color.getDarker(0.3).toString();
+                            fillStyle = color.createDarker(0.3).toString();
                             break;
                         case 'inner':
                             fillStyle = Ext.create("Ext.draw.gradient.Linear", {
@@ -96,11 +96,11 @@ Ext.define("Ext.chart.series.sprite.Pie3DPart", {
                                 stops: [
                                     {
                                         offset: 0,
-                                        color: color.getDarker(0.4).toString()
+                                        color: color.createDarker(0.4).toString()
                                     },
                                     {
                                         offset: 0.2,
-                                        color: color.getLighter(0.2).toString()
+                                        color: color.createLighter(0.2).toString()
                                     },
                                     {
                                         offset: 0.7,
@@ -108,7 +108,7 @@ Ext.define("Ext.chart.series.sprite.Pie3DPart", {
                                     },
                                     {
                                         offset: 1,
-                                        color: color.getDarker(0.3).toString()
+                                        color: color.createDarker(0.3).toString()
                                     }
                                 ]
                             });
@@ -156,7 +156,7 @@ Ext.define("Ext.chart.series.sprite.Pie3DPart", {
         return this.updatePlainBBox(transform);
     },
     
-    drawPath: function (path) {
+    updatePath: function (path) {
         if (this.attr.endAngle < this.attr.startAngle) {
             return;
         }

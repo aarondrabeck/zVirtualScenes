@@ -18,7 +18,7 @@ Ext.define('Ext.scroll.Indicator', {
         else if (Ext.os.is.iOS) {
             return new Ext.scroll.indicator.CssTransform(config);
         }
-        else if(Ext.os.is.Android4){
+        else if (Ext.os.is.Android4) {
             return new Ext.scroll.indicator.Throttled(config);
         }
         else {

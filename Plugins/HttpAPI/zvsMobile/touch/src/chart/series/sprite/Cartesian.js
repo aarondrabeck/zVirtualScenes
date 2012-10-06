@@ -16,15 +16,17 @@ Ext.define("Ext.chart.series.sprite.Cartesian", {
                 dataX: 'data',
                 labels: 'default',
                 labelOverflowPadding: 'number',
-                flipXY: 'bool'
+                flipXY: 'bool',
+                renderer: 'default'
             },
             defaults: {
                 dataY: null,
                 dataX: null,
-                dataRange: null,
+                dataRange: [0, 0, 1, 1],
                 labels: null,
                 labelOverflowPadding: 10,
-                flipXY: false
+                flipXY: false,
+                renderer: null
             },
             dirtyTriggers: {
                 dataX: 'dataX,bbox',
@@ -47,7 +49,9 @@ Ext.define("Ext.chart.series.sprite.Cartesian", {
     },
 
     config: {
-        flipXY: false
+        flipXY: false,
+        dataItems: null,
+        field: null
     },
 
     processDataY: Ext.emptyFn,
@@ -98,9 +102,9 @@ Ext.define("Ext.chart.series.sprite.Cartesian", {
             flipXY = me.getFlipXY(),
             attr = me.attr,
             inverseMatrix = attr.inverseMatrix.clone();
-        
-        inverseMatrix.postpendMatrix(surface.inverseMatrix);
-        
+
+        inverseMatrix.appendMatrix(surface.inverseMatrix);
+
         if (attr.dataX === null) {
             return;
         }
@@ -121,16 +125,6 @@ Ext.define("Ext.chart.series.sprite.Cartesian", {
 
         clip = clip[0].concat(clip[1]);
 
-        if (flipXY) {
-            var temp = clip[0];
-            clip[0] = clip[1];
-            clip[1] = temp;
-
-            temp = clip[2];
-            clip[2] = clip[3];
-            clip[3] = temp;
-        }
-
         if (clip[2] < clip[0]) {
             console.log('Cartesian Series sprite does not supports flipped X.');
             // TODO: support it
@@ -146,5 +140,40 @@ Ext.define("Ext.chart.series.sprite.Cartesian", {
      * @param clip
      * @param region
      */
-    renderClipped: Ext.emptyFn
+    renderClipped: Ext.emptyFn,
+
+    /**
+     * Get the nearest item index from point (x, y). -1 as not found.
+     * @param {Number} x
+     * @param {Number} y
+     * @return {Number} The index
+     */
+    getIndexNearPoint: function (x, y) {
+        var sprite = this,
+            mat = sprite.attr.matrix,
+            dataX = sprite.attr.dataX,
+            dataY = sprite.attr.dataY,
+            minX, minY, index = -1,
+            imat = mat.clone().prependMatrix(this.surfaceMatrix).inverse(),
+            center = imat.transformPoint([x, y]),
+            positionLB = imat.transformPoint([x - 22, y - 22]),
+            positionTR = imat.transformPoint([x + 22, y + 22]),
+            left = Math.min(positionLB[0], positionTR[0]),
+            right = Math.max(positionLB[0], positionTR[0]),
+            top = Math.min(positionLB[1], positionTR[1]),
+            bottom = Math.max(positionLB[1], positionTR[1]);
+
+        for (var i = 0; i < dataX.length; i++) {
+            if (left < dataX[i] && dataX[i] < right && top < dataY[i] && dataY[i] < bottom) {
+                if (index === -1 || Math.abs(dataX[i] - center[0]) < minX &&
+                    Math.abs(dataY[i] - center[1]) < minY) {
+                    minX = Math.abs(dataX[i] - center[0]);
+                    minY = Math.abs(dataY[i] - center[1]);
+                    index = i;
+                }
+            }
+        }
+
+        return index;
+    }
 });

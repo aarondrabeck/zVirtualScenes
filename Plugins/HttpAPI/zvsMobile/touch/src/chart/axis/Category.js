@@ -72,7 +72,10 @@
  */
 
 Ext.define('Ext.chart.axis.Category', {
-    require: ['Ext.chart.axis.layout.CombineDuplicate'],
+    requires: [
+        'Ext.chart.axis.layout.CombineDuplicate',
+        'Ext.chart.axis.segmenter.Names'
+    ],
     extend: 'Ext.chart.axis.Axis',
     alias: 'axis.category',
     type: 'category',

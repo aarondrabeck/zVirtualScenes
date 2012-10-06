@@ -204,7 +204,7 @@ Ext.define('Ext.data.reader.Json', {
 
     objectRe: /[\[\.]/,
 
-    //inherit docs
+    // @inheritdoc
     getResponseData: function(response) {
         var responseText = response;
 
@@ -243,7 +243,7 @@ Ext.define('Ext.data.reader.Json', {
         return data;
     },
 
-    // inherit docs
+    // @inheritdoc
     buildExtractors: function() {
         var me = this,
             root = me.getRootProperty();

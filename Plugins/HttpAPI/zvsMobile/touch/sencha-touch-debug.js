@@ -13,7 +13,7 @@ Sencha license terms. Public redistribution is prohibited.
 
 For early licensing, please contact us at licensing@sencha.com
 
-Build date: 2012-09-11 16:50:01 (a52d28b6aec34fdaf9f006f273b2d8bd9c7c5e7c)
+Build date: 2012-10-03 10:47:32 (c38447dc05eb368fb96778dfdd7a5a2e43c7d6f1)
 */
 //@tag foundation,core
 //@define Ext
@@ -3115,7 +3115,7 @@ Ext.Function = {
      *     });
      *
      * @param {Function} setter
-     * @returns {Function} flexSetter
+     * @return {Function} flexSetter
      */
     flexSetter: function(fn) {
         return function(a, b) {
@@ -3410,25 +3410,20 @@ Ext.Function = {
      * passed by the caller.
      * @return {Function} A function which invokes the passed function after buffering for the specified time.
      */
+
     createBuffered: function(fn, buffer, scope, args) {
         var timerId;
 
         return function() {
-            if (!scope) {
-                scope = this;
-            }
-
-            if (!args) {
-                args = Array.prototype.slice.call(arguments);
-            }
+            var callArgs = args || Array.prototype.slice.call(arguments, 0),
+                me = scope || this;
 
             if (timerId) {
                 clearTimeout(timerId);
-                timerId = null;
             }
 
             timerId = setTimeout(function(){
-                fn.apply(scope, args);
+                fn.apply(me, callArgs);
             }, buffer);
         };
     },
@@ -3445,7 +3440,7 @@ Ext.Function = {
      * @param {Number} interval The interval, in milliseconds, on which the passed function is executed.
      * @param {Object} scope (optional) The scope (`this` reference) in which
      * the passed function is executed. If omitted, defaults to the scope specified by the caller.
-     * @returns {Function} A function which invokes the passed function at the specified interval.
+     * @return {Function} A function which invokes the passed function at the specified interval.
      */
     createThrottled: function(fn, interval, scope) {
         var lastCallTime, elapsed, lastArgs, timer, execute = function() {
@@ -3731,7 +3726,6 @@ Ext.Date = {
     }
 };
 
-//<deprecated product=touch since="2.0">
 
 //@tag foundation,core
 //@define Ext.Base
@@ -6020,7 +6014,6 @@ var noArgs = [],
  * @singleton
  */
 (function(Class, alias, arraySlice, arrayFrom, global) {
-    //<if nonBrowser>
     var Manager = Ext.ClassManager = {
 
         /**
@@ -6713,7 +6706,6 @@ var noArgs = [],
             // Still not existing at this point, try to load it via synchronous mode as the last resort
             if (!cls) {
                 //<debug warn>
-                //<if nonBrowser>
                 Ext.Logger.warn("[Ext.Loader] Synchronously loading '" + name + "'; consider adding '" +
                     ((possibleName) ? alias : name) + "' explicitly as a require of the corresponding class");
                 //</debug>
@@ -7532,7 +7524,6 @@ var noArgs = [],
 (function(Manager, Class, flexSetter, alias, pass, arrayFrom, arrayErase, arrayInclude) {
 
     var
-        //<if nonBrowser>
         dependencyProperties = ['extend', 'mixins', 'requires'],
         Loader,
         setPathCount = 0;;
@@ -8421,7 +8412,6 @@ var noArgs = [],
         }
     });
 
-    //<if nonBrowser>
     //</feature>
 
     /**
@@ -8659,7 +8649,6 @@ var noArgs = [],
  * @private
  */
 
-//<deprecated product=touch since=2.0>
 
 //@tag dom,core
 //@define Ext-more
@@ -8695,7 +8684,7 @@ var noArgs = [],
  *
  * [getting_started]: #!/guide/getting_started
  */
-Ext.setVersion('touch', '2.1.0-beta3');
+Ext.setVersion('touch', '2.1.0-rc1');
 
 Ext.apply(Ext, {
     /**
@@ -8952,6 +8941,9 @@ Ext.apply(Ext, {
             },
             elementSize: {
                 xclass: 'Ext.event.publisher.ElementSize'
+            },
+            seriesItemEvents: {
+                xclass: 'Ext.chart.series.ItemPublisher'
             }
         },
 
@@ -8989,7 +8981,7 @@ Ext.apply(Ext, {
     /**
      * This indicate the start timestamp of current cycle.
      * It is only reliable during dom-event-initiated cycles and
-     * {@link Ext.draw.fx.Frame} initiated cycles.
+     * {@link Ext.draw.Animator} initiated cycles.
      */
     frameStartTime: +new Date(),
 
@@ -9106,6 +9098,7 @@ Ext.apply(Ext, {
      *         startupImage: {
      *             '320x460': 'resources/startup/320x460.jpg',
      *             '640x920': 'resources/startup/640x920.png',
+     *             '640x1096': 'resources/startup/640x1096.png',
      *             '768x1004': 'resources/startup/768x1004.png',
      *             '748x1024': 'resources/startup/748x1024.png',
      *             '1536x2008': 'resources/startup/1536x2008.png',
@@ -9121,6 +9114,7 @@ Ext.apply(Ext, {
      *
      * - 320x460: Non-retina iPhone, iPod touch, and all Android devices
      * - 640x920: Retina iPhone and iPod touch
+     * - 640x1096: iPhone 5 and iPod touch (fifth generation)
      * - 768x1004: Non-retina iPad (first and second generation) in portrait orientation
      * - 748x1024: Non-retina iPad (first and second generation) in landscape orientation
      * - 1536x2008: Retina iPad (third generation) in portrait orientation
@@ -9304,7 +9298,12 @@ Ext.apply(Ext, {
             statusBarStyle = config.statusBarStyle,
             devicePixelRatio = window.devicePixelRatio || 1;
 
-        addMeta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no');
+        if (navigator.standalone) {
+            addMeta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0');
+        }
+        else {
+            addMeta('viewport', 'initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0');
+        }
         addMeta('apple-mobile-web-app-capable', 'yes');
         addMeta('apple-touch-fullscreen', 'yes');
 
@@ -9325,7 +9324,6 @@ Ext.apply(Ext, {
             icon = {};
         }
 
-        //<deprecated product=touch since=2.0.1>
 
         if (Ext.os.is.iPad) {
             if (devicePixelRatio >= 2) {
@@ -9362,7 +9360,11 @@ Ext.apply(Ext, {
         else {
             // Retina iPhone, iPod touch with iOS version >= 4.3
             if (devicePixelRatio >= 2 && Ext.os.version.gtEq('4.3')) {
-                addStartupImage(startupImage['640x920']);
+                if (Ext.os.is.iPhone5) {
+                    addStartupImage(startupImage['640x1096']);
+                } else {
+                    addStartupImage(startupImage['640x920']);
+                }
 
                 // Retina iPhone and iPod touch
                 if ('114' in icon) {
@@ -9467,6 +9469,7 @@ Ext.apply(Ext, {
      *         startupImage: {
      *             '320x460': 'resources/startup/320x460.jpg',
      *             '640x920': 'resources/startup/640x920.png',
+     *             '640x1096': 'resources/startup/640x1096.png',
      *             '768x1004': 'resources/startup/768x1004.png',
      *             '748x1024': 'resources/startup/748x1024.png',
      *             '1536x2008': 'resources/startup/1536x2008.png',
@@ -9482,6 +9485,7 @@ Ext.apply(Ext, {
      *
      * - 320x460: Non-retina iPhone, iPod touch, and all Android devices
      * - 640x920: Retina iPhone and iPod touch
+     * - 640x1096: iPhone 5 and iPod touch (fifth generation)
      * - 768x1004: Non-retina iPad (first and second generation) in portrait orientation
      * - 748x1024: Non-retina iPad (first and second generation) in landscape orientation
      * - 1536x2008: Retina iPad (third generation) in portrait orientation
@@ -10009,7 +10013,6 @@ Ext.Object.defineProperty(Ext, 'Msg', {
 });
 //</debug>
 
-//<deprecated product=touch since=2.0>
 
 //@tag dom,core
 //@require Ext-more
@@ -10236,6 +10239,10 @@ Ext.define('Ext.env.Browser', {
             engineName = engineNames.webkit;
         }
 
+        if (userAgent.match(/Android.*Chrome/g)) {
+            browserName = 'ChromeMobile';
+        }
+
         Ext.apply(this, {
             engineName: engineName,
             engineVersion: engineVersion,
@@ -10323,7 +10330,6 @@ Ext.define('Ext.env.Browser', {
 }, function() {
     var browserEnv = Ext.browser = new this(Ext.global.navigator.userAgent);
 
-    //<deprecated product=touch since=2.0>
 });
 
 //@tag dom,core
@@ -10404,7 +10410,8 @@ Ext.define('Ext.env.OS', {
      * - iOS
      * - iPad
      * - iPhone
-     * - iPod,
+     * - iPhone5 (also true for 4in iPods).
+     * - iPod
      * - Android
      * - WebOS
      * - BlackBerry
@@ -10515,6 +10522,11 @@ Ext.define('Ext.env.OS', {
             }
         }
 
+        // Detect if the device is the iPhone 5.
+        if (this.name == "iOS" && window.screen.height == 568) {
+            this.setFlag('iPhone5');
+        }
+
         return this;
     }
 
@@ -10524,7 +10536,6 @@ Ext.define('Ext.env.OS', {
         userAgent = navigation.userAgent,
         osEnv, osName, deviceType;
 
-    //<deprecated product=touch since=2.0>
 
     Ext.os = osEnv = new this(userAgent, navigation.platform);
 
@@ -10562,7 +10573,6 @@ Ext.define('Ext.env.OS', {
     osEnv.setFlag(deviceType, true);
     osEnv.deviceType = deviceType;
 
-    //<deprecated product=touch since=2.0>
 
     /**
      * @class Ext.is
@@ -10888,10 +10898,31 @@ Ext.define('Ext.env.Feature', {
          */
         ClassList: function() {
             return "classList" in this.getTestElement();
+        },
+
+        /**
+         * @member Ext.feature.has
+         * @property {Boolean}ClassList
+         * True if LocalStorage is supported and can be written to.
+         * False if LocalStorage is not supported or cannot be written to.
+         */
+        LocalStorage : function() {
+            var supported = false;
+
+            try {
+                if ('localStorage' in window && window['localStorage'] !== null) {
+                    //this should throw an error in private browsing mode in iOS
+                    localStorage.setItem('sencha-localstorage-test', 'test success');
+                    //clean up if setItem worked
+                    localStorage.removeItem('sencha-localstorage-test');
+                    supported = true;
+                }
+            } catch ( e ) {}
+
+            return supported;
         }
     });
 
-    //<deprecated product=touch since=2.0>
 });
 
 //@tag dom,core
@@ -12120,7 +12151,6 @@ Ext.define('Ext.dom.Element', {
         Element.mixin('observable', Ext.mixin.Observable);
     }, null, 'Ext.mixin.Observable');
 
-    //<deprecated product=touch since=2.0>
 
 });
 
@@ -12248,7 +12278,7 @@ Ext.dom.Element.addStatics({
                me.addUnits(box.left, units);
     },
 
-    // private
+    // @private
     camelReplaceFn: function(m, a) {
         return a.charAt(1).toUpperCase();
     },
@@ -12315,7 +12345,6 @@ Ext.dom.Element.addStatics({
     }
 });
 
-//<deprecated product=touch since=2.0>
 
 //@tag dom,core
 //@define Ext.Element-all
@@ -12325,7 +12354,6 @@ Ext.dom.Element.addStatics({
 /**
  * @class Ext.dom.Element
  */
-//<deprecated product=touch since=2.0>
 
 //@tag dom,core
 //@define Ext.Element-all
@@ -13446,7 +13474,7 @@ Ext.dom.Element.addMembers({
      */
     styleHooks: {},
 
-    // private
+    // @private
     addStyles: function(sides, styles) {
         var totalSize = 0,
             sidesArr = sides.match(this.wordsRe),
@@ -13685,7 +13713,6 @@ Ext.dom.Element.addMembers({
     }
 });
 
-//<deprecated product=touch since=2.0>
 
 //@tag dom,core
 //@define Ext.Element-all
@@ -13960,13 +13987,13 @@ Ext.define('Ext.dom.CompositeElementLite', {
 
     isComposite: true,
 
-    // private
+    // @private
     getElement: function(el) {
         // Set the shared flyweight dom property to the current element
         return this.el.attach(el).synchronize();
     },
 
-    // private
+    // @private
     transformElement: function(el) {
         return Ext.getDom(el);
     },
@@ -14028,7 +14055,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
     },
 
     /**
-     * Returns a flyweight Element of the dom element object at the specified index
+     * Returns a flyweight Element of the dom element object at the specified index.
      * @param {Number} index
      * @return {Ext.dom.Element}
      */
@@ -14043,7 +14070,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
         return out;
     },
 
-    // fixes scope with flyweight
+    // fixes scope with flyweight.
     addListener: function(eventName, handler, scope, opt) {
         var els = this.elements,
                 len = els.length,
@@ -14140,7 +14167,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
      * @param {String/HTMLElement/Ext.Element/Number} el The id of an element, the Element itself, the index of the
      * element in this composite to replace.
      * @param {String/Ext.Element} replacement The id of an element or the Element itself.
-     * @param {Boolean} [domReplace] True to remove and replace the element in the document too.
+     * @param {Boolean} [domReplace] `true` to remove and replace the element in the document too.
      * @return {Ext.dom.CompositeElementLite} this
      */
     replaceElement: function(el, replacement, domReplace) {
@@ -14200,7 +14227,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
     },
 
     /**
-     * Returns true if this composite contains the passed element
+     * Returns `true` if this composite contains the passed element
      * @param {String/HTMLElement/Ext.Element/Number} el The id of an element, or an Ext.Element, or an HtmlElement to
      * find within the composite collection.
      * @return {Boolean}
@@ -14213,7 +14240,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
      * Removes the specified element(s).
      * @param {String/HTMLElement/Ext.Element/Number} el The id of an element, the Element itself, the index of the
      * element in this composite or an array of any of those.
-     * @param {Boolean} [removeDom] True to also remove the element from the document
+     * @param {Boolean} [removeDom] `true` to also remove the element from the document
      * @return {Ext.dom.CompositeElementLite} this
      */
     removeElement: function(keys, removeDom) {
@@ -14302,7 +14329,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.app.Profile": [],
   "Ext.event.recognizer.MultiTouch": [],
   "Ext.fx.Runner": [],
-  "Ext.draw.engine.ImageExporter": [],
   "Ext.mixin.Templatable": [],
   "Ext.event.recognizer.Pinch": [],
   "Ext.util.Format": [],
@@ -14331,7 +14357,6 @@ Ext.ClassManager.addNameAlternateMappings({
     "Ext.Tab"
   ],
   "Ext.chart.series.sprite.StackedCartesian": [],
-  "Ext.chart.grid.HorizontalGridPart": [],
   "Ext.util.Grouper": [],
   "Ext.util.translatable.CssPosition": [],
   "Ext.util.paintmonitor.Abstract": [],
@@ -14341,6 +14366,7 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.chart.interactions.PanZoom": [],
   "Ext.util.PositionMap": [],
+  "Ext.chart.series.ItemPublisher": [],
   "Ext.util.Sortable": [],
   "Ext.chart.series.sprite.AbstractRadial": [],
   "Ext.fx.runner.Css": [],
@@ -14383,14 +14409,12 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.device.contacts.Abstract": [],
   "Ext.device.push.Sencha": [],
   "Ext.fx.animation.WipeOut": [],
-  "Ext.draw.RMQ": [],
   "Ext.slider.Slider": [],
   "Ext.Component": [
     "Ext.lib.Component"
   ],
   "Ext.device.communicator.Default": [],
   "Ext.fx.runner.CssAnimation": [],
-  "Ext.draw.fx.Frame": [],
   "Ext.chart.axis.Axis": [],
   "Ext.fx.animation.Cube": [],
   "Ext.chart.Markers": [],
@@ -14400,11 +14424,11 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.dataview.component.ListItem": [],
   "Ext.util.Filter": [],
   "Ext.layout.wrapper.Inner": [],
+  "Ext.draw.Animator": [],
   "Ext.device.geolocation.Simulator": [],
   "Ext.data.association.BelongsTo": [
     "Ext.data.BelongsToAssociation"
   ],
-  "Ext.draw.RMQPM": [],
   "Ext.draw.Surface": [],
   "Ext.scroll.indicator.ScrollPosition": [],
   "Ext.field.Email": [
@@ -14419,6 +14443,7 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.chart.axis.segmenter.Segmenter": [],
   "Ext.viewport.Android": [],
   "Ext.log.formatter.Identity": [],
+  "Ext.chart.interactions.ItemHighlight": [],
   "Ext.picker.Picker": [
     "Ext.Picker"
   ],
@@ -14454,11 +14479,11 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.fx.Easing": [],
   "Ext.chart.series.sprite.Scatter": [],
-  "Ext.picker.Date": [
-    "Ext.DatePicker"
-  ],
   "Ext.data.reader.Array": [
     "Ext.data.ArrayReader"
+  ],
+  "Ext.picker.Date": [
+    "Ext.DatePicker"
   ],
   "Ext.data.proxy.JsonP": [
     "Ext.data.ScriptTagProxy"
@@ -14469,6 +14494,7 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.field.Checkbox": [
     "Ext.form.Checkbox"
   ],
+  "Ext.chart.Legend": [],
   "Ext.Media": [],
   "Ext.TitleBar": [],
   "Ext.chart.interactions.RotatePie3D": [],
@@ -14476,16 +14502,16 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.util.TapRepeater": [],
   "Ext.event.Touch": [],
   "Ext.mixin.Bindable": [],
-  "Ext.draw.RMQSegTree": [],
-  "Ext.chart.series.Cartesian": [],
   "Ext.data.proxy.Server": [
     "Ext.data.ServerProxy"
   ],
+  "Ext.chart.series.Cartesian": [],
   "Ext.util.sizemonitor.Scroll": [],
   "Ext.data.ResultSet": [],
   "Ext.data.association.HasMany": [
     "Ext.data.HasManyAssociation"
   ],
+  "Ext.draw.TimingFunctions": [],
   "Ext.draw.engine.Canvas": [],
   "Ext.data.proxy.Ajax": [
     "Ext.data.HttpProxy",
@@ -14540,9 +14566,8 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.device.Camera": [],
   "Ext.mixin.Filterable": [],
   "Ext.draw.TextMeasurer": [],
-  "Ext.chart.axis.Gauge": [],
-  "Ext.chart.series.sprite.PieSlice": [],
   "Ext.dataview.element.Container": [],
+  "Ext.chart.series.sprite.PieSlice": [],
   "Ext.data.Connection": [],
   "Ext.direct.ExceptionEvent": [],
   "Ext.Panel": [
@@ -14617,7 +14642,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.data.proxy.Client": [
     "Ext.proxy.ClientProxy"
   ],
-  "Ext.chart.series.ItemEvents": [],
   "Ext.fx.easing.Bounce": [],
   "Ext.data.Types": [],
   "Ext.chart.series.sprite.Cartesian": [],
@@ -14631,6 +14655,7 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.chart.axis.sprite.Axis": [],
   "Ext.behavior.Draggable": [],
+  "Ext.chart.grid.RadialGrid": [],
   "Ext.util.TranslatableGroup": [],
   "Ext.fx.Animation": [],
   "Ext.draw.sprite.Ellipse": [],
@@ -14643,23 +14668,23 @@ Ext.ClassManager.addNameAlternateMappings({
     "Ext.form.FormPanel"
   ],
   "Ext.chart.series.Series": [],
-  "Ext.chart.grid.VerticalGridPart": [],
   "Ext.data.Request": [],
   "Ext.draw.sprite.Text": [],
   "Ext.layout.Float": [],
+  "Ext.dataview.component.DataItem": [],
   "Ext.chart.CartesianChart": [
     "Ext.chart.Chart"
   ],
   "Ext.data.proxy.WebStorage": [
     "Ext.data.WebStorageProxy"
   ],
-  "Ext.dataview.component.DataItem": [],
   "Ext.log.writer.Writer": [],
   "Ext.device.Communicator": [],
   "Ext.fx.animation.Flip": [],
   "Ext.util.Point": [],
   "Ext.chart.series.StackedCartesian": [],
   "Ext.fx.layout.card.Slide": [],
+  "Ext.chart.grid.AngularGrid": [],
   "Ext.data.DirectStore": [],
   "Ext.dataview.NestedList": [
     "Ext.NestedList"
@@ -14676,8 +14701,8 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.device.Push": [],
   "Ext.fx.easing.BoundMomentum": [],
   "Ext.viewport.Viewport": [],
-  "Ext.event.recognizer.VerticalSwipe": [],
   "Ext.chart.series.Polar": [],
+  "Ext.event.recognizer.VerticalSwipe": [],
   "Ext.event.Event": [
     "Ext.EventObject"
   ],
@@ -14685,8 +14710,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.chart.grid.VerticalGrid": [],
   "Ext.chart.label.Label": [],
   "Ext.draw.sprite.EllipticalArc": [],
-  "Ext.chart.Shape": [],
-  "Ext.draw.RMQLinear": [],
   "Ext.fx.easing.EaseOut": [],
   "Ext.Toolbar": [],
   "Ext.event.recognizer.LongPress": [],
@@ -14694,11 +14717,11 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.chart.series.sprite.Line": [],
   "Ext.data.ArrayStore": [],
   "Ext.data.proxy.SQL": [],
-  "Ext.event.recognizer.Rotate": [],
   "Ext.mixin.Sortable": [],
   "Ext.fx.layout.card.Flip": [],
   "Ext.chart.interactions.CrossZoom": [],
   "Ext.event.publisher.ComponentPaint": [],
+  "Ext.event.recognizer.Rotate": [],
   "Ext.util.TranslatableList": [],
   "Ext.carousel.Item": [],
   "Ext.event.recognizer.Swipe": [],
@@ -14726,7 +14749,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.fx.layout.card.ScrollCover": [],
   "Ext.device.orientation.Sencha": [],
   "Ext.util.Droppable": [],
-  "Ext.draw.fx.Pool": [],
   "Ext.draw.sprite.Composite": [],
   "Ext.chart.series.Pie": [],
   "Ext.device.Purchases.Product": [],
@@ -14759,11 +14781,9 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.Label": [],
   "Ext.util.translatable.CssTransform": [],
   "Ext.viewport.Ios": [],
-  "Ext.chart.axis.Radial": [],
   "Ext.Spacer": [],
   "Ext.mixin.Selectable": [],
   "Ext.draw.sprite.Image": [],
-  "Ext.chart.axis.Abstract": [],
   "Ext.data.proxy.Rest": [
     "Ext.data.RestProxy"
   ],
@@ -14795,7 +14815,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.direct.Manager": [
     "Ext.Direct"
   ],
-  "Ext.draw.CartesianTree": [],
   "Ext.data.proxy.Proxy": [
     "Ext.data.DataProxy",
     "Ext.data.Proxy"
@@ -14820,13 +14839,13 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.field.Url": [
     "Ext.form.Url"
   ],
+  "Ext.draw.Solver": [],
   "Ext.data.proxy.Memory": [
     "Ext.data.MemoryProxy"
   ],
   "Ext.chart.axis.Time": [],
   "Ext.layout.Card": [],
   "Ext.ComponentQuery": [],
-  "Ext.draw.engine.SvgExporter": [],
   "Ext.chart.series.Pie3D": [],
   "Ext.device.camera.Abstract": [],
   "Ext.device.device.Sencha": [],
@@ -14856,7 +14875,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.device.connection.Abstract": [],
   "Ext.direct.Event": [],
   "Ext.direct.RemotingMethod": [],
-  "Ext.draw.RMQSparse": [],
   "Ext.Evented": [
     "Ext.EventedBase"
   ],
@@ -14872,6 +14890,7 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.Audio": [],
   "Ext.device.Contacts": [],
   "Ext.table.Table": [],
+  "Ext.draw.engine.SvgContext.Gradient": [],
   "Ext.chart.axis.layout.Layout": [],
   "Ext.data.Errors": [],
   "Ext.field.Text": [
@@ -14914,7 +14933,6 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.app.Profile": [],
   "Ext.event.recognizer.MultiTouch": [],
   "Ext.fx.Runner": [],
-  "Ext.draw.engine.ImageExporter": [],
   "Ext.mixin.Templatable": [],
   "Ext.event.recognizer.Pinch": [],
   "Ext.util.Format": [],
@@ -14924,19 +14942,41 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.data.identifier.Simple": [
     "data.identifier.simple"
   ],
-  "Ext.dataview.DataView": [],
-  "Ext.field.Hidden": [],
-  "Ext.field.Number": [],
+  "Ext.dataview.DataView": [
+    "widget.component",
+    "widget.container",
+    "widget.dataview"
+  ],
+  "Ext.field.Hidden": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.hiddenfield"
+  ],
+  "Ext.field.Number": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.numberfield"
+  ],
   "Ext.chart.series.CandleStick": [
     "series.candlestick"
   ],
   "Ext.device.Connection": [],
   "Ext.data.Model": [],
   "Ext.data.reader.Reader": [],
-  "Ext.Sheet": [],
-  "Ext.tab.Tab": [],
+  "Ext.Sheet": [
+    "widget.panel",
+    "widget.component",
+    "widget.container",
+    "widget.sheet"
+  ],
+  "Ext.tab.Tab": [
+    "widget.component",
+    "widget.button",
+    "widget.tab"
+  ],
   "Ext.chart.series.sprite.StackedCartesian": [],
-  "Ext.chart.grid.HorizontalGridPart": [],
   "Ext.util.Grouper": [],
   "Ext.util.translatable.CssPosition": [],
   "Ext.util.paintmonitor.Abstract": [],
@@ -14945,9 +14985,11 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.data.NodeInterface": [],
   "Ext.chart.interactions.PanZoom": [
+    "widget.interaction",
     "interaction.panzoom"
   ],
   "Ext.util.PositionMap": [],
+  "Ext.chart.series.ItemPublisher": [],
   "Ext.util.Sortable": [],
   "Ext.chart.series.sprite.AbstractRadial": [],
   "Ext.fx.runner.Css": [],
@@ -14970,29 +15012,48 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.ComponentManager": [],
   "Ext.util.sizemonitor.OverflowChange": [],
   "Ext.event.publisher.ElementSize": [],
-  "Ext.tab.Bar": [],
+  "Ext.tab.Bar": [
+    "widget.toolbar",
+    "widget.component",
+    "widget.tabbar",
+    "widget.container"
+  ],
   "Ext.event.Dom": [],
   "Ext.app.Application": [],
-  "Ext.dataview.List": [],
+  "Ext.dataview.List": [
+    "widget.component",
+    "widget.container",
+    "widget.list",
+    "widget.dataview"
+  ],
   "Ext.util.translatable.Dom": [],
   "Ext.fx.layout.card.Scroll": [
     "fx.layout.card.scroll"
   ],
   "Ext.draw.LimitedCache": [],
   "Ext.device.geolocation.Sencha": [],
-  "Ext.dataview.ListItemHeader": [],
+  "Ext.dataview.ListItemHeader": [
+    "widget.component",
+    "widget.listitemheader"
+  ],
   "Ext.event.publisher.TouchGesture": [],
   "Ext.data.SortTypes": [],
   "Ext.device.contacts.Abstract": [],
   "Ext.device.push.Sencha": [],
   "Ext.fx.animation.WipeOut": [],
-  "Ext.draw.RMQ": [],
-  "Ext.slider.Slider": [],
-  "Ext.Component": [],
+  "Ext.slider.Slider": [
+    "widget.slider",
+    "widget.component",
+    "widget.container"
+  ],
+  "Ext.Component": [
+    "widget.component"
+  ],
   "Ext.device.communicator.Default": [],
   "Ext.fx.runner.CssAnimation": [],
-  "Ext.draw.fx.Frame": [],
-  "Ext.chart.axis.Axis": [],
+  "Ext.chart.axis.Axis": [
+    "widget.axis"
+  ],
   "Ext.fx.animation.Cube": [
     "animation.cube"
   ],
@@ -15002,37 +15063,77 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.device.device.Simulator": [],
   "Ext.Ajax": [],
-  "Ext.dataview.component.ListItem": [],
+  "Ext.dataview.component.ListItem": [
+    "widget.dataitem",
+    "widget.component",
+    "widget.container",
+    "widget.listitem"
+  ],
   "Ext.util.Filter": [],
   "Ext.layout.wrapper.Inner": [],
+  "Ext.draw.Animator": [],
   "Ext.device.geolocation.Simulator": [],
   "Ext.data.association.BelongsTo": [
     "association.belongsto"
   ],
-  "Ext.draw.RMQPM": [],
-  "Ext.draw.Surface": [],
-  "Ext.scroll.indicator.ScrollPosition": [],
-  "Ext.field.Email": [],
+  "Ext.draw.Surface": [
+    "widget.surface",
+    "widget.component"
+  ],
+  "Ext.scroll.indicator.ScrollPosition": [
+    "widget.component"
+  ],
+  "Ext.field.Email": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.emailfield"
+  ],
   "Ext.fx.layout.card.Abstract": [],
   "Ext.event.Controller": [],
-  "Ext.dataview.component.Container": [],
+  "Ext.dataview.component.Container": [
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.log.writer.Remote": [],
   "Ext.fx.layout.card.Style": [],
   "Ext.device.purchases.Sencha": [],
   "Ext.chart.axis.segmenter.Segmenter": [],
-  "Ext.viewport.Android": [],
+  "Ext.viewport.Android": [
+    "widget.viewport",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.log.formatter.Identity": [],
+  "Ext.chart.interactions.ItemHighlight": [
+    "widget.interaction",
+    "interaction.itemhighlight"
+  ],
   "Ext.picker.Picker": [
+    "widget.panel",
+    "widget.component",
+    "widget.container",
+    "widget.sheet",
     "widget.picker"
   ],
   "Ext.data.Batch": [],
   "Ext.draw.modifier.Animation": [
     "modifier.animation"
   ],
-  "Ext.chart.AbstractChart": [],
-  "Ext.tab.Panel": [],
+  "Ext.chart.AbstractChart": [
+    "widget.draw",
+    "widget.component",
+    "widget.container"
+  ],
+  "Ext.tab.Panel": [
+    "widget.tabpanel",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.draw.Path": [],
-  "Ext.scroll.indicator.Throttled": [],
+  "Ext.scroll.indicator.Throttled": [
+    "widget.component"
+  ],
   "Ext.fx.animation.SlideOut": [
     "animation.slideOut"
   ],
@@ -15046,7 +15147,9 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.data.Field": [
     "data.field"
   ],
-  "Ext.chart.series.Gauge": [],
+  "Ext.chart.series.Gauge": [
+    "series.gauge"
+  ],
   "Ext.data.StoreManager": [],
   "Ext.fx.animation.PopOut": [
     "animation.popOut"
@@ -15056,16 +15159,30 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.util.DelayedTask": [],
   "Ext.fx.easing.Momentum": [],
   "Ext.fx.easing.Abstract": [],
-  "Ext.Title": [],
+  "Ext.Title": [
+    "widget.title",
+    "widget.component"
+  ],
   "Ext.event.recognizer.Drag": [],
-  "Ext.field.TextArea": [],
+  "Ext.field.TextArea": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.textareafield"
+  ],
   "Ext.fx.Easing": [],
   "Ext.chart.series.sprite.Scatter": [
     "sprite.scatterSeries"
   ],
-  "Ext.picker.Date": [],
   "Ext.data.reader.Array": [
     "reader.array"
+  ],
+  "Ext.picker.Date": [
+    "widget.panel",
+    "widget.datepicker",
+    "widget.component",
+    "widget.container",
+    "widget.sheet"
   ],
   "Ext.data.proxy.JsonP": [
     "proxy.jsonp",
@@ -15076,27 +15193,48 @@ Ext.ClassManager.addNameAlternateMappings({
     "series.area"
   ],
   "Ext.device.device.PhoneGap": [],
-  "Ext.field.Checkbox": [],
-  "Ext.Media": [],
-  "Ext.TitleBar": [],
+  "Ext.field.Checkbox": [
+    "widget.field",
+    "widget.component",
+    "widget.checkboxfield"
+  ],
+  "Ext.chart.Legend": [
+    "widget.component",
+    "widget.legend",
+    "widget.container",
+    "widget.dataview"
+  ],
+  "Ext.Media": [
+    "widget.component",
+    "widget.media"
+  ],
+  "Ext.TitleBar": [
+    "widget.titlebar",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.chart.interactions.RotatePie3D": [
+    "widget.interaction",
     "interaction.rotatePie3d"
   ],
   "Ext.draw.gradient.Linear": [],
   "Ext.util.TapRepeater": [],
   "Ext.event.Touch": [],
   "Ext.mixin.Bindable": [],
-  "Ext.draw.RMQSegTree": [],
-  "Ext.chart.series.Cartesian": [],
   "Ext.data.proxy.Server": [
     "proxy.server"
   ],
+  "Ext.chart.series.Cartesian": [],
   "Ext.util.sizemonitor.Scroll": [],
   "Ext.data.ResultSet": [],
   "Ext.data.association.HasMany": [
     "association.hasmany"
   ],
-  "Ext.draw.engine.Canvas": [],
+  "Ext.draw.TimingFunctions": [],
+  "Ext.draw.engine.Canvas": [
+    "widget.surface",
+    "widget.component"
+  ],
   "Ext.data.proxy.Ajax": [
     "proxy.ajax"
   ],
@@ -15114,6 +15252,8 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.event.recognizer.Recognizer": [],
   "Ext.form.FieldSet": [
+    "widget.component",
+    "widget.container",
     "widget.fieldset"
   ],
   "Ext.scroll.Indicator": [],
@@ -15134,44 +15274,76 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.chart.series.sprite.Pie3DPart": [
     "sprite.pie3dPart"
   ],
-  "Ext.viewport.Default": [],
+  "Ext.viewport.Default": [
+    "widget.viewport",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.layout.HBox": [
     "layout.hbox"
   ],
   "Ext.ux.auth.model.Session": [],
-  "Ext.scroll.indicator.Default": [],
+  "Ext.scroll.indicator.Default": [
+    "widget.component"
+  ],
   "Ext.data.ModelManager": [],
   "Ext.data.Validations": [],
   "Ext.util.translatable.Abstract": [],
-  "Ext.scroll.indicator.Abstract": [],
-  "Ext.Button": [],
-  "Ext.field.Radio": [],
+  "Ext.scroll.indicator.Abstract": [
+    "widget.component"
+  ],
+  "Ext.Button": [
+    "widget.button",
+    "widget.component"
+  ],
+  "Ext.field.Radio": [
+    "widget.field",
+    "widget.component",
+    "widget.radiofield",
+    "widget.checkboxfield"
+  ],
   "Ext.util.HashMap": [],
-  "Ext.field.Input": [],
+  "Ext.field.Input": [
+    "widget.input",
+    "widget.component"
+  ],
   "Ext.device.Camera": [],
   "Ext.mixin.Filterable": [],
   "Ext.draw.TextMeasurer": [],
-  "Ext.chart.axis.Gauge": [],
+  "Ext.dataview.element.Container": [
+    "widget.component"
+  ],
   "Ext.chart.series.sprite.PieSlice": [
     "sprite.pieslice"
   ],
-  "Ext.dataview.element.Container": [],
   "Ext.data.Connection": [],
   "Ext.direct.ExceptionEvent": [
     "direct.exception"
   ],
-  "Ext.Panel": [],
+  "Ext.Panel": [
+    "widget.panel",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.data.association.HasOne": [
     "association.hasone"
   ],
   "Ext.device.geolocation.Abstract": [],
   "Ext.ActionSheet": [
+    "widget.panel",
+    "widget.component",
+    "widget.container",
+    "widget.sheet",
     "widget.actionsheet"
   ],
   "Ext.layout.Box": [
     "layout.tablebox"
   ],
-  "Ext.Video": [],
+  "Ext.Video": [
+    "widget.component",
+    "widget.media",
+    "widget.video"
+  ],
   "Ext.ux.auth.Session": [],
   "Ext.chart.series.Line": [
     "series.line"
@@ -15191,9 +15363,17 @@ Ext.ClassManager.addNameAlternateMappings({
     "animation.slideIn"
   ],
   "Ext.device.Purchases.Purchase": [],
-  "Ext.table.Row": [],
+  "Ext.table.Row": [
+    "widget.component",
+    "widget.tablerow",
+    "widget.container",
+    "widget.tablecell"
+  ],
   "Ext.log.formatter.Formatter": [],
-  "Ext.Container": [],
+  "Ext.Container": [
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.fx.animation.Pop": [
     "animation.pop",
     "animation.popIn"
@@ -15213,12 +15393,15 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.event.publisher.ElementPaint": [],
   "Ext.chart.axis.Category": [
+    "widget.axis",
     "axis.category"
   ],
   "Ext.data.reader.Json": [
     "reader.json"
   ],
-  "Ext.Decorator": [],
+  "Ext.Decorator": [
+    "widget.component"
+  ],
   "Ext.data.TreeStore": [
     "store.tree"
   ],
@@ -15227,15 +15410,27 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.draw.gradient.Gradient": [],
   "Ext.event.recognizer.DoubleTap": [],
   "Ext.log.Logger": [],
-  "Ext.picker.Slot": [],
+  "Ext.picker.Slot": [
+    "widget.component",
+    "widget.container",
+    "widget.pickerslot",
+    "widget.dataview"
+  ],
   "Ext.device.notification.Simulator": [],
-  "Ext.field.Field": [],
+  "Ext.field.Field": [
+    "widget.field",
+    "widget.component"
+  ],
   "Ext.log.filter.Priority": [],
   "Ext.util.sizemonitor.Abstract": [],
   "Ext.chart.series.sprite.Polar": [],
   "Ext.util.paintmonitor.OverflowChange": [],
   "Ext.util.LineSegment": [],
-  "Ext.SegmentedButton": [],
+  "Ext.SegmentedButton": [
+    "widget.segmentedbutton",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.Sortable": [],
   "Ext.fx.easing.Linear": [
     "easing.linear"
@@ -15246,7 +15441,6 @@ Ext.ClassManager.addNameAlternateMappings({
     "data.identifier.uuid"
   ],
   "Ext.data.proxy.Client": [],
-  "Ext.chart.series.ItemEvents": [],
   "Ext.fx.easing.Bounce": [],
   "Ext.data.Types": [],
   "Ext.chart.series.sprite.Cartesian": [],
@@ -15256,25 +15450,40 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.draw.sprite.Path": [
     "sprite.path"
   ],
-  "Ext.LoadMask": [],
+  "Ext.LoadMask": [
+    "widget.component",
+    "widget.mask",
+    "widget.loadmask"
+  ],
   "Ext.data.association.Association": [],
   "Ext.chart.axis.sprite.Axis": [],
   "Ext.behavior.Draggable": [],
+  "Ext.chart.grid.RadialGrid": [
+    "grid.radial"
+  ],
   "Ext.util.TranslatableGroup": [],
   "Ext.fx.Animation": [],
   "Ext.draw.sprite.Ellipse": [
     "sprite.ellipse"
   ],
   "Ext.util.Inflector": [],
-  "Ext.Map": [],
+  "Ext.Map": [
+    "widget.component",
+    "widget.container",
+    "widget.map"
+  ],
   "Ext.XTemplate": [],
   "Ext.data.NodeStore": [
     "store.node"
   ],
   "Ext.draw.sprite.AttributeParser": [],
-  "Ext.form.Panel": [],
+  "Ext.form.Panel": [
+    "widget.panel",
+    "widget.component",
+    "widget.formpanel",
+    "widget.container"
+  ],
   "Ext.chart.series.Series": [],
-  "Ext.chart.grid.VerticalGridPart": [],
   "Ext.data.Request": [],
   "Ext.draw.sprite.Text": [
     "sprite.text"
@@ -15282,11 +15491,19 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.layout.Float": [
     "layout.float"
   ],
+  "Ext.dataview.component.DataItem": [
+    "widget.dataitem",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.chart.CartesianChart": [
+    "widget.draw",
+    "widget.component",
+    "widget.container",
+    "widget.chart",
     "Ext.chart.Chart"
   ],
   "Ext.data.proxy.WebStorage": [],
-  "Ext.dataview.component.DataItem": [],
   "Ext.log.writer.Writer": [],
   "Ext.device.Communicator": [],
   "Ext.fx.animation.Flip": [
@@ -15297,19 +15514,36 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.fx.layout.card.Slide": [
     "fx.layout.card.slide"
   ],
+  "Ext.chart.grid.AngularGrid": [
+    "grid.angular"
+  ],
   "Ext.data.DirectStore": [
     "store.direct"
   ],
-  "Ext.dataview.NestedList": [],
+  "Ext.dataview.NestedList": [
+    "widget.component",
+    "widget.container",
+    "widget.nestedlist"
+  ],
   "Ext.app.Route": [],
   "Ext.device.connection.Simulator": [],
-  "Ext.chart.PolarChart": [],
+  "Ext.chart.PolarChart": [
+    "widget.polar",
+    "widget.draw",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.event.publisher.ComponentSize": [],
-  "Ext.slider.Toggle": [],
+  "Ext.slider.Toggle": [
+    "widget.slider",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.data.identifier.Sequential": [
     "data.identifier.sequential"
   ],
   "Ext.chart.interactions.Reset": [
+    "widget.interaction",
     "interaction.reset"
   ],
   "Ext.Template": [],
@@ -15317,21 +15551,25 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.device.Push": [],
   "Ext.fx.easing.BoundMomentum": [],
   "Ext.viewport.Viewport": [],
-  "Ext.event.recognizer.VerticalSwipe": [],
   "Ext.chart.series.Polar": [],
+  "Ext.event.recognizer.VerticalSwipe": [],
   "Ext.event.Event": [],
   "Ext.behavior.Behavior": [],
-  "Ext.chart.grid.VerticalGrid": [],
+  "Ext.chart.grid.VerticalGrid": [
+    "grid.vertical"
+  ],
   "Ext.chart.label.Label": [],
   "Ext.draw.sprite.EllipticalArc": [
     "sprite.ellipticalArc"
   ],
-  "Ext.chart.Shape": [],
-  "Ext.draw.RMQLinear": [],
   "Ext.fx.easing.EaseOut": [
     "easing.ease-out"
   ],
-  "Ext.Toolbar": [],
+  "Ext.Toolbar": [
+    "widget.toolbar",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.event.recognizer.LongPress": [],
   "Ext.device.notification.Sencha": [],
   "Ext.chart.series.sprite.Line": [
@@ -15343,17 +15581,20 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.data.proxy.SQL": [
     "proxy.sql"
   ],
-  "Ext.event.recognizer.Rotate": [],
   "Ext.mixin.Sortable": [],
   "Ext.fx.layout.card.Flip": [
     "fx.layout.card.flip"
   ],
   "Ext.chart.interactions.CrossZoom": [
+    "widget.interaction",
     "interaction.crosszoom"
   ],
   "Ext.event.publisher.ComponentPaint": [],
+  "Ext.event.recognizer.Rotate": [],
   "Ext.util.TranslatableList": [],
-  "Ext.carousel.Item": [],
+  "Ext.carousel.Item": [
+    "widget.component"
+  ],
   "Ext.event.recognizer.Swipe": [],
   "Ext.util.translatable.ScrollPosition": [],
   "Ext.device.camera.Simulator": [],
@@ -15362,6 +15603,7 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.event.recognizer.Touch": [],
   "Ext.plugin.ListPaging": [
+    "widget.component",
     "plugin.listpaging"
   ],
   "Ext.draw.sprite.Sector": [
@@ -15371,9 +15613,16 @@ Ext.ClassManager.addNameAlternateMappings({
     "segmenter.names"
   ],
   "Ext.mixin.Observable": [],
-  "Ext.carousel.Infinite": [],
+  "Ext.carousel.Infinite": [
+    "widget.component",
+    "widget.container",
+    "widget.carousel"
+  ],
   "Ext.draw.Matrix": [],
-  "Ext.Mask": [],
+  "Ext.Mask": [
+    "widget.component",
+    "widget.mask"
+  ],
   "Ext.event.publisher.Publisher": [],
   "Ext.layout.wrapper.Dock": [],
   "Ext.app.History": [],
@@ -15383,13 +15632,16 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.chart.axis.layout.Continuous": [
     "axisLayout.continuous"
   ],
-  "Ext.table.Cell": [],
+  "Ext.table.Cell": [
+    "widget.component",
+    "widget.container",
+    "widget.tablecell"
+  ],
   "Ext.fx.layout.card.ScrollCover": [
     "fx.layout.card.scrollcover"
   ],
   "Ext.device.orientation.Sencha": [],
   "Ext.util.Droppable": [],
-  "Ext.draw.fx.Pool": [],
   "Ext.draw.sprite.Composite": [
     "sprite.composite"
   ],
@@ -15409,7 +15661,9 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.util.Draggable": [],
   "Ext.device.contacts.Sencha": [],
-  "Ext.chart.grid.HorizontalGrid": [],
+  "Ext.chart.grid.HorizontalGrid": [
+    "grid.horizontal"
+  ],
   "Ext.mixin.Traversable": [],
   "Ext.util.AbstractMixedCollection": [],
   "Ext.data.JsonStore": [
@@ -15420,10 +15674,17 @@ Ext.ClassManager.addNameAlternateMappings({
     "direct.rpc"
   ],
   "Ext.plugin.PullRefresh": [
+    "widget.component",
     "plugin.pullrefresh"
   ],
   "Ext.log.writer.Console": [],
-  "Ext.field.Spinner": [],
+  "Ext.field.Spinner": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.numberfield",
+    "widget.spinnerfield"
+  ],
   "Ext.chart.axis.segmenter.Numeric": [
     "segmenter.numeric"
   ],
@@ -15433,22 +15694,32 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.fx.animation.Wipe": [],
   "Ext.fx.layout.Card": [],
   "Ext.TaskQueue": [],
-  "Ext.Label": [],
+  "Ext.Label": [
+    "widget.component",
+    "widget.label"
+  ],
   "Ext.util.translatable.CssTransform": [],
-  "Ext.viewport.Ios": [],
-  "Ext.chart.axis.Radial": [],
+  "Ext.viewport.Ios": [
+    "widget.viewport",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.Spacer": [
+    "widget.component",
     "widget.spacer"
   ],
   "Ext.mixin.Selectable": [],
   "Ext.draw.sprite.Image": [
     "sprite.image"
   ],
-  "Ext.chart.axis.Abstract": [],
   "Ext.data.proxy.Rest": [
     "proxy.rest"
   ],
-  "Ext.Img": [],
+  "Ext.Img": [
+    "widget.component",
+    "widget.img",
+    "widget.image"
+  ],
   "Ext.chart.series.sprite.Bar": [
     "sprite.barSeries"
   ],
@@ -15460,13 +15731,24 @@ Ext.ClassManager.addNameAlternateMappings({
   "Ext.device.notification.Abstract": [],
   "Ext.log.filter.Filter": [],
   "Ext.device.camera.Sencha": [],
-  "Ext.draw.sprite.Sprite": [],
+  "Ext.draw.sprite.Sprite": [
+    "sprite.sprite"
+  ],
   "Ext.draw.Color": [],
   "Ext.chart.series.Bar": [
     "series.bar"
   ],
-  "Ext.field.Slider": [],
-  "Ext.field.Search": [],
+  "Ext.field.Slider": [
+    "widget.field",
+    "widget.component",
+    "widget.sliderfield"
+  ],
+  "Ext.field.Search": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.searchfield"
+  ],
   "Ext.chart.series.Scatter": [
     "series.scatter"
   ],
@@ -15480,41 +15762,66 @@ Ext.ClassManager.addNameAlternateMappings({
     "modifier.highlight"
   ],
   "Ext.direct.Manager": [],
-  "Ext.draw.CartesianTree": [],
   "Ext.data.proxy.Proxy": [
     "proxy.proxy"
   ],
   "Ext.draw.modifier.Modifier": [],
-  "Ext.navigation.View": [],
+  "Ext.navigation.View": [
+    "widget.navigationview",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.draw.modifier.Target": [
     "modifier.target"
   ],
   "Ext.draw.sprite.AttributeDefinition": [],
   "Ext.device.Notification": [],
-  "Ext.draw.Component": [],
+  "Ext.draw.Component": [
+    "widget.draw",
+    "widget.component",
+    "widget.container"
+  ],
   "Ext.layout.VBox": [
     "layout.vbox"
   ],
-  "Ext.slider.Thumb": [],
-  "Ext.MessageBox": [],
+  "Ext.slider.Thumb": [
+    "widget.component",
+    "widget.thumb"
+  ],
+  "Ext.MessageBox": [
+    "widget.panel",
+    "widget.component",
+    "widget.container",
+    "widget.sheet"
+  ],
   "Ext.ux.Faker": [],
-  "Ext.dataview.IndexBar": [],
-  "Ext.dataview.element.List": [],
+  "Ext.dataview.IndexBar": [
+    "widget.component"
+  ],
+  "Ext.dataview.element.List": [
+    "widget.component"
+  ],
   "Ext.layout.FlexBox": [
     "layout.box"
   ],
-  "Ext.field.Url": [],
+  "Ext.field.Url": [
+    "widget.field",
+    "widget.textfield",
+    "widget.urlfield",
+    "widget.component"
+  ],
+  "Ext.draw.Solver": [],
   "Ext.data.proxy.Memory": [
     "proxy.memory"
   ],
   "Ext.chart.axis.Time": [
+    "widget.axis",
     "axis.time"
   ],
   "Ext.layout.Card": [
     "layout.card"
   ],
   "Ext.ComponentQuery": [],
-  "Ext.draw.engine.SvgExporter": [],
   "Ext.chart.series.Pie3D": [
     "series.pie3d"
   ],
@@ -15525,16 +15832,30 @@ Ext.ClassManager.addNameAlternateMappings({
     "sprite.rect"
   ],
   "Ext.util.Region": [],
-  "Ext.field.Select": [],
+  "Ext.field.Select": [
+    "widget.field",
+    "widget.textfield",
+    "widget.selectfield",
+    "widget.component"
+  ],
   "Ext.draw.Draw": [],
   "Ext.ItemCollection": [],
   "Ext.log.formatter.Default": [],
-  "Ext.navigation.Bar": [],
+  "Ext.navigation.Bar": [
+    "widget.component",
+    "widget.titlebar",
+    "widget.container"
+  ],
   "Ext.chart.axis.layout.CombineDuplicate": [
     "axisLayout.combineDuplicate"
   ],
   "Ext.device.Geolocation": [],
-  "Ext.chart.SpaceFillingChart": [],
+  "Ext.chart.SpaceFillingChart": [
+    "widget.draw",
+    "widget.component",
+    "widget.container",
+    "widget.spacefilling"
+  ],
   "Ext.data.proxy.SessionStorage": [
     "proxy.sessionstorage"
   ],
@@ -15542,38 +15863,79 @@ Ext.ClassManager.addNameAlternateMappings({
     "easing.ease-in"
   ],
   "Ext.draw.sprite.AnimationParser": [],
-  "Ext.field.Password": [],
+  "Ext.field.Password": [
+    "widget.passwordfield",
+    "widget.field",
+    "widget.textfield",
+    "widget.component"
+  ],
   "Ext.device.connection.Abstract": [],
   "Ext.direct.Event": [
     "direct.event"
   ],
   "Ext.direct.RemotingMethod": [],
-  "Ext.draw.RMQSparse": [],
   "Ext.Evented": [],
-  "Ext.carousel.Indicator": [],
+  "Ext.carousel.Indicator": [
+    "widget.component",
+    "widget.carouselindicator"
+  ],
   "Ext.util.Collection": [],
   "Ext.chart.interactions.ItemInfo": [
+    "widget.interaction",
     "interaction.iteminfo"
   ],
   "Ext.chart.MarkerHolder": [],
-  "Ext.carousel.Carousel": [],
-  "Ext.Audio": [],
+  "Ext.carousel.Carousel": [
+    "widget.component",
+    "widget.container",
+    "widget.carousel"
+  ],
+  "Ext.Audio": [
+    "widget.audio",
+    "widget.component",
+    "widget.media"
+  ],
   "Ext.device.Contacts": [],
-  "Ext.table.Table": [],
+  "Ext.table.Table": [
+    "widget.component",
+    "widget.container",
+    "widget.table"
+  ],
+  "Ext.draw.engine.SvgContext.Gradient": [],
   "Ext.chart.axis.layout.Layout": [],
   "Ext.data.Errors": [],
-  "Ext.field.Text": [],
-  "Ext.field.TextAreaInput": [],
-  "Ext.field.DatePicker": [],
-  "Ext.draw.engine.Svg": [],
+  "Ext.field.Text": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component"
+  ],
+  "Ext.field.TextAreaInput": [
+    "widget.input",
+    "widget.component",
+    "widget.textareainput"
+  ],
+  "Ext.field.DatePicker": [
+    "widget.field",
+    "widget.textfield",
+    "widget.component",
+    "widget.datepickerfield"
+  ],
+  "Ext.draw.engine.Svg": [
+    "widget.surface",
+    "widget.component"
+  ],
   "Ext.event.recognizer.Tap": [],
   "Ext.device.orientation.Abstract": [],
   "Ext.AbstractManager": [],
   "Ext.chart.series.Radar": [
     "series.radar"
   ],
-  "Ext.chart.interactions.Abstract": [],
-  "Ext.scroll.indicator.CssTransform": [],
+  "Ext.chart.interactions.Abstract": [
+    "widget.interaction"
+  ],
+  "Ext.scroll.indicator.CssTransform": [
+    "widget.component"
+  ],
   "Ext.util.PaintMonitor": [],
   "Ext.direct.PollingProvider": [
     "direct.pollingprovider"
@@ -15588,15 +15950,22 @@ Ext.ClassManager.addNameAlternateMappings({
   ],
   "Ext.event.publisher.ComponentDelegation": [],
   "Ext.chart.axis.Numeric": [
+    "widget.axis",
     "axis.numeric"
   ],
-  "Ext.field.Toggle": [],
+  "Ext.field.Toggle": [
+    "widget.field",
+    "widget.component",
+    "widget.sliderfield",
+    "widget.togglefield"
+  ],
   "Ext.fx.layout.card.ScrollReveal": [
     "fx.layout.card.scrollreveal"
   ],
   "Ext.data.Operation": [],
   "Ext.fx.animation.Abstract": [],
   "Ext.chart.interactions.Rotate": [
+    "widget.interaction",
     "interaction.rotate"
   ],
   "Ext.draw.engine.SvgContext": [],

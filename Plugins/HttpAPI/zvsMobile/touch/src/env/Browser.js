@@ -223,6 +223,10 @@ Ext.define('Ext.env.Browser', {
             engineName = engineNames.webkit;
         }
 
+        if (userAgent.match(/Android.*Chrome/g)) {
+            browserName = 'ChromeMobile';
+        }
+
         Ext.apply(this, {
             engineName: engineName,
             engineVersion: engineVersion,

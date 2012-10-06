@@ -252,7 +252,11 @@ Ext.define('Ext.dataview.component.Container', {
 
     updateListItem: function(record, item) {
         if (item.updateRecord) {
-            item.updateRecord(record);
+            if (item.getRecord() === record) {
+                item.updateRecord(record);
+            } else {
+                item.setRecord(record);
+            }
         }
     },
 

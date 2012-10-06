@@ -35,6 +35,12 @@ Ext.define("Ext.draw.modifier.Modifier", {
         }
     },
 
+    updatePrev: function (prev) {
+        if (prev) {
+            prev.setNext    (this);
+        }
+    },
+
     /**
      * Validate attribute set before use.
      * 
@@ -47,6 +53,11 @@ Ext.define("Ext.draw.modifier.Modifier", {
         }
     },
 
+    /**
+     * Invoked when the change need to be popped up to the top. 
+     * @param attributes
+     * @param changes
+     */
     popUp: function (attributes, changes) {
         if (this._next) {
             this._next.popUp(attributes, changes);
@@ -72,9 +83,5 @@ Ext.define("Ext.draw.modifier.Modifier", {
             }
             return changes;
         }
-    },
-
-    beforeAttach: function (sprite) {
-
     }
 });

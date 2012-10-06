@@ -3,16 +3,16 @@ Ext.Loader.setPath({
     'Ext': 'touch/src',
     'zvsMobile': 'app'
 });
+//</debug>
 
 Ext.application({
     name: 'zvsMobile',
 
     requires: [
-        'Ext.MessageBox','zvsMobile.store.Settings'
+       'Ext.MessageBox', 'zvsMobile.store.Settings'
     ],
 
-    
-    profiles: ['Phone', 'Tablet'],    
+    profiles: ['Phone', 'Tablet'],
     views: ['SettingsViewPort', 'LogViewPort'],
     stores: ['Settings', 'Devices', 'Groups', 'Scenes', 'LogEntries'],
 
@@ -87,7 +87,6 @@ Ext.application({
         GroupStore.setProxy({
             type: 'ajax',
             url: zvsMobile.app.BaseURL() + '/Groups/',
-            withCredentials: true,
             extraParams: {
                 u: Math.random()
             },
@@ -127,7 +126,6 @@ Ext.application({
         LogEntryStore.setProxy({
             type: 'ajax',
             url: zvsMobile.app.BaseURL() + '/LogEntries/',
-            withCredentials: true,
             extraParams: {
                 u: Math.random()
             },
@@ -145,7 +143,7 @@ Ext.application({
         });
     },
 
-    launch: function () {
+    launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
 
@@ -153,11 +151,11 @@ Ext.application({
         Ext.Viewport.add(Ext.create('zvsMobile.view.Main'));
     },
 
-    onUpdated: function () {
+    onUpdated: function() {
         Ext.Msg.confirm(
             "Application Update",
-            "zvsMobile has just successfully been updated to the latest version. Reload now?",
-            function (buttonId) {
+            "This application has just successfully been updated to the latest version. Reload now?",
+            function(buttonId) {
                 if (buttonId === 'yes') {
                     window.location.reload();
                 }

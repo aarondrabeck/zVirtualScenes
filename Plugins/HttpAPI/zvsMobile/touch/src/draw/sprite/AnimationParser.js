@@ -4,7 +4,10 @@
     }
 
     /**
+     * @private
+     * @class Ext.draw.sprite.AnimationParser
      *
+     * Parsers for sprite attributes used in animations.
      */
     Ext.define("Ext.draw.sprite.AnimationParser", {
         singleton: true,
@@ -18,6 +21,7 @@
                 }
                 if (Ext.isString(color2)) {
                     color2 = Ext.draw.Color.create(color2);
+
                 }
                 if ((color1 instanceof Ext.draw.Color) && (color2 instanceof Ext.draw.Color)) {
                     return [
@@ -25,7 +29,7 @@
                         [color2.r, color2.g, color2.b, color2.a]
                     ];
                 } else {
-                    return [null, color2];
+                    return [color1 || color2, color2 || color1];
                 }
             },
             compute: function (from, to, delta) {
@@ -55,7 +59,6 @@
                 }
             }
         },
-
 
         angle: {
             parseInitial: function (from, to) {

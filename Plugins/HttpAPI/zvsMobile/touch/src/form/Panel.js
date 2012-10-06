@@ -517,6 +517,7 @@ Ext.define('Ext.form.Panel', {
                             if (f.isRadio) {
                                 // If it is a radio field just use setGroupValue which will handle all of the radio fields
                                 f.setGroupValue(value);
+                                break;
                             } else if (f.isCheckbox) {
                                 if (Ext.isArray(value)) {
                                    f.setChecked((value.indexOf(f._value) != -1));

@@ -6,14 +6,14 @@ Ext.define("Ext.chart.axis.layout.Discrete", {
         var me = this,
             axis = me.getAxis(),
             boundSeries = axis.boundSeries,
-            category = axis.getCategory(),
+            direction = axis.getDirection(),
             i, ln, item;
         this.labels = [];
         this.labelMap = {};
         for (i = 0, ln = boundSeries.length; i < ln; i++) {
             item = boundSeries[i];
-            if (item['get' + category + 'Axis']() === axis) {
-                item['coordinate' + category]();
+            if (item['get' + direction + 'Axis']() === axis) {
+                item['coordinate' + direction]();
             }
         }
     },
@@ -62,7 +62,7 @@ Ext.define("Ext.chart.axis.layout.Discrete", {
         };
     },
 
-    // inherit docs
+    // @inheritdoc
     trimByRange: function (context, out, trimMin, trimMax) {
         var unit = out.unit,
             beginIdx = Math.ceil((trimMin - out.from) / unit) * unit,

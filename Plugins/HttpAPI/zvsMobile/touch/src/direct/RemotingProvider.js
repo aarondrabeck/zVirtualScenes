@@ -128,7 +128,7 @@ Ext.define('Ext.direct.RemotingProvider', {
      * executing.
      * @param {Ext.direct.RemotingProvider} provider
      * @param {Ext.direct.Transaction} transaction
-     * @param {Object} meta The meta data
+     * @param {Object} meta The meta data.
      */
 
     /**
@@ -137,7 +137,7 @@ Ext.define('Ext.direct.RemotingProvider', {
      * NOT fire after the response has come back from the call.
      * @param {Ext.direct.RemotingProvider} provider
      * @param {Ext.direct.Transaction} transaction
-     * @param {Object} meta The meta data
+     * @param {Object} meta The meta data.
      */
 
     constructor : function(config) {
@@ -211,12 +211,12 @@ Ext.define('Ext.direct.RemotingProvider', {
         return handler;
     },
 
-    // inherit docs
+    // @inheritdoc
     isConnected: function() {
         return !!this.connected;
     },
 
-    // inherit docs
+    // @inheritdoc
     connect: function() {
         var me = this;
 
@@ -231,7 +231,7 @@ Ext.define('Ext.direct.RemotingProvider', {
         }
     },
 
-    // inherit docs
+    // @inheritdoc
     disconnect: function() {
         var me = this;
 
@@ -446,13 +446,13 @@ Ext.define('Ext.direct.RemotingProvider', {
     }
 
 //    /**
-//     * Configure a form submission request
+//     * Configure a form submission request.
 //     * @private
-//     * @param {String} action The action being executed
-//     * @param {Object} method The method being executed
-//     * @param {HTMLElement} form The form being submitted
-//     * @param {Function} callback (optional) A callback to run after the form submits
-//     * @param {Object} scope (optional) A scope to execute the callback in
+//     * @param {String} action The action being executed.
+//     * @param {Object} method The method being executed.
+//     * @param {HTMLElement} form The form being submitted.
+//     * @param {Function} callback (optional) A callback to run after the form submits.
+//     * @param {Object} scope (optional) A scope to execute the callback in.
 //     */
 //    configureFormRequest : function(action, method, form, callback, scope){
 //        var me = this,

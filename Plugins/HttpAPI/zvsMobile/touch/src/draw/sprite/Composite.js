@@ -1,5 +1,8 @@
 /**
- *
+ * @class Ext.draw.sprite.Composite
+ * @extends Ext.draw.sprite.Sprite
+ * 
+ * Represents a group of sprites.
  */
 Ext.define("Ext.draw.sprite.Composite", {
     extend: "Ext.draw.sprite.Sprite",
@@ -11,6 +14,9 @@ Ext.define("Ext.draw.sprite.Composite", {
         this.sprites.map = {};
     },
 
+    /**
+     * Adds a sprite to the composite.
+     */
     add: function (sprite) {
         if (!(sprite instanceof Ext.draw.sprite.Sprite)) {
             sprite = Ext.create('sprite.' + sprite.type, sprite);
@@ -34,6 +40,9 @@ Ext.define("Ext.draw.sprite.Composite", {
         attr.bbox.transform.dirty = true;
     },
 
+    /**
+     * Updates the bounding box of the composite, which contains the bounding box of all sprites in the composite.
+     */
     updatePlainBBox: function (plain) {
         var me = this,
             left = Infinity,
@@ -65,6 +74,9 @@ Ext.define("Ext.draw.sprite.Composite", {
         plain.height = bottom - top;
     },
 
+    /**
+     * Renders all sprites contained in the composite to the surface.
+     */
     render: function (surface, ctx, region) {
         var mat = this.attr.matrix,
             i, ln;

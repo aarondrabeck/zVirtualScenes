@@ -122,7 +122,7 @@ Ext.dom.Element.addStatics({
                me.addUnits(box.left, units);
     },
 
-    // private
+    // @private
     camelReplaceFn: function(m, a) {
         return a.charAt(1).toUpperCase();
     },

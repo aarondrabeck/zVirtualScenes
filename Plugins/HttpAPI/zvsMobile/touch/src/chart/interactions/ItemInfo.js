@@ -19,7 +19,7 @@
  *             type: 'iteminfo',
  *             listeners: {
  *                 show: function(me, item, panel) {
- *                     panel.setHtml('Stock Price: $' + item.storeItem.get('price'));
+ *                     panel.setHtml('Stock Price: $' + item.record.get('price'));
  *                 }
  *             }
  *         }]
@@ -40,7 +40,7 @@ Ext.define('Ext.chart.interactions.ItemInfo', {
          * @cfg {String} gesture
          * Defines the gesture type that should trigger the item info panel to be displayed.
          */
-        gesture: 'tap',
+        gesture: 'itemtap',
 
         /**
          * @cfg {Object} infoPanel
@@ -89,25 +89,23 @@ Ext.define('Ext.chart.interactions.ItemInfo', {
         }
     },
 
-    onGesture: function (e) {
+    onGesture: function (series, item) {
         var me = this,
-            item = me.getItemForEvent(e),
-            panel;
-        if (item) {
-            me.item = item;
-            item.series.highlightItem(item);
             panel = me.getPanel();
-            me.fireEvent('show', me, item, panel);
-            panel.show('pop');
-        }
+        me.item = item;
+        me.fireEvent('show', me, item, panel);
+        panel.show('pop');
+        series.setAttributesForItem(item, { highlighted: true });
+        me.sync();
     },
 
     reset: function () {
         var me = this,
             item = me.item;
         if (item) {
-            item.series.unHighlightItem(item);
+            item.series.setAttributesForItem(item, { highlighted: false });
             delete me.item;
+            me.sync();
         }
     }
 });

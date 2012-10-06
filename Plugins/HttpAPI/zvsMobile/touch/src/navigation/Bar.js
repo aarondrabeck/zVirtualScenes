@@ -12,7 +12,7 @@ Ext.define('Ext.navigation.Bar', {
         'Ext.Spacer'
     ],
 
-    // private
+    // @private
     isToolbar: true,
 
     config: {

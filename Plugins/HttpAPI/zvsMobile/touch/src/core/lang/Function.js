@@ -37,7 +37,7 @@ Ext.Function = {
      *     });
      *
      * @param {Function} setter
-     * @returns {Function} flexSetter
+     * @return {Function} flexSetter
      */
     flexSetter: function(fn) {
         return function(a, b) {
@@ -332,25 +332,20 @@ Ext.Function = {
      * passed by the caller.
      * @return {Function} A function which invokes the passed function after buffering for the specified time.
      */
+
     createBuffered: function(fn, buffer, scope, args) {
         var timerId;
 
         return function() {
-            if (!scope) {
-                scope = this;
-            }
-
-            if (!args) {
-                args = Array.prototype.slice.call(arguments);
-            }
+            var callArgs = args || Array.prototype.slice.call(arguments, 0),
+                me = scope || this;
 
             if (timerId) {
                 clearTimeout(timerId);
-                timerId = null;
             }
 
             timerId = setTimeout(function(){
-                fn.apply(scope, args);
+                fn.apply(me, callArgs);
             }, buffer);
         };
     },
@@ -367,7 +362,7 @@ Ext.Function = {
      * @param {Number} interval The interval, in milliseconds, on which the passed function is executed.
      * @param {Object} scope (optional) The scope (`this` reference) in which
      * the passed function is executed. If omitted, defaults to the scope specified by the caller.
-     * @returns {Function} A function which invokes the passed function at the specified interval.
+     * @return {Function} A function which invokes the passed function at the specified interval.
      */
     createThrottled: function(fn, interval, scope) {
         var lastCallTime, elapsed, lastArgs, timer, execute = function() {

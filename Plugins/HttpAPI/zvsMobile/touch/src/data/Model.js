@@ -360,6 +360,7 @@ Ext.define('Ext.data.Model', {
         'belongsTo',
         'clientIdProperty',
         'identifier',
+        'useCache',
         'proxy'
     ],
 
@@ -373,7 +374,6 @@ Ext.define('Ext.data.Model', {
         generateProxyMethod: function(name) {
             return function() {
                 var prototype = this.prototype;
-
                 return prototype[name].apply(prototype, arguments);
             };
         },
@@ -499,8 +499,9 @@ Ext.define('Ext.data.Model', {
     constructor: function(data, id, raw, convertedData) {
         var me = this,
             cached = null,
-            useCache = this.getUseCache(),
-            idProperty = this.getIdProperty();
+            useCache = me.getUseCache(),
+            idProperty = me.getIdProperty();
+
 
         /**
          * @property {Object} modified key/value pairs of all fields whose values have changed.
@@ -579,7 +580,7 @@ Ext.define('Ext.data.Model', {
             ln = fields.length,
             modified = me.modified,
             data = me.data,
-            i, field, fieldName, value, convert;
+            i, field, fieldName, value, id;
 
         for (i = 0; i < ln; i++) {
             field = fields[i];
@@ -593,6 +594,10 @@ Ext.define('Ext.data.Model', {
 
                 data[fieldName] = value;
             }
+        }
+
+        if (me.associations.length) {
+            me.handleInlineAssociationData(rawData);
         }
 
         return this;
@@ -615,7 +620,7 @@ Ext.define('Ext.data.Model', {
             i, field, name, value, convert, id;
 
         if (!rawData) {
-            return this;
+            return me;
         }
 
         for (i = 0; i < ln; i++) {
@@ -641,11 +646,11 @@ Ext.define('Ext.data.Model', {
         }
 
         id = me.getId();
-        if (this.associations.length && (id || id === 0)) {
-            this.handleInlineAssociationData(rawData);
+        if (me.associations.length && (id || id === 0)) {
+            me.handleInlineAssociationData(rawData);
         }
 
-        return this;
+        return me;
     },
 
     handleInlineAssociationData: function(data) {
@@ -737,7 +742,6 @@ Ext.define('Ext.data.Model', {
             fieldMap = me.fields.map,
             modified = me.modified,
             notEditing = !me.editing,
-            associations = me.associations.items,
             modifiedCount = 0,
             modifiedFieldNames = [],
             field, key, i, currentValue, ln, convert;
@@ -1655,6 +1659,15 @@ Ext.define('Ext.data.Model', {
 
             for (i = 0,ln = associations.length; i < ln; ++i) {
                 dependencies.push('association.' + associations[i].type.toLowerCase());
+            }
+
+            if (config.identifier) {
+                if (typeof config.identifier === 'string') {
+                    dependencies.push('data.identifier.' + config.identifier);
+                }
+                else if (typeof config.identifier.type === 'string') {
+                    dependencies.push('data.identifier.' + config.identifier.type);
+                }
             }
 
             if (config.proxy) {

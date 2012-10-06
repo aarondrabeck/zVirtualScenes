@@ -5,17 +5,25 @@ Ext.define("Ext.chart.axis.segmenter.Time", {
     extend: 'Ext.chart.axis.segmenter.Segmenter',
     alias: 'segmenter.time',
 
+    config: {
+        step: null
+    },
+
     renderer: function (value, context) {
         var ExtDate = Ext.Date;
         switch (context.majorTicks.unit) {
             case 'y':
-                return ExtDate.format(new Date(value), 'Y');
+                return ExtDate.format(value, 'Y');
             case 'mo':
-                return ExtDate.format(new Date(value), 'Y-m');
+                return ExtDate.format(value, 'Y-m');
             case 'd':
-                return ExtDate.format(new Date(value), 'Y-m-d');
+                return ExtDate.format(value, 'Y-m-d');
         }
-        return ExtDate.format(new Date(value), 'Y-m-d\nH:i:s');
+        return ExtDate.format(value, 'Y-m-d\nH:i:s');
+    },
+
+    from: function (value) {
+        return new Date(value);
     },
 
     diff: function (min, max, unit) {
@@ -44,10 +52,12 @@ Ext.define("Ext.chart.axis.segmenter.Time", {
     },
 
     preferredStep: function (min, estStepSize) {
+        if (this.getStep()) {
+            return this.getStep();
+        }
         var from = new Date(+min),
-            to = new Date(+min + Math.ceil(estStepSize));
-
-        var ExtDate = Ext.Date,
+            to = new Date(+min + Math.ceil(estStepSize)),
+            ExtDate = Ext.Date,
             units = [
                 [ExtDate.YEAR, 1, 2, 5, 10, 20, 50, 100, 200, 500],
                 [ExtDate.MONTH, 1, 3, 6],

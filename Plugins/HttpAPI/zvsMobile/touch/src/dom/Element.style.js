@@ -534,7 +534,7 @@ Ext.dom.Element.addMembers({
      */
     styleHooks: {},
 
-    // private
+    // @private
     addStyles: function(sides, styles) {
         var totalSize = 0,
             sidesArr = sides.match(this.wordsRe),

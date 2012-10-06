@@ -161,7 +161,7 @@ Ext.dom.Element.addMembers({
         return [x, y];
     },
 
-    // private
+    // @private
     getAnchor: function(){
         var dom = this.dom;
             if (!dom) {
@@ -175,7 +175,8 @@ Ext.dom.Element.addMembers({
         return anchor;
     },
 
-    // private ==>  used outside of core
+    // @private
+    // used outside of core
     adjustForConstraints: function(xy, parent) {
         var vector = this.getConstrainVector(parent, xy);
         if (vector) {

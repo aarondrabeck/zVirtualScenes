@@ -730,6 +730,14 @@ Ext.define('Ext.util.Collection', {
         var index = this.items.indexOf(item);
         if (index === -1) {
             Ext.Array.remove(this.all, item);
+
+            if (typeof this.getKey == 'function') {
+                var key = this.getKey(item);
+                if (key !== undefined) {
+                    delete this.map[key];
+                }
+            }
+
             return item;
         }
         return this.removeAt(this.items.indexOf(item));

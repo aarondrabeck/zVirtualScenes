@@ -5,6 +5,9 @@ Ext.define("Ext.chart.series.sprite.Scatter", {
     alias: 'sprite.scatterSeries',
     extend: 'Ext.chart.series.sprite.Cartesian',
     renderClipped: function (surface, ctx, clip, clipRegion) {
+        if (this.cleanRedraw) {
+            return;
+        }
         var attr = this.attr,
             dataX = attr.dataX,
             dataY = attr.dataY,
@@ -14,7 +17,6 @@ Ext.define("Ext.chart.series.sprite.Scatter", {
             dx = matrix.getDX(),
             dy = matrix.getDY(),
             markerCfg = {},
-            surfaceMatrix = surface.inverseMatrix,
             left = clipRegion[0],
             right = clipRegion[0] + clipRegion[2],
             top = clipRegion[1],
@@ -26,9 +28,12 @@ Ext.define("Ext.chart.series.sprite.Scatter", {
             x = x * xx + dx;
             y = y * yy + dy;
             if (left <= x && x <= right && top <= y && y <= bottom) {
-                markerCfg.translationX = surfaceMatrix.x(x, y);
-                markerCfg.translationY = surfaceMatrix.y(x, y);
-                this.putMarker('items', markerCfg, i);
+                if (attr.renderer) {
+                    attr.renderer.call(this, markerCfg, this, i, this.getDataItems().items[i]);
+                }
+                markerCfg.translationX = x;
+                markerCfg.translationY = y;
+                this.putMarker("items", markerCfg, i, !attr.renderer);
             }
         }
     }

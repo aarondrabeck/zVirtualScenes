@@ -1,5 +1,5 @@
 /**
- * Return the aggregation
+ * This class we summarize the data and returns it when required.
  */
 Ext.define("Ext.draw.SegmentTree", {
 
@@ -7,6 +7,16 @@ Ext.define("Ext.draw.SegmentTree", {
         strategy: "double"
     },
 
+    /**
+     * @private
+     * @param result
+     * @param last
+     * @param dataX
+     * @param dataOpen
+     * @param dataHigh
+     * @param dataLow
+     * @param dataClose
+     */
     "time": function (result, last, dataX, dataOpen, dataHigh, dataLow, dataClose) {
         var start = 0, lastOffset, lastOffsetEnd,
             minimum = new Date(dataX[result.startIdx[0]]),
@@ -85,7 +95,7 @@ Ext.define("Ext.draw.SegmentTree", {
             maxXs[last] = maxXs[lastOffset];
             maxYs[last] = maxYs[lastOffset];
             current = Ext.Date.add(current, currentUnit[0], currentUnit[1]);
-            
+
             for (i = lastOffset + 1; i < lastOffsetEnd; i++) {
                 if (dataX[endIdxs[i]] < +current) {
                     endIdxs[last] = endIdxs[i];
@@ -121,6 +131,16 @@ Ext.define("Ext.draw.SegmentTree", {
         }
     },
 
+    /**
+     * @private
+     * @param result
+     * @param position
+     * @param dataX
+     * @param dataOpen
+     * @param dataHigh
+     * @param dataLow
+     * @param dataClose
+     */
     "double": function (result, position, dataX, dataOpen, dataHigh, dataLow, dataClose) {
         var offset = 0, lastOffset, step = 1,
             i,
@@ -191,8 +211,21 @@ Ext.define("Ext.draw.SegmentTree", {
         }
     },
 
+    /**
+     * @private
+     */
     "none": Ext.emptyFn,
 
+    /**
+     * @private
+     *
+     * @param dataX
+     * @param dataOpen
+     * @param dataHigh
+     * @param dataLow
+     * @param dataClose
+     * @return {Object}
+     */
     aggregateData: function (dataX, dataOpen, dataHigh, dataLow, dataClose) {
         var length = dataX.length,
             startIdx = [],
@@ -241,25 +274,14 @@ Ext.define("Ext.draw.SegmentTree", {
         return result;
     },
 
-    setData: function (dataX, dataOpen, dataHigh, dataLow, dataClose) {
-        if (!dataHigh) {
-            dataClose = dataLow = dataHigh = dataOpen;
-        }
-        this.dataX = dataX;
-        this.dataOpen = dataOpen;
-        this.dataHigh = dataHigh;
-        this.dataLow = dataLow;
-        this.dataClose = dataClose;
-        if (dataX.length === dataHigh.length &&
-            dataX.length === dataLow.length) {
-            this.cache = this.aggregateData(dataX, dataOpen, dataHigh, dataLow, dataClose);
-        }
-    },
-
-    constructor: function (config) {
-        this.initConfig(config);
-    },
-
+    /**
+     * @private
+     * @param items
+     * @param start
+     * @param end
+     * @param key
+     * @return {*}
+     */
     binarySearchMin: function (items, start, end, key) {
         var dx = this.dataX;
         if (key <= dx[items.startIdx[0]]) {
@@ -282,6 +304,14 @@ Ext.define("Ext.draw.SegmentTree", {
         return start;
     },
 
+    /**
+     * @private
+     * @param items
+     * @param start
+     * @param end
+     * @param key
+     * @return {*}
+     */
     binarySearchMax: function (items, start, end, key) {
         var dx = this.dataX;
         if (key <= dx[items.endIdx[0]]) {
@@ -304,6 +334,44 @@ Ext.define("Ext.draw.SegmentTree", {
         return end;
     },
 
+    constructor: function (config) {
+        this.initConfig(config);
+    },
+
+    /**
+     * Sets the data of the segment tree.
+     * @param dataX
+     * @param dataOpen
+     * @param dataHigh
+     * @param dataLow
+     * @param dataClose
+     */
+    setData: function (dataX, dataOpen, dataHigh, dataLow, dataClose) {
+        if (!dataHigh) {
+            dataClose = dataLow = dataHigh = dataOpen;
+        }
+        this.dataX = dataX;
+        this.dataOpen = dataOpen;
+        this.dataHigh = dataHigh;
+        this.dataLow = dataLow;
+        this.dataClose = dataClose;
+        if (dataX.length === dataHigh.length &&
+            dataX.length === dataLow.length) {
+            this.cache = this.aggregateData(dataX, dataOpen, dataHigh, dataLow, dataClose);
+        }
+    },
+
+    /**
+     * Returns the minimum range of data that fits the given range and step size.
+     *
+     * @param {Number} min
+     * @param {Number} max
+     * @param {Number} estStep
+     * @return {Object} The aggregation information.
+     * @return {Number} return.start
+     * @return {Number} return.end
+     * @return {Object} return.data The aggregated data
+     */
     getAggregation: function (min, max, estStep) {
         if (!this.cache) {
             return null;

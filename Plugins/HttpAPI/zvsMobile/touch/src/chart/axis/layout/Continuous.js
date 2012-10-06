@@ -21,8 +21,8 @@ Ext.define("Ext.chart.axis.layout.Continuous", {
             from = segmenter.align(min, step, unit),
             steps = segmenter.diff(min, max, unit) + 1;
         return {
-            min: min,
-            max: max,
+            min: segmenter.from(min),
+            max: segmenter.from(max),
             from: from,
             to: segmenter.add(from, steps * step, unit),
             step: step,

@@ -4,7 +4,6 @@
 Ext.define("Ext.chart.series.sprite.CandleStick", {
     alias: 'sprite.candlestickSeries',
     extend: 'Ext.chart.series.sprite.Aggregative',
-    requires: ['Ext.draw.RMQ'],
     inheritableStatics: {
         def: {
             processors: {
@@ -34,12 +33,12 @@ Ext.define("Ext.chart.series.sprite.CandleStick", {
                 miterLimit: 5,
                 ohlcType: 'candlestick'
             },
-            
+
             dirtyTriggers: {
                 raiseStyle: 'raiseStyle',
                 dropStyle: 'dropStyle'
             },
-            
+
             updaters: {
                 raiseStyle: function () {
                     this.raiseTemplate && this.raiseTemplate.setAttributes(this.attr.raiseStyle);
@@ -56,7 +55,7 @@ Ext.define("Ext.chart.series.sprite.CandleStick", {
             maxOC = Math.max(open, close);
         ctx.moveTo(mid, low);
         ctx.lineTo(mid, maxOC);
-        
+
         ctx.moveTo(mid + halfWidth, maxOC);
         ctx.lineTo(mid + halfWidth, minOC);
         ctx.lineTo(mid - halfWidth, minOC);
@@ -112,8 +111,8 @@ Ext.define("Ext.chart.series.sprite.CandleStick", {
             startIdxs = aggregates.startIdx,
             open, high, low, close, mid,
             i,
-            pixelAdjust = (attr.lineWidth || 1) * surface.devicePixelRatio / 2;
-        
+            pixelAdjust = attr.lineWidth * surface.devicePixelRatio / 2;
+
         pixelAdjust -= Math.floor(pixelAdjust);
         ctx.save();
         template = this.raiseTemplate;

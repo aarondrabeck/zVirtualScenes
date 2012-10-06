@@ -93,7 +93,7 @@ Ext.define('Ext.Toolbar', {
         'Ext.layout.HBox'
     ],
 
-    // private
+    // @private
     isToolbar: true,
 
     config: {
@@ -203,7 +203,6 @@ Ext.define('Ext.Toolbar', {
     updateTitle: function(newTitle, oldTitle) {
         if (newTitle) {
             this.add(newTitle);
-            this.getLayout().setItemFlex(newTitle, 1);
         }
 
         if (oldTitle) {

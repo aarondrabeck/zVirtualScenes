@@ -1,6 +1,6 @@
 /**
  * @class Ext.Decorator
- * @extend Ext.Component
+ * @extends Ext.Component
  *
  * In a few words, a Decorator is a Component that wraps around another Component. A typical example of a Decorator is a
  * {@link Ext.field.Field Field}. A form field is nothing more than a decorator around another component, and gives the

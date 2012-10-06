@@ -1,5 +1,22 @@
 /**
+ * @class Ext.draw.sprite.Ellipse
+ * @extends Ext.draw.sprite.Path
+ * 
+ * A sprite that represents an ellipse.
  *
+ *     @example preview miniphone
+ *     var component = new Ext.draw.Component({
+ *       items: [{
+ *         type: 'ellipse',
+ *         cx: 100,
+ *         cy: 100,
+ *         rx: 40,
+ *         ry: 25,
+ *         fillStyle: 'blue'
+ *       }]
+ *     });
+ *     Ext.Viewport.setLayout('fit');
+ *     Ext.Viewport.add(component);
  */
 Ext.define("Ext.draw.sprite.Ellipse", {
     extend: "Ext.draw.sprite.Path",
@@ -8,10 +25,29 @@ Ext.define("Ext.draw.sprite.Ellipse", {
     inheritableStatics: {
         def: {
             processors: {
+                /**
+                 * @cfg {Number} cx The center coordinate of the sprite on the x-axis.
+                 */
                 cx: "number",
+                
+                /**
+                 * @cfg {Number} cy The center coordinate of the sprite on the y-axis.
+                 */
                 cy: "number",
+                
+                /**
+                 * @cfg {Number} rx The radius of the sprite on the x-axis.
+                 */
                 rx: "number",
+
+                /**
+                 * @cfg {Number} ry The radius of the sprite on the y-axis.
+                 */
                 ry: "number",
+
+                /**
+                 * @cfg {Number} axisRotation The rotation of the sprite about its axis.
+                 */
                 axisRotation: "number"
             },
             aliases: {
@@ -61,7 +97,7 @@ Ext.define("Ext.draw.sprite.Ellipse", {
             rxy = ry / rx,
             matrix = attr.matrix.clone(),
             xx, xy, yx, yy, dx, dy, w, h;
-        matrix.postpend(1, 0, 0, rxy, 0, cy * (1 - rxy));
+        matrix.append(1, 0, 0, rxy, 0, cy * (1 - rxy));
         xx = matrix.getXX();
         yx = matrix.getYX();
         dx = matrix.getDX();
@@ -76,7 +112,7 @@ Ext.define("Ext.draw.sprite.Ellipse", {
         transform.height = h + h;
     },
 
-    drawPath: function (path, attr) {
+    updatePath: function (path, attr) {
         path.ellipse(attr.cx, attr.cy, attr.rx, attr.ry, attr.axisRotation, 0, Math.PI * 2, false);
     }
 });

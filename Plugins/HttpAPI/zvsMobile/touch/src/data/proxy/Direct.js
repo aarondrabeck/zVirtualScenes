@@ -86,7 +86,7 @@ Ext.define('Ext.data.proxy.Direct', {
         extraParams: null
     },
 
-    // private
+    // @private
     paramOrderRe: /[\s,|]/,
 
     applyParamOrder: function(paramOrder) {

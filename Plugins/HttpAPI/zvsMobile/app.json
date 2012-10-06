@@ -16,7 +16,7 @@
      * This value is needed when build to resolve your application's dependencies if it requires server-side resources
      * that are not accessible via file system protocol.
      */
-    "url": "http://localhost:3171/index.html",
+    "url": null,
 
     /**
      * List of all JavaScript assets in the right execution order.
@@ -140,5 +140,5 @@
      * Uniquely generated id for this application, used as prefix for localStorage keys.
      * Normally you should never change this value.
      */
-    "id": "c228cfeb-509a-4603-9231-270e2680c126"
+    "id": "5b71ee6d-d8f3-43ba-98bf-ab0fde4bc743"
 }

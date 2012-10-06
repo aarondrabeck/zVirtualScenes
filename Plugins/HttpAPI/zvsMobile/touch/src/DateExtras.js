@@ -203,7 +203,7 @@ Ext.DateExtras = {
     */
     useStrict: false,
 
-    // private
+    // @private
     formatCodeToRegex: function(character, currentGroup) {
         // Note: currentGroup - position in regex result array (see notes for Ext.Date.parseCodes below)
         var p = utilDate.parseCodes[character];
@@ -645,7 +645,7 @@ Ext.DateExtras = {
     },
 
 
-    // private
+    // @private
     getFormatCode : function(character) {
         var f = utilDate.formatCodes[character];
 
@@ -658,7 +658,7 @@ Ext.DateExtras = {
         return f || ("'" + Ext.String.escape(character) + "'");
     },
 
-    // private
+    // @private
     createFormat : function(format) {
         var code = [],
             special = false,
@@ -680,7 +680,7 @@ Ext.DateExtras = {
         utilDate.formatFunctions[format] = Ext.functionFactory("return " + code.join('+'));
     },
 
-    // private
+    // @private
     createParser : (function() {
         var code = [
             "var dt, y, m, d, h, i, s, ms, o, z, zz, u, v,",
@@ -773,7 +773,7 @@ Ext.DateExtras = {
         };
     })(),
 
-    // private
+    // @private
     parseCodes : {
         /*
          * Notes:
@@ -819,7 +819,7 @@ Ext.DateExtras = {
         w: {
             g:0,
             c:null,
-            s:"[0-6]" // javascript day number (0 (sunday) - 6 (saturday))
+            s:"[0-6]" // JavaScript day number (0 (sunday) - 6 (saturday))
         },
         z: {
             g:1,
@@ -1014,8 +1014,8 @@ Ext.DateExtras = {
         }
     },
 
-    //Old Ext.Date prototype methods.
-    // private
+    // Old Ext.Date prototype methods.
+    // @private
     dateFormat: function(date, format) {
         return utilDate.format(date, format);
     },
