@@ -1339,8 +1339,8 @@ namespace OpenZWavePlugin
                             }
                         }
 
-
-                        log.Debug("Ready:  All nodes queried. Plug-in now ready.");
+                        //This is an important message to see.  It tells you that you can start issuing commands
+                        log.Info("Ready:  All nodes queried. Plug-in now ready.");
                         IsReady = true;
 
                         FinishedInitialPoll = true;
