@@ -411,7 +411,7 @@ namespace HttpAPI
 
                         if (relative_file_path.ToLower() == "\\tile.png")
                         {
-                            var onCount = 999;
+                            var onCount = 0;
                             using (zvsContext context = new zvsContext())
                             {
                                 foreach (Device d in context.Devices)
@@ -425,7 +425,7 @@ namespace HttpAPI
                                     }
                                 }
                             }
-                            var color = "Red";
+                            var color = "Black";
                             foreach (var q in httpListenerContext.Request.QueryString.AllKeys)
                             {
                                 if (q.ToLower() == "color")
