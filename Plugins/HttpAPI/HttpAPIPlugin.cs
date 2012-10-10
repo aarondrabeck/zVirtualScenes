@@ -22,7 +22,7 @@ using System.Net.Mime;
 using zvs.Processor;
 using zvs.Entities;
 using zvs.Processor.Logging;
-
+using System.Drawing;
 
 namespace HttpAPI
 {
@@ -314,28 +314,37 @@ namespace HttpAPI
                         if (!httpListenerContext.Request.RawUrl.ToLower().StartsWith("/api"))
                         {
                             allowed = true;
+                            reason = string.Empty;
                         }
                         else
                         {
                             reason = "Only certain API calls are allowed without credentials.";
-                        }
 
-                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
-                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
-                            && (httpListenerContext.Request.HttpMethod == "POST" ||
-                            httpListenerContext.Request.HttpMethod == "GET"))
-                        {
-                            allowed = true;
+
+                            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login")
+                                && (httpListenerContext.Request.HttpMethod == "POST" ||
+                                httpListenerContext.Request.HttpMethod == "GET"))
+                            {
+                                allowed = true;
+                                reason = string.Empty;
+                            }
+                            else
+                            {
+
+                                if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                                    httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") &&
+                                    httpListenerContext.Request.HttpMethod == "POST")
+                                {
+                                    allowed = true;
+                                    reason = string.Empty;
+                                }
+                                else
+                                {
+                                    reason = "Only login and logout API calls are allowed.";
+                                }
+                            }
                         }
-                        
-                        if (httpListenerContext.Request.Url.Segments.Length == 3 &&
-                            httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") &&
-                            httpListenerContext.Request.HttpMethod == "POST")
-                        {
-                            allowed = true;
-                        }
-                        
-                        reason = "Only login and logout API calls are allowed.";
                         if (!allowed)
                         {
                             log.WarnFormat("[{0}] was denied access to '{1}' because:{2}", ip, httpListenerContext.Request.RawUrl, reason);
@@ -400,44 +409,33 @@ namespace HttpAPI
                         if (httpListenerContext.Request.RawUrl.Equals("/"))
                             relative_file_path = @"\index.htm";
 
-                        FileInfo f = new FileInfo(htdocs_path + relative_file_path);
-
-                        if (!f.Exists)
+                        if (relative_file_path.ToLower() == "\\tile.png")
                         {
-                            sendResponse((int)HttpStatusCode.NotFound, "404 Not Found", "The resource requested does not exist.", httpListenerContext);
-                        }
-                        else
-                        {
-                            string contentType = string.Empty;
-                            response.StatusCode = (int)HttpStatusCode.OK;
-                            switch (f.Extension.ToLower())
+                            var onCount = 999;
+                            using (zvsContext context = new zvsContext())
                             {
-                                case ".js": contentType = "application/javascript"; break;
-                                case ".css": contentType = "text/css"; break;
-                                case ".manifest": contentType = "text/cache-manifest"; break;
+                                foreach (Device d in context.Devices)
+                                {
+                                    bool show = true;
+                                    bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
 
-                                //images
-                                case ".gif": contentType = MediaTypeNames.Image.Gif; break;
-                                case ".jpg":
-                                case ".jpeg": contentType = MediaTypeNames.Image.Jpeg; break;
-                                case ".tiff": contentType = MediaTypeNames.Image.Tiff; break;
-                                case ".png": contentType = "image/png"; break;
-                                case ".ico": contentType = "image/ico"; break;
-
-                                // application
-                                case ".pdf": contentType = MediaTypeNames.Application.Pdf; break;
-                                case ".zip": contentType = MediaTypeNames.Application.Zip; break;
-
-                                // text
-                                case ".htm":
-                                case ".html": contentType = MediaTypeNames.Text.Html; break;
-                                case ".txt": contentType = MediaTypeNames.Text.Plain; break;
-                                case ".xml": contentType = MediaTypeNames.Text.Xml; break;
-                                default: contentType = MediaTypeNames.Application.Octet; break;
+                                    if (show)
+                                    {
+                                        if (d.CurrentLevelInt > 0) onCount++;
+                                    }
+                                }
                             }
-
-                            response.ContentType = contentType;
-                            byte[] buffer = File.ReadAllBytes(f.ToString());
+                            var color = "Red";
+                            foreach (var q in httpListenerContext.Request.QueryString.AllKeys)
+                            {
+                                if (q.ToLower() == "color")
+                                {
+                                    color = httpListenerContext.Request.QueryString[q];
+                                    break;
+                                }
+                            }
+                            response.ContentType = "image/png";
+                            byte[] buffer = ShellTile(onCount, color);
                             response.ContentLength64 = buffer.Length;
                             try
                             {
@@ -449,9 +447,61 @@ namespace HttpAPI
                                 log.Error(e);
                             }
                         }
+                        else
+                        {
+
+                            FileInfo f = new FileInfo(htdocs_path + relative_file_path);
+
+                            if (!f.Exists)
+                            {
+                                sendResponse((int)HttpStatusCode.NotFound, "404 Not Found", "The resource requested does not exist.", httpListenerContext);
+                            }
+                            else
+                            {
+                                string contentType = string.Empty;
+                                response.StatusCode = (int)HttpStatusCode.OK;
+                                switch (f.Extension.ToLower())
+                                {
+                                    case ".js": contentType = "application/javascript"; break;
+                                    case ".css": contentType = "text/css"; break;
+                                    case ".manifest": contentType = "text/cache-manifest"; break;
+
+                                    //images
+                                    case ".gif": contentType = MediaTypeNames.Image.Gif; break;
+                                    case ".jpg":
+                                    case ".jpeg": contentType = MediaTypeNames.Image.Jpeg; break;
+                                    case ".tiff": contentType = MediaTypeNames.Image.Tiff; break;
+                                    case ".png": contentType = "image/png"; break;
+                                    case ".ico": contentType = "image/ico"; break;
+
+                                    // application
+                                    case ".pdf": contentType = MediaTypeNames.Application.Pdf; break;
+                                    case ".zip": contentType = MediaTypeNames.Application.Zip; break;
+
+                                    // text
+                                    case ".htm":
+                                    case ".html": contentType = MediaTypeNames.Text.Html; break;
+                                    case ".txt": contentType = MediaTypeNames.Text.Plain; break;
+                                    case ".xml": contentType = MediaTypeNames.Text.Xml; break;
+                                    default: contentType = MediaTypeNames.Application.Octet; break;
+                                }
+
+                                response.ContentType = contentType;
+                                byte[] buffer = File.ReadAllBytes(f.ToString());
+                                response.ContentLength64 = buffer.Length;
+                                try
+                                {
+                                    using (var s = response.OutputStream)
+                                        s.Write(buffer, 0, buffer.Length);
+                                }
+                                catch (Exception e)
+                                {
+                                    log.Error(e);
+                                }
+                            }
+                        }
                     }
                 }
-
             }
             catch (Exception e)
             {
@@ -1043,6 +1093,31 @@ namespace HttpAPI
             return utf8;
         }
 
+        private byte[] ShellTile(int Count, string color)
+        {
+            var asm = typeof(HttpAPI.HttpAPIPlugin).Assembly;
+            using (var template = asm.GetManifestResourceStream("HttpAPI.TileTemplate.png"))
+            {
+                System.Drawing.Image canvas = System.Drawing.Image.FromStream(template);
+                var g = Graphics.FromImage(canvas);
+                Font font = new Font(new FontFamily("Arial"), 20);
+
+                Color c = Color.FromName(color);
+                if (c == null) c = Color.Blue;
+                SolidBrush s = new SolidBrush(c);
+
+                g.DrawString(Count.ToString(), font,s, new PointF(125, 10));
+                using (var stm = new MemoryStream())
+                {
+                    canvas.Save(stm, System.Drawing.Imaging.ImageFormat.Png);
+                    var bytes = new byte[stm.Length];
+                    if (stm.CanSeek && stm.Position > 0) stm.Seek(0, SeekOrigin.Begin);
+                    stm.Read(bytes, 0, bytes.Length);
+                    return bytes;
+                }                
+            }
+            
+        }
         public class Utf8StringWriter : StringWriter
         {
             public override Encoding Encoding

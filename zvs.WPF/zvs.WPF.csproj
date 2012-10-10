@@ -387,9 +387,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\20radio.png" />
   </ItemGroup>
   <ItemGroup>
