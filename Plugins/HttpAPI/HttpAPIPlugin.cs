@@ -411,31 +411,18 @@ namespace HttpAPI
 
                         if (relative_file_path.ToLower() == "\\tile.png")
                         {
-                            var onCount = 0;
+
+                            var color = httpListenerContext.Request.QueryString["color"];
+                            if (string.IsNullOrEmpty(color)) color = "Black";
+                            var style = httpListenerContext.Request.QueryString["style"];
+                            if (string.IsNullOrEmpty(style)) style = "Simple";
+
+                            response.ContentType = "image/png";
+                            byte[] buffer;
                             using (zvsContext context = new zvsContext())
                             {
-                                foreach (Device d in context.Devices)
-                                {
-                                    bool show = true;
-                                    bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
-
-                                    if (show)
-                                    {
-                                        if (d.CurrentLevelInt > 0) onCount++;
-                                    }
-                                }
+                                buffer = ShellTile(context, color, style);
                             }
-                            var color = "Black";
-                            foreach (var q in httpListenerContext.Request.QueryString.AllKeys)
-                            {
-                                if (q.ToLower() == "color")
-                                {
-                                    color = httpListenerContext.Request.QueryString[q];
-                                    break;
-                                }
-                            }
-                            response.ContentType = "image/png";
-                            byte[] buffer = ShellTile(onCount, color);
                             response.ContentLength64 = buffer.Length;
                             try
                             {
@@ -446,6 +433,8 @@ namespace HttpAPI
                             {
                                 log.Error(e);
                             }
+
+
                         }
                         else
                         {
@@ -1093,20 +1082,53 @@ namespace HttpAPI
             return utf8;
         }
 
-        private byte[] ShellTile(int Count, string color)
+        private byte[] ShellTile(zvsContext context, string color, string style)
         {
+            int deviceOnCount = 0;
+            int sceneRunningCount = 0;
+            foreach (Device d in context.Devices)
+            {
+                bool show = true;
+                bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
+
+                if (show)
+                {
+                    if (d.CurrentLevelInt > 0) deviceOnCount++;
+                }
+            }
+            foreach (Scene scene in context.Scenes)
+            {
+                bool show = false;
+                string prop = ScenePropertyValue.GetPropertyValue(context, scene, "HTTPAPI_SHOW");
+                bool.TryParse(prop, out show);
+
+                if (show && scene.isRunning)
+                {
+                    sceneRunningCount++;
+                }
+            }
+            
             var asm = typeof(HttpAPI.HttpAPIPlugin).Assembly;
             using (var template = asm.GetManifestResourceStream("HttpAPI.TileTemplate.png"))
             {
                 System.Drawing.Image canvas = System.Drawing.Image.FromStream(template);
                 var g = Graphics.FromImage(canvas);
-                Font font = new Font(new FontFamily("Arial"), 20);
-
+                Font font = new Font(FontFamily.GenericSansSerif, 20);
+                
                 Color c = Color.FromName(color);
                 if (c == null) c = Color.Blue;
                 SolidBrush s = new SolidBrush(c);
 
-                g.DrawString(Count.ToString(), font,s, new PointF(125, 10));
+                if (style.ToLower() == "dands")
+                {
+                    g.DrawString(string.Format("Devices: {0}", deviceOnCount), font, s, new PointF(50, 10));
+                    g.DrawString(string.Format("Scenes:  {0}", deviceOnCount), font, s, new PointF(50, 35));
+                }
+                else
+                {
+                    g.DrawString(string.Format("Devices: {0}", deviceOnCount), font, s, new PointF(50, 10));
+                }
+
                 using (var stm = new MemoryStream())
                 {
                     canvas.Save(stm, System.Drawing.Imaging.ImageFormat.Png);
