@@ -1119,10 +1119,12 @@ namespace HttpAPI
                 if (c == null) c = Color.Blue;
                 SolidBrush s = new SolidBrush(c);
 
+                log.InfoFormat("Tile Style:{0}, Color:{1}, Devices On:{2}, Scenes Active:{3}", style, color, deviceOnCount, sceneRunningCount);
                 if (style.ToLower() == "dands")
                 {
+                    
                     g.DrawString(string.Format("Devices: {0}", deviceOnCount), font, s, new PointF(50, 10));
-                    g.DrawString(string.Format("Scenes:  {0}", deviceOnCount), font, s, new PointF(50, 35));
+                    g.DrawString(string.Format("Scenes:  {0}", sceneRunningCount), font, s, new PointF(50, 35));
                 }
                 else
                 {
