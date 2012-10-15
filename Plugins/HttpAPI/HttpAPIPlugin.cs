@@ -51,7 +51,7 @@ namespace HttpAPI
                 {
                     UniqueIdentifier = "PORT",
                     Name = "HTTP Port",
-                    Value = "80",
+                    Value = "8085",
                     ValueType = DataType.INTEGER,
                     Description = "The port that HTTP will listen for commands on."
                 }, context);
@@ -575,7 +575,7 @@ namespace HttpAPI
 
                         if (d != null)
                         {
-                            int level = 0;
+                            double level = 0;
 
                             if (d.CurrentLevelInt.HasValue)
                                 level = d.CurrentLevelInt.Value;
