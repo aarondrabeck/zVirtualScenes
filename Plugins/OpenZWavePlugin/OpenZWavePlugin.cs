@@ -689,76 +689,87 @@ namespace OpenZWavePlugin
                                 }, Context, true);
 
                                 #region Install Dynamic Commands
-
+                                
                                 if (!read_only)
                                 {
-                                    DataType pType = DataType.NONE;
-
-                                    //Set parameter types for command
-                                    switch (vid.GetType())
+                                    string label = value.Label;
+                                    if (!string.IsNullOrEmpty(label))
                                     {
-                                        case ZWValueID.ValueType.List:
-                                            pType = DataType.LIST;
-                                            break;
-                                        case ZWValueID.ValueType.Byte:
-                                            pType = DataType.BYTE;
-                                            break;
-                                        case ZWValueID.ValueType.Decimal:
-                                            pType = DataType.DECIMAL;
-                                            break;
-                                        case ZWValueID.ValueType.Int:
-                                            pType = DataType.INTEGER;
-                                            break;
-                                        case ZWValueID.ValueType.String:
-                                            pType = DataType.STRING;
-                                            break;
-                                        case ZWValueID.ValueType.Short:
-                                            pType = DataType.SHORT;
-                                            break;
-                                        case ZWValueID.ValueType.Bool:
-                                            pType = DataType.BOOL;
-                                            break;
+                                        label.ToUpper();
+
+                                        #region Cmd Value Type
+                                        DataType pType;
+                                        //Set parameter types for command
+                                        switch (vid.GetType())
+                                        {
+                                            case ZWValueID.ValueType.List:
+                                                pType = DataType.LIST;
+                                                break;
+                                            case ZWValueID.ValueType.Byte:
+                                                pType = DataType.BYTE;
+                                                break;
+                                            case ZWValueID.ValueType.Decimal:
+                                                pType = DataType.DECIMAL;
+                                                break;
+                                            case ZWValueID.ValueType.Int:
+                                                pType = DataType.INTEGER;
+                                                break;
+                                            case ZWValueID.ValueType.String:
+                                                pType = DataType.STRING;
+                                                break;
+                                            case ZWValueID.ValueType.Short:
+                                                pType = DataType.SHORT;
+                                                break;
+                                            case ZWValueID.ValueType.Bool:
+                                                pType = DataType.BOOL;
+                                                break;
+                                            default:
+                                                pType = DataType.NONE;
+                                                break;
+                                        }
+                                        #endregion
+
+                                        #region Node Command
+                                        //Install the Node Specific Command
+                                        int order;
+                                        switch (value.Genre)
+                                        {
+                                            case "User":
+                                                order = 1;
+                                                break;
+                                            case "Config":
+                                                order = 2;
+                                                break;
+                                            default:
+                                                order = 99;
+                                                break;
+                                        }
+                                        #endregion
+
+                                        DeviceCommand dynamic_dc = new DeviceCommand
+                                        {
+                                            Device = d,
+                                            UniqueIdentifier = string.Format("DYNAMIC_CMD_{0}", label),
+                                            Name = string.Format("Set {0}", value.Label),
+                                            ArgumentType = pType,
+                                            Help = string.IsNullOrEmpty(value.Help) ? string.Empty : value.Help,
+                                            CustomData1 = string.IsNullOrEmpty(value.Label) ? string.Empty : value.Label,
+                                            CustomData2 = string.IsNullOrEmpty(vid.GetId().ToString()) ? string.Empty : vid.GetId().ToString(),
+                                            SortOrder = order
+                                        };
+
+                                        //Special case for lists add additional info
+                                        if (vid.GetType() == ZWValueID.ValueType.List)
+                                        {
+                                            //Install the allowed options/values
+                                            String[] options;
+                                            if (m_manager.GetValueListItems(vid, out options))
+                                                foreach (string option in options)
+                                                    dynamic_dc.Options.Add(new CommandOption { Name = option });
+                                        }
+
+                                        DefineOrUpdateDeviceCommand(dynamic_dc, Context);
                                     }
-
-                                    //Install the Node Specific Command
-                                    int order;
-                                    switch (value.Genre)
-                                    {
-                                        case "User":
-                                            order = 1;
-                                            break;
-                                        case "Config":
-                                            order = 2;
-                                            break;
-                                        default:
-                                            order = 99;
-                                            break;
-                                    }
-
-
-                                    DeviceCommand dynamic_dc = new DeviceCommand
-                                    {
-                                        Device = d,
-                                        UniqueIdentifier = "DYNAMIC_CMD_" + value.Label.ToUpper(),
-                                        Name = "Set " + value.Label,
-                                        ArgumentType = pType,
-                                        Help = value.Help,
-                                        CustomData1 = value.Label,
-                                        CustomData2 = vid.GetId().ToString(),
-                                        SortOrder = order
-                                    };
-
-                                    //Special case for lists add additional info
-                                    if (vid.GetType() == ZWValueID.ValueType.List)
-                                    {
-                                        //Install the allowed options/values
-                                        String[] options;
-                                        if (m_manager.GetValueListItems(vid, out options))
-                                            foreach (string option in options)
-                                                dynamic_dc.Options.Add(new CommandOption { Name = option });
-                                    }
-
-                                    DefineOrUpdateDeviceCommand(dynamic_dc, Context);
                                 }
                                 #endregion
                             }
@@ -900,8 +911,8 @@ namespace OpenZWavePlugin
                                 {
                                     if (value.Label == "Temperature")
                                     {
-                                        int level = 0;
-                                        int.TryParse(data, out level);
+                                        double level = 0;
+                                        double.TryParse(data, out level);
 
                                         d.CurrentLevelInt = level;
                                         d.CurrentLevelText = level + "° F";
@@ -912,8 +923,8 @@ namespace OpenZWavePlugin
                                 {
                                     if (value.Label == "Basic")
                                     {
-                                        int level = 0;
-                                        if (int.TryParse(data, out level))
+                                        double level = 0;
+                                        if (double.TryParse(data, out level))
                                         {
                                             d.CurrentLevelInt = level > 0 ? 100 : 0;
                                             d.CurrentLevelText = level > 0 ? "On" : "Off";
@@ -925,10 +936,10 @@ namespace OpenZWavePlugin
                                 {
                                     if (value.Label == "Basic")
                                     {
-                                        int level = 0;
-                                        int.TryParse(data, out level);
+                                        double level = 0;
+                                        double.TryParse(data, out level);
 
-                                        d.CurrentLevelInt = level;
+                                        d.CurrentLevelInt = (int)level;
                                         d.CurrentLevelText = level + "%";
                                         Context.SaveChanges();
                                         Context.SaveChanges();
