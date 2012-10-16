@@ -145,7 +145,7 @@ namespace OpenZWavePlugin
 
                 DeviceProperty.AddOrEdit(new DeviceProperty
                 {
-                    UniqueIdentifier = "DEFAULONLEVEL",
+                    UniqueIdentifier = base.Name + "DEFAULONLEVEL",
                     Name = "Default Level",
                     Description = "Level that an device is set to when using the 'ON' command.",
                     Value = "99",//default value
@@ -154,7 +154,7 @@ namespace OpenZWavePlugin
 
                 DeviceProperty.AddOrEdit(new DeviceProperty
                 {
-                    UniqueIdentifier = "ENABLEREPOLLONLEVELCHANGE",
+                    UniqueIdentifier = base.Name + "ENABLEREPOLLONLEVELCHANGE",
                     Name = "Enable re-poll on level change",
                     Description = "Re-poll dimmers 3 seconds after a level change is received?",
                     Value = true.ToString(), //default value
@@ -461,7 +461,7 @@ namespace OpenZWavePlugin
                             using (zvsContext Context = new zvsContext())
                             {
                                 byte defaultonlevel = 99;
-                                byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, cmd.Device, "DEFAULONLEVEL"), out defaultonlevel);
+                                byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, cmd.Device, base.Name + "DEFAULONLEVEL"), out defaultonlevel);
                                 m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, defaultonlevel);
                             }
                             break;
@@ -600,7 +600,7 @@ namespace OpenZWavePlugin
                                 break;
                             case "DIMMER":
                                 byte defaultonlevel = 99;
-                                byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, d, "DEFAULONLEVEL"), out defaultonlevel);
+                                byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, d, base.Name + "DEFAULONLEVEL"), out defaultonlevel);
                                 m_manager.SetNodeLevel(m_homeId, Convert.ToByte(d.NodeNumber), defaultonlevel);
                                 break;
                         }
@@ -860,7 +860,7 @@ namespace OpenZWavePlugin
                                 //level between old level and new level. (if going from 0 to 100 we get 84 here).
                                 //To get the real level re-poll the device a second or two after a level change was received.     
                                 bool EnableDimmerRepoll = false;
-                                bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, d, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+                                bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, d, base.Name + "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
 
                                 if (FinishedInitialPoll && EnableDimmerRepoll)
                                 {
