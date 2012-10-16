@@ -127,8 +127,8 @@ namespace LightSwitchPlugin
             using (zvsContext context = new zvsContext())
             {
                 DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
-               // zvs.Processor.CommandProcessor.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
-               // zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
+                // zvs.Processor.CommandProcessor.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
+                // zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
                 OpenLightSwitchSocket();
             }
         }
@@ -226,16 +226,19 @@ namespace LightSwitchPlugin
                     DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
                     if (dv != null)
                     {
-                        string UpdateString = DeviceToString(dv);
-                        if (!string.IsNullOrEmpty(UpdateString))
+                        if (dv.Name == "Basic")
                         {
-                            BroadcastMessage("UPDATE~" + DeviceToString(dv) + Environment.NewLine);
-                            BroadcastMessage("ENDLIST" + Environment.NewLine);
-                        }
+                            string UpdateString = DeviceToString(dv.Device);
+                            if (!string.IsNullOrEmpty(UpdateString))
+                            {
+                                BroadcastMessage("UPDATE~" + UpdateString + Environment.NewLine);
+                                BroadcastMessage("ENDLIST" + Environment.NewLine);
+                            }
 
-                        string device_name = string.Empty;
-                        device_name = dv.Device.Name;
-                        BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.Name + " changed to " + args.newValue + Environment.NewLine);
+                            string device_name = string.Empty;
+                            device_name = dv.Device.Name;
+                            BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.Name + " changed to " + args.newValue + Environment.NewLine);
+                        }
                     }
                 }
             };
@@ -644,71 +647,13 @@ namespace LightSwitchPlugin
             switch (d.Type.UniqueIdentifier)
             {
                 case "SWITCH":
-                    {
-                        int level = 0;
-                        DeviceValue dv = d.Values.FirstOrDefault(v => v.Name == "Basic");
-                        if (dv != null)
-                            int.TryParse(dv.Value, out level);
-
-                        return d.Name + "~" + d.DeviceId + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
-                    }
+                    return d.Name + "~" + d.DeviceId + "~" + (d.CurrentLevelInt > 0 ? "255" : "0") + "~" + "BinarySwitch";
                 case "DIMMER":
-                    {
-                        int level = 0;
-                        DeviceValue dv = d.Values.FirstOrDefault(v => v.Name == "Basic");
-                        if (dv != null)
-                            int.TryParse(dv.Value, out level);
-
-                        return d.Name + "~" + d.DeviceId + "~" + level + "~" + "MultiLevelSwitch";
-                    }
+                    return d.Name + "~" + d.DeviceId + "~" + d.CurrentLevelInt + "~" + "MultiLevelSwitch";
                 case "THERMOSTAT":
-                    {
-                        int temp = 0;
-                        DeviceValue dv_temp = d.Values.FirstOrDefault(v => v.Name == "Temperature");
-                        if (dv_temp != null)
-                            int.TryParse(dv_temp.Value, out temp);
-
-                        return d.Name + "~" + d.DeviceId + "~" + temp + "~" + "Thermostat";
-                    }
+                    return d.Name + "~" + d.DeviceId + "~" + d.CurrentLevelInt + "~" + "Thermostat";
                 case "SENSOR":
-                    {
-                        int level = 0;
-                        DeviceValue dv = d.Values.FirstOrDefault(v => v.Name == "Basic");
-                        if (dv != null)
-                            int.TryParse(dv.Value, out level);
-
-                        return d.Name + "~" + d.DeviceId + "~" + level + "~" + "Sensor";
-                    }
-            }
-            return string.Empty;
-        }
-
-        private string DeviceToString(DeviceValue dv)
-        {
-            //Only send applicable updated to LightSwitch
-            if (dv.Name == "Basic")
-            {
-                int level = 0;
-                int.TryParse(dv.Value, out level);
-
-                switch (dv.Device.Type.UniqueIdentifier)
-                {
-                    case "SWITCH":
-                        return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + (level > 0 ? "255" : "0") + "~" + "BinarySwitch";
-                    case "DIMMER":
-                        return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + level + "~" + "MultiLevelSwitch";
-                    case "SENSOR":
-                        return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + level + "~" + "Sensor";
-                }
-            }
-            else if (dv.Name == "Temperature")
-            {
-                if (dv.Device.Type.UniqueIdentifier.Equals("THERMOSTAT"))
-                {
-                    int temp = 0;
-                    int.TryParse(dv.Value, out temp);
-                    return dv.Device.Name + "~" + dv.Device.DeviceId + "~" + temp + "~" + "Thermostat";
-                }
+                    return d.Name + "~" + d.DeviceId + "~" + d.CurrentLevelInt + "~" + "Sensor";
             }
             return string.Empty;
         }
@@ -802,7 +747,7 @@ namespace LightSwitchPlugin
                     };
                     cp.RunBuiltinCommand(context, cmd, SceneID.ToString());
                 }
-            }            
+            }
         }
 
         private bool ExecuteDynamicCMD(zvsContext context, Device d, string cmdUniqueId, string arg, Socket Client)

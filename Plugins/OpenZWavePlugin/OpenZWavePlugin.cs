@@ -118,7 +118,7 @@ namespace OpenZWavePlugin
                 dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a dimmer." });
 
                 DeviceTypeCommand dimmer_preset_cmd = new DeviceTypeCommand { UniqueIdentifier = "SETPRESETLEVEL", Name = "Set Level", ArgumentType = DataType.LIST, Description = "Sets a dimmer to a preset level." };
-                dimmer_preset_cmd.Options.Add(new CommandOption  { Name = "0%" });
+                dimmer_preset_cmd.Options.Add(new CommandOption { Name = "0%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "20%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "40%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "60%" });
@@ -146,7 +146,7 @@ namespace OpenZWavePlugin
                 DeviceProperty.AddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "DEFAULONLEVEL",
-                    Name= "Default Level",
+                    Name = "Default Level",
                     Description = "Level that an device is set to when using the 'ON' command.",
                     Value = "99",//default value
                     ValueType = DataType.BYTE
@@ -672,7 +672,7 @@ namespace OpenZWavePlugin
                             Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == node.ID);
                             if (d != null)
                             {
-                                    log.Debug("[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
+                                log.Debug("[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
 
                                 //Values are 'unknown' at this point so don't report a value change. 
                                 DefineOrUpdateDeviceValue(new DeviceValue
@@ -689,7 +689,7 @@ namespace OpenZWavePlugin
                                 }, Context, true);
 
                                 #region Install Dynamic Commands
-                                
+
                                 if (!read_only)
                                 {
                                     string label = value.Label;
@@ -785,7 +785,7 @@ namespace OpenZWavePlugin
                             ZWValueID vid = m_notification.GetValueID();
                             Value val = node.GetValue(vid);
 
-                                log.Debug("[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
+                            log.Debug("[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
 
                             node.RemoveValue(val);
                             //TODO: Remove from values and command table
@@ -814,8 +814,8 @@ namespace OpenZWavePlugin
                         string data = GetValue(vid);
                         //m_manager.GetValueAsString(vid, out data);                          
 
-                        
-                            log.Debug("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
+
+                        log.Debug("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
 
 
                         using (zvsContext Context = new zvsContext())
@@ -976,7 +976,7 @@ namespace OpenZWavePlugin
 
                 case ZWNotification.Type.Group:
                     {
-                            log.Debug("[Group]"); ;
+                        log.Debug("[Group]"); ;
                         break;
                     }
 
@@ -991,7 +991,7 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                            log.Debug("[NodeAdded] ID:" + node.ID.ToString() + " Added");
+                        log.Debug("[NodeAdded] ID:" + node.ID.ToString() + " Added");
                         //}
                         break;
                     }
@@ -1004,7 +1004,7 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                            log.Debug("[NodeNew] ID:" + node.ID.ToString() + " Added");
+                        log.Debug("[NodeNew] ID:" + node.ID.ToString() + " Added");
                         break;
                     }
 
@@ -1014,7 +1014,7 @@ namespace OpenZWavePlugin
                         {
                             if (node.ID == m_notification.GetNodeId())
                             {
-                                    log.Debug("[NodeRemoved] ID:" + node.ID.ToString());
+                                log.Debug("[NodeRemoved] ID:" + node.ID.ToString());
                                 m_nodeList.Remove(node);
                                 break;
                             }
@@ -1036,10 +1036,10 @@ namespace OpenZWavePlugin
 
                             if (node != null)
                             {
-                                
-                                    log.Debug("[Node Protocol Info] " + node.Label);
 
-                                
+                                log.Debug("[Node Protocol Info] " + node.Label);
+
+
                                 switch (node.Label)
                                 {
                                     case "Toggle Switch":
@@ -1113,7 +1113,7 @@ namespace OpenZWavePlugin
                                         break;
                                     default:
                                         {
-                                                log.Debug("[Node Label] " + node.Label);
+                                            log.Debug("[Node Label] " + node.Label);
                                             break;
                                         }
                                 }
@@ -1124,7 +1124,7 @@ namespace OpenZWavePlugin
                                     if (ozw_device == null)
                                     {
                                         ozw_device = new Device
-                                        {                                            
+                                        {
                                             NodeNumber = node.ID,
                                             Type = device_type,
                                             Name = deviceName,
@@ -1146,7 +1146,7 @@ namespace OpenZWavePlugin
                                         Name = "Last Node Event Value",
                                         Genre = "Custom",
                                         Index = "0",
-                                        ValueType = DataType.BYTE, 
+                                        ValueType = DataType.BYTE,
                                         CommandClass = "0",
                                         Value = "0",
                                         isReadOnly = true
@@ -1185,12 +1185,12 @@ namespace OpenZWavePlugin
                                     //Giving ManufacturerName a random value_id 9999058723211334120                                                           
                                     DefineOrUpdateDeviceValue(new DeviceValue
                                     {
-                                        Device = d, 
+                                        Device = d,
                                         UniqueIdentifier = ManufacturerNameValueId,
                                         Name = "Manufacturer Name",
                                         Genre = "Custom",
                                         Index = "0",
-                                        ValueType = DataType.STRING, 
+                                        ValueType = DataType.STRING,
                                         CommandClass = "0",
                                         Value = node.Manufacturer,
                                         isReadOnly = true
@@ -1202,7 +1202,7 @@ namespace OpenZWavePlugin
                                         Name = "Product Name",
                                         Genre = "Custom",
                                         Index = "0",
-                                        ValueType = DataType.STRING, 
+                                        ValueType = DataType.STRING,
                                         CommandClass = "0",
                                         Value = node.Product,
                                         isReadOnly = true
@@ -1214,7 +1214,7 @@ namespace OpenZWavePlugin
                                         Name = "Node Location",
                                         Genre = "Custom",
                                         Index = "0",
-                                        ValueType = DataType.STRING, 
+                                        ValueType = DataType.STRING,
                                         CommandClass = "0",
                                         Value = node.Location,
                                         isReadOnly = true
@@ -1226,7 +1226,7 @@ namespace OpenZWavePlugin
                                         Name = "Node Name",
                                         Genre = "Custom",
                                         Index = "0",
-                                        ValueType = DataType.STRING, 
+                                        ValueType = DataType.STRING,
                                         CommandClass = "0",
                                         Value = node.Name,
                                         isReadOnly = true
@@ -1234,7 +1234,7 @@ namespace OpenZWavePlugin
                                 }
                             }
                         }
-                            log.Debug("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
+                        log.Debug("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
                         break;
                     }
@@ -1246,8 +1246,8 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            
-                                log.Debug(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
+
+                            log.Debug(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
 
                             using (zvsContext Context = new zvsContext())
                             {
@@ -1262,9 +1262,9 @@ namespace OpenZWavePlugin
                                         dv.Value = gevent.ToString();
                                         Context.SaveChanges();
 
-                                        //Since events are differently than values fire the value change event every time we recieve the event regardless if 
-                                        //it is the same value or not.
-                                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(dv.DeviceValueId, string.Empty, dv.Value));
+                                        //Since open wave events are differently than values changes, we need to fire the value change event every time we receive the 
+                                        //event regardless if it is the same value or not.
+                                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(dv.DeviceValueId, dv.Value, string.Empty));
                                     }
                                 }
                                 #endregion
@@ -1294,8 +1294,8 @@ namespace OpenZWavePlugin
 
                         if (node != null)
                         {
-                            
-                                log.Debug("[PollingEnabled] Node:" + node.ID);
+
+                            log.Debug("[PollingEnabled] Node:" + node.ID);
                         }
                         break;
                     }
@@ -1389,41 +1389,41 @@ namespace OpenZWavePlugin
             DataType dataType = DataType.NONE;
             ZWValueID.ValueType openZwaveVType = v.GetType();
 
-            if(openZwaveVType == ZWValueID.ValueType.Bool)
+            if (openZwaveVType == ZWValueID.ValueType.Bool)
             {
-                 dataType = DataType.BOOL;
+                dataType = DataType.BOOL;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.Button)
+            else if (openZwaveVType == ZWValueID.ValueType.Button)
             {
-                 dataType = DataType.STRING;
+                dataType = DataType.STRING;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.Byte)
+            else if (openZwaveVType == ZWValueID.ValueType.Byte)
             {
-                 dataType = DataType.BYTE;
+                dataType = DataType.BYTE;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.Decimal)
+            else if (openZwaveVType == ZWValueID.ValueType.Decimal)
             {
-                 dataType = DataType.DECIMAL;
+                dataType = DataType.DECIMAL;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.Int)
+            else if (openZwaveVType == ZWValueID.ValueType.Int)
             {
-                 dataType = DataType.INTEGER;
+                dataType = DataType.INTEGER;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.List)
+            else if (openZwaveVType == ZWValueID.ValueType.List)
             {
-                 dataType = DataType.LIST;
+                dataType = DataType.LIST;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.Schedule)
+            else if (openZwaveVType == ZWValueID.ValueType.Schedule)
             {
-                 dataType = DataType.STRING;            
+                dataType = DataType.STRING;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.Short)
+            else if (openZwaveVType == ZWValueID.ValueType.Short)
             {
-                 dataType = DataType.SHORT;
+                dataType = DataType.SHORT;
             }
-            else if(openZwaveVType == ZWValueID.ValueType.String)
+            else if (openZwaveVType == ZWValueID.ValueType.String)
             {
-                 dataType = DataType.STRING;
+                dataType = DataType.STRING;
             }
             return dataType;
         }

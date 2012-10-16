@@ -190,7 +190,7 @@ namespace zvs.Processor
                         }));
 
                         //Call Event
-                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(existing_dv.DeviceValueId, prev_value, dv.Value));
+                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(existing_dv.DeviceValueId,  dv.Value, prev_value));
                     }
                 }
             }
