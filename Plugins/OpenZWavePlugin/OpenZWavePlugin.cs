@@ -695,8 +695,6 @@ namespace OpenZWavePlugin
                                     string label = value.Label;
                                     if (!string.IsNullOrEmpty(label))
                                     {
-                                        label.ToUpper();
-
                                         #region Cmd Value Type
                                         DataType pType;
                                         //Set parameter types for command
