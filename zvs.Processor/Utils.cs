@@ -30,13 +30,23 @@ namespace zvs.Processor
             }
         }
 
-        public static string ApplicationVersion
+        public static string ApplicationVersionLong
         {
             get
             {
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 Version vrs = assembly.GetName().Version;
                 return string.Format("{0}.{1}.{2}.{3}", vrs.Major, vrs.Minor, vrs.Revision, vrs.Build);
+            }
+        }
+
+        public static string ApplicationVersion
+        {
+            get
+            {
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                Version vrs = assembly.GetName().Version;
+                return string.Format("{0}.{1}", vrs.Major, vrs.Minor);
             }
         }
 

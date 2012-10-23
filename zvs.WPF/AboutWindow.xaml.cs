@@ -35,7 +35,7 @@ namespace zvs.WPF
         private void AboutWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
             FullNameTxtBl.Text = Utils.ApplicationName;
-            VersionTxtBl.Text = string.Format("Version {0}", Utils.ApplicationVersion);
+            VersionTxtBl.Text = string.Format("Version {0}", Utils.ApplicationVersionLong);
         }
 
         private void WebsiteLink_MouseDown_1(object sender, MouseButtonEventArgs e)
