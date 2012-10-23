@@ -649,11 +649,11 @@ namespace LightSwitchPlugin
                 case "SWITCH":
                     return d.Name + "~" + d.DeviceId + "~" + (d.CurrentLevelInt > 0 ? "255" : "0") + "~" + "BinarySwitch";
                 case "DIMMER":
-                    return d.Name + "~" + d.DeviceId + "~" + d.CurrentLevelInt + "~" + "MultiLevelSwitch";
+                    return d.Name + "~" + d.DeviceId + "~" + (int)d.CurrentLevelInt + "~" + "MultiLevelSwitch"; //careful lightswitch can only handle ints
                 case "THERMOSTAT":
-                    return d.Name + "~" + d.DeviceId + "~" + d.CurrentLevelInt + "~" + "Thermostat";
+                    return d.Name + "~" + d.DeviceId + "~" + (int)d.CurrentLevelInt + "~" + "Thermostat"; //careful lightswitch can only handle ints
                 case "SENSOR":
-                    return d.Name + "~" + d.DeviceId + "~" + d.CurrentLevelInt + "~" + "Sensor";
+                    return d.Name + "~" + d.DeviceId + "~" + (int)d.CurrentLevelInt + "~" + "Sensor"; //careful lightswitch can only handle ints
             }
             return string.Empty;
         }
@@ -720,7 +720,7 @@ namespace LightSwitchPlugin
                             }
                     }
                 }
-                BroadcastMessage("ERR~Error setting device # " + device_id + ". Try Agian");
+                BroadcastMessage("ERR~Error setting device # " + device_id + ". Try Again");
             }
         }
 
@@ -862,7 +862,7 @@ namespace LightSwitchPlugin
                     }
                 }
             }
-            BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Agian");
+            BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Again");
         }
 
         /// <summary>
