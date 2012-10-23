@@ -36,11 +36,7 @@ namespace zvs.Processor
             {
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 Version vrs = assembly.GetName().Version;
-#if DEBUG
                 return string.Format("{0}.{1}.{2}.{3}", vrs.Major, vrs.Minor, vrs.Revision, vrs.Build);
-#else
-                return string.Format("{0}.{1}", vrs.Major, vrs.Minor);
-#endif
             }
         }
 
