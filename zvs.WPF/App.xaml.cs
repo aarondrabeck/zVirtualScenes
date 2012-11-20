@@ -50,9 +50,32 @@ namespace zvs.WPF
             zvs.Processor.Logging.LogManager.ConfigureLogging();
             log = zvs.Processor.Logging.LogManager.GetLogger<App>();
 
-            log.Info("Init Complete");            
+            log.InfoFormat("Init Complete ({0})", (Utils.DebugMode ? "Debug Mode" : "Release Mode"));
+            if (Utils.DebugMode)
+            {
+                log.Info("--------------DUMPING ENVIRONMENT--------------");
+                log.InfoFormat("AppDataPath:{0}", Utils.AppDataPath);
+                log.InfoFormat("AppPath:{0}", Utils.AppPath);
+                log.InfoFormat("ApplicationNameAndVersion:{0}", Utils.ApplicationNameAndVersion);
+                log.InfoFormat("ApplicationVersionLong:{0}", Utils.ApplicationVersionLong);
+                log.InfoFormat("HasDotNet45:{0}", Utils.HasDotNet45());
+                log.InfoFormat("HasSQLCE4:{0}", Utils.HasSQLCE4());
+                log.InfoFormat("CommandLine:{0}", System.Environment.CommandLine);
+                log.InfoFormat("CurrentDirectory:{0}", System.Environment.CurrentDirectory);
+                log.InfoFormat("Is64BitOperatingSystem:{0}", System.Environment.Is64BitOperatingSystem);
+                log.InfoFormat("Is64BitProcess:{0}", System.Environment.Is64BitProcess);
+                log.InfoFormat("MachineName:{0}", System.Environment.MachineName);
+                log.InfoFormat("OSVersion:{0}", System.Environment.OSVersion);
+                log.InfoFormat("ProcessorCount:{0}", System.Environment.ProcessorCount);
+                log.InfoFormat("UserDomainName:{0}", System.Environment.UserDomainName);
+                log.InfoFormat("UserInteractive:{0}", System.Environment.UserInteractive);
+                log.InfoFormat("UserName:{0}", System.Environment.UserName);
+                log.InfoFormat("Version:{0}", System.Environment.Version);
+                log.InfoFormat("WorkingSet:{0}", System.Environment.WorkingSet);
+                log.Info("--------------/DUMPING ENVIRONMENT--------------");
+            }
         }
-        
+
         public bool SignalExternalCommandLineArgs(IList<string> args)
         {
             
