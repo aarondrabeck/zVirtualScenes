@@ -216,7 +216,7 @@ namespace NOAAPlugin
                     Double MinsBetweenTimeSunset = (_sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                     {
-                        log.Info("It is now sunset. Activating sunrise scenes.");
+                        log.Info("It is now sunset. Activating sunset scenes.");
                         foreach (Scene scene in context.Scenes)
                         {
                             string value = ScenePropertyValue.GetPropertyValue(context, scene, "ACTIVATE_SUNSET");
