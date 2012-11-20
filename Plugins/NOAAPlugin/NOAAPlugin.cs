@@ -112,14 +112,8 @@ namespace NOAAPlugin
         {
             log.InfoFormat("{0} started. Today's Sunrise: {1}, Today's Sunset: {2}", this.Name, _sunrise.ToString("T"), _sunset.ToString("T"));
 
-            if (Utils.DebugMode)
-            {
-                timerNOAA.Interval = 10000;
-            }
-            else
-            {
-                timerNOAA.Interval = 60000;
-            }
+            timerNOAA.Interval = 60000;
+
             timerNOAA.Elapsed += new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = true;
 
@@ -173,8 +167,8 @@ namespace NOAAPlugin
 
         private void CalculateSunriseSet()
         {
+            _date = DateTime.Now;
             SunTimes.Instance.CalculateSunRiseSetTimes(_Lat, _Long, _date, ref _sunrise, ref _sunset, ref _isSunrise, ref _isSunset);
-
             //Add delays
             if (_sunrise != null)
                 _sunrise = _sunrise.AddMinutes(_SunriseDelay);
@@ -195,6 +189,8 @@ namespace NOAAPlugin
         {
             try
             {
+                CalculateSunriseSet();
+
                 using (zvsContext context = new zvsContext())
                 {
                     Double MinsBetweenTimeSunrise = (_sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
@@ -219,7 +215,6 @@ namespace NOAAPlugin
                                 }
                             }
                         }
-                        CalculateSunriseSet();
                     }
 
                     Double MinsBetweenTimeSunset = (_sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
@@ -246,7 +241,6 @@ namespace NOAAPlugin
                                 }
                             }
                         }
-                        CalculateSunriseSet();
                     }
                 }
             }
