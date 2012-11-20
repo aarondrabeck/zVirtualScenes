@@ -112,7 +112,14 @@ namespace NOAAPlugin
         {
             log.InfoFormat("{0} started. Today's Sunrise: {1}, Today's Sunset: {2}", this.Name, _sunrise.ToString("T"), _sunset.ToString("T"));
 
-            timerNOAA.Interval = 60000;
+            if (Utils.DebugMode)
+            {
+                timerNOAA.Interval = 10000;
+            }
+            else
+            {
+                timerNOAA.Interval = 60000;
+            }
             timerNOAA.Elapsed += new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = true;
 
@@ -191,6 +198,8 @@ namespace NOAAPlugin
                 using (zvsContext context = new zvsContext())
                 {
                     Double MinsBetweenTimeSunrise = (_sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+                    log.InfoFormat("RISE: MinsBetweenTimeSunrise={0}, _sunrise={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunrise, _sunrise, DateTime.Now.TimeOfDay);
+
                     if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
                         log.Info("It is now sunrise. Activating sunrise scenes.");
@@ -214,6 +223,10 @@ namespace NOAAPlugin
                     }
 
                     Double MinsBetweenTimeSunset = (_sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
+
+                    log.InfoFormat("SET: MinsBetweenTimeSunset={0}, _sunset={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunset, _sunset, DateTime.Now.TimeOfDay);
+
+
                     if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
                     {
                         log.Info("It is now sunset. Activating sunset scenes.");
