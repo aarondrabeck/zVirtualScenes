@@ -225,11 +225,11 @@ namespace zvs.WPF.DeviceControls
 
                 foreach (Device selectedDevice in SelectedItemsCopy)
                 {
-                    Device d = context.Devices.FirstOrDefault(o => o.DeviceId == selectedDevice.DeviceId);
+                    Device d = context.Devices.FirstOrDefault(o => o.Id == selectedDevice.Id);
                     if (d != null)
                     {
                         //Check for device dependencies
-                        foreach (StoredCommand storedCommand in context.StoredCommands.Where(t => t.Device.DeviceId == d.DeviceId))
+                        foreach (StoredCommand storedCommand in context.StoredCommands.Where(t => t.Device.Id == d.Id))
                         {
                             StoredCommand.RemoveDependencies(context, storedCommand);
                             context.StoredCommands.Local.Remove(storedCommand);
@@ -237,7 +237,7 @@ namespace zvs.WPF.DeviceControls
                         context.SaveChanges();
 
                         //Check for device dependencies
-                        foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.DeviceId == d.DeviceId))
+                        foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id))
                         {
                             MessageBoxResult result = MessageBox.Show(
                                 string.Format("Deleting device '{0}' will delete trigger '{1}', would you like continue?",
@@ -323,7 +323,7 @@ namespace zvs.WPF.DeviceControls
         private void OpenDeviceDetails(Device d)
         {
             App app = (App)Application.Current;
-            DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.DeviceId);
+            DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.Id);
             deviceDetailsWindow.Owner = app.zvsWindow;
             deviceDetailsWindow.Show();
         }

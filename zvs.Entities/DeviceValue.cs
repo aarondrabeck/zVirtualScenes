@@ -11,17 +11,19 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DeviceValues", Schema = "ZVS")]
-    public partial class DeviceValue : BaseValue
+    public partial class DeviceValue : BaseValue, IIdentity
     {
 
         public DeviceValue()
         {
             this.Triggers = new ObservableCollection<DeviceValueTrigger>();
         }
-        public int DeviceValueId { get; set; }
+        public int Id { get; set; }
 
-         [Required]
+        public int DeviceId { get; set; }
+        [Required]
         public virtual Device Device { get; set; }
+
         public virtual ObservableCollection<DeviceValueTrigger> Triggers { get; set; }
 
         private string _Genre;
@@ -41,7 +43,7 @@ namespace zvs.Entities
                 }
             }
         }
-              
+
         private string _Index;
         [StringLength(255)]
         public string Index

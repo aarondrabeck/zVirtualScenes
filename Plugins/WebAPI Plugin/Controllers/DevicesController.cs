@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
                     {
                         var device = new
                         {
-                            id = d.DeviceId,
+                            id = d.Id,
                             name = d.Name,
                             on_off = d.CurrentLevelInt == 0 ? "OFF" : "ON",
                             level = d.CurrentLevelInt,
@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
 
                     if (d != null)
                     {
-                        return Get(d.DeviceId);
+                        return Get(d.Id);
                     }
                 }
             }
@@ -65,7 +65,7 @@ namespace WebAPI.Controllers
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
+                    Device d = context.Devices.FirstOrDefault(o => o.Id == id);
 
                     if (d != null)
                     {
@@ -81,7 +81,7 @@ namespace WebAPI.Controllers
                                 read_only = v.isReadOnly,
                                 label_name = v.Name,
                                 type = v.ValueType,
-                                id = v.DeviceValueId
+                                id = v.Id
                             });
                         }
 
@@ -100,7 +100,7 @@ namespace WebAPI.Controllers
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
+                    Device d = context.Devices.FirstOrDefault(o => o.Id == id);
 
                     if (d != null)
                     {
@@ -122,7 +122,7 @@ namespace WebAPI.Controllers
 
                         var details = new
                         {
-                            id = d.DeviceId,
+                            id = d.Id,
                             name = d.Name,
                             on_off = on_off,
                             level = d.CurrentLevelInt,

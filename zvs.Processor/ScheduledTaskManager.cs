@@ -306,23 +306,23 @@ namespace zvs.Processor
 
             using (zvsContext context = new zvsContext())
             {
-                _task = context.ScheduledTasks.FirstOrDefault(o => o.ScheduledTaskId == task.ScheduledTaskId);
+                _task = context.ScheduledTasks.FirstOrDefault(o => o.Id == task.Id);
                 if (_task == null)
                 {
-                    ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
-                          string.Format("Scheduled task '{0}' started.", task.ScheduledTaskId), true));
+                    ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.Id,
+                          string.Format("Scheduled task '{0}' started.", task.Id), true));
 
-                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
-                          string.Format("Scheduled task '{0}' has been deleted.", task.ScheduledTaskId), true));
+                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
+                          string.Format("Scheduled task '{0}' has been deleted.", task.Id), true));
                     return;
                 }
 
-                ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.Id,
                           string.Format("Scheduled task '{0}' started.", _task.Name), true));
 
                 if (_task.StoredCommand == null)
                 {
-                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
                           string.Format("Scheduled task '{0}'. No command to run.", _task.Name), true));
                     return;
                 }
@@ -330,7 +330,7 @@ namespace zvs.Processor
                 CommandProcessor cp = new CommandProcessor(Core);
                 cp.onProcessingCommandEnd += (s, a) =>
                 {
-                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.ScheduledTaskId,
+                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
                             string.Format("Task '{0}' ended.", _task.Name), false));
                 };
                 cp.RunStoredCommand(context, _task.StoredCommand);

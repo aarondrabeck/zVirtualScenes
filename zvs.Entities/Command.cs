@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("Commands", Schema = "ZVS")]
-    public class Command : INotifyPropertyChanged
+    public class Command : INotifyPropertyChanged, IIdentity
     {
-        public int CommandId { get; set; }
+        public int Id { get; set; }
 
         public Command()
         {

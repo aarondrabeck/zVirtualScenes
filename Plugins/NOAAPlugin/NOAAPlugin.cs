@@ -211,7 +211,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                                    cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
                                 }
                             }
                         }
@@ -237,7 +237,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                                    cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
                                 }
                             }
                         }

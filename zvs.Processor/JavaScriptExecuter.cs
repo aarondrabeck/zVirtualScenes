@@ -223,7 +223,7 @@ namespace zvs.Processor
                 return;
             }
 
-            RunDeviceCommand(d.DeviceId, CommandName, Value);//TODO: ReportProgress here
+            RunDeviceCommand(d.Id, CommandName, Value);//TODO: ReportProgress here
         }
 
         //RunDeviceCommand(7,'Set Level', '99');
@@ -288,7 +288,7 @@ namespace zvs.Processor
                 ReportProgress("Cannot find scene {0}", SceneName);
                 return;
             }
-            RunScene(s.SceneId);
+            RunScene(s.Id);
         }
 
         //RunScene(1);

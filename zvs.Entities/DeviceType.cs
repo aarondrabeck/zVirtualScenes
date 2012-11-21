@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DeviceTypes", Schema = "ZVS")]
-    public partial class DeviceType : INotifyPropertyChanged
+    public partial class DeviceType : INotifyPropertyChanged, IIdentity
     {
-        public int DeviceTypeId { get; set; }
+        public int Id { get; set; }
 
         public DeviceType()
         {
@@ -21,6 +21,7 @@ namespace zvs.Entities
             this.Commands = new ObservableCollection<DeviceTypeCommand>();
         }
 
+        public int PluginId { get; set; }
         public virtual Plugin Plugin { get; set; }
         public virtual ObservableCollection<Device> Devices { get; set; }
         public virtual ObservableCollection<DeviceTypeCommand> Commands { get; set; }

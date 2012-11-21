@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DevicePropertyOptions", Schema = "ZVS")]
-    public partial class DevicePropertyOption : BaseOption
+    public partial class DevicePropertyOption : BaseOption, IIdentity
     {
-        public int DevicePropertyOptionId { get; set; }
-       
+        public int Id { get; set; }
+
+        public int DevicePropertyId { get; set; }
         public virtual DeviceProperty DeviceProperty { get; set; }
     }
 }

@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("StoredCommands", Schema = "ZVS")]
-    public partial class StoredCommand : INotifyPropertyChanged
+    public partial class StoredCommand : INotifyPropertyChanged, IIdentity
     {
-        public int StoredCommandId { get; set; }
+        public int Id { get; set; }
 
+        public int DeviceId { get; set; }
         private Device _Device;
         public virtual Device Device
         {
@@ -35,10 +36,16 @@ namespace zvs.Entities
             }
         }
 
+        public int? DeviceValueTriggerId { get; set; }
         public virtual DeviceValueTrigger DeviceValueTrigger { get; set; }
+
+        public int SceneCommandId { get; set; }
         public virtual SceneCommand SceneCommand { get; set; }
+
+        public int ScheduledTaskId { get; set; }
         public virtual ScheduledTask ScheduledTask { get; set; }
 
+        public int CommandId { get; set; }
         private Command _Command;
         [Required]
         public virtual Command Command
@@ -138,7 +145,7 @@ namespace zvs.Entities
                                         int d_id = 0;
                                         int.TryParse(this.Argument, out d_id);
 
-                                        Device device_to_repoll = context.Devices.FirstOrDefault(d => d.DeviceId == d_id);
+                                        Device device_to_repoll = context.Devices.FirstOrDefault(d => d.Id == d_id);
                                         if (device_to_repoll != null)
                                             return device_to_repoll.Name;
 
@@ -149,7 +156,7 @@ namespace zvs.Entities
                                     {
                                         int g_id = 0;
                                         int.TryParse(this.Argument, out g_id);
-                                        Group g = context.Groups.FirstOrDefault(gr => gr.GroupId == g_id);
+                                        Group g = context.Groups.FirstOrDefault(gr => gr.Id == g_id);
 
                                         if (g != null)
                                             return g.Name;
@@ -160,7 +167,7 @@ namespace zvs.Entities
                                         int SceneId = 0;
                                         int.TryParse(this.Argument, out SceneId);
 
-                                        Scene Scene = context.Scenes.FirstOrDefault(d => d.SceneId == SceneId);
+                                        Scene Scene = context.Scenes.FirstOrDefault(d => d.Id == SceneId);
                                         if (Scene != null)
                                             return Scene.Name;
                                         break;
@@ -244,7 +251,7 @@ namespace zvs.Entities
 
 
 
-            foreach (SceneCommand sceneCommand in context.SceneCommands.Where(o => o.StoredCommand.StoredCommandId == sc.StoredCommandId))
+            foreach (SceneCommand sceneCommand in context.SceneCommands.Where(o => o.StoredCommand.Id == sc.Id))
             {
                 context.SceneCommands.Local.Remove(sceneCommand);
             }

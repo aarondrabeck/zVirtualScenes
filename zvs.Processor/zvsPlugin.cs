@@ -110,7 +110,7 @@ namespace zvs.Processor
 
         public void UpdateDeviceValue(int deviceId, string UniqueIdentifier, string Value, zvsContext context)
         {
-            Device d = context.Devices.FirstOrDefault(o => o.DeviceId == deviceId);
+            Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
             if (d != null)
             {
                 DeviceValue existing_dv = d.Values.FirstOrDefault(o => o.UniqueIdentifier == UniqueIdentifier);
@@ -136,7 +136,7 @@ namespace zvs.Processor
 
         public void DefineOrUpdateDeviceValue(DeviceValue dv, zvsContext context, bool IgnoreValueChange = false)
         {
-            Device d = context.Devices.FirstOrDefault(o => o.DeviceId == dv.Device.DeviceId);
+            Device d = context.Devices.FirstOrDefault(o => o.Id == dv.Device.Id);
             if (d != null)
             {
                 DeviceValue existing_dv = d.Values.FirstOrDefault(o => o.UniqueIdentifier == dv.UniqueIdentifier);
@@ -177,7 +177,7 @@ namespace zvs.Processor
                         //LOG IT
                         string device_name = "Unknown";
                         if (String.IsNullOrEmpty(d.Name))
-                            device_name = "Device #" + d.DeviceId;
+                            device_name = "Device #" + d.Id;
                         else
                             device_name = d.Name;
 
@@ -190,7 +190,7 @@ namespace zvs.Processor
                         }));
 
                         //Call Event
-                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(existing_dv.DeviceValueId,  dv.Value, prev_value));
+                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(existing_dv.Id,  dv.Value, prev_value));
                     }
                 }
             }
@@ -198,7 +198,7 @@ namespace zvs.Processor
             {
                 this.Core.Dispatcher.Invoke(new Action(() =>
                 {
-                    log.InfoFormat("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", dv.Name, dv.DeviceValueId);//, "EVENT"); 
+                    log.InfoFormat("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", dv.Name, dv.Id);//, "EVENT"); 
                 }));
             }
 
@@ -315,7 +315,7 @@ namespace zvs.Processor
             Plugin pl = context.Plugins.FirstOrDefault(p => p.UniqueIdentifier == this.UniqueIdentifier);
             if (pl != null)
             {
-                Group g = context.Groups.FirstOrDefault(gr => gr.GroupId == GroupID);
+                Group g = context.Groups.FirstOrDefault(gr => gr.Id == GroupID);
                 if (g != null)
                 {
                     return g.Devices.Where(o => o.Type.Plugin == pl).AsQueryable();
@@ -337,7 +337,7 @@ namespace zvs.Processor
 
         public void DefineOrUpdateDeviceCommand(DeviceCommand dc, zvsContext context)
         {
-            Device d = context.Devices.FirstOrDefault(o => o.DeviceId == dc.Device.DeviceId);
+            Device d = context.Devices.FirstOrDefault(o => o.Id == dc.Device.Id);
             if (d != null)
             {
                 //Does device type exist? 

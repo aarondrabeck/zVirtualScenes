@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("ProgramOptions", Schema = "ZVS")]
-    public partial class ProgramOption : INotifyPropertyChanged
+    public partial class ProgramOption : INotifyPropertyChanged, IIdentity
     {
 
-        public int ProgramOptionId { get; set; }
+        public int Id { get; set; }
 
         private string _UniqueIdentifier;
         [StringLength(50)]

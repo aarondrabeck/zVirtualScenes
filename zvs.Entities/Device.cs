@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("Devices", Schema = "ZVS")]
-    public partial class Device : INotifyPropertyChanged
+    public partial class Device : INotifyPropertyChanged, IIdentity
     {
-        public int DeviceId { get; set; }
+        public int Id { get; set; }
 
         public Device()
         {
@@ -113,7 +113,10 @@ namespace zvs.Entities
             }
         }
 
+
+        public int DeviceTypeId { get; set; }
         public virtual DeviceType Type { get; set; }
+
         public virtual ObservableCollection<QueuedDeviceCommand> QueuedDeviceCommands { get; set; }
         public virtual ObservableCollection<QueuedDeviceTypeCommand> QueuedDeviceTypeCommands { get; set; }
         public virtual ObservableCollection<DeviceCommand> Commands { get; set; }

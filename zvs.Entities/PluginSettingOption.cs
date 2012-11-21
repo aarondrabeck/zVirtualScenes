@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("PluginSettingOptions", Schema = "ZVS")]
-    public partial class PluginSettingOption : BaseOption
+    public partial class PluginSettingOption : BaseOption, IIdentity
     {
-        public int PluginSettingOptionId { get; set; }       
+        public int Id { get; set; }
 
+        public int PluginSettingId { get; set; }
         public virtual PluginSetting Setting { get; set; }
     }
 }

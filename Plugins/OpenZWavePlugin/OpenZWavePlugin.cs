@@ -877,7 +877,7 @@ namespace OpenZWavePlugin
                                                         //only allow each device to re-poll 1 time.
                                                         if (timers.Contains(d.NodeNumber))
                                                         {
-                                                            log.Debug(string.Format("Timer {0} restarted.", d.DeviceId));
+                                                            log.Debug(string.Format("Timer {0} restarted.", d.Id));
                                                             System.Timers.Timer t = (System.Timers.Timer)timers[d.NodeNumber];
                                                             t.Stop();
                                                             t.Start();
@@ -1262,7 +1262,7 @@ namespace OpenZWavePlugin
 
                                         //Since open wave events are differently than values changes, we need to fire the value change event every time we receive the 
                                         //event regardless if it is the same value or not.
-                                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(dv.DeviceValueId, dv.Value, string.Empty));
+                                        dv.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(dv.Id, dv.Value, string.Empty));
                                     }
                                 }
                                 #endregion

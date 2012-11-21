@@ -77,7 +77,7 @@ namespace zvs.Processor.Triggers
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
+                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.Id == args.DeviceValueId);
                     if (dv != null)
                     {
                         //Event Triggering
@@ -109,7 +109,7 @@ namespace zvs.Processor.Triggers
                                         {
                                             if (onTriggerBegin != null)
                                             {
-                                                onTriggerBegin(this, new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                                                onTriggerBegin(this, new onTriggerEventArgs(trigger.Id,
                                                     string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
                                             }
                                         }
@@ -131,7 +131,7 @@ namespace zvs.Processor.Triggers
                                         {
                                             if (onTriggerBegin != null)
                                             {
-                                                onTriggerBegin(this, new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                                                onTriggerBegin(this, new onTriggerEventArgs(trigger.Id,
                                                     string.Format("Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.", trigger.Name), true));
                                             }
                                         }
@@ -157,13 +157,13 @@ namespace zvs.Processor.Triggers
 
         private void ActivateTrigger(zvsContext context, DeviceValueTrigger trigger)
         {
-            TriggerBegin(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+            TriggerBegin(new onTriggerEventArgs(trigger.Id,
                         string.Format("Trigger '{0}' caused  '{1}'", trigger.Name, trigger.StoredCommand.ActionDescription), false));
 
             CommandProcessor cp = new CommandProcessor(Core);
             cp.onProcessingCommandEnd += (s, a) =>
             {
-                TriggerEnd(new onTriggerEventArgs(trigger.DeviceValueTriggerId,
+                TriggerEnd(new onTriggerEventArgs(trigger.Id,
                         string.Format("Trigger '{0}' ended.", trigger.Name), false));
             };
             cp.RunStoredCommand(context, trigger.StoredCommand);

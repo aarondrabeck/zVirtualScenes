@@ -169,7 +169,7 @@ namespace zvs.WPF.Groups
 
                     foreach (Device device in devices)
                     {
-                        Device d2 = context.Devices.FirstOrDefault(o => o.DeviceId == device.DeviceId); ;
+                        Device d2 = context.Devices.FirstOrDefault(o => o.Id == device.Id); ;
                         if (d2 != null)
                         {
                             //If not already in the group...

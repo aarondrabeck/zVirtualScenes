@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("SceneProperties", Schema = "ZVS")]
-    public partial class SceneProperty : BaseValue
+    public partial class SceneProperty : BaseValue, IIdentity
     {
-        public int ScenePropertyId { get; set; }
+        public int Id { get; set; }
 
         public SceneProperty()
         {

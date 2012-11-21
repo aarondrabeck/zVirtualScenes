@@ -51,7 +51,7 @@ namespace zvs.WPF.SceneControls
 
             using (zvsContext context = new zvsContext())
             {
-                Scene s = context.Scenes.FirstOrDefault(sc => sc.SceneId == SceneID);
+                Scene s = context.Scenes.FirstOrDefault(sc => sc.Id == SceneID);
                 if (s != null)
                 {
                     s.isRunning = false;

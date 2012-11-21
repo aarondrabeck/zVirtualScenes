@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DeviceProperties", Schema = "ZVS")]
-    public partial class DeviceProperty : BaseValue
+    public partial class DeviceProperty : BaseValue, IIdentity
     {
-        public int DevicePropertyId { get; set; }
+        public int Id { get; set; }
         public DeviceProperty()
         {
             this.Options = new ObservableCollection<DevicePropertyOption>();

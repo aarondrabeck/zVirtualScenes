@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("Groups", Schema = "ZVS")]
-    public partial class Group : INotifyPropertyChanged
+    public partial class Group : INotifyPropertyChanged, IIdentity
     {
         public Group()
         {
             this.Devices = new ObservableCollection<Device>();
         }
-        public int GroupId {get; set; }
+        public int Id {get; set; }
 
         public virtual ObservableCollection<Device> Devices { get; set; }
         

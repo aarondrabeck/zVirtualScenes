@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
                     {
                         scenes.Add(new
                         {
-                            id = scene.SceneId,
+                            id = scene.Id,
                             name = scene.Name,
                             is_running = scene.isRunning,
                             cmd_count = scene.Commands.Count()
@@ -50,7 +50,7 @@ namespace WebAPI.Controllers
 
                 if (scene != null)
                 {
-                    return Get(scene.SceneId);
+                    return Get(scene.Id);
                 }
             }
             return new { success = false, reason = "Scene not found." };
@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
 
             using (zvsContext context = new zvsContext())
             {
-                Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == id);
+                Scene scene = context.Scenes.FirstOrDefault(s => s.Id == id);
 
                 if (scene != null)
                 {
@@ -77,7 +77,7 @@ namespace WebAPI.Controllers
                     }
                     var s = new
                     {
-                        id = scene.SceneId,
+                        id = scene.Id,
                         name = scene.Name,
                         is_running = scene.isRunning,
                         cmd_count = scene.Commands.Count(),
@@ -97,7 +97,7 @@ namespace WebAPI.Controllers
 
             using (zvsContext context = new zvsContext())
             {
-                Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == id);
+                Scene scene = context.Scenes.FirstOrDefault(s => s.Id == id);
 
                 if (scene != null)
                 {
@@ -121,7 +121,7 @@ namespace WebAPI.Controllers
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(Core);
-                        cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                        cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
                     }
                     return new { success = true, desc = "Scene Started." };
                 }

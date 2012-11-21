@@ -10,9 +10,7 @@ using System.Threading.Tasks;
 
 namespace zvs.Entities
 {
-    public partial class QueuedDeviceTypeCommand : QueuedCommand
+    public partial class QueuedDeviceTypeCommand : QueuedDeviceCommandBase
     {
-        [Required]
-        public virtual Device Device { get; set; }
     }
 }

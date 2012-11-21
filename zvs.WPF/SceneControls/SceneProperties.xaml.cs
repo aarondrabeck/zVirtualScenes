@@ -75,7 +75,7 @@ namespace zvs.WPF.SceneControls
         {
             PropertiesStkPnl.Children.Clear();
 
-            Scene s = context.Scenes.FirstOrDefault(sc => sc.SceneId == SceneID);
+            Scene s = context.Scenes.FirstOrDefault(sc => sc.Id == SceneID);
             if (s != null)
             {
                 #region Scene Properties

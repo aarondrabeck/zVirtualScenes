@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("SceneCommands", Schema = "ZVS")]
-    public partial class SceneCommand
+    public partial class SceneCommand : IIdentity
     {
-        public int SceneCommandId { get; set; }
+        public int Id { get; set; }
 
+        public int StoredCommandId { get; set; }
         private StoredCommand _StoredCommand;
         [Required]
         public virtual StoredCommand StoredCommand
@@ -33,6 +34,7 @@ namespace zvs.Entities
             }
         }
 
+        public int SceneId { get; set; }
         private Scene _Scene;
         [Required]
         public virtual Scene Scene

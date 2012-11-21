@@ -36,6 +36,8 @@
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\ScenesController.cs" />
     <Compile Include="Controllers\zvsControllerBase.cs" />
+    <Compile Include="DTO\DTOFactory.cs" />
+    <Compile Include="EntityReflection.cs" />
     <Compile Include="WebAPIPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -63,6 +65,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.Entity" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>

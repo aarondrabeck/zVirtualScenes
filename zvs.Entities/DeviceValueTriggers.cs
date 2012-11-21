@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DeviceValueTriggers", Schema = "ZVS")]
-    public partial class DeviceValueTrigger : INotifyPropertyChanged
+    public partial class DeviceValueTrigger : INotifyPropertyChanged, IIdentity
     {
-        public int DeviceValueTriggerId { get; set; }
+        public int Id { get; set; }
 
+        public int? StoredCommandId { get; set; }
         private StoredCommand _StoredCommand;
         public virtual StoredCommand StoredCommand
         {
@@ -32,7 +33,8 @@ namespace zvs.Entities
                 }
             }
         }
-        
+
+        // public int DeviceValueId { get; set; }
         private DeviceValue _DeviceValue;
         public virtual DeviceValue DeviceValue
         {

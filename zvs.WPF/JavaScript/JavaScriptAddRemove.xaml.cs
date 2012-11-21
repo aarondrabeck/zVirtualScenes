@@ -127,13 +127,13 @@ namespace zvs.WPF.JavaScript
                 MessageBox.Show("Are you sure you want to delete the '" + jsCommand.Name + "' command?",
                                 "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                foreach (QueuedCommand qc in context.QueuedCommands.Where(o => o.Command.CommandId == jsCommand.CommandId))
+                foreach (QueuedCommand qc in context.QueuedCommands.Where(o => o.Command.Id == jsCommand.Id))
                 {
                     context.QueuedCommands.Local.Remove(qc);
                 }
                 context.SaveChanges();
 
-                foreach (StoredCommand sc in context.StoredCommands.Where(o => o.Command.CommandId == jsCommand.CommandId).ToList())
+                foreach (StoredCommand sc in context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToList())
                 {
                     StoredCommand.RemoveDependencies(context, sc);
                 }

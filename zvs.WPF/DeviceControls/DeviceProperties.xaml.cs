@@ -48,7 +48,7 @@ namespace zvs.WPF.DeviceControls
         {
             PropertiesStkPnl.Children.Clear();
 
-            Device d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
+            Device d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
             if (d != null)
             {
                 #region Device Properties

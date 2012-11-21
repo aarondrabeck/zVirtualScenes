@@ -223,7 +223,7 @@ namespace LightSwitchPlugin
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
+                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.Id == args.DeviceValueId);
                     if (dv != null)
                     {
                         if (dv.Name == "Basic")
@@ -518,7 +518,7 @@ namespace LightSwitchPlugin
                                             int groupId = int.TryParse(values[1], out groupId) ? groupId : 0;
                                             string cmdUniqId = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
 
-                                            Group g = context.Groups.FirstOrDefault(o => o.GroupId == groupId);
+                                            Group g = context.Groups.FirstOrDefault(o => o.Id == groupId);
                                             if (g != null)
                                             {
                                                 BuiltinCommand zvs_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqId);
@@ -529,7 +529,7 @@ namespace LightSwitchPlugin
                                                     BroadcastMessage("MSG~" + result + Environment.NewLine);
 
                                                     CommandProcessor cp = new CommandProcessor(Core);
-                                                    cp.RunBuiltinCommand(context, zvs_cmd, g.GroupId.ToString());
+                                                    cp.RunBuiltinCommand(context, zvs_cmd, g.Id.ToString());
                                                 }
                                             }
 
@@ -596,7 +596,7 @@ namespace LightSwitchPlugin
                     bool.TryParse(ScenePropertyValue.GetPropertyValue(context, scene, "SHOWSCENEINLSLIST"), out show);
 
                     if (show)
-                        SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.Name + "~" + scene.SceneId + Environment.NewLine);
+                        SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.Name + "~" + scene.Id + Environment.NewLine);
                 }
             }
         }
@@ -607,7 +607,7 @@ namespace LightSwitchPlugin
             {
                 foreach (Group g in context.Groups)
                 {
-                    SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.Name + "~" + g.GroupId + Environment.NewLine);
+                    SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.Name + "~" + g.Id + Environment.NewLine);
                 }
             }
         }
@@ -647,13 +647,13 @@ namespace LightSwitchPlugin
             switch (d.Type.UniqueIdentifier)
             {
                 case "SWITCH":
-                    return d.Name + "~" + d.DeviceId + "~" + (d.CurrentLevelInt > 0 ? "255" : "0") + "~" + "BinarySwitch";
+                    return d.Name + "~" + d.Id + "~" + (d.CurrentLevelInt > 0 ? "255" : "0") + "~" + "BinarySwitch";
                 case "DIMMER":
-                    return d.Name + "~" + d.DeviceId + "~" + (int)d.CurrentLevelInt + "~" + "MultiLevelSwitch"; //careful lightswitch can only handle ints
+                    return d.Name + "~" + d.Id + "~" + (int)d.CurrentLevelInt + "~" + "MultiLevelSwitch"; //careful lightswitch can only handle ints
                 case "THERMOSTAT":
-                    return d.Name + "~" + d.DeviceId + "~" + (int)d.CurrentLevelInt + "~" + "Thermostat"; //careful lightswitch can only handle ints
+                    return d.Name + "~" + d.Id + "~" + (int)d.CurrentLevelInt + "~" + "Thermostat"; //careful lightswitch can only handle ints
                 case "SENSOR":
-                    return d.Name + "~" + d.DeviceId + "~" + (int)d.CurrentLevelInt + "~" + "Sensor"; //careful lightswitch can only handle ints
+                    return d.Name + "~" + d.Id + "~" + (int)d.CurrentLevelInt + "~" + "Sensor"; //careful lightswitch can only handle ints
             }
             return string.Empty;
         }
@@ -683,7 +683,7 @@ namespace LightSwitchPlugin
         {
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(o => o.DeviceId == device_id);
+                Device d = context.Devices.FirstOrDefault(o => o.Id == device_id);
 
                 if (d != null)
                 {
@@ -776,7 +776,7 @@ namespace LightSwitchPlugin
         {
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
+                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceID);
                 if (d != null && d.Type.UniqueIdentifier.Equals("THERMOSTAT"))
                 {
                     string plugin = d.Type.Plugin.UniqueIdentifier;
@@ -820,7 +820,7 @@ namespace LightSwitchPlugin
             //PLUGINNAME-0 -->CmdName,Arg 
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
+                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceID);
                 if (d != null && d.Type.UniqueIdentifier.Equals("THERMOSTAT"))
                 {
                     string plugin = d.Type.Plugin.UniqueIdentifier;

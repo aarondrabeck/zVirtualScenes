@@ -62,7 +62,7 @@ namespace zvs.WPF
         {
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
+                Device d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
 
                 if (d == null)
                     this.Close();

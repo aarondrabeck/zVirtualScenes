@@ -11,13 +11,17 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DevicePropertyValues", Schema = "ZVS")]
-    public partial class DevicePropertyValue : INotifyPropertyChanged
+    public partial class DevicePropertyValue : INotifyPropertyChanged, IIdentity
     {
-        public int DevicePropertyValueId { get; set; }
+        public int Id { get; set; }
 
+        
+        public int DeviceId { get; set; }
         [Required]
         public virtual Device Device { get; set; }
 
+        
+        public int DevicePropertyId { get; set; }
         [Required]
         public virtual DeviceProperty DeivceProperty { get; set; }
 
@@ -50,7 +54,7 @@ namespace zvs.Entities
 
         public static string GetDevicePropertyValue(zvsContext context, Device device, string SettingName)
         {
-            Device d2 = context.Devices.FirstOrDefault(o => o.DeviceId == device.DeviceId);
+            Device d2 = context.Devices.FirstOrDefault(o => o.Id == device.Id);
             if (d2 == null)
                 return string.Empty;
 

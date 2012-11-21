@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("ScenePropertyOptions", Schema = "ZVS")]
-    public partial class ScenePropertyOption : BaseOption
+    public partial class ScenePropertyOption : BaseOption, IIdentity
     {
-        public int ScenePropertyOptionId { get; set; }
+        public int Id { get; set; }
 
+        public int ScenePropertyId { get; set; }
         public virtual SceneProperty SceneProperty { get; set; }
     }
 }

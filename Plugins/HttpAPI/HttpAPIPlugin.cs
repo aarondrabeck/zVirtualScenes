@@ -547,7 +547,7 @@ namespace HttpAPI
                         {
                             var device = new
                             {
-                                id = d.DeviceId,
+                                id = d.Id,
                                 name = d.Name,
                                 on_off = d.CurrentLevelInt == 0 ? "OFF" : "ON",
                                 level = d.CurrentLevelInt,
@@ -571,7 +571,7 @@ namespace HttpAPI
                 {
                     using (zvsContext context = new zvsContext())
                     {
-                        Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
+                        Device d = context.Devices.FirstOrDefault(o => o.Id == id);
 
                         if (d != null)
                         {
@@ -593,7 +593,7 @@ namespace HttpAPI
 
                             var details = new
                             {
-                                id = d.DeviceId,
+                                id = d.Id,
                                 name = d.Name,
                                 on_off = on_off,
                                 level = d.CurrentLevelInt,
@@ -627,7 +627,7 @@ namespace HttpAPI
                 {
                     using (zvsContext context = new zvsContext())
                     {
-                        Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
+                        Device d = context.Devices.FirstOrDefault(o => o.Id == id);
 
                         if (d != null)
                         {
@@ -643,7 +643,7 @@ namespace HttpAPI
                                     read_only = v.isReadOnly,
                                     label_name = v.Name,
                                     type = v.ValueType,
-                                    id = v.DeviceValueId
+                                    id = v.Id
                                 });
                             }
 
@@ -670,7 +670,7 @@ namespace HttpAPI
                         {
                             scenes.Add(new
                              {
-                                 id = scene.SceneId,
+                                 id = scene.Id,
                                  name = scene.Name,
                                  is_running = scene.isRunning,
                                  cmd_count = scene.Commands.Count()
@@ -689,7 +689,7 @@ namespace HttpAPI
 
                 using (zvsContext context = new zvsContext())
                 {
-                    Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == sID);
+                    Scene scene = context.Scenes.FirstOrDefault(s => s.Id == sID);
 
                     if (scene != null)
                     {
@@ -705,7 +705,7 @@ namespace HttpAPI
                         }
                         var s = new
                         {
-                            id = scene.SceneId,
+                            id = scene.Id,
                             name = scene.Name,
                             is_running = scene.isRunning,
                             cmd_count = scene.Commands.Count(),
@@ -731,7 +731,7 @@ namespace HttpAPI
 
                 using (zvsContext context = new zvsContext())
                 {
-                    Scene scene = context.Scenes.FirstOrDefault(s => s.SceneId == sID);
+                    Scene scene = context.Scenes.FirstOrDefault(s => s.Id == sID);
 
                     if (scene != null)
                     {
@@ -766,7 +766,7 @@ namespace HttpAPI
                     var q0 = from g in db.Groups
                              select new
                              {
-                                 id = g.GroupId,
+                                 id = g.Id,
                                  name = g.Name,
                                  count = g.Devices.Count()
                              };
@@ -783,7 +783,7 @@ namespace HttpAPI
 
                 using (zvsContext db = new zvsContext())
                 {
-                    Group group = db.Groups.FirstOrDefault(g => g.GroupId == gID);
+                    Group group = db.Groups.FirstOrDefault(g => g.Id == gID);
 
                     if (group != null)
                     {
@@ -792,14 +792,14 @@ namespace HttpAPI
                         {
                             group_devices.Add(new
                             {
-                                id = gd.DeviceId,
+                                id = gd.Id,
                                 name = gd.Name,
                                 type = gd.Type.Name
                             });
                         }
                         var g = new
                         {
-                            id = group.GroupId,
+                            id = group.Id,
                             name = group.Name,
                             devices = group_devices.ToArray()
                         };
@@ -819,7 +819,7 @@ namespace HttpAPI
                 {
                     using (zvsContext db = new zvsContext())
                     {
-                        Device d = db.Devices.FirstOrDefault(o => o.DeviceId == id);
+                        Device d = db.Devices.FirstOrDefault(o => o.Id == id);
                         if (d != null)
                         {
                             List<object> DeviceCommand = new List<object>();
@@ -827,7 +827,7 @@ namespace HttpAPI
                             {
                                 DeviceCommand.Add(new
                                 {
-                                    id = cmd.CommandId,
+                                    id = cmd.Id,
                                     type = "device",
                                     friendlyname = cmd.Name,
                                     helptext = cmd.Help,
@@ -839,7 +839,7 @@ namespace HttpAPI
                             {
                                 DeviceCommand.Add(new
                                 {
-                                    id = cmd.CommandId,
+                                    id = cmd.Id,
                                     type = "device_type",
                                     friendlyname = cmd.Name,
                                     helptext = cmd.Help,
@@ -871,7 +871,7 @@ namespace HttpAPI
                 {
                     using (zvsContext context = new zvsContext())
                     {
-                        Device d = context.Devices.FirstOrDefault(o => o.DeviceId == id);
+                        Device d = context.Devices.FirstOrDefault(o => o.Id == id);
 
                         if (d != null)
                         {
@@ -891,7 +891,7 @@ namespace HttpAPI
                                         else if (!string.IsNullOrEmpty(cmdUnqId))
                                             cmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUnqId));
                                         else if (c_id > 0)
-                                            cmd = d.Commands.FirstOrDefault(c => c.CommandId == c_id);
+                                            cmd = d.Commands.FirstOrDefault(c => c.Id == c_id);
                                         if (cmd != null)
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
@@ -911,7 +911,7 @@ namespace HttpAPI
                                         else if (!string.IsNullOrEmpty(cmdUnqId))
                                             cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUnqId));
                                         else if (c_id > 0)
-                                            cmd = d.Type.Commands.FirstOrDefault(c => c.CommandId == c_id);
+                                            cmd = d.Type.Commands.FirstOrDefault(c => c.Id == c_id);
 
                                         if (cmd != null)
                                         {
@@ -948,7 +948,7 @@ namespace HttpAPI
                     {
                         bi_commands.Add(new
                         {
-                            id = cmd.CommandId,
+                            id = cmd.Id,
                             friendlyname = cmd.Name,
                             helptext = cmd.Help,
                             name = cmd.UniqueIdentifier
@@ -977,7 +977,7 @@ namespace HttpAPI
                     else if (!string.IsNullOrEmpty(cmdUniqId))
                         cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUniqId));
                     else
-                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.CommandId == id);
+                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.Id == id);
 
                     if (cmd != null)
                     {

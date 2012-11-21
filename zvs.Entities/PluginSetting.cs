@@ -11,15 +11,16 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("PluginSettings", Schema = "ZVS")]
-    public partial class PluginSetting : BaseValue
+    public partial class PluginSetting : BaseValue, IIdentity
     {
-        public int PluginSettingId { get; set; }
+        public int Id { get; set; }
 
         public PluginSetting()
         {
             this.Options = new ObservableCollection<PluginSettingOption>();
         }
 
+        public int PluginId { get; set; }
         public virtual Plugin Plugin { get; set; }
         public virtual ObservableCollection<PluginSettingOption> Options { get; set; }
         

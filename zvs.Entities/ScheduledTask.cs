@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("ScheduledTasks", Schema = "ZVS")]
-    public partial class ScheduledTask : INotifyPropertyChanged
+    public partial class ScheduledTask : INotifyPropertyChanged, IIdentity
     {
-        public int ScheduledTaskId { get; set; }
+        public int Id { get; set; }
 
+        public int StoredCommandId { get; set; }
         private StoredCommand _StoredCommand;
         public virtual StoredCommand StoredCommand
         {

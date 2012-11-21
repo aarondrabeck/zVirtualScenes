@@ -106,7 +106,7 @@ namespace zvs.Processor
         {
             worker.DoWork += (sender, args) =>
             {
-                _scene = context.Scenes.FirstOrDefault(o => o.SceneId == sceneId);
+                _scene = context.Scenes.FirstOrDefault(o => o.Id == sceneId);
 
                 if (_scene == null)
                 {
@@ -115,18 +115,18 @@ namespace zvs.Processor
                 }
 
 
-                ReportBegin(new onSceneRunEventArgs(_scene.SceneId, false, "Scene '" + _scene.Name + "' started."));
+                ReportBegin(new onSceneRunEventArgs(_scene.Id, false, "Scene '" + _scene.Name + "' started."));
 
 
                 if (_scene.isRunning)
                 {
-                    ReportEnd(new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it is already running!"));
+                    ReportEnd(new onSceneRunEventArgs(_scene.Id, true, "Failed to run scene '" + _scene.Name + "' because it is already running!"));
                 }
                 else
                 {
                     if (_scene.Commands.Count < 1)
                     {
-                        ReportEnd(new onSceneRunEventArgs(_scene.SceneId, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!"));
+                        ReportEnd(new onSceneRunEventArgs(_scene.Id, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!"));
 
                         return;
                     }
@@ -174,7 +174,7 @@ namespace zvs.Processor
                 _scene.isRunning = false;
                 context.SaveChanges();
 
-                ReportEnd(new onSceneRunEventArgs(_scene.SceneId, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors)));
+                ReportEnd(new onSceneRunEventArgs(_scene.Id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors)));
             }
         }
         

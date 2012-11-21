@@ -76,13 +76,13 @@ namespace zvs.WPF.Commands
                     {
                         if (StoredCommand.Command is DeviceCommand)
                         {
-                            DeviceCommand cmd = Context.DeviceCommands.FirstOrDefault(o => o.CommandId == StoredCommand.Command.CommandId);
+                            DeviceCommand cmd = Context.DeviceCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
                             if (cmd != null)
                                 DeviceCmdsCmboBox.SelectedItem = cmd;
                         }
                         if (StoredCommand.Command is DeviceTypeCommand)
                         {
-                            DeviceTypeCommand cmd = Context.DeviceTypeCommands.FirstOrDefault(o => o.CommandId == StoredCommand.Command.CommandId);
+                            DeviceTypeCommand cmd = Context.DeviceTypeCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
                             if (cmd != null)
                                 DeviceCmdsCmboBox.SelectedItem = cmd;
                         }
@@ -148,11 +148,11 @@ namespace zvs.WPF.Commands
                         int deviceID = 0;
                         if (int.TryParse(StoredCommand.Argument, out deviceID))
                         {
-                            Device d = Context.Devices.FirstOrDefault(o => o.DeviceId == deviceID);
+                            Device d = Context.Devices.FirstOrDefault(o => o.Id == deviceID);
                             if (d != null)
                             {
                                 default_value = d.Name;
-                                SelectedBuiltinArg = d.DeviceId.ToString();
+                                SelectedBuiltinArg = d.Id.ToString();
                             }
                         }
 
@@ -163,7 +163,7 @@ namespace zvs.WPF.Commands
                             if (d != null)
                             {
                                 default_value = d.Name;
-                                SelectedBuiltinArg = d.DeviceId.ToString();
+                                SelectedBuiltinArg = d.Id.ToString();
                             }
                         }
 
@@ -175,7 +175,7 @@ namespace zvs.WPF.Commands
                             {
                                 Device d = Context.Devices.FirstOrDefault(o => o.Name == value);
                                 if (d != null)
-                                    SelectedBuiltinArg = d.DeviceId.ToString();
+                                    SelectedBuiltinArg = d.Id.ToString();
                             }, icon);
                         BuiltinArgSckPnl.Children.Add(control);
                         break;
@@ -189,11 +189,11 @@ namespace zvs.WPF.Commands
                         int groupID = 0;
                         if (int.TryParse(StoredCommand.Argument, out groupID))
                         {
-                            Group g = Context.Groups.FirstOrDefault(o => o.GroupId == groupID);
+                            Group g = Context.Groups.FirstOrDefault(o => o.Id == groupID);
                             if (g != null)
                             {
                                 default_value = g.Name;
-                                SelectedBuiltinArg = g.GroupId.ToString();
+                                SelectedBuiltinArg = g.Id.ToString();
                             }
                         }
 
@@ -204,7 +204,7 @@ namespace zvs.WPF.Commands
                             if (g != null)
                             {
                                 default_value = g.Name;
-                                SelectedBuiltinArg = g.GroupId.ToString();
+                                SelectedBuiltinArg = g.Id.ToString();
                             }
                         }
 
@@ -216,7 +216,7 @@ namespace zvs.WPF.Commands
                             {
                                 Group g = Context.Groups.FirstOrDefault(o => o.Name == value);
                                 if (g != null)
-                                    SelectedBuiltinArg = g.GroupId.ToString();
+                                    SelectedBuiltinArg = g.Id.ToString();
                             }, icon);
                         BuiltinArgSckPnl.Children.Add(control);
                     }
@@ -229,11 +229,11 @@ namespace zvs.WPF.Commands
                         int sceneID = 0;
                         if (int.TryParse(StoredCommand.Argument, out sceneID))
                         {
-                            Scene s = Context.Scenes.FirstOrDefault(o => o.SceneId == sceneID);
+                            Scene s = Context.Scenes.FirstOrDefault(o => o.Id == sceneID);
                             if (s != null)
                             {
                                 default_value = s.Name;
-                                SelectedBuiltinArg = s.SceneId.ToString();
+                                SelectedBuiltinArg = s.Id.ToString();
                             }
                         }
 
@@ -245,7 +245,7 @@ namespace zvs.WPF.Commands
                             if (s != null)
                             {
                                 default_value = s.Name;
-                                SelectedBuiltinArg = s.SceneId.ToString();
+                                SelectedBuiltinArg = s.Id.ToString();
                             }
                         }
 
@@ -257,7 +257,7 @@ namespace zvs.WPF.Commands
                             {
                                 Scene s = Context.Scenes.FirstOrDefault(o => o.Name == value);
                                 if (s != null)
-                                    SelectedBuiltinArg = s.SceneId.ToString();
+                                    SelectedBuiltinArg = s.Id.ToString();
                             }, icon);
                         BuiltinArgSckPnl.Children.Add(control);
                         break;

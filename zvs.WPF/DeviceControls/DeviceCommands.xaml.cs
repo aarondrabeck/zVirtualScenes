@@ -53,7 +53,7 @@ namespace zvs.WPF.DeviceControls
             DeviceCommandsStkPnl.Children.Clear();
             TypeCommandsStkPnl.Children.Clear();
 
-            Device d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
+            Device d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
             if (d != null)
             {
                 #region Device Commands

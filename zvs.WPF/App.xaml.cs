@@ -93,7 +93,7 @@ namespace zvs.WPF
                     {
                         Scene scene = null;
                         if (int.TryParse(SearchQuery, out SceneId))
-                            scene = context.Scenes.FirstOrDefault(s => s.SceneId == SceneId);
+                            scene = context.Scenes.FirstOrDefault(s => s.Id == SceneId);
                         else if (SearchQuery != null)
                             scene = context.Scenes.FirstOrDefault(s => s.Name.ToLower().Equals(SearchQuery));
 
@@ -103,7 +103,7 @@ namespace zvs.WPF
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(zvsCore);
-                                cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                                cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
                             }
                         }
                         else

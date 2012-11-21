@@ -39,10 +39,10 @@ namespace zvs.WPF.DeviceControls
             context = new zvsContext();
             zvsContext.onDeviceValueChanged += zvsContext_onDeviceValueChanged;
 
-            d = context.Devices.FirstOrDefault(dv => dv.DeviceId == DeviceID);
+            d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
             if (d != null)
             {
-                d.Values.OrderBy(dv => dv.DeviceValueId).ToList();
+                d.Values.OrderBy(dv => dv.Id).ToList();
 
                 // Do not load your data at design time.
                 if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
@@ -89,7 +89,7 @@ namespace zvs.WPF.DeviceControls
                 if (cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    cp.RunBuiltinCommand(context, cmd, d.DeviceId.ToString());
+                    cp.RunBuiltinCommand(context, cmd, d.Id.ToString());
                 }
             }
         }

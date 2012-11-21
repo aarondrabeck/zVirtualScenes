@@ -262,7 +262,7 @@ namespace JabberPlugin
                 {
                     using (zvsContext context = new zvsContext())
                     {
-                        DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
+                        DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.Id == args.DeviceValueId);
                         if (dv != null)
                         {
                             string[] objTypeValuespairs = GetSettingValue("JABBERNOTIFICATIONS", context).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);

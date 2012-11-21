@@ -10,10 +10,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("QueuedCommands", Schema = "ZVS")]
-    public class QueuedCommand : INotifyPropertyChanged
+    public class QueuedCommand : INotifyPropertyChanged, IIdentity
     {
-        public int QueuedCommandId { get; set; }
+        public int Id { get; set; }
 
+        public int CommandId { get; set; }
         public virtual Command Command { get; set; }
 
         private string _Argument;

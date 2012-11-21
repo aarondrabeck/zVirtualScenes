@@ -51,6 +51,9 @@
     <Compile Include="Command.cs" />
     <Compile Include="BuiltinCommand.cs" />
     <Compile Include="CommandOption.cs" />
+    <Compile Include="ConfidentialDataAttribute.cs" />
+    <Compile Include="QueuedDeviceCommandBase.cs" />
+    <Compile Include="IIdentity.cs" />
     <Compile Include="StoredCommand.cs" />
     <Compile Include="QueuedJavaScriptCommand.cs" />
     <Compile Include="JavaScriptCommand.cs" />

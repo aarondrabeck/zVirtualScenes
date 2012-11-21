@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("Plugins", Schema = "ZVS")]
-    public partial class Plugin : INotifyPropertyChanged
+    public partial class Plugin : INotifyPropertyChanged, IIdentity
     {
         [Key]
-        public int PluginId { get; set; }
+        public int Id { get; set; }
 
         public Plugin()
         {

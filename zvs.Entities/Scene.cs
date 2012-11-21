@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("Scenes", Schema = "ZVS")]
-    public partial class Scene : INotifyPropertyChanged
+    public partial class Scene : INotifyPropertyChanged, IIdentity
     {
-        public int SceneId { get; set; }
+        public int Id { get; set; }
 
         public virtual ObservableCollection<SceneCommand> Commands { get; set; }
         public virtual ObservableCollection<ScenePropertyValue> PropertyValues { get; set; }

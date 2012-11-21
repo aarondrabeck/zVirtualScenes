@@ -11,13 +11,15 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("ScenePropertyValues", Schema = "ZVS")]
-    public partial class ScenePropertyValue : INotifyPropertyChanged
+    public partial class ScenePropertyValue : INotifyPropertyChanged, IIdentity
     {
-        public int ScenePropertyValueId { get; set; }
+        public int Id { get; set; }
 
+        public int SceneId { get; set; }
         [Required]
         public virtual Scene Scene { get; set; }
 
+        public int ScenePropertyId { get; set; }
         [Required]
         public virtual SceneProperty SceneProperty { get; set; }
 
@@ -56,7 +58,7 @@ namespace zvs.Entities
             if (property == null)
                 return string.Empty;
 
-            Scene s2 = Context.Scenes.FirstOrDefault(o => o.SceneId == scene.SceneId);
+            Scene s2 = Context.Scenes.FirstOrDefault(o => o.Id == scene.Id);
 
             if (s2 == null)
                 return string.Empty;

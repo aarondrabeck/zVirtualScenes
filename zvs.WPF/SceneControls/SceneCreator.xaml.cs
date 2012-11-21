@@ -249,7 +249,7 @@ namespace zvs.WPF.SceneControls
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                        cp.RunBuiltinCommand(context, cmd, scene.SceneId.ToString());
+                        cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
                     }
                 }
             }
@@ -322,7 +322,7 @@ namespace zvs.WPF.SceneControls
 
                         foreach (Device d in devices)
                         {
-                            Device d2 = context.Devices.FirstOrDefault(o => o.DeviceId == d.DeviceId);
+                            Device d2 = context.Devices.FirstOrDefault(o => o.Id == d.Id);
                             if (d2 == null)
                                 continue;
 
@@ -462,7 +462,7 @@ namespace zvs.WPF.SceneControls
                 {
                     foreach (SceneCommand scene_command in SelectedItemsCopy)
                     {
-                        SceneCommand d = context.SceneCommands.FirstOrDefault(o => o.SceneCommandId == scene_command.SceneCommandId);
+                        SceneCommand d = context.SceneCommands.FirstOrDefault(o => o.Id == scene_command.Id);
                         if (d != null)
                             context.SceneCommands.Local.Remove(d);
                     }
@@ -483,7 +483,7 @@ namespace zvs.WPF.SceneControls
                     {
                         foreach (SceneCommand item in SceneCmdsGrid.Items)
                         {
-                            if (item.SceneCommandId == cmd.SceneCommandId)
+                            if (item.Id == cmd.Id)
                                 cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
                         }
                     }
@@ -627,7 +627,7 @@ namespace zvs.WPF.SceneControls
                 var s = (Scene)obj;
                 if (s != null)
                 {
-                    ShowSceneProperties(s.SceneId, s.Name);
+                    ShowSceneProperties(s.Id, s.Name);
                 }
             }
         }

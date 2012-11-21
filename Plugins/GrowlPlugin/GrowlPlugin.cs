@@ -58,7 +58,7 @@ namespace GrowlPlugin
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.DeviceValueId == args.DeviceValueId);
+                    DeviceValue dv = context.DeviceValues.FirstOrDefault(v => v.Id == args.DeviceValueId);
                     if (dv != null)
                     {
 

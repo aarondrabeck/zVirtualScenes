@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("CommandOptions", Schema = "ZVS")]
-    public partial class CommandOption : BaseOption
+    public partial class CommandOption : BaseOption, IIdentity
     {
-        public int CommandOptionId { get; set; }
-       
+        public int Id { get; set; }
+
+        public int CommandId { get; set; }
         public virtual Command Command { get; set; }
     }
 }

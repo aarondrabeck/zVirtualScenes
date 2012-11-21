@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace zvs.Entities
 {
     [Table("DbInfo", Schema = "ZVS")]
-    public partial class DbInfo : INotifyPropertyChanged
+    public partial class DbInfo : INotifyPropertyChanged, IIdentity
     {
-        public int DbInfoId { get; set; }
+        public int Id { get; set; }
        
         private string _UniqueIdentifier;
         [StringLength(50)]
