@@ -1,0 +1,5 @@
+﻿Install-package EntityFramework
+Install-Package Microsoft.Data.OData
+Install-Package Microsoft.AspNet.WebApi
+Install-Package Microsoft.AspNet.WebApi.SelfHost
+
