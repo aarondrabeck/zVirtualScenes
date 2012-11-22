@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Data.Entity.Design.PluralizationServices;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web;
 
 namespace WebAPI
@@ -73,5 +75,33 @@ namespace WebAPI
             return (type.IsPrimitive && type != typeof(IntPtr) && type != typeof(UIntPtr))
                   || BuiltInTypes.Contains(type);
         }
+       
+
+        public static HttpResponseMessage CreateResponse(this HttpRequestMessage request, ResponseStatus responseStatus, HttpStatusCode statusCode, string message, object data = null, Dictionary<string, object> additionalKeyValues = null)
+        {
+            Dictionary<string, object> ResponseDictionary = new Dictionary<string, object>();
+            ResponseDictionary.Add("Error", responseStatus == ResponseStatus.Error ? true : false);
+            ResponseDictionary.Add("Message", message);
+            ResponseDictionary.Add("StatusCode", (int)statusCode);
+            ResponseDictionary.Add("StatusDescription", statusCode);
+
+            if (additionalKeyValues != null)
+                foreach (KeyValuePair<string, object> entry in additionalKeyValues)
+                    if (!ResponseDictionary.ContainsKey(entry.Key))
+                        ResponseDictionary.Add(entry.Key, entry.Value);
+
+            if (data != null)
+                ResponseDictionary.Add("Data", data);
+
+            return request.CreateResponse(statusCode, ResponseDictionary);
+        }
+    }
+}
+namespace System.Net.Http
+{
+    public enum ResponseStatus
+    {
+        Error,
+        Success
     }
 }

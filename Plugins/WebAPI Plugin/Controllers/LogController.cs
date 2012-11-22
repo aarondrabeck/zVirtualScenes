@@ -7,19 +7,19 @@ using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers
 {
-    public class LogController : zvsControllerBase
-    {
-        ILog log = LogManager.GetLogger<LogController>();
+    //public class LogController : zvsControllerBase
+    //{
+    //    ILog log = LogManager.GetLogger<LogController>();
 
-        public IEnumerable<zvs.Processor.Logging.LogItem> Get()
-        {
-            base.Log(log);
-            return EventedLog.Items;
-        }
-        public void Delete()
-        {
-            EventedLog.Clear();
-            base.Log(log);
-        }
-    }
+    //    public IEnumerable<zvs.Processor.Logging.LogItem> Get()
+    //    {
+    //        base.Log(log);
+    //        return EventedLog.Items;
+    //    }
+    //    public void Delete()
+    //    {
+    //        EventedLog.Clear();
+    //        base.Log(log);
+    //    }
+    //}
 }

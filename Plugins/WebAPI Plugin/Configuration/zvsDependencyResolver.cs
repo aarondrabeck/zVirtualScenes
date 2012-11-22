@@ -16,6 +16,7 @@ namespace WebAPI.Configuration
             return this;
         }
         public zvs.Processor.Core Core { get; set; }
+
         public object GetService(Type serviceType)
         {
             if (serviceType == typeof(zvs.Processor.Core))
@@ -24,15 +25,15 @@ namespace WebAPI.Configuration
             }
             else
             {
-                if (serviceType == typeof(DevicesController) || serviceType == typeof(ScenesController))
-                {
-                    zvsControllerBase c = (Activator.CreateInstance(serviceType) as zvsControllerBase);
-                    if (c != null)
-                    {
-                        c.Core = Core;
-                        return c;
-                    }
-                }
+                //if (serviceType == typeof(DevicesController) || serviceType == typeof(ScenesController))
+                //{
+                //    zvsControllerBase c = (Activator.CreateInstance(serviceType) as zvsControllerBase);
+                //    if (c != null)
+                //    {
+                //        c.Core = Core;
+                //        return c;
+                //    }
+                //}
             }
             if(!serviceType.IsAbstract) return Activator.CreateInstance(serviceType);
             return null;

@@ -665,7 +665,13 @@ namespace OpenZWavePlugin
                         node.AddValue(value);
 
                         string data = "";
-                        bool b = m_manager.GetValueAsString(vid, out data);
+                        //TODO: INVESTIGATE
+                        bool b = false;
+                        try
+                        {
+                            b = m_manager.GetValueAsString(vid, out data);
+                        }
+                        catch { }
 
                         using (zvsContext Context = new zvsContext())
                         {

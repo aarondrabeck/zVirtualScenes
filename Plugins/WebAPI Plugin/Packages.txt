@@ -1,5 +1,4 @@
 ﻿Install-package EntityFramework
-Install-Package Microsoft.Data.OData
-Install-Package Microsoft.AspNet.WebApi
+install-package Microsoft.AspNet.WebApi.OData -IncludePrerelease -source http://www.myget.org/F/aspnetwebstacknightly/
 Install-Package Microsoft.AspNet.WebApi.SelfHost
 
