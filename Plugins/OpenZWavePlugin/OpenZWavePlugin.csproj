@@ -38,6 +38,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Data.OData, Version=5.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="OpenZWaveDotNet">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\OpenZWaveDotNet.dll</HintPath>
@@ -109,7 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_options.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
