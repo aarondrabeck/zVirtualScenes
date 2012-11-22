@@ -15,36 +15,7 @@ namespace WebAPI.Controllers
     public class DevicesController : zvsControllerBase<Device>
     {
         ILog log = LogManager.GetLogger<DevicesController>();
-        //public object Get()
-        //{
-        //    base.Log(log);
-        //    List<object> devices = new List<object>();
-        //    using (zvsContext context = new zvsContext())
-        //    {
-        //        foreach (Device d in context.Devices.OrderBy(o => o.Name))
-        //        {
-        //            bool show = true;
-        //            bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
-
-        //            if (show)
-        //            {
-        //                var device = new
-        //                {
-        //                    id = d.Id,
-        //                    name = d.Name,
-        //                    on_off = d.CurrentLevelInt == 0 ? "OFF" : "ON",
-        //                    level = d.CurrentLevelInt,
-        //                    level_txt = d.CurrentLevelText,
-        //                    type = d.Type.UniqueIdentifier,
-        //                    plugin_name = d.Type.Plugin.UniqueIdentifier
-        //                };
-        //                devices.Add(device);
-        //            }
-        //        }
-        //    }
-        //    return new { success = true, devices = devices.ToArray() };
-        //}
-
+       
         protected override DbSet DBSet
         {
             get { return db.Devices; }
@@ -55,7 +26,16 @@ namespace WebAPI.Controllers
         [DTOQueryable]
         public new IQueryable<Device> Get()
         {
-            return base.Get();
+            List<Device> devices = new List<Device>();
+            foreach (Device d in db.Devices.OrderBy(o => o.Name))
+            {
+                bool show = true;
+                bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(db, d, "HTTPAPI_SHOW"), out show);
+
+                if (show) devices.Add(d);
+            }
+            return devices.AsQueryable();
+
         }
 
         [EnableCors]
