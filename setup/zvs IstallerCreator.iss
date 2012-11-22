@@ -111,7 +111,6 @@ Source: "..\bin\release\plugins\GrowlPlugin.dll.config"; DestDir: "{app}\plugins
 
 Source: "..\bin\release\plugins\HttpAPI.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: http
 Source: "..\bin\release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: http 
-Source: "..\bin\release\plugins\htdocs\*"; DestDir: "{app}\plugins\htdocs"; Flags: ignoreversion recursesubdirs ; Components: http
 
 Source: "..\bin\release\plugins\LightSwitchPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: lightswitch
 Source: "..\bin\release\plugins\LightSwitchPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: lightswitch
