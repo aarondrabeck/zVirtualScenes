@@ -32,7 +32,7 @@ namespace WebAPI
         bool _verbose = true;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<zvsPlugin>();
 
-        public WebAPIPlugin() : base("WebAPI", "WebAPI Plug-in", "This plug-in acts as a HTTP server to send respond to JSON AJAX requests using the Web API.") { }
+        public WebAPIPlugin() : base("WebAPI", "WebAPI Plug-in ALPHA 1", "This plug-in acts as a HTTP server to send respond to JSON AJAX requests using the Web API.") { }
 
         public override void Initialize()
         {
