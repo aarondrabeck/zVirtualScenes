@@ -82,6 +82,10 @@ namespace zvs.Entities
                    .WithOptionalPrincipal(a => a.ScheduledTask)
                    .WillCascadeOnDelete();
 
+            modelBuilder.Entity<SceneCommand>()
+                   .HasOptional(s => s.StoredCommand)
+                   .WithOptionalPrincipal(a => a.SceneCommand)
+                   .WillCascadeOnDelete();
            
         }
         public delegate void onEntityChangedventHandler(object sender, onEntityChangedEventArgs args);

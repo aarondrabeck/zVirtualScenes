@@ -15,7 +15,7 @@ namespace zvs.Entities
     {
         public int Id { get; set; }
 
-        public int CommandId { get; set; }
+        public int? CommandId { get; set; }
         public virtual Command Command { get; set; }
     }
 }

@@ -103,6 +103,7 @@ namespace zvs.Processor.Backup
                                         StoredCommand = sc,
                                         SortOrder = backupSceneCMD.Order
                                     });
+                                    ImportedCmdCount++;
                                 }
                             }
                             context.Scenes.Add(s);

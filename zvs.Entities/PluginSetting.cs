@@ -21,8 +21,10 @@ namespace zvs.Entities
         }
 
         public int PluginId { get; set; }
+        [Required]
         public virtual Plugin Plugin { get; set; }
+
         public virtual ObservableCollection<PluginSettingOption> Options { get; set; }
-        
+
     }
 }

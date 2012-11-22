@@ -22,7 +22,9 @@ namespace zvs.Entities
         }
 
         public int PluginId { get; set; }
+        [Required]
         public virtual Plugin Plugin { get; set; }
+
         public virtual ObservableCollection<Device> Devices { get; set; }
         public virtual ObservableCollection<DeviceTypeCommand> Commands { get; set; }
         

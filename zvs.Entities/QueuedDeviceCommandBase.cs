@@ -12,7 +12,7 @@ namespace zvs.Entities
 {
     public partial class QueuedDeviceCommandBase : QueuedCommand
     {
-        public int DeviceId { get; set; }
+        //Cannot have ID here
         public virtual Device Device { get; set; }
     }
 }

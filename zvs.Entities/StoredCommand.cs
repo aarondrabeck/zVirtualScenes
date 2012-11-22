@@ -15,7 +15,7 @@ namespace zvs.Entities
     {
         public int Id { get; set; }
 
-        public int DeviceId { get; set; }
+        public int? DeviceId { get; set; }
         private Device _Device;
         public virtual Device Device
         {
@@ -36,13 +36,23 @@ namespace zvs.Entities
             }
         }
 
-        public int? DeviceValueTriggerId { get; set; }
+        //public int? DeviceValueTriggerId { get; set; }
+        //not sure how or if you can expose the ID here
         public virtual DeviceValueTrigger DeviceValueTrigger { get; set; }
 
-        public int SceneCommandId { get; set; }
+        public int? SceneCommandId
+        {
+            get
+            {
+                if (SceneCommand != null)
+                    return SceneCommand.Id;
+                else
+                    return null;
+            }
+        }
         public virtual SceneCommand SceneCommand { get; set; }
 
-        public int ScheduledTaskId { get; set; }
+        //public int? ScheduledTaskId { get; set; }
         public virtual ScheduledTask ScheduledTask { get; set; }
 
         public int CommandId { get; set; }
@@ -246,8 +256,8 @@ namespace zvs.Entities
                 sc.DeviceValueTrigger = null;
             }
 
-           // if (sc.SceneCommand != null)
-           //     context.SceneCommands.Local.Remove(sc.SceneCommand);
+            // if (sc.SceneCommand != null)
+            //     context.SceneCommands.Local.Remove(sc.SceneCommand);
 
 
 

@@ -23,7 +23,7 @@ namespace zvs.Entities
             this.Groups = new ObservableCollection<Group>();
             this.QueuedDeviceCommands = new ObservableCollection<QueuedDeviceCommand>();
             this.QueuedDeviceTypeCommands = new ObservableCollection<QueuedDeviceTypeCommand>();
-            this.SceneCommands = new ObservableCollection<SceneCommand>();
+            this.StoredCommands = new ObservableCollection<StoredCommand>();
         }
 
         private string _Name;
@@ -123,7 +123,7 @@ namespace zvs.Entities
         public virtual ObservableCollection<DevicePropertyValue> PropertyValues { get; set; }
         public virtual ObservableCollection<DeviceValue> Values { get; set; }
         public virtual ObservableCollection<Group> Groups { get; set; }
-        public virtual ObservableCollection<SceneCommand> SceneCommands { get; set; }
+        public virtual ObservableCollection<StoredCommand> StoredCommands { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyPropertyChanged(string name)

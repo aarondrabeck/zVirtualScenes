@@ -15,7 +15,7 @@ namespace zvs.Entities
     {
         public int Id { get; set; }
 
-        public int StoredCommandId { get; set; }
+        //No actual navigational property here
         private StoredCommand _StoredCommand;
         [Required]
         public virtual StoredCommand StoredCommand

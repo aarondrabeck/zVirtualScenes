@@ -16,6 +16,7 @@ namespace zvs.Entities
         public int Id { get; set; }
 
         public int ScenePropertyId { get; set; }
+        [Required]
         public virtual SceneProperty SceneProperty { get; set; }
     }
 }

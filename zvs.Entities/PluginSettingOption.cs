@@ -16,6 +16,7 @@ namespace zvs.Entities
         public int Id { get; set; }
 
         public int PluginSettingId { get; set; }
+        [Required]
         public virtual PluginSetting Setting { get; set; }
     }
 }

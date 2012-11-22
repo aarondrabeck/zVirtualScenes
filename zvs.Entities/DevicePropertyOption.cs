@@ -15,7 +15,7 @@ namespace zvs.Entities
     {
         public int Id { get; set; }
 
-        public int DevicePropertyId { get; set; }
+        public int? DevicePropertyId { get; set; }
         public virtual DeviceProperty DeviceProperty { get; set; }
     }
 }
