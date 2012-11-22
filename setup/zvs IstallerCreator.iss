@@ -6,7 +6,7 @@
 
 #define MyAppExeName "zVirtualScenes.exe"
 #define MyAppName "zVirtualScenes"
-#define MyAppVersion GetFileVersion(AddBackslash("..\output_release\") + MyAppExeName)
+#define MyAppVersion GetFileVersion(AddBackslash("..\bin\release\") + MyAppExeName)
 #define MyAppPublisher "Nonce Labs"
 
 [Setup]                            
