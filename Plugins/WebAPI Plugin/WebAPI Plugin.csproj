@@ -32,12 +32,17 @@
   <ItemGroup>
     <Compile Include="Configuration\SelfHostConfiguration.cs" />
     <Compile Include="Configuration\zvsDependencyResolver.cs" />
-    <Compile Include="Controllers\DevicesController.cs" />
-    <Compile Include="Controllers\LogController.cs" />
-    <Compile Include="Controllers\ScenesController.cs" />
+    <Compile Include="ContractResolver.cs" />
+    <Compile Include="ControllerNamespacingConstraint.cs" />
+    <Compile Include="Controllers\v2\DevicesController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\v2\LogController.cs" />
+    <Compile Include="Controllers\v2\ScenesController.cs" />
+    <Compile Include="Controllers\zvsAuthenticatedControllerBase.cs" />
     <Compile Include="Controllers\zvsControllerBase.cs" />
     <Compile Include="Cors\CorsPreflightActionSelector.cs" />
     <Compile Include="Cors\EnableCorsAttribute.cs" />
+    <Compile Include="DocumentationAttribute.cs" />
     <Compile Include="DTO\DTOFactory.cs" />
     <Compile Include="EntityReflection.cs" />
     <Compile Include="DTOQueryable.cs" />
@@ -56,6 +61,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\EntityFramework.5.0.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Data.Entity.Design.Extensibility, Version=11.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Data.OData, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Microsoft.Data.OData.5.1.0-rc2\lib\net40\Microsoft.Data.OData.dll</HintPath>
@@ -69,6 +76,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Net.Http" />

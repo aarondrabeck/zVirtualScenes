@@ -59,27 +59,10 @@ namespace WebAPI.DTO
 
                         //_uri
                         innerDictionary.Add("_uri", string.Format("/{0}/{1}/{2}/{3}",
-                            EntityType.NamespaceLastSegment(),
+                            "v2", //TODO: Fix this
                             EntityType.NamePlural(),
                             Entity.Id,
                             pi.Name));
-
-                        #region Counts....
-                        //TODO: FINISH COUNT..right now it is not doing an SQL count, it is retuning set in memory and doing count in memory 
-                        //TODO: Check generic type for typeof(IExirerable).IsAssignableFrom(GenericType)
-
-                        //var PropertyGenericTypeArg = pi.PropertyType.GenericTypeArguments.FirstOrDefault();
-                        ////_active count
-                        //var Count = typeof(Enumerable)
-                        //.GetMethods()
-                        //.Where(o => o.Name == "Count" &&
-                        // o.IsGenericMethod &&
-                        // o.GetParameters().Count() == 1)
-                        //.SingleOrDefault()
-                        //.MakeGenericMethod(new Type[] { PropertyGenericTypeArg })
-                        //.Invoke(null, new object[] { pi.GetValue(Entity) });  //Count is an extension method
-                        //innerDictionary.Add("_active", Count);
-                        #endregion
 
                         dtoDictionary.Add(pi.Name, innerDictionary);
                         continue;
@@ -103,7 +86,7 @@ namespace WebAPI.DTO
                             objectDictionary.Add("_type", NestedComplexObject.GetTypeEntityWrapperDetection().Name);
                             objectDictionary.Add("_uri",
                                 string.Format("/{0}/{1}/{2}",
-                                EntityType.NamespaceLastSegment(),
+                                "v2", //TODO: Fix this //EntityType.NamespaceLastSegment(),
                                 NestedComplexObject.GetTypeEntityWrapperDetection().NamePlural(),
                                 NestedComplexObject.Id));
 
@@ -118,7 +101,10 @@ namespace WebAPI.DTO
             dtoDictionary.Add("_type", Entity.GetTypeEntityWrapperDetection().Name);
 
             //add the base _uri
-            dtoDictionary.Add("_uri", string.Format("/{0}/{1}/{2}", Entity.GetTypeEntityWrapperDetection().NamespaceLastSegment(), Entity.GetTypeEntityWrapperDetection().NamePlural(), Entity.Id));
+            dtoDictionary.Add("_uri", string.Format("/{0}/{1}/{2}",
+                "v2", //TODO: Fix this //Entity.GetTypeEntityWrapperDetection().NamespaceLastSegment(), 
+                Entity.GetTypeEntityWrapperDetection().NamePlural(), 
+                Entity.Id));
 
             return dtoDictionary;
         }

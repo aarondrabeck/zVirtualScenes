@@ -6,16 +6,18 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.OData;
 using WebAPI.Cors;
 using zvs.Entities;
 using zvs.Processor.Logging;
 
-namespace WebAPI.Controllers
+namespace WebAPI.Controllers.v2
 {
+    [Documentation("v2/Devices", 2.1, "All devices.")]
     public class DevicesController : zvsControllerBase<Device>
     {
         ILog log = LogManager.GetLogger<DevicesController>();
-       
+
         protected override DbSet DBSet
         {
             get { return db.Devices; }
@@ -26,6 +28,9 @@ namespace WebAPI.Controllers
         [DTOQueryable]
         public new IQueryable<Device> Get()
         {
+            //Check authorization
+            bool isAuthorized = base.isAuthorized;
+
             List<Device> devices = new List<Device>();
             foreach (Device d in db.Devices.OrderBy(o => o.Name))
             {
@@ -35,7 +40,6 @@ namespace WebAPI.Controllers
                 if (show) devices.Add(d);
             }
             return devices.AsQueryable();
-
         }
 
         [EnableCors]
@@ -44,6 +48,37 @@ namespace WebAPI.Controllers
         {
             return base.GetById(id);
         }
+
+        [EnableCors]
+        [HttpPost]
+        public new HttpResponseMessage Add(Device tEntityPost)
+        {
+            return base.Add(tEntityPost);
+        }
+
+        [EnableCors]
+        [HttpPatch]
+        [HttpPut]
+        public new HttpResponseMessage Update(int id, Delta<Device> tEntityPatch)
+        {
+            return base.Update(id, tEntityPatch);
+        }
+
+        [EnableCors]
+        [HttpDelete]
+        public new HttpResponseMessage Remove(int id)
+        {
+            return base.Remove(id);
+        }
+
+        [EnableCors]
+        [HttpGet]
+        [DTOQueryable]
+        public new IQueryable<object> GetNestedCollections(int parentId, string nestedCollectionName)
+        {
+            return base.GetNestedCollections(parentId, nestedCollectionName);
+        }
+
 
         //public object Get(string name)
         //{

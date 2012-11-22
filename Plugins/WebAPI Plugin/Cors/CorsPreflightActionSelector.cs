@@ -54,6 +54,7 @@ namespace WebAPI.Cors
             }
             catch (HttpResponseException ex)
             {
+                Console.Write(ex);
                 //We can override this to present errors in the LG format
                 throw new HttpResponseException(controllerContext.Request.CreateResponse(ResponseStatus.Error, ex.Response.StatusCode, ex.Response.ReasonPhrase));
             }

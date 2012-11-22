@@ -52,6 +52,7 @@ Name: "core"; Description: "zVirtualScenes Core"; Types: full compact custom; Fl
 Name: "jabber"; Description: "Jabber Plug-in"; Types: full
 Name: "growl"; Description: "Growl Plug-in"; Types: full
 Name: "http"; Description: "HTTP API Plug-in"; Types: full
+Name: "webapi"; Description: "Web API Plug-in"; Types: full
 Name: "lightswitch"; Description: "LightSwitch Server Plug-in"; Types: full
 Name: "noaa"; Description: "NOAA Plug-in"; Types: full
 Name: "openzwave"; Description: "OpenZWave Plug-in"; Types: full compact
@@ -126,11 +127,27 @@ Source: "..\bin\release\plugins\ZeroconfService.dll"; DestDir: "{app}\plugins"; 
 Source: "..\bin\release\plugins\config\*"; DestDir: "{app}\plugins\config"; Flags: ignoreversion recursesubdirs    ; Components: openzwave
 
 Source: "..\bin\release\plugins\SpeechPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: speech
-Source: "..\bi\release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: speech
+Source: "..\bin\release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: speech
                                                                             
 Source: "..\bin\release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: controlthink
 Source: "..\bin\release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: controlthink
 Source: "..\bin\release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: controlthink
+
+
+Source: "..\bin\release\plugins\HttpAPI.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: webapi
+Source: "..\bin\release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.Data.Entity.Design.Extensibility.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.Data.OData.Contrib.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.Data.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Net.Http.Formatting.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.SelfHost.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\WebAPIPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\WebAPIPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

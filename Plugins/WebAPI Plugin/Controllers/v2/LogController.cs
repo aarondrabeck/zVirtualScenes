@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using zvs.Processor.Logging;
 
-namespace WebAPI.Controllers
+namespace WebAPI.Controllers.v2
 {
     //public class LogController : zvsControllerBase
     //{
