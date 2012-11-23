@@ -194,7 +194,7 @@ namespace NOAAPlugin
                 using (zvsContext context = new zvsContext())
                 {
                     Double MinsBetweenTimeSunrise = (_sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
-                    log.InfoFormat("RISE: MinsBetweenTimeSunrise={0}, _sunrise={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunrise, _sunrise, DateTime.Now.TimeOfDay);
+                    log.DebugFormat("RISE: MinsBetweenTimeSunrise={0}, _sunrise={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunrise, _sunrise, DateTime.Now.TimeOfDay);
 
                     if (MinsBetweenTimeSunrise < 1 && MinsBetweenTimeSunrise > 0)
                     {
@@ -219,7 +219,7 @@ namespace NOAAPlugin
 
                     Double MinsBetweenTimeSunset = (_sunset.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
 
-                    log.InfoFormat("SET: MinsBetweenTimeSunset={0}, _sunset={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunset, _sunset, DateTime.Now.TimeOfDay);
+                    log.DebugFormat("SET: MinsBetweenTimeSunset={0}, _sunset={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunset, _sunset, DateTime.Now.TimeOfDay);
 
 
                     if (MinsBetweenTimeSunset < 1 && MinsBetweenTimeSunset > 0)
