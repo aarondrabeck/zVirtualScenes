@@ -21,7 +21,6 @@ namespace WebAPI
     [Export(typeof(zvsPlugin))]
     public class WebAPIPlugin : zvsPlugin
     {
-
         public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
         public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
         public override void Repoll(zvs.Entities.Device device) { }
@@ -76,18 +75,18 @@ namespace WebAPI
 
                 DeviceProperty.AddOrEdit(new DeviceProperty
                 {
-                    UniqueIdentifier = "HTTPAPI_SHOW",
-                    Name = "Show device in HTTP API",
-                    Description = "If enabled this device will show in applications that use the HTTP API",
+                    UniqueIdentifier = "WebAPI_SHOW_DEVICE",
+                    Name = "Show device in Web API",
+                    Description = "If enabled this device will show in applications that use the Web API",
                     ValueType = DataType.BOOL,
                     Value = "true"
                 }, context);
 
                 SceneProperty.AddOrEdit(new SceneProperty
                 {
-                    UniqueIdentifier = "HTTPAPI_SHOW",
-                    Name = "Show in HTTP API Applications",
-                    Description = "If enabled this scene will show in applications that use the HTTP API",
+                    UniqueIdentifier = "WebAPI_SHOW_SCENE",
+                    Name = "Show scene in Web API",
+                    Description = "If enabled this scene will show in applications that use the Web API",
                     Value = "true",
                     ValueType = DataType.BOOL
                 }, context);
@@ -161,7 +160,7 @@ namespace WebAPI
             server = new HttpSelfHostServer(config);
 
             var resolver = new zvsDependencyResolver();
-            resolver.Core = this.Core;
+            resolver.WebAPIPlugin = this;
             config.DependencyResolver = resolver;
 
             await server.OpenAsync();

@@ -38,8 +38,8 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\v2\LogController.cs" />
     <Compile Include="Controllers\v2\ScenesController.cs" />
-    <Compile Include="Controllers\zvsAuthenticatedControllerBase.cs" />
-    <Compile Include="Controllers\zvsControllerBase.cs" />
+    <Compile Include="Controllers\Abstract\zvsController.cs" />
+    <Compile Include="Controllers\Abstract\zvsEntityController.cs" />
     <Compile Include="Cors\CorsPreflightActionSelector.cs" />
     <Compile Include="Cors\EnableCorsAttribute.cs" />
     <Compile Include="DocumentationAttribute.cs" />
@@ -106,6 +106,7 @@
       <Name>zvs.Processor</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

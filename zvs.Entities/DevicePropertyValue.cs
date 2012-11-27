@@ -52,7 +52,7 @@ namespace zvs.Entities
             }
         }
 
-        public static string GetDevicePropertyValue(zvsContext context, Device device, string SettingName)
+        public static string GetPropertyValue(zvsContext context, Device device, string SettingName)
         {
             Device d2 = context.Devices.FirstOrDefault(o => o.Id == device.Id);
             if (d2 == null)

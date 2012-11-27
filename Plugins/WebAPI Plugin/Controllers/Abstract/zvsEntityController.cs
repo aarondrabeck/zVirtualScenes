@@ -22,49 +22,16 @@ using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers
 {
-    public abstract class  zvsControllerBase<TEntity> : zvsAuthenticatedControllerBase 
+    /// <summary>
+    /// <para>Wraps up Get, GetById, Add, Update and Remove into one abstract controller.</para>
+    /// 
+    /// <para>IMPORTNAT: You must choose which methods you would like to expose in the derived class and call the base method.</para>
+    /// </summary>
+    /// <typeparam name="TEntity">Entity that abides by the IIdentity interface.</typeparam>
+    public abstract class zvsEntityController<TEntity> : zvsController 
         where TEntity : class, IIdentity, new()
     {
-       
-        ILog log = LogManager.GetLogger<zvsControllerBase<TEntity>>();
-        public Core Core { get; set; }
-        
-        protected void Log(ILog Logger, params object[] data)
-        {
-            string msg = string.Format("Incoming Request, From:{0}, Controller:{1}, Method:{2}, Headers:{3}", GetClientIp(this.Request), this.GetType().Name, this.Request.Method.ToString(), Request.Headers.ToString());
-            if (data != null)
-            {
-                foreach (var d in data)
-                {
-                    msg += d.ToString();
-                }
-            }
-            Logger.Info(msg);
-        }
-        private object GetClientVar(HttpRequestMessage request, string var)
-        {
-            if (request.Properties.ContainsKey("MS_HttpContext"))
-            {
-                return ((HttpContextWrapper)request.Properties["MS_HttpContext"]).Request.UserHostAddress;
-            }
-            else if (request.Properties.ContainsKey(var))
-            {
-                return request.Properties[RemoteEndpointMessageProperty.Name];
-            }
-            else
-            {
-                return null;
-            }
-        }
-        private string GetClientIp(HttpRequestMessage request)
-        {
-            var prop = GetClientVar(request, RemoteEndpointMessageProperty.Name);
-            if (prop != null)
-            {
-                return (prop as RemoteEndpointMessageProperty).Address;
-            }
-            return "";
-        }
+        public zvsEntityController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }        
 
         /// <summary>
         /// <para>This is a standardized way to retrieve an entities collection. It is fully DataControl compliant.</para>
@@ -77,9 +44,14 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         protected IQueryable<TEntity> Get()
         {
-            bool isAuthorized = base.isAuthorized;
+            DenyUnauthorized();
             return BaseQueryable;
         }
+
+        /// <summary>
+        /// Defines your DBSet. It declares where TEntity can be added and removed.
+        /// </summary>
+        protected abstract DbSet DBSet { get; }
 
         protected HttpResponseMessage GetById(int id)
         {
@@ -89,18 +61,12 @@ namespace WebAPI.Controllers
         }
 
         /// <summary>
-        /// Defines your DBSet. It declares where TEntity can be added and removed.
-        /// </summary>
-        protected abstract DbSet DBSet { get; }
-
-        /// <summary>
         /// Defines restrictions on the DBSet when getting objects. 
         /// </summary>
         protected virtual IQueryable<TEntity> BaseQueryable
         {
             get
             {
-                bool isAuthorized = base.isAuthorized;
                 return DBSet.OfType<TEntity>().AsQueryable();
             }
         }
@@ -116,7 +82,7 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         protected HttpResponseMessage Update(int id, Delta<TEntity> tEntityPatch)
         {
-            bool isAuthorized = base.isAuthorized;
+            DenyUnauthorized();
 
             if (tEntityPatch == null)
                 return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "DTO null");
@@ -143,7 +109,7 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         protected HttpResponseMessage Add(TEntity tEntity)
         {
-            bool isAuthorized = base.isAuthorized;
+            DenyUnauthorized();
 
             if (tEntity == null)
                 return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "No data posted");
@@ -193,7 +159,7 @@ namespace WebAPI.Controllers
         /// <returns></returns>
         protected HttpResponseMessage Remove(int id)
         {
-            bool isAuthorized = base.isAuthorized;
+            DenyUnauthorized();
 
             TEntity entity = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
             if (entity == null)
@@ -218,7 +184,7 @@ namespace WebAPI.Controllers
         /// <summary>
         /// <para>Given an object, this method attempts to find a ObservableCollection with the name of the passed propertyName and return it as a IQueryable.</para>
         /// 
-        /// <para>If found, it then does permission checking via datacontrol, finds the appropriate DTO, and returns an IQueryable of GenericType(propertyName).</para>
+        /// <para>If found, it then does permission checking via data control, finds the appropriate DTO, and returns an IQueryable of GenericType(propertyName).</para>
         /// 
         /// <exception cref="HttpResponseException">Invalid property name</exception>
         /// <exception cref="HttpResponseException">Bad Request</exception>
@@ -231,9 +197,9 @@ namespace WebAPI.Controllers
         /// <param name="baseObject"></param>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        protected IQueryable<object> GetNestedCollections(int id, string propertyName)
+        protected IQueryable<object> GetNestedCollection(int id, string propertyName)
         {
-            bool isAuthorized = base.isAuthorized;
+            DenyUnauthorized();
             TEntity tEntity = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
 
             if (string.IsNullOrEmpty(propertyName))

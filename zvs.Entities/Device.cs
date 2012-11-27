@@ -96,8 +96,8 @@ namespace zvs.Entities
             }
         }
 
-        private Nullable<double> _CurrentLevelInt;
-        public Nullable<double> CurrentLevelInt
+        private double? _CurrentLevelInt;
+        public double? CurrentLevelInt
         {
             get
             {

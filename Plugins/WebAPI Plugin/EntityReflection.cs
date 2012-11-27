@@ -66,6 +66,8 @@ namespace WebAPI
             typeof(Guid?),
             typeof(DateTime),
             typeof(DateTime?),
+            typeof(double?),
+            typeof(double),            
             typeof(bool?),            
             typeof(int?)
         };

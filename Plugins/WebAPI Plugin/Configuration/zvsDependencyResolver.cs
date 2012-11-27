@@ -15,27 +15,15 @@ namespace WebAPI.Configuration
             // This example does not support child scopes, so we simply return 'this'.
             return this;
         }
-        public zvs.Processor.Core Core { get; set; }
+        public WebAPIPlugin WebAPIPlugin { get; set; }
 
         public object GetService(Type serviceType)
         {
-            if (serviceType == typeof(zvs.Processor.Core))
+            //We will give each controller zvsAuthenticatedControllerBase based controller reference to the WebAPIPlugin 
+            if (typeof(zvsController).IsAssignableFrom(serviceType))
             {
-                return Core;
+                return Activator.CreateInstance(serviceType, WebAPIPlugin);
             }
-            else
-            {
-                //if (serviceType == typeof(DevicesController) || serviceType == typeof(ScenesController))
-                //{
-                //    zvsControllerBase c = (Activator.CreateInstance(serviceType) as zvsControllerBase);
-                //    if (c != null)
-                //    {
-                //        c.Core = Core;
-                //        return c;
-                //    }
-                //}
-            }
-            if(!serviceType.IsAbstract) return Activator.CreateInstance(serviceType);
             return null;
         }
 

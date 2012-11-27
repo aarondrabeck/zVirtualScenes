@@ -541,7 +541,7 @@ namespace HttpAPI
                     foreach (Device d in context.Devices.OrderBy(o => o.Name))
                     {
                         bool show = true;
-                        bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
+                        bool.TryParse(DevicePropertyValue.GetPropertyValue(context, d, "HTTPAPI_SHOW"), out show);
 
                         if (show)
                         {
@@ -1089,7 +1089,7 @@ namespace HttpAPI
             foreach (Device d in context.Devices)
             {
                 bool show = true;
-                bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "HTTPAPI_SHOW"), out show);
+                bool.TryParse(DevicePropertyValue.GetPropertyValue(context, d, "HTTPAPI_SHOW"), out show);
 
                 if (show)
                 {

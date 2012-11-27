@@ -622,7 +622,7 @@ namespace LightSwitchPlugin
                 foreach (Device d in context.Devices)
                 {
                     bool show = true;
-                    bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, d, "SHOWINLSLIST"), out show);
+                    bool.TryParse(DevicePropertyValue.GetPropertyValue(context, d, "SHOWINLSLIST"), out show);
 
                     if (show)
                     {

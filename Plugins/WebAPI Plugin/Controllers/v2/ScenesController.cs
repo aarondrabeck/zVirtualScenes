@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,12 +15,42 @@ using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers.v2
 {
-    [Documentation("v2/Scenes", 2.1, "All scenes.")]
-    public class ScenesController : zvsControllerBase<Scene>
+    [Documentation("v2/Scenes", 2.1, @"All scenes.
+
+    Change scene name: PATCH /Scenes/{scene.id}
     {
+      ""Name"": ""Movie Mode Bright"",
+    }
+
+    Run scene: PATCH /Scenes/{scene.id}
+    {
+      ""isRunning"": true
+    }
+
+")]
+    public class ScenesController : zvsEntityController<Scene>
+    {
+        public ScenesController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }        
+
         protected override DbSet DBSet
         {
             get { return db.Scenes; }
+        }
+
+        protected override IQueryable<Scene> BaseQueryable
+        {
+            get
+            {
+                //We need to hide the scenes the user chooses from all CRUD operations.
+                List<Scene> scenes = new List<Scene>();
+                foreach (Scene s in DBSet)
+                {
+                    bool show = true;
+                    bool.TryParse(ScenePropertyValue.GetPropertyValue(db, s, "WebAPI_SHOW_SCENE"), out show);
+                    if (show) scenes.Add(s);
+                }
+                return scenes.AsQueryable();
+            }
         }
 
         [EnableCors]
@@ -47,9 +78,34 @@ namespace WebAPI.Controllers.v2
         [EnableCors]
         [HttpPatch]
         [HttpPut]
-        public new HttpResponseMessage Update(int id, Delta<Scene> tEntityPatch)
+        public new HttpResponseMessage Update(int id, Delta<Scene> scene)
         {
-            return base.Update(id, tEntityPatch);
+            DenyUnauthorized();
+
+            //if isRunning = true is sent, lets start the scene.
+            Scene s = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
+            if (s == null)            
+                return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.NotFound, "Resource not found");
+
+            if (scene != null)
+            {
+                object isRunning = false;
+                scene.TryGetPropertyValue("isRunning", out isRunning);
+                
+                if ((bool)isRunning)
+                {
+                    BuiltinCommand cmd = db.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                    if (cmd != null)
+                    {
+                        CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
+                        cp.RunBuiltinCommand(db, cmd, s.Id.ToString());
+                        return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Scene started. No other changes to the scene made.");
+                    }
+                }
+            }
+
+            //update standard properties such as scene.Name
+            return base.Update(id, scene);
         }
 
         [EnableCors]
@@ -62,89 +118,15 @@ namespace WebAPI.Controllers.v2
         [EnableCors]
         [HttpGet]
         [DTOQueryable]
-        public new IQueryable<object> GetNestedCollections(int parentId, string nestedCollectionName)
+        public new IQueryable<object> GetNestedCollection(int parentId, string nestedCollectionName)
         {
-            return base.GetNestedCollections(parentId, nestedCollectionName);
+            return base.GetNestedCollection(parentId, nestedCollectionName);
         }
 
 
-        //    ILog log = LogManager.GetLogger<DevicesController>();
-        //    public object Get()
-        //    {
-        //        base.Log(log);
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            List<object> scenes = new List<object>();
-        //            foreach (Scene scene in context.Scenes)
-        //            {
-        //                bool show = false;
-        //                string prop = ScenePropertyValue.GetPropertyValue(context, scene, "HTTPAPI_SHOW");
-        //                bool.TryParse(prop, out show);
+       
 
-        //                if (show)
-        //                {
-        //                    scenes.Add(new
-        //                    {
-        //                        id = scene.Id,
-        //                        name = scene.Name,
-        //                        is_running = scene.isRunning,
-        //                        cmd_count = scene.Commands.Count()
-        //                    });
-        //                }
-        //            }
-
-        //            return new { success = true, scenes = scenes.ToArray() };
-        //        }
-
-        //    }
-        //    public object Get(string name)
-        //    {
-        //        base.Log(log, "name=", name);
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Scene scene = context.Scenes.FirstOrDefault(s => s.Name == name);
-
-        //            if (scene != null)
-        //            {
-        //                return Get(scene.Id);
-        //            }
-        //        }
-        //        return new { success = false, reason = "Scene not found." };
-        //    }
-        //    public object Get(int id)
-        //    {
-        //        base.Log(log, "id=", id);
-
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Scene scene = context.Scenes.FirstOrDefault(s => s.Id == id);
-
-        //            if (scene != null)
-        //            {
-        //                List<object> s_cmds = new List<object>();
-        //                foreach (SceneCommand sc in scene.Commands.OrderBy(o => o.SortOrder))
-        //                {
-        //                    s_cmds.Add(new
-        //                    {
-        //                        device = sc.StoredCommand.ActionableObject,
-        //                        action = sc.StoredCommand.ActionDescription,
-        //                        order = (sc.SortOrder + 1)
-        //                    });
-        //                }
-        //                var s = new
-        //                {
-        //                    id = scene.Id,
-        //                    name = scene.Name,
-        //                    is_running = scene.isRunning,
-        //                    cmd_count = scene.Commands.Count(),
-        //                    cmds = s_cmds.ToArray()
-        //                };
-        //                return new { success = true, scene = s };
-        //            }
-        //        }
-        //        return new { success = false, reason = "Scene not found." };
-
-        //    }
+      
 
         //    [AcceptVerbs("POST")]
         //    public object Post(int id)

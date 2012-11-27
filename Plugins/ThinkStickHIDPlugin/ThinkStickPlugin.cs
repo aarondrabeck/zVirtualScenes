@@ -292,7 +292,7 @@ namespace ThinkStickHIDPlugin
                                     using (zvsContext Context = new zvsContext())
                                     {
                                         byte defaultonlevel = 99;
-                                        byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, cmd.Device, "DEFAULONLEVEL"), out defaultonlevel);
+                                        byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, cmd.Device, "DEFAULONLEVEL"), out defaultonlevel);
 
                                         AsyncSetLevel(CTDevice, defaultonlevel);
                                     }
@@ -395,7 +395,7 @@ namespace ThinkStickHIDPlugin
                                         break;
                                     case "DIMMER":
                                         byte defaultonlevel = 99;
-                                        byte.TryParse(DevicePropertyValue.GetDevicePropertyValue(Context, d, "DEFAULONLEVEL"), out defaultonlevel);
+                                        byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, d, "DEFAULONLEVEL"), out defaultonlevel);
                                         AsyncSetLevel(CTDevice, defaultonlevel);
                                         break;
                                 }
@@ -1285,7 +1285,7 @@ namespace ThinkStickHIDPlugin
                             //level between old level and new level. (if going from 0 to 100 we get 84 here).
                             //To get the real level repoll the device a second or two after a level change was recieved.     
                             bool EnableDimmerRepoll = false;
-                            bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(context, dev, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
+                            bool.TryParse(DevicePropertyValue.GetPropertyValue(context, dev, "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
 
                             if (!isPolling)
                             {

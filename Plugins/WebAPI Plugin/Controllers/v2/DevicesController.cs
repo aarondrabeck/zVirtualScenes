@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,18 +10,35 @@ using System.Web.Http;
 using System.Web.Http.OData;
 using WebAPI.Cors;
 using zvs.Entities;
+using zvs.Processor;
 using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers.v2
 {
     [Documentation("v2/Devices", 2.1, "All devices.")]
-    public class DevicesController : zvsControllerBase<Device>
+    public class DevicesController : zvsEntityController<Device>
     {
-        ILog log = LogManager.GetLogger<DevicesController>();
+        public DevicesController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }
 
         protected override DbSet DBSet
         {
             get { return db.Devices; }
+        }
+
+        protected override IQueryable<Device> BaseQueryable
+        {
+            get
+            {
+                //We need to hide the devices the user chooses from all CRUD operations.
+                List<Device> devices = new List<Device>();
+                foreach (Device d in DBSet)
+                {
+                    bool show = true;
+                    bool.TryParse(DevicePropertyValue.GetPropertyValue(db, d, "WebAPI_SHOW_DEVICE"), out show);
+                    if (show) devices.Add(d);
+                }
+                return devices.AsQueryable();
+            }
         }
 
         [EnableCors]
@@ -29,17 +47,9 @@ namespace WebAPI.Controllers.v2
         public new IQueryable<Device> Get()
         {
             //Check authorization
-            bool isAuthorized = base.isAuthorized;
+            DenyUnauthorized();
 
-            List<Device> devices = new List<Device>();
-            foreach (Device d in db.Devices.OrderBy(o => o.Name))
-            {
-                bool show = true;
-                bool.TryParse(DevicePropertyValue.GetDevicePropertyValue(db, d, "HTTPAPI_SHOW"), out show);
-
-                if (show) devices.Add(d);
-            }
-            return devices.AsQueryable();
+            return base.Get().OrderBy(o => o.Name);
         }
 
         [EnableCors]
@@ -59,9 +69,40 @@ namespace WebAPI.Controllers.v2
         [EnableCors]
         [HttpPatch]
         [HttpPut]
-        public new HttpResponseMessage Update(int id, Delta<Device> tEntityPatch)
+        public new HttpResponseMessage Update(int id, Delta<Device> device)
         {
-            return base.Update(id, tEntityPatch);
+
+            DenyUnauthorized();
+
+            //if isRunning = true is sent, lets start the scene.
+            Device d = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
+            if (d == null)
+                return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.NotFound, "Resource not found");
+
+
+            if (device != null)
+            {
+                if (device.GetChangedPropertyNames().Contains("CurrentLevelInt"))
+                    return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Cannot set CurrentLevelInt, use CurrentLevelText instead");
+
+                double newlevel = 0;
+                object CurrentLevelText;
+                if (device.TryGetPropertyValue("CurrentLevelText", out CurrentLevelText))
+                {
+                    if (double.TryParse((string)CurrentLevelText, out newlevel))
+                    {
+                        DeviceCommand basicCmd = d.Commands.FirstOrDefault(o=> o.UniqueIdentifier == "DYNAMIC_CMD_BASIC"); 
+                        if(basicCmd == null)
+                            return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Cannot set CurrentLevelText, cannot find basic command on device");
+
+                        CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
+                        cp.RunDeviceCommand(db, basicCmd, newlevel.ToString());
+                        return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Change basic processed");
+                    }
+                    return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "CurrentLevelText Invalid");
+                }
+            }
+            return base.Update(id, device);
         }
 
         [EnableCors]
@@ -74,117 +115,9 @@ namespace WebAPI.Controllers.v2
         [EnableCors]
         [HttpGet]
         [DTOQueryable]
-        public new IQueryable<object> GetNestedCollections(int parentId, string nestedCollectionName)
+        public new IQueryable<object> GetNestedCollection(int parentId, string nestedCollectionName)
         {
-            return base.GetNestedCollections(parentId, nestedCollectionName);
+            return base.GetNestedCollection(parentId, nestedCollectionName);
         }
-
-
-        //public object Get(string name)
-        //{
-        //    base.Log(log, "name=", name);
-        //    if (!string.IsNullOrEmpty(name))
-        //    {
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Device d = context.Devices.FirstOrDefault(o => o.Name == name);
-
-        //            if (d != null)
-        //            {
-        //                return Get(d.Id);
-        //            }
-        //        }
-        //    }
-        //    return null;
-        //}
-        //public object Get(int id)
-        //{
-        //    base.Log(log, "id=", id);
-        //    if (id > 0)
-        //    {
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Device d = context.Devices.FirstOrDefault(o => o.Id == id);
-
-        //            if (d != null)
-        //            {
-        //                List<object> values = new List<object>();
-        //                foreach (DeviceValue v in d.Values)
-        //                {
-        //                    values.Add(new
-        //                    {
-        //                        value_id = v.UniqueIdentifier,
-        //                        value = v.Value,
-        //                        grene = v.Genre,
-        //                        index2 = v.Index,
-        //                        read_only = v.isReadOnly,
-        //                        label_name = v.Name,
-        //                        type = v.ValueType,
-        //                        id = v.Id
-        //                    });
-        //                }
-
-        //                return new { success = true, values = values.ToArray() };
-        //            }
-        //        }
-        //    }
-        //    return new { success = false, reason = "Device not found." };
-        //}
-
-        //public object Get(int id, string action)
-        //{
-        //    base.Log(log, "id=", id, "action=", action);
-
-        //    if (id > 0 && action.ToLower() == "values")
-        //    {
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Device d = context.Devices.FirstOrDefault(o => o.Id == id);
-
-        //            if (d != null)
-        //            {
-        //                double level = 0;
-
-        //                if (d.CurrentLevelInt.HasValue)
-        //                    level = d.CurrentLevelInt.Value;
-
-        //                string on_off = string.Empty;
-        //                if (level == 0)
-        //                    on_off = "OFF";
-        //                else if (level > 98)
-        //                    on_off = "ON";
-        //                else
-        //                    on_off = "DIM";
-
-        //                StringBuilder sb = new StringBuilder();
-        //                d.Groups.ToList().ForEach((o) => sb.Append(o.Name + " "));
-
-        //                var details = new
-        //                {
-        //                    id = d.Id,
-        //                    name = d.Name,
-        //                    on_off = on_off,
-        //                    level = d.CurrentLevelInt,
-        //                    level_txt = d.CurrentLevelText,
-        //                    type = d.Type.UniqueIdentifier,
-        //                    type_txt = d.Type.Name,
-        //                    last_heard_from = d.LastHeardFrom.HasValue ? d.LastHeardFrom.Value.ToString() : "",
-        //                    groups = sb.ToString(),
-        //                    mode = d.Values.FirstOrDefault(o => o.Name == "Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Mode").Value,
-        //                    fan_mode = d.Values.FirstOrDefault(o => o.Name == "Fan Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan Mode").Value,
-        //                    op_state = d.Values.FirstOrDefault(o => o.Name == "Operating State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Operating State").Value,
-        //                    fan_state = d.Values.FirstOrDefault(o => o.Name == "Fan State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan State").Value,
-        //                    heat_p = d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1").Value,
-        //                    cool_p = d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1").Value,
-        //                    esm = d.Values.FirstOrDefault(o => o.Name == "SetBack Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "SetBack Mode").Value,
-        //                    plugin_name = d.Type.Plugin.UniqueIdentifier
-        //                };
-        //                return new { success = true, details = details };
-        //            }
-        //        }
-        //    }
-        //    return new { success = false, reason = "Device not found." };
-
-        //}
     }
 }
