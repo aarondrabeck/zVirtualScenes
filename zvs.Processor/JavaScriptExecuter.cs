@@ -168,7 +168,11 @@ namespace zvs.Processor
                 {
                     Core.log.Info(a.Progress);
                 };
-                je.ExecuteScriptAsync(script, Context).Wait();
+
+                // invoked on the ThreadPool, where there won’t be a SynchronizationContext
+                JavaScriptResult result = Task.Run(() => je.ExecuteScriptAsync(script, Context)).Result;
+                Core.log.Info(result.Details);
+
                 mutex.Set();
                 t.Dispose();
             };
@@ -261,16 +265,21 @@ namespace zvs.Processor
                 ReportProgress("JSE{0} Warning cannot find scene {1}",id, SceneName);
                 return;
             }
-            RunScene(s.Id).Wait();
+
+            // invoked on the ThreadPool, where there won’t be a SynchronizationContext
+            CommandProcessor.CommandProcessorResult result =  Task.Run(() => RunSceneAsync(s.Id)).Result;
+            ReportProgress("JSE{0} {1}", id, result.Details);
         }
 
         //RunScene(1);
         public void RunSceneJS(double SceneID)
         {
-            RunScene(SceneID).Wait();
+            // invoked on the ThreadPool, where there won’t be a SynchronizationContext
+            CommandProcessor.CommandProcessorResult result = Task.Run(() => RunSceneAsync(SceneID)).Result;
+            ReportProgress("JSE{0} {1}", id, result.Details);
         }
 
-        public async Task<CommandProcessor.CommandProcessorResult> RunScene(double SceneID)
+        public async Task<CommandProcessor.CommandProcessorResult> RunSceneAsync(double SceneID)
         {
             using (zvsContext context = new zvsContext())
             {
