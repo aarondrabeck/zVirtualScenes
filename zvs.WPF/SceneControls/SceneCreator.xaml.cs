@@ -249,7 +249,7 @@ namespace zvs.WPF.SceneControls
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                        cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
+                        cp.RunBuiltinCommandAsync( cmd.Id, scene.Id.ToString());
                     }
                 }
             }

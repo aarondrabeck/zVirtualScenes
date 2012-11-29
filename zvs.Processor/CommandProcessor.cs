@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,539 +22,523 @@ namespace zvs.Processor
             this.Core = core;
         }
 
-        //Events
-        public delegate void onProcessingCommandEventHandler(object sender, onProcessingCommandEventArgs args);
-        public class onProcessingCommandEventArgs : EventArgs
+        public class CommandProcessorResult : EventArgs
         {
             public bool Errors { get; private set; }
             public string Details { get; private set; }
             public int QueueCommandId { get; private set; }
 
-            public onProcessingCommandEventArgs(bool Errors, string Details, int CommandQueueID)
+            public CommandProcessorResult(bool Errors, string Details, int CommandQueueID)
             {
                 this.QueueCommandId = CommandQueueID;
                 this.Errors = Errors;
                 this.Details = Details;
             }
         }
-        public event onProcessingCommandEventHandler onProcessingCommandBegin;
-        public event onProcessingCommandEventHandler onProcessingCommandEnd;
-
-        private void ProcessingCommandBegin(onProcessingCommandEventArgs args)
-        {
-            string msg = string.Format("{0}, QueueCommandId:{1}", args.Details, args.QueueCommandId);
-            if (args.Errors)
-                Core.log.Error(msg);
-            else
-                Core.log.Info(msg);
-
-            if (onProcessingCommandBegin != null)
-                onProcessingCommandBegin(this, args);
-        }
-
-        private void ProcessingCommandEnd(onProcessingCommandEventArgs args)
-        {
-            string msg = string.Format("{0}, QueueCommandId:{1}", args.Details, args.QueueCommandId);
-            if (args.Errors)
-                Core.log.Error(msg);
-            else
-                Core.log.Info(msg);
-
-            if (onProcessingCommandEnd != null)
-                onProcessingCommandEnd(this, args);
-        }
-
-
 
         //public Methods 
-        public void RunStoredCommand(zvsContext context, StoredCommand storedCommand)
+        public async Task<CommandProcessorResult> RunStoredCommandAsync(int storedCommandId)
         {
-            if (storedCommand == null)
+            using (zvsContext context = new zvsContext())
             {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. StoredCommand is null.", 0));
+                StoredCommand sc = context.StoredCommands.Single(o => o.Id == storedCommandId);
+
+                if (sc.Command == null)
+                    return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.", 0);
+                if (sc.Command is DeviceCommand)
+                    return await RunDeviceCommandAsync(sc.CommandId, ((DeviceCommand)sc.Command).DeviceId, sc.Argument);
+                else if (sc.Command is DeviceTypeCommand)
+                    return await RunDeviceTypeCommandAsync(sc.Command.Id, sc.Device.Id, sc.Argument);
+                else if (sc.Command is JavaScriptCommand)
+                    return await RunJavaScriptCommandAsync(sc.Command.Id, sc.Argument);
+                else if (sc.Command is BuiltinCommand)
+                    return await RunBuiltinCommandAsync(sc.Command.Id, sc.Argument);
             }
 
-            if (storedCommand.Command == null)
-            {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. StoredCommand command is null.", 0));
-            }
+            return new CommandProcessorResult(true, "Failed to process stored command. Command type unknown.", 0);
+        }
 
-            if (storedCommand.Command is DeviceCommand)
-                RunDeviceCommand(context, (DeviceCommand)storedCommand.Command, storedCommand.Argument);
-            else if (storedCommand.Command is DeviceTypeCommand)
-                RunDeviceTypeCommand(context, (DeviceTypeCommand)storedCommand.Command, storedCommand.Device, storedCommand.Argument);
-            else if (storedCommand.Command is JavaScriptCommand)
-                RunJavaScriptCommand(context, (JavaScriptCommand)storedCommand.Command, storedCommand.Argument);
-            else if (storedCommand.Command is BuiltinCommand)
-                RunBuiltinCommand(context, (BuiltinCommand)storedCommand.Command, storedCommand.Argument);
+        public async Task<CommandProcessorResult> RunDeviceCommandAsync(int deviceCommandId, int deviceId, string argument = "")
+        {
+            QueuedDeviceCommand qdc = await Task<QueuedDeviceCommand>.Factory.StartNew(() =>
+            {
+                using (zvsContext context = new zvsContext())
+                {
+                    var cmd = new QueuedDeviceCommand
+                    {
+                        Command = context.DeviceCommands.Single(o => o.Id == deviceCommandId),
+                        Argument = argument,
+                        Device = context.Devices.Single(o => o.Id == deviceId)
+                    };
+
+                    context.QueuedCommands.Add(cmd);
+                    context.SaveChanges();
+                    return cmd;
+                }
+            });
+
+            CommandProcessorResult result = await ProcessCommandAsync(qdc);
+            if (result.Errors)
+                Core.log.Error(result.Details);
             else
-            {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, "Processing saved command.", 0));
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, "Failed to process saved command. Command type unknown.", 0));
-            }
+                Core.log.Info(result.Details);
+            return result;
         }
 
-        public void RunDeviceCommand(zvsContext context, DeviceCommand deviceCommand, string argument = "")
+        public async Task<CommandProcessorResult> RunDeviceTypeCommandAsync(int deviceTypeCommandId, int deviceId, string argument = "")
         {
-            QueuedDeviceCommand qdc = new QueuedDeviceCommand
+            QueuedDeviceTypeCommand qdtc = await Task<QueuedDeviceTypeCommand>.Factory.StartNew(() =>
             {
-                Command = deviceCommand,
-                Argument = argument,
-                Device = deviceCommand.Device
-            };
-            context.QueuedCommands.Add(qdc);
-            context.SaveChanges();
-            ProcessCommand(qdc);
+                using (zvsContext context = new zvsContext())
+                {
+                    var cmd = new QueuedDeviceTypeCommand
+                    {
+                        Command = context.DeviceTypeCommands.Single(o => o.Id == deviceTypeCommandId),
+                        Device = context.Devices.Single(o => o.Id == deviceId),
+                        Argument = argument
+                    };
+
+                    context.QueuedCommands.Add(cmd);
+                    context.SaveChanges();
+                    return cmd;
+                }
+            });
+            CommandProcessorResult result = await ProcessCommandAsync(qdtc);
+            if (result.Errors)
+                Core.log.Error(result.Details);
+            else
+                Core.log.Info(result.Details);
+            return result;
         }
 
-        public void RunDeviceTypeCommand(zvsContext context, DeviceTypeCommand deviceTypeCommand, Device device, string argument = "")
+        public async Task<CommandProcessorResult> RunBuiltinCommandAsync(int builtinCommandId, string argument = "")
         {
-            QueuedDeviceTypeCommand qdtc = new QueuedDeviceTypeCommand
-            {
-                Command = deviceTypeCommand,
-                Argument = argument,
-                Device = device
-            };
-            context.QueuedCommands.Add(qdtc);
-            context.SaveChanges();
-            ProcessCommand(qdtc);
+            QueuedBuiltinCommand qbc = await Task<QueuedBuiltinCommand>.Factory.StartNew(() =>
+             {
+                 using (zvsContext context = new zvsContext())
+                 {
+                     var cmd = new QueuedBuiltinCommand
+                     {
+                         Command = context.BuiltinCommands.Single(o => o.Id == builtinCommandId),
+                         Argument = argument
+                     };
+
+                     context.QueuedCommands.Add(cmd);
+                     context.SaveChanges();
+                     return cmd;
+                 }
+             });
+
+            CommandProcessorResult result = await ProcessCommandAsync(qbc);
+            if (result.Errors)
+                Core.log.Error(result.Details);
+            else
+                Core.log.Info(result.Details);
+            return result;
         }
 
-        public void RunBuiltinCommand(zvsContext context, BuiltinCommand builtinCommand, string argument = "")
+        public async Task<CommandProcessorResult> RunJavaScriptCommandAsync(int javaScriptCommandId, string argument = "")
         {
-            QueuedBuiltinCommand qbc = new QueuedBuiltinCommand
-            {
-                Command = builtinCommand,
-                Argument = argument,
-            };
-            context.QueuedCommands.Add(qbc);
-            context.SaveChanges();
-            ProcessCommand(qbc);
-        }
+            QueuedJavaScriptCommand qjsc = await Task<QueuedJavaScriptCommand>.Factory.StartNew(() =>
+             {
+                 using (zvsContext context = new zvsContext())
+                 {
+                     var cmd = new QueuedJavaScriptCommand
+                     {
+                         Command = context.JavaScriptCommands.Single(o => o.Id == javaScriptCommandId),
+                         Argument = argument
+                     };
 
-        public void RunJavaScriptCommand(zvsContext context, JavaScriptCommand javaScriptCommand, string argument = "")
-        {
-            QueuedJavaScriptCommand qjsc = new QueuedJavaScriptCommand
-            {
-                Command = javaScriptCommand,
-                Argument = argument,
-            };
-            context.QueuedCommands.Add(qjsc);
-            context.SaveChanges();
-            ProcessCommand(qjsc);
+                     context.QueuedCommands.Add(cmd);
+                     context.SaveChanges();
+                     return (cmd);
+                 }
+             });
+
+            CommandProcessorResult result = await ProcessCommandAsync(qjsc);
+            if (result.Errors)
+                Core.log.Error(result.Details);
+            else
+                Core.log.Info(result.Details);
+            return result;
         }
 
         //private Methods
-        private void ProcessCommand(QueuedCommand queuedCommand)
+        private async Task<CommandProcessorResult> ProcessCommandAsync(QueuedCommand queuedCommand)
         {
             if (queuedCommand == null)
-                throw new ArgumentException("QueuedCommand");
+                throw new ArgumentException("queuedCommand");
 
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (s, a) =>
+            zvsContext context = new zvsContext();
+
+            #region QueuedDeviceCommand
+            if (queuedCommand is QueuedDeviceCommand)
             {
-                zvsContext context = new zvsContext();
-                if (queuedCommand is QueuedDeviceCommand)
+                QueuedDeviceCommand cmd = null;
+                await Task.Factory.StartNew(() =>
                 {
-                    QueuedDeviceCommand cmd = context.QueuedCommands.OfType<QueuedDeviceCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
-                    ProcessDeviceCmd(context, cmd);
-                }
-                else if (queuedCommand is QueuedDeviceTypeCommand)
+                    cmd = context.QueuedCommands.OfType<QueuedDeviceCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
+                });
+                if (cmd == null && cmd.Device == null)
                 {
-                    QueuedDeviceTypeCommand cmd = context.QueuedCommands.OfType<QueuedDeviceTypeCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
-                    ProcessDeviceTypeCmd(context, cmd);
+                    context.Dispose();
+                    return new CommandProcessorResult(true, string.Format("Queued device cmd {0} failed. Queued command not found in database.", cmd.Id), cmd.Id);
                 }
-                else if (queuedCommand is QueuedBuiltinCommand)
+
+                return await Task<CommandProcessorResult>.Factory.StartNew(() =>
                 {
-                    QueuedBuiltinCommand cmd = context.QueuedCommands.OfType<QueuedBuiltinCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
-                    ProcessBuiltinCmd(context, cmd);
-                }
-                else if (queuedCommand is QueuedJavaScriptCommand)
-                {
-                    QueuedJavaScriptCommand cmd = context.QueuedCommands.OfType<QueuedJavaScriptCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
-                    ProcessJavaScriptCmd(context, cmd);
-                }
-            };
-            bw.RunWorkerAsync();
-        }
-
-        private void ProcessDeviceCmd(zvsContext context, QueuedDeviceCommand cmd)
-        {
-            if (cmd == null && cmd.Device == null)
-            {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, string.Format("Processing device command id {0}", cmd.Id), cmd.Id));
-
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process device command id {0}. Could not locate device in the database.", cmd.Id), cmd.Id));
-
-                context.Dispose();
-                return;
-            }
-
-            string StartDetails = string.Format("Processing queued device command #{0} ({1} with arg '{2}' on {3})",
-                                                     cmd.Id,
-                                                     cmd.Command.Name,
-                                                     cmd.Argument,
-                                                     cmd.Device.Name);
-
-            //We found the command so continue
-            ProcessingCommandBegin(new onProcessingCommandEventArgs(false, StartDetails, cmd.Id));
-
-            zvsPlugin p = Core.pluginManager.GetPlugins().FirstOrDefault(o => o.UniqueIdentifier == cmd.Device.Type.Plugin.UniqueIdentifier);
-            if (p == null)
-            {
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process device command id {0}. Could not locate queued commands plug-in.", cmd.Id), cmd.Id));
-
-                context.QueuedCommands.Remove(cmd);
-                context.SaveChanges();
-                context.Dispose();
-
-                return;
-            }
-
-            if (p.Enabled && p.IsReady)
-            {
-                string details = string.Format("Finished processing command #{0} ({1} with arg '{2}' on {3} to plug-in '{4}')",
-                                                      cmd.Id,
-                                                      cmd.Command.Name,
-                                                      cmd.Argument,
-                                                      cmd.Device.Name,
-                                                      p.Name);
-
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
-
-                p.ProcessDeviceCommand(cmd);
-                context.QueuedCommands.Remove(cmd);
-                context.SaveChanges();
-                context.Dispose();
-                return;
-
-            }
-            else
-            {
-                string err_str = string.Format("Failed to process command #{0} '{1}' on '{2}' because the '{3}' plug-in is {4}. Removing command from queue...",
-                    cmd.Id,
-                    cmd.Command.Name,
-                    cmd.Device.Name,
-                    cmd.Device.Type.Plugin.Name,
-                    p.Enabled ? "not ready" : "disabled");
-
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, err_str, cmd.Id));
-
-                context.QueuedCommands.Remove(cmd);
-                context.SaveChanges();
-                context.Dispose();
-                return;
-            }
-        }
-
-        private void ProcessDeviceTypeCmd(zvsContext context, QueuedDeviceTypeCommand cmd)
-        {
-            if (cmd == null || cmd.Device == null)
-            {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, string.Format("Processing device type command id {0}", cmd.Id), cmd.Id));
-
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process device type command id {0}. Could not locate queued command in database.", cmd.Id), cmd.Id));
-
-                context.Dispose();
-
-                return;
-            }
-
-            string StartDetails = string.Format("Processing queued device type command #{0} ({1} with arg '{2}' on {3})",
-                                                     cmd.Id,
-                                                     cmd.Command.Name,
-                                                     cmd.Argument,
-                                                     cmd.Device.Name);
-
-            //We found the command so continue
-            ProcessingCommandBegin(new onProcessingCommandEventArgs(false, StartDetails, cmd.Id));
-
-            zvsPlugin p = Core.pluginManager.GetPlugins().FirstOrDefault(o => o.UniqueIdentifier == cmd.Device.Type.Plugin.UniqueIdentifier);
-            if (p == null)
-            {
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process device type command id {0}. Could not locate queued commands plug-in.", cmd.Id), cmd.Id));
-
-                context.QueuedCommands.Remove(cmd);
-                context.SaveChanges();
-                context.Dispose();
-
-                return;
-            }
-
-
-            if (p.Enabled && p.IsReady)
-            {
-                string details = string.Format("Finished processing command #{0} ({1} with arg '{2}' on {3} to plug-in '{4}')",
-                                                    cmd.Id,
-                                                    cmd.Command.Name,
-                                                     cmd.Argument,
-                                                    cmd.Device.Name,
-                                                    p.Name);
-
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
-
-                p.ProcessDeviceTypeCommand(cmd);
-                context.QueuedCommands.Remove(cmd);
-                context.SaveChanges();
-                context.Dispose();
-                return;
-
-            }
-            else
-            {
-                string err_str = string.Format("Failed to process command #{0} '{1}' on '{2}' because the '{3}' plug-in is {4}. Removing command from queue...",
-                cmd.Id,
-                cmd.Command.Name,
-                cmd.Device.Name,
-                cmd.Device.Type.Plugin.Name,
-                p.Enabled ? "not ready" : "disabled"
-                );
-
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, err_str, cmd.Id));
-
-                context.QueuedCommands.Remove(cmd);
-                context.SaveChanges();
-                context.Dispose();
-                return;
-            }
-
-        }
-
-        private void ProcessBuiltinCmd(zvsContext context, QueuedBuiltinCommand cmd)
-        {
-            if (cmd == null)
-            {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, string.Format("Processing built-in command id {0}", cmd.Id), cmd.Id));
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process built-in command id {0}. Could not locate queued command in database.", cmd.Id), cmd.Id));
-
-                context.Dispose();
-                return;
-
-            }
-
-            string StartDetails = string.Format("Processing queued built-in command #{0} ({1} with arg '{2}')",
-                                                         cmd.Id,
-                                                         cmd.Command.Name,
-                                                         cmd.Argument);
-
-            //We found the command so continue
-            ProcessingCommandBegin(new onProcessingCommandEventArgs(false, StartDetails, cmd.Id));
-
-            switch (cmd.Command.UniqueIdentifier)
-            {
-                case "TIMEDELAY":
+                    zvsPlugin p = Core.pluginManager.GetPlugins().FirstOrDefault(o => o.UniqueIdentifier == cmd.Device.Type.Plugin.UniqueIdentifier);
+                    if (p == null)
                     {
-                        int delay = 0;
-                        if (int.TryParse(cmd.Argument, out delay) && delay > 0)
+                        context.QueuedCommands.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        return new CommandProcessorResult(true, string.Format("Queued device cmd {0} failed.  Could not locate the associated plug-in.", cmd.Id), cmd.Id);
+                    }
+
+                    if (p.Enabled && p.IsReady)
+                    {
+                        string details = string.Format("Queued device cmd {0}{1} on {2} processed.",
+                                                           cmd.Command.Name,
+                                                           string.IsNullOrEmpty(cmd.Argument) ? "" : string.Format(" with arg '{0}'", cmd.Argument),
+                                                           cmd.Device.Name
+                                                           );
+
+                        p.ProcessDeviceCommand(cmd);
+                        context.QueuedCommands.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        return new CommandProcessorResult(false, details, cmd.Id);
+
+                    }
+                    else
+                    {
+                        string err_str = string.Format("Queued device cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
+                         cmd.Command.Name,
+                         string.IsNullOrEmpty(cmd.Argument) ? "" : string.Format(" with arg '{0}'", cmd.Argument),
+                         cmd.Device.Name,
+                         cmd.Device.Type.Plugin.Name,
+                         p.Enabled ? "not ready" : "disabled"
+                         );
+
+                        context.QueuedCommands.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        return new CommandProcessorResult(true, err_str, cmd.Id);
+                    }
+                });
+            }
+            #endregion
+
+            #region QueuedDeviceTypeCommand
+            else if (queuedCommand is QueuedDeviceTypeCommand)
+            {
+                QueuedDeviceTypeCommand cmd = null;
+                await Task.Factory.StartNew(() =>
+                {
+                    cmd = context.QueuedCommands.OfType<QueuedDeviceTypeCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
+                });
+
+                if (cmd == null || cmd.Device == null)
+                {
+                    context.Dispose();
+                    return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed. Queued command not found in database.", cmd.Id), cmd.Id);
+                }
+
+                return await Task<CommandProcessorResult>.Factory.StartNew(() =>
+                {
+                    zvsPlugin p = Core.pluginManager.GetPlugins().FirstOrDefault(o => o.UniqueIdentifier == cmd.Device.Type.Plugin.UniqueIdentifier);
+                    if (p == null)
+                    {
+                        context.QueuedCommands.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed. Could not locate the associated plug-in.", cmd.Id), cmd.Id);
+                    }
+
+
+                    if (p.Enabled && p.IsReady)
+                    {
+                        string details = string.Format("Queued device type cmd {0}{1} on {2} processed.",
+                                                            cmd.Command.Name,
+                                                            string.IsNullOrEmpty(cmd.Argument) ? "" : string.Format(" with arg '{0}'", cmd.Argument),
+                                                            cmd.Device.Name
+                                                            );
+
+                        p.ProcessDeviceTypeCommand(cmd);
+                        context.QueuedCommands.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        return new CommandProcessorResult(false, details, cmd.Id);
+
+                    }
+                    else
+                    {
+                        string err_str = string.Format("Queued device type cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
+                        cmd.Command.Name,
+                        string.IsNullOrEmpty(cmd.Argument) ? "" : string.Format(" with arg '{0}'", cmd.Argument),
+                        cmd.Device.Name,
+                        cmd.Device.Type.Plugin.Name,
+                        p.Enabled ? "not ready" : "disabled"
+                        );
+
+                        context.QueuedCommands.Remove(cmd);
+                        context.SaveChanges();
+                        context.Dispose();
+                        return new CommandProcessorResult(true, err_str, cmd.Id);
+                    }
+                });
+            }
+            #endregion
+
+            #region QueuedBuiltinCommand
+            else if (queuedCommand is QueuedBuiltinCommand)
+            {
+                QueuedBuiltinCommand cmd = null;
+                await Task.Factory.StartNew(() =>
+                {
+                    cmd = context.QueuedCommands.OfType<QueuedBuiltinCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
+                });
+                if (cmd == null)
+                {
+                    context.Dispose();
+                    return new CommandProcessorResult(true, string.Format("Queued built-in cmd {0} failed. Queued command not found in database.", cmd.Id), cmd.Id);
+                }
+
+                switch (cmd.Command.UniqueIdentifier)
+                {
+                    case "TIMEDELAY":
                         {
-                            System.Timers.Timer timer = new System.Timers.Timer();
-                            timer.Elapsed += (sender, args) =>
+                            int delay = 0;
+                            int.TryParse(cmd.Argument, out delay);
+
+                            await Task.Delay(delay * 1000);
+
+                            string details = string.Format("Queued built-in cmd {0} second time delay processed.", delay);
+
+                            await Task.Factory.StartNew(() =>
                             {
-                                timer.Stop();
-
-                                string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg '{2}')",
-                                                         cmd.Id,
-                                                         cmd.Command.Name,
-                                                         cmd.Argument);
-
-                                ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
-
                                 //Remove processed command from queue
                                 context.QueuedCommands.Remove(cmd);
                                 context.SaveChanges();
                                 context.Dispose();
+                            });
 
-                            };
-                            timer.Interval = delay * 1000;
-                            timer.Start();
+                            return new CommandProcessorResult(false, details, cmd.Id);
                         }
-                        break;
-                    }
-                case "REPOLL_ME":
-                    {
-                        int d_id = 0;
-                        int.TryParse(cmd.Argument, out d_id);
-                        Device d = Device.GetAllDevices(context, false).FirstOrDefault(o => o.Id == d_id);
-
-                        if (d.Type.Plugin.isEnabled)
-                            Core.pluginManager.GetPlugin(d.Type.Plugin.UniqueIdentifier).Repoll(d);
-
-                        string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg '{2}')",
-                                                         cmd.Id,
-                                                         cmd.Command.Name,
-                                                         cmd.Argument);
-
-                        ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
-
-                        //Remove processed command from queue
-                        context.QueuedCommands.Remove(cmd);
-                        context.SaveChanges();
-                        context.Dispose();
-
-                        break;
-                    }
-                case "REPOLL_ALL":
-                    {
-                        foreach (Device d in Device.GetAllDevices(context, false))
+                    case "REPOLL_ME":
                         {
-                            if (d.Type.Plugin.isEnabled)
+                            int d_id = 0;
+                            int.TryParse(cmd.Argument, out d_id);
+
+                            Device device = await Task<Device>.Factory.StartNew(() =>
                             {
-                                Core.pluginManager.GetPlugin(d.Type.Plugin.UniqueIdentifier).Repoll(d);
-                            }
-                        }
+                                Device d = Device.GetAllDevices(context, false).FirstOrDefault(o => o.Id == d_id);
 
-                        string details = string.Format("Finished processing queued built-in command #{0} ({1}))",
-                                                          cmd.Id,
-                                                         cmd.Command.Name);
+                                if (d.Type.Plugin.isEnabled)
+                                    Core.pluginManager.GetPlugin(d.Type.Plugin.UniqueIdentifier).Repoll(d);
+                                return d;
+                            });
 
-                        ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
+                            string details = string.Format("Queued built-in cmd re-poll '{0}' processed.", device.Name);
 
-                        //Remove processed command from queue
-                        context.QueuedCommands.Remove(cmd);
-                        context.SaveChanges();
-                        context.Dispose();
-
-                        break;
-                    }
-                case "GROUP_ON":
-                    {
-                        int g_id = 0;
-                        int.TryParse(cmd.Argument, out g_id);
-                        //EXECUTE ON ALL API's
-                        if (g_id > 0)
-                        {
-                            foreach (zvsPlugin p in Core.pluginManager.GetPlugins())
+                            await Task.Factory.StartNew(() =>
                             {
-                                if (p.Enabled)
-                                    p.ActivateGroup(g_id);
-                            }
+                                //Remove processed command from queue
+                                context.QueuedCommands.Remove(cmd);
+                                context.SaveChanges();
+                                context.Dispose();
+                            });
+
+                            return new CommandProcessorResult(false, details, cmd.Id);
                         }
-
-                        string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg '{2}')",
-                                                         cmd.Id,
-                                                         cmd.Command.Name,
-                                                         cmd.Argument);
-
-                        ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
-
-                        //Remove processed command from queue
-                        context.QueuedCommands.Remove(cmd);
-                        context.SaveChanges();
-                        context.Dispose();
-
-                        break;
-                    }
-                case "GROUP_OFF":
-                    {
-                        int g_id = 0;
-                        int.TryParse(cmd.Argument, out g_id);
-                        //EXECUTE ON ALL API's
-                        if (g_id > 0)
+                    case "REPOLL_ALL":
                         {
-                            foreach (zvsPlugin p in Core.pluginManager.GetPlugins())
+                            await Task.Factory.StartNew(() =>
                             {
-                                if (p.Enabled)
-                                    p.DeactivateGroup(g_id);
-                            }
+                                foreach (Device d in Device.GetAllDevices(context, false))
+                                    if (d.Type.Plugin.isEnabled)
+                                        Core.pluginManager.GetPlugin(d.Type.Plugin.UniqueIdentifier).Repoll(d);
+                            });
+
+                            string details = "Queued built-in cmd re-poll all devices processed.";
+
+                            await Task.Factory.StartNew(() =>
+                            {
+                                //Remove processed command from queue
+                                context.QueuedCommands.Remove(cmd);
+                                context.SaveChanges();
+                                context.Dispose();
+                            });
+
+                            return new CommandProcessorResult(false, details, cmd.Id);
+
                         }
-
-                        string details = string.Format("Finished processing queued built-in command #{0} ({1} with arg '{2}')",
-                                                       cmd.Id,
-                                                         cmd.Command.Name,
-                                                         cmd.Argument);
-
-                        ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
-
-                        //Remove processed command from queue
-                        context.QueuedCommands.Remove(cmd);
-                        context.SaveChanges();
-                        context.Dispose();
-                        break;
-                    }
-                case "RUN_SCENE":
-                    {
-                        int id = 0;
-                        //EXECUTE ON ALL API's
-                        if (int.TryParse(cmd.Argument, out id) && id > 0)
+                    case "GROUP_ON":
                         {
+                            int g_id = 0;
+                            int.TryParse(cmd.Argument, out g_id);
+
+                            //EXECUTE ON ALL API's
+                            if (g_id > 0)
+                            {
+                                await Task.Factory.StartNew(() =>
+                                {
+                                    foreach (zvsPlugin p in Core.pluginManager.GetPlugins())
+                                    {
+                                        if (p.Enabled)
+                                            p.ActivateGroup(g_id);
+                                    }
+                                });
+                            }
+
+                            string GroupName = cmd.Argument;
+                            int GroupId = 0;
+                            int.TryParse(cmd.Argument, out GroupId);
+                            Group g = context.Groups.FirstOrDefault(o => o.Id == GroupId);
+                            if (g != null)
+                                GroupName = g.Name;
+
+                            string details = string.Format("Queued built-in cmd {0} '{1}' processed.",
+                                                             cmd.Command.Name,
+                                                             GroupName);
+
+                            await Task.Factory.StartNew(() =>
+                            {
+                                //Remove processed command from queue
+                                context.QueuedCommands.Remove(cmd);
+                                context.SaveChanges();
+                                context.Dispose();
+                            });
+
+                            return new CommandProcessorResult(false, details, cmd.Id);
+
+                        }
+                    case "GROUP_OFF":
+                        {
+                            int g_id = 0;
+                            int.TryParse(cmd.Argument, out g_id);
+                            //EXECUTE ON ALL API's
+                            if (g_id > 0)
+                            {
+                                await Task.Factory.StartNew(() =>
+                                {
+                                    foreach (zvsPlugin p in Core.pluginManager.GetPlugins())
+                                    {
+                                        if (p.Enabled)
+                                            p.DeactivateGroup(g_id);
+                                    }
+                                });
+                            }
+
+                            string GroupName = cmd.Argument;
+                            int GroupId = 0;
+                            int.TryParse(cmd.Argument, out GroupId);
+                            Group g = context.Groups.FirstOrDefault(o => o.Id == GroupId);
+                            if (g != null)
+                                GroupName = g.Name;
+
+                            string details = string.Format("Queued built-in cmd {0} '{1}' processed.",
+                                                             cmd.Command.Name,
+                                                             GroupName);
+
+                            await Task.Factory.StartNew(() =>
+                            {
+                                //Remove processed command from queue
+                                context.QueuedCommands.Remove(cmd);
+                                context.SaveChanges();
+                                context.Dispose();
+                            });
+                            return new CommandProcessorResult(false, details, cmd.Id);
+
+                        }
+                    case "RUN_SCENE":
+                        {
+                            int id = 0;
+                            int.TryParse(cmd.Argument, out id);
+
                             SceneRunner sr = new SceneRunner(Core);
-                            sr.onRunEnd += (s, a) =>
+                            sr.onReportProgress += (s, a) =>
                             {
-                                string details = string.Format("Finished processing queued built-in command #{0} ({1} '{2}')",
-                                                       cmd.Id,
-                                                         cmd.Command.Name,
-                                                         cmd.Argument);
+                                Core.log.Info(a.Progress);
+                            };
+                            SceneRunner.SceneResult result = await sr.RunSceneAsync(id);
 
-                                ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
+                            string details = string.Format("{0} Queued built-in cmd '{1}' processed.",
+                                result.Details,
+                                cmd.Command.Name);
 
+                            await Task.Factory.StartNew(() =>
+                            {
                                 //Remove processed command from queue
                                 context.QueuedCommands.Remove(cmd);
                                 context.SaveChanges();
                                 context.Dispose();
-                            };
-                            sr.RunScene(id);
+                            });
+
+                            return new CommandProcessorResult(result.Errors, details, cmd.Id);
+
                         }
-                        break;
-                    }
-                default:
-                    {
-                        string details = string.Format("Error processing command '{0}':'{1}'. Command {2} not recognized.",
-                                                         cmd.Command.Name,
-                                                         cmd.Argument,
-                                                         cmd.Command.UniqueIdentifier);
+                    default:
+                        {
+                            var err = new CommandProcessorResult(true, string.Format("Queued built-in cmd {0} failed. No logic defined for this built-in command.", cmd.Id), cmd.Id);
 
-                        ProcessingCommandEnd(new onProcessingCommandEventArgs(true, details, cmd.Id));
+                            await Task.Factory.StartNew(() =>
+                            {
+                                //Remove processed command from queue
+                                context.QueuedCommands.Remove(cmd);
+                                context.SaveChanges();
+                                context.Dispose();
+                            });
 
-                        //Remove processed command from queue
-                        context.QueuedCommands.Remove(cmd);
-                        context.SaveChanges();
-                        context.Dispose();
-                        break;
-                    }
+                            return err;
+                        }
+                }
             }
-        }
+            #endregion
 
-        private void ProcessJavaScriptCmd(zvsContext context, QueuedJavaScriptCommand cmd)
-        {
-            if (cmd == null)
+            #region QueuedJavaScriptCommand
+            else if (queuedCommand is QueuedJavaScriptCommand)
             {
-                ProcessingCommandBegin(new onProcessingCommandEventArgs(false, string.Format("Processing device type command id {0}", cmd.Id), cmd.Id));
-                ProcessingCommandEnd(new onProcessingCommandEventArgs(true, string.Format("Failed to process device type command id {0}. Could not locate queued command in database.", cmd.Id), cmd.Id));
-                context.Dispose();
-                return;
-            }
-
-            string StartDetails = string.Format("Processing queued JavaScript command #{0} ({1} with arg '{2}' )",
-                                                     cmd.Id,
-                                                     cmd.Command.Name,
-                                                     cmd.Argument);
-
-            //We found the command so continue
-            ProcessingCommandBegin(new onProcessingCommandEventArgs(false, StartDetails, cmd.Id));
-
-            JavaScriptCommand js = (JavaScriptCommand)cmd.Command;
-            JavaScriptExecuter je = new JavaScriptExecuter(Core);
-
-            je.onExecuteScriptEnd += (s, a) =>
-            {
-                if (a.Errors)
+                QueuedJavaScriptCommand cmd = null;
+                await Task.Factory.StartNew(() =>
                 {
-                    string details = string.Format("Finished processing JavaScript command #{0} ({1} with arg '{2}')",
-                                                       cmd.Id,
-                                                       cmd.Command.Name,
-                                                        cmd.Argument);
+                    cmd = context.QueuedCommands.OfType<QueuedJavaScriptCommand>().FirstOrDefault(o => o.Id == queuedCommand.Id);
+                });
+                if (cmd == null)
+                {
+                    context.Dispose();
+                    return new CommandProcessorResult(true, string.Format("Queued JavaScipt cmd {0} failed. Queued command not found in database.", cmd.Id), cmd.Id);
+                }
 
-                    ProcessingCommandEnd(new onProcessingCommandEventArgs(false, details, cmd.Id));
+                // We found the command so continue
+                JavaScriptCommand js = (JavaScriptCommand)cmd.Command;
+                JavaScriptExecuter je = new JavaScriptExecuter(Core);
+                je.onReportProgress += (sender, args) =>
+                {
+                    Core.log.Info(args.Progress);
+                };
 
+               JavaScriptExecuter.JavaScriptResult jsResult = await je.ExecuteScriptAsync(js.Script, context);
+
+               string details = string.Format("{0}. Queued JavaScript cmd '{1}' processed.",
+                               jsResult.Details,
+                               cmd.Command.Name);
+               
+                await Task.Factory.StartNew(() =>
+                {
+                    //Remove processed command from queue
                     context.QueuedCommands.Remove(cmd);
                     context.SaveChanges();
                     context.Dispose();
-                    return;
-                }
-            };
-            je.ExecuteScript(js.Script, context);
+                });
+
+                return new CommandProcessorResult(false, details, cmd.Id);
+            }
+            #endregion
+
+            context.Dispose();
+            return new CommandProcessorResult(true, "Failed to process queued command. Command type unknown.", 0);
         }
     }
 }

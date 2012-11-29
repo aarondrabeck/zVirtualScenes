@@ -35,11 +35,10 @@ namespace zvs.Processor.Triggers
 
         private void TriggerBegin(onTriggerEventArgs args)
         {
-            string msg = string.Format("{0}, TriggerID:{1}", args.Details, args.TriggerID);
             if (args.Errors)
-                Core.log.Error(msg);
+                Core.log.Error(args.Details);
             else
-                Core.log.Info(msg);
+                Core.log.Info(args.Details);
 
             if (onTriggerBegin != null)
                 onTriggerBegin(this, args);
@@ -47,11 +46,10 @@ namespace zvs.Processor.Triggers
 
         private void TriggerEnd(onTriggerEventArgs args)
         {
-            string msg = string.Format("{0}, TriggerID:{1}", args.Details, args.TriggerID);
             if (args.Errors)
-                Core.log.Error(msg);
+                Core.log.Error(args.Details);
             else
-                Core.log.Info(msg);
+                Core.log.Info(args.Details);
 
             if (onTriggerEnd != null)
                 onTriggerEnd(this, args);
@@ -155,18 +153,14 @@ namespace zvs.Processor.Triggers
             bw.RunWorkerAsync();
         }
 
-        private void ActivateTrigger(zvsContext context, DeviceValueTrigger trigger)
+        private async void ActivateTrigger(zvsContext context, DeviceValueTrigger trigger)
         {
             TriggerBegin(new onTriggerEventArgs(trigger.Id,
-                        string.Format("Trigger '{0}' caused  '{1}'", trigger.Name, trigger.StoredCommand.ActionDescription), false));
+                        string.Format("Trigger '{0}' caused {1} {2}.", trigger.Name, trigger.StoredCommand.ActionableObject, trigger.StoredCommand.ActionDescription), false));
 
             CommandProcessor cp = new CommandProcessor(Core);
-            cp.onProcessingCommandEnd += (s, a) =>
-            {
-                TriggerEnd(new onTriggerEventArgs(trigger.Id,
-                        string.Format("Trigger '{0}' ended.", trigger.Name), false));
-            };
-            cp.RunStoredCommand(context, trigger.StoredCommand);
+            zvs.Processor.CommandProcessor.CommandProcessorResult result = await cp.RunStoredCommandAsync( trigger.StoredCommand.Id);
+            TriggerEnd(new onTriggerEventArgs(trigger.Id, string.Format("Trigger '{0}' ended {1} errors.", trigger.Name, result.Errors ? "with" : "without"), false));
         }
     }
 }

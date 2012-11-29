@@ -12,17 +12,17 @@ namespace zvs.Processor
     {
         private Core Core;
         private zvsContext Context;
+        private int id;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
         Jint.JintEngine engine = new Jint.JintEngine();
 
         #region Events
-        public delegate void onJavaScriptExecuterEventHandler(object sender, JavaScriptExecuterEventArgs args);
-        public class JavaScriptExecuterEventArgs : EventArgs
+        public class JavaScriptResult : EventArgs
         {
             public bool Errors { get; private set; }
             public string Details { get; private set; }
 
-            public JavaScriptExecuterEventArgs(bool errors, string details)
+            public JavaScriptResult(bool errors, string details)
             {
                 this.Errors = errors;
                 this.Details = details;
@@ -42,45 +42,10 @@ namespace zvs.Processor
 
         public event onReportProgressEventHandler onReportProgress;
 
-        /// <summary>
-        /// Called when JavaScript executer is finished.
-        /// </summary>
-        public event onJavaScriptExecuterEventHandler onExecuteScriptEnd;
-
-        /// <summary>
-        /// Called when JavaScript executer begins.
-        /// </summary>
-        public event onJavaScriptExecuterEventHandler onExecuteScriptBegin;
-
-        private void ReportBegin(JavaScriptExecuterEventArgs args)
-        {
-            if (args.Errors)
-                Core.log.Error(args.Details);
-            else
-                Core.log.Info(args.Details);
-
-            if (onExecuteScriptBegin != null)
-                onExecuteScriptBegin(this, args);
-        }
-
-        private void ReportEnd(JavaScriptExecuterEventArgs args)
-        {
-            if (args.Errors)
-                Core.log.Error(args.Details);
-            else
-                Core.log.Info(args.Details);
-
-            if (onExecuteScriptEnd != null)
-                onExecuteScriptEnd(this, args);
-        }
-
         private void ReportProgress(string progress, params object[] args)
         {
-            string msg = string.Format(progress, args);
-            Core.log.Error(msg);
-
             if (onReportProgress != null)
-                onReportProgress(this, new onReportProgressEventArgs(msg));
+                onReportProgress(this, new onReportProgressEventArgs(string.Format(progress, args)));
         }
 
         #endregion
@@ -88,6 +53,14 @@ namespace zvs.Processor
         public JavaScriptExecuter(Core core)
         {
             Core = core;
+
+            engine.Step += (sender, info) =>
+            {
+                ReportProgress(string.Format("JSE{0}:{1} '{2}'", id, info.CurrentStatement.Source.Start.Line, info.CurrentStatement.Source.Code.Replace(Environment.NewLine, "")));
+            };
+            Random random = new Random();
+            id = random.Next(1, 100);
+
         }
 
         //shell("wget.exe", "http://10.0.0.55/webcam/latest.jpg");
@@ -100,9 +73,8 @@ namespace zvs.Processor
         {
             return System.IO.Path.Combine(zvs.Processor.Utils.AppPath, Path);
         }
-        public void ExecuteScript(string Script, zvsContext context)
+        public async Task<JavaScriptResult> ExecuteScriptAsync(string Script, zvsContext context)
         {
-            ReportBegin(new JavaScriptExecuterEventArgs(false, "JavaScript executor started (debug mode = true)"));
             this.Context = context;
             engine.SetDebugMode(true);
             engine.DisableSecurity();
@@ -135,21 +107,22 @@ namespace zvs.Processor
                 //pull out import statements
                 //import them into the engine by running each script
                 //then run the engine as normal
-                object result = engine.Run(Script);
+
+                object result = await Task<object>.Factory.StartNew(() =>
+                {
+                    return engine.Run(Script);
+                });
 
                 if (result != null)
-                {
-                    ReportEnd(new JavaScriptExecuterEventArgs(true, string.Format("JavaScript executed without errors. {0}", result.ToString())));
-                    return;
-                }
+                    return new JavaScriptResult(true, string.Format("JSE{0} Finished without errors. {1}", id, result.ToString()));
             }
             catch (Exception exc)
             {
-                ReportEnd(new JavaScriptExecuterEventArgs(true,string.Format("JavaScript executed with errors. {0}", exc.ToString())));
-                return;
+                return new JavaScriptResult(true, string.Format("JSE{0} Finished with errors. {1}", id, exc.ToString()));
             }
-            ReportEnd(new JavaScriptExecuterEventArgs(false, "JavaScript executed without errors"));
+            return new JavaScriptResult(false, string.Format("JSE{0} Finished without errors.", id));
         }
+
         public void Require(string Script)
         {
             string path = Script;
@@ -175,7 +148,7 @@ namespace zvs.Processor
                 }
                 catch (Exception e)
                 {
-                    log.Error("Error running script: " + Script, e);
+                    log.Error(string.Format("JSE{0} Error running script: {1}", id, Script), e);
 
                 }
             }
@@ -184,15 +157,18 @@ namespace zvs.Processor
         //Delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
         public void Delay(string script, double time, bool Async)
         {
-            ReportProgress("Executing delayed script {0}...", Async ? "synchronously" : "asynchronously");
-
             AutoResetEvent mutex = new AutoResetEvent(false);
             System.Timers.Timer t = new System.Timers.Timer();
             t.Interval = time;
             t.Elapsed += (sender, e) =>
             {
                 t.Stop();
-                ExecuteScript(script, Context);
+                JavaScriptExecuter je = new JavaScriptExecuter(Core);
+                je.onReportProgress += (s, a) =>
+                {
+                    Core.log.Info(a.Progress);
+                };
+                je.ExecuteScriptAsync(script, Context).Wait();
                 mutex.Set();
                 t.Dispose();
             };
@@ -211,15 +187,13 @@ namespace zvs.Processor
         //RunDeviceCommand('Office Light','Set Level', '99');
         public void RunDeviceCommandJS(string DeviceName, string CommandName, string Value)
         {
-            ReportProgress(string.Format("Running JavaScript Command: RunDeviceCommand({0},{1},{2})", DeviceName, CommandName, Value));
-
             Device d = null;
-            using (zvsContext context = new zvsContext())            
+            using (zvsContext context = new zvsContext())
                 d = context.Devices.FirstOrDefault(o => o.Name == DeviceName);
 
             if (d == null)
             {
-                ReportProgress("Cannot find device {0}", DeviceName);
+                ReportProgress("JSE{0} Warning cannot find device {1}", id, DeviceName);
                 return;
             }
 
@@ -229,7 +203,6 @@ namespace zvs.Processor
         //RunDeviceCommand(7,'Set Level', '99');
         public void RunDeviceCommandJS(double DeviceId, string CommandName, string Value)
         {
-            ReportProgress(string.Format("Running JavaScript Command: RunDeviceCommand({0},{1},{2})", DeviceId, CommandName, Value));
             RunDeviceCommand(DeviceId, CommandName, Value);
         }
 
@@ -253,15 +226,15 @@ namespace zvs.Processor
                 }
 
                 CommandProcessor cp = new CommandProcessor(Core);
-                cp.RunDeviceCommand(context, dc, Value);
+                cp.RunDeviceCommandAsync(dc.Id, dc.DeviceId, Value).Wait();
             }
         }
-
 
         public void Error(object Message)
         {
             log.Error(Message);
         }
+
         public void Info(object Message)
         {
             if (Message != null)
@@ -270,6 +243,7 @@ namespace zvs.Processor
                 ReportProgressJS(Message.ToString());
             }
         }
+
         public void Warning(object Message)
         {
             log.Warn(Message);
@@ -278,42 +252,31 @@ namespace zvs.Processor
         //RunScene("Energy Save");
         public void RunSceneJS(string SceneName)
         {
-            ReportProgress(string.Format("Running JavaScript Command: RunScene({0})", SceneName));
             Scene s = null;
             using (zvsContext context = new zvsContext())
                 s = context.Scenes.FirstOrDefault(o => o.Name == SceneName);
-                
+
             if (s == null)
             {
-                ReportProgress("Cannot find scene {0}", SceneName);
+                ReportProgress("JSE{0} Warning cannot find scene {1}",id, SceneName);
                 return;
             }
-            RunScene(s.Id);
+            RunScene(s.Id).Wait();
         }
 
         //RunScene(1);
         public void RunSceneJS(double SceneID)
         {
-            ReportProgress(string.Format("Running JavaScript Command: RunScene({0})", SceneID));
-            RunScene(SceneID);
+            RunScene(SceneID).Wait();
         }
 
-        public void RunScene(double SceneID)
+        public async Task<CommandProcessor.CommandProcessorResult> RunScene(double SceneID)
         {
-            AutoResetEvent mutex = new AutoResetEvent(false);
             using (zvsContext context = new zvsContext())
             {
-                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
-                if (cmd != null)
-                {
-                    CommandProcessor cp = new CommandProcessor(Core);
-                    cp.onProcessingCommandEnd += (s, a) =>
-                    {
-                        mutex.Set();
-                    };
-                    cp.RunBuiltinCommand(context, cmd, SceneID.ToString());
-                    mutex.WaitOne();
-                }
+                BuiltinCommand cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
+                CommandProcessor cp = new CommandProcessor(Core);
+                return await cp.RunBuiltinCommandAsync(cmd.Id, SceneID.ToString());
             }
         }
     }

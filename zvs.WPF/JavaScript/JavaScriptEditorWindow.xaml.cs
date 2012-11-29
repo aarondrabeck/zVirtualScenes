@@ -16,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
+using zvs.Processor;
 
 
 namespace zvs.WPF.JavaScript
@@ -73,36 +74,26 @@ namespace zvs.WPF.JavaScript
             jSResultViewSource.Source = Results;
         }
 
-        private void Run()
+        private async void Run()
         {
             Results.Clear();
             string script = TriggerScriptEditor.Editor.Text;
             if (!string.IsNullOrEmpty(script))
             {
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.DoWork += (s, a) =>
+                isRunning = true;
+                SetFeedBackText("Executing JavaScript...");
+
+                //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
+                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(app.zvsCore);
+                jse.onReportProgress += (sender, args) =>
                 {
-                    isRunning = true;
-                    SetFeedBackText("Executing JavaScript...");
-                    
-                    //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
-                    zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(app.zvsCore);
-                    jse.onExecuteScriptBegin += (sender, args) =>
-                    {
-                        SetFeedBackText(args.Details);
-                    };
-                    jse.onExecuteScriptEnd += (sender, args) =>
-                    {
-                        isRunning = false;
-                        SetFeedBackText(args.Details);
-                    };
-                    jse.onReportProgress += (sender, args) =>
-                    {
-                        SetFeedBackText(args.Progress);
-                    };
-                    jse.ExecuteScript(script, Context);
+                    SetFeedBackText(args.Progress);
+                    app.zvsCore.log.Info(args.Progress);
                 };
-                bw.RunWorkerAsync();
+                JavaScriptExecuter.JavaScriptResult result = await jse.ExecuteScriptAsync(script, Context);
+                isRunning = false;
+                app.zvsCore.log.Info(result.Details);
+                SetFeedBackText(result.Details);
             }
         }
 

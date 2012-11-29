@@ -300,7 +300,7 @@ namespace zvs.Processor
             return false;
         }
 
-        private void RunTask(ScheduledTask task)
+        private async void RunTask(ScheduledTask task)
         {
             ScheduledTask _task = null;
 
@@ -328,12 +328,9 @@ namespace zvs.Processor
                 }
 
                 CommandProcessor cp = new CommandProcessor(Core);
-                cp.onProcessingCommandEnd += (s, a) =>
-                {
-                    ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
-                            string.Format("Task '{0}' ended.", _task.Name), false));
-                };
-                cp.RunStoredCommand(context, _task.StoredCommand);
+                await cp.RunStoredCommandAsync( _task.StoredCommand.Id);
+                ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
+                           string.Format("Task '{0}' ended.", _task.Name), false));
             }
         }
 

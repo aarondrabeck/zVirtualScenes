@@ -529,7 +529,7 @@ namespace LightSwitchPlugin
                                                     BroadcastMessage("MSG~" + result + Environment.NewLine);
 
                                                     CommandProcessor cp = new CommandProcessor(Core);
-                                                    cp.RunBuiltinCommand(context, zvs_cmd, g.Id.ToString());
+                                                    cp.RunBuiltinCommandAsync(zvs_cmd.Id, g.Id.ToString());
                                                 }
                                             }
 
@@ -698,7 +698,7 @@ namespace LightSwitchPlugin
                                     string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.Name, d.Name);
                                     log.Info(result);
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunDeviceTypeCommand(context, cmd, d);
+                                    cp.RunDeviceTypeCommandAsync(cmd.Id, d.Id);
                                     return;
                                 }
                                 break;
@@ -729,7 +729,7 @@ namespace LightSwitchPlugin
         /// </summary>
         /// <param name="SceneID">Scene ID</param>
         /// <param name="Client">Clients Socket.</param>
-        private void ExecuteZVSCommand(int SceneID, Socket Client)
+        private async void ExecuteZVSCommand(int SceneID, Socket Client)
         {
             using (zvsContext context = new zvsContext())
             {
@@ -737,15 +737,14 @@ namespace LightSwitchPlugin
                 if (cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(Core);
-                    cp.onProcessingCommandBegin += (s, a) =>
-                    {
-                        BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
-                    };
-                    cp.onProcessingCommandEnd += (s, a) =>
-                    {
-                        BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
-                    };
-                    cp.RunBuiltinCommand(context, cmd, SceneID.ToString());
+                    //TODO: FIX
+                    //cp.onProcessingCommandBegin += (s, a) =>
+                    //{
+                    //    BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
+                    //};
+
+                    zvs.Processor.CommandProcessor.CommandProcessorResult args = await cp.RunBuiltinCommandAsync(cmd.Id, SceneID.ToString());
+                    BroadcastMessage("MSG~" + args.Details + Environment.NewLine);
                 }
             }
         }
@@ -758,7 +757,7 @@ namespace LightSwitchPlugin
                 string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.Name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.Name);
                 log.Info(result);
                 CommandProcessor cp = new CommandProcessor(Core);
-                cp.RunDeviceCommand(context, cmd, arg);
+                cp.RunDeviceCommandAsync(cmd.Id, cmd.DeviceId, arg);
                 return true;
             }
             return false;
@@ -842,7 +841,7 @@ namespace LightSwitchPlugin
                                 {
                                     log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunDeviceTypeCommand(context, cmd, d);
+                                    cp.RunDeviceTypeCommandAsync(cmd.Id, d.Id);
                                     return;
                                 }
                                 break;
@@ -854,7 +853,7 @@ namespace LightSwitchPlugin
                                 {
                                     log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunDeviceTypeCommand(context, cmd, d);
+                                    cp.RunDeviceTypeCommandAsync(cmd.Id, d.Id);
                                     return;
                                 }
                                 break;

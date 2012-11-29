@@ -98,7 +98,7 @@ namespace WebAPI.Controllers.v2
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
-                        cp.RunBuiltinCommand(db, cmd, s.Id.ToString());
+                        cp.RunBuiltinCommandAsync( cmd.Id, s.Id.ToString());
                         return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Scene started. No other changes to the scene made.");
                     }
                 }

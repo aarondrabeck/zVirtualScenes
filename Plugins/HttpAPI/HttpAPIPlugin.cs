@@ -741,7 +741,7 @@ namespace HttpAPI
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(Core);
-                                cp.RunBuiltinCommand(context, cmd, sID.ToString());
+                                cp.RunBuiltinCommandAsync( cmd.Id, sID.ToString());
                             }
                             return new { success = true, desc = "Scene Started." };
                         }
@@ -896,7 +896,7 @@ namespace HttpAPI
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunDeviceCommand(context, cmd, arg);
+                                            cp.RunDeviceCommandAsync( cmd.Id, cmd.DeviceId, arg);
                                             return new { success = true };
                                         }
                                         else
@@ -918,7 +918,7 @@ namespace HttpAPI
 
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunDeviceTypeCommand(context, cmd, d, arg);
+                                            cp.RunDeviceTypeCommandAsync( cmd.Id, d.Id, arg);
 
                                             return new { success = true };
                                         }
@@ -983,7 +983,7 @@ namespace HttpAPI
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                         CommandProcessor cp = new CommandProcessor(Core);
-                        cp.RunBuiltinCommand(context, cmd, arg);
+                        cp.RunBuiltinCommandAsync( cmd.Id, arg);
 
                         return new { success = true };
                     }

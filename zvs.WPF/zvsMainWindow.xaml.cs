@@ -208,7 +208,7 @@ namespace zvs.WPF
             if (cmd != null)
             {
                 CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                cp.RunBuiltinCommand(context, cmd);
+                cp.RunBuiltinCommandAsync( cmd.Id);
             }
         }
 
