@@ -1,9 +1,10 @@
 ﻿
 ﻿using System;
+using zvs.Entities;
 
 namespace zvs.Processor.Logging
 {
-    public class LogItem
+    public class LogItem : IIdentity
     {
         public DateTime Datetime { get { return _Event.TimeStamp; } }
         public string DatetimeLog
@@ -121,6 +122,18 @@ namespace zvs.Processor.Logging
         public override string ToString()
         {
             return String.Format("{0:yyyy-MM-dd-hh:mm:ss:fff}|{1,6}|{2,-20}|{3}", Datetime, Urgency, Source, Description);
+        }
+
+        public int Id
+        {
+            get
+            {
+                return (int)Datetime.Ticks;
+            }
+            set
+            {
+                return;
+            }
         }
     }
 }

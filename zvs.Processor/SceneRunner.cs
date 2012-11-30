@@ -109,7 +109,7 @@ namespace zvs.Processor
             if (ExecutedCommands < CommandsToExecute.Count)
             {
                 SceneCommand sceneCommand = CommandsToExecute[ExecutedCommands];
-                zvs.Processor.CommandProcessor.CommandProcessorResult result = await cp.RunStoredCommandAsync(sceneCommand.StoredCommand.Id);
+                CommandProcessorResult result = await cp.RunStoredCommandAsync(sceneCommand.StoredCommand.Id);
 
                 if (result.Errors)
                     ExecutionErrors++;

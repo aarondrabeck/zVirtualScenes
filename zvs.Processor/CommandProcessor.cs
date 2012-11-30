@@ -9,6 +9,20 @@ using zvs.Entities;
 
 namespace zvs.Processor
 {
+    public class CommandProcessorResult : EventArgs
+    {
+        public bool Errors { get; private set; }
+        public string Details { get; private set; }
+        public int QueueCommandId { get; private set; }
+
+        public CommandProcessorResult(bool Errors, string Details, int CommandQueueID)
+        {
+            this.QueueCommandId = CommandQueueID;
+            this.Errors = Errors;
+            this.Details = Details;
+        }
+    }
+
     public class CommandProcessor
     {
         private Core Core;
@@ -21,21 +35,7 @@ namespace zvs.Processor
 
             this.Core = core;
         }
-
-        public class CommandProcessorResult : EventArgs
-        {
-            public bool Errors { get; private set; }
-            public string Details { get; private set; }
-            public int QueueCommandId { get; private set; }
-
-            public CommandProcessorResult(bool Errors, string Details, int CommandQueueID)
-            {
-                this.QueueCommandId = CommandQueueID;
-                this.Errors = Errors;
-                this.Details = Details;
-            }
-        }
-
+        
         //public Methods 
         public async Task<CommandProcessorResult> RunStoredCommandAsync(int storedCommandId)
         {

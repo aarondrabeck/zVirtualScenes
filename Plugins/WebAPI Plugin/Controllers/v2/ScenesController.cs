@@ -30,7 +30,7 @@ namespace WebAPI.Controllers.v2
 ")]
     public class ScenesController : zvsEntityController<Scene>
     {
-        public ScenesController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }        
+        public ScenesController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }
 
         protected override DbSet DBSet
         {
@@ -78,28 +78,32 @@ namespace WebAPI.Controllers.v2
         [EnableCors]
         [HttpPatch]
         [HttpPut]
-        public new HttpResponseMessage Update(int id, Delta<Scene> scene)
+        public new async Task<HttpResponseMessage> Update(int id, Delta<Scene> scene)
         {
             DenyUnauthorized();
 
             //if isRunning = true is sent, lets start the scene.
-            Scene s = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
-            if (s == null)            
+            Scene s = await Task.Run(() => BaseQueryable.Where(o => o.Id == id).SingleOrDefault());
+
+            if (s == null)
                 return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.NotFound, "Resource not found");
 
             if (scene != null)
             {
                 object isRunning = false;
                 scene.TryGetPropertyValue("isRunning", out isRunning);
-                
+
                 if ((bool)isRunning)
                 {
-                    BuiltinCommand cmd = db.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                    BuiltinCommand cmd = await Task.Run(() => db.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE"));
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
-                        cp.RunBuiltinCommandAsync( cmd.Id, s.Id.ToString());
-                        return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Scene started. No other changes to the scene made.");
+
+                        //Marshal to another thread pool thread as to not await complete...
+                        Task.Run(() => cp.RunBuiltinCommandAsync(cmd.Id, s.Id.ToString()));
+                        
+                        return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Scene started.");
                     }
                 }
             }
@@ -124,9 +128,9 @@ namespace WebAPI.Controllers.v2
         }
 
 
-       
 
-      
+
+
 
         //    [AcceptVerbs("POST")]
         //    public object Post(int id)
@@ -167,7 +171,7 @@ namespace WebAPI.Controllers.v2
 
         //        return new { success = false, reason = "Scene not found." };
         //    }
-        
+
     }
 
 }

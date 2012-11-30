@@ -96,7 +96,10 @@ namespace WebAPI.Controllers.v2
                             return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Cannot set CurrentLevelText, cannot find basic command on device");
 
                         CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
-                        cp.RunDeviceCommandAsync( basicCmd.Id, basicCmd.DeviceId, newlevel.ToString());
+
+                        //Marshal to another thread pool thread as to not await complete...
+                        Task.Run(() => cp.RunDeviceCommandAsync(basicCmd.Id, basicCmd.DeviceId, newlevel.ToString()));
+
                         return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Change basic processed");
                     }
                     return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "CurrentLevelText Invalid");

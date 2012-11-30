@@ -52,7 +52,7 @@ namespace zvs.WPF
                 myCollectionViewSource.Source = logSource;
             }
             zvs.Processor.Logging.EventedLog.OnLogItemsCleared += EventedLog_OnLogItemsCleared;
-            
+
         }
 
 
@@ -91,11 +91,11 @@ namespace zvs.WPF
         }
 
         private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
-        
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
-            
+
             log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
 
             ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
@@ -126,9 +126,9 @@ namespace zvs.WPF
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            
+
         }
-        
+
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             foreach (Window window in app.Windows)
@@ -202,13 +202,13 @@ namespace zvs.WPF
                 context.Dispose();
         }
 
-        private void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
+        private async void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
         {
             BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ALL");
             if (cmd != null)
             {
                 CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                cp.RunBuiltinCommandAsync( cmd.Id);
+                await cp.RunBuiltinCommandAsync(cmd.Id);
             }
         }
 
@@ -220,7 +220,7 @@ namespace zvs.WPF
         private void ViewLogsMI_Click_1(object sender, RoutedEventArgs e)
         {
             try
-            {                
+            {
                 string logFile = zvs.Processor.Logging.LogManager.DefaultLogFile;
                 if (System.IO.File.Exists(logFile))
                 {
@@ -530,7 +530,7 @@ namespace zvs.WPF
         private void ClearLogsMI_Click(object sender, RoutedEventArgs e)
         {
             zvs.Processor.Logging.EventedLog.Clear();
-            
+
         }
 
         void EventedLog_OnLogItemsCleared()
@@ -538,6 +538,6 @@ namespace zvs.WPF
             logSource.Clear();
         }
 
-            
+
     }
 }

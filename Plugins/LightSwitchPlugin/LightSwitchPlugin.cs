@@ -743,7 +743,7 @@ namespace LightSwitchPlugin
                     //    BroadcastMessage("MSG~" + a.Details + Environment.NewLine);
                     //};
 
-                    zvs.Processor.CommandProcessor.CommandProcessorResult args = await cp.RunBuiltinCommandAsync(cmd.Id, SceneID.ToString());
+                    CommandProcessorResult args = await cp.RunBuiltinCommandAsync(cmd.Id, SceneID.ToString());
                     BroadcastMessage("MSG~" + args.Details + Environment.NewLine);
                 }
             }

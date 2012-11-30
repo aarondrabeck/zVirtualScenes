@@ -231,7 +231,7 @@ namespace zvs.Processor
 
                 CommandProcessor cp = new CommandProcessor(Core);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                CommandProcessor.CommandProcessorResult result = Task.Run(() => cp.RunDeviceCommandAsync(dc.Id, dc.DeviceId, Value)).Result;
+                CommandProcessorResult result = Task.Run(() => cp.RunDeviceCommandAsync(dc.Id, dc.DeviceId, Value)).Result;
             }
         }
 
@@ -268,17 +268,17 @@ namespace zvs.Processor
             }
 
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            CommandProcessor.CommandProcessorResult result =  Task.Run(() => RunSceneAsync(s.Id)).Result;
+            CommandProcessorResult result =  Task.Run(() => RunSceneAsync(s.Id)).Result;
         }
 
         //RunScene(1);
         public void RunSceneJS(double SceneID)
         {
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            CommandProcessor.CommandProcessorResult result = Task.Run(() => RunSceneAsync(SceneID)).Result;
+            CommandProcessorResult result = Task.Run(() => RunSceneAsync(SceneID)).Result;
         }
 
-        public async Task<CommandProcessor.CommandProcessorResult> RunSceneAsync(double SceneID)
+        public async Task<CommandProcessorResult> RunSceneAsync(double SceneID)
         {
             using (zvsContext context = new zvsContext())
             {
