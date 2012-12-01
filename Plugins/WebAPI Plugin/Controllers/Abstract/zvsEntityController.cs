@@ -45,6 +45,7 @@ namespace WebAPI.Controllers
         protected IQueryable<TEntity> Get()
         {
             DenyUnauthorized();
+
             return BaseQueryable;
         }
 
@@ -55,6 +56,8 @@ namespace WebAPI.Controllers
 
         protected HttpResponseMessage GetById(int id)
         {
+            DenyUnauthorized();
+
             TEntity tEntity = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
             DTOFactory<TEntity> dtoFactory = new DTOFactory<TEntity>(tEntity);
             return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "OK", dtoFactory.getDTO());
@@ -94,7 +97,7 @@ namespace WebAPI.Controllers
             }
 
             tEntityPatch.Patch(entity);
-            db.SaveChanges();
+            SaveChanges(db);
 
             return Request.CreateResponse(HttpStatusCode.NoContent);
         }
@@ -116,9 +119,17 @@ namespace WebAPI.Controllers
            
             DBSet.Add(tEntity);
 
+            SaveChanges(db);
+            
+            DTOFactory<TEntity> dtoFactory = new DTOFactory<TEntity>(tEntity);
+            return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.Created, "Created", dtoFactory.getDTO());
+        }
+
+        protected void SaveChanges(DbContext context)
+        {
             try
             {
-                db.SaveChanges();
+                context.SaveChanges();
             }
             catch (DbEntityValidationException dbEx)
             {
@@ -137,16 +148,13 @@ namespace WebAPI.Controllers
 
                 Dictionary<string, object> ResponseDictionary = new Dictionary<string, object>();
                 ResponseDictionary.Add("ValidationErrors", ValidationErrors);
-                return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Bad Request", null, ResponseDictionary);
+                throw new HttpResponseException(Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Bad Request", null, ResponseDictionary));
             }
             catch (Exception ex)
             {
                 string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
-                return Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Validation Errors", new { ValidationErrors = ErrMsg });
+                throw new HttpResponseException(Request.CreateResponse(ResponseStatus.Error, HttpStatusCode.BadRequest, "Validation Errors", new { ValidationErrors = ErrMsg }));
             }
-
-            DTOFactory<TEntity> dtoFactory = new DTOFactory<TEntity>(tEntity);
-            return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.Created, "Created", dtoFactory.getDTO());
         }
         
         /// <summary>
@@ -200,6 +208,7 @@ namespace WebAPI.Controllers
         protected IQueryable<object> GetNestedCollection(int id, string propertyName)
         {
             DenyUnauthorized();
+
             TEntity tEntity = BaseQueryable.Where(o => o.Id == id).SingleOrDefault();
 
             if (string.IsNullOrEmpty(propertyName))

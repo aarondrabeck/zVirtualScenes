@@ -757,7 +757,7 @@ namespace LightSwitchPlugin
                 string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.Name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.Name);
                 log.Info(result);
                 CommandProcessor cp = new CommandProcessor(Core);
-                cp.RunDeviceCommandAsync(cmd.Id, cmd.DeviceId, arg);
+                cp.RunDeviceCommandAsync(cmd.Id, arg);
                 return true;
             }
             return false;

@@ -119,7 +119,10 @@ namespace zvs.Entities
 
         public virtual ObservableCollection<QueuedDeviceCommand> QueuedDeviceCommands { get; set; }
         public virtual ObservableCollection<QueuedDeviceTypeCommand> QueuedDeviceTypeCommands { get; set; }
+
+        [ConfidentialData]
         public virtual ObservableCollection<DeviceCommand> Commands { get; set; }
+
         public virtual ObservableCollection<DevicePropertyValue> PropertyValues { get; set; }
         public virtual ObservableCollection<DeviceValue> Values { get; set; }
         public virtual ObservableCollection<Group> Groups { get; set; }

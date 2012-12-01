@@ -35,7 +35,7 @@ namespace zvs.Processor
 
             this.Core = core;
         }
-        
+
         //public Methods 
         public async Task<CommandProcessorResult> RunStoredCommandAsync(int storedCommandId)
         {
@@ -46,7 +46,7 @@ namespace zvs.Processor
                 if (sc.Command == null)
                     return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.", 0);
                 if (sc.Command is DeviceCommand)
-                    return await RunDeviceCommandAsync(sc.CommandId, ((DeviceCommand)sc.Command).DeviceId, sc.Argument);
+                    return await RunDeviceCommandAsync(sc.CommandId, sc.Argument);
                 else if (sc.Command is DeviceTypeCommand)
                     return await RunDeviceTypeCommandAsync(sc.Command.Id, sc.Device.Id, sc.Argument);
                 else if (sc.Command is JavaScriptCommand)
@@ -58,17 +58,18 @@ namespace zvs.Processor
             return new CommandProcessorResult(true, "Failed to process stored command. Command type unknown.", 0);
         }
 
-        public async Task<CommandProcessorResult> RunDeviceCommandAsync(int deviceCommandId, int deviceId, string argument = "")
+        public async Task<CommandProcessorResult> RunDeviceCommandAsync(int deviceCommandId, string argument = "")
         {
             QueuedDeviceCommand qdc = await Task<QueuedDeviceCommand>.Factory.StartNew(() =>
             {
                 using (zvsContext context = new zvsContext())
                 {
+                    var deviceCmd = context.DeviceCommands.Single(o => o.Id == deviceCommandId);
                     var cmd = new QueuedDeviceCommand
                     {
-                        Command = context.DeviceCommands.Single(o => o.Id == deviceCommandId),
+                        Command = deviceCmd,
                         Argument = argument,
-                        Device = context.Devices.Single(o => o.Id == deviceId)
+                        Device = deviceCmd.Device
                     };
 
                     context.QueuedCommands.Add(cmd);
@@ -519,12 +520,12 @@ namespace zvs.Processor
                     Core.log.Info(args.Progress);
                 };
 
-               JavaScriptExecuter.JavaScriptResult jsResult = await je.ExecuteScriptAsync(js.Script, context);
+                JavaScriptExecuter.JavaScriptResult jsResult = await je.ExecuteScriptAsync(js.Script, context);
 
-               string details = string.Format("{0}. Queued JavaScript cmd '{1}' processed.",
-                               jsResult.Details,
-                               cmd.Command.Name);
-               
+                string details = string.Format("{0}. Queued JavaScript cmd '{1}' processed.",
+                                jsResult.Details,
+                                cmd.Command.Name);
+
                 await Task.Factory.StartNew(() =>
                 {
                     //Remove processed command from queue

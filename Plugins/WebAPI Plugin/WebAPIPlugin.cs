@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -156,6 +157,12 @@ namespace WebAPI
                  routeTemplate: "{controller}/{action}",
                  defaults: new { controller = "Home", action = "Index" }
             );
+
+            //NO ONE CAN GET XML
+            config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
+
+            //BROWSERS GET JSON
+            config.Formatters[0].SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html")); 
 
             server = new HttpSelfHostServer(config);
 

@@ -46,9 +46,6 @@ namespace WebAPI.Controllers.v2
         [DTOQueryable]
         public new IQueryable<Device> Get()
         {
-            //Check authorization
-            DenyUnauthorized();
-
             return base.Get().OrderBy(o => o.Name);
         }
 
@@ -98,7 +95,7 @@ namespace WebAPI.Controllers.v2
                         CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
 
                         //Marshal to another thread pool thread as to not await complete...
-                        Task.Run(() => cp.RunDeviceCommandAsync(basicCmd.Id, basicCmd.DeviceId, newlevel.ToString()));
+                        Task.Run(() => cp.RunDeviceCommandAsync(basicCmd.Id, newlevel.ToString()));
 
                         return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Change basic processed");
                     }

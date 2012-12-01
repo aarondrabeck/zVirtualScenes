@@ -13,7 +13,7 @@ namespace WebAPI.Cors
             if (actionExecutedContext.Request.Headers.Contains(Origin))
             {
                 string originHeader = actionExecutedContext.Request.Headers.GetValues(Origin).FirstOrDefault();
-                if (!string.IsNullOrEmpty(originHeader))
+                if (!string.IsNullOrEmpty(originHeader) && actionExecutedContext.Response!= null)
                 {
                     actionExecutedContext.Response.Headers.Add(AccessControlAllowOrigin, originHeader);
                 }

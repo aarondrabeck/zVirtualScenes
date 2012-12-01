@@ -896,7 +896,7 @@ namespace HttpAPI
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunDeviceCommandAsync( cmd.Id, cmd.DeviceId, arg);
+                                            cp.RunDeviceCommandAsync( cmd.Id, arg);
                                             return new { success = true };
                                         }
                                         else

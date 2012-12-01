@@ -127,51 +127,6 @@ namespace WebAPI.Controllers.v2
             return base.GetNestedCollection(parentId, nestedCollectionName);
         }
 
-
-
-
-
-
-        //    [AcceptVerbs("POST")]
-        //    public object Post(int id)
-        //    {
-        //        base.Log(log, "id=", id);
-
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Scene scene = context.Scenes.FirstOrDefault(s => s.Id == id);
-
-        //            if (scene != null)
-        //            {
-        //                return Post(scene.Name);
-        //            }
-        //        }
-        //        return new { success = false, reason = "Scene not found." };
-        //    }
-        //    [AcceptVerbs("POST")]
-        //    public object Post(string name)
-        //    {
-        //        base.Log(log, "name=", name);
-
-        //        using (zvsContext context = new zvsContext())
-        //        {
-        //            Scene scene = context.Scenes.FirstOrDefault(s => s.Name == name);
-
-        //            if (scene != null)
-        //            {
-        //                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
-        //                if (cmd != null)
-        //                {
-        //                    CommandProcessor cp = new CommandProcessor(Core);
-        //                    cp.RunBuiltinCommand(context, cmd, scene.Id.ToString());
-        //                }
-        //                return new { success = true, desc = "Scene Started." };
-        //            }
-        //        }
-
-        //        return new { success = false, reason = "Scene not found." };
-        //    }
-
     }
 
 }

@@ -12,7 +12,10 @@ using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers.v2
 {
-    [Documentation("v2/Log", 2.1, "All devices.")]
+    [Documentation("v2/Log", 2.1, 
+     @"Current log entries. 
+
+       Send DELETE to the collection to clear the log.")]
     public class LogItemsController : zvsController 
     {
         public LogItemsController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }
@@ -32,6 +35,7 @@ namespace WebAPI.Controllers.v2
         [HttpDelete]
         public HttpResponseMessage Remove()
         {
+            //Check authorization
             DenyUnauthorized();
 
             EventedLog.Clear();
@@ -53,19 +57,4 @@ namespace WebAPI.Controllers.v2
         }
 
     }
-    //public class LogController : zvsControllerBase
-    //{
-    //    ILog log = LogManager.GetLogger<LogController>();
-
-    //    public IEnumerable<zvs.Processor.Logging.LogItem> Get()
-    //    {
-    //        base.Log(log);
-    //        return EventedLog.Items;
-    //    }
-    //    public void Delete()
-    //    {
-    //        EventedLog.Clear();
-    //        base.Log(log);
-    //    }
-    //}
 }

@@ -23,6 +23,7 @@ namespace zvs.Processor.Logging
         //
         // Remarks:
         //      Gets the AppDomain friendly name.
+        [ConfidentialData]
         public string Domain { get { return _Event.Domain; } }
         //
         // Summary:
@@ -36,6 +37,7 @@ namespace zvs.Processor.Logging
         //     this property.
         //     If there is no defined exception object for this event then null will be
         //     returned.
+         [ConfidentialData]
         public Exception ExceptionObject { get { return _Event.ExceptionObject; } }
         //
         // Summary:
@@ -44,6 +46,7 @@ namespace zvs.Processor.Logging
         // Remarks:
         //      Calls System.Threading.Thread.CurrentPrincipal.Identity.Name to get the
         //     name of the current thread principal.
+         [ConfidentialData]
         public string Identity { get { return _Event.Identity; } }
         //
         // Summary:
@@ -59,6 +62,7 @@ namespace zvs.Processor.Logging
         //
         // Remarks:
         //      Gets all available caller information, in the format fully.qualified.classname.of.caller.methodName(Filename:line)
+         [ConfidentialData]
         public string LocationFullInfo { get { return _Event.LocationInformation.FullInfo; } }
         //
         // Summary:
@@ -66,6 +70,7 @@ namespace zvs.Processor.Logging
         //
         // Remarks:
         //      Gets the line number of the caller.
+         [ConfidentialData]
         public string LocationLineNumber { get { return _Event.LocationInformation.LineNumber; } }
         //
         // Summary:
@@ -73,6 +78,7 @@ namespace zvs.Processor.Logging
         //
         // Remarks:
         //      Gets the method name of the caller.
+         [ConfidentialData]
         public string LocationMethodName { get { return _Event.LocationInformation.MethodName; } }
         //
         // Summary:
@@ -84,6 +90,7 @@ namespace zvs.Processor.Logging
         //     object will not be transferred. To get the text of the message the log4net.Core.LoggingEvent.RenderedMessage
         //     property must be used not this property.
         //     If there is no defined message object for this event then null will be returned.
+         [ConfidentialData]
         public object MessageObject { get { return _Event.MessageObject; } }
         //
         // Summary:
