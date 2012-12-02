@@ -77,8 +77,8 @@ Source: "..\bin\release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\bin\release\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\log4net.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\Microsoft.Data.Edm.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\release\System.Spatial.dll"; DestDir: "{app}"; Flags: ignoreversion
 
- 
 
 Source: "..\bin\release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\bin\release\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion           
