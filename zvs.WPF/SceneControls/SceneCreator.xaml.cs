@@ -47,7 +47,7 @@ namespace zvs.WPF.SceneControls
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
                 myCollectionViewSource.Source = context.Scenes.Local;
                 context.Scenes.ToList();
-                
+
             }
             SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
             zvsContext.onScenesChanged += zvsContext_onScenesChanged;
@@ -249,7 +249,7 @@ namespace zvs.WPF.SceneControls
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                        cp.RunBuiltinCommandAsync( cmd.Id, scene.Id.ToString());
+                        cp.RunCommandAsync(cmd.Id, scene.Id.ToString());
                     }
                 }
             }
@@ -280,8 +280,7 @@ namespace zvs.WPF.SceneControls
                                     StoredCommand = new StoredCommand
                                     {
                                         Argument = sc.StoredCommand.Argument,
-                                        Command = sc.StoredCommand.Command,
-                                        Device = sc.StoredCommand.Device
+                                        Command = sc.StoredCommand.Command
                                     },
                                     SortOrder = sc.SortOrder
                                 });
@@ -329,7 +328,7 @@ namespace zvs.WPF.SceneControls
                             //Create a Stored Command.
                             //pre-fill the device with users dropped device.
                             StoredCommand sc = new StoredCommand();
-                            sc.Device = d2;
+                            sc.Command = d2.Commands.FirstOrDefault();
 
                             //Send it to the command builder to get filled with a command
                             CommandBuilder cbWindow = new CommandBuilder(context, sc);
@@ -558,7 +557,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
             if (SceneGrid.SelectedItem == null || SceneGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
@@ -571,12 +570,11 @@ namespace zvs.WPF.SceneControls
                 SceneCommandGrid.Visibility = System.Windows.Visibility.Visible;
             }
 
-            //TODO: FIX lame hack
-            System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Elapsed += (s, args) =>
-            {
-                timer.Stop();
+            await Task.Delay(10);
 
+            //TODO: FIX lame hack
+            await Task.Run(() =>
+            {
                 this.Dispatcher.Invoke(new Action(() =>
                 {
                     SortSceneCMDsGridBySortOrder();
@@ -586,9 +584,7 @@ namespace zvs.WPF.SceneControls
                     if (SceneCmdsGrid.Items.Count > 0)
                         SceneCmdsGrid.SelectedIndex = 0;
                 }));
-            };
-            timer.Interval = 10;
-            timer.Start();
+            });
             //END TODO
         }
 

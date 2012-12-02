@@ -103,7 +103,7 @@ namespace zvs.WPF
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(zvsCore);
-                                cp.RunBuiltinCommandAsync( cmd.Id, scene.Id.ToString());
+                                cp.RunCommandAsync( cmd.Id, scene.Id.ToString());
                             }
                         }
                         else

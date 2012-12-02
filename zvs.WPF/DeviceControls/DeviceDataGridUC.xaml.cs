@@ -229,14 +229,6 @@ namespace zvs.WPF.DeviceControls
                     if (d != null)
                     {
                         //Check for device dependencies
-                        foreach (StoredCommand storedCommand in context.StoredCommands.Where(t => t.Device.Id == d.Id))
-                        {
-                            StoredCommand.RemoveDependencies(context, storedCommand);
-                            context.StoredCommands.Local.Remove(storedCommand);
-                        }
-                        context.SaveChanges();
-
-                        //Check for device dependencies
                         foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id))
                         {
                             MessageBoxResult result = MessageBox.Show(

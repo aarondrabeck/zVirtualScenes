@@ -175,9 +175,7 @@ namespace HttpAPI
             }
         }
 
-        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
-
-        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
+        public override void ProcessCommand(int queuedCommandId) { }
 
         public override void Repoll(zvs.Entities.Device device) { }
 
@@ -741,7 +739,7 @@ namespace HttpAPI
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(Core);
-                                cp.RunBuiltinCommandAsync( cmd.Id, sID.ToString());
+                                cp.RunCommandAsync( cmd.Id, sID.ToString());
                             }
                             return new { success = true, desc = "Scene Started." };
                         }
@@ -896,7 +894,7 @@ namespace HttpAPI
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunDeviceCommandAsync( cmd.Id, arg);
+                                            cp.RunCommandAsync( cmd.Id, arg);
                                             return new { success = true };
                                         }
                                         else
@@ -918,7 +916,7 @@ namespace HttpAPI
 
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunDeviceTypeCommandAsync( cmd.Id, d.Id, arg);
+                                            cp.RunCommandAsync(cmd.Id, arg, d.Id.ToString());
 
                                             return new { success = true };
                                         }
@@ -983,7 +981,7 @@ namespace HttpAPI
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                         CommandProcessor cp = new CommandProcessor(Core);
-                        cp.RunBuiltinCommandAsync( cmd.Id, arg);
+                        cp.RunCommandAsync( cmd.Id, arg);
 
                         return new { success = true };
                     }

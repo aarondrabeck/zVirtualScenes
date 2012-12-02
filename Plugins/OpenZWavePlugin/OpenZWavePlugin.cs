@@ -334,247 +334,261 @@ namespace OpenZWavePlugin
             }
         }
 
-        public override void ProcessDeviceTypeCommand(QueuedDeviceTypeCommand cmd)
+        public override void ProcessCommand(int queuedCommandId)
         {
-            if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
+            using (zvsContext context = new zvsContext())
             {
-                switch (cmd.Command.UniqueIdentifier)
+                QueuedCommand queuedCommand = context.QueuedCommands.Single(o => o.Id == queuedCommandId);
+
+                if (queuedCommand.Command is DeviceTypeCommand)
                 {
-                    case "RESET":
+                    //Try to get the device from the second Argument
+                    Device device =  null;
+                    if (!Device.TryGetDevice(context, queuedCommand.Argument2, out device))
+                        return;
+
+                    if (device.Type.UniqueIdentifier == "CONTROLLER")
+                    {
+                        switch (queuedCommand.Command.UniqueIdentifier)
                         {
-                            m_manager.ResetController(m_homeId);
-                            break;
+                            case "RESET":
+                                {
+                                    m_manager.ResetController(m_homeId);
+                                    break;
+                                }
+                            case "ADDDEVICE":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddDevice, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "AddController":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddController, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "CreateNewPrimary":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.CreateNewPrimary, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "ReceiveConfiguration":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReceiveConfiguration, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "RemoveController":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveController, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "RemoveDevice":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveDevice, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "TransferPrimaryRole":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.TransferPrimaryRole, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "HasNodeFailed":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.HasNodeFailed, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "RemoveFailedNode":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveFailedNode, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
+                            case "ReplaceFailedNode":
+                                {
+                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReplaceFailedNode, (byte)device.NodeNumber);
+                                    dlg.ShowDialog();
+                                    dlg.Dispose();
+                                    break;
+                                }
                         }
-                    case "ADDDEVICE":
+                    }
+                    else if (device.Type.UniqueIdentifier == "SWITCH")
+                    {
+                        switch (queuedCommand.Command.UniqueIdentifier)
                         {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddDevice, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
+                            case "MOMENTARY":
+                                {
+                                    int delay = 1000;
+                                    int.TryParse(queuedCommand.Argument, out delay);
+                                    byte nodeID = (byte)device.NodeNumber;
+
+                                    m_manager.SetNodeOn(m_homeId, nodeID);
+                                    System.Timers.Timer t = new System.Timers.Timer();
+                                    t.Interval = delay;
+                                    t.Elapsed += (sender, e) =>
+                                    {
+                                        t.Stop();
+                                        m_manager.SetNodeOff(m_homeId, nodeID);
+                                        t.Dispose();
+                                    };
+                                    t.Start();
+                                    break;
+
+                                }
+                            case "TURNON":
+                                {
+                                    m_manager.SetNodeOn(m_homeId, (byte)device.NodeNumber);
+                                    break;
+                                }
+                            case "TURNOFF":
+                                {
+                                    m_manager.SetNodeOff(m_homeId, (byte)device.NodeNumber);
+                                    break;
+                                }
                         }
-                    case "AddController":
+                    }
+                    else if (device.Type.UniqueIdentifier == "DIMMER")
+                    {
+                        switch (queuedCommand.Command.UniqueIdentifier)
                         {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddController, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
+                            case "TURNON":
+                                {
+                                    using (zvsContext Context = new zvsContext())
+                                    {
+                                        byte defaultonlevel = 99;
+                                        byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, device, base.Name + "DEFAULONLEVEL"), out defaultonlevel);
+                                        m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, defaultonlevel);
+                                    }
+                                    break;
+                                }
+                            case "TURNOFF":
+                                {
+                                    m_manager.SetNodeOff(m_homeId, (byte)device.NodeNumber);
+                                    break;
+                                }
+                            case "SETPRESETLEVEL":
+                                {
+                                    switch (queuedCommand.Argument)
+                                    {
+                                        case "0%":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(0));
+                                            break;
+                                        case "20%":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(20));
+                                            break;
+                                        case "40%":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(40));
+                                            break;
+                                        case "60%":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(60));
+                                            break;
+                                        case "80%":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(80));
+                                            break;
+                                        case "100%":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(100));
+                                            break;
+                                        case "255":
+                                            m_manager.SetNodeLevel(m_homeId, (byte)device.NodeNumber, Convert.ToByte(255));
+                                            break;
+                                    }
+                                    break;
+                                }
                         }
-                    case "CreateNewPrimary":
+                    }
+                    else if (device.Type.UniqueIdentifier == "THERMOSTAT")
+                    {
+                        switch (queuedCommand.Command.UniqueIdentifier)
                         {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.CreateNewPrimary, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
+                            case "SETENERGYMODE":
+                                {
+                                    m_manager.SetNodeOff(m_homeId, (byte)device.NodeNumber);
+                                    break;
+                                }
+                            case "SETCONFORTMODE":
+                                {
+                                    m_manager.SetNodeOn(m_homeId, (byte)device.NodeNumber);
+                                    break;
+                                }
                         }
-                    case "ReceiveConfiguration":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReceiveConfiguration, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
-                    case "RemoveController":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveController, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
-                    case "RemoveDevice":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveDevice, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
-                    case "TransferPrimaryRole":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.TransferPrimaryRole, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
-                    case "HasNodeFailed":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.HasNodeFailed, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
-                    case "RemoveFailedNode":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveFailedNode, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
-                    case "ReplaceFailedNode":
-                        {
-                            ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.ReplaceFailedNode, (byte)cmd.Device.NodeNumber);
-                            dlg.ShowDialog();
-                            dlg.Dispose();
-                            break;
-                        }
+                    }
                 }
-            }
-            else if (cmd.Device.Type.UniqueIdentifier == "SWITCH")
-            {
-                switch (cmd.Command.UniqueIdentifier)
+                else if (queuedCommand.Command is DeviceCommand)
                 {
-                    case "MOMENTARY":
-                        {
-                            int delay = 1000;
-                            int.TryParse(cmd.Argument, out delay);
-                            byte nodeID = (byte)cmd.Device.NodeNumber;
+                    DeviceCommand deviceTypeCommand = (DeviceCommand)queuedCommand.Command;
 
-                            m_manager.SetNodeOn(m_homeId, nodeID);
-                            System.Timers.Timer t = new System.Timers.Timer();
-                            t.Interval = delay;
-                            t.Elapsed += (sender, e) =>
-                            {
-                                t.Stop();
-                                m_manager.SetNodeOff(m_homeId, nodeID);
-                                t.Dispose();
-                            };
-                            t.Start();
-                            break;
+                    if (queuedCommand.Command.UniqueIdentifier.Contains("DYNAMIC_CMD_"))
+                    {
+                        //Get more info from this Node from OpenZWave
+                        Node node = GetNode(m_homeId, (byte)deviceTypeCommand.Device.NodeNumber);
 
-                        }
-                    case "TURNON":
+                        switch (queuedCommand.Command.ArgumentType)
                         {
-                            m_manager.SetNodeOn(m_homeId, (byte)cmd.Device.NodeNumber);
-                            break;
-                        }
-                    case "TURNOFF":
-                        {
-                            m_manager.SetNodeOff(m_homeId, (byte)cmd.Device.NodeNumber);
-                            break;
-                        }
-                }
-            }
-            else if (cmd.Device.Type.UniqueIdentifier == "DIMMER")
-            {
-                switch (cmd.Command.UniqueIdentifier)
-                {
-                    case "TURNON":
-                        {
-                            using (zvsContext Context = new zvsContext())
-                            {
-                                byte defaultonlevel = 99;
-                                byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, cmd.Device, base.Name + "DEFAULONLEVEL"), out defaultonlevel);
-                                m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, defaultonlevel);
-                            }
-                            break;
-                        }
-                    case "TURNOFF":
-                        {
-                            m_manager.SetNodeOff(m_homeId, (byte)cmd.Device.NodeNumber);
-                            break;
-                        }
-                    case "SETPRESETLEVEL":
-                        {
-                            switch (cmd.Argument)
-                            {
-                                case "0%":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(0));
+                            case DataType.BYTE:
+                                {
+                                    byte b = 0;
+                                    byte.TryParse(queuedCommand.Argument, out b);
+
+                                    foreach (Value v in node.Values)
+                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
+                                            m_manager.SetValue(v.ValueID, b);
                                     break;
-                                case "20%":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(20));
-                                    break;
-                                case "40%":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(40));
-                                    break;
-                                case "60%":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(60));
-                                    break;
-                                case "80%":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(80));
-                                    break;
-                                case "100%":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(100));
-                                    break;
-                                case "255":
-                                    m_manager.SetNodeLevel(m_homeId, (byte)cmd.Device.NodeNumber, Convert.ToByte(255));
-                                    break;
-                            }
-                            break;
-                        }
-                }
-            }
-            else if (cmd.Device.Type.UniqueIdentifier == "THERMOSTAT")
-            {
-                switch (cmd.Command.UniqueIdentifier)
-                {
-                    case "SETENERGYMODE":
-                        {
-                            m_manager.SetNodeOff(m_homeId, (byte)cmd.Device.NodeNumber);
-                            break;
-                        }
-                    case "SETCONFORTMODE":
-                        {
-                            m_manager.SetNodeOn(m_homeId, (byte)cmd.Device.NodeNumber);
-                            break;
-                        }
-                }
-            }
-        }
+                                }
+                            case DataType.BOOL:
+                                {
+                                    bool b = true;
+                                    bool.TryParse(queuedCommand.Argument, out b);
 
-        public override void ProcessDeviceCommand(QueuedDeviceCommand cmd)
-        {
-            if (cmd.Command.UniqueIdentifier.Contains("DYNAMIC_CMD_"))
-            {
-                //Get more info from this Node from OpenZWave
-                Node node = GetNode(m_homeId, (byte)cmd.Device.NodeNumber);
+                                    foreach (Value v in node.Values)
+                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
+                                            m_manager.SetValue(v.ValueID, b);
+                                    break;
+                                }
+                            case DataType.DECIMAL:
+                                {
+                                    float f = Convert.ToSingle(queuedCommand.Argument);
 
-                switch (cmd.Command.ArgumentType)
-                {
-                    case DataType.BYTE:
-                        {
-                            byte b = 0;
-                            byte.TryParse(cmd.Argument, out b);
+                                    foreach (Value v in node.Values)
+                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
+                                            m_manager.SetValue(v.ValueID, f);
+                                    break;
+                                }
+                            case DataType.LIST:
+                            case DataType.STRING:
+                                {
+                                    foreach (Value v in node.Values)
+                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
+                                            m_manager.SetValue(v.ValueID, queuedCommand.Argument);
+                                    break;
+                                }
+                            case DataType.INTEGER:
+                                {
+                                    int i = 0;
+                                    int.TryParse(queuedCommand.Argument, out i);
 
-                            foreach (Value v in node.Values)
-                                if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.Command.CustomData1))
-                                    m_manager.SetValue(v.ValueID, b);
-                            break;
+                                    foreach (Value v in node.Values)
+                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
+                                            m_manager.SetValue(v.ValueID, i);
+                                    break;
+                                }
                         }
-                    case DataType.BOOL:
-                        {
-                            bool b = true;
-                            bool.TryParse(cmd.Argument, out b);
-
-                            foreach (Value v in node.Values)
-                                if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.Command.CustomData1))
-                                    m_manager.SetValue(v.ValueID, b);
-                            break;
-                        }
-                    case DataType.DECIMAL:
-                        {
-                            float f = Convert.ToSingle(cmd.Argument);
-
-                            foreach (Value v in node.Values)
-                                if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.Command.CustomData1))
-                                    m_manager.SetValue(v.ValueID, f);
-                            break;
-                        }
-                    case DataType.LIST:
-                    case DataType.STRING:
-                        {
-                            foreach (Value v in node.Values)
-                                if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.Command.CustomData1))
-                                    m_manager.SetValue(v.ValueID, cmd.Argument);
-                            break;
-                        }
-                    case DataType.INTEGER:
-                        {
-                            int i = 0;
-                            int.TryParse(cmd.Argument, out i);
-
-                            foreach (Value v in node.Values)
-                                if (m_manager.GetValueLabel(v.ValueID).Equals(cmd.Command.CustomData1))
-                                    m_manager.SetValue(v.ValueID, i);
-                            break;
-                        }
+                    }
                 }
             }
         }

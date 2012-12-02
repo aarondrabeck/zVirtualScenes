@@ -15,27 +15,6 @@ namespace zvs.Entities
     {
         public int Id { get; set; }
 
-        public int? DeviceId { get; set; }
-        private Device _Device;
-        public virtual Device Device
-        {
-            get
-            {
-                return _Device;
-            }
-            set
-            {
-                if (value != _Device)
-                {
-                    _Device = value;
-                    NotifyPropertyChanged("ActionDescription");
-                    NotifyPropertyChanged("ActionableObject");
-                    NotifyPropertyChanged("Device");
-                    NotifyPropertyChanged("Summary");
-                }
-            }
-        }
-
         //public int? DeviceValueTriggerId { get; set; }
         //not sure how or if you can expose the ID here
         public virtual DeviceValueTrigger DeviceValueTrigger { get; set; }
@@ -98,6 +77,24 @@ namespace zvs.Entities
             }
         }
 
+        private string _Argument2;
+        [StringLength(512)]
+        public string Argument2
+        {
+            get
+            {
+                return _Argument2;
+            }
+            set
+            {
+                if (value != _Argument2)
+                {
+                    _Argument2 = value;
+                    NotifyPropertyChanged("Argument2");
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyPropertyChanged(string name)
         {
@@ -123,11 +120,24 @@ namespace zvs.Entities
                 {
                     return this.Command.Name;
                 }
-                else if (this.Command is DeviceCommand ||
-                         this.Command is DeviceTypeCommand)
+                else if (this.Command is DeviceCommand)
                 {
-                    if (Device != null)
-                        return Device.Name;
+                    using (zvsContext context = new zvsContext())
+                    {
+                        DeviceCommand dc = context.DeviceCommands.Find(this.Command.Id);
+                        return dc.Device.Name;
+                    }
+                }
+                else if (this.Command is DeviceTypeCommand)
+                {
+                    using (zvsContext context = new zvsContext())
+                    {
+                        Device d = null;
+                        if (Device.TryGetDevice(context, this.Argument2, out d))
+                            return d.Name;
+                        else
+                            return "Unknown Device";
+                    }
                 }
                 else if (this.Command is JavaScriptCommand)
                 {

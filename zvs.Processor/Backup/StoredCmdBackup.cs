@@ -12,7 +12,7 @@ namespace zvs.Processor.Backup
         Unknown = 0,
         Builtin = 1,
         Device = 2,
-        DeviceType = 3, 
+        DeviceType = 3,
         JavaScript = 4
     }
 
@@ -22,6 +22,7 @@ namespace zvs.Processor.Backup
         public Command_Types CommandType;
         public string UniqueIdentifier;
         public string Argument;
+        public string Argument2;
         public int NodeNumber;
 
         public static implicit operator StoredCMDBackup(StoredCommand m)
@@ -31,17 +32,25 @@ namespace zvs.Processor.Backup
             if (m.Command is BuiltinCommand)
                 bcmd.CommandType = Command_Types.Builtin;
             else if (m.Command is DeviceTypeCommand)
+            {
                 bcmd.CommandType = Command_Types.DeviceType;
+                using (zvsContext context = new zvsContext())
+                {
+                    Device d = null;
+                    if (Device.TryGetDevice(context, m.Argument2, out d))
+                        bcmd.NodeNumber = d.NodeNumber;
+                }
+            }
             else if (m.Command is DeviceCommand)
+            {
                 bcmd.CommandType = Command_Types.Device;
+                bcmd.NodeNumber = ((DeviceCommand)m.Command).Device.NodeNumber;
+            }
             else if (m.Command is JavaScriptCommand)
                 bcmd.CommandType = Command_Types.JavaScript;
 
             if (m.Command != null)
                 bcmd.UniqueIdentifier = m.Command.UniqueIdentifier;
-
-            if (m.Device != null)
-                bcmd.NodeNumber = m.Device.NodeNumber;
 
             bcmd.Argument = m.Argument;
 
@@ -59,6 +68,8 @@ namespace zvs.Processor.Backup
             if (backupStoredCMD.CommandType == Command_Types.Device ||
                 backupStoredCMD.CommandType == Command_Types.DeviceType)
             {
+                StoredCommand sc = new StoredCommand();
+
                 Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupStoredCMD.NodeNumber);
                 if (d == null)
                     return null;
@@ -67,13 +78,14 @@ namespace zvs.Processor.Backup
                 if (backupStoredCMD.CommandType == Command_Types.Device)
                     c = d.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
                 if (backupStoredCMD.CommandType == Command_Types.DeviceType)
+                { 
                     c = d.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                    sc.Argument2 = d.Id.ToString();
+                }
 
                 if (c == null)
                     return null;
 
-                StoredCommand sc = new StoredCommand();
-                sc.Device = d;
                 sc.Argument = backupStoredCMD.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
@@ -89,7 +101,7 @@ namespace zvs.Processor.Backup
 
                 if (backupStoredCMD.CommandType == Command_Types.JavaScript)
                     c = context.JavaScriptCommands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
-                
+
                 if (c == null)
                     return null;
 
@@ -100,7 +112,7 @@ namespace zvs.Processor.Backup
                 context.SaveChanges();
                 return sc;
             }
-            
+
             return null;
         }
     }

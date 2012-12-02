@@ -153,10 +153,8 @@ namespace NOAAPlugin
             log.Info(string.Format("Lat/Long updated.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
         }
 
-        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
-
-        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
-
+        public override void ProcessCommand(int queuedCommandId) { }
+     
         public override void Repoll(zvs.Entities.Device device) { }
 
         public override void ActivateGroup(int groupID) { }
@@ -211,7 +209,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunBuiltinCommandAsync( cmd.Id, scene.Id.ToString());
+                                    cp.RunCommandAsync( cmd.Id, scene.Id.ToString());
                                 }
                             }
                         }
@@ -237,7 +235,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunBuiltinCommandAsync( cmd.Id, scene.Id.ToString());
+                                    cp.RunCommandAsync( cmd.Id, scene.Id.ToString());
                                 }
                             }
                         }

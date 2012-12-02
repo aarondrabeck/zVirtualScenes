@@ -22,8 +22,7 @@ namespace WebAPI
     [Export(typeof(zvsPlugin))]
     public class WebAPIPlugin : zvsPlugin
     {
-        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
-        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
+        public override void ProcessCommand(int queuedCommandId) { }
         public override void Repoll(zvs.Entities.Device device) { }
         public override void ActivateGroup(int groupID) { }
         public override void DeactivateGroup(int groupID) { }
@@ -170,7 +169,14 @@ namespace WebAPI
             resolver.WebAPIPlugin = this;
             config.DependencyResolver = resolver;
 
-            await server.OpenAsync();
+            try
+            {
+                await server.OpenAsync();
+            }
+            catch(Exception ex)
+            {
+                log.Error(ex.Message);
+            }
             log.InfoFormat("WebAPI Server Online on port {0} {1} SSL", _port, _isSSL ? "using" : "not using");
         }
 

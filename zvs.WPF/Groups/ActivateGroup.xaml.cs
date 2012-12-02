@@ -94,7 +94,7 @@ namespace zvs.WPF.Groups
                 if (group_on_cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    cp.RunBuiltinCommandAsync( group_on_cmd.Id, g.Id.ToString());
+                    cp.RunCommandAsync( group_on_cmd.Id, g.Id.ToString());
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace zvs.WPF.Groups
                 if (group_off_cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    cp.RunBuiltinCommandAsync( group_off_cmd.Id, g.Id.ToString());
+                    cp.RunCommandAsync( group_off_cmd.Id, g.Id.ToString());
                 }
             }
         }

@@ -385,8 +385,7 @@ namespace zvs.Processor
         protected abstract void StopPlugin();
         protected abstract void SettingChanged(string settingsettingUniqueIdentifier, string settingValue);
         public abstract void Initialize();
-        public abstract void ProcessDeviceCommand(QueuedDeviceCommand cmd);
-        public abstract void ProcessDeviceTypeCommand(QueuedDeviceTypeCommand cmd);
+        public abstract void ProcessCommand(int queuedCommandId);
         public abstract void Repoll(Device device);
         public abstract void ActivateGroup(int groupID);
         public abstract void DeactivateGroup(int groupID);

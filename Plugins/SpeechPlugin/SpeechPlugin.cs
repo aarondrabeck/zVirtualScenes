@@ -70,10 +70,8 @@ namespace SpeechPlugin
 
         protected override void SettingChanged(string settingsettingUniqueIdentifier, string settingValue) { }
 
-        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
-
-        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
-
+        public override void ProcessCommand(int queuedCommandId) { }
+              
         public override void Repoll(zvs.Entities.Device device) { }
 
         public override void ActivateGroup(int groupID) { }

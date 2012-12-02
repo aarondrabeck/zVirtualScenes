@@ -88,9 +88,7 @@ namespace GrowlPlugin
 
         protected override void SettingChanged(string settingUniqueIdentifier, string settingValue) { }
 
-        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd) { }
-
-        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd) { }
+        public override void ProcessCommand(int queuedCommandId) { }
 
         public override void Repoll(zvs.Entities.Device device) { }
 

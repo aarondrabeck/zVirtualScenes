@@ -71,7 +71,7 @@ namespace zvs.WPF.DeviceControls
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                    cp.RunDeviceCommandAsync(d_cmd.Id);
+                                    cp.RunCommandAsync(d_cmd.Id);
                                 }, icon);
                                 DeviceCommandsStkPnl.Children.Add(bc);
                                 break;
@@ -89,7 +89,7 @@ namespace zvs.WPF.DeviceControls
                                 CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                    cp.RunDeviceCommandAsync( d_cmd.Id, isChecked.ToString());
+                                    cp.RunCommandAsync(d_cmd.Id, isChecked.ToString());
                                 }, icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
 
@@ -112,7 +112,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceCommandAsync( d_cmd.Id, value);
+                                        cp.RunCommandAsync(d_cmd.Id, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -136,7 +136,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceCommandAsync( d_cmd.Id, value);
+                                        cp.RunCommandAsync(d_cmd.Id, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -160,7 +160,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceCommandAsync( d_cmd.Id, value);
+                                        cp.RunCommandAsync(d_cmd.Id, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -184,7 +184,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceCommandAsync( d_cmd.Id, value);
+                                        cp.RunCommandAsync(d_cmd.Id, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -208,7 +208,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceCommandAsync( d_cmd.Id, value);
+                                        cp.RunCommandAsync(d_cmd.Id, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -232,7 +232,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceCommandAsync(d_cmd.Id, value);
+                                        cp.RunCommandAsync(d_cmd.Id, value);
                                     },
                                     icon);
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -254,7 +254,7 @@ namespace zvs.WPF.DeviceControls
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, () =>
                                 {
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                    cp.RunDeviceTypeCommandAsync(device_type_command.Id, d.Id);
+                                    cp.RunCommandAsync(device_type_command.Id, null,  d.Id.ToString());
                                 },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(bc);
@@ -273,7 +273,7 @@ namespace zvs.WPF.DeviceControls
                                 CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, (isChecked) =>
                                 {
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                    cp.RunDeviceTypeCommandAsync( device_type_command.Id, d.Id, isChecked.ToString());
+                                    cp.RunCommandAsync(device_type_command.Id, isChecked.ToString(), d.Id.ToString());
                                 },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -297,7 +297,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceTypeCommandAsync( device_type_command.Id, d.Id, value);
+                                        cp.RunCommandAsync(device_type_command.Id, value, d.Id.ToString());
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -321,7 +321,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceTypeCommandAsync( device_type_command.Id, d.Id, value);
+                                        cp.RunCommandAsync(device_type_command.Id, value, d.Id.ToString());
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -345,7 +345,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceTypeCommandAsync( device_type_command.Id, d.Id, value);
+                                        cp.RunCommandAsync(device_type_command.Id, value, d.Id.ToString());
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -369,7 +369,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceTypeCommandAsync( device_type_command.Id, d.Id, value);
+                                        cp.RunCommandAsync(device_type_command.Id, value, d.Id.ToString());
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -392,7 +392,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceTypeCommandAsync( device_type_command.Id, d.Id, value);
+                                        cp.RunCommandAsync(device_type_command.Id, value, d.Id.ToString());
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);
@@ -416,7 +416,7 @@ namespace zvs.WPF.DeviceControls
                                     (value) =>
                                     {
                                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                                        cp.RunDeviceTypeCommandAsync(device_type_command.Id, d.Id, value);
+                                        cp.RunCommandAsync(device_type_command.Id, value, d.Id.ToString());
                                     },
                                     icon);
                                 TypeCommandsStkPnl.Children.Add(control);

@@ -21,7 +21,7 @@ namespace zvs.Entities
     public partial class zvsContext : DbContext
     {
         public zvsContext()
-            : base("zvsDBEFCF4")
+            : base("zvsDBEFCF5")
         {
 
         }

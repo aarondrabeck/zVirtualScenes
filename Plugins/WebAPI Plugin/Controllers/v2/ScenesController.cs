@@ -101,7 +101,7 @@ namespace WebAPI.Controllers.v2
                         CommandProcessor cp = new CommandProcessor(this.WebAPIPlugin.Core);
 
                         //Marshal to another thread pool thread as to not await complete...
-                        Task.Run(() => cp.RunBuiltinCommandAsync(cmd.Id, s.Id.ToString()));
+                        Task.Run(() => cp.RunCommandAsync(cmd.Id, s.Id.ToString()));
                         
                         return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "Scene started.");
                     }

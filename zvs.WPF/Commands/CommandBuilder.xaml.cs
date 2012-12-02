@@ -58,36 +58,32 @@ namespace zvs.WPF.Commands
             if (DevicesCmboBox.Items.Count > 0)
                 DevicesCmboBox.SelectedIndex = 0;
 
-            //When creating new commands, we sometimes pass in the device but no the command.
-            //if this is the case, select the device.
-            if (StoredCommand.Device != null)
-                DevicesCmboBox.SelectedItem = StoredCommand.Device;
-
             //If we are editing, ie. we get passed a StoredCommand with data, 
             //preselect the correct tab and item.
-            if (StoredCommand.Command is DeviceCommand ||
-                StoredCommand.Command is DeviceTypeCommand)
+            if (StoredCommand.Command is DeviceCommand)
             {
                 DeviceTab.IsSelected = true;
-                if (StoredCommand.Device != null)
-                {
-                    //Preselect device command
-                    if (StoredCommand.Command != null)
-                    {
-                        if (StoredCommand.Command is DeviceCommand)
-                        {
-                            DeviceCommand cmd = Context.DeviceCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
-                            if (cmd != null)
-                                DeviceCmdsCmboBox.SelectedItem = cmd;
-                        }
-                        if (StoredCommand.Command is DeviceTypeCommand)
-                        {
-                            DeviceTypeCommand cmd = Context.DeviceTypeCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
-                            if (cmd != null)
-                                DeviceCmdsCmboBox.SelectedItem = cmd;
-                        }
-                    }
-                }
+
+                DeviceCommand dc = (DeviceCommand)StoredCommand.Command;
+                DevicesCmboBox.SelectedItem = dc.Device;
+
+                //Preselect device command
+                DeviceCommand cmd = Context.DeviceCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
+                if (cmd != null)
+                    DeviceCmdsCmboBox.SelectedItem = cmd;
+            }
+            else if (StoredCommand.Command is DeviceTypeCommand)
+            {
+                DeviceTab.IsSelected = true;
+
+                Device d = null;
+                if (Device.TryGetDevice(Context, StoredCommand.Argument2, out d))
+                    DevicesCmboBox.SelectedItem = d;
+
+                //Preselect device type command
+                DeviceTypeCommand cmd = Context.DeviceTypeCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
+                if (cmd != null)
+                    DeviceCmdsCmboBox.SelectedItem = cmd;
             }
         }
 
@@ -438,9 +434,6 @@ namespace zvs.WPF.Commands
                     return;
                 }
 
-                //Set Device
-                StoredCommand.Device = (Device)DevicesCmboBox.SelectedItem;
-
                 //Set Command and Arg
                 if (DeviceCmdsCmboBox.SelectedItem is DeviceCommand)
                 {
@@ -450,7 +443,8 @@ namespace zvs.WPF.Commands
                 if (DeviceCmdsCmboBox.SelectedItem is DeviceTypeCommand)
                 {
                     StoredCommand.Command = (DeviceTypeCommand)DeviceCmdsCmboBox.SelectedItem;
-                    StoredCommand.Argument = SelectedDeviceArg;
+                    StoredCommand.Argument =  SelectedDeviceArg;
+                    StoredCommand.Argument2 = ((Device)DevicesCmboBox.SelectedItem).Id.ToString();
                 }
 
                 this.DialogResult = true;
@@ -537,7 +531,7 @@ namespace zvs.WPF.Commands
                             {
                                 //get the current value from the value table list
                                 bool DefaultValue = false;
-                                if (!bool.TryParse(StoredCommand.Argument, out DefaultValue) )
+                                if (!bool.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
                                     DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
@@ -650,7 +644,7 @@ namespace zvs.WPF.Commands
                         case DataType.STRING:
                             {
                                 //get the current value from the value table list
-                                string DefaultValue = "0"; 
+                                string DefaultValue = "0";
                                 if (!string.IsNullOrEmpty(StoredCommand.Argument))
                                 {
                                     DefaultValue = StoredCommand.Argument;
@@ -843,7 +837,7 @@ namespace zvs.WPF.Commands
                             {
                                 //get the current value from the value table list
                                 string DefaultValue = "0";
-                                if (!string.IsNullOrEmpty(StoredCommand.Argument) )
+                                if (!string.IsNullOrEmpty(StoredCommand.Argument))
                                 {
                                     DefaultValue = StoredCommand.Argument;
                                 }

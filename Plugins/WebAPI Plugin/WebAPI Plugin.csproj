@@ -37,10 +37,6 @@
     <Compile Include="Controllers\v2\BuiltinCommandsController.cs" />
     <Compile Include="Controllers\v2\CommandsController.cs" />
     <Compile Include="Controllers\v2\CommandOptionsController.cs" />
-    <Compile Include="Controllers\v2\QueuedDeviceTypeCommandsController.cs" />
-    <Compile Include="Controllers\v2\QueuedJavaScriptCommandsController.cs" />
-    <Compile Include="Controllers\v2\QueuedDeviceCommandsController.cs" />
-    <Compile Include="Controllers\v2\QueuedBuiltinCommandsController.cs" />
     <Compile Include="Controllers\v2\QueuedCommandsController.cs" />
     <Compile Include="Controllers\v2\StoredCommandsController.cs" />
     <Compile Include="Controllers\v2\ScheduledTasksController.cs" />

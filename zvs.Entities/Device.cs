@@ -21,8 +21,6 @@ namespace zvs.Entities
             this.PropertyValues = new ObservableCollection<DevicePropertyValue>();
             this.Values = new ObservableCollection<DeviceValue>();
             this.Groups = new ObservableCollection<Group>();
-            this.QueuedDeviceCommands = new ObservableCollection<QueuedDeviceCommand>();
-            this.QueuedDeviceTypeCommands = new ObservableCollection<QueuedDeviceTypeCommand>();
             this.StoredCommands = new ObservableCollection<StoredCommand>();
         }
 
@@ -117,9 +115,6 @@ namespace zvs.Entities
         public int DeviceTypeId { get; set; }
         public virtual DeviceType Type { get; set; }
 
-        public virtual ObservableCollection<QueuedDeviceCommand> QueuedDeviceCommands { get; set; }
-        public virtual ObservableCollection<QueuedDeviceTypeCommand> QueuedDeviceTypeCommands { get; set; }
-
         [ConfidentialData]
         public virtual ObservableCollection<DeviceCommand> Commands { get; set; }
 
@@ -153,6 +148,23 @@ namespace zvs.Entities
         public override string ToString()
         {
             return this.Name;
+        }
+
+        public static bool TryGetDevice(zvsContext context, string deviceId, out Device device)
+        {
+            device = null;
+
+            if (string.IsNullOrEmpty(deviceId))
+                return false;
+
+            int DeviceId = 0;
+            int.TryParse(deviceId, out DeviceId);
+            Device d = context.Devices.FirstOrDefault(o => o.Id == DeviceId);
+            if (d == null)
+                return false;
+
+            device = d;
+            return true;
         }
     }
 }

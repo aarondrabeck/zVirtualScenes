@@ -35,12 +35,32 @@ namespace zvs.Entities
             }
         }
 
+        private string _Argument2;
+        [StringLength(512)]
+        public string Argument2
+        {
+            get
+            {
+                return _Argument2;
+            }
+            set
+            {
+                if (value != _Argument2)
+                {
+                    _Argument2 = value;
+                    NotifyPropertyChanged("Argument2");
+                }
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyPropertyChanged(string name)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
+
+        
 
     }
 }

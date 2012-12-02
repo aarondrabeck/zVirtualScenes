@@ -62,10 +62,8 @@
     <Compile Include="BuiltinCommand.cs" />
     <Compile Include="CommandOption.cs" />
     <Compile Include="ConfidentialDataAttribute.cs" />
-    <Compile Include="QueuedDeviceCommandBase.cs" />
     <Compile Include="IIdentity.cs" />
     <Compile Include="StoredCommand.cs" />
-    <Compile Include="QueuedJavaScriptCommand.cs" />
     <Compile Include="JavaScriptCommand.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ScheduledTask.cs" />
@@ -77,11 +75,8 @@
     <Compile Include="Scene.cs" />
     <Compile Include="ProgramOption.cs" />
     <Compile Include="DbInfo.cs" />
-    <Compile Include="QueuedBuiltinCommand.cs" />
     <Compile Include="QueuedCommand.cs" />
     <Compile Include="DeviceTypeCommand.cs" />
-    <Compile Include="QueuedDeviceTypeCommand.cs" />
-    <Compile Include="QueuedDeviceCommand.cs" />
     <Compile Include="DeviceValueTriggers.cs" />
     <Compile Include="DeviceValue.cs" />
     <Compile Include="DeviceCommand.cs" />
