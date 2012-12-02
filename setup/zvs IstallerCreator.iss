@@ -74,6 +74,8 @@ Source: "..\bin\release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ign
 Source: "..\bin\release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\log4net.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\log4net.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\release\Microsoft.Data.Edm.dll"; DestDir: "{app}"; Flags: ignoreversion
+
  
 
 Source: "..\bin\release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
