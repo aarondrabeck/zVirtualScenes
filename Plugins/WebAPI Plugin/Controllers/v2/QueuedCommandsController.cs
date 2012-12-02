@@ -19,27 +19,27 @@ namespace WebAPI.Controllers.v2
     [Documentation("v2/QueuedCommands", 2.1,
     @"All available queued command.
 
-        Example DeviceCommand where CommandId 27 = Set Basic, Argument 7 = desired level
-        POST:        
-        {
-            CommandId: 27,
-            Argument: ""7""
-        }
+        POST to execute commands: 
 
-        Example DeviceTypeCommand where CommandId 19 = Turn Off, Argument2 2 = device with Id of 2
-        POST:        
-        {
-            CommandId: 19,
-            Argument2: ""2""
-        }
+            Example DeviceCommand where CommandId 27 = Set Basic, Argument 7 = desired level
+            POST:        
+            {
+                CommandId: 27,
+                Argument: ""7""
+            }
 
-        Example Built-in Command where CommandId 2 = Built-in Command REPOLL_ALL
-        POST:        
-        {
-            CommandId: 2
-        }
+            Example DeviceTypeCommand where CommandId 19 = Turn Off, Argument2 2 = device with Id of 2
+            POST:        
+            {
+                CommandId: 19,
+                Argument2: ""2""
+            }
 
-
+            Example Built-in Command where CommandId 2 = Built-in Command REPOLL_ALL
+            POST:        
+            {
+                CommandId: 2
+            }
     ")]
     public class QueuedCommandsController : zvsEntityController<QueuedCommand>
     {

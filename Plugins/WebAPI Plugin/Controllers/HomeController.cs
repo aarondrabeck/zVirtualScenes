@@ -61,7 +61,7 @@ namespace WebAPI.Controllers
                 foreach (var ControllerDocumentation in ControllerNamespace.Value)
                 {
                     sb.Append("<li>");
-                    sb.Append(@" <h5>" + ControllerDocumentation.Name + @"<span style=""font-size: .6em; font-weight: normal"">(version " + ControllerDocumentation.Version + ")</span></h5>");
+                    sb.Append(@" <h5>" + ControllerDocumentation.Name + @"<span style=""font-size: .8em; font-weight: normal""> (Controller version " + ControllerDocumentation.Version + ")</span></h5>");
                     sb.Append(@" <code class=""Notes"">" + ControllerDocumentation.Notes.Replace(Environment.NewLine, "<br />") + "</code>");
                     sb.Append("</li>");
                 }
