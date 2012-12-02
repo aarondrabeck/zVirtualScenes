@@ -92,32 +92,32 @@ namespace OpenZWavePlugin
 
                 //Controller Type Devices
                 DeviceType controller_dt = new DeviceType { UniqueIdentifier = "CONTROLLER", Name = "OpenZWave Controller", ShowInList = true };
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RESET", Name = "Reset Controller", ArgumentType = DataType.NONE, Description = "Erases all Z-Wave network settings from your controller." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "ADDDEVICE", Name = "Add Device to Network", ArgumentType = DataType.NONE, Description = "Adds a ZWave Device to your network." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "AddController", Name = "Add Controller to Network", ArgumentType = DataType.NONE, Description = "Adds a ZWave Controller to your network." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "CreateNewPrimary", Name = "Create New Primary", ArgumentType = DataType.NONE, Description = "Puts the target controller into receive configuration mode." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "ReceiveConfiguration", Name = "Receive Configuration", ArgumentType = DataType.NONE, Description = "Receives the network configuration from another controller." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RemoveController", Name = "Remove Controller", ArgumentType = DataType.NONE, Description = "Removes a Controller from your network." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RemoveDevice", Name = "Remove Device", ArgumentType = DataType.NONE, Description = "Removes a Device from your network." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TransferPrimaryRole", Name = "Transfer Primary Role", ArgumentType = DataType.NONE, Description = "Transfers the primary role to another controller." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "HasNodeFailed", Name = "Has Node Failed", ArgumentType = DataType.NONE, Description = "Tests whether a node has failed." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RemoveFailedNode", Name = "Remove Failed Node", ArgumentType = DataType.NONE, Description = "Removes the failed node from the controller's list." });
-                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "ReplaceFailedNode", Name = "Replace Failed Node", ArgumentType = DataType.NONE, Description = "Tests the failed node." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RESET", Name = "Reset Controller", ArgumentType = DataType.NONE, Description = "Erases all Z-Wave network settings from your controller. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "ADDDEVICE", Name = "Add Device to Network", ArgumentType = DataType.NONE, Description = "Adds a ZWave Device to your network. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "AddController", Name = "Add Controller to Network", ArgumentType = DataType.NONE, Description = "Adds a ZWave Controller to your network. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "CreateNewPrimary", Name = "Create New Primary", ArgumentType = DataType.NONE, Description = "Puts the target controller into receive configuration mode. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "ReceiveConfiguration", Name = "Receive Configuration", ArgumentType = DataType.NONE, Description = "Receives the network configuration from another controller. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RemoveController", Name = "Remove Controller", ArgumentType = DataType.NONE, Description = "Removes a Controller from your network. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RemoveDevice", Name = "Remove Device", ArgumentType = DataType.NONE, Description = "Removes a Device from your network. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TransferPrimaryRole", Name = "Transfer Primary Role", ArgumentType = DataType.NONE, Description = "Transfers the primary role to another controller. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "HasNodeFailed", Name = "Has Node Failed", ArgumentType = DataType.NONE, Description = "Tests whether a node has failed. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "RemoveFailedNode", Name = "Remove Failed Node", ArgumentType = DataType.NONE, Description = "Removes the failed node from the controller's list. Argument2 = DeviceId." });
+                controller_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "ReplaceFailedNode", Name = "Replace Failed Node", ArgumentType = DataType.NONE, Description = "Tests the failed node. Argument2 = DeviceId." });
                 DefineOrUpdateDeviceType(controller_dt, Context);
 
                 //Switch Type Devices
                 DeviceType switch_dt = new DeviceType { UniqueIdentifier = "SWITCH", Name = "OpenZWave Binary", ShowInList = true };
-                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a switch." });
-                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a switch." });
-                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "MOMENTARY", Name = "Turn On for X milliseconds", ArgumentType = DataType.INTEGER, Description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a switch. Argument2 = DeviceId." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a switch. Argument2 = DeviceId." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "MOMENTARY", Name = "Turn On for X milliseconds", ArgumentType = DataType.INTEGER, Description = "Turns a device on for the specified number of milliseconds and then turns the device back off. Argument2 = DeviceId." });
                 DefineOrUpdateDeviceType(switch_dt, Context);
 
                 //Dimmer Type Devices
                 DeviceType dimmer_dt = new DeviceType { UniqueIdentifier = "DIMMER", Name = "OpenZWave Dimmer", ShowInList = true };
-                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a dimmer." });
-                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a dimmer." });
+                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a dimmer. Argument2 = DeviceId." });
+                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a dimmer. Argument2 = DeviceId." });
 
-                DeviceTypeCommand dimmer_preset_cmd = new DeviceTypeCommand { UniqueIdentifier = "SETPRESETLEVEL", Name = "Set Level", ArgumentType = DataType.LIST, Description = "Sets a dimmer to a preset level." };
+                DeviceTypeCommand dimmer_preset_cmd = new DeviceTypeCommand { UniqueIdentifier = "SETPRESETLEVEL", Name = "Set Level", ArgumentType = DataType.LIST, Description = "Sets a dimmer to a preset level. Argument2 = DeviceId." };
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "0%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "20%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "40%" });
@@ -131,8 +131,8 @@ namespace OpenZWavePlugin
 
                 //Thermostat Type Devices
                 DeviceType thermo_dt = new DeviceType { UniqueIdentifier = "THERMOSTAT", Name = "OpenZWave Thermostat", ShowInList = true };
-                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETENERGYMODE", Name = "Set Energy Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Energy Mode." });
-                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETCONFORTMODE", Name = "Set Comfort Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Comfort Mode. (Run)" });
+                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETENERGYMODE", Name = "Set Energy Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Energy Mode. Argument2 = DeviceId." });
+                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETCONFORTMODE", Name = "Set Comfort Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Comfort Mode. (Run) Argument2 = DeviceId." });
                 DefineOrUpdateDeviceType(thermo_dt, Context);
 
                 //Door Lock Type Devices

@@ -95,6 +95,7 @@ namespace zvs.Entities
             }
         }
 
+
         private string _Description;
         [StringLength(1024)]
         public string Description

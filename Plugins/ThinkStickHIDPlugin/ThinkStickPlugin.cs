@@ -42,16 +42,16 @@ namespace ThinkStickHIDPlugin
                 DefineOrUpdateDeviceType(controller_dt, context);
 
                 DeviceType switch_dt = new DeviceType { UniqueIdentifier = "SWITCH", Name = "ControlThink Binary", ShowInList = true };
-                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a switch." });
-                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a switch." });
-                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "MOMENTARY", Name = "Turn On for X milliseconds", ArgumentType = DataType.INTEGER, Description = "Turns a device on for the specified number of milliseconds and then turns the device back off." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a switch. Argument2 = DeviceId." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a switch. Argument2 = DeviceId." });
+                switch_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "MOMENTARY", Name = "Turn On for X milliseconds", ArgumentType = DataType.INTEGER, Description = "Turns a device on for the specified number of milliseconds and then turns the device back off. Argument2 = DeviceId." });
                 DefineOrUpdateDeviceType(switch_dt, context);
 
                 DeviceType dimmer_dt = new DeviceType { UniqueIdentifier = "DIMMER", Name = "ControlThink Dimmer", ShowInList = true };
-                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a dimmer." });
-                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a dimmer." });
+                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNON", Name = "Turn On", ArgumentType = DataType.NONE, Description = "Activates a dimmer. Argument2 = DeviceId." });
+                dimmer_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "TURNOFF", Name = "Turn Off", ArgumentType = DataType.NONE, Description = "Deactivates a dimmer. Argument2 = DeviceId." });
 
-                DeviceTypeCommand dimmer_preset_cmd = new DeviceTypeCommand { UniqueIdentifier = "SETPRESETLEVEL", Name = "Set Basic", ArgumentType = DataType.LIST, Description = "Sets a dimmer to a preset level." };
+                DeviceTypeCommand dimmer_preset_cmd = new DeviceTypeCommand { UniqueIdentifier = "SETPRESETLEVEL", Name = "Set Basic", ArgumentType = DataType.LIST, Description = "Sets a dimmer to a preset level. Argument2 = DeviceId." };
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "0%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "20%" });
                 dimmer_preset_cmd.Options.Add(new CommandOption { Name = "40%" });
@@ -63,11 +63,11 @@ namespace ThinkStickHIDPlugin
                 DefineOrUpdateDeviceType(dimmer_dt, context);
 
                 DeviceType thermo_dt = new DeviceType { UniqueIdentifier = "THERMOSTAT", Name = "ControlThink Thermostat", ShowInList = true };
-                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETENERGYMODE", Name = "Set Energy Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Energy Mode." });
-                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETCONFORTMODE", Name = "Set Comfort Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Comfort Mode. (Run)" });
+                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETENERGYMODE", Name = "Set Energy Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Energy Mode. Argument2 = DeviceId." });
+                thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETCONFORTMODE", Name = "Set Comfort Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Comfort Mode. (Run) Argument2 = DeviceId." });
                 DefineOrUpdateDeviceType(thermo_dt, context);
 
-                DeviceType sensor_dt = new DeviceType { UniqueIdentifier = "SENSOR", Name = "ControlThink Sensor", ShowInList = true };
+                DeviceType sensor_dt = new DeviceType { UniqueIdentifier = "SENSOR", Name = "ControlThink Sensor.", ShowInList = true };
                 DefineOrUpdateDeviceType(sensor_dt, context);
 
                 DeviceProperty.AddOrEdit(new DeviceProperty
@@ -123,245 +123,258 @@ namespace ThinkStickHIDPlugin
         {
         }
 
-        public override void ProcessDeviceCommand(zvs.Entities.QueuedDeviceCommand cmd)
+        public override void ProcessCommand(int queuedCommandId)
         {
-            try
+            using (zvsContext context = new zvsContext())
             {
-                ZWaveDevice CTDevice = GetCTDevice((byte)cmd.Device.NodeNumber);
-                if (CTDevice != null)
+                QueuedCommand queuedCommand = context.QueuedCommands.Single(o => o.Id == queuedCommandId);
+
+                if (queuedCommand.Command is DeviceTypeCommand)
                 {
-                    if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
+                    //Try to get the device from the second Argument
+                    Device device = null;
+                    if (!Device.TryGetDevice(context, queuedCommand.Argument2, out device))
+                        return;
+
+                    try
                     {
-                        if (CTDevice.NodeID == CTController.NodeID)
+                        ZWaveDevice CTDevice = GetCTDevice((byte)device.NodeNumber);
+                        if (CTDevice != null)
                         {
-                            if (CommandDialogWindow == null)
+                            if (device.Type.UniqueIdentifier == "CONTROLLER")
                             {
-                                string cmdName = cmd.Command.UniqueIdentifier;
-                                Thread t = new Thread(() =>
-                                {
-                                    ControllerDialogWindow cdWindow = new ControllerDialogWindow(CTController, cmdName);
-                                    CommandDialogWindow = cdWindow;
-                                    cdWindow.Closed += (s, a) =>
-                                    {
-                                        CommandDialogWindow = null;
-                                    };
 
-                                    cdWindow.ShowDialog();
-                                });
-                                t.SetApartmentState(ApartmentState.STA);
-                                t.Start();
                             }
-                            else
+                            else if (device.Type.UniqueIdentifier == "SWITCH")
                             {
-                                CommandDialogWindow.Dispatcher.Invoke(new Action(() => CommandDialogWindow.Activate()));
-                            }
-
-                        }
-                    }
-                    else if (cmd.Device.Type.UniqueIdentifier == "THERMOSTAT")
-                    {
-                        GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
-
-                        switch (cmd.Command.UniqueIdentifier)
-                        {
-                            case "FAN_MODE":
+                                switch (queuedCommand.Command.UniqueIdentifier)
                                 {
-                                    ThermostatFanMode mode = ThermostatFanMode.AutoLow;
-                                    if (Enum.TryParse(cmd.Argument, out mode))
-                                    {
-                                        CTThermostat.ThermostatFanMode = mode;
-                                    }
-                                    break;
+                                    case "MOMENTARY":
+                                        {
+
+                                            int delay = 1000;
+                                            int.TryParse(queuedCommand.Argument, out delay);
+                                            byte nodeID = (byte)device.NodeNumber;
+                                            CTDevice.PowerOn();
+
+                                            System.Timers.Timer t = new System.Timers.Timer();
+                                            t.Interval = delay;
+                                            t.Elapsed += (sender, e) =>
+                                            {
+                                                t.Stop();
+                                                CTDevice.PowerOff();
+                                                t.Dispose();
+                                            };
+                                            t.Start();
+
+                                            break;
+                                        }
+                                    case "TURNON":
+                                        {
+
+                                            CTDevice.PowerOn();
+
+                                            break;
+                                        }
+                                    case "TURNOFF":
+                                        {
+
+                                            CTDevice.PowerOff();
+                                            break;
+                                        }
                                 }
-                            case "MODE":
+                            }
+                            else if (device.Type.UniqueIdentifier == "DIMMER")
+                            {
+                                switch (queuedCommand.Command.UniqueIdentifier)
                                 {
-                                    ThermostatMode mode = ThermostatMode.Off;
-                                    if (Enum.TryParse(cmd.Argument, out mode))
-                                    {
-                                        CTThermostat.ThermostatMode = mode;
-                                    }
-                                    break;
+                                    case "TURNON":
+                                        {
+                                            using (zvsContext Context = new zvsContext())
+                                            {
+                                                byte defaultonlevel = 99;
+                                                byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, device, "DEFAULONLEVEL"), out defaultonlevel);
+
+                                                AsyncSetLevel(CTDevice, defaultonlevel);
+                                            }
+                                            break;
+                                        }
+                                    case "TURNOFF":
+                                        {
+
+                                            CTDevice.PowerOff();
+                                            break;
+                                        }
+                                    case "SETPRESETLEVEL":
+                                        {
+
+                                            switch (queuedCommand.Argument)
+                                            {
+                                                case "0%":
+                                                    AsyncSetLevel(CTDevice, 0);
+                                                    break;
+                                                case "20%":
+                                                    AsyncSetLevel(CTDevice, 20);
+                                                    break;
+                                                case "40%":
+                                                    AsyncSetLevel(CTDevice, 40);
+                                                    break;
+                                                case "60%":
+                                                    AsyncSetLevel(CTDevice, 60);
+                                                    break;
+                                                case "80%":
+                                                    AsyncSetLevel(CTDevice, 80);
+                                                    break;
+                                                case "100%":
+                                                    AsyncSetLevel(CTDevice, 99);
+                                                    break;
+                                                case "255":
+                                                    AsyncSetLevel(CTDevice, 255);
+                                                    break;
+
+                                            }
+                                            break;
+
+                                        }
+
                                 }
-                        }
-
-                        //Dynamic SP's
-                        if (cmd.Command.UniqueIdentifier.StartsWith("DYNAMIC_SP_R207_"))
-                        {
-                            string spTypeStr = cmd.Command.UniqueIdentifier.Replace("DYNAMIC_SP_R207_", "");
-                            ThermostatSetpointType setPointType = ThermostatSetpointType.Cooling1;
-                            decimal temp = 0;
-
-                            if (Enum.TryParse(spTypeStr, out setPointType) && decimal.TryParse(cmd.Argument, out temp))
+                            }
+                            else if (device.Type.UniqueIdentifier == "THERMOSTAT")
                             {
-                                CTThermostat.ThermostatSetpoints[setPointType].Temperature = new Temperature(temp, TemperatureScale.Fahrenheit);
+
+                                GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
+
+                                switch (queuedCommand.Command.UniqueIdentifier)
+                                {
+                                    case "SETENERGYMODE":
+                                        {
+                                            AsyncSetLevel(CTThermostat, 0);
+                                            break;
+                                        }
+                                    case "SETCONFORTMODE":
+                                        {
+                                            AsyncSetLevel(CTThermostat, 255);
+                                            break;
+                                        }
+                                }
                             }
                         }
                     }
-                    else if (cmd.Device.Type.UniqueIdentifier == "SWITCH" || cmd.Device.Type.UniqueIdentifier == "DIMMER")
+                    catch (Exception ex)
                     {
-                        if (cmd.Command.UniqueIdentifier == "BASIC")
-                        {
-                            byte level = 0;
-                            byte.TryParse(cmd.Argument, out level);
-                            AsyncSetLevel(CTDevice, level);
-
-                        }
+                        log.Error("Error sending command. " + ex.Message);
                     }
 
-                    //Polling all devices
-                    if (cmd.Command.UniqueIdentifier == "REPOLLINT")
-                    {
-                        int PollingInt = 0;
-
-                        if (int.TryParse(cmd.Argument, out PollingInt))
-                        {
-                            //Set the Polling Interval
-                            CTDevice.PollEnabled = PollingInt > 0;
-                            CTDevice.PollInterval = TimeSpan.FromSeconds(PollingInt);
-
-                            using (zvsContext context = new zvsContext())
-                            {
-                                UpdateDeviceValue(cmd.Device.Id, "REPOLLINT", PollingInt.ToString(), context);
-                            }
-                        }
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error sending command. " + ex.Message);
-            }
-        }
-
-        public override void ProcessDeviceTypeCommand(zvs.Entities.QueuedDeviceTypeCommand cmd)
-        {
-            try
-            {
-                ZWaveDevice CTDevice = GetCTDevice((byte)cmd.Device.NodeNumber);
-                if (CTDevice != null)
+                else if (queuedCommand.Command is DeviceCommand)
                 {
-                    if (cmd.Device.Type.UniqueIdentifier == "CONTROLLER")
+                    DeviceCommand deviceCommand = (DeviceCommand)queuedCommand.Command;
+                    try
                     {
-
-                    }
-                    else if (cmd.Device.Type.UniqueIdentifier == "SWITCH")
-                    {
-                        switch (cmd.Command.UniqueIdentifier)
+                        ZWaveDevice CTDevice = GetCTDevice((byte)deviceCommand.Device.NodeNumber);
+                        if (CTDevice != null)
                         {
-                            case "MOMENTARY":
+                            if (deviceCommand.Device.Type.UniqueIdentifier == "CONTROLLER")
+                            {
+                                if (CTDevice.NodeID == CTController.NodeID)
                                 {
-
-                                    int delay = 1000;
-                                    int.TryParse(cmd.Argument, out delay);
-                                    byte nodeID = (byte)cmd.Device.NodeNumber;
-                                    CTDevice.PowerOn();
-
-                                    System.Timers.Timer t = new System.Timers.Timer();
-                                    t.Interval = delay;
-                                    t.Elapsed += (sender, e) =>
+                                    if (CommandDialogWindow == null)
                                     {
-                                        t.Stop();
-                                        CTDevice.PowerOff();
-                                        t.Dispose();
-                                    };
-                                    t.Start();
+                                        string cmdName = deviceCommand.UniqueIdentifier;
+                                        Thread t = new Thread(() =>
+                                        {
+                                            ControllerDialogWindow cdWindow = new ControllerDialogWindow(CTController, cmdName);
+                                            CommandDialogWindow = cdWindow;
+                                            cdWindow.Closed += (s, a) =>
+                                            {
+                                                CommandDialogWindow = null;
+                                            };
 
-                                    break;
-                                }
-                            case "TURNON":
-                                {
-
-                                    CTDevice.PowerOn();
-
-                                    break;
-                                }
-                            case "TURNOFF":
-                                {
-
-                                    CTDevice.PowerOff();
-                                    break;
-                                }
-                        }
-                    }
-                    else if (cmd.Device.Type.UniqueIdentifier == "DIMMER")
-                    {
-                        switch (cmd.Command.UniqueIdentifier)
-                        {
-                            case "TURNON":
-                                {
-                                    using (zvsContext Context = new zvsContext())
-                                    {
-                                        byte defaultonlevel = 99;
-                                        byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, cmd.Device, "DEFAULONLEVEL"), out defaultonlevel);
-
-                                        AsyncSetLevel(CTDevice, defaultonlevel);
+                                            cdWindow.ShowDialog();
+                                        });
+                                        t.SetApartmentState(ApartmentState.STA);
+                                        t.Start();
                                     }
-                                    break;
-                                }
-                            case "TURNOFF":
-                                {
-
-                                    CTDevice.PowerOff();
-                                    break;
-                                }
-                            case "SETPRESETLEVEL":
-                                {
-
-                                    switch (cmd.Argument)
+                                    else
                                     {
-                                        case "0%":
-                                            AsyncSetLevel(CTDevice, 0);
-                                            break;
-                                        case "20%":
-                                            AsyncSetLevel(CTDevice, 20);
-                                            break;
-                                        case "40%":
-                                            AsyncSetLevel(CTDevice, 40);
-                                            break;
-                                        case "60%":
-                                            AsyncSetLevel(CTDevice, 60);
-                                            break;
-                                        case "80%":
-                                            AsyncSetLevel(CTDevice, 80);
-                                            break;
-                                        case "100%":
-                                            AsyncSetLevel(CTDevice, 99);
-                                            break;
-                                        case "255":
-                                            AsyncSetLevel(CTDevice, 255);
-                                            break;
-
+                                        CommandDialogWindow.Dispatcher.Invoke(new Action(() => CommandDialogWindow.Activate()));
                                     }
-                                    break;
 
                                 }
+                            }
+                            else if (deviceCommand.Device.Type.UniqueIdentifier == "THERMOSTAT")
+                            {
+                                GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
 
+                                switch (deviceCommand.UniqueIdentifier)
+                                {
+                                    case "FAN_MODE":
+                                        {
+                                            ThermostatFanMode mode = ThermostatFanMode.AutoLow;
+                                            if (Enum.TryParse(queuedCommand.Argument, out mode))
+                                            {
+                                                CTThermostat.ThermostatFanMode = mode;
+                                            }
+                                            break;
+                                        }
+                                    case "MODE":
+                                        {
+                                            ThermostatMode mode = ThermostatMode.Off;
+                                            if (Enum.TryParse(queuedCommand.Argument, out mode))
+                                            {
+                                                CTThermostat.ThermostatMode = mode;
+                                            }
+                                            break;
+                                        }
+                                }
+
+                                //Dynamic SP's
+                                if (deviceCommand.UniqueIdentifier.StartsWith("DYNAMIC_SP_R207_"))
+                                {
+                                    string spTypeStr = deviceCommand.UniqueIdentifier.Replace("DYNAMIC_SP_R207_", "");
+                                    ThermostatSetpointType setPointType = ThermostatSetpointType.Cooling1;
+                                    decimal temp = 0;
+
+                                    if (Enum.TryParse(spTypeStr, out setPointType) && decimal.TryParse(queuedCommand.Argument, out temp))
+                                    {
+                                        CTThermostat.ThermostatSetpoints[setPointType].Temperature = new Temperature(temp, TemperatureScale.Fahrenheit);
+                                    }
+                                }
+                            }
+                            else if (deviceCommand.Device.Type.UniqueIdentifier == "SWITCH" || deviceCommand.Device.Type.UniqueIdentifier == "DIMMER")
+                            {
+                                if (deviceCommand.UniqueIdentifier == "BASIC")
+                                {
+                                    byte level = 0;
+                                    byte.TryParse(queuedCommand.Argument, out level);
+
+                                    AsyncSetLevel(CTDevice, level);
+
+                                }
+                            }
+
+                            //Polling all devices
+                            if (deviceCommand.UniqueIdentifier == "REPOLLINT")
+                            {
+                                int PollingInt = 0;
+
+                                if (int.TryParse(queuedCommand.Argument, out PollingInt))
+                                {
+                                    //Set the Polling Interval
+                                    CTDevice.PollEnabled = PollingInt > 0;
+                                    CTDevice.PollInterval = TimeSpan.FromSeconds(PollingInt);
+
+                                    UpdateDeviceValue(deviceCommand.Device.Id, "REPOLLINT", PollingInt.ToString(), context);
+                                }
+                            }
                         }
                     }
-                    else if (cmd.Device.Type.UniqueIdentifier == "THERMOSTAT")
+                    catch (Exception ex)
                     {
-
-                        GeneralThermostatV2 CTThermostat = (GeneralThermostatV2)CTDevice;
-
-                        switch (cmd.Command.UniqueIdentifier)
-                        {
-                            case "SETENERGYMODE":
-                                {
-                                    AsyncSetLevel(CTThermostat, 0);
-                                    break;
-                                }
-                            case "SETCONFORTMODE":
-                                {
-                                    AsyncSetLevel(CTThermostat, 255);
-                                    break;
-                                }
-                        }
+                        log.Error("Error sending command. " + ex.Message);
                     }
+
                 }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Error sending command. " + ex.Message);
             }
         }
 
