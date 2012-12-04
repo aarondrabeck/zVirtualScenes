@@ -8,8 +8,9 @@
 		<MSBuild Projects="zVirtualScenes.sln" Targets="Rebuild" Properties="Configuration=Release" />
 	</Target>
 		
+<!--	<Target Name="Build-Release-Setup">-->
 	<Target Name="Build-Release-Setup" DependsOnTargets="Build-Release">
-		<Exec Command="&quot;C:\Program Files (x86)\Inno Setup 5\iscc.exe&quot; &quot;setup\zvs IstallerCreator.iss&quot; /v99 /SStandard=&quot;C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\signtool.exe&quot; $p /dAppVerName=%build.number% /dAppVersion=%build.number%  /dMyAppVersion=%build.number%"/>
+		<Exec Command="&quot;C:\Program Files (x86)\Inno Setup 5\iscc.exe&quot; /v99 /dBuildPath=&quot;$(MSBuildProjectDirectory)&quot; /dAppVerName=%build.number% /dAppVersion=%build.number%  /dMyAppVersion=%build.number%  /SStandard=$p  &quot;setup\zvs IstallerCreator.iss&quot;"/>
 		
     </Target>
 	

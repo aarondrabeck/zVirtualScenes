@@ -35,7 +35,7 @@ OutputDir=output
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
 
-SignTool=Standard sign /f "zvs.Entities\zvsCert.pfx" /p 4CCAFE63BC9D97822E3FB96942C4F12A752BEDE0 /d $qzVirtualScenes Installer$q $f
+SignTool=Standard "setup\signtool.exe" sign /f "{#BuildPath}\zvs.Entities\zvsCert.pfx" /p 4CCAFE63BC9D97822E3FB96942C4F12A752BEDE0 /d $qzVirtualScenes Installer$q $f
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
