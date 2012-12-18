@@ -18,6 +18,7 @@ using zvs.Processor;
 
 using System.Diagnostics;
 using zvs.Entities;
+using System.Data.Entity.Validation;
 
 namespace OpenZWavePlugin
 {
@@ -343,7 +344,7 @@ namespace OpenZWavePlugin
                 if (queuedCommand.Command is DeviceTypeCommand)
                 {
                     //Try to get the device from the second Argument
-                    Device device =  null;
+                    Device device = null;
                     if (!Device.TryGetDevice(context, queuedCommand.Argument2, out device))
                         return;
 
@@ -928,7 +929,27 @@ namespace OpenZWavePlugin
 
                                         d.CurrentLevelInt = level;
                                         d.CurrentLevelText = level + "° F";
-                                        Context.SaveChanges();
+
+                                        try
+                                        {
+                                            Context.SaveChanges();
+                                        }
+                                        catch (DbEntityValidationException dbEx)
+                                        {
+                                            StringBuilder sb = new StringBuilder();
+                                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                                            {
+                                                foreach (var validationError in validationErrors.ValidationErrors)
+                                                    sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                                            }
+                                            log.Error(sb);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                                            log.Error(ErrMsg);
+                                        }
+
                                     }
                                 }
                                 else if (d.Type != null && d.Type == GetDeviceType("SWITCH", Context))
@@ -940,7 +961,25 @@ namespace OpenZWavePlugin
                                         {
                                             d.CurrentLevelInt = level > 0 ? 100 : 0;
                                             d.CurrentLevelText = level > 0 ? "On" : "Off";
-                                            Context.SaveChanges();
+                                            try
+                                            {
+                                                Context.SaveChanges();
+                                            }
+                                            catch (DbEntityValidationException dbEx)
+                                            {
+                                                StringBuilder sb = new StringBuilder();
+                                                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                                                {
+                                                    foreach (var validationError in validationErrors.ValidationErrors)
+                                                        sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                                                }
+                                                log.Error(sb);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                                                log.Error(ErrMsg);
+                                            }
                                         }
                                     }
                                 }
@@ -953,8 +992,25 @@ namespace OpenZWavePlugin
 
                                         d.CurrentLevelInt = (int)level;
                                         d.CurrentLevelText = level + "%";
-                                        Context.SaveChanges();
-                                        Context.SaveChanges();
+                                        try
+                                        {
+                                            Context.SaveChanges();
+                                        }
+                                        catch (DbEntityValidationException dbEx)
+                                        {
+                                            StringBuilder sb = new StringBuilder();
+                                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                                            {
+                                                foreach (var validationError in validationErrors.ValidationErrors)
+                                                    sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                                            }
+                                            log.Error(sb);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                                            log.Error(ErrMsg);
+                                        }
                                     }
                                 }
 
@@ -1145,7 +1201,25 @@ namespace OpenZWavePlugin
                                         };
 
                                         Context.Devices.Add(ozw_device);
-                                        Context.SaveChanges();
+                                        try
+                                        {
+                                            Context.SaveChanges();
+                                        }
+                                        catch (DbEntityValidationException dbEx)
+                                        {
+                                            StringBuilder sb = new StringBuilder();
+                                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                                            {
+                                                foreach (var validationError in validationErrors.ValidationErrors)
+                                                    sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                                            }
+                                            log.Error(sb);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                                            log.Error(ErrMsg);
+                                        }
 
                                     }
 
@@ -1272,7 +1346,25 @@ namespace OpenZWavePlugin
                                     if (dv != null)
                                     {
                                         dv.Value = gevent.ToString();
-                                        Context.SaveChanges();
+                                        try
+                                        {
+                                            Context.SaveChanges();
+                                        }
+                                        catch (DbEntityValidationException dbEx)
+                                        {
+                                            StringBuilder sb = new StringBuilder();
+                                            foreach (var validationErrors in dbEx.EntityValidationErrors)
+                                            {
+                                                foreach (var validationError in validationErrors.ValidationErrors)
+                                                    sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                                            }
+                                            log.Error(sb);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                                            log.Error(ErrMsg);
+                                        }
 
                                         //Since open wave events are differently than values changes, we need to fire the value change event every time we receive the 
                                         //event regardless if it is the same value or not.
@@ -1336,7 +1428,25 @@ namespace OpenZWavePlugin
                                 {
                                     d.LastHeardFrom = DateTime.Now;
                                 }
-                                Context.SaveChanges();
+                                try
+                                {
+                                    Context.SaveChanges();
+                                }
+                                catch (DbEntityValidationException dbEx)
+                                {
+                                    StringBuilder sb = new StringBuilder();
+                                    foreach (var validationErrors in dbEx.EntityValidationErrors)
+                                    {
+                                        foreach (var validationError in validationErrors.ValidationErrors)
+                                            sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                                    }
+                                    log.Error(sb);
+                                }
+                                catch (Exception ex)
+                                {
+                                    string ErrMsg = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                                    log.Error(ErrMsg);
+                                }
                             }
 
 
