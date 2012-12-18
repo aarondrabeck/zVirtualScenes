@@ -58,6 +58,10 @@
 	</Manufacturer>
 	<Manufacturer id="0018" name="Balboa Inst.">
 	</Manufacturer>
+	<Manufacturer id="008a" name="BeNext">
+		<Product type="0004" id="0100" name="Door Sensor" config="BeNext/DoorSensor.xml"/>
+		<Product type="0007" id="0101" name="Tag Reader" config="BeNext/TagReader.xml"/>
+	</Manufacturer>
 	<Manufacturer id="002c" name="BeSafer">
 	</Manufacturer>
 	<Manufacturer id="0023" name="Boca Devices">
@@ -139,7 +143,7 @@
 	<Manufacturer id="0085" name="Fakro">
 	</Manufacturer>
 	<Manufacturer id="010f" name="FIBARO System">
-	  <Product type="0501" id="0102" name="FGBS001 Universal Binary Sensor" />
+	  <Product type="0501" id="0102" name="FGBS001 Universal Binary Sensor" config="fibaro/fgbs001.xml" />
 	  <Product type="0100" id="0104" name="FGD211 Universal Dimmer 500W" />
 	  <Product type="0100" id="0107" name="FGD211 Universal Dimmer 500W" config="fibaro/fgd211.xml" />
 	  <Product type="0300" id="0106" name="FGR221 Roller Shutter Controller" />
@@ -154,6 +158,7 @@
 	</Manufacturer>
 	<Manufacturer id="0110" name="Frostdale">
 		<Product type="2411" id="0001" name="Nanogrid: FDN2nxx light switch - where n is 1, 2, 3 or 4 buttons"/>
+		<Product type="7333" id="0031" name="Nanogrid: FDN2nxx light switch - where n is 1, 2, 3 or 4 buttons" config="frostdale/fdn2nxx.xml"/>
 	</Manufacturer>
 	<Manufacturer id="0020" name="General Electric">
 		<Product type="8007" id="1390" name="Wireless Lighting Control"/>
@@ -241,6 +246,7 @@
 		<Product type="0401" id="0209" name="VRI06-1LX Multilevel Scene Switch" config="leviton/vri06.xml"/>
 		<Product type="0501" id="0206" name="VRI10-1LX Multilevel Scene Switch" config="leviton/vri10.xml"/>
 		<Product type="0501" id="0209" name="VRI10-1LZ Scene Capable Dimmer" config="leviton/vri10.xml"/>
+		<Product type="0602" id="0209" name="VRMX1-1LZ Multilevel Scene Switch" config="leviton/vri10.xml"/>
 		<Product type="0901" id="0215" name="VRC51-1LX One Scene Controller"/>
 		<Product type="0702" id="0261" name="VRCZ4-M0Z 4-Button Zone Controller"/>
 		<Product type="0b02" id="030b" name="VRC0P-1LW Plug-in Serial Interface Module"/>
@@ -287,6 +293,7 @@
 	<Manufacturer id="0041" name="OpenPeak Inc.">
 	</Manufacturer>
 	<Manufacturer id="0064" name="Popp / Duwi">
+	  <Product type="1001" id="0000" name="Plugin Dimmer" />
 	  <Product type="3001" id="0000" name="Plugin Switch" />
 	</Manufacturer>
 	<Manufacturer id="0016" name="PowerLynx">
