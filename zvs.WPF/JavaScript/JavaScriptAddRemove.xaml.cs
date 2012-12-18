@@ -109,7 +109,9 @@ namespace zvs.WPF.JavaScript
             if (!window.Canceled)
             {
                 context.JavaScriptCommands.Add(jsCommand);
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
 
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
                 EvaluateAddEditBtnsUsability();
@@ -131,11 +133,15 @@ namespace zvs.WPF.JavaScript
                 {
                     context.QueuedCommands.Local.Remove(qc);
                 }
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
 
                 foreach (StoredCommand sc in context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToList())
                 {
-                    StoredCommand.RemoveDependencies(context, sc);
+                    string error = string.Empty;
+                    StoredCommand.TryRemoveDependencies(context, sc, out error);
+                    Debug.Write(error);
                 }
 
                 //Delete the Command from each Scene it is user
@@ -146,7 +152,9 @@ namespace zvs.WPF.JavaScript
                 }
 
                 context.JavaScriptCommands.Local.Remove(jsCommand);
-                context.SaveChanges();
+
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
 
                 EvaluateAddEditBtnsUsability();
             }
@@ -166,7 +174,10 @@ namespace zvs.WPF.JavaScript
 
             if (!window.Canceled)
             {
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
+
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
             }
         }

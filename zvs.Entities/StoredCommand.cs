@@ -252,7 +252,7 @@ namespace zvs.Entities
         /// </summary>
         /// <param name="context"></param>
         /// <param name="sc"></param>
-        public static void RemoveDependencies(zvsContext context, StoredCommand sc)
+        public static bool TryRemoveDependencies(zvsContext context, StoredCommand sc, out string error)
         {
             if (sc.ScheduledTask != null)
             {
@@ -269,13 +269,15 @@ namespace zvs.Entities
             // if (sc.SceneCommand != null)
             //     context.SceneCommands.Local.Remove(sc.SceneCommand);
 
-
-
             foreach (SceneCommand sceneCommand in context.SceneCommands.Where(o => o.StoredCommand.Id == sc.Id))
             {
                 context.SceneCommands.Local.Remove(sceneCommand);
             }
-            context.SaveChanges();
+
+            if (!context.TrySaveChanges(out error))
+                return false;
+
+            return true;
         }
     }
 }

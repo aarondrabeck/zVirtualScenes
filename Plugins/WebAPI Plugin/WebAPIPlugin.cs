@@ -73,23 +73,28 @@ namespace WebAPI
                     Description = "Writes all server client communication to the log for debugging."
                 }, context);
 
-                DeviceProperty.AddOrEdit(new DeviceProperty
+                string error = null;
+
+                DeviceProperty.TryAddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "WebAPI_SHOW_DEVICE",
                     Name = "Show device in Web API",
                     Description = "If enabled this device will show in applications that use the Web API",
                     ValueType = DataType.BOOL,
                     Value = "true"
-                }, context);
+                }, context, out error);
 
-                SceneProperty.AddOrEdit(new SceneProperty
+                SceneProperty.TryAddOrEdit(new SceneProperty
                 {
                     UniqueIdentifier = "WebAPI_SHOW_SCENE",
                     Name = "Show scene in Web API",
                     Description = "If enabled this scene will show in applications that use the Web API",
                     Value = "true",
                     ValueType = DataType.BOOL
-                }, context);
+                }, context, out error);
+
+                if (!string.IsNullOrEmpty(error))
+                    log.Error(error);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
                 int.TryParse(GetSettingValue("PORT", context), out _port);

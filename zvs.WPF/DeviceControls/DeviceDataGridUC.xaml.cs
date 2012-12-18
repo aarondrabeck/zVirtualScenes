@@ -241,14 +241,18 @@ namespace zvs.WPF.DeviceControls
                             if (result == MessageBoxResult.Yes)
                             {
                                 context.DeviceValueTriggers.Local.Remove(dvt);
-                                context.SaveChanges();
+                                string SaveError = string.Empty;
+                                if (!context.TrySaveChanges(out SaveError))
+                                    ((App)App.Current).zvsCore.log.Error(SaveError);
                             }
                             else
                                 return;
                         }
 
                         context.Devices.Local.Remove(d);
-                        context.SaveChanges();
+                        string SaveError1 = string.Empty;
+                        if (!context.TrySaveChanges(out SaveError1))
+                            ((App)App.Current).zvsCore.log.Error(SaveError1);
                     }
                 }
             }
@@ -307,7 +311,9 @@ namespace zvs.WPF.DeviceControls
             if (e.EditAction == DataGridEditAction.Commit)
             {
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
                 ////device.CallOnContextUpdated();
             }
         }

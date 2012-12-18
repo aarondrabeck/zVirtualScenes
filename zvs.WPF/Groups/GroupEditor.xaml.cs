@@ -107,7 +107,9 @@ namespace zvs.WPF.Groups
                 };
 
                 context.Groups.Local.Add(new_g);
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<Group>().FirstOrDefault(o => o.Name == new_g.Name);
 
@@ -125,7 +127,9 @@ namespace zvs.WPF.Groups
                 {
 
                     context.Groups.Local.Remove(g);
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
                 }
             }
 
@@ -142,7 +146,9 @@ namespace zvs.WPF.Groups
                 if (nameWindow.ShowDialog() ?? false)
                 {
                     g.Name = nameWindow.GroupName;
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
                 }
             }
         }
@@ -188,7 +194,9 @@ namespace zvs.WPF.Groups
                             }
                         }
                     }
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
 
                     groupsDevicesLstVw.Focus();
                 }
@@ -226,7 +234,9 @@ namespace zvs.WPF.Groups
                     foreach (Device gd in devicesToRemove)
                         selected_group.Devices.Remove(gd);
 
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
                 }
             }
         }

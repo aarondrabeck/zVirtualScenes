@@ -89,7 +89,9 @@ namespace zvs.WPF.TriggerControls
             if (e.EditAction == DataGridEditAction.Commit)
             {
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
             }
         }
 
@@ -109,7 +111,9 @@ namespace zvs.WPF.TriggerControls
                     {
                         if (!new_window.Canceled)
                         {
-                            context.SaveChanges();
+                            string SaveError = string.Empty;
+                            if (!context.TrySaveChanges(out SaveError))
+                                ((App)App.Current).zvsCore.log.Error(SaveError);
                         }
                     };
                 }
@@ -127,7 +131,9 @@ namespace zvs.WPF.TriggerControls
                         MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         context.DeviceValueTriggers.Local.Remove(trigger);
-                        context.SaveChanges();
+                        string SaveError = string.Empty;
+                        if (!context.TrySaveChanges(out SaveError))
+                            ((App)App.Current).zvsCore.log.Error(SaveError);
                     }
                 }
 
@@ -148,7 +154,9 @@ namespace zvs.WPF.TriggerControls
                 if (!new_window.Canceled)
                 {
                     context.DeviceValueTriggers.Add(trigger);
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
                 }
             };
         }

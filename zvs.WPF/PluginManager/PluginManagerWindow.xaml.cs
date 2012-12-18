@@ -102,8 +102,10 @@ namespace zvs.WPF.PluginManager
                     (isChecked) =>
                     {
                         //Save to the database
-                        p.isEnabled = isChecked;                        
-                        context.SaveChanges();
+                        p.isEnabled = isChecked;
+                        string SaveError = string.Empty;
+                        if (!context.TrySaveChanges(out SaveError))
+                            ((App)App.Current).zvsCore.log.Error(SaveError);
 
                         //STOP OR START
                         var Plugin = application.zvsCore.pluginManager.GetPlugins().FirstOrDefault(o => o.Name == p.Name);
@@ -131,8 +133,10 @@ namespace zvs.WPF.PluginManager
                                     DefaultValue,
                                     (isChecked) =>
                                     {
-                                        _ps.Value = isChecked.ToString();                                        
-                                        context.SaveChanges();
+                                        _ps.Value = isChecked.ToString();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -147,8 +151,10 @@ namespace zvs.WPF.PluginManager
                                     NumericControl.NumberType.Decimal,
                                     (value) =>
                                     {
-                                        _ps.Value = value;                                        
-                                        context.SaveChanges();
+                                        _ps.Value = value;
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -163,8 +169,10 @@ namespace zvs.WPF.PluginManager
                                     NumericControl.NumberType.Byte,
                                     (value) =>
                                     {
-                                        _ps.Value = value;                                        
-                                        context.SaveChanges();
+                                        _ps.Value = value;
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -179,8 +187,10 @@ namespace zvs.WPF.PluginManager
                                     NumericControl.NumberType.Integer,
                                     (value) =>
                                     {
-                                        _ps.Value = value;                                       
-                                        context.SaveChanges();
+                                        _ps.Value = value;
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -195,8 +205,10 @@ namespace zvs.WPF.PluginManager
                                     NumericControl.NumberType.Short,
                                     (value) =>
                                     {
-                                        _ps.Value = value;                                        
-                                        context.SaveChanges();
+                                        _ps.Value = value;
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -212,7 +224,9 @@ namespace zvs.WPF.PluginManager
                                     (value) =>
                                     {
                                         _ps.Value = value;
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -227,7 +241,9 @@ namespace zvs.WPF.PluginManager
                                     (value) =>
                                     {
                                         _ps.Value = value;
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);
@@ -243,7 +259,9 @@ namespace zvs.WPF.PluginManager
                                     (value) =>
                                     {
                                         _ps.Value = value;
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                         application.zvsCore.pluginManager.NotifyPluginSettingsChanged(_ps);
                                     },
                                 icon);

@@ -61,19 +61,28 @@ namespace zvs.Entities
             }
         }
 
-        public static void AddOrEdit(zvsContext context, ProgramOption opt)
+        public static bool TryAddOrEdit(zvsContext context, ProgramOption opt, out string error)
         {
-            if (opt != null)
+
+            if (opt == null)
             {
-                ProgramOption existing_option = context.ProgramOptions.FirstOrDefault(o => o.UniqueIdentifier == opt.UniqueIdentifier);
-
-                if (existing_option == null)
-                    context.ProgramOptions.Add(opt);
-                else
-                    existing_option.Value = opt.Value;
-
-                context.SaveChanges();
+                error = "ProgramOption is null";
+                return false;
             }
+
+
+            ProgramOption existing_option = context.ProgramOptions.FirstOrDefault(o => o.UniqueIdentifier == opt.UniqueIdentifier);
+
+            if (existing_option == null)
+                context.ProgramOptions.Add(opt);
+            else
+                existing_option.Value = opt.Value;
+
+            if (!context.TrySaveChanges(out error))
+                return false;
+
+            return true;
+
         }
 
         public static string GetProgramOption(zvsContext context, string UniqueIdentifier)

@@ -82,23 +82,27 @@ namespace NOAAPlugin
                     Description = "The minutes to delay sunset as a positive or negative number"
                 }, context);
 
-                SceneProperty.AddOrEdit(new SceneProperty
+                string error = null;
+                SceneProperty.TryAddOrEdit(new SceneProperty
                 {
                     UniqueIdentifier = "ACTIVATE_SUNRISE",
                     Name = "Activate at Sunrise",
                     Description = "Activates this scene at sunrise",
                     Value = "false",
                     ValueType = DataType.BOOL
-                }, context);
+                }, context, out error);
 
-                SceneProperty.AddOrEdit(new SceneProperty
+                SceneProperty.TryAddOrEdit(new SceneProperty
                 {
                     UniqueIdentifier = "ACTIVATE_SUNSET",
                     Name = "Activate at Sunset",
                     Description = "Activates this scene at sunset",
                     Value = "false",
                     ValueType = DataType.BOOL
-                }, context);
+                }, context, out error);
+
+                if (!string.IsNullOrEmpty(error))
+                    log.Error(error);
 
                 Double.TryParse(GetSettingValue("DELAY_SUNRISE", context), out _SunriseDelay);
                 Double.TryParse(GetSettingValue("DELAY_SUNSET", context), out _SunsetDelay);

@@ -43,16 +43,17 @@ namespace zvs.WPF
         private void AcenLogOrderRadioBtn_Checked(object sender, RoutedEventArgs e)
         {
             DecenLogOrderRadioBtn.IsChecked = false;
+            string error = null;
 
             if (!isLoading)
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    ProgramOption.AddOrEdit(context, new ProgramOption()
+                    ProgramOption.TryAddOrEdit(context, new ProgramOption()
                     {
                         UniqueIdentifier = "LOGDIRECTION",
                         Value = "Ascending"
-                    });
+                    }, out error);
                 }
             }
         }
@@ -60,19 +61,18 @@ namespace zvs.WPF
         private void DecenLogOrderRadioBtn_Checked(object sender, RoutedEventArgs e)
         {
             AcenLogOrderRadioBtn.IsChecked = false;
-
+            string error = null;
             if (!isLoading)
             {
                 using (zvsContext context = new zvsContext())
                 {
-                    ProgramOption.AddOrEdit(context, new ProgramOption()
+                    ProgramOption.TryAddOrEdit(context, new ProgramOption()
                     {
                         UniqueIdentifier = "LOGDIRECTION",
                         Value = "Descending"
-                    });
+                    }, out error);
                 }
             }
-
         }
 
         private void BtnDone_Click(object sender, RoutedEventArgs e)

@@ -106,7 +106,9 @@ namespace zvs.WPF.ScheduledTaskControls
                 }
 
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
             }
         }
 
@@ -137,7 +139,9 @@ namespace zvs.WPF.ScheduledTaskControls
             if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 context.ScheduledTasks.Local.Remove(task);
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
                 ScheduledTaskDataGrid.Focus();
                 return true;
             }
@@ -226,7 +230,9 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = true;
             ThirtiethChkBx.IsChecked = false;
             ThirtyfirstChkBx.IsChecked = true;
-            context.SaveChanges();
+            string SaveError = string.Empty;
+            if (!context.TrySaveChanges(out SaveError))
+                ((App)App.Current).zvsCore.log.Error(SaveError);
         }
 
         private void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
@@ -262,7 +268,9 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = false;
             ThirtiethChkBx.IsChecked = true;
             ThirtyfirstChkBx.IsChecked = false;
-            context.SaveChanges();
+            string SaveError = string.Empty;
+            if (!context.TrySaveChanges(out SaveError))
+                ((App)App.Current).zvsCore.log.Error(SaveError);
         }
 
         private void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
@@ -298,12 +306,16 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = false;
             ThirtiethChkBx.IsChecked = false;
             ThirtyfirstChkBx.IsChecked = false;
-            context.SaveChanges();
+            string SaveError = string.Empty;
+            if (!context.TrySaveChanges(out SaveError))
+                ((App)App.Current).zvsCore.log.Error(SaveError);
         }
 
         private void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
         {
-            context.SaveChanges();
+            string SaveError = string.Empty;
+            if (!context.TrySaveChanges(out SaveError))
+                ((App)App.Current).zvsCore.log.Error(SaveError);
         }
 
         private void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
@@ -328,7 +340,9 @@ namespace zvs.WPF.ScheduledTaskControls
                 else
                     st.StoredCommand = st.StoredCommand;
 
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
             }
         }
     }

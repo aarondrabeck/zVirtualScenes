@@ -74,23 +74,27 @@ namespace HttpAPI
                     Description = "Writes all server client communication to the log for debugging."
                 }, context);
 
-                DeviceProperty.AddOrEdit(new DeviceProperty
+                string error = null;
+                DeviceProperty.TryAddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "HTTPAPI_SHOW",
                     Name = "Show device in HTTP API",
                     Description = "If enabled this device will show in applications that use the HTTP API",
                     ValueType = DataType.BOOL,
                     Value = "true"
-                }, context);
+                }, context, out error);
 
-                SceneProperty.AddOrEdit(new SceneProperty
+                SceneProperty.TryAddOrEdit(new SceneProperty
                 {
                     UniqueIdentifier = "HTTPAPI_SHOW",
                     Name = "Show in HTTP API Applications",
                     Description = "If enabled this scene will show in applications that use the HTTP API",
                     Value = "true",
                     ValueType = DataType.BOOL
-                }, context);
+                }, context, out error);
+
+                if (!string.IsNullOrEmpty(error))
+                    log.Error(error);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
                 int.TryParse(GetSettingValue("PORT", context), out _port);
@@ -739,7 +743,7 @@ namespace HttpAPI
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(Core);
-                                cp.RunCommandAsync( cmd.Id, sID.ToString());
+                                cp.RunCommandAsync(cmd.Id, sID.ToString());
                             }
                             return new { success = true, desc = "Scene Started." };
                         }
@@ -747,8 +751,14 @@ namespace HttpAPI
                         if (!string.IsNullOrEmpty(name))
                         {
                             scene.Name = name;
-                            context.SaveChanges();
-                            return new { success = true, desc = "Scene Name Updated." };
+                            string SaveError = string.Empty;
+                            if (!context.TrySaveChanges(out SaveError))
+                            {
+                                log.Error(SaveError);
+                                return new { success = false, desc = SaveError };
+                            }
+                            else
+                                return new { success = true, desc = "Scene Name Updated." };
                         }
 
                     }
@@ -894,7 +904,7 @@ namespace HttpAPI
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunCommandAsync( cmd.Id, arg);
+                                            cp.RunCommandAsync(cmd.Id, arg);
                                             return new { success = true };
                                         }
                                         else
@@ -981,7 +991,7 @@ namespace HttpAPI
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                         CommandProcessor cp = new CommandProcessor(Core);
-                        cp.RunCommandAsync( cmd.Id, arg);
+                        cp.RunCommandAsync(cmd.Id, arg);
 
                         return new { success = true };
                     }
@@ -1105,14 +1115,14 @@ namespace HttpAPI
                     sceneRunningCount++;
                 }
             }
-            
+
             var asm = typeof(HttpAPI.HttpAPIPlugin).Assembly;
             using (var template = asm.GetManifestResourceStream("HttpAPI.TileTemplate.png"))
             {
                 System.Drawing.Image canvas = System.Drawing.Image.FromStream(template);
                 var g = Graphics.FromImage(canvas);
                 Font font = new Font(FontFamily.GenericSansSerif, 20);
-                
+
                 Color c = Color.FromName(color);
                 if (c == null) c = Color.Blue;
                 SolidBrush s = new SolidBrush(c);
@@ -1120,7 +1130,7 @@ namespace HttpAPI
                 log.InfoFormat("Tile Style:{0}, Color:{1}, Devices On:{2}, Scenes Active:{3}", style, color, deviceOnCount, sceneRunningCount);
                 if (style.ToLower() == "dands")
                 {
-                    
+
                     g.DrawString(string.Format("Devices: {0}", deviceOnCount), font, s, new PointF(50, 10));
                     g.DrawString(string.Format("Scenes:  {0}", sceneRunningCount), font, s, new PointF(50, 35));
                 }
@@ -1136,9 +1146,9 @@ namespace HttpAPI
                     if (stm.CanSeek && stm.Position > 0) stm.Seek(0, SeekOrigin.Begin);
                     stm.Read(bytes, 0, bytes.Length);
                     return bytes;
-                }                
+                }
             }
-            
+
         }
         public class Utf8StringWriter : StringWriter
         {

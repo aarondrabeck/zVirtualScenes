@@ -37,62 +37,66 @@ namespace zvs.Processor
             #region Install Base Commands and Properties
             using (zvsContext context = new zvsContext())
             {
-                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                string error = string.Empty;
+                BuiltinCommand.TryAddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "REPOLL_ME",
                     Name = "Re-poll Device",
                     ArgumentType = DataType.INTEGER,
                     Description = "This will force a re-poll on an object."
-                }, context);
+                }, context, out error);
 
-                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                BuiltinCommand.TryAddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "REPOLL_ALL",
                     Name = "Re-poll all Devices",
                     ArgumentType = DataType.NONE,
                     Description = "This will force a re-poll on all objects."
-                }, context);
+                }, context, out error);
 
-                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                BuiltinCommand.TryAddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "GROUP_ON",
                     Name = "Turn Group On",
                     ArgumentType = DataType.STRING,
                     Description = "Activates a group."
-                }, context);
+                }, context, out error);
 
-                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                BuiltinCommand.TryAddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "GROUP_OFF",
                     Name = "Turn Group Off",
                     ArgumentType = DataType.STRING,
                     Description = "Deactivates a group."
-                }, context);
+                }, context, out error);
 
-                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                BuiltinCommand.TryAddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "TIMEDELAY",
                     Name = "Time Delay (sec)",
                     ArgumentType = DataType.INTEGER,
                     Description = "Pauses a execution for x seconds."
-                }, context);
+                }, context, out error);
 
-                BuiltinCommand.AddOrEdit(new BuiltinCommand
+                BuiltinCommand.TryAddOrEdit(new BuiltinCommand
                 {
                     UniqueIdentifier = "RUN_SCENE",
                     Name = "Run Scene",
                     ArgumentType = DataType.INTEGER,
                     Description = "Argument = SceneId"
-                }, context);
+                }, context, out error);
 
-                DeviceProperty.AddOrEdit(new DeviceProperty
+                DeviceProperty.TryAddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "ENABLEPOLLING",
                     Name = "Enable polling for this device.",
                     Value = "false", //default value
                     ValueType = DataType.BOOL,
                     Description = "Toggles automatic polling for a device."
-                }, context);
+                }, context, out error);
+
+                if (!string.IsNullOrEmpty(error))
+                    log.Error(error);
             }
             #endregion
 
@@ -113,7 +117,7 @@ namespace zvs.Processor
                             Exception ex = reflectionEx.LoaderExceptions.FirstOrDefault();
                             if (ex != null)
                             {
-                                string errorMsg = !string.IsNullOrEmpty(ex.StackTrace)? ex.StackTrace.ToString() : string.Empty;
+                                string errorMsg = !string.IsNullOrEmpty(ex.StackTrace) ? ex.StackTrace.ToString() : string.Empty;
                                 if (string.IsNullOrEmpty(errorMsg) && !string.IsNullOrEmpty(ex.Message))
                                     errorMsg = ex.Message;
 
@@ -140,13 +144,18 @@ namespace zvs.Processor
             //Install Program Options
             using (zvsContext context = new zvsContext())
             {
+               
                 if (ProgramOption.GetProgramOption(context, "LOGDIRECTION") == null)
                 {
-                    ProgramOption.AddOrEdit(context, new ProgramOption()
+                    string error = null;
+                    ProgramOption.TryAddOrEdit(context, new ProgramOption()
                     {
                         UniqueIdentifier = "LOGDIRECTION",
                         Value = "Descending"
-                    });
+                    }, out error);
+
+                    if (!string.IsNullOrEmpty(error))
+                        log.Error(error);
                 }
             }
         }

@@ -143,7 +143,9 @@ namespace zvs.WPF.SceneControls
                 }
             }
 
-            context.SaveChanges();
+            string SaveError = string.Empty;
+            if (!context.TrySaveChanges(out SaveError))
+                ((App)App.Current).zvsCore.log.Error(SaveError);
         }
 
         private void SceneGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
@@ -160,7 +162,9 @@ namespace zvs.WPF.SceneControls
                 }
 
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
             }
         }
 
@@ -218,7 +222,9 @@ namespace zvs.WPF.SceneControls
             foreach (Scene s in SceneCollection)
                 s.SortOrder = SceneGrid.Items.IndexOf(s);
 
-            context.SaveChanges();
+            string SaveError = string.Empty;
+            if (!context.TrySaveChanges(out SaveError))
+                ((App)App.Current).zvsCore.log.Error(SaveError);
         }
 
         private void SortSceneGridBySortOrder()
@@ -287,7 +293,9 @@ namespace zvs.WPF.SceneControls
                                 SceneGrid.Focus();
                             }
                             context.Scenes.Local.Add(new_scene);
-                            context.SaveChanges();
+                            string SaveError = string.Empty;
+                            if (!context.TrySaveChanges(out SaveError))
+                                ((App)App.Current).zvsCore.log.Error(SaveError);
                         }
                     };
 
@@ -354,7 +362,9 @@ namespace zvs.WPF.SceneControls
                                 else
                                 {
                                     selected_scene.Commands.Add(newSceneCommand);
-                                    context.SaveChanges();
+                                    string SaveError = string.Empty;
+                                    if (!context.TrySaveChanges(out SaveError))
+                                        ((App)App.Current).zvsCore.log.Error(SaveError);
                                     SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                                 }
                             }
@@ -418,7 +428,9 @@ namespace zvs.WPF.SceneControls
                 else
                     context.Scenes.Local.Remove(scene);
 
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
                 SceneGrid.Focus();
                 return true;
             }
@@ -465,7 +477,9 @@ namespace zvs.WPF.SceneControls
                         if (d != null)
                             context.SceneCommands.Local.Remove(d);
                     }
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
                 }
             }
         }
@@ -487,7 +501,9 @@ namespace zvs.WPF.SceneControls
                         }
                     }
 
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        ((App)App.Current).zvsCore.log.Error(SaveError);
                 }
             }
         }
@@ -608,7 +624,9 @@ namespace zvs.WPF.SceneControls
                         }
                         else
                         {
-                            context.SaveChanges();
+                            string SaveError = string.Empty;
+                            if (!context.TrySaveChanges(out SaveError))
+                                ((App)App.Current).zvsCore.log.Error(SaveError);
                         }
                     }
                 }
@@ -660,7 +678,9 @@ namespace zvs.WPF.SceneControls
                             {
                                 cmd.StoredCommand.Command = window.SelectedCommand;
                                 selected_scene.Commands.Add(cmd);
-                                context.SaveChanges();
+                                string SaveError = string.Empty;
+                                if (!context.TrySaveChanges(out SaveError))
+                                    ((App)App.Current).zvsCore.log.Error(SaveError);
 
                                 SceneCmdsGrid.SelectedItems.Add(cmd);
                             }
@@ -708,7 +728,9 @@ namespace zvs.WPF.SceneControls
                         else
                         {
                             selected_scene.Commands.Add(newSceneCommand);
-                            context.SaveChanges();
+                            string SaveError = string.Empty;
+                            if (!context.TrySaveChanges(out SaveError))
+                                ((App)App.Current).zvsCore.log.Error(SaveError);
                             SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                         }
                     }

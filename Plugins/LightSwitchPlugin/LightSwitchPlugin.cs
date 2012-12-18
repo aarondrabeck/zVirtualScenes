@@ -96,23 +96,27 @@ namespace LightSwitchPlugin
                     Description = "Zero configuration networking allows clients on your network to detect and connect to your LightSwitch server automatically."
                 }, context);
 
-                DeviceProperty.AddOrEdit(new DeviceProperty
+                string error = null;
+                DeviceProperty.TryAddOrEdit(new DeviceProperty
                 {
                     UniqueIdentifier = "SHOWINLSLIST",
                     Name = "Show device in LightSwitch",
                     Description = "If enabled this device will show in the LightSwitch device tab.",
                     ValueType = DataType.BOOL,
                     Value = "true"
-                }, context);
+                }, context, out error);
 
-                SceneProperty.AddOrEdit(new SceneProperty
+                SceneProperty.TryAddOrEdit(new SceneProperty
                 {
                     UniqueIdentifier = "SHOWSCENEINLSLIST",
                     Name = "Show scene in LightSwitch",
                     Description = "If enabled this scene will show in the LightSwitch scene tab.",
                     Value = "true",
                     ValueType = DataType.BOOL
-                }, context);
+                }, context, out error);
+
+                if (!string.IsNullOrEmpty(error))
+                    log.Error(error);
 
                 bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
                 bool.TryParse(GetSettingValue("PUBLISHZEROCFG", context), out _useBonjour);

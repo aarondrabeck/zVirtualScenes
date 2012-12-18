@@ -83,7 +83,9 @@ namespace zvs.WPF.DeviceControls
                                         });
                                     }
 
-                                    context.SaveChanges();
+                                    string SaveError = string.Empty;
+                                    if (!context.TrySaveChanges(out SaveError))
+                                        ((App)App.Current).zvsCore.log.Error(SaveError);
                                 },
                                 icon);
                                 PropertiesStkPnl.Children.Add(control);
@@ -111,7 +113,9 @@ namespace zvs.WPF.DeviceControls
                                             });
                                         }
 
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                     }, 
                                     icon);
                                 PropertiesStkPnl.Children.Add(control);
@@ -139,7 +143,9 @@ namespace zvs.WPF.DeviceControls
                                             });
                                         }
 
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                     },
                                     icon);
                                 PropertiesStkPnl.Children.Add(control);
@@ -167,7 +173,9 @@ namespace zvs.WPF.DeviceControls
                                             });
                                         }
 
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                     },
                                     icon);
                                 PropertiesStkPnl.Children.Add(control);
@@ -195,7 +203,9 @@ namespace zvs.WPF.DeviceControls
                                             });
                                         }
 
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                     },
                                     icon);
                                 PropertiesStkPnl.Children.Add(control);
@@ -223,7 +233,9 @@ namespace zvs.WPF.DeviceControls
                                             });
                                         }
 
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                     },
                                     icon);
                                 PropertiesStkPnl.Children.Add(control);
@@ -252,7 +264,9 @@ namespace zvs.WPF.DeviceControls
                                             });
                                         }
 
-                                        context.SaveChanges();
+                                        string SaveError = string.Empty;
+                                        if (!context.TrySaveChanges(out SaveError))
+                                            ((App)App.Current).zvsCore.log.Error(SaveError);
                                     },
                                     icon);
                                 PropertiesStkPnl.Children.Add(control);

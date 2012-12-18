@@ -13,7 +13,7 @@ namespace zvs.Entities
     [Table("BuiltinCommands", Schema = "ZVS")]
     public partial class BuiltinCommand : Command
     {
-        public static void AddOrEdit(BuiltinCommand c, zvsContext context)
+        public static bool TryAddOrEdit(BuiltinCommand c, zvsContext context, out string error)
         {
             BuiltinCommand existing_c = context.BuiltinCommands.FirstOrDefault(cmd => cmd.UniqueIdentifier == c.UniqueIdentifier);
             if (existing_c == null)
@@ -30,7 +30,10 @@ namespace zvs.Entities
                 existing_c.Help = c.Help;
                 existing_c.Options = c.Options;
             }
-            context.SaveChanges();
+            if (!context.TrySaveChanges(out error))
+                return false;
+
+            return true;
         }
     }
 }

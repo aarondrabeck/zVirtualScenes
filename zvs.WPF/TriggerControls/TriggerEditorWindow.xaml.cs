@@ -164,7 +164,9 @@ namespace zvs.WPF.TriggerControls
                 else
                     trigger.StoredCommand = trigger.StoredCommand;
 
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    ((App)App.Current).zvsCore.log.Error(SaveError);
             }
 
             if (trigger.StoredCommand != null)

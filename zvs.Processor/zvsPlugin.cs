@@ -45,7 +45,9 @@ namespace zvs.Processor
                     };
                     context.Plugins.Add(pl);
                 }
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    log.Error(SaveError);
             }
         }
 
@@ -97,7 +99,9 @@ namespace zvs.Processor
                     if (pl != null)
                     {
                         pl.isEnabled = value;
-                        context.SaveChanges();
+                        string SaveError = string.Empty;
+                        if (!context.TrySaveChanges(out SaveError))
+                            log.Error(SaveError);
                     }
                 }
             }
@@ -146,7 +150,9 @@ namespace zvs.Processor
                 {
                     //NEW VALUE
                     d.Values.Add(dv);
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        log.Error(SaveError);
 
                     //Call Event
                     dv.DeviceValueAdded(new System.EventArgs());
@@ -170,7 +176,9 @@ namespace zvs.Processor
                     existing_dv.isReadOnly = dv.isReadOnly;
                     existing_dv.CustomData1 = dv.CustomData1;
                     existing_dv.CustomData2 = dv.CustomData2;
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        log.Error(SaveError);
 
                     if (!IgnoreValueChange && !string.IsNullOrEmpty(dv.Value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(dv.Value)))
                     {
@@ -221,7 +229,9 @@ namespace zvs.Processor
                     existing_ps.ValueType = ps.ValueType;
                     existing_ps.Options = ps.Options;
                 }
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    log.Error(SaveError);
             }
         }
 
@@ -234,7 +244,9 @@ namespace zvs.Processor
                 if (ps != null)
                 {
                     ps.Value = settingValue;
-                    context.SaveChanges();
+                    string SaveError = string.Empty;
+                    if (!context.TrySaveChanges(out SaveError))
+                        log.Error(SaveError);
                 }
             }
         }
@@ -306,7 +318,9 @@ namespace zvs.Processor
                         }
                     }
                 }
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                    log.Error(SaveError);
             }
         }
 
@@ -365,7 +379,9 @@ namespace zvs.Processor
 
                     dc.Options.ToList().ForEach(o => existing_dc.Options.Add(o));
                 }
-                context.SaveChanges();
+                string SaveError = string.Empty;
+                if (!context.TrySaveChanges(out SaveError))
+                   log.Error(SaveError);
             }
         }
 

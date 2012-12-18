@@ -18,11 +18,11 @@ namespace zvs.Entities
         {
             this.Options = new ObservableCollection<DevicePropertyOption>();
         }
-        
+
         public virtual ObservableCollection<DevicePropertyOption> Options { get; set; }
 
 
-        public static void AddOrEdit(DeviceProperty deviceProperty, zvsContext context)
+        public static bool TryAddOrEdit(DeviceProperty deviceProperty, zvsContext context, out string error)
         {
             DeviceProperty existing_dp = context.DeviceProperties.FirstOrDefault(d => d.UniqueIdentifier == deviceProperty.UniqueIdentifier);
 
@@ -44,7 +44,10 @@ namespace zvs.Entities
                 existing_dp.Options.Clear();
                 deviceProperty.Options.ToList().ForEach(o => existing_dp.Options.Add(o));
             }
-            context.SaveChanges();
-        }     
+            if (!context.TrySaveChanges(out error))
+                return false;
+
+            return true;
+        }
     }
 }

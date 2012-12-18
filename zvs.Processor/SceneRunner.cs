@@ -122,10 +122,10 @@ namespace zvs.Processor
             else
             {
                 await Task.Factory.StartNew(() =>
-             {
-                _scene.isRunning = false;
-                context.SaveChanges();
-             });
+                {
+                    _scene.isRunning = false;
+                    context.SaveChanges();
+                });
 
                 return new SceneResult(_scene.Id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors));
             }

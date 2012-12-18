@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,7 +47,7 @@ namespace zvs.Entities
         public DbSet<Group> Groups { get; set; }
 
         public DbSet<JavaScriptCommand> JavaScriptCommands { get; set; }
-        
+
         public DbSet<Plugin> Plugins { get; set; }
         public DbSet<PluginSetting> PluginSettings { get; set; }
         public DbSet<PluginSettingOption> PluginSettingOptions { get; set; }
@@ -86,7 +87,7 @@ namespace zvs.Entities
                    .HasOptional(s => s.StoredCommand)
                    .WithOptionalPrincipal(a => a.SceneCommand)
                    .WillCascadeOnDelete();
-           
+
         }
         public delegate void onEntityChangedventHandler(object sender, onEntityChangedEventArgs args);
 
@@ -135,6 +136,35 @@ namespace zvs.Entities
          {28, () => { if(onJavaScriptCommandsChanged != null) { onJavaScriptCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Deleted)); }}},
          {29, () => { if(onJavaScriptCommandsChanged != null) { onJavaScriptCommandsChanged(null, new onEntityChangedEventArgs(System.Data.EntityState.Modified)); }}}
         };
+
+
+        public bool TrySaveChanges(out string error)
+        {
+            error = string.Empty;
+
+            try
+            {
+                SaveChanges();
+            }
+            catch (DbEntityValidationException dbEx)
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                {
+                    foreach (var validationError in validationErrors.ValidationErrors)
+                        sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                }
+                error = sb.ToString();
+                return false;
+            }
+            catch (Exception ex)
+            {
+                error = (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message)) ? ex.InnerException.Message : ex.Message;
+                return false;
+            }
+
+            return true;
+        }
 
         public override int SaveChanges()
         {
@@ -255,6 +285,8 @@ namespace zvs.Entities
 
             return result;
         }
+
+
 
         public class onEntityChangedEventArgs : EventArgs
         {

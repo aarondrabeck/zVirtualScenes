@@ -78,7 +78,7 @@ namespace zvs.Processor.Backup
                 if (backupStoredCMD.CommandType == Command_Types.Device)
                     c = d.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
                 if (backupStoredCMD.CommandType == Command_Types.DeviceType)
-                { 
+                {
                     c = d.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
                     sc.Argument2 = d.Id.ToString();
                 }
@@ -89,7 +89,10 @@ namespace zvs.Processor.Backup
                 sc.Argument = backupStoredCMD.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
-                context.SaveChanges();
+                string saveError = string.Empty;
+                if (!context.TrySaveChanges(out saveError))
+                    return null;
+
                 return sc;
             }
             else if (backupStoredCMD.CommandType == Command_Types.Builtin ||
@@ -109,7 +112,9 @@ namespace zvs.Processor.Backup
                 sc.Argument = backupStoredCMD.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
-                context.SaveChanges();
+                string saveError = string.Empty;
+                if (!context.TrySaveChanges(out saveError))
+                    return null;
                 return sc;
             }
 
