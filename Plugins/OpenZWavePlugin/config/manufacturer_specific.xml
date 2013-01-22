@@ -60,7 +60,9 @@
 	</Manufacturer>
 	<Manufacturer id="008a" name="BeNext">
 		<Product type="0004" id="0100" name="Door Sensor" config="BeNext/DoorSensor.xml"/>
+		<Product type="0006" id="0101" name="Energy Switch" config="BeNext/EnergySwitch.xml"/>
 		<Product type="0007" id="0101" name="Tag Reader" config="BeNext/TagReader.xml"/>
+		<Product type="0008" id="0101" name="Power Switch"/>
 	</Manufacturer>
 	<Manufacturer id="002c" name="BeSafer">
 	</Manufacturer>
@@ -120,14 +122,16 @@
 		<Product type="0104" id="0001" name="AN145 Lamp Screw In Module" config="everspring/an145.xml"/>
 		<Product type="0004" id="0002" name="AN158 Plug-in Meter Appliance Module" config="everspring/an158.xml"/>
 		<Product type="0004" id="0001" name="AN157 Plug-in Appliance Module"/>
-		<Product type="000C" id="0001" name="SE812 Siren"/>
+		<Product type="000C" id="0001" name="SE812 Siren" config="everspring/se812.xml"/>
 		<Product type="000D" id="0001" name="SF812 Smoke Alarm" config="everspring/sf812.xml"/>
 		<Product type="0202" id="0001" name="SM103 Door/Window Sensor" config="everspring/sm103.xml"/>
 		<Product type="0002" id="0001" name="SM103 Door/Window Sensor" config="everspring/sm103.xml"/>
 		<Product type="0101" id="0001" name="SP103 PIR Motion Sensor" config="everspring/sp103.xml"/>
 		<Product type="0001" id="0002" name="SP814 Motion Detector" config="everspring/sp814.xml"/>
 		<Product type="0006" id="0001" name="ST814 Temperature and Humidity Sensor" config="everspring/st814.xml"/>
+		<Product type="0007" id="0001" name="ST815 Illumination Sensor" config="everspring/st815.xml"/>
 		<Product type="000b" id="0001" name="ST812 Flood Detector"/>
+		<Product type="0009" id="0001" name="TSE03 Door Bell" config="everspring/tse03.xml"/>
 	</Manufacturer>
 	<Manufacturer id="0116" name="Everspring CT">
 		<Product type="0002" id="0001" name="HSM02 Mini Door/Window Detector" config="everspringct/hsm02.xml" />
@@ -146,9 +150,11 @@
 	  <Product type="0501" id="0102" name="FGBS001 Universal Binary Sensor" config="fibaro/fgbs001.xml" />
 	  <Product type="0100" id="0104" name="FGD211 Universal Dimmer 500W" />
 	  <Product type="0100" id="0107" name="FGD211 Universal Dimmer 500W" config="fibaro/fgd211.xml" />
+	  <Product type="0700" id="1000" name="FGK101 Door Opening Sensor" config="fibaro/fgk001.xml" />
 	  <Product type="0300" id="0106" name="FGR221 Roller Shutter Controller" />
 	  <Product type="0300" id="0107" name="FGR221 Roller Shutter Controller" />
-	  <Product type="0400" id="0104" name="FGS211 Switch 3KW" config="fibaro/fgs211.xml" />
+	  <Product type="0400" id="0104" name="FGS211 Switch 3kW" config="fibaro/fgs211.xml" />
+	  <Product type="0400" id="0109" name="FGS221 Switch 3kW" config="fibaro/fgs221.xml" />
 	  <Product type="0200" id="0104" name="FGS221 Double Relay Switch 2x1,5kW" config="fibaro/fgs221.xml" />
 	  <Product type="0200" id="0105" name="FGS221 Double Relay Switch 2x1,5kW" config="fibaro/fgs221.xml" />
 	  <Product type="0200" id="0106" name="FGS221 Double Relay Switch 2x1,5kW" config="fibaro/fgs221.xml" />
@@ -250,7 +256,7 @@
 		<Product type="0901" id="0215" name="VRC51-1LX One Scene Controller"/>
 		<Product type="0702" id="0261" name="VRCZ4-M0Z 4-Button Zone Controller"/>
 		<Product type="0b02" id="030b" name="VRC0P-1LW Plug-in Serial Interface Module"/>
-		<Product type="0c01" id="0206" name="VRCPG-SG RF Handheld Remote Controller"/>
+		<Product type="0c01" id="0206" name="VRCPG-SG RF Handheld Remote Controller" config="leviton/vrcpg.xml"/>
 		<Product type="1001" id="0209" name="VRF01-1LZ Multilevel Scene Switch - 1.5A Fan" config="leviton/vrf01.xml"/>
 		<Product type="1102" id="0243" name="VRCS2-MRZ 2-Button Scene Controller with Switches"/>
 	</Manufacturer>
@@ -293,8 +299,12 @@
 	<Manufacturer id="0041" name="OpenPeak Inc.">
 	</Manufacturer>
 	<Manufacturer id="0064" name="Popp / Duwi">
-	  <Product type="1001" id="0000" name="Plugin Dimmer" />
-	  <Product type="3001" id="0000" name="Plugin Switch" />
+		<Product type="0001" id="0000" name="ZW EDAN 300 Flush Mounted Dimmer" />
+		<Product type="1001" id="0000" name="Plugin Dimmer" />
+		<Product type="2001" id="0000" name="ZW ES 1000 Flush Mounted Switch" config="duwi/ZWES1000.xml" />
+		<Product type="3001" id="0000" name="ZW ZS 3500 Plugin Switch" />
+		<Product type="3002" id="0000" name="ZW ZSA 3500 Plugin Switch" />
+		<Product type="4001" id="0000" name="ZW ESJ Blind Control" />
 	</Manufacturer>
 	<Manufacturer id="0016" name="PowerLynx">
 	</Manufacturer>
@@ -349,6 +359,7 @@
 	<Manufacturer id="008b" name="Trane">
 		<Product type="5452" id="5431" name="Model TZEMT400AB32MAA" config="trane/TZEMT400AB32MAA.xml"/>
 		<Product type="5452" id="5433" name="Model TZEMT400BB32MAA" config="trane/TZEMT400BB32MAA.xml"/>
+		<Product type="5452" id="5436" name="Model TZEMT400BB32MAA" config="trane/TZEMT400BB32MAA.xml"/>
 	</Manufacturer>
 	<Manufacturer id="006b" name="Tricklestar">
 	</Manufacturer>
