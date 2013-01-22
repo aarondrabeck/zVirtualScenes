@@ -368,13 +368,7 @@ namespace OpenZWavePlugin
                                     dlg.Dispose();
                                     break;
                                 }
-                            case "AddController":
-                                {
-                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.AddController, (byte)device.NodeNumber);
-                                    dlg.ShowDialog();
-                                    dlg.Dispose();
-                                    break;
-                                }
+                            
                             case "CreateNewPrimary":
                                 {
                                     ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.CreateNewPrimary, (byte)device.NodeNumber);
@@ -389,13 +383,7 @@ namespace OpenZWavePlugin
                                     dlg.Dispose();
                                     break;
                                 }
-                            case "RemoveController":
-                                {
-                                    ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveController, (byte)device.NodeNumber);
-                                    dlg.ShowDialog();
-                                    dlg.Dispose();
-                                    break;
-                                }
+                          
                             case "RemoveDevice":
                                 {
                                     ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveDevice, (byte)device.NodeNumber);
@@ -954,6 +942,20 @@ namespace OpenZWavePlugin
                                                 log.Error(SaveError);
                                         }
                                     }
+                                    else if (value.Label == "Switch") //Some Intermatic devices do not set basic when changing status
+                                    {
+                                        bool state = false;
+                                        if (bool.TryParse(data, out state))
+                                        {
+                                            d.CurrentLevelInt = state ? 100 : 0;
+                                            d.CurrentLevelText = state ? "On" : "Off";
+
+                                            string SaveError = string.Empty;
+                                            if (!Context.TrySaveChanges(out SaveError))
+                                                log.Error(SaveError);
+                                        }
+                                    }
+
                                 }
                                 else
                                 {
@@ -1273,7 +1275,7 @@ namespace OpenZWavePlugin
                         if (node != null)
                         {
 
-                            log.Debug(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
+                            log.Info(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
 
                             using (zvsContext Context = new zvsContext())
                             {
