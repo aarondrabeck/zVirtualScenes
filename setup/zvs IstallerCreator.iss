@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 #define use_dotnetfx45
 #define use_sqlcompact4
-#define use_vc2010
+#define use_vc2012
 
 #define MyAppExeName "zVirtualScenes.exe"
 #define MyAppName "zVirtualScenes"
@@ -35,7 +35,7 @@ OutputDir=output
 ArchitecturesAllowed=x86 x64 ia64
 ArchitecturesInstallIn64BitMode=x64 ia64
 
-SignTool=Standard "setup\signtool.exe" sign /f "{#BuildPath}\zvs.Entities\zvsCert.pfx" /p 4CCAFE63BC9D97822E3FB96942C4F12A752BEDE0 /d $qzVirtualScenes Installer$q $f
+;SignTool=Standard "setup\signtool.exe" sign /f "{#BuildPath}\zvs.Entities\zvsCert.pfx" /p 4CCAFE63BC9D97822E3FB96942C4F12A752BEDE0 /d $qzVirtualScenes Installer$q $f
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
@@ -177,8 +177,8 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 #include "scripts\products\dotnetfx45full.iss"
 #endif
 
-#ifdef use_vc2010
-#include "scripts\products\vcredist2010.iss"
+#ifdef use_vc2012
+#include "scripts\products\vcredist2012.iss"
 #endif
 
 
@@ -198,8 +198,8 @@ if (not netfxinstalled(NetFx45Full, '')) then
 sqlcompact4();
 #endif
 
-#ifdef use_vc2010
-	vcredist2010();
+#ifdef use_vc2012
+	vcredist2012();
 #endif
 
 

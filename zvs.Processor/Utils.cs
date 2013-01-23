@@ -136,7 +136,7 @@ namespace zvs.Processor
             //Check for VCRedist
             if (!DetectVCRedist.IsVCRedistInstalled())
             {
-                return "Visual C++ Redistributable Missing!\n\n zVirtualScenes cannot open because Visual C++ Redistributable is not installed.";
+                return "Visual C++ 2012 Redistributable Missing!\n\n zVirtualScenes cannot open because Visual C++ Redistributable is not installed.";
             }
 
             using (zvsContext context = new zvsContext())
