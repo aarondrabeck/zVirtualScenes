@@ -368,7 +368,7 @@ namespace OpenZWavePlugin
                                     dlg.Dispose();
                                     break;
                                 }
-                            
+
                             case "CreateNewPrimary":
                                 {
                                     ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.CreateNewPrimary, (byte)device.NodeNumber);
@@ -383,7 +383,7 @@ namespace OpenZWavePlugin
                                     dlg.Dispose();
                                     break;
                                 }
-                          
+
                             case "RemoveDevice":
                                 {
                                     ControllerCommandDlg dlg = new ControllerCommandDlg(m_manager, m_homeId, ZWControllerCommand.RemoveDevice, (byte)device.NodeNumber);
@@ -658,6 +658,8 @@ namespace OpenZWavePlugin
             {
                 case ZWNotification.Type.ValueAdded:
                     {
+                        #region ValueAdded
+                       
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         ZWValueID vid = m_notification.GetValueID();
                         Value value = new Value();
@@ -780,10 +782,13 @@ namespace OpenZWavePlugin
                             }
                         }
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.ValueRemoved:
                     {
+                        #region ValueRemoved
+                       
                         try
                         {
                             Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
@@ -800,10 +805,12 @@ namespace OpenZWavePlugin
                             log.Error("ValueRemoved error: " + ex.Message);
                         }
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.ValueChanged:
                     {
+                        #region ValueChanged
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         ZWValueID vid = m_notification.GetValueID();
                         Value value = new Value();
@@ -998,16 +1005,20 @@ namespace OpenZWavePlugin
                         //    log.Error("error: " + ex.Message);
                         //}
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.Group:
                     {
+                        #region Group
                         log.Debug("[Group]"); ;
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.NodeAdded:
                     {
+                        #region NodeAdded
                         // if this node was in zwcfg*.xml, this is the first node notification
                         // if not, the NodeNew notification should already have been received
                         //if (GetNode(m_notification.GetHomeId(), m_notification.GetNodeId()) == null)
@@ -1020,10 +1031,12 @@ namespace OpenZWavePlugin
                         log.Debug("[NodeAdded] ID:" + node.ID.ToString() + " Added");
                         //}
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.NodeNew:
                     {
+                        #region NodeNew
                         // Add the new node to our list (and flag as uninitialized)
                         Node node = new Node();
                         node.ID = m_notification.GetNodeId();
@@ -1032,10 +1045,12 @@ namespace OpenZWavePlugin
 
                         log.Debug("[NodeNew] ID:" + node.ID.ToString() + " Added");
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.NodeRemoved:
                     {
+                        #region NodeRemoved
                         foreach (Node node in m_nodeList)
                         {
                             if (node.ID == m_notification.GetNodeId())
@@ -1046,10 +1061,12 @@ namespace OpenZWavePlugin
                             }
                         }
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.NodeProtocolInfo:
                     {
+                        #region NodeProtocolInfo
                         using (zvsContext Context = new zvsContext())
                         {
                             Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
@@ -1124,14 +1141,14 @@ namespace OpenZWavePlugin
                                     case "Alarm Sensor":
                                     case "Basic Routing Alarm Sensor":
                                     case "Routing Alarm Sensor":
-                                    case "Basic Zensor Alarm Sensor":
-                                    case "Zensor Alarm Sensor":
-                                    case "Advanced Zensor Alarm Sensor":
+                                    case "Basic Sensor Alarm Sensor":
+                                    case "Sensor Alarm Sensor":
+                                    case "Advanced Sensor Alarm Sensor":
                                     case "Basic Routing Smoke Sensor":
                                     case "Routing Smoke Sensor":
-                                    case "Basic Zensor Smoke Sensor":
-                                    case "Zensor Smoke Sensor":
-                                    case "Advanced Zensor Smoke Sensor":
+                                    case "Basic Sensor Smoke Sensor":
+                                    case "Sensor Smoke Sensor":
+                                    case "Advanced Sensor Smoke Sensor":
                                     case "Routing Binary Sensor":
                                     case "Routing Multilevel Sensor":
                                         deviceName = (string.IsNullOrEmpty(node.Name) ? ("OpenZWave Sensor " + node.ID) : node.Name);
@@ -1187,10 +1204,12 @@ namespace OpenZWavePlugin
                             }
                         }
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.NodeNaming:
                     {
+                        #region NodeNaming
                         string ManufacturerNameValueId = "MN1";
                         string ProductNameValueId = "PN1";
                         string NodeLocationValueId = "NL1";
@@ -1265,16 +1284,17 @@ namespace OpenZWavePlugin
                         log.Debug("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
                         break;
+                        #endregion
                     }
 
                 case ZWNotification.Type.NodeEvent:
                     {
+                        #region NodeEvent
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         byte gevent = m_notification.GetEvent();
 
                         if (node != null)
                         {
-
                             log.Info(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
 
                             using (zvsContext Context = new zvsContext())
@@ -1299,50 +1319,21 @@ namespace OpenZWavePlugin
                                 }
                                 #endregion
                             }
-
                         }
                         break;
-
+                        #endregion
                     }
-
-                case ZWNotification.Type.PollingDisabled:
-                    {
-                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
-
-                        if (node != null)
-                        {
-
-                            log.Debug("[PollingDisabled] Node:" + node.ID);
-                        }
-
-                        break;
-                    }
-
-                case ZWNotification.Type.PollingEnabled:
-                    {
-                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
-
-                        if (node != null)
-                        {
-
-                            log.Debug("[PollingEnabled] Node:" + node.ID);
-                        }
-                        break;
-                    }
-
                 case ZWNotification.Type.DriverReady:
                     {
-
+                        #region DriverReady
                         m_homeId = m_notification.GetHomeId();
-
-                        log.Debug("Initializing...driver with Home ID 0x" + m_homeId);
-
+                        log.InfoFormat("Initializing...driver with Home ID 0x{0} is ready.", m_homeId.ToString("X8"));
                         break;
+                        #endregion
                     }
-
                 case ZWNotification.Type.NodeQueriesComplete:
                     {
-
+                        #region NodeQueriesComplete
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
 
                         if (node != null)
@@ -1359,62 +1350,91 @@ namespace OpenZWavePlugin
                                 if (!Context.TrySaveChanges(out SaveError))
                                     log.Error(SaveError);
                             }
-
-
-                            log.Info("[NodeQueriesComplete] node " + node.ID + " query complete.");
+                            log.Info("[NodeQueriesComplete] node " + node.ID + " query complete");
                         }
 
                         break;
+                        #endregion
                     }
-
+                case ZWNotification.Type.EssentialNodeQueriesComplete:
+                    {
+                        #region EssentialNodeQueriesComplete
+                        Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
+                        log.InfoFormat("Initializing...node {0} essential queries complete", node.ID);
+                        break;
+                        #endregion
+                    }
                 case ZWNotification.Type.AllNodesQueried:
                     {
-                        foreach (Node n in m_nodeList)
-                        {
-                            using (zvsContext Context = new zvsContext())
-                            {
-                                Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == n.ID);
-
-                                if (d != null)
-                                {
-                                    if (DevicePropertyValue.GetPropertyValue(Context, d, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
-                                        EnablePolling(n.ID);
-                                }
-                            }
-                        }
-
+                        #region AllNodesQueried
                         //This is an important message to see.  It tells you that you can start issuing commands
-                        log.Info("Ready:  All nodes queried. Plug-in now ready.");
+                        log.Info("Ready:  All nodes queried");
+                        m_manager.WriteConfig(m_notification.GetHomeId());
                         IsReady = true;
-
                         FinishedInitialPoll = true;
+                        EnablePollingOnDevices();
+                        break;
+                        #endregion
+                    }
+                case ZWNotification.Type.AllNodesQueriedSomeDead:
+                    {
+                        #region AllNodesQueriedSomeDead
+                        //This is an important message to see.  It tells you that you can start issuing commands
+                        log.Info("Ready:  All nodes queried but some are dead.");
+                        m_manager.WriteConfig(m_notification.GetHomeId());
+                        IsReady = true;
+                        FinishedInitialPoll = true;
+                        EnablePollingOnDevices();
+                        break;
+                        #endregion
                         break;
                     }
-
                 case ZWNotification.Type.AwakeNodesQueried:
                     {
-                        using (zvsContext Context = new zvsContext())
-                        {
-                            foreach (Node n in m_nodeList)
-                            {
-                                Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == n.ID);
-
-                                if (d != null)
-                                {
-                                    if (DevicePropertyValue.GetPropertyValue(Context, d, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
-                                        EnablePolling(n.ID);
-                                }
-                            }
-                        }
-
-                        log.Debug("Ready:  Awake nodes queried (but not some sleeping nodes).");
+                        #region AwakeNodesQueried
+                        log.Info("Ready:  Awake nodes queried (but not some sleeping nodes)");
+                        m_manager.WriteConfig(m_notification.GetHomeId());
                         IsReady = true;
-
                         FinishedInitialPoll = true;
-
+                        EnablePollingOnDevices();
                         break;
+                        #endregion
+                    }
+                case ZWNotification.Type.PollingDisabled:
+                    {
+                        #region PollingDisabled
+                        log.Info("Polling disabled notification");
+                        break;
+                        #endregion
+                    }
+                case ZWNotification.Type.PollingEnabled:
+                    {
+                        #region PollingEnabled
+                        log.Info("Polling enabled notification");
+                        break;
+                        #endregion
+                    }
+                case ZWNotification.Type.SceneEvent:
+                    {
+                        #region SceneEvent
+                        log.Info("Scene event notification received");
+                        break;
+                        #endregion
                     }
             }
+        }
+
+        private void EnablePollingOnDevices()
+        {
+            foreach (Node n in m_nodeList)
+                using (zvsContext Context = new zvsContext())
+                {
+                    Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == n.ID);
+
+                    if (d != null)
+                        if (DevicePropertyValue.GetPropertyValue(Context, d, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
+                            EnablePolling(n.ID);
+                }
         }
 
         private DataType ConvertType(ZWValueID v)
