@@ -30,7 +30,6 @@ namespace OpenZWavePlugin
         ZWNotification m_notification = null;
         UInt32 m_homeId = 0;
         List<Node> m_nodeList = new List<Node>();
-        private bool FinishedInitialPoll = false;
         private string LastEventNameValueId = "LEN1";
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<OpenZWavePlugin>();
 
@@ -38,6 +37,7 @@ namespace OpenZWavePlugin
         private bool _useHID = false;
         private string _comPort = "3";
         private int _pollint = 0;
+        private List<byte> NodesReady = new List<byte>();
 
         public static string LogPath
         {
@@ -345,12 +345,21 @@ namespace OpenZWavePlugin
             {
                 QueuedCommand queuedCommand = context.QueuedCommands.Single(o => o.Id == queuedCommandId);
 
+                #region DeviceTypeCommand Processing
+
                 if (queuedCommand.Command is DeviceTypeCommand)
                 {
                     //Try to get the device from the second Argument
                     Device device = null;
                     if (!Device.TryGetDevice(context, queuedCommand.Argument2, out device))
                         return;
+
+                    var nodeNumber = Convert.ToByte(device.NodeNumber);
+                    if (!isNodeReady(nodeNumber))
+                    {
+                        log.ErrorFormat("Failed to issue command on {0}, node {1}. Node not ready.", device.Name, nodeNumber);
+                        return;
+                    }
 
                     if (device.Type.UniqueIdentifier == "CONTROLLER")
                     {
@@ -522,14 +531,25 @@ namespace OpenZWavePlugin
                         }
                     }
                 }
+                #endregion
+
+                #region DeviceCommand Processing
                 else if (queuedCommand.Command is DeviceCommand)
                 {
                     DeviceCommand deviceTypeCommand = (DeviceCommand)queuedCommand.Command;
 
                     if (queuedCommand.Command.UniqueIdentifier.Contains("DYNAMIC_CMD_"))
                     {
+                        var nodeNumber = Convert.ToByte(deviceTypeCommand.Device.NodeNumber);
+
                         //Get more info from this Node from OpenZWave
-                        Node node = GetNode(m_homeId, (byte)deviceTypeCommand.Device.NodeNumber);
+                        Node node = GetNode(m_homeId, nodeNumber);
+
+                        if (!isNodeReady(nodeNumber))
+                        {
+                            log.ErrorFormat("Failed to issue command on {0}, node {1}. Node not ready.", deviceTypeCommand.Device.Name, nodeNumber);
+                            return;
+                        }
 
                         switch (queuedCommand.Command.ArgumentType)
                         {
@@ -583,12 +603,21 @@ namespace OpenZWavePlugin
                         }
                     }
                 }
+                #endregion
             }
         }
 
         public override void Repoll(Device device)
         {
-            m_manager.RequestNodeState(m_homeId, Convert.ToByte(device.NodeNumber));
+            var nodeNumber = Convert.ToByte(device.NodeNumber);
+
+            if (!isNodeReady(nodeNumber))
+            {
+                log.ErrorFormat("Re-poll node {0} failed, node not ready.", nodeNumber);
+                return;
+            }
+
+            m_manager.RequestNodeState(m_homeId, nodeNumber);
         }
 
         public override void ActivateGroup(int groupID)
@@ -600,15 +629,22 @@ namespace OpenZWavePlugin
                 {
                     foreach (Device d in devices)
                     {
+                        var nodeNumber = Convert.ToByte(d.NodeNumber);
+                        if (!isNodeReady(nodeNumber))
+                        {
+                            log.ErrorFormat("Failed to activate group member {0}, node {1}. Node not ready.", d.Name, nodeNumber);
+                            continue;
+                        }
+
                         switch (d.Type.UniqueIdentifier)
                         {
                             case "SWITCH":
-                                m_manager.SetNodeOn(m_homeId, Convert.ToByte(d.NodeNumber));
+                                m_manager.SetNodeOn(m_homeId, nodeNumber);
                                 break;
                             case "DIMMER":
                                 byte defaultonlevel = 99;
                                 byte.TryParse(DevicePropertyValue.GetPropertyValue(Context, d, base.Name + "DEFAULONLEVEL"), out defaultonlevel);
-                                m_manager.SetNodeLevel(m_homeId, Convert.ToByte(d.NodeNumber), defaultonlevel);
+                                m_manager.SetNodeLevel(m_homeId, nodeNumber, defaultonlevel);
                                 break;
                         }
 
@@ -626,20 +662,32 @@ namespace OpenZWavePlugin
                 {
                     foreach (Device d in devices)
                     {
+                        var nodeNumber = Convert.ToByte(d.NodeNumber);
+                        if (!isNodeReady(nodeNumber))
+                        {
+                            log.ErrorFormat("Failed to deactivate group member {0}, node {1}. Node not ready.", d.Name, nodeNumber);
+                            continue;
+                        }
+
                         switch (d.Type.UniqueIdentifier)
                         {
                             case "SWITCH":
-                                m_manager.SetNodeOff(m_homeId, Convert.ToByte(d.NodeNumber));
+                                m_manager.SetNodeOff(m_homeId, nodeNumber);
                                 break;
                             case "DIMMER":
 
-                                m_manager.SetNodeLevel(m_homeId, Convert.ToByte(d.NodeNumber), 0);
+                                m_manager.SetNodeLevel(m_homeId, nodeNumber, 0);
                                 break;
                         }
 
                     }
                 }
             }
+        }
+
+        private bool isNodeReady(byte NodeId)
+        {
+            return NodesReady.Contains(NodeId);
         }
 
         #region OpenZWave interface
@@ -659,7 +707,7 @@ namespace OpenZWavePlugin
                 case ZWNotification.Type.ValueAdded:
                     {
                         #region ValueAdded
-                       
+
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         ZWValueID vid = m_notification.GetValueID();
                         Value value = new Value();
@@ -788,7 +836,7 @@ namespace OpenZWavePlugin
                 case ZWNotification.Type.ValueRemoved:
                     {
                         #region ValueRemoved
-                       
+
                         try
                         {
                             Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
@@ -874,7 +922,7 @@ namespace OpenZWavePlugin
                                 bool EnableDimmerRepoll = false;
                                 bool.TryParse(DevicePropertyValue.GetPropertyValue(Context, d, base.Name + "ENABLEREPOLLONLEVELCHANGE"), out EnableDimmerRepoll);
 
-                                if (FinishedInitialPoll && EnableDimmerRepoll)
+                                if (EnableDimmerRepoll)
                                 {
                                     if (d.Type != null && d.Type == GetDeviceType("DIMMER", Context))
                                     {
@@ -1328,12 +1376,15 @@ namespace OpenZWavePlugin
                         #region DriverReady
                         m_homeId = m_notification.GetHomeId();
                         log.InfoFormat("Initializing...driver with Home ID 0x{0} is ready.", m_homeId.ToString("X8"));
+                        IsReady = true;
                         break;
                         #endregion
                     }
                 case ZWNotification.Type.NodeQueriesComplete:
                     {
                         #region NodeQueriesComplete
+                        NodesReady.Clear();
+
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
 
                         if (node != null)
@@ -1350,7 +1401,7 @@ namespace OpenZWavePlugin
                                 if (!Context.TrySaveChanges(out SaveError))
                                     log.Error(SaveError);
                             }
-                            log.Info("[NodeQueriesComplete] node " + node.ID + " query complete");
+                            log.InfoFormat("Initializing...node {0} queries complete", node.ID);
                         }
 
                         break;
@@ -1361,6 +1412,7 @@ namespace OpenZWavePlugin
                         #region EssentialNodeQueriesComplete
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
                         log.InfoFormat("Initializing...node {0} essential queries complete", node.ID);
+                        NodesReady.Add(node.ID);
                         break;
                         #endregion
                     }
@@ -1370,8 +1422,6 @@ namespace OpenZWavePlugin
                         //This is an important message to see.  It tells you that you can start issuing commands
                         log.Info("Ready:  All nodes queried");
                         m_manager.WriteConfig(m_notification.GetHomeId());
-                        IsReady = true;
-                        FinishedInitialPoll = true;
                         EnablePollingOnDevices();
                         break;
                         #endregion
@@ -1382,20 +1432,16 @@ namespace OpenZWavePlugin
                         //This is an important message to see.  It tells you that you can start issuing commands
                         log.Info("Ready:  All nodes queried but some are dead.");
                         m_manager.WriteConfig(m_notification.GetHomeId());
-                        IsReady = true;
-                        FinishedInitialPoll = true;
                         EnablePollingOnDevices();
                         break;
                         #endregion
-                        break;
+
                     }
                 case ZWNotification.Type.AwakeNodesQueried:
                     {
                         #region AwakeNodesQueried
                         log.Info("Ready:  Awake nodes queried (but not some sleeping nodes)");
                         m_manager.WriteConfig(m_notification.GetHomeId());
-                        IsReady = true;
-                        FinishedInitialPoll = true;
                         EnablePollingOnDevices();
                         break;
                         #endregion
