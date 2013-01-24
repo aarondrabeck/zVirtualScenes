@@ -1374,34 +1374,27 @@ namespace OpenZWavePlugin
                 case ZWNotification.Type.DriverReady:
                     {
                         #region DriverReady
+                        NodesReady.Clear();
+
                         m_homeId = m_notification.GetHomeId();
                         log.InfoFormat("Initializing...driver with Home ID 0x{0} is ready.", m_homeId.ToString("X8"));
                         IsReady = true;
+
                         break;
                         #endregion
                     }
                 case ZWNotification.Type.NodeQueriesComplete:
                     {
                         #region NodeQueriesComplete
-                        NodesReady.Clear();
-
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
-
                         if (node != null)
                         {
-                            using (zvsContext Context = new zvsContext())
-                            {
-                                Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == node.ID);
-                                if (d != null)
-                                {
-                                    d.LastHeardFrom = DateTime.Now;
-                                }
-
-                                string SaveError = string.Empty;
-                                if (!Context.TrySaveChanges(out SaveError))
-                                    log.Error(SaveError);
-                            }
                             log.InfoFormat("Initializing...node {0} queries complete", node.ID);
+
+                            if (!NodesReady.Contains(node.ID))
+                                NodesReady.Add(node.ID);
+
+                            UpdateLastHeardFrom(node.ID);
                         }
 
                         break;
@@ -1411,8 +1404,16 @@ namespace OpenZWavePlugin
                     {
                         #region EssentialNodeQueriesComplete
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
-                        log.InfoFormat("Initializing...node {0} essential queries complete", node.ID);
-                        NodesReady.Add(node.ID);
+                        if (node != null)
+                        {
+                            log.InfoFormat("Initializing...node {0} essential queries complete", node.ID);
+
+                            if (!NodesReady.Contains(node.ID))
+                                NodesReady.Add(node.ID);
+
+                            UpdateLastHeardFrom(node.ID);
+                        }
+
                         break;
                         #endregion
                     }
@@ -1481,6 +1482,23 @@ namespace OpenZWavePlugin
                         if (DevicePropertyValue.GetPropertyValue(Context, d, "ENABLEPOLLING").ToUpper().Equals("TRUE"))
                             EnablePolling(n.ID);
                 }
+        }
+
+        private void UpdateLastHeardFrom(byte NodeId)
+        {
+            using (zvsContext Context = new zvsContext())
+            {
+                Device d = GetMyPluginsDevices(Context).FirstOrDefault(o => o.NodeNumber == NodeId);
+                if (d != null)
+                {
+                    d.LastHeardFrom = DateTime.Now;
+                }
+
+                string SaveError = string.Empty;
+                if (!Context.TrySaveChanges(out SaveError))
+                    log.Error(SaveError);
+            }
+
         }
 
         private DataType ConvertType(ZWValueID v)
