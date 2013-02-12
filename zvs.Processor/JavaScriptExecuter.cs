@@ -56,7 +56,10 @@ namespace zvs.Processor
 
             engine.Step += (sender, info) =>
             {
-                ReportProgress(string.Format("JSE{0}:{1} '{2}'", id, info.CurrentStatement.Source.Start.Line, info.CurrentStatement.Source.Code.Replace(Environment.NewLine, "")));
+                ReportProgress("JSE{0}:{1} '{2}'", 
+                    id, 
+                    info.CurrentStatement.Source.Start.Line, 
+                    info.CurrentStatement.Source.Code.Replace(Environment.NewLine, ""));
             };
             Random random = new Random();
             id = random.Next(1, 100);
