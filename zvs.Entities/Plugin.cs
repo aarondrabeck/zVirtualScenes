@@ -42,7 +42,7 @@ namespace zvs.Entities
 
         private string _UniqueIdentifier;
         [Required(ErrorMessage = "UniqueIdentifier cannot be empty")]  
-        [StringLength(50)]
+        [StringLength(255)]
         public string UniqueIdentifier
         {
             get

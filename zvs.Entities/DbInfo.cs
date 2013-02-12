@@ -16,7 +16,7 @@ namespace zvs.Entities
         public int Id { get; set; }
        
         private string _UniqueIdentifier;
-        [StringLength(50)]
+        [StringLength(255)]
         public string UniqueIdentifier
         {
             get
