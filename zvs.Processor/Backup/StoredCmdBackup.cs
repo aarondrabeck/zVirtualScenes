@@ -27,6 +27,9 @@ namespace zvs.Processor.Backup
 
         public static implicit operator StoredCMDBackup(StoredCommand m)
         {
+            if (m == null)
+                return null;
+
             StoredCMDBackup bcmd = new StoredCMDBackup();
 
             if (m.Command is BuiltinCommand)
@@ -65,6 +68,9 @@ namespace zvs.Processor.Backup
         /// <returns></returns>
         public static StoredCommand RestoreStoredCommand(zvsContext context, StoredCMDBackup backupStoredCMD)
         {
+            if (backupStoredCMD == null)
+                return null;
+
             if (backupStoredCMD.CommandType == Command_Types.Device ||
                 backupStoredCMD.CommandType == Command_Types.DeviceType)
             {
