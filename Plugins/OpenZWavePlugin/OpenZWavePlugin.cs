@@ -550,7 +550,7 @@ namespace OpenZWavePlugin
                             log.ErrorFormat("Failed to issue command on {0}, node {1}. Node not ready.", deviceTypeCommand.Device.Name, nodeNumber);
                             return;
                         }
-
+                                                                        
                         switch (queuedCommand.Command.ArgumentType)
                         {
                             case DataType.BYTE:
@@ -558,9 +558,9 @@ namespace OpenZWavePlugin
                                     byte b = 0;
                                     byte.TryParse(queuedCommand.Argument, out b);
 
-                                    foreach (Value v in node.Values)
-                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
-                                            m_manager.SetValue(v.ValueID, b);
+                                    var Value = node.Values.FirstOrDefault(o => o.ValueID.GetId().ToString().Equals(queuedCommand.Command.CustomData2));
+                                    if(Value != null)
+                                        m_manager.SetValue(Value.ValueID, b);
                                     break;
                                 }
                             case DataType.BOOL:
@@ -568,26 +568,26 @@ namespace OpenZWavePlugin
                                     bool b = true;
                                     bool.TryParse(queuedCommand.Argument, out b);
 
-                                    foreach (Value v in node.Values)
-                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
-                                            m_manager.SetValue(v.ValueID, b);
+                                    var Value = node.Values.FirstOrDefault(o => o.ValueID.GetId().ToString().Equals(queuedCommand.Command.CustomData2));
+                                    if (Value != null)
+                                        m_manager.SetValue(Value.ValueID, b);
                                     break;
                                 }
                             case DataType.DECIMAL:
                                 {
                                     float f = Convert.ToSingle(queuedCommand.Argument);
 
-                                    foreach (Value v in node.Values)
-                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
-                                            m_manager.SetValue(v.ValueID, f);
+                                    var Value = node.Values.FirstOrDefault(o => o.ValueID.GetId().ToString().Equals(queuedCommand.Command.CustomData2));
+                                    if (Value != null)
+                                        m_manager.SetValue(Value.ValueID, f);
                                     break;
                                 }
                             case DataType.LIST:
                             case DataType.STRING:
                                 {
-                                    foreach (Value v in node.Values)
-                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
-                                            m_manager.SetValue(v.ValueID, queuedCommand.Argument);
+                                    var Value = node.Values.FirstOrDefault(o => o.ValueID.GetId().ToString().Equals(queuedCommand.Command.CustomData2));
+                                    if (Value != null)
+                                        m_manager.SetValue(Value.ValueID, queuedCommand.Argument);
                                     break;
                                 }
                             case DataType.INTEGER:
@@ -595,9 +595,9 @@ namespace OpenZWavePlugin
                                     int i = 0;
                                     int.TryParse(queuedCommand.Argument, out i);
 
-                                    foreach (Value v in node.Values)
-                                        if (m_manager.GetValueLabel(v.ValueID).Equals(queuedCommand.Command.CustomData1))
-                                            m_manager.SetValue(v.ValueID, i);
+                                     var Value = node.Values.FirstOrDefault(o => o.ValueID.GetId().ToString().Equals(queuedCommand.Command.CustomData2));
+                                    if(Value != null)
+                                        m_manager.SetValue(Value.ValueID, i);
                                     break;
                                 }
                         }
