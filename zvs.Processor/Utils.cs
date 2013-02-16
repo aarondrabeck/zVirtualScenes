@@ -54,7 +54,7 @@ namespace zvs.Processor
         {
             get
             {
-                return string.Format("{0} {1}", ApplicationName, ApplicationVersion);
+                return string.Format("{0} {1}", ApplicationName, ApplicationVersionLong);
             }
         }
 
