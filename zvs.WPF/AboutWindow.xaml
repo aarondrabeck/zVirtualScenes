@@ -8,7 +8,7 @@
         <Image  VerticalAlignment="Top" Source="Images/zvsLogoTextOnly.png" Margin="95,30,0,0" HorizontalAlignment="Left" Width="301" Height="53"/>
         <TextBlock Name="FullNameTxtBl" HorizontalAlignment="Left" Margin="10,115,0,0" TextWrapping="Wrap" Text="zVirtualScenes" VerticalAlignment="Top"/>
         <TextBlock Name="VersionTxtBl" HorizontalAlignment="Left" Margin="10,136,0,0" TextWrapping="Wrap" Text="Version 1.0.0.0" VerticalAlignment="Top"/>
-        <TextBlock  HorizontalAlignment="Left" Margin="10,157,0,0" TextWrapping="Wrap" Text="© 2012 Drabeck Solutions" VerticalAlignment="Top"/>
+        <TextBlock Name="Copyrighttxtbl" HorizontalAlignment="Left" Margin="10,157,0,0" TextWrapping="Wrap" Text="© 20xx Nonce Labs" VerticalAlignment="Top"/>
         <TextBlock  HorizontalAlignment="Left" Margin="10,178,0,0" TextWrapping="Wrap" Text="All Rights Reserved." VerticalAlignment="Top"/>
         <TextBlock  HorizontalAlignment="Right" Margin="0,115,10,0" TextWrapping="Wrap" Text="Distributed under the MIT License" VerticalAlignment="Top" Width="191"/>
         <TextBlock Name="WebsiteLink"  HorizontalAlignment="Right" Margin="0,178,10,0" TextWrapping="Wrap" Text="zVirtualScenes Official Website" FontWeight="Bold" Foreground="#FF1122CC" Cursor="Hand" MouseDown="WebsiteLink_MouseDown_1"  VerticalAlignment="Top" Width="191"/>

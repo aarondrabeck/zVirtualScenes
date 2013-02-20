@@ -72,6 +72,11 @@ namespace zvs.Processor
             return System.Diagnostics.Process.Start(Path, Arguments);
         }
 
+        private System.Diagnostics.Process Shell(string Path)
+        {
+            return System.Diagnostics.Process.Start(Path);
+        }
+
         private string MapPath(string Path)
         {
             return System.IO.Path.Combine(zvs.Processor.Utils.AppPath, Path);
@@ -98,6 +103,7 @@ namespace zvs.Processor
             engine.SetFunction("warn", new Action<object>(Warning));
             engine.SetFunction("require", new Action<string>(Require));
             engine.SetFunction("shell", new Func<string, string, System.Diagnostics.Process>(Shell));
+            engine.SetFunction("shell", new Func<string, System.Diagnostics.Process>(Shell));
             engine.SetFunction("mappath", new Func<string, string>(MapPath));
 
             // if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);

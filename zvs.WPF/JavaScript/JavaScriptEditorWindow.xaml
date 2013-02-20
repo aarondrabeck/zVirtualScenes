@@ -23,7 +23,7 @@
 
         </Rectangle>
 
-        <Border Height="Auto" Margin="22,125,264,339">
+        <Border Height="Auto" Margin="22,130,264,339">
             <Editor:JSEditor x:Name="TriggerScriptEditor" Width="750" Height="380"  KeyUp="TriggerScriptEditor_KeyUp" > </Editor:JSEditor>
         </Border>
         
@@ -32,7 +32,7 @@
         <Button Name="TestBtn" Content="Test" Margin="10,0,0,8" VerticalAlignment="Bottom" Click="TestBtn_Click" HorizontalAlignment="Left" Width="75"/>
         <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click"/>
         <Button Name="OKBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,8" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
-        <TextBlock HorizontalAlignment="Left" Margin="22,50,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="22,55,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
         <TextBox Name="CmdNameTxtBx" Margin="59,50,22,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25"/>
         <DataGrid  x:Name="JSResultDataGrid"  Margin="22,510,22,47" Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
                    HorizontalGridLinesBrush="#FFE2E2E2" 
@@ -41,7 +41,7 @@
                 <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True" />
             </DataGrid.Columns>
         </DataGrid>
-        <Grid  Margin="22,60,22,540" Height="32">
+        <Grid  Margin="22,87,22,540" Height="32">
             <Grid.RowDefinitions>
                 <RowDefinition Height="32"/>
             </Grid.RowDefinitions>
@@ -56,13 +56,15 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="32"/>
             </Grid.ColumnDefinitions>
-            <Image Grid.Row="0" Grid.Column="0" Source="/zVirtualScenes;component/Images/scene_run64.png" MouseUp="Image_MouseUp_1" Stretch="Fill"  />
+            <Image Grid.Row="0" Grid.Column="0" Source="/zVirtualScenes;component/Images/scene_run64.png" MouseUp="Image_MouseUp_1" Stretch="Fill" Cursor="Hand" ToolTip="Insert sample code to run a scene"  />
+              
+               
             <Image Grid.Row="0" Grid.Column="1"  />
-            <Image Grid.Row="0" Grid.Column="2" Source="/zVirtualScenes;component/Images/switch.png" MouseUp="Image_MouseUp_2"  Stretch="Fill"   />
+            <Image Grid.Row="0" Grid.Column="2" Source="/zVirtualScenes;component/Images/switch.png" MouseUp="Image_MouseUp_2"  Stretch="Fill"   Cursor="Hand" ToolTip="Insert sample code to activate a device"/>
             <Image Grid.Row="0" Grid.Column="3"  />
-            <Image Grid.Row="0" Grid.Column="4"   MouseUp="Image_MouseUp_4" Source="/zVirtualScenes;component/Images/small-icon-status.png"  Stretch="Fill"   />
+            <Image Grid.Row="0" Grid.Column="4"   MouseUp="Image_MouseUp_4" Source="/zVirtualScenes;component/Images/small-icon-status.png"  Stretch="Fill"  Cursor="Hand" ToolTip="Insert sample code to activate a device with a delay" />
             <Image Grid.Row="0" Grid.Column="5"  />
-            <Image Grid.Row="0" Grid.Column="6"   MouseUp="JS_IncludeMouseUp" Source="/zVirtualScenes;component/Images/js.png"  Stretch="Fill"   />
+            <Image Grid.Row="0" Grid.Column="6"   MouseUp="JS_IncludeMouseUp" Source="/zVirtualScenes;component/Images/js.png"  Stretch="Fill"   Cursor="Hand" ToolTip="Insert sample code to include/require a external JavaScript file"/>
         </Grid>
 
     </Grid>

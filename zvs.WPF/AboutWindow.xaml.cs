@@ -36,6 +36,7 @@ namespace zvs.WPF
         {
             FullNameTxtBl.Text = Utils.ApplicationName;
             VersionTxtBl.Text = string.Format("Version {0}", Utils.ApplicationVersionLong);
+            Copyrighttxtbl.Text = string.Format("© {0} Nonce Labs", DateTime.Now.Year);
         }
 
         private void WebsiteLink_MouseDown_1(object sender, MouseButtonEventArgs e)

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nonce Labs")]
 [assembly: AssemblyProduct("LightSwitchPlugin")]
-[assembly: AssemblyCopyright("Copyright © Nonce Labs 2012")]
+[assembly: AssemblyCopyright("Copyright © Nonce Labs 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
