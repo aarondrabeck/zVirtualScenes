@@ -897,7 +897,7 @@ namespace HttpAPI
                                         if (!string.IsNullOrEmpty(cmdName))
                                             cmd = d.Commands.FirstOrDefault(c => c.Name.Equals(cmdName));
                                         else if (!string.IsNullOrEmpty(cmdUnqId))
-                                            cmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUnqId));
+                                            cmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Contains(cmdUnqId));
                                         else if (c_id > 0)
                                             cmd = d.Commands.FirstOrDefault(c => c.Id == c_id);
                                         if (cmd != null)
@@ -917,7 +917,7 @@ namespace HttpAPI
                                         if (!string.IsNullOrEmpty(cmdName))
                                             cmd = d.Type.Commands.FirstOrDefault(c => c.Name.Equals(cmdName));
                                         else if (!string.IsNullOrEmpty(cmdUnqId))
-                                            cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUnqId));
+                                            cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier.Contains(cmdUnqId));
                                         else if (c_id > 0)
                                             cmd = d.Type.Commands.FirstOrDefault(c => c.Id == c_id);
 
@@ -983,7 +983,7 @@ namespace HttpAPI
                     if (!string.IsNullOrEmpty(Name))
                         cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.Name.Equals(Name));
                     else if (!string.IsNullOrEmpty(cmdUniqId))
-                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.UniqueIdentifier.Equals(cmdUniqId));
+                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.UniqueIdentifier.Contains(cmdUniqId));
                     else
                         cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.Id == id);
 
