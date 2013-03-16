@@ -12,19 +12,28 @@ using System.Linq;
 using ZeroconfService;
 using zvs.Processor;
 using zvs.Entities;
-
-
+using System.Threading.Tasks;
+using System.Collections.Specialized;
+using System.IO;
+using System.Diagnostics;
+using LightSwitchPlugin.LightSwitch;
 
 namespace LightSwitchPlugin
 {
+    public static class AsyncExtensions
+    {
+        public static Task<TcpClient> AcceptTcpClientAsync(this TcpListener source, CancellationToken cancellationToken)
+        {
+            return Task<TcpClient>.Factory.FromAsync(new Func<AsyncCallback, object, IAsyncResult>(source.BeginAcceptTcpClient),
+                                                     new Func<IAsyncResult, TcpClient>(source.EndAcceptTcpClient), cancellationToken);
+        }
+    }
+
     [Export(typeof(zvsPlugin))]
     public class LightSwitchPlugin : zvsPlugin
     {
-        private Socket LightSwitchSocket;
-        private readonly List<Socket> LightSwitchClients = new List<Socket>();
-        public AsyncCallback pfnWorkerCallBack;
-        private int m_cookie = new Random().Next(65536);
-        public volatile bool isActive = false;
+        private HashSet<LightSwitchClient> LightSwitchClients = new HashSet<LightSwitchClient>();
+        private CancellationTokenSource _cts = new CancellationTokenSource();
         private NetService netservice = null;
         private bool _verbose = false;
         private bool _useBonjour = false;
@@ -128,24 +137,18 @@ namespace LightSwitchPlugin
 
         protected override void StartPlugin()
         {
-            using (zvsContext context = new zvsContext())
-            {
-                DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
-                // zvs.Processor.CommandProcessor.onProcessingCommandBegin += PluginManager_onProcessingCommandBegin;
-                // zvs.Processor.PluginManager.onProcessingCommandEnd += PluginManager_onProcessingCommandEnd;
-                OpenLightSwitchSocket();
-            }
+            DeviceValue.DeviceValueDataChangedEvent += DeviceValue_DeviceValueDataChangedEvent;
+            StartLightSwitchServer();
+            publishZeroConf();
         }
 
-        protected override void StopPlugin()
+        protected async override void StopPlugin()
         {
             DeviceValue.DeviceValueDataChangedEvent -= DeviceValue_DeviceValueDataChangedEvent;
-            //zvs.Processor.PluginManager.onProcessingCommandBegin -= PluginManager_onProcessingCommandBegin;
-            //zvs.Processor.PluginManager.onProcessingCommandEnd -= PluginManager_onProcessingCommandEnd;
-            CloseLightSwitchSocket();
+            await StopLightSwitchServer();
         }
 
-        protected override void SettingChanged(string UniqueIdentifier, string settingValue)
+        protected async override void SettingChanged(string UniqueIdentifier, string settingValue)
         {
             if (UniqueIdentifier == "VERBOSE")
             {
@@ -163,23 +166,23 @@ namespace LightSwitchPlugin
             else if (UniqueIdentifier == "PORT")
             {
                 if (this.Enabled)
-                    CloseLightSwitchSocket();
+                    await StopLightSwitchServer();
 
                 int.TryParse(settingValue, out _port);
 
                 if (this.Enabled)
-                    OpenLightSwitchSocket();
+                    StartLightSwitchServer();
 
             }
             else if (UniqueIdentifier == "MAXCONN")
             {
                 if (this.Enabled)
-                    CloseLightSwitchSocket();
+                    await StopLightSwitchServer();
 
                 int.TryParse(settingValue, out _max_conn);
 
                 if (this.Enabled)
-                    OpenLightSwitchSocket();
+                    StartLightSwitchServer();
             }
         }
 
@@ -218,10 +221,9 @@ namespace LightSwitchPlugin
 
         public override void DeactivateGroup(int groupID) { }
 
-        private void DeviceValue_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
+        private async void DeviceValue_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
         {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (s, a) =>
+            await Task.Run(async () =>
             {
                 using (zvsContext context = new zvsContext())
                 {
@@ -230,562 +232,514 @@ namespace LightSwitchPlugin
                     {
                         if (dv.Name == "Basic")
                         {
-                            string UpdateString = DeviceToString(dv.Device);
-                            if (!string.IsNullOrEmpty(UpdateString))
-                            {
-                                BroadcastMessage("UPDATE~" + UpdateString + Environment.NewLine);
-                                BroadcastMessage("ENDLIST" + Environment.NewLine);
-                            }
+                            if (!ZVSTypeToLSType.ContainsKey(dv.Device.Type.UniqueIdentifier))
+                                return;
 
-                            string device_name = string.Empty;
-                            device_name = dv.Device.Name;
-                            BroadcastMessage("MSG~" + "'" + device_name + "' " + dv.Name + " changed to " + args.newValue + Environment.NewLine);
+                            string level = ((int)dv.Device.CurrentLevelInt).ToString();
+                            var type = ZVSTypeToLSType[dv.Device.Type.UniqueIdentifier];
+
+                            if (dv.Device.Type.UniqueIdentifier == "SWITCH")
+                                level = (dv.Device.CurrentLevelInt > 0 ? "255" : "0");
+
+                            await BroadcastCommand(LightSwitchProtocol.CreateUpdateCmd(dv.Device.Name, dv.Device.Id.ToString(), level, type));
+                            await BroadcastCommand(LightSwitchProtocol.CreateEndListCmd());
+                            await BroadcastCommand(LightSwitchProtocol.CreateMsgCmdFormat("'{0}' {1} changed to {2}", dv.Device.Name, dv.Name, args.newValue));
                         }
                     }
                 }
-            };
-            bw.RunWorkerAsync();
+            });
 
         }
 
-        //void PluginManager_onProcessingCommandEnd(object sender, onProcessingCommandEventArgs args)
-        //{
-        //    BackgroundWorker bw = new BackgroundWorker();
-        //    bw.DoWork += (s, a) =>
-        //    {
-        //        if (args.hasErrors)
-        //            BroadcastMessage("ERR~" + args.Details + Environment.NewLine);
-        //    };
-        //    bw.RunWorkerAsync();
-        //}
-
-        //void PluginManager_onProcessingCommandBegin(object sender, PluginManager.onProcessingCommandEventArgs args)
-        //{
-        //    BackgroundWorker bw = new BackgroundWorker();
-        //    bw.DoWork += (s, a) =>
-        //    {
-        //        if (args.hasErrors)
-        //            BroadcastMessage("ERR~" + args.Details + Environment.NewLine);
-        //    };
-        //    bw.RunWorkerAsync();
-        //}
-
-        /// <summary>
-        /// Starts listening for LightSwitch clients. 
-        /// </summary>
-        public void OpenLightSwitchSocket()
+        public void StartLightSwitchServer()
         {
-            if (LightSwitchSocket == null || !isActive)
+            _cts = new CancellationTokenSource();
+            var listener = new TcpListener(IPAddress.Any, _port);
+            listener.Server.NoDelay = true;
+            listener.Server.LingerState = new LingerOption(true, 2);
+            listener.Start();
+            log.Info("LightSwitch server started on port " + _port);
+
+            while (true)
             {
+                var task = listener.AcceptTcpClientAsync();
                 try
                 {
-                    using (zvsContext context = new zvsContext())
+                    task.Wait(_cts.Token);
+                }
+                catch (OperationCanceledException e)
+                {
+                    if (e.CancellationToken == _cts.Token)
+                        break;
+                }
+
+                var client = task.Result;
+                var lightSwitchClient = new LightSwitchClient(client);
+                LightSwitchClients.Add(lightSwitchClient);
+
+                lightSwitchClient.onConnectionEstabilished += lightSwitchClient_ConnectionEstabilished;
+                lightSwitchClient.onConnectionClosed += lightSwitchClient_ConnectionClosed;
+
+                lightSwitchClient.onDataReceived += lightSwitchClient_DataReceived;
+                lightSwitchClient.onDataSent += lightSwitchClient_DataSent;
+
+                lightSwitchClient.onCmdAList += lightSwitchClient_onCmdAList;
+                lightSwitchClient.onCmdDevice += lightSwitchClient_onCmdDevice;
+                lightSwitchClient.onCmdIphone += lightSwitchClient_onCmdIphone;
+                lightSwitchClient.onCmdList += lightSwitchClient_onCmdList;
+                lightSwitchClient.onCmdPassword += lightSwitchClient_onCmdPassword;
+                lightSwitchClient.onCmdScene += lightSwitchClient_onCmdScene;
+                lightSwitchClient.onCmdServer += lightSwitchClient_onCmdServer;
+                lightSwitchClient.onCmdSList += lightSwitchClient_onCmdSList;
+                lightSwitchClient.onCmdTerminate += lightSwitchClient_onCmdTerminate;
+                lightSwitchClient.onCmdThermMode += lightSwitchClient_onCmdThermMode;
+                lightSwitchClient.onCmdThermTemp += lightSwitchClient_onCmdThermTemp;
+                lightSwitchClient.onCmdVersion += lightSwitchClient_onCmdVersion;
+                lightSwitchClient.onCmdZList += lightSwitchClient_onCmdZList;
+                lightSwitchClient.onCmdZone += lightSwitchClient_onCmdZone;
+               
+                lightSwitchClient.StartMonitoring();
+            }
+            listener.Stop();
+            log.Info("LightSwitch server stopped");
+        }
+
+        void lightSwitchClient_DataSent(object sender, LightSwitchDataEventArgs args)
+        {
+            if (_verbose && !string.IsNullOrEmpty(args.RawData))
+                log.InfoFormat("Sent to [{0}]: {1}", args.LightSwitchClient.RemoteEndPoint, args.RawData.Trim());
+        }
+
+        #region LightSwitch Client Events
+
+        void lightSwitchClient_DataReceived(object sender, LightSwitchDataEventArgs args)
+        {
+            if (_verbose && !string.IsNullOrEmpty(args.RawData))
+                log.InfoFormat("Received from [{0}]: {1}", args.LightSwitchClient.RemoteEndPoint, args.RawData.Trim());
+        }
+
+        async void lightSwitchClient_onCmdIphone(object sender, LightSwitchClientEventArgs args)
+        {
+            args.LightSwitchClient.isAuthenticated = false;
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateCookieCmd(args.LightSwitchClient.Nonce.ToString()));
+        }
+        async void lightSwitchClient_onCmdPassword(object sender, onPasswordEventArgs args)
+        {
+            using (zvsContext context = new zvsContext())
+            {
+                var lightSwitchClient = args.LightSwitchClient;
+                string hashedPassword = EncodePassword(string.Format("{0}:{1}", lightSwitchClient.Nonce, GetSettingValue("PASSWORD", context)));
+
+                if (args.Password.StartsWith(hashedPassword))
+                {
+                    lightSwitchClient.isAuthenticated = true;
+                    await lightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateVersionCmd(Utils.ApplicationNameAndVersion));
+
+                    log.InfoFormat("Received [{0}] User Authenticated", lightSwitchClient.RemoteEndPoint);
+                }
+                else
+                {
+                    lightSwitchClient.isAuthenticated = false;
+                    lightSwitchClient.Disconnect();
+                }
+            }
+        }
+
+        async void lightSwitchClient_onCmdAList(object sender, LightSwitchClientEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            log.InfoFormat("Received [{0}] User requested device, scene and group list", args.LightSwitchClient.RemoteEndPoint);
+
+            await SendDeviceListAsync(args.LightSwitchClient);
+            await SendSceneListAsync(args.LightSwitchClient);
+            await SendZoneListAsync(args.LightSwitchClient);
+
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateEndListCmd());
+        }
+        async void lightSwitchClient_onCmdZList(object sender, LightSwitchClientEventArgs args)
+        {
+            log.InfoFormat("Received [{0}] User requested zone list", args.LightSwitchClient.RemoteEndPoint);
+            await SendZoneListAsync(args.LightSwitchClient);
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateEndListCmd());
+        }
+        async void lightSwitchClient_onCmdSList(object sender, LightSwitchClientEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            log.InfoFormat("Received [{0}] User requested scene list", args.LightSwitchClient.RemoteEndPoint);
+            await SendSceneListAsync(args.LightSwitchClient);
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateEndListCmd());
+        }
+        async void lightSwitchClient_onCmdList(object sender, LightSwitchClientEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            log.InfoFormat("Received [{0}] User requested device list", args.LightSwitchClient.RemoteEndPoint);
+            await SendDeviceListAsync(args.LightSwitchClient);
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateEndListCmd());
+        }
+
+        async void lightSwitchClient_onCmdVersion(object sender, LightSwitchClientEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateVersionCmd(Utils.ApplicationNameAndVersion));
+        }
+        void lightSwitchClient_onCmdTerminate(object sender, LightSwitchClientEventArgs args)
+        {
+            args.LightSwitchClient.Disconnect();
+        }
+        async void lightSwitchClient_onCmdServer(object sender, LightSwitchClientEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateVersionCmd(Utils.ApplicationNameAndVersion));
+        }
+
+        async void lightSwitchClient_onCmdDevice(object sender, onDeviceEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            int deviceId = int.TryParse(args.DeviceId, out deviceId) ? deviceId : 0;
+            byte level = byte.TryParse(args.Level, out level) ? level : (byte)0;
+
+            using (zvsContext context = new zvsContext())
+            {
+                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
+                if (d == null)
+                {
+                    var error = "Cannot locate device";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                string arg1 = null;
+                string arg2 = null;
+                int commandId = 0;
+                string cmdMsg = string.Empty;
+
+                #region Find Command
+
+                switch (d.Type.UniqueIdentifier)
+                {
+                    case "SWITCH":
+                        {
+                            string cmdUniqueId = (level == 0 ? "TURNOFF" : "TURNON");
+
+                            DeviceTypeCommand dtcmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqueId);
+                            if (dtcmd == null)
+                            {
+                                var error = "Cannot locate zvs command";
+                                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                                log.Error(error);
+
+                                return;
+                            }
+
+                            cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dtcmd.Name, d.Name);
+                            commandId = dtcmd.Id;
+                            arg1 = null;
+                            arg2 = d.Id.ToString();
+                            break;
+                        }
+                    case "DIMMER":
+                        {
+                            string l = (level == 255 ? "99" : level.ToString());
+                            if (!PluginToDimmerBasicCommand.ContainsKey(d.Type.Plugin.UniqueIdentifier))
+                            {
+                                var error = "No command defines for this plug-in";
+                                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                                log.Error(error);
+
+                                return;
+                            }
+
+                            var cmdUniqueId = PluginToDimmerBasicCommand[d.Type.Plugin.UniqueIdentifier];
+                            DeviceCommand dcmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Contains(cmdUniqueId));
+                            if (dcmd == null)
+                            {
+                                var error = "Cannot locate zvs command";
+                                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                                log.Error(error);
+
+                                return;
+                            }
+
+                            cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                            commandId = dcmd.Id;
+                            arg1 = l;
+                            arg2 = d.Id.ToString();
+
+                            break;
+                        }
+                }
+                #endregion
+
+                if (commandId == 0)
+                {
+                    var error = "Cannot locate zvs command";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                log.Info(cmdMsg);
+                CommandProcessor cp = new CommandProcessor(Core);
+                var commandResult = await cp.RunCommandAsync(commandId, arg1, arg2);
+
+                if (commandResult.HasErrors)
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
+                else
+                    await BroadcastCommand(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
+            }
+        }
+        async void lightSwitchClient_onCmdZone(object sender, onZoneEventArgs args)
+        {
+            int groupId = int.TryParse(args.ZoneId, out groupId) ? groupId : 0;
+            string cmdUniqId = (args.Level.Equals("255") ? "GROUP_ON" : "GROUP_OFF");
+
+            using (zvsContext context = new zvsContext())
+            {
+                Group g = context.Groups.FirstOrDefault(o => o.Id == groupId);
+                if (g != null)
+                {
+                    BuiltinCommand zvs_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqId);
+                    if (zvs_cmd == null)
                     {
-                        isActive = true;
-                        LightSwitchSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                        LightSwitchSocket.Bind(new IPEndPoint(IPAddress.Any, _port));
-                        LightSwitchSocket.Listen(_max_conn);
-                        LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-                        log.Info("LightSwitch server started on port " + _port);
-                        IsReady = true;
+                        var error = "Cannot locate zvs command";
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                        log.Error(error);
+
+                        return;
                     }
-                }
-                catch (SocketException e)
-                {
-                    log.Error("Socket Failed to Open - " + e);
+                    string result = string.Format("[{0}] Ran {1} on group '{2}'", args.LightSwitchClient.RemoteEndPoint, zvs_cmd.Name, g.Name);
+                    log.Info(result);
+
+                    CommandProcessor cp = new CommandProcessor(Core);
+                    var r = await cp.RunCommandAsync(zvs_cmd.Id, g.Id.ToString());
+                    if (r.HasErrors)
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
+                    else
+                        await BroadcastCommand(LightSwitchProtocol.CreateMsgCmd(result));
+
                 }
             }
         }
-
-        public void CloseLightSwitchSocket()
+        async void lightSwitchClient_onCmdScene(object sender, onSceneEventArgs args)
         {
-            if (LightSwitchSocket != null && isActive)
-            {
-                LightSwitchSocket.Close();
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
 
-                foreach (Socket client in LightSwitchClients)
+            int sceneId = int.TryParse(args.SceneId, out sceneId) ? sceneId : 0;
+            using (zvsContext context = new zvsContext())
+            {
+                BuiltinCommand bcmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                if (bcmd == null)
                 {
-                    if (client.Connected)
+                    var error = "Cannot locate zvs command";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                CommandProcessor cp = new CommandProcessor(Core);
+                var r = await cp.RunCommandAsync(bcmd.Id, sceneId.ToString());
+
+                if (r.HasErrors)
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
+                else
+                    await BroadcastCommand(LightSwitchProtocol.CreateMsgCmd(r.Details));
+            }
+        }
+
+        async void lightSwitchClient_onCmdThermTemp(object sender, onThermTempEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            int deviceId = int.TryParse(args.DeviceId, out deviceId) ? deviceId : 0;
+
+            using (zvsContext context = new zvsContext())
+            {
+                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
+                if (d == null)
+                {
+                    var error = "Cannot locate thermostat";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                string plugin = d.Type.Plugin.UniqueIdentifier;
+                string key = plugin + args.Mode;
+
+                if (!ThermoTempCommandTranslations.ContainsKey(key))
+                {
+                    var error = "No command defined for this plug-in";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                DeviceCommand dcmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.StartsWith(ThermoTempCommandTranslations[key]));
+                if (dcmd == null)
+                {
+                    var error = "Cannot locate zvs command";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                var cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+                log.Info(cmdMsg);
+                CommandProcessor cp = new CommandProcessor(Core);
+                var commandResult = await cp.RunCommandAsync(dcmd.Id, args.Temp);
+
+                if (commandResult.HasErrors)
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
+                else
+                    await BroadcastCommand(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
+            }
+        }
+        async void lightSwitchClient_onCmdThermMode(object sender, onThermModeEventArgs args)
+        {
+            if (!args.LightSwitchClient.isAuthenticated)
+                args.LightSwitchClient.Disconnect();
+
+            int deviceId = int.TryParse(args.DeviceId, out deviceId) ? deviceId : 0;
+            int mode = int.TryParse(args.Mode, out mode) ? mode : 0;
+
+            string arg1 = null;
+            string arg2 = null;
+            int commandId = 0;
+            string cmdMsg = string.Empty;
+
+            //PLUGINNAME-0 -->CmdName,Arg 
+            using (zvsContext context = new zvsContext())
+            {
+                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
+                if (d == null)
+                {
+                    var error = "Cannot locate thermostat";
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                    log.Error(error);
+
+                    return;
+                }
+
+                if (mode < 6)
+                {
+                    string plugin = d.Type.Plugin.UniqueIdentifier;
+                    string key = plugin + args.Mode;
+
+                    if (!ThermoCommandTranslations.ContainsKey(key))
                     {
-                        client.Close();
-                    }
-                }
-                log.Info("LightSwitch server stopped");
-                isActive = false;
-                IsReady = false;
-            }
-        }
+                        var error = "No command defined for this plug-in";
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                        log.Error(error);
 
-        /// <summary>
-        /// Welcomes client and opens individualized socket for them to clear main socket.
-        /// </summary>
-        /// <param name="asyn"></param>
-        private void OnLightSwitchClientConnect(IAsyncResult asyn)
-        {
-            try
-            {
-                //accept and create new socket
-                Socket LightSwitchClientsSocket = LightSwitchSocket.EndAccept(asyn);
-
-                lock (LightSwitchClients)
-                    LightSwitchClients.Add(LightSwitchClientsSocket);
-
-                log.Info("Connection Attempt from: " + LightSwitchClientsSocket.RemoteEndPoint.ToString());
-
-                // Send a welcome message to client                
-                string msg = "LightSwitch zVirtualScenes Plug-in (Active Connections " + LightSwitchClients.Count + ")" + Environment.NewLine;
-                SendMsgToLightSwitchClient(msg, LightSwitchClients.Count);
-
-                // Let the worker Socket do the further processing for the just connected client
-                WaitForData(LightSwitchClientsSocket, LightSwitchClients.Count, false);
-
-                // Since the main Socket is now free, it can go back and wait for other clients who are attempting to connect
-                LightSwitchSocket.BeginAccept(new AsyncCallback(OnLightSwitchClientConnect), null);
-            }
-            catch (ObjectDisposedException)
-            {
-            }
-            catch (SocketException e)
-            {
-                log.Error("Socket Exception: " + e);
-            }
-            catch (Exception)
-            { }
-        }
-
-        /// <summary>
-        /// Waits for client data and handles it when recieved
-        /// </summary>
-        /// <param name="soc"></param>
-        /// <param name="clientNumber"></param>
-        /// <param name="verified"></param>
-        public void WaitForData(System.Net.Sockets.Socket soc, int clientNumber, bool verified)
-        {
-            try
-            {
-                if (pfnWorkerCallBack == null)
-                {
-                    // Specify the call back function which is to be invoked when there is any write activity by the connected client
-                    pfnWorkerCallBack = new AsyncCallback(OnDataReceived);
-                }
-                SocketPacket theSocPkt = new SocketPacket(soc, clientNumber, verified);
-                soc.BeginReceive(theSocPkt.dataBuffer, 0, theSocPkt.dataBuffer.Length, SocketFlags.None, pfnWorkerCallBack, theSocPkt);
-            }
-            catch (SocketException e)
-            {
-                log.Error("Socket Exception: " + e);
-            }
-        }
-
-        /// <summary>
-        /// This the call back function which will be invoked when the socket detects any client writing of data on the stream
-        /// </summary>
-        /// <param name="asyn">Object containing Socket Packet</param>
-        public void OnDataReceived(IAsyncResult asyn)
-        {
-            SocketPacket socketData = (SocketPacket)asyn.AsyncState;
-            Socket LightSwitchClientSocket = (Socket)socketData.m_currentSocket;
-
-            if (!LightSwitchClientSocket.Connected)
-                return;
-
-            try
-            {
-                using (zvsContext context = new zvsContext())
-                {
-                    // Complete the BeginReceive() asynchronous call by EndReceive() method which will return the number of characters written to the stream  by the client
-                    int iRx = LightSwitchClientSocket.EndReceive(asyn);
-
-                    //this socket was closed
-                    if (iRx == 0)
-                    {
-                        DisconnectClientSocket(socketData);
                         return;
                     }
 
-                    if (iRx > 2)
+                    zvsCMD cmd = ThermoCommandTranslations[key];
+                    DeviceCommand dcmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier.Contains(cmd.CmdName));
+                    if (dcmd == null)
                     {
-                        char[] chars = new char[iRx + 1];
-                        // Extract the characters as a buffer
-                        System.Text.Decoder d = System.Text.Encoding.UTF8.GetDecoder();
-                        int charLen = d.GetChars(socketData.dataBuffer, 0, iRx, chars, 0);
-                        string data = new string(chars);
+                        var error = "Cannot locate zvs command";
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                        log.Error(error);
 
-                        if (_verbose)
-                            log.Info("Received [" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] " + data);
-
-                        string[] commands = data.Split('\n');
-
-                        string version = "VER~" + Utils.ApplicationNameAndVersion;
-
-                        foreach (string command in commands)
-                        {
-                            if (command.Length > 0)
-                            {
-                                if (command.Length <= 2)
-                                    continue;
-
-                                string cmd = command.TrimEnd(Environment.NewLine.ToCharArray()).ToUpper();
-
-                                if (cmd.StartsWith("IPHONE"))  //Send salt to phone
-                                {
-                                    socketData.m_verified = false;
-                                    SendMessagetoClientsSocket(LightSwitchClientSocket, "COOKIE~" + Convert.ToString(m_cookie) + Environment.NewLine);
-                                }
-
-                                if (!socketData.m_verified)
-                                {
-                                    //If not verified attept to verify                            
-                                    if (cmd.StartsWith("PASSWORD"))
-                                    {
-                                        string[] values = cmd.Split('~');
-                                        string inputPassword = values[1];
-                                        string hashedPassword = EncodePassword(Convert.ToString(m_cookie) + ":" + GetSettingValue("PASSWORD", context));
-                                        //hashedPassword = "638831F3AF6F32B25D6F1C961CBBA393"
-
-                                        if (inputPassword.StartsWith(hashedPassword))
-                                        {
-                                            socketData.m_verified = true;
-                                            SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
-                                            log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User Authenticated.");
-                                        }
-                                        else
-                                        {
-                                            socketData.m_verified = false;
-                                            throw new Exception("Passwords do not match");
-                                        }
-                                    }
-                                }
-                                else //CLIENT IS VERIFIED
-                                {
-                                    if (cmd.StartsWith("VERSION"))
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
-
-                                    else if (cmd.StartsWith("SERVER"))
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, version + Environment.NewLine);
-
-                                    else if (cmd.StartsWith("TERMINATE"))
-                                        throw new Exception("Terminating client socket...");
-
-                                    else if (cmd.StartsWith("ALIST"))  //DEVICES, SCENES AND ZONES.
-                                    {
-                                        log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
-
-                                        sendDeviceList(LightSwitchClientSocket);
-
-                                        SendSceneList(LightSwitchClientSocket);
-
-                                        SendZoneList(LightSwitchClientSocket);
-
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
-                                    }
-                                    else if (cmd.StartsWith("LIST")) //DEVICES
-                                    {
-                                        log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested device list.");
-
-                                        sendDeviceList(LightSwitchClientSocket);
-
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
-                                    }
-                                    else if (cmd.StartsWith("SLIST"))  //SCENES
-                                    {
-                                        SendSceneList(LightSwitchClientSocket);
-
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
-                                    }
-                                    else if (cmd.StartsWith("ZLIST")) //ZONES
-                                    {
-                                        log.Info("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] User requested zone/group list.");
-
-                                        SendZoneList(LightSwitchClientSocket);
-                                        SendMessagetoClientsSocket(LightSwitchClientSocket, "ENDLIST" + Environment.NewLine);
-                                    }
-                                    else if (cmd.StartsWith("DEVICE"))
-                                    {
-                                        string[] values = cmd.Split('~');
-                                        //NOTIFY ALL CLIENTS
-                                        ExecuteZVSCommand(Convert.ToInt32(values[1]), Convert.ToByte(values[2]), LightSwitchClientSocket);
-                                    }
-                                    else if (cmd.StartsWith("SCENE"))
-                                    {
-                                        string[] values = cmd.Split('~');
-                                        //NOTIFY ALL CLIENTS
-                                        ExecuteZVSCommand(Convert.ToInt32(values[1]), LightSwitchClientSocket);
-                                    }
-                                    else if (cmd.StartsWith("ZONE"))
-                                    {
-                                        string[] values = cmd.Split('~');
-                                        if (values.Length > 1)
-                                        {
-                                            int groupId = int.TryParse(values[1], out groupId) ? groupId : 0;
-                                            string cmdUniqId = (values[2].Equals("255") ? "GROUP_ON" : "GROUP_OFF");
-
-                                            Group g = context.Groups.FirstOrDefault(o => o.Id == groupId);
-                                            if (g != null)
-                                            {
-                                                BuiltinCommand zvs_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqId);
-                                                if (zvs_cmd != null)
-                                                {
-                                                    string result = string.Format("[{0}] Ran {1} on group '{2}'", LightSwitchClientSocket.RemoteEndPoint.ToString(), zvs_cmd.Name, g.Name);
-                                                    log.Info(result);
-                                                    BroadcastMessage("MSG~" + result + Environment.NewLine);
-
-                                                    CommandProcessor cp = new CommandProcessor(Core);
-                                                    cp.RunCommandAsync(zvs_cmd.Id, g.Id.ToString());
-                                                }
-                                            }
-
-                                        }
-
-                                    }
-                                    else if (cmd.StartsWith("THERMMODE"))
-                                    {
-                                        string[] values = cmd.Split('~');
-                                        //NOTIFY ALL CLIENTS
-                                        ExecuteZVSThermostatCommand(Convert.ToInt32(values[1]), Convert.ToByte(values[2]), LightSwitchClientSocket);
-                                    }
-                                    else if (cmd.StartsWith("THERMTEMP"))
-                                    {
-                                        string[] values = cmd.Split('~');
-                                        //NOTIFY ALL CLIENTS
-                                        ExecuteZVSThermostatCommand(Convert.ToInt32(values[1]), Convert.ToByte(values[2]), Convert.ToInt32(values[3]), LightSwitchClientSocket);
-                                    }
-                                    else
-                                    {
-                                        throw new Exception("Terminating Due To Unknown Socket Command: " + data);
-                                    }
-                                }
-                            }
-                        }
+                        return;
                     }
 
-                    // Continue the waiting for data on the Socket
-                    WaitForData(socketData.m_currentSocket, socketData.m_clientNumber, socketData.m_verified);
+                    commandId = dcmd.Id;
+                    arg1 = cmd.arg;
+                    cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
+
                 }
-            }
-            catch (ObjectDisposedException)
-            {
-                log.Error("OnDataReceived - Socket has been closed");
-            }
-            catch (SocketException se)
-            {
-                if (se.ErrorCode == 10054) // Error code for Connection reset by peer
-                    log.Error("Client " + socketData.m_clientNumber + " Disconnected.");
-                else
-                    log.Error("SocketException - " + se.Message);
-
-                DisconnectClientSocket(socketData);
-            }
-            catch (Exception e)
-            {
-                log.Error("[" + LightSwitchClientSocket.RemoteEndPoint.ToString() + "] Server Exception: " + e);
-
-                //SEND ERROR TO CLIENT
-                SendMessagetoClientsSocket(LightSwitchClientSocket, "ERR~" + e.Message + Environment.NewLine);
-
-                Thread.Sleep(3000);
-                DisconnectClientSocket(socketData);
-            }
-        }
-
-        private void SendSceneList(Socket LightSwitchClientSocket)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                foreach (Scene scene in context.Scenes)
+                else if (mode == 6)
                 {
-                    bool show = false;
-                    bool.TryParse(ScenePropertyValue.GetPropertyValue(context, scene, "SHOWSCENEINLSLIST"), out show);
-
-                    if (show)
-                        SendMessagetoClientsSocket(LightSwitchClientSocket, "SCENE~" + scene.Name + "~" + scene.Id + Environment.NewLine);
-                }
-            }
-        }
-
-        private void SendZoneList(Socket LightSwitchClientSocket)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                foreach (Group g in context.Groups)
-                {
-                    SendMessagetoClientsSocket(LightSwitchClientSocket, "ZONE~" + g.Name + "~" + g.Id + Environment.NewLine);
-                }
-            }
-        }
-
-        private void sendDeviceList(Socket LightSwitchClientSocket)
-        {
-            List<string> LS_devices = new List<string>();
-
-            using (zvsContext context = new zvsContext())
-            {
-                //Get Devices
-                foreach (Device d in context.Devices)
-                {
-                    bool show = true;
-                    bool.TryParse(DevicePropertyValue.GetPropertyValue(context, d, "SHOWINLSLIST"), out show);
-
-                    if (show)
+                    DeviceTypeCommand dcmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETENERGYMODE");
+                    if (dcmd == null)
                     {
-                        string device_str = DeviceToString(d);
-                        if (!string.IsNullOrEmpty(device_str))
-                            LS_devices.Add(device_str);
+                        var error = "Cannot locate zvs command";
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                        log.Error(error);
+
+                        return;
                     }
+
+                    commandId = dcmd.Id;
+                    arg1 = null;
+                    arg2 = d.Id.ToString();
+                    cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
                 }
-
-                if (_sort_list)
-                    LS_devices.Sort();
-
-                //Send to Client
-                foreach (string d_str in LS_devices)
-                    SendMessagetoClientsSocket(LightSwitchClientSocket, "DEVICE~" + d_str + Environment.NewLine);
-            }
-
-        }
-
-        private string DeviceToString(Device d)
-        {
-            switch (d.Type.UniqueIdentifier)
-            {
-                case "SWITCH":
-                    return d.Name + "~" + d.Id + "~" + (d.CurrentLevelInt > 0 ? "255" : "0") + "~" + "BinarySwitch";
-                case "DIMMER":
-                    return d.Name + "~" + d.Id + "~" + (int)d.CurrentLevelInt + "~" + "MultiLevelSwitch"; //careful lightswitch can only handle ints
-                case "THERMOSTAT":
-                    return d.Name + "~" + d.Id + "~" + (int)d.CurrentLevelInt + "~" + "Thermostat"; //careful lightswitch can only handle ints
-                case "SENSOR":
-                    return d.Name + "~" + d.Id + "~" + (int)d.CurrentLevelInt + "~" + "Sensor"; //careful lightswitch can only handle ints
-            }
-            return string.Empty;
-        }
-
-        //Light Switch Socket Format 
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Bedroom Lights~0~60~MultiLevelSceneSwitch" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Garage Light~1~0~BinarySwitch" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Thermostat~3~75~Thermostat" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Electric Blinds~4~100~WindowCovering" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~Motion Detector~5~0~Sensor" + Environment.NewLine);
-        //workerSocket.Send(byData);
-        //byData = System.Text.Encoding.UTF8.GetBytes("DEVICE~House (AWAY MODE)~6~0~Status" + Environment.NewLine);
-        //workerSocket.Send(byData);
-
-        /// <summary>
-        /// Set levels for devices when a Lightswitch action level string is recieved.
-        /// </summary>
-        /// <param name="Node"></param>
-        /// <param name="Level"></param>
-        /// <param name="Client"></param>
-        /// <returns></returns>
-        private void ExecuteZVSCommand(int device_id, byte Level, Socket Client)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                Device d = context.Devices.FirstOrDefault(o => o.Id == device_id);
-
-                if (d != null)
+                else if (mode == 7)
                 {
-                    switch (d.Type.UniqueIdentifier)
+                    DeviceTypeCommand dcmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETCONFORTMODE");
+                    if (dcmd == null)
                     {
-                        case "SWITCH":
-                            {
-                                string cmdUniqueId = (Level == 0 ? "TURNOFF" : "TURNON");
-                                DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqueId);
-                                if (cmd != null)
-                                {
-                                    string result = string.Format("[{0}] Executed command '{1}' on '{2}'.", Client.RemoteEndPoint.ToString(), cmd.Name, d.Name);
-                                    log.Info(result);
-                                    CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunCommandAsync(cmd.Id, null, d.Id.ToString());
-                                    return;
-                                }
-                                break;
-                            }
-                        case "DIMMER":
-                            {
-                                string l = (Level == 255 ? "99" : Level.ToString());
-                                if (d.Type.Plugin.UniqueIdentifier == "OPENZWAVE")
-                                {
-                                    if (ExecuteDynamicCMD(context, d, "DYNAMIC_CMD_BASIC", l, Client))
-                                        return;
-                                }
-                                if (d.Type.Plugin.UniqueIdentifier == "THINKSTICK")
-                                {
-                                    if (ExecuteDynamicCMD(context, d, "BASIC", l, Client))
-                                        return;
-                                }
-                                break;
-                            }
+                        var error = "Cannot locate zvs command";
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                        log.Error(error);
+
+                        return;
                     }
-                }
-                BroadcastMessage("ERR~Error setting device # " + device_id + ". Try Again");
-            }
-        }
 
-        /// <summary>
-        /// Runs a zVirtualScene Scene
-        /// </summary>
-        /// <param name="SceneID">Scene ID</param>
-        /// <param name="Client">Clients Socket.</param>
-        private async void ExecuteZVSCommand(int SceneID, Socket Client)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
-                if (cmd != null)
-                {
-                    CommandProcessor cp = new CommandProcessor(Core);
-                    CommandProcessorResult args = await cp.RunCommandAsync(cmd.Id, SceneID.ToString());
-                    BroadcastMessage("MSG~" + args.Details + Environment.NewLine);
+                    commandId = dcmd.Id;
+                    arg1 = null;
+                    arg2 = d.Id.ToString();
+                    cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
                 }
             }
-        }
 
-        private bool ExecuteDynamicCMD(zvsContext context, Device d, string cmdUniqueId, string arg, Socket Client)
-        {
-            DeviceCommand cmd = d.Commands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqueId);
-            if (cmd != null)
+            if (commandId == 0)
             {
-                string result = string.Format("[{0}] Executed command '{1}{2}' on '{3}'.", Client.RemoteEndPoint.ToString(), cmd.Name, string.IsNullOrEmpty(arg) ? arg : " to " + arg, d.Name);
-                log.Info(result);
-                CommandProcessor cp = new CommandProcessor(Core);
-                cp.RunCommandAsync(cmd.Id, arg);
-                return true;
+                var error = "Cannot locate zvs command";
+                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
+                log.Error(error);
+
+                return;
             }
-            return false;
+
+            log.Info(cmdMsg);
+            CommandProcessor cp = new CommandProcessor(Core);
+            var commandResult = await cp.RunCommandAsync(commandId, arg1, arg2);
+
+            if (commandResult.HasErrors)
+                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
+            else
+                await BroadcastCommand(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
         }
+        #endregion
+
+        private Dictionary<string, string> PluginToDimmerBasicCommand = new Dictionary<string, string>()
+        {
+            {"OPENZWAVE", "DYNAMIC_CMD_BASIC"},
+            {"THINKSTICK", "BASIC"} 
+        };
 
         private Dictionary<string, string> ThermoTempCommandTranslations = new Dictionary<string, string>()
         {
             {"THINKSTICK2", "DYNAMIC_SP_R207_Heating1"},
-            {"OPENZWAVE2", "DYNAMIC_CMD_HEATING 1"},
+            {"OPENZWAVE2", "DYNAMIC_CMD_HEATING 1_"},
             {"THINKSTICK3", "DYNAMIC_SP_R207_Cooling1"},
-            {"OPENZWAVE3", "DYNAMIC_CMD_COOLING 1"} 
+            {"OPENZWAVE3", "DYNAMIC_CMD_COOLING 1_"} 
         };
-
-        private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, int Temp, Socket Client)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceID);
-                if (d != null && d.Type.UniqueIdentifier.Equals("THERMOSTAT"))
-                {
-                    string plugin = d.Type.Plugin.UniqueIdentifier;
-                    string key = plugin + Mode;
-
-                    if (ThermoTempCommandTranslations.ContainsKey(key))
-                    {
-                        if (ExecuteDynamicCMD(context, d, ThermoTempCommandTranslations[key], Temp.ToString(), Client))
-                            return;
-                    }
-                }
-            }
-            BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Again");
-        }
 
         private class zvsCMD
         {
@@ -807,167 +761,129 @@ namespace LightSwitchPlugin
             {"OPENZWAVE4", new zvsCMD() { CmdName="DYNAMIC_CMD_FAN MODE", arg="On Low"}},
             {"THINKSTICK5", new zvsCMD() { CmdName="FAN_MODE", arg="AutoLow"}},
             {"OPENZWAVE5", new zvsCMD() { CmdName="DYNAMIC_CMD_FAN MODE", arg="Auto Low"}}
-
         };
 
-        private void ExecuteZVSThermostatCommand(int deviceID, byte Mode, Socket Client)
+        public async Task StopLightSwitchServer()
         {
-            //PLUGINNAME-0 -->CmdName,Arg 
-            using (zvsContext context = new zvsContext())
+            await BroadcastCommand(LightSwitchProtocol.CreateMsgCmd("Server shutting down..."));
+
+            foreach (var client in LightSwitchClients)
+                client.Disconnect();
+
+            _cts.Cancel();
+        }
+
+        void lightSwitchClient_ConnectionClosed(object sender, LightSwitchClientEventArgs args)
+        {
+            log.InfoFormat("Client {0} disconnected", args.LightSwitchClient.RemoteEndPoint);
+
+            if (LightSwitchClients.Contains(args.LightSwitchClient))
+                LightSwitchClients.Remove(args.LightSwitchClient);
+
+            args.LightSwitchClient.onConnectionEstabilished -= lightSwitchClient_ConnectionEstabilished;
+            args.LightSwitchClient.onConnectionClosed -= lightSwitchClient_ConnectionClosed;
+
+            args.LightSwitchClient.onDataReceived -= lightSwitchClient_DataReceived;
+            args.LightSwitchClient.onDataSent -= lightSwitchClient_DataSent;
+
+            args.LightSwitchClient.onCmdAList -= lightSwitchClient_onCmdAList;
+            args.LightSwitchClient.onCmdDevice -= lightSwitchClient_onCmdDevice;
+            args.LightSwitchClient.onCmdIphone -= lightSwitchClient_onCmdIphone;
+            args.LightSwitchClient.onCmdList -= lightSwitchClient_onCmdList;
+            args.LightSwitchClient.onCmdPassword -= lightSwitchClient_onCmdPassword;
+            args.LightSwitchClient.onCmdScene -= lightSwitchClient_onCmdScene;
+            args.LightSwitchClient.onCmdServer -= lightSwitchClient_onCmdServer;
+            args.LightSwitchClient.onCmdSList -= lightSwitchClient_onCmdSList;
+            args.LightSwitchClient.onCmdTerminate -= lightSwitchClient_onCmdTerminate;
+            args.LightSwitchClient.onCmdThermMode -= lightSwitchClient_onCmdThermMode;
+            args.LightSwitchClient.onCmdThermTemp -= lightSwitchClient_onCmdThermTemp;
+            args.LightSwitchClient.onCmdVersion -= lightSwitchClient_onCmdVersion;
+            args.LightSwitchClient.onCmdZList -= lightSwitchClient_onCmdZList;
+            args.LightSwitchClient.onCmdZone -= lightSwitchClient_onCmdZone;
+        }
+
+        async void lightSwitchClient_ConnectionEstabilished(object sender, LightSwitchClientEventArgs args)
+        {
+            if (LightSwitchClients.Count > _max_conn)
             {
-                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceID);
-                if (d != null && d.Type.UniqueIdentifier.Equals("THERMOSTAT"))
-                {
-                    string plugin = d.Type.Plugin.UniqueIdentifier;
-                    string key = plugin + Mode;
-
-                    if (ThermoCommandTranslations.ContainsKey(key))
-                    {
-                        zvsCMD cmd = ThermoCommandTranslations[key];
-                        if (ExecuteDynamicCMD(context, d, cmd.CmdName, cmd.arg, Client))
-                            return;
-                    }
-
-                    switch (Mode)
-                    {
-                        case 6:
-                            {
-                                DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETENERGYMODE");
-                                if (cmd != null)
-                                {
-                                    log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
-                                    CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunCommandAsync(cmd.Id, null, d.Id.ToString());
-                                    return;
-                                }
-                                break;
-                            }
-                        case 7:
-                            {
-                                DeviceTypeCommand cmd = d.Type.Commands.FirstOrDefault(c => c.UniqueIdentifier == "SETCONFORTMODE");
-                                if (cmd != null)
-                                {
-                                    log.Info("[" + Client.RemoteEndPoint.ToString() + "] Executed command " + cmd.Name + " on " + d.Name + ".");
-                                    CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunCommandAsync(cmd.Id, null, d.Id.ToString());
-                                    return;
-                                }
-                                break;
-                            }
-                    }
-                }
+                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateMsgCmd("Max clients reached!"));
+                args.LightSwitchClient.Disconnect();
             }
-            BroadcastMessage("ERR~Error setting device # " + deviceID + ". Try Again");
+
+            log.InfoFormat("Client {0} connected", args.LightSwitchClient.RemoteEndPoint);
+            await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateInfoCmdFormat("LightSwitch zVirtualScenes Plug-in (Active Connections {0}){1}", LightSwitchClients.Count, Environment.NewLine));
         }
 
         /// <summary>
         /// Sends a message to ALL connected clients.
         /// </summary>
-        /// <param name="msg">the message to send</param>
-        public void BroadcastMessage(string msg)
+        /// <param name="command">the message to send</param>
+        public async Task BroadcastCommand(LightSwitchCommand command)
         {
-            if (msg.Length > 0)
-            {
-                // Convert the reply to byte array
-                byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
-
-                foreach (Socket workerSocket in LightSwitchClients)
-                    if (workerSocket != null && workerSocket.Connected)
-                    {
-                        try
-                        {
-                            workerSocket.Send(byData);
-                        }
-                        catch (SocketException se)
-                        {
-                            if (_verbose)
-                                log.Error("Socket Exception: " + se.Message);
-
-                            return;
-                        }
-                    }
-
-                if (_verbose)
-                    log.Info("SENT TO ALL - " + msg);
-
-            }
+            foreach (var client in LightSwitchClients)
+                await client.SendCommandAsync(command);
         }
 
-        /// <summary>
-        /// Sends a message to ONE client by socket
-        /// </summary>
-        /// <param name="msg">the message to send</param>
-        public void SendMessagetoClientsSocket(Socket LightSwitchClientSocket, string msg)
+        #region Lists
+        private async Task SendSceneListAsync(LightSwitchClient client)
         {
-            if (msg.Length > 0)
+            using (zvsContext context = new zvsContext())
             {
-                // Convert the reply to byte array
-                byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
-                if (LightSwitchClientSocket != null && LightSwitchClientSocket.Connected)
+                foreach (Scene scene in context.Scenes.OrderBy(o => o.SortOrder))
                 {
-                    try
-                    {
-                        LightSwitchClientSocket.Send(byData);
-                    }
-                    catch (SocketException se)
-                    {
-                        if (_verbose)
-                            log.Error("Socket Exception: " + se.Message);
-                    }
-                }
+                    bool show = false;
+                    bool.TryParse(ScenePropertyValue.GetPropertyValue(context, scene, "SHOWSCENEINLSLIST"), out show);
+                    if (!show)
+                        continue;
 
-                if (_verbose)
-                    log.Info("SENT - " + msg);
-
-            }
-        }
-
-        /// <summary>
-        /// Sends a message to ONE client by client number
-        /// </summary>
-        private void SendMsgToLightSwitchClient(string msg, int clientNumber)
-        {
-
-            // Convert the reply to byte array
-            byte[] byData = System.Text.Encoding.UTF8.GetBytes(msg);
-            Socket LightSwitchClientsSocket = (Socket)LightSwitchClients[clientNumber - 1];
-
-            if (LightSwitchClientsSocket != null && LightSwitchClientsSocket.Connected)
-            {
-                try
-                {
-                    LightSwitchClientsSocket.Send(byData);
-                }
-                catch (SocketException se)
-                {
-                    if (_verbose)
-                        log.Error("Socket Exception: " + se.Message);
+                    await client.SendCommandAsync(LightSwitchProtocol.CreateSceneCmd(scene.Name, scene.Id.ToString()));
                 }
             }
-
-
-            if (_verbose)
-                log.Info("SENT " + msg);
-
         }
 
-        private void DisconnectClientSocket(SocketPacket socketData)
+        private async Task SendZoneListAsync(LightSwitchClient client)
         {
-            Socket LightSwitchClientsSocket = (Socket)socketData.m_currentSocket;
-            try
-            {
-                // Remove the reference to the worker socket of the closed client so that this object will get garbage collected
-                lock (LightSwitchClients)
-                    LightSwitchClients.Remove(LightSwitchClientsSocket);
+            using (zvsContext context = new zvsContext())
+                foreach (Group g in context.Groups.OrderBy(o => o.Name))
+                    await client.SendCommandAsync(LightSwitchProtocol.CreateZoneCmd(g.Name, g.Id.ToString()));
+        }
 
-                LightSwitchClientsSocket.Close();
-                LightSwitchClientsSocket = null;
-            }
-            catch (Exception e)
+        private Dictionary<string, LightSwitchProtocol.DeviceTypes> ZVSTypeToLSType = new Dictionary<string, LightSwitchProtocol.DeviceTypes>()
+        {
+            {"SWITCH", LightSwitchProtocol.DeviceTypes.BinarySwitch},
+            {"DIMMER", LightSwitchProtocol.DeviceTypes.MultiLevelSwitch} ,
+            {"THERMOSTAT", LightSwitchProtocol.DeviceTypes.Thermostat},
+            {"SENSOR", LightSwitchProtocol.DeviceTypes.Sensor},
+        };
+
+        private async Task SendDeviceListAsync(LightSwitchClient client)
+        {
+            using (zvsContext context = new zvsContext())
             {
-                log.Info("Socket Disconnect: " + e);
+                //Get Devices
+                foreach (Device device in context.Devices.OrderBy(o => o.Name).Where(o => o.Type.UniqueIdentifier != "CONTROLLER"))
+                {
+                    bool show = true;
+                    bool.TryParse(DevicePropertyValue.GetPropertyValue(context, device, "SHOWINLSLIST"), out show);
+                    if (!show)
+                        continue;
+
+                    if (!ZVSTypeToLSType.ContainsKey(device.Type.UniqueIdentifier))
+                        continue;
+
+                    string level = ((int)device.CurrentLevelInt).ToString();
+                    var type = ZVSTypeToLSType[device.Type.UniqueIdentifier];
+
+                    if (device.Type.UniqueIdentifier == "SWITCH")
+                        level = (device.CurrentLevelInt > 0 ? "255" : "0");
+
+                    await client.SendCommandAsync(LightSwitchProtocol.CreateDeviceCmd(device.Name, device.Id.ToString(), level, type));
+
+                }
             }
         }
+
+        #endregion
 
         public string EncodePassword(string originalPassword)
         {
@@ -981,7 +897,6 @@ namespace LightSwitchPlugin
 
             return result.ToString().ToUpper();
         }
-
 
         #region ZeroConf/Bonjour
 
@@ -1026,33 +941,6 @@ namespace LightSwitchPlugin
         }
 
         #endregion
-    }
-
-    public class SocketPacket
-    {
-        // holds a reference to the socket
-        public Socket m_currentSocket;
-
-        // holds the client number for identification
-        public int m_clientNumber;
-
-        //Is a IViewer Client?
-        public bool iViewerClient;
-
-        // Buffer to store the data sent by the client
-        public byte[] dataBuffer = new byte[1024];
-
-        // flag whether this has passed authentication
-        public bool m_verified = false;
-
-        // Constructor which takes a Socket and a client number
-        public SocketPacket(Socket socket, int clientNumber, bool verified)
-        {
-            m_currentSocket = socket;
-            m_clientNumber = clientNumber;
-            m_verified = verified;
-            iViewerClient = false;
-        }
     }
 }
 

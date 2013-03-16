@@ -54,7 +54,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LightSwitch\LightSwitchClient.cs" />
+    <Compile Include="LightSwitch\ILightSwitchChannel.cs" />
     <Compile Include="LightSwitchPlugin.cs" />
+    <Compile Include="LightSwitch\LightSwitchProtocol.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

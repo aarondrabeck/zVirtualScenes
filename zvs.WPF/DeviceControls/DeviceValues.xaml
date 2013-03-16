@@ -14,7 +14,7 @@
                   Unloaded="DataGrid_Unloaded_1" BorderThickness="0" CanUserDeleteRows="False" Margin="0,0,0,24">
 
             <DataGrid.Columns>
-                <DataGridTextColumn Width="50" MinWidth="50" Header="Id" Binding="{Binding Path=DeviceValueId}" IsReadOnly="True" />
+                <DataGridTextColumn Width="50" MinWidth="50" Header="Id" Binding="{Binding Path=Id}" IsReadOnly="True" />
                 
                 <DataGridTextColumn Width="150" MinWidth="50" Header="Label" Binding="{Binding Path=Name}" IsReadOnly="True" />
                 <DataGridTextColumn Width="*" MinWidth="50" Header="Value" Binding="{Binding Path=Value}" IsReadOnly="True" />

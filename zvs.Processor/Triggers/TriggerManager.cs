@@ -160,7 +160,7 @@ namespace zvs.Processor.Triggers
 
             CommandProcessor cp = new CommandProcessor(Core);
             CommandProcessorResult result = await cp.RunStoredCommandAsync( trigger.StoredCommand.Id);
-            TriggerEnd(new onTriggerEventArgs(trigger.Id, string.Format("Trigger '{0}' ended {1} errors.", trigger.Name, result.Errors ? "with" : "without"), false));
+            TriggerEnd(new onTriggerEventArgs(trigger.Id, string.Format("Trigger '{0}' ended {1} errors.", trigger.Name, result.HasErrors ? "with" : "without"), false));
         }
     }
 }
