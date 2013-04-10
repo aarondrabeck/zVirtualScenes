@@ -96,6 +96,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Forms\ControllerCommandDlg.resx">
       <DependentUpon>ControllerCommandDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
