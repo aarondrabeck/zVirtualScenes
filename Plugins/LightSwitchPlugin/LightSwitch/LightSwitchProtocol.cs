@@ -103,7 +103,7 @@ namespace LightSwitchPlugin.LightSwitch
 
         internal static LightSwitchCommand CreateSceneCmd(string name, string id)
         {
-            return new LightSwitchCommand(string.Format("SCENE~{0}~{1}~{2}",
+            return new LightSwitchCommand(string.Format("SCENE~{0}~{1}{2}",
                 name,
                 id,
                 Environment.NewLine));
@@ -111,7 +111,7 @@ namespace LightSwitchPlugin.LightSwitch
 
         internal static LightSwitchCommand CreateZoneCmd(string name, string id)
         {
-            return new LightSwitchCommand(string.Format("ZONE~{0}~{1}~{2}",
+            return new LightSwitchCommand(string.Format("ZONE~{0}~{1}{2}",
                 name,
                 id,
                 Environment.NewLine));
