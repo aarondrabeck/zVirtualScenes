@@ -68,6 +68,11 @@ namespace SpeechPlugin
             IsReady = false;
         }
 
+        public void Announce(String announceText)
+        {
+            _synth.SpeakAsync(announceText);
+        }
+
         protected override void SettingChanged(string settingsettingUniqueIdentifier, string settingValue) { }
 
         public override void ProcessCommand(int queuedCommandId) { }
