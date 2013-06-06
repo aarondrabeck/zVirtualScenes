@@ -15,6 +15,9 @@ namespace zvs.Processor
         private int id;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
         Jint.JintEngine engine = new Jint.JintEngine();
+        private string callerType;
+        private string callerName;
+
 
         #region Events
         public class JavaScriptResult : EventArgs
@@ -50,9 +53,11 @@ namespace zvs.Processor
 
         #endregion
 
-        public JavaScriptExecuter(Core core)
+        public JavaScriptExecuter(Core core, string argument = "", string argument2 = "")
         {
             Core = core;
+            callerType = argument;
+            callerName = argument2;
 
             engine.Step += (sender, info) =>
             {
@@ -106,11 +111,16 @@ namespace zvs.Processor
             engine.SetFunction("shell", new Func<string, System.Diagnostics.Process>(Shell));
             engine.SetFunction("mappath", new Func<string, string>(MapPath));
 
-            // if (Trigger != null) engine.SetParameter("Trigger", this.Trigger);
-            //if (Scene != null) engine.SetParameter("Scene", this.Scene);
-            // engine.SetParameter("HasTrigger", (this.Trigger!=null));
-            // engine.SetParameter("HasScene", (this.Scene!=null));
+            
+            engine.SetParameter("TriggerName", "NoTrigger"); //include a default value so script can be tested
+            engine.SetParameter("SceneName", "NoScene");
 
+            if (callerType != "")
+            {
+                if (this.callerType == "trigger") engine.SetParameter("TriggerName", this.callerName);
+                else engine.SetParameter("SceneName", this.callerName);
+            }
+           
             try
             {
                 //pull out import statements

@@ -394,7 +394,7 @@ namespace zvs.Processor
                 {
                     JavaScriptCommand javaScriptCommand = (JavaScriptCommand)command;
 
-                    JavaScriptExecuter je = new JavaScriptExecuter(Core);
+                    JavaScriptExecuter je = new JavaScriptExecuter(Core, queuedCommand.Argument, queuedCommand.Argument2);
                     je.onReportProgress += (sender, args) =>
                     {
                         Core.log.Info(args.Progress);
