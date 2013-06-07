@@ -94,11 +94,11 @@ namespace zvs.Processor
 
             engine.SetParameter("zvsContext", context);
 
-            engine.SetFunction("RunScene", new Action<double>(RunSceneJS));
-            engine.SetFunction("RunScene", new Action<string>(RunSceneJS));
-            engine.SetFunction("RunDeviceCommand", new Action<double, string, string>(RunDeviceCommandJS));
-            engine.SetFunction("RunDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
-            engine.SetFunction("ReportProgress", new Action<string>(ReportProgressJS));
+            engine.SetFunction("runScene", new Action<double>(RunSceneJS));
+            engine.SetFunction("runScene", new Action<string>(RunSceneJS));
+            engine.SetFunction("runDeviceCommand", new Action<double, string, string>(RunDeviceCommandJS));
+            engine.SetFunction("runDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
+            engine.SetFunction("reportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("progress", new Action<string>(ReportProgressJS));
             engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
             engine.SetFunction("error", new Action<object>(Error));
@@ -111,20 +111,12 @@ namespace zvs.Processor
             engine.SetFunction("mappath", new Func<string, string>(MapPath));
 
             //include a default value so script can be tested
-            engine.SetParameter("senderTask", null);
-            engine.SetParameter("senderDeviceValueTrigger", null);
-            engine.SetParameter("senderScene", null);
+            engine.SetParameter("senderType", null);
+            if (Sender != null)
+                engine.SetParameter("senderType", Sender.GetType().Name);
 
             engine.SetParameter("senderObject", Sender);
-
-            if (Sender is Scene)
-                engine.SetParameter("senderScene", Sender);
-
-            if (Sender is DeviceValueTrigger)
-                engine.SetParameter("senderDeviceValueTrigger", Sender);
-
-            if (Sender is ScheduledTask)
-                engine.SetParameter("senderTask", Sender);
+            
            
             try
             {
