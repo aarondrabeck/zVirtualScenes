@@ -243,7 +243,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void ActivateScene_Click_1(object sender, RoutedEventArgs e)
+        private async void ActivateScene_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
@@ -255,7 +255,7 @@ namespace zvs.WPF.SceneControls
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                        cp.RunCommandAsync(cmd.Id, scene.Id.ToString());
+                        await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
                     }
                 }
             }

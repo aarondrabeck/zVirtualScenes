@@ -85,7 +85,7 @@ namespace zvs.WPF.Groups
             this.Close();
         }
 
-        private void AllOnBtn_Click(object sender, RoutedEventArgs e)
+        private async void AllOnBtn_Click(object sender, RoutedEventArgs e)
         {
             Group g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
@@ -94,12 +94,12 @@ namespace zvs.WPF.Groups
                 if (group_on_cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    cp.RunCommandAsync( group_on_cmd.Id, g.Id.ToString());
+                    await cp.RunCommandAsync(this, group_on_cmd.Id, g.Id.ToString());
                 }
             }
         }
 
-        private void AllOffBtn_Click_1(object sender, RoutedEventArgs e)
+        private async void AllOffBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Group g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
@@ -108,7 +108,7 @@ namespace zvs.WPF.Groups
                 if (group_off_cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    cp.RunCommandAsync( group_off_cmd.Id, g.Id.ToString());
+                    await cp.RunCommandAsync(this, group_off_cmd.Id, g.Id.ToString());
                 }
             }
         }

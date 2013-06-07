@@ -77,7 +77,7 @@ namespace WebAPI.Controllers.v2
             CommandProcessor cp = new CommandProcessor(WebAPIPlugin.Core);
             try
             {
-                Task.Run(() => cp.RunCommandAsync(cmd.CommandId.Value, cmd.Argument, cmd.Argument2));
+                Task.Run(() => cp.RunCommandAsync(this, cmd.CommandId.Value, cmd.Argument, cmd.Argument2));
             }
             catch (DbEntityValidationException dbEx)
             {

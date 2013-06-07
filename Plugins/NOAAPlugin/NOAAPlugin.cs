@@ -187,7 +187,7 @@ namespace NOAAPlugin
             return false;
         }
 
-        void timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
+        async void  timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -213,7 +213,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunCommandAsync( cmd.Id, scene.Id.ToString());
+                                    await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
                                 }
                             }
                         }
@@ -239,7 +239,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    cp.RunCommandAsync( cmd.Id, scene.Id.ToString());
+                                    await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
                                 }
                             }
                         }

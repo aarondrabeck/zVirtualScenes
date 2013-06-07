@@ -23,6 +23,7 @@ using zvs.Processor;
 using zvs.Entities;
 using zvs.Processor.Logging;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace HttpAPI
 {
@@ -518,7 +519,7 @@ namespace HttpAPI
             context.Response.Close();
         }
 
-        private object GetResponse(HttpListenerContext httpListenerContext)
+        private async Task<object> GetResponse(HttpListenerContext httpListenerContext)
         {
             string ip = string.Empty;
             if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
@@ -743,7 +744,7 @@ namespace HttpAPI
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(Core);
-                                cp.RunCommandAsync(cmd.Id, sID.ToString());
+                                await Task.Run(async () => await cp.RunCommandAsync(this, cmd.Id, sID.ToString()));
                             }
                             return new { success = true, desc = "Scene Started." };
                         }
@@ -904,7 +905,7 @@ namespace HttpAPI
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunCommandAsync(cmd.Id, arg);
+                                            await Task.Run(async () => await  cp.RunCommandAsync(this, cmd.Id, arg));
                                             return new { success = true };
                                         }
                                         else
@@ -926,7 +927,7 @@ namespace HttpAPI
 
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            cp.RunCommandAsync(cmd.Id, arg, d.Id.ToString());
+                                            await Task.Run(async () => await cp.RunCommandAsync(this, cmd.Id, arg, d.Id.ToString()));
 
                                             return new { success = true };
                                         }
@@ -991,7 +992,7 @@ namespace HttpAPI
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                         CommandProcessor cp = new CommandProcessor(Core);
-                        cp.RunCommandAsync(cmd.Id, arg);
+                        await Task.Run(async () => await cp.RunCommandAsync(this, cmd.Id, arg));
 
                         return new { success = true };
                     }

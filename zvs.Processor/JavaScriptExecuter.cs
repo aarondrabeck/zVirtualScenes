@@ -15,7 +15,7 @@ namespace zvs.Processor
         private int id;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
         Jint.JintEngine engine = new Jint.JintEngine();
-        private string callerType;
+        public object Sender { get; private set; }
         private string callerName;
 
 
@@ -53,13 +53,12 @@ namespace zvs.Processor
 
         #endregion
 
-        public JavaScriptExecuter(Core core, string argument = "", string argument2 = "")
+        public JavaScriptExecuter(object sender, Core core)
         {
             Core = core;
-            callerType = argument;
-            callerName = argument2;
+            Sender = sender;
 
-            engine.Step += (sender, info) =>
+            engine.Step += (s, info) =>
             {
                 ReportProgress("JSE{0}:{1} '{2}'", 
                     id, 
@@ -111,15 +110,21 @@ namespace zvs.Processor
             //engine.SetFunction("shell", new Func<string, System.Diagnostics.Process>(Shell));
             engine.SetFunction("mappath", new Func<string, string>(MapPath));
 
-            
-            engine.SetParameter("TriggerName", "NoTrigger"); //include a default value so script can be tested
-            engine.SetParameter("SceneName", "NoScene");
+            //include a default value so script can be tested
+            engine.SetParameter("senderTask", null);
+            engine.SetParameter("senderDeviceValueTrigger", null);
+            engine.SetParameter("senderScene", null);
 
-            if (callerType != "")
-            {
-                if (this.callerType == "trigger") engine.SetParameter("TriggerName", this.callerName);
-                else engine.SetParameter("SceneName", this.callerName);
-            }
+            engine.SetParameter("senderObject", Sender);
+
+            if (Sender is Scene)
+                engine.SetParameter("senderScene", Sender);
+
+            if (Sender is DeviceValueTrigger)
+                engine.SetParameter("senderDeviceValueTrigger", Sender);
+
+            if (Sender is ScheduledTask)
+                engine.SetParameter("senderTask", Sender);
            
             try
             {
@@ -182,7 +187,7 @@ namespace zvs.Processor
             t.Elapsed += (sender, e) =>
             {
                 t.Stop();
-                JavaScriptExecuter je = new JavaScriptExecuter(Core);
+                JavaScriptExecuter je = new JavaScriptExecuter(Sender, Core);
                 je.onReportProgress += (s, a) =>
                 {
                     Core.log.Info(a.Progress);
@@ -250,7 +255,7 @@ namespace zvs.Processor
 
                 CommandProcessor cp = new CommandProcessor(Core);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                CommandProcessorResult result = Task.Run(() => cp.RunCommandAsync(dc.Id, Value)).Result;
+                CommandProcessorResult result = Task.Run(() => cp.RunCommandAsync(this, dc.Id, Value)).Result;
             }
         }
 
@@ -303,7 +308,7 @@ namespace zvs.Processor
             {
                 BuiltinCommand cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
                 CommandProcessor cp = new CommandProcessor(Core);
-                return await cp.RunCommandAsync(cmd.Id, SceneID.ToString());
+                return await cp.RunCommandAsync(this, cmd.Id, SceneID.ToString());
             }
         }
     }

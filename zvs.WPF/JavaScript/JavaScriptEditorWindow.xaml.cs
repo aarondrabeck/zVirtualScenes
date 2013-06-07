@@ -84,7 +84,7 @@ namespace zvs.WPF.JavaScript
                 SetFeedBackText("Executing JavaScript...");
 
                 //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
-                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(app.zvsCore);
+                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(this, app.zvsCore);
                 jse.onReportProgress += (sender, args) =>
                 {
                     SetFeedBackText(args.Progress);

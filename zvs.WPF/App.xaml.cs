@@ -14,6 +14,7 @@ using Microsoft.Shell;
 using System.Windows.Shell;
 using System.Reflection;
 using zvs.Entities;
+using System.Threading.Tasks;
 
 namespace zvs.WPF
 {
@@ -103,7 +104,7 @@ namespace zvs.WPF
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(zvsCore);
-                                cp.RunCommandAsync( cmd.Id, scene.Id.ToString());
+                                cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
                             }
                         }
                         else

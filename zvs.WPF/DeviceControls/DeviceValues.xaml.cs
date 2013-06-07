@@ -81,7 +81,7 @@ namespace zvs.WPF.DeviceControls
            
         }
 
-        private void RepollLnk_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private async void RepollLnk_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             if (d != null)
             {
@@ -89,7 +89,7 @@ namespace zvs.WPF.DeviceControls
                 if (cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    cp.RunCommandAsync( cmd.Id, d.Id.ToString());
+                    await cp.RunCommandAsync(this, cmd.Id, d.Id.ToString());
                 }
             }
         }

@@ -495,7 +495,7 @@ namespace LightSwitchPlugin
 
                 log.Info(cmdMsg);
                 CommandProcessor cp = new CommandProcessor(Core);
-                var commandResult = await cp.RunCommandAsync(commandId, arg1, arg2);
+                var commandResult = await cp.RunCommandAsync(this, commandId, arg1, arg2);
 
                 if (commandResult.HasErrors)
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
@@ -526,7 +526,7 @@ namespace LightSwitchPlugin
                     log.Info(result);
 
                     CommandProcessor cp = new CommandProcessor(Core);
-                    var r = await cp.RunCommandAsync(zvs_cmd.Id, g.Id.ToString());
+                    var r = await cp.RunCommandAsync(this, zvs_cmd.Id, g.Id.ToString());
                     if (r.HasErrors)
                         await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
                     else
@@ -554,7 +554,7 @@ namespace LightSwitchPlugin
                 }
 
                 CommandProcessor cp = new CommandProcessor(Core);
-                var r = await cp.RunCommandAsync(bcmd.Id, sceneId.ToString());
+                var r = await cp.RunCommandAsync(this, bcmd.Id, sceneId.ToString());
 
                 if (r.HasErrors)
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
@@ -607,7 +607,7 @@ namespace LightSwitchPlugin
                 var cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
                 log.Info(cmdMsg);
                 CommandProcessor cp = new CommandProcessor(Core);
-                var commandResult = await cp.RunCommandAsync(dcmd.Id, args.Temp);
+                var commandResult = await cp.RunCommandAsync(this, dcmd.Id, args.Temp);
 
                 if (commandResult.HasErrors)
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
@@ -718,7 +718,7 @@ namespace LightSwitchPlugin
 
             log.Info(cmdMsg);
             CommandProcessor cp = new CommandProcessor(Core);
-            var commandResult = await cp.RunCommandAsync(commandId, arg1, arg2);
+            var commandResult = await cp.RunCommandAsync(this, commandId, arg1, arg2);
 
             if (commandResult.HasErrors)
                 await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));

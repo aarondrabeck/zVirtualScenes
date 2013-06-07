@@ -37,7 +37,7 @@ namespace zvs.Processor
         }
 
         //public Methods 
-        public async Task<CommandProcessorResult> RunStoredCommandAsync(int storedCommandId)
+        public async Task<CommandProcessorResult> RunStoredCommandAsync(object sender, int storedCommandId)
         {
             StoredCommand sc = await Task<StoredCommand>.Factory.StartNew(() =>
             {
@@ -52,10 +52,10 @@ namespace zvs.Processor
             if (sc.Command == null)
                 return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.", 0);
 
-            return await RunCommandAsync(sc.CommandId, sc.Argument, sc.Argument2);
+            return await RunCommandAsync(sender, sc.CommandId, sc.Argument, sc.Argument2);
         }
 
-        public async Task<CommandProcessorResult> RunCommandAsync(int commandId, string argument = "", string argument2 = "")
+        public async Task<CommandProcessorResult> RunCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
         {
             QueuedCommand queuedCommand = await Task<QueuedCommand>.Factory.StartNew(() =>
             {
@@ -74,7 +74,7 @@ namespace zvs.Processor
                 }
             });
 
-            CommandProcessorResult result = await ProcessCommandAsync(queuedCommand.Id);
+            CommandProcessorResult result = await ProcessCommandAsync(sender, queuedCommand.Id);
             if (result.HasErrors)
                 Core.log.Error(result.Details);
             else
@@ -83,7 +83,7 @@ namespace zvs.Processor
         }
 
         //private Methods
-        private async Task<CommandProcessorResult> ProcessCommandAsync(int queuedCommandId)
+        private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, int queuedCommandId)
         {
             CommandProcessorResult result = new CommandProcessorResult(true, "Failed to process queued command. Command type unknown.", 0);
 
@@ -394,8 +394,8 @@ namespace zvs.Processor
                 {
                     JavaScriptCommand javaScriptCommand = (JavaScriptCommand)command;
 
-                    JavaScriptExecuter je = new JavaScriptExecuter(Core, queuedCommand.Argument, queuedCommand.Argument2);
-                    je.onReportProgress += (sender, args) =>
+                    JavaScriptExecuter je = new JavaScriptExecuter(sender, Core);
+                    je.onReportProgress += (s, args) =>
                     {
                         Core.log.Info(args.Progress);
                     };

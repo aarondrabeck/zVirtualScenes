@@ -328,7 +328,7 @@ namespace zvs.Processor
                 }
 
                 CommandProcessor cp = new CommandProcessor(Core);
-                await cp.RunStoredCommandAsync( _task.StoredCommand.Id);
+                await cp.RunStoredCommandAsync(_task, _task.StoredCommand.Id);
                 ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
                            string.Format("Task '{0}' ended.", _task.Name), false));
             }
