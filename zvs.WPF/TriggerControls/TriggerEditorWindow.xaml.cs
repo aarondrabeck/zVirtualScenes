@@ -160,16 +160,7 @@ namespace zvs.WPF.TriggerControls
             if (cbWindow.ShowDialog() ?? false)
             {
                 if (trigger.StoredCommand == null) //if this was a new command, assign it.
-                {
                     trigger.StoredCommand = newSC;
-
-                    //Set Argumetns for Javascript commands
-                    if (trigger.StoredCommand.Command is JavaScriptCommand)
-                    {
-                        trigger.StoredCommand.Argument = "trigger";
-                        trigger.StoredCommand.Argument2 = trigger.Name;
-                    }
-                }
                 else
                     trigger.StoredCommand = trigger.StoredCommand;
 

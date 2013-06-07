@@ -714,13 +714,6 @@ namespace zvs.WPF.SceneControls
                         SceneCommand newSceneCommand = new SceneCommand();
                         //Set Command
                         newSceneCommand.StoredCommand = sc;
-                        
-                        //Set Arguments if Javascript
-                        if (newSceneCommand.StoredCommand.Command is JavaScriptCommand)
-                        {
-                            newSceneCommand.StoredCommand.Argument = "scene";
-                            newSceneCommand.StoredCommand.Argument2 = selected_scene.Name;
-                        }
 
                         //Set Order
                         int? max = selected_scene.Commands.Max(o => o.SortOrder);
