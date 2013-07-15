@@ -62,6 +62,7 @@ namespace zvs.Processor
                     }
 
                     //Update Name and Description
+                    zvsAdapter.IsEnabled = dbAdapter.IsEnabled;
                     dbAdapter.Name = zvsAdapter.Name;
                     dbAdapter.Description = zvsAdapter.Description;
 
