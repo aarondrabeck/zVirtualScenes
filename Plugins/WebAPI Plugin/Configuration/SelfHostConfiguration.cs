@@ -17,8 +17,8 @@ namespace WebAPI.Configuration
         public SelfHostConfiguration(Uri baseAddress) : base(baseAddress) { }
 
         public bool EnableSSL { get; set; }
-        private string sslFile = "ssl.gen";
-        private string enableSSL = "enableSSL.bat";
+        //private string sslFile = "ssl.gen";
+       // private string enableSSL = "enableSSL.bat";
         protected override BindingParameterCollection OnConfigureBinding(HttpBinding httpBinding)
         {
             if (EnableSSL)

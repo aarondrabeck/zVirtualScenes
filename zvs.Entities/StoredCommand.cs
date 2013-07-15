@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace zvs.Entities
     [Table("StoredCommands", Schema = "ZVS")]
     public partial class StoredCommand : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //public int? DeviceValueTriggerId { get; set; }
@@ -36,7 +38,6 @@ namespace zvs.Entities
 
         public int CommandId { get; set; }
         private Command _Command;
-        [Required]
         public virtual Command Command
         {
             get
@@ -95,13 +96,10 @@ namespace zvs.Entities
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public string Summary
@@ -112,6 +110,7 @@ namespace zvs.Entities
             }
         }
 
+        //TODO: MOVE TO ASYNC METHOD
         public string ActionableObject
         {
             get
@@ -132,8 +131,10 @@ namespace zvs.Entities
                 {
                     using (zvsContext context = new zvsContext())
                     {
-                        Device d = null;
-                        if (Device.TryGetDevice(context, this.Argument2, out d))
+                        int d_id = int.TryParse(this.Argument2, out d_id) ? d_id : 0;
+                        Device d = context.Devices.FirstOrDefault(o => o.Id == d_id);
+
+                        if(d!= null)
                             return d.Name;
                         else
                             return "Unknown Device";
@@ -252,7 +253,7 @@ namespace zvs.Entities
         /// </summary>
         /// <param name="context"></param>
         /// <param name="sc"></param>
-        public static bool TryRemoveDependencies(zvsContext context, StoredCommand sc, out string error)
+        public static async Task<Result> TryRemoveDependenciesAsync(zvsContext context, StoredCommand sc)
         {
             if (sc.ScheduledTask != null)
             {
@@ -274,10 +275,7 @@ namespace zvs.Entities
                 context.SceneCommands.Local.Remove(sceneCommand);
             }
 
-            if (!context.TrySaveChanges(out error))
-                return false;
-
-            return true;
+            return await context.TrySaveChangesAsync();
         }
     }
 }

@@ -79,7 +79,7 @@ namespace zvs.WPF
 
         public bool SignalExternalCommandLineArgs(IList<string> args)
         {
-            
+
             if (args == null || args.Count == 0)
                 return true;
             if ((args.Count > 2))
@@ -108,21 +108,16 @@ namespace zvs.WPF
                             }
                         }
                         else
-                            try
-                            {
-                                zvsCore.Dispatcher.Invoke(new Action(() =>
-                                {
-                                   log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
-                                }));
-                            }
-                            catch { }
+                            log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
+
+
                     }
                 }
             }
             return true;
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected async override void OnStartup(StartupEventArgs e)
         {
             try
             {
@@ -137,7 +132,10 @@ namespace zvs.WPF
 
 
             AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
+#if DEBUG
+#else
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+#endif
 
             string error = Utils.PreReqChecks();
 
@@ -148,7 +146,8 @@ namespace zvs.WPF
 
             //throw new Exception("Exception Test!");
             //Initilize the core
-            zvsCore = new Core(this.Dispatcher);
+            zvsCore = new Core();
+            await zvsCore.StartAsync();
 
             //This is a placeholder for a main window. Application.Current.MainWindow
             firstWindow = new Window();
@@ -156,34 +155,24 @@ namespace zvs.WPF
             //Create taskbar Icon 
             taskbarIcon = new ZVSTaskbarIcon();
 
-            //for (int i = 0; i < 50; i++)
-            //{
-            //    Test main = new Test();
-            //    main.Show();
-            //    main.Close();
-            //    GC.Collect(3);
-
-            //    GC.WaitForPendingFinalizers();
-
-            //    GC.Collect(3);
-            //}
-
-
             taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
 
             base.OnStartup(e);
         }
 
+#if DEBUG
+#else
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-           log.Fatal(sender.ToString(), (System.Exception)e.ExceptionObject);
+            log.Fatal(sender.ToString(), (System.Exception)e.ExceptionObject);
 
             App app = (App)Application.Current;
             string exception = GetHostDetails + Environment.NewLine + Environment.NewLine + e.ExceptionObject.ToString();
             FatalErrorWindow fWindow = new FatalErrorWindow(exception);
             fWindow.ShowDialog();
         }
-        
+#endif
+
         public static string GetHostDetails
         {
             get
@@ -211,7 +200,7 @@ namespace zvs.WPF
                     zvsWindow = null;
                     log.InfoFormat("{0} User Interface Unloaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
                     isLoading = false;
-                    
+
                 };
                 zvsWindow.Show();
             }

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,15 +14,21 @@ namespace zvs.Entities
     [Table("Scenes", Schema = "ZVS")]
     public partial class Scene : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public virtual ObservableCollection<SceneCommand> Commands { get; set; }
-        public virtual ObservableCollection<ScenePropertyValue> PropertyValues { get; set; }
-
-        public Scene()
+        private ObservableCollection<SceneCommand> _Commands = new ObservableCollection<SceneCommand>();
+        public virtual ObservableCollection<SceneCommand> Commands
         {
-            Commands = new ObservableCollection<SceneCommand>();
-            PropertyValues = new ObservableCollection<ScenePropertyValue>();
+            get { return _Commands; }
+            set { _Commands = value; }
+        }
+
+        private ObservableCollection<SceneSettingValue> _SettingValues = new ObservableCollection<SceneSettingValue>();
+        public virtual ObservableCollection<SceneSettingValue> SettingValues
+        {
+            get { return _SettingValues; }
+            set { _SettingValues = value; }
         }
         
         private string _Name;
@@ -37,7 +44,7 @@ namespace zvs.Entities
                 if (value != _Name)
                 {
                     _Name = value;
-                    NotifyPropertyChanged("Name");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -54,7 +61,7 @@ namespace zvs.Entities
                 if (value != _isRunning)
                 {
                     _isRunning = value;
-                    NotifyPropertyChanged("isRunning");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -71,18 +78,15 @@ namespace zvs.Entities
                 if (value != _SortOrder)
                 {
                     _SortOrder = value;
-                    NotifyPropertyChanged("SortOrder");
+                    NotifyPropertyChanged();
                 }
             }
         }
-       
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

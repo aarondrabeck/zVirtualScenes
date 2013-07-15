@@ -16,7 +16,7 @@ using System.ComponentModel;
 using zvs.Processor;
 using zvs.WPF.DeviceControls;
 using zvs.WPF.Groups;
-using zvs.WPF.PluginManager;
+using zvs.WPF.AdapterManager;
 
 using System.Threading;
 using System.Diagnostics;
@@ -149,14 +149,14 @@ namespace zvs.WPF
         {
             foreach (Window window in app.Windows)
             {
-                if (window.GetType() == typeof(PluginManagerWindow))
+                if (window.GetType() == typeof(AdapterManagerWindow))
                 {
                     window.Activate();
                     return;
                 }
             }
 
-            PluginManagerWindow new_window = new PluginManagerWindow();
+            AdapterManagerWindow new_window = new AdapterManagerWindow();
             new_window.Owner = this;
             new_window.Show();
         }

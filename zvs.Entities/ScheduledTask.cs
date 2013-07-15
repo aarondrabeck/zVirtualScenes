@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace zvs.Entities
     [Table("ScheduledTasks", Schema = "ZVS")]
     public partial class ScheduledTask : INotifyPropertyChanged, IIdentity
     {
+         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //No actual navigational property here
@@ -28,7 +30,7 @@ namespace zvs.Entities
                 if (value != _StoredCommand)
                 {
                     _StoredCommand = value;
-                    NotifyPropertyChanged("StoredCommand");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -46,7 +48,7 @@ namespace zvs.Entities
                 if (value != _Frequency)
                 {
                     _Frequency = value;
-                    NotifyPropertyChanged("Frequency");                   
+                    NotifyPropertyChanged();                   
                 }
             }
         }
@@ -64,7 +66,7 @@ namespace zvs.Entities
                 if (value != _Name)
                 {
                     _Name = value;
-                    NotifyPropertyChanged("Name");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -81,7 +83,7 @@ namespace zvs.Entities
                 if (value != _isEnabled)
                 {
                     _isEnabled = value;
-                    NotifyPropertyChanged("isEnabled");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -98,7 +100,7 @@ namespace zvs.Entities
                 if (value != _StartTime)
                 {
                     _StartTime = value;
-                    NotifyPropertyChanged("StartTime");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -115,7 +117,7 @@ namespace zvs.Entities
                 if (value != _SortOrder)
                 {
                     _SortOrder = value;
-                    NotifyPropertyChanged("SortOrder");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -132,7 +134,7 @@ namespace zvs.Entities
                 if (value != _RecurMonday)
                 {
                     _RecurMonday = value;
-                    NotifyPropertyChanged("RecurMonday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -149,7 +151,7 @@ namespace zvs.Entities
                 if (value != _RecurTuesday)
                 {
                     _RecurTuesday = value;
-                    NotifyPropertyChanged("RecurTuesday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -166,7 +168,7 @@ namespace zvs.Entities
                 if (value != _RecurWednesday)
                 {
                     _RecurWednesday = value;
-                    NotifyPropertyChanged("RecurWednesday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -183,7 +185,7 @@ namespace zvs.Entities
                 if (value != _RecurThursday)
                 {
                     _RecurThursday = value;
-                    NotifyPropertyChanged("RecurThursday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -200,7 +202,7 @@ namespace zvs.Entities
                 if (value != _RecurFriday)
                 {
                     _RecurFriday = value;
-                    NotifyPropertyChanged("RecurFriday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -217,7 +219,7 @@ namespace zvs.Entities
                 if (value != _RecurSaturday)
                 {
                     _RecurSaturday = value;
-                    NotifyPropertyChanged("RecurSaturday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -234,7 +236,7 @@ namespace zvs.Entities
                 if (value != _RecurSunday)
                 {
                     _RecurSunday = value;
-                    NotifyPropertyChanged("RecurSunday");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -251,7 +253,7 @@ namespace zvs.Entities
                 if (value != _RecurDays)
                 {
                     _RecurDays = value;
-                    NotifyPropertyChanged("RecurDays");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -268,7 +270,7 @@ namespace zvs.Entities
                 if (value != _RecurWeeks)
                 {
                     _RecurWeeks = value;
-                    NotifyPropertyChanged("RecurWeeks");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -285,7 +287,7 @@ namespace zvs.Entities
                 if (value != _RecurMonth)
                 {
                     _RecurMonth = value;
-                    NotifyPropertyChanged("RecurMonth");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -302,7 +304,7 @@ namespace zvs.Entities
                 if (value != _RecurDayofMonth)
                 {
                     _RecurDayofMonth = value;
-                    NotifyPropertyChanged("RecurDayofMonth");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -319,7 +321,7 @@ namespace zvs.Entities
                 if (value != _RecurSeconds)
                 {
                     _RecurSeconds = value;
-                    NotifyPropertyChanged("RecurSeconds");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -336,7 +338,7 @@ namespace zvs.Entities
                 if (value != _RecurEven)
                 {
                     _RecurEven = value;
-                    NotifyPropertyChanged("RecurEven");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -353,7 +355,7 @@ namespace zvs.Entities
                 if (value != _RecurDay01)
                 {
                     _RecurDay01 = value;
-                    NotifyPropertyChanged("RecurDay01");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -370,7 +372,7 @@ namespace zvs.Entities
                 if (value != _RecurDay02)
                 {
                     _RecurDay02 = value;
-                    NotifyPropertyChanged("RecurDay02");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -387,7 +389,7 @@ namespace zvs.Entities
                 if (value != _RecurDay03)
                 {
                     _RecurDay03 = value;
-                    NotifyPropertyChanged("RecurDay03");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -404,7 +406,7 @@ namespace zvs.Entities
                 if (value != _RecurDay04)
                 {
                     _RecurDay04 = value;
-                    NotifyPropertyChanged("RecurDay04");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -421,7 +423,7 @@ namespace zvs.Entities
                 if (value != _RecurDay05)
                 {
                     _RecurDay05 = value;
-                    NotifyPropertyChanged("RecurDay05");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -438,7 +440,7 @@ namespace zvs.Entities
                 if (value != _RecurDay06)
                 {
                     _RecurDay06 = value;
-                    NotifyPropertyChanged("RecurDay06");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -455,7 +457,7 @@ namespace zvs.Entities
                 if (value != _RecurDay07)
                 {
                     _RecurDay07 = value;
-                    NotifyPropertyChanged("RecurDay07");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -472,7 +474,7 @@ namespace zvs.Entities
                 if (value != _RecurDay08)
                 {
                     _RecurDay08 = value;
-                    NotifyPropertyChanged("RecurDay08");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -489,7 +491,7 @@ namespace zvs.Entities
                 if (value != _RecurDay09)
                 {
                     _RecurDay09 = value;
-                    NotifyPropertyChanged("RecurDay09");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -506,7 +508,7 @@ namespace zvs.Entities
                 if (value != _RecurDay10)
                 {
                     _RecurDay10 = value;
-                    NotifyPropertyChanged("RecurDay10");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -523,7 +525,7 @@ namespace zvs.Entities
                 if (value != _RecurDay11)
                 {
                     _RecurDay11 = value;
-                    NotifyPropertyChanged("RecurDay11");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -540,7 +542,7 @@ namespace zvs.Entities
                 if (value != _RecurDay12)
                 {
                     _RecurDay12 = value;
-                    NotifyPropertyChanged("RecurDay12");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -557,7 +559,7 @@ namespace zvs.Entities
                 if (value != _RecurDay13)
                 {
                     _RecurDay13 = value;
-                    NotifyPropertyChanged("RecurDay13");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -574,7 +576,7 @@ namespace zvs.Entities
                 if (value != _RecurDay14)
                 {
                     _RecurDay14 = value;
-                    NotifyPropertyChanged("RecurDay14");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -591,7 +593,7 @@ namespace zvs.Entities
                 if (value != _RecurDay15)
                 {
                     _RecurDay15 = value;
-                    NotifyPropertyChanged("RecurDay15");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -608,7 +610,7 @@ namespace zvs.Entities
                 if (value != _RecurDay16)
                 {
                     _RecurDay16 = value;
-                    NotifyPropertyChanged("RecurDay16");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -625,7 +627,7 @@ namespace zvs.Entities
                 if (value != _RecurDay17)
                 {
                     _RecurDay17 = value;
-                    NotifyPropertyChanged("RecurDay17");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -642,7 +644,7 @@ namespace zvs.Entities
                 if (value != _RecurDay18)
                 {
                     _RecurDay18 = value;
-                    NotifyPropertyChanged("RecurDay18");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -659,7 +661,7 @@ namespace zvs.Entities
                 if (value != _RecurDay19)
                 {
                     _RecurDay19 = value;
-                    NotifyPropertyChanged("RecurDay19");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -676,7 +678,7 @@ namespace zvs.Entities
                 if (value != _RecurDay20)
                 {
                     _RecurDay20 = value;
-                    NotifyPropertyChanged("RecurDay20");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -693,7 +695,7 @@ namespace zvs.Entities
                 if (value != _RecurDay21)
                 {
                     _RecurDay21 = value;
-                    NotifyPropertyChanged("RecurDay21");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -710,7 +712,7 @@ namespace zvs.Entities
                 if (value != _RecurDay22)
                 {
                     _RecurDay22 = value;
-                    NotifyPropertyChanged("RecurDay22");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -727,7 +729,7 @@ namespace zvs.Entities
                 if (value != _RecurDay23)
                 {
                     _RecurDay23 = value;
-                    NotifyPropertyChanged("RecurDay23");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -744,7 +746,7 @@ namespace zvs.Entities
                 if (value != _RecurDay24)
                 {
                     _RecurDay24 = value;
-                    NotifyPropertyChanged("RecurDay24");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -761,7 +763,7 @@ namespace zvs.Entities
                 if (value != _RecurDay25)
                 {
                     _RecurDay25 = value;
-                    NotifyPropertyChanged("RecurDay25");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -778,7 +780,7 @@ namespace zvs.Entities
                 if (value != _RecurDay26)
                 {
                     _RecurDay26 = value;
-                    NotifyPropertyChanged("RecurDay26");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -795,7 +797,7 @@ namespace zvs.Entities
                 if (value != _RecurDay27)
                 {
                     _RecurDay27 = value;
-                    NotifyPropertyChanged("RecurDay27");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -812,7 +814,7 @@ namespace zvs.Entities
                 if (value != _RecurDay28)
                 {
                     _RecurDay28 = value;
-                    NotifyPropertyChanged("RecurDay28");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -832,7 +834,7 @@ namespace zvs.Entities
                 if (value != _RecurDay29)
                 {
                     _RecurDay29 = value;
-                    NotifyPropertyChanged("RecurDay29");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -852,7 +854,7 @@ namespace zvs.Entities
                 if (value != _RecurDay30)
                 {
                     _RecurDay30 = value;
-                    NotifyPropertyChanged("RecurDay30");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -869,18 +871,15 @@ namespace zvs.Entities
                 if (value != _RecurDay31)
                 {
                     _RecurDay31 = value;
-                    NotifyPropertyChanged("RecurDay31");
+                    NotifyPropertyChanged();
                 }
             }
         }
-       
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace zvs.Entities
     [Table("DbInfo", Schema = "ZVS")]
     public partial class DbInfo : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
        
         private string _UniqueIdentifier;
@@ -28,7 +30,7 @@ namespace zvs.Entities
                 if (value != _UniqueIdentifier)
                 {
                     _UniqueIdentifier = value;
-                    NotifyPropertyChanged("UniqueIdentifier");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -46,18 +48,15 @@ namespace zvs.Entities
                 if (value != _Value)
                 {
                     _Value = value;
-                    NotifyPropertyChanged("Value");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

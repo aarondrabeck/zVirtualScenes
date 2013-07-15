@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -73,7 +74,7 @@ namespace zvs.WPF.ScheduledTaskControls
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         context.ScheduledTasks.ToList();
@@ -88,7 +89,7 @@ namespace zvs.WPF.ScheduledTaskControls
             }));
         }
 
-        private void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
+        private async void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
@@ -106,13 +107,13 @@ namespace zvs.WPF.ScheduledTaskControls
                 }
 
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
 
-        private void ScheduledTaskDataGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        private async void ScheduledTaskDataGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
             DataGrid dg = sender as DataGrid;
             if (dg != null)
@@ -127,21 +128,23 @@ namespace zvs.WPF.ScheduledTaskControls
                         var task = (ScheduledTask)dgr.Item;
                         if (task != null)
                         {
-                            e.Handled = !DeleteTask(task);
+                            e.Handled = !await DeleteTask(task);
                         }
                     }
                 }
             }
         }
 
-        private bool DeleteTask(ScheduledTask task)
+        private async Task<bool> DeleteTask(ScheduledTask task)
         {
             if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 context.ScheduledTasks.Local.Remove(task);
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
+
                 ScheduledTaskDataGrid.Focus();
                 return true;
             }
@@ -197,7 +200,7 @@ namespace zvs.WPF.ScheduledTaskControls
             }
         }
 
-        private void OddTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private async void OddTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             FirstChkBx.IsChecked = true;
             SecondChkBx.IsChecked = false;
@@ -230,12 +233,13 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = true;
             ThirtiethChkBx.IsChecked = false;
             ThirtyfirstChkBx.IsChecked = true;
-            string SaveError = string.Empty;
-            if (!context.TrySaveChanges(out SaveError))
-                ((App)App.Current).zvsCore.log.Error(SaveError);
+
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
-        private void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private async void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             FirstChkBx.IsChecked = false;
             SecondChkBx.IsChecked = true;
@@ -268,12 +272,13 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = false;
             ThirtiethChkBx.IsChecked = true;
             ThirtyfirstChkBx.IsChecked = false;
-            string SaveError = string.Empty;
-            if (!context.TrySaveChanges(out SaveError))
-                ((App)App.Current).zvsCore.log.Error(SaveError);
+
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
-        private void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private async void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             FirstChkBx.IsChecked = false;
             SecondChkBx.IsChecked = false;
@@ -306,19 +311,20 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = false;
             ThirtiethChkBx.IsChecked = false;
             ThirtyfirstChkBx.IsChecked = false;
-            string SaveError = string.Empty;
-            if (!context.TrySaveChanges(out SaveError))
-                ((App)App.Current).zvsCore.log.Error(SaveError);
+
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
-        private void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
+        private async void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
         {
-            string SaveError = string.Empty;
-            if (!context.TrySaveChanges(out SaveError))
-                ((App)App.Current).zvsCore.log.Error(SaveError);
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
-        private void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
+        private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
             ScheduledTask st = (ScheduledTask)ScheduledTaskDataGrid.SelectedItem;
             //Create a Stored Command if there is not one...
@@ -340,9 +346,9 @@ namespace zvs.WPF.ScheduledTaskControls
                 else
                     st.StoredCommand = st.StoredCommand;
 
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
     }

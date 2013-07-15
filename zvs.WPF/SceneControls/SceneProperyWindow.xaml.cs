@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.WPF.SceneControls
 {
@@ -46,18 +46,18 @@ namespace zvs.WPF.SceneControls
             SceneControl.SceneID = SceneID;
         }
 
-        private void ResetBtn_Click_1(object sender, RoutedEventArgs e)
+        private async void ResetBtn_Click_1(object sender, RoutedEventArgs e)
         {
-
             using (zvsContext context = new zvsContext())
             {
-                Scene s = context.Scenes.FirstOrDefault(sc => sc.Id == SceneID);
-                if (s != null)
+                var scene = await context.Scenes.FirstOrDefaultAsync(sc => sc.Id == SceneID);
+                if (scene != null)
                 {
-                    s.isRunning = false;
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+                    scene.isRunning = false;
+
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             }
         }

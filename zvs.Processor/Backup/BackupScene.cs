@@ -69,7 +69,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportScenesAsync(string PathFileName, Action<string> Callback)
+        public static async Task ImportScenesAsync(string PathFileName, Action<string> Callback)
         {
             List<SceneBackup> scenes = new List<SceneBackup>();
             FileStream myFileStream = null;
@@ -95,7 +95,7 @@ namespace zvs.Processor.Backup
 
                             foreach (SceneCMDBackup backupSceneCMD in backupScene.Commands)
                             {
-                                StoredCommand sc = StoredCMDBackup.RestoreStoredCommand(context, backupSceneCMD.StoredCommand);
+                                var sc = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupSceneCMD.StoredCommand);
                                 if (sc != null)
                                 {
                                     s.Commands.Add(new SceneCommand()
@@ -109,7 +109,7 @@ namespace zvs.Processor.Backup
                             context.Scenes.Add(s);
                             ImportedCount++;
                         }
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
                     Callback(string.Format("Imported {0} scenes and {1} scene commands from '{2}'", ImportedCount, ImportedCmdCount, Path.GetFileName(PathFileName)));
                 }

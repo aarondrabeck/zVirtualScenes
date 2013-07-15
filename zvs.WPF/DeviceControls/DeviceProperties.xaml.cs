@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zvs.WPF.DynamicActionControls;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.WPF.DeviceControls
 {
@@ -33,250 +33,255 @@ namespace zvs.WPF.DeviceControls
             InitializeComponent();
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
             context = new zvsContext();
-            LoadCommands();
+            await LoadCommandsAsync();
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
-        private void LoadCommands()
+        private async Task LoadCommandsAsync()
         {
             PropertiesStkPnl.Children.Clear();
 
-            Device d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
-            if (d != null)
+            var device = await context.Devices
+                .Include(o=> o.DeviceSettingValues)
+                .FirstOrDefaultAsync(dv => dv.Id == DeviceID);
+
+            if (device == null)
+                return;
+
+            #region Device Properties
+            foreach (var s in await context.DeviceSettings.ToListAsync())
             {
-                #region Device Properties
-                foreach (DeviceProperty dp in context.DeviceProperties)
+                var deviceSetting = s;
+
+                //See if the device has a value stored for it for this property
+                var deviceSettingValue = await context.DeviceSettingValues.FirstOrDefaultAsync(v => v.DeviceSetting.Id == deviceSetting.Id &&
+                    v.DeviceId == device.Id);
+
+                string _default = deviceSettingValue == null ? deviceSetting.Value : deviceSettingValue.Value;
+
+                switch (deviceSetting.ValueType)
                 {
-                    DeviceProperty _dp = dp;
+                    case DataType.BOOL:
+                        {
+                            //get the current value from the value table list
+                            bool DefaultValue = false;
+                            bool.TryParse(_default, out DefaultValue);
 
-                    //See if the device has a value stored for it for this property
-                    DevicePropertyValue _dpv = d.PropertyValues.FirstOrDefault(v => v.DeivceProperty == _dp);                    
-                    string _default = _dpv == null ? _dp.Value : _dpv.Value;
-
-                    switch (_dp.ValueType)
-                    {
-                        case DataType.BOOL:
+                            CheckboxControl control = new CheckboxControl(deviceSetting.Name, deviceSetting.Description, DefaultValue, async (isChecked) =>
                             {
-                                //get the current value from the value table list
-                                bool DefaultValue = false;
-                                bool.TryParse(_default, out DefaultValue);
-
-                                CheckboxControl control = new CheckboxControl(_dp.Name, _dp.Description, DefaultValue, (isChecked) =>
+                                if (deviceSettingValue != null)
                                 {
-                                    if (_dpv != null)
+                                    deviceSettingValue.Value = isChecked.ToString();
+                                }
+                                else
+                                {
+                                    device.DeviceSettingValues.Add(new DeviceSettingValue()
                                     {
-                                        _dpv.Value = isChecked.ToString();
+                                        DeviceSetting = deviceSetting,
+                                        Value = isChecked.ToString()
+                                    });
+                                }
+
+                                var result = await context.TrySaveChangesAsync();
+                                if (result.HasError)
+                                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                            },
+                            icon);
+                            PropertiesStkPnl.Children.Add(control);
+
+                            break;
+                        }
+                    case DataType.DECIMAL:
+                        {
+                            NumericControl control = new NumericControl(deviceSetting.Name,
+                                deviceSetting.Description,
+                                _default,
+                                NumericControl.NumberType.Decimal,
+                                async (value) =>
+                                {
+                                    if (deviceSettingValue != null)
+                                    {
+                                        deviceSettingValue.Value = value;
                                     }
                                     else
                                     {
-                                        d.PropertyValues.Add(new DevicePropertyValue()
+                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
                                         {
-                                            DeivceProperty = _dp,
-                                            Value = isChecked.ToString()
+                                            DeviceSetting = deviceSetting,
+                                            Value = value
                                         });
                                     }
 
-                                    string SaveError = string.Empty;
-                                    if (!context.TrySaveChanges(out SaveError))
-                                        ((App)App.Current).zvsCore.log.Error(SaveError);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
                                 },
                                 icon);
-                                PropertiesStkPnl.Children.Add(control);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-                        case DataType.DECIMAL:
-                            {
-                                NumericControl control = new NumericControl(_dp.Name,
-                                    _dp.Description,
-                                    _default,
-                                    NumericControl.NumberType.Decimal,
-                                    (value) =>
+                            break;
+                        }
+                    case DataType.INTEGER:
+                        {
+                            NumericControl control = new NumericControl(deviceSetting.Name,
+                                deviceSetting.Description,
+                                _default,
+                                NumericControl.NumberType.Integer,
+                                async  (value) =>
+                                {
+                                    if (deviceSettingValue != null)
                                     {
-                                        if (_dpv != null)
-                                        {
-                                            _dpv.Value = value;
-                                        }
-                                        else
-                                        {
-                                            d.PropertyValues.Add(new DevicePropertyValue()
-                                            {
-                                                DeivceProperty = _dp,
-                                                Value = value
-                                            });
-                                        }
-
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    }, 
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
-
-                                break;
-                            }
-                        case DataType.INTEGER:
-                            {
-                                NumericControl control = new NumericControl(_dp.Name,
-                                    _dp.Description,
-                                    _default,
-                                    NumericControl.NumberType.Integer,
-                                    (value) =>
+                                        deviceSettingValue.Value = value;
+                                    }
+                                    else
                                     {
-                                        if (_dpv != null)
+                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
                                         {
-                                            _dpv.Value = value;
-                                        }
-                                        else
-                                        {
-                                            d.PropertyValues.Add(new DevicePropertyValue()
-                                            {
-                                                DeivceProperty = _dp,
-                                                Value = value
-                                            });
-                                        }
+                                            DeviceSetting = deviceSetting,
+                                            Value = value
+                                        });
+                                    }
 
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-                        case DataType.BYTE:
-                            {
-                                NumericControl control = new NumericControl(_dp.Name,
-                                    _dp.Description,
-                                    _default,
-                                    NumericControl.NumberType.Byte,
-                                    (value) =>
+                            break;
+                        }
+                    case DataType.BYTE:
+                        {
+                            NumericControl control = new NumericControl(deviceSetting.Name,
+                                deviceSetting.Description,
+                                _default,
+                                NumericControl.NumberType.Byte,
+                                async (value) =>
+                                {
+                                    if (deviceSettingValue != null)
                                     {
-                                        if (_dpv != null)
-                                        {
-                                            _dpv.Value = value;
-                                        }
-                                        else
-                                        {
-                                            d.PropertyValues.Add(new DevicePropertyValue()
-                                            {
-                                                DeivceProperty = _dp,
-                                                Value = value
-                                            });
-                                        }
-
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
-
-                                break;
-                            }
-                        case DataType.SHORT:
-                            {
-                                NumericControl control = new NumericControl(_dp.Name,
-                                   _dp.Description,
-                                    _default,
-                                    NumericControl.NumberType.Short,
-                                    (value) =>
+                                        deviceSettingValue.Value = value;
+                                    }
+                                    else
                                     {
-                                        if (_dpv != null)
+                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
                                         {
-                                            _dpv.Value = value;
-                                        }
-                                        else
-                                        {
-                                            d.PropertyValues.Add(new DevicePropertyValue()
-                                            {
-                                                DeivceProperty = _dp,
-                                                Value = value
-                                            });
-                                        }
+                                            DeviceSetting = deviceSetting,
+                                            Value = value
+                                        });
+                                    }
 
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-
-                        case DataType.STRING:
-                            {
-                                StringControl control = new StringControl(_dp.Name,
-                                    _dp.Description,
-                                    _default,
-                                    (value) =>
+                            break;
+                        }
+                    case DataType.SHORT:
+                        {
+                            NumericControl control = new NumericControl(deviceSetting.Name,
+                               deviceSetting.Description,
+                                _default,
+                                NumericControl.NumberType.Short,
+                               async (value) =>
+                                {
+                                    if (deviceSettingValue != null)
                                     {
-                                        if (_dpv != null)
-                                        {
-                                            _dpv.Value = value;
-                                        }
-                                        else
-                                        {
-                                            d.PropertyValues.Add(new DevicePropertyValue()
-                                            {
-                                                DeivceProperty = _dp,
-                                                Value = value
-                                            });
-                                        }
-
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
-
-                                break;
-                            }
-
-                        case DataType.LIST:
-                            {
-                                ComboboxControl control = new ComboboxControl(_dp.Name,
-                                    _dp.Description,
-                                    _dp.Options.Select(o => o.Name).ToList(),
-                                    _default,
-                                    (value) =>
+                                        deviceSettingValue.Value = value;
+                                    }
+                                    else
                                     {
-                                        if (_dpv != null)
+                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
                                         {
-                                            _dpv.Value = value;
-                                        }
-                                        else
+                                            DeviceSetting = deviceSetting,
+                                            Value = value
+                                        });
+                                    }
+
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
+
+                            break;
+                        }
+
+                    case DataType.STRING:
+                        {
+                            StringControl control = new StringControl(deviceSetting.Name,
+                                deviceSetting.Description,
+                                _default,
+                                async (value) =>
+                                {
+                                    if (deviceSettingValue != null)
+                                    {
+                                        deviceSettingValue.Value = value;
+                                    }
+                                    else
+                                    {
+                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
                                         {
-                                            d.PropertyValues.Add(new DevicePropertyValue()
-                                            {
-                                                DeivceProperty = _dp,
-                                                Value = value
-                                            });
-                                        }
+                                            DeviceSetting = deviceSetting,
+                                            Value = value
+                                        });
+                                    }
 
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-                    }
+                            break;
+                        }
+
+                    case DataType.LIST:
+                        {
+                            ComboboxControl control = new ComboboxControl(deviceSetting.Name,
+                                deviceSetting.Description,
+                                deviceSetting.Options.Select(o => o.Name).ToList(),
+                                _default,
+                                async (value) =>
+                                {
+                                    if (deviceSettingValue != null)
+                                    {
+                                        deviceSettingValue.Value = value;
+                                    }
+                                    else
+                                    {
+                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
+                                        {
+                                            DeviceSetting = deviceSetting,
+                                            Value = value
+                                        });
+                                    }
+
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
+
+                            break;
+                        }
                 }
-                #endregion
             }
+            #endregion
         }
     }
 }

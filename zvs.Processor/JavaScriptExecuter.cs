@@ -16,8 +16,6 @@ namespace zvs.Processor
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
         Jint.JintEngine engine = new Jint.JintEngine();
         public object Sender { get; private set; }
-        private string callerName;
-
 
         #region Events
         public class JavaScriptResult : EventArgs

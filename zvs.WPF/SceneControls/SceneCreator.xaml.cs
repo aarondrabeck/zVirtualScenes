@@ -20,6 +20,7 @@ using zvs.WPF.TriggerControls;
 using zvs.WPF.JavaScript;
 using zvs.WPF.Commands;
 using System.Diagnostics;
+using System.Data.Entity;
 
 
 namespace zvs.WPF.SceneControls
@@ -87,7 +88,7 @@ namespace zvs.WPF.SceneControls
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         context.JavaScriptCommands.ToList();
@@ -108,7 +109,7 @@ namespace zvs.WPF.SceneControls
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         context.Scenes.ToList();
@@ -123,7 +124,7 @@ namespace zvs.WPF.SceneControls
             }));
         }
 
-        private void SceneCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private async void SceneCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             //Give the new items a sort order
             if (e.NewItems != null)
@@ -143,12 +144,12 @@ namespace zvs.WPF.SceneControls
                 }
             }
 
-            string SaveError = string.Empty;
-            if (!context.TrySaveChanges(out SaveError))
-                ((App)App.Current).zvsCore.log.Error(SaveError);
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
-        private void SceneGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        private async void SceneGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
@@ -162,13 +163,13 @@ namespace zvs.WPF.SceneControls
                 }
 
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
 
-        private void SortUp_Click_1(object sender, RoutedEventArgs e)
+        private async void SortUp_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
@@ -183,7 +184,7 @@ namespace zvs.WPF.SceneControls
                     scene.SortOrder--;
 
                     SortSceneGridBySortOrder();
-                    NormalizeSortOrder();
+                    await NormalizeSortOrderAsync();
                     SortSceneGridBySortOrder();
 
                     SceneGrid.SelectedItem = scene;
@@ -192,7 +193,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void SortDown_Click_1(object sender, RoutedEventArgs e)
+        private async void SortDown_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
@@ -207,7 +208,7 @@ namespace zvs.WPF.SceneControls
                     scene.SortOrder++;
 
                     SortSceneGridBySortOrder();
-                    NormalizeSortOrder();
+                    await NormalizeSortOrderAsync();
                     SortSceneGridBySortOrder();
 
                     SceneGrid.SelectedItem = scene;
@@ -216,15 +217,15 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void NormalizeSortOrder()
+        private async Task NormalizeSortOrderAsync()
         {
             //normalize sort order
             foreach (Scene s in SceneCollection)
                 s.SortOrder = SceneGrid.Items.IndexOf(s);
 
-            string SaveError = string.Empty;
-            if (!context.TrySaveChanges(out SaveError))
-                ((App)App.Current).zvsCore.log.Error(SaveError);
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
         private void SortSceneGridBySortOrder()
@@ -273,7 +274,7 @@ namespace zvs.WPF.SceneControls
 
                     MenuItem dup = new MenuItem();
                     dup.Header = "Duplicate Scene";
-                    dup.Click += (s, args) =>
+                    dup.Click += async (s, args) =>
                     {
                         if (MessageBox.Show("Are you sure you want to duplicate this scene?",
                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -293,9 +294,9 @@ namespace zvs.WPF.SceneControls
                                 SceneGrid.Focus();
                             }
                             context.Scenes.Local.Add(new_scene);
-                            string SaveError = string.Empty;
-                            if (!context.TrySaveChanges(out SaveError))
-                                ((App)App.Current).zvsCore.log.Error(SaveError);
+                            var result = await context.TrySaveChangesAsync();
+                            if (result.HasError)
+                                ((App)App.Current).zvsCore.log.Error(result.Message);
                         }
                     };
 
@@ -314,7 +315,7 @@ namespace zvs.WPF.SceneControls
             e.Effects = DragDropEffects.None;
         }
 
-        private void SceneCmdsGrid_Drop_1(object sender, DragEventArgs e)
+        private async void SceneCmdsGrid_Drop_1(object sender, DragEventArgs e)
         {
             if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
@@ -329,7 +330,10 @@ namespace zvs.WPF.SceneControls
 
                         foreach (Device d in devices)
                         {
-                            Device d2 = context.Devices.FirstOrDefault(o => o.Id == d.Id);
+                            Device d2 = await context.Devices
+                                .Include(o => o.Commands)
+                                .FirstOrDefaultAsync(o => o.Id == d.Id);
+
                             if (d2 == null)
                                 continue;
 
@@ -362,9 +366,11 @@ namespace zvs.WPF.SceneControls
                                 else
                                 {
                                     selected_scene.Commands.Add(newSceneCommand);
-                                    string SaveError = string.Empty;
-                                    if (!context.TrySaveChanges(out SaveError))
-                                        ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+
                                     SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                                 }
                             }
@@ -378,7 +384,7 @@ namespace zvs.WPF.SceneControls
             e.Handled = true;
         }
 
-        private void SceneGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        private async void SceneGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             DataGrid dg = sender as DataGrid;
             if (dg != null)
@@ -394,7 +400,7 @@ namespace zvs.WPF.SceneControls
                             var scene = (Scene)dgr.Item;
                             if (scene != null)
                             {
-                                DeleteSelectedScene(scene);
+                                await DeleteSelectedScene(scene);
                             }
                         }
                     }
@@ -419,7 +425,7 @@ namespace zvs.WPF.SceneControls
             new_window.Show();
         }
 
-        private bool DeleteSelectedScene(Scene scene)
+        private async Task<bool> DeleteSelectedScene(Scene scene)
         {
             if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
@@ -428,9 +434,10 @@ namespace zvs.WPF.SceneControls
                 else
                     context.Scenes.Local.Remove(scene);
 
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
+
                 SceneGrid.Focus();
                 return true;
             }
@@ -446,7 +453,7 @@ namespace zvs.WPF.SceneControls
 
 
 
-        private void SceneCmdsGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        private async void SceneCmdsGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
             DataGrid dg = sender as DataGrid;
             if (dg != null)
@@ -455,13 +462,12 @@ namespace zvs.WPF.SceneControls
                 if (e.Key == Key.Delete)
                 {
                     e.Handled = true;
-                    DeleteSelectedSceneCommands();
-
+                    await DeleteSelectedSceneCommandsAsync();
                 }
             }
         }
 
-        private void DeleteSelectedSceneCommands()
+        private async Task DeleteSelectedSceneCommandsAsync()
         {
             if (SceneCmdsGrid.SelectedItems.Count > 0)
             {
@@ -473,18 +479,19 @@ namespace zvs.WPF.SceneControls
                 {
                     foreach (SceneCommand scene_command in SelectedItemsCopy)
                     {
-                        SceneCommand d = context.SceneCommands.FirstOrDefault(o => o.Id == scene_command.Id);
-                        if (d != null)
-                            context.SceneCommands.Local.Remove(d);
+                        var sceneCommand = await context.SceneCommands.FirstOrDefaultAsync(o => o.Id == scene_command.Id);
+                        if (sceneCommand != null)
+                            context.SceneCommands.Local.Remove(sceneCommand);
                     }
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             }
         }
 
-        private void NormalizeSortOrderSceneCmds()
+        private async Task NormalizeSortOrderSceneCmdsAsync()
         {
             if (SceneGrid.SelectedItem is Scene)
             {
@@ -501,9 +508,9 @@ namespace zvs.WPF.SceneControls
                         }
                     }
 
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             }
         }
@@ -525,7 +532,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void SortUpSceneCmd_Click_1(object sender, RoutedEventArgs e)
+        private async void SortUpSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneCommand)
@@ -540,7 +547,7 @@ namespace zvs.WPF.SceneControls
                     scene_command.SortOrder--;
 
                     SortSceneCMDsGridBySortOrder();
-                    NormalizeSortOrderSceneCmds();
+                    await NormalizeSortOrderSceneCmdsAsync();
                     SortSceneCMDsGridBySortOrder();
 
                     SceneCmdsGrid.SelectedItem = scene_command;
@@ -549,7 +556,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void SortDownSceneCmd_Click_1(object sender, RoutedEventArgs e)
+        private async void SortDownSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneCommand)
@@ -564,7 +571,7 @@ namespace zvs.WPF.SceneControls
                     scene_command.SortOrder++;
 
                     SortSceneCMDsGridBySortOrder();
-                    NormalizeSortOrderSceneCmds();
+                    await NormalizeSortOrderSceneCmdsAsync();
                     SortSceneCMDsGridBySortOrder();
 
                     SceneCmdsGrid.SelectedItem = scene_command;
@@ -588,23 +595,17 @@ namespace zvs.WPF.SceneControls
 
             await Task.Delay(10);
 
-            //TODO: FIX lame hack
-            await Task.Run(() =>
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    SortSceneCMDsGridBySortOrder();
-                    NormalizeSortOrderSceneCmds();
-                    SortSceneCMDsGridBySortOrder();
 
-                    if (SceneCmdsGrid.Items.Count > 0)
-                        SceneCmdsGrid.SelectedIndex = 0;
-                }));
-            });
-            //END TODO
+            SortSceneCMDsGridBySortOrder();
+            await NormalizeSortOrderSceneCmdsAsync();
+            SortSceneCMDsGridBySortOrder();
+
+            if (SceneCmdsGrid.Items.Count > 0)
+                SceneCmdsGrid.SelectedIndex = 0;
+
         }
 
-        private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
+        private async void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneCommand)
@@ -624,9 +625,9 @@ namespace zvs.WPF.SceneControls
                         }
                         else
                         {
-                            string SaveError = string.Empty;
-                            if (!context.TrySaveChanges(out SaveError))
-                                ((App)App.Current).zvsCore.log.Error(SaveError);
+                            var result = await context.TrySaveChangesAsync();
+                            if (result.HasError)
+                                ((App)App.Current).zvsCore.log.Error(result.Message);
                         }
                     }
                 }
@@ -646,7 +647,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void AddJSCommand_Click_1(object sender, RoutedEventArgs e)
+        private async void AddJSCommand_Click_1(object sender, RoutedEventArgs e)
         {
             if (SceneGrid.SelectedItem is Scene)
             {
@@ -655,7 +656,6 @@ namespace zvs.WPF.SceneControls
                 {
                     SceneCmdsGrid.SelectedItems.Clear();
                     SceneCommand cmd = new SceneCommand();
-
 
                     int? max = selected_scene.Commands.Max(o => o.SortOrder);
                     if (max.HasValue)
@@ -678,9 +678,10 @@ namespace zvs.WPF.SceneControls
                             {
                                 cmd.StoredCommand.Command = window.SelectedCommand;
                                 selected_scene.Commands.Add(cmd);
-                                string SaveError = string.Empty;
-                                if (!context.TrySaveChanges(out SaveError))
-                                    ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                                var result = await context.TrySaveChangesAsync();
+                                if (result.HasError)
+                                    ((App)App.Current).zvsCore.log.Error(result.Message);
 
                                 SceneCmdsGrid.SelectedItems.Add(cmd);
                             }
@@ -691,7 +692,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private void AddCommand_Click(object sender, RoutedEventArgs e)
+        private async void AddCommand_Click(object sender, RoutedEventArgs e)
         {
             if (SceneGrid.SelectedItem is Scene)
             {
@@ -729,9 +730,11 @@ namespace zvs.WPF.SceneControls
                         else
                         {
                             selected_scene.Commands.Add(newSceneCommand);
-                            string SaveError = string.Empty;
-                            if (!context.TrySaveChanges(out SaveError))
-                                ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                            var result = await context.TrySaveChangesAsync();
+                            if (result.HasError)
+                                ((App)App.Current).zvsCore.log.Error(result.Message);
+
                             SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                         }
                     }

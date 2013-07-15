@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -60,7 +61,7 @@ namespace zvs.WPF.DeviceControls
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         d.Values.ToList();

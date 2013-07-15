@@ -85,7 +85,7 @@ namespace zvs.Processor
             }
         }
 
-        public static string DBName = "zvsDBEFCF5.sdf";
+        public static string DBName = "zvsDBEFCF6.sdf";
         public static string DBNamePlusFullPath = Path.Combine(AppDataPath, DBName);
 
         public static bool HasDotNet45()
@@ -143,6 +143,9 @@ namespace zvs.Processor
             using (zvsContext context = new zvsContext())
             {
                 var configuration = new Configuration();
+
+               // System.Data.Entity.Database.SetInitializer(new System.Data.Entity.MigrateDatabaseToLatestVersion<zvsContext, zvs.Context.Migrations.Configuration>());
+
                 var migrator = new DbMigrator(configuration);
                 
                 migrator.Update();

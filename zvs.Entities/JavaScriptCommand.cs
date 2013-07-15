@@ -25,7 +25,7 @@ namespace zvs.Entities
                 if (value != _Script)
                 {
                     _Script = value;
-                    NotifyPropertyChanged("Script");
+                    NotifyPropertyChanged();
                 }
             }
         }

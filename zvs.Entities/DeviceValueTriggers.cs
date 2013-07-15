@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace zvs.Entities
     [Table("DeviceValueTriggers", Schema = "ZVS")]
     public partial class DeviceValueTrigger : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //No actual navigational property here
@@ -28,7 +30,7 @@ namespace zvs.Entities
                 if (value != _StoredCommand)
                 {
                     _StoredCommand = value;
-                    NotifyPropertyChanged("StoredCommand");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -47,7 +49,7 @@ namespace zvs.Entities
                 if (value != _DeviceValue)
                 {
                     _DeviceValue = value;
-                    NotifyPropertyChanged("DeviceValue");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -65,7 +67,7 @@ namespace zvs.Entities
                 if (value != _Operator)
                 {
                     _Operator = value;
-                    NotifyPropertyChanged("Operator");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -83,7 +85,7 @@ namespace zvs.Entities
                 if (value != _isEnabled)
                 {
                     _isEnabled = value;
-                    NotifyPropertyChanged("isEnabled");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -102,7 +104,7 @@ namespace zvs.Entities
                 if (value != _Name)
                 {
                     _Name = value;
-                    NotifyPropertyChanged("Name");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
@@ -121,19 +123,16 @@ namespace zvs.Entities
                 if (value != _Value)
                 {
                     _Value = value;
-                    NotifyPropertyChanged("Value");
+                    NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public string TriggerDescription

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,15 +14,12 @@ namespace zvs.Entities
     [Table("Devices", Schema = "ZVS")]
     public partial class Device : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public Device()
+        public override string ToString()
         {
-            this.Commands = new ObservableCollection<DeviceCommand>();
-            this.PropertyValues = new ObservableCollection<DevicePropertyValue>();
-            this.Values = new ObservableCollection<DeviceValue>();
-            this.Groups = new ObservableCollection<Group>();
-            this.StoredCommands = new ObservableCollection<StoredCommand>();
+            return this.Name;
         }
 
         private string _Name;
@@ -37,7 +35,7 @@ namespace zvs.Entities
                 if (value != _Name)
                 {
                     _Name = value;
-                    NotifyPropertyChanged("Name");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -54,7 +52,7 @@ namespace zvs.Entities
                 if (value != _NodeNumber)
                 {
                     _NodeNumber = value;
-                    NotifyPropertyChanged("NodeNumber");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -71,7 +69,7 @@ namespace zvs.Entities
                 if (value != _LastHeardFrom)
                 {
                     _LastHeardFrom = value;
-                    NotifyPropertyChanged("LastHeardFrom");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -89,7 +87,7 @@ namespace zvs.Entities
                 if (value != _CurrentLevelText)
                 {
                     _CurrentLevelText = value;
-                    NotifyPropertyChanged("CurrentLevelText");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -106,65 +104,62 @@ namespace zvs.Entities
                 if (value != _CurrentLevelInt)
                 {
                     _CurrentLevelInt = value;
-                    NotifyPropertyChanged("CurrentLevelInt");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
-
         public int DeviceTypeId { get; set; }
         public virtual DeviceType Type { get; set; }
 
+        private ObservableCollection<DeviceCommand> _Commands = new ObservableCollection<DeviceCommand>();
         [ConfidentialData]
-        public virtual ObservableCollection<DeviceCommand> Commands { get; set; }
-
-        public virtual ObservableCollection<DevicePropertyValue> PropertyValues { get; set; }
-        public virtual ObservableCollection<DeviceValue> Values { get; set; }
-        public virtual ObservableCollection<Group> Groups { get; set; }
-        public virtual ObservableCollection<StoredCommand> StoredCommands { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public virtual ObservableCollection<DeviceCommand> Commands
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            get { return _Commands; }
+            set { _Commands = value; }
         }
 
-        /// <summary>
-        /// This is called when a device or device value 
-        /// </summary> 
-        public static IQueryable<Device> GetAllDevices(zvsContext context, bool forList)
+        private ObservableCollection<DeviceSettingValue> _DeviceSettingValues = new ObservableCollection<DeviceSettingValue>();
+        public virtual ObservableCollection<DeviceSettingValue> DeviceSettingValues
         {
-            var query = context.Devices.Where(o => o.Type.Plugin.UniqueIdentifier != "BUILTIN");
-
-            if (forList)
-                return query.Where(o => o.Type.ShowInList == true);
-
-            return query;
+            get { return _DeviceSettingValues; }
+            set { _DeviceSettingValues = value; }
         }
 
-        public override string ToString()
+        private ObservableCollection<DeviceTypeSettingValue> _DeviceTypeSettingValues = new ObservableCollection<DeviceTypeSettingValue>();
+        public virtual ObservableCollection<DeviceTypeSettingValue> DeviceTypeSettingValues
         {
-            return this.Name;
+            get { return _DeviceTypeSettingValues; }
+            set { _DeviceTypeSettingValues = value; }
         }
 
-        public static bool TryGetDevice(zvsContext context, string deviceId, out Device device)
+        private ObservableCollection<DeviceValue> _Values = new ObservableCollection<DeviceValue>();
+        public virtual ObservableCollection<DeviceValue> Values
         {
-            device = null;
-
-            if (string.IsNullOrEmpty(deviceId))
-                return false;
-
-            int DeviceId = 0;
-            int.TryParse(deviceId, out DeviceId);
-            Device d = context.Devices.FirstOrDefault(o => o.Id == DeviceId);
-            if (d == null)
-                return false;
-
-            device = d;
-            return true;
+            get { return _Values; }
+            set { _Values = value; }
         }
+
+        private ObservableCollection<Group> _Groups = new ObservableCollection<Group>();
+        public virtual ObservableCollection<Group> Groups
+        {
+            get { return _Groups; }
+            set { _Groups = value; }
+        }
+
+        private ObservableCollection<StoredCommand> _StoredCommands = new ObservableCollection<StoredCommand>();
+        public virtual ObservableCollection<StoredCommand> StoredCommands
+        {
+            get { return _StoredCommands; }
+            set { _StoredCommands = value; }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
     }
 }

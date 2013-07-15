@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,11 +14,11 @@ namespace zvs.Entities
     [Table("SceneCommands", Schema = "ZVS")]
     public partial class SceneCommand : IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //No actual navigational property here
         private StoredCommand _StoredCommand;
-        [Required]
         public virtual StoredCommand StoredCommand
         {
             get
@@ -29,14 +30,13 @@ namespace zvs.Entities
                 if (value != _StoredCommand)
                 {
                     _StoredCommand = value;
-                    NotifyPropertyChanged("StoredCommand");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
         public int SceneId { get; set; }
         private Scene _Scene;
-        [Required]
         public virtual Scene Scene
         {
             get
@@ -48,7 +48,7 @@ namespace zvs.Entities
                 if (value != _Scene)
                 {
                     _Scene = value;
-                    NotifyPropertyChanged("Scene");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -65,18 +65,15 @@ namespace zvs.Entities
                 if (value != _SortOrder)
                 {
                     _SortOrder = value;
-                    NotifyPropertyChanged("SortOrder");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -11,11 +11,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.WPF.DeviceControls;
-using System.Data.Objects;
 using System.ComponentModel;
 
 using System.Diagnostics;
 using zvs.Entities;
+using System.Data.Entity;
+using System.Threading.Tasks;
 
 namespace zvs.WPF.Groups
 {
@@ -70,7 +71,7 @@ namespace zvs.WPF.Groups
             {
                 if (context != null)
                 {
-                    if (args.ChangeType != System.Data.EntityState.Added)
+                    if (args.ChangeType != EntityState.Added)
                     {
                         //Reloads context from DB when modifications happen
                         foreach (var ent in context.ChangeTracker.Entries<Device>())
@@ -94,7 +95,7 @@ namespace zvs.WPF.Groups
             }
         }
 
-        private void AddBtn_Click(object sender, RoutedEventArgs e)
+        private async void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             GroupNameEditor nameWindow = new GroupNameEditor(null);
             nameWindow.Owner = this;
@@ -107,16 +108,17 @@ namespace zvs.WPF.Groups
                 };
 
                 context.Groups.Local.Add(new_g);
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<Group>().FirstOrDefault(o => o.Name == new_g.Name);
 
             }
         }
 
-        private void RemoveBtn_Click(object sender, RoutedEventArgs e)
+        private async void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
             Group g = (Group)GroupCmbBx.SelectedItem;
             if (g != null)
@@ -127,15 +129,16 @@ namespace zvs.WPF.Groups
                 {
 
                     context.Groups.Local.Remove(g);
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             }
 
         }
 
-        private void EditBtn_Click(object sender, RoutedEventArgs e)
+        private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
             Group g = (Group)GroupCmbBx.SelectedItem;
             if (g != null)
@@ -146,9 +149,10 @@ namespace zvs.WPF.Groups
                 if (nameWindow.ShowDialog() ?? false)
                 {
                     g.Name = nameWindow.GroupName;
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             }
         }
@@ -162,7 +166,7 @@ namespace zvs.WPF.Groups
             e.Effects = DragDropEffects.None;
         }
 
-        private void groupsDevicesLstVw_Drop(object sender, DragEventArgs e)
+        private async void groupsDevicesLstVw_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
@@ -175,7 +179,7 @@ namespace zvs.WPF.Groups
 
                     foreach (Device device in devices)
                     {
-                        Device d2 = context.Devices.FirstOrDefault(o => o.Id == device.Id); ;
+                        Device d2 = await context.Devices.FirstOrDefaultAsync(o => o.Id == device.Id); ;
                         if (d2 != null)
                         {
                             //If not already in the group...
@@ -194,9 +198,9 @@ namespace zvs.WPF.Groups
                             }
                         }
                     }
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
 
                     groupsDevicesLstVw.Focus();
                 }
@@ -218,7 +222,7 @@ namespace zvs.WPF.Groups
                 this.RemoveSelected.IsEnabled = false;
         }
 
-        private void RemoveSelectedGroupDevices()
+        private async Task RemoveSelectedGroupDevicesAsync()
         {
             Group selected_group = (Group)GroupCmbBx.SelectedItem;
             if (selected_group != null && groupsDevicesLstVw.SelectedItems.Count > 0)
@@ -234,24 +238,24 @@ namespace zvs.WPF.Groups
                     foreach (Device gd in devicesToRemove)
                         selected_group.Devices.Remove(gd);
 
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             }
         }
 
-        private void groupsDevicesLstVw_PreviewKeyDown(object sender, KeyEventArgs e)
+        private async void groupsDevicesLstVw_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
             {
-                RemoveSelectedGroupDevices();
+                await RemoveSelectedGroupDevicesAsync();
             }
         }
 
-        private void RemoveSelected_Click(object sender, RoutedEventArgs e)
+        private async void RemoveSelected_Click(object sender, RoutedEventArgs e)
         {
-            RemoveSelectedGroupDevices();
+            await RemoveSelectedGroupDevicesAsync();
         }
 
         private void GroupCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)

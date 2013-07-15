@@ -65,7 +65,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportTriggersAsync(string PathFileName, Action<string> Callback)
+        public static async Task ImportTriggersAsync(string PathFileName, Action<string> Callback)
         {
             List<TriggerBackup> triggers = new List<TriggerBackup>();
             int ImportedCount = 0;
@@ -95,7 +95,7 @@ namespace zvs.Processor.Backup
                                     trigger.DeviceValue = dv;
                                     trigger.isEnabled = backupTrigger.isEnabled;
                                     trigger.Name = backupTrigger.Name;
-                                    trigger.StoredCommand = StoredCMDBackup.RestoreStoredCommand(context, backupTrigger.StoredCommand);
+                                    trigger.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupTrigger.StoredCommand);
                                     trigger.Operator = (TriggerOperator)backupTrigger.Operator;
                                     trigger.Value = backupTrigger.Value;
                                     context.DeviceValueTriggers.Add(trigger);
@@ -103,7 +103,7 @@ namespace zvs.Processor.Backup
                                 }
                             }
                         }
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
                     Callback(string.Format("Imported {0} triggers from '{1}'", ImportedCount, Path.GetFileName(PathFileName)));
                 }

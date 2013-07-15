@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,21 +14,33 @@ namespace zvs.Entities
     [Table("DeviceTypes", Schema = "ZVS")]
     public partial class DeviceType : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        public DeviceType()
+        public int AdapterId { get; set; }
+        public virtual Adapter Adapter { get; set; }
+
+        private ObservableCollection<Device> _Devices = new ObservableCollection<Device>();
+        public virtual ObservableCollection<Device> Devices
         {
-            this.Devices = new ObservableCollection<Device>();
-            this.Commands = new ObservableCollection<DeviceTypeCommand>();
+            get { return _Devices; }
+            set { _Devices = value; }
         }
 
-        public int PluginId { get; set; }
-        [Required]
-        public virtual Plugin Plugin { get; set; }
+        private ObservableCollection<DeviceTypeSetting> _DeviceTypeSettings = new ObservableCollection<DeviceTypeSetting>();
+        public virtual ObservableCollection<DeviceTypeSetting> Settings
+        {
+            get { return _DeviceTypeSettings; }
+            set { _DeviceTypeSettings = value; }
+        }
 
-        public virtual ObservableCollection<Device> Devices { get; set; }
-        public virtual ObservableCollection<DeviceTypeCommand> Commands { get; set; }
-        
+        private ObservableCollection<DeviceTypeCommand> _Commands = new ObservableCollection<DeviceTypeCommand>();
+        public virtual ObservableCollection<DeviceTypeCommand> Commands
+        {
+            get { return _Commands; }
+            set { _Commands = value; }
+        }
+
         private string _Name;
         [StringLength(255)]
         public string Name
@@ -41,11 +54,11 @@ namespace zvs.Entities
                 if (value != _Name)
                 {
                     _Name = value;
-                    NotifyPropertyChanged("Name");
+                    NotifyPropertyChanged();
                 }
             }
         }
-        
+
         private string _UniqueIdentifier;
         [Required(ErrorMessage = "Name cannot be empty")]
         [StringLength(255)]
@@ -60,7 +73,7 @@ namespace zvs.Entities
                 if (value != _UniqueIdentifier)
                 {
                     _UniqueIdentifier = value;
-                    NotifyPropertyChanged("UniqueIdentifier");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -77,18 +90,15 @@ namespace zvs.Entities
                 if (value != _ShowInList)
                 {
                     _ShowInList = value;
-                    NotifyPropertyChanged("ShowInList");
+                    NotifyPropertyChanged();
                 }
             }
-        }        
+        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
 using zvs.WPF.DynamicActionControls;
+using System.Data.Entity;
 
 namespace zvs.WPF.Commands
 {
@@ -43,17 +44,18 @@ namespace zvs.WPF.Commands
             this.Close();
         }
 
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        private async void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            InitializeDeviceCommands();
-            InitializeBuiltinCommands();
-            InitializeJavaScriptCommands();
+            await InitializeDeviceCommandsAsync();
+            await InitializeBuiltinCommandsAsync();
+            await InitializeJavaScriptCommandsAsync();
         }
 
-        private void InitializeDeviceCommands()
+        private async Task InitializeDeviceCommandsAsync()
         {
             //Fill the device combo box from db
-            Context.Devices.ToList();
+            await Context.Devices.ToListAsync();
+
             DevicesCmboBox.ItemsSource = Context.Devices.Local;
             if (DevicesCmboBox.Items.Count > 0)
                 DevicesCmboBox.SelectedIndex = 0;
@@ -68,7 +70,7 @@ namespace zvs.WPF.Commands
                 DevicesCmboBox.SelectedItem = dc.Device;
 
                 //Preselect device command
-                DeviceCommand cmd = Context.DeviceCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
+                var cmd = await Context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == StoredCommand.Command.Id);
                 if (cmd != null)
                     DeviceCmdsCmboBox.SelectedItem = cmd;
             }
@@ -76,21 +78,23 @@ namespace zvs.WPF.Commands
             {
                 DeviceTab.IsSelected = true;
 
-                Device d = null;
-                if (Device.TryGetDevice(Context, StoredCommand.Argument2, out d))
+                int dId = int.TryParse(StoredCommand.Argument2, out dId) ? dId : 0;
+                var d = await Context.Devices.FirstOrDefaultAsync(o => o.Id == dId);
+                if (d != null)
                     DevicesCmboBox.SelectedItem = d;
 
                 //Preselect device type command
-                DeviceTypeCommand cmd = Context.DeviceTypeCommands.FirstOrDefault(o => o.Id == StoredCommand.Command.Id);
+                DeviceTypeCommand cmd = await Context.DeviceTypeCommands.FirstOrDefaultAsync(o => o.Id == StoredCommand.Command.Id);
                 if (cmd != null)
                     DeviceCmdsCmboBox.SelectedItem = cmd;
             }
         }
 
-        private void InitializeBuiltinCommands()
+        private async Task InitializeBuiltinCommandsAsync()
         {
             //Fill the Built-in command box with available command from the DB
-            Context.BuiltinCommands.ToList();
+            await Context.BuiltinCommands.ToListAsync();
+
             BuiltinCmdsCmboBox.ItemsSource = Context.BuiltinCommands.Local;
             if (BuiltinCmdsCmboBox.Items.Count > 0)
                 BuiltinCmdsCmboBox.SelectedIndex = 0;
@@ -108,13 +112,13 @@ namespace zvs.WPF.Commands
             }
         }
 
-        private void InitializeJavaScriptCommands()
+        private async Task InitializeJavaScriptCommandsAsync()
         {
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("JSCmdsViewSource")));
-                Context.JavaScriptCommands.ToList();
+                await Context.JavaScriptCommands.ToListAsync();
                 CmdsViewSource.Source = Context.JavaScriptCommands.Local;
             }
 
@@ -128,7 +132,7 @@ namespace zvs.WPF.Commands
             }
         }
 
-        private void BuiltinCmdsCmboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        private async void BuiltinCmdsCmboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
             BuiltinArgSckPnl.Children.Clear();
             BuiltinCommand selected_cmd = (BuiltinCommand)BuiltinCmdsCmboBox.SelectedItem;
@@ -141,35 +145,28 @@ namespace zvs.WPF.Commands
                         string default_value = string.Empty;
 
                         //Lookup the device involved in the command
-                        int deviceID = 0;
-                        if (int.TryParse(StoredCommand.Argument, out deviceID))
+                        int deviceID = int.TryParse(StoredCommand.Argument, out deviceID) ? deviceID : 0;
+                        var device = await Context.Devices.FirstOrDefaultAsync(o => o.Id == deviceID);
+
+                        if (device == null)
                         {
-                            Device d = Context.Devices.FirstOrDefault(o => o.Id == deviceID);
-                            if (d != null)
-                            {
-                                default_value = d.Name;
-                                SelectedBuiltinArg = d.Id.ToString();
-                            }
+                            //If this is a new command or we cannot find the old device, just preselect the first device.
+                            device = await Context.Devices.FirstOrDefaultAsync();
                         }
 
-                        //If this is a new command or we cannot find the old device, just preselect the first device.
-                        if (string.IsNullOrEmpty(default_value))
+                        if (device != null)
                         {
-                            Device d = Context.Devices.FirstOrDefault();
-                            if (d != null)
-                            {
-                                default_value = d.Name;
-                                SelectedBuiltinArg = d.Id.ToString();
-                            }
+                            default_value = device.Name;
+                            SelectedBuiltinArg = device.Id.ToString();
                         }
 
                         ComboboxControl control = new ComboboxControl(selected_cmd.Name,
                             selected_cmd.Description,
-                            Context.Devices.Select(o => o.Name).ToList(),
+                            await Context.Devices.Select(o => o.Name).ToListAsync(),
                             default_value,
-                            (value) =>
+                            async (value) =>
                             {
-                                Device d = Context.Devices.FirstOrDefault(o => o.Name == value);
+                                var d = await Context.Devices.FirstOrDefaultAsync(o => o.Name == value);
                                 if (d != null)
                                     SelectedBuiltinArg = d.Id.ToString();
                             }, icon);
@@ -182,35 +179,25 @@ namespace zvs.WPF.Commands
                         string default_value = string.Empty;
 
                         //Lookup the group involved in the command
-                        int groupID = 0;
-                        if (int.TryParse(StoredCommand.Argument, out groupID))
-                        {
-                            Group g = Context.Groups.FirstOrDefault(o => o.Id == groupID);
-                            if (g != null)
-                            {
-                                default_value = g.Name;
-                                SelectedBuiltinArg = g.Id.ToString();
-                            }
-                        }
+                        int groupID = int.TryParse(StoredCommand.Argument, out groupID) ? groupID : 0;
+                        var group = await Context.Groups.FirstOrDefaultAsync(o => o.Id == groupID);
 
-                        //If this is a new command or we cannot find the old group, just preselect the first group.
-                        if (string.IsNullOrEmpty(default_value))
+                        if(group == null) 
+                            group = await Context.Groups.FirstOrDefaultAsync(); //If this is a new command or we cannot find the old group, just preselect the first group.
+
+                        if (group != null)
                         {
-                            Group g = Context.Groups.FirstOrDefault();
-                            if (g != null)
-                            {
-                                default_value = g.Name;
-                                SelectedBuiltinArg = g.Id.ToString();
-                            }
+                            default_value = group.Name;
+                            SelectedBuiltinArg = group.Id.ToString();
                         }
 
                         ComboboxControl control = new ComboboxControl(selected_cmd.Name,
                             selected_cmd.Description,
-                            Context.Groups.Select(o => o.Name).ToList(),
+                            await Context.Groups.Select(o => o.Name).ToListAsync(),
                             default_value,
-                            (value) =>
+                            async (value) =>
                             {
-                                Group g = Context.Groups.FirstOrDefault(o => o.Name == value);
+                                Group g = await Context.Groups.FirstOrDefaultAsync(o => o.Name == value);
                                 if (g != null)
                                     SelectedBuiltinArg = g.Id.ToString();
                             }, icon);
@@ -222,36 +209,27 @@ namespace zvs.WPF.Commands
                         string default_value = string.Empty;
 
                         //Try to match supplied arg (sceneID) with a scene
-                        int sceneID = 0;
-                        if (int.TryParse(StoredCommand.Argument, out sceneID))
-                        {
-                            Scene s = Context.Scenes.FirstOrDefault(o => o.Id == sceneID);
-                            if (s != null)
-                            {
-                                default_value = s.Name;
-                                SelectedBuiltinArg = s.Id.ToString();
-                            }
-                        }
-
+                        int sceneID = int.TryParse(StoredCommand.Argument, out sceneID) ? sceneID : 0;
+                            var scene = await Context.Scenes.FirstOrDefaultAsync(o => o.Id == sceneID);
+                            
                         //If this is a new command or we cannot find the old scene, 
                         //just preselect the first scene.
-                        if (string.IsNullOrEmpty(default_value))
+                        if(scene == null)
+                            scene = await Context.Scenes.FirstOrDefaultAsync();
+
+                        if (scene != null)
                         {
-                            Scene s = Context.Scenes.FirstOrDefault();
-                            if (s != null)
-                            {
-                                default_value = s.Name;
-                                SelectedBuiltinArg = s.Id.ToString();
-                            }
+                            default_value = scene.Name;
+                            SelectedBuiltinArg = scene.Id.ToString();
                         }
 
                         ComboboxControl control = new ComboboxControl(selected_cmd.Name,
                             selected_cmd.Description,
-                            Context.Scenes.Select(o => o.Name).ToList(),
+                            await Context.Scenes.Select(o => o.Name).ToListAsync(),
                             default_value,
-                            (value) =>
+                            async (value) =>
                             {
-                                Scene s = Context.Scenes.FirstOrDefault(o => o.Name == value);
+                                var s = await Context.Scenes.FirstOrDefaultAsync(o => o.Name == value);
                                 if (s != null)
                                     SelectedBuiltinArg = s.Id.ToString();
                             }, icon);
@@ -443,7 +421,7 @@ namespace zvs.WPF.Commands
                 if (DeviceCmdsCmboBox.SelectedItem is DeviceTypeCommand)
                 {
                     StoredCommand.Command = (DeviceTypeCommand)DeviceCmdsCmboBox.SelectedItem;
-                    StoredCommand.Argument =  SelectedDeviceArg;
+                    StoredCommand.Argument = SelectedDeviceArg;
                     StoredCommand.Argument2 = ((Device)DevicesCmboBox.SelectedItem).Id.ToString();
                 }
 

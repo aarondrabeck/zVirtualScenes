@@ -11,11 +11,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.WPF.DeviceControls;
-using System.Data.Objects;
 using System.ComponentModel;
 
 using System.Diagnostics;
 using zvs.Entities;
+using System.Data.Entity;
 
 namespace zvs.WPF.JavaScript
 {
@@ -59,7 +59,7 @@ namespace zvs.WPF.JavaScript
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         context.JavaScriptCommands.ToList();
@@ -96,7 +96,7 @@ namespace zvs.WPF.JavaScript
             }
         }
 
-        private void AddBtn_Click(object sender, RoutedEventArgs e)
+        private async void AddBtn_Click(object sender, RoutedEventArgs e)
         {
             JavaScriptCommand jsCommand = new JavaScriptCommand();
             jsCommand.Name = "My JavaScript";
@@ -109,16 +109,17 @@ namespace zvs.WPF.JavaScript
             if (!window.Canceled)
             {
                 context.JavaScriptCommands.Add(jsCommand);
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                var saveResult = await context.TrySaveChangesAsync();
+                if (saveResult.HasError)
+                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
 
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
                 EvaluateAddEditBtnsUsability();
             }
         }
 
-        private void RemoveBtn_Click(object sender, RoutedEventArgs e)
+        private async void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
             JavaScriptCommand jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
 
@@ -129,23 +130,24 @@ namespace zvs.WPF.JavaScript
                 MessageBox.Show("Are you sure you want to delete the '" + jsCommand.Name + "' command?",
                                 "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                foreach (QueuedCommand qc in context.QueuedCommands.Where(o => o.Command.Id == jsCommand.Id))
-                {
-                    context.QueuedCommands.Local.Remove(qc);
-                }
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var commands = await context.QueuedCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync();
+                context.QueuedCommands.RemoveRange(commands);
 
-                foreach (StoredCommand sc in context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToList())
+                var saveResult = await context.TrySaveChangesAsync();
+                if (saveResult.HasError)
+                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
+
+                foreach (StoredCommand sc in await context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync())
                 {
                     string error = string.Empty;
-                    StoredCommand.TryRemoveDependencies(context, sc, out error);
-                    Debug.Write(error);
+                    
+                    var result = await StoredCommand.TryRemoveDependenciesAsync(context, sc);
+                    if(result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
 
                 //Delete the Command from each Scene it is user
-                foreach (SceneCommand sc in context.SceneCommands)
+                foreach (SceneCommand sc in await context.SceneCommands.ToListAsync())
                 {
                     if (sc.StoredCommand.Command == jsCommand)
                         sc.Scene.Commands.Remove(sc);
@@ -153,14 +155,15 @@ namespace zvs.WPF.JavaScript
 
                 context.JavaScriptCommands.Local.Remove(jsCommand);
 
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                saveResult = await context.TrySaveChangesAsync();
+                if (saveResult.HasError)
+                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
 
                 EvaluateAddEditBtnsUsability();
             }
         }
 
-        private void EditBtn_Click(object sender, RoutedEventArgs e)
+        private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
             JavaScriptCommand jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
 
@@ -174,9 +177,9 @@ namespace zvs.WPF.JavaScript
 
             if (!window.Canceled)
             {
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var saveResult = await context.TrySaveChangesAsync();
+                if (saveResult.HasError)
+                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
 
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
             }

@@ -5,15 +5,17 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.Entities
 {
     [Table("ProgramOptions", Schema = "ZVS")]
     public partial class ProgramOption : INotifyPropertyChanged, IIdentity
     {
-
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         private string _UniqueIdentifier;
@@ -29,7 +31,7 @@ namespace zvs.Entities
                 if (value != _UniqueIdentifier)
                 {
                     _UniqueIdentifier = value;
-                    NotifyPropertyChanged("UniqueIdentifier");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -47,44 +49,34 @@ namespace zvs.Entities
                 if (value != _Value)
                 {
                     _Value = value;
-                    NotifyPropertyChanged("Value");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static bool TryAddOrEdit(zvsContext context, ProgramOption opt, out string error)
+        //TODO: MOVE TO EXTENSION METHOD
+        public static async Task<Result> TryAddOrEditAsync(zvsContext context, ProgramOption programOption)
         {
+            if (programOption == null)
+                throw new ArgumentNullException("programOption");
 
-            if (opt == null)
-            {
-                error = "ProgramOption is null";
-                return false;
-            }
-
-
-            ProgramOption existing_option = context.ProgramOptions.FirstOrDefault(o => o.UniqueIdentifier == opt.UniqueIdentifier);
+            var existing_option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == programOption.UniqueIdentifier);
 
             if (existing_option == null)
-                context.ProgramOptions.Add(opt);
+                context.ProgramOptions.Add(programOption);
             else
-                existing_option.Value = opt.Value;
+                existing_option.Value = programOption.Value;
 
-            if (!context.TrySaveChanges(out error))
-                return false;
-
-            return true;
-
+            return await context.TrySaveChangesAsync();
         }
 
+        //TODO: MOVE TO EXTENSION METHOD
         public static string GetProgramOption(zvsContext context, string UniqueIdentifier)
         {
             ProgramOption option = context.ProgramOptions.FirstOrDefault(o => o.UniqueIdentifier == UniqueIdentifier);

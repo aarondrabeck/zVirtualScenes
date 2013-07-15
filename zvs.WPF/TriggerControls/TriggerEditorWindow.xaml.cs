@@ -143,7 +143,7 @@ namespace zvs.WPF.TriggerControls
             this.Close();
         }
 
-        private void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
+        private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
             //Create a Stored Command if there is not one...
             StoredCommand newSC = new StoredCommand();
@@ -164,9 +164,9 @@ namespace zvs.WPF.TriggerControls
                 else
                     trigger.StoredCommand = trigger.StoredCommand;
 
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
 
             if (trigger.StoredCommand != null)

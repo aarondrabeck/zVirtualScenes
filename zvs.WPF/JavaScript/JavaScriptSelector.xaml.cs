@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.WPF.DeviceControls;
-using System.Data.Objects;
 using System.ComponentModel;
 
 using System.Diagnostics;

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace zvs.Entities
     [Table("QueuedCommands", Schema = "ZVS")]
     public class QueuedCommand : INotifyPropertyChanged, IIdentity
     {
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int? CommandId { get; set; }
@@ -30,7 +32,7 @@ namespace zvs.Entities
                 if (value != _Argument)
                 {
                     _Argument = value;
-                    NotifyPropertyChanged("Argument");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -48,19 +50,15 @@ namespace zvs.Entities
                 if (value != _Argument2)
                 {
                     _Argument2 = value;
-                    NotifyPropertyChanged("Argument2");
+                    NotifyPropertyChanged();
                 }
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string name)
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        
-
     }
 }

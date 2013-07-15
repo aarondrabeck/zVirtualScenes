@@ -13,18 +13,18 @@ namespace zvs.Entities
     [Table("DeviceValues", Schema = "ZVS")]
     public partial class DeviceValue : BaseValue, IIdentity
     {
-
-        public DeviceValue()
-        {
-            this.Triggers = new ObservableCollection<DeviceValueTrigger>();
-        }
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         public int DeviceId { get; set; }
-        [Required]
         public virtual Device Device { get; set; }
 
-        public virtual ObservableCollection<DeviceValueTrigger> Triggers { get; set; }
+        private ObservableCollection<DeviceValueTrigger> _Triggers = new ObservableCollection<DeviceValueTrigger>();
+        public virtual ObservableCollection<DeviceValueTrigger> Triggers
+        {
+            get { return _Triggers; }
+            set { _Triggers = value; }
+        }
 
         private string _Genre;
         [StringLength(255)]
@@ -39,7 +39,7 @@ namespace zvs.Entities
                 if (value != _Genre)
                 {
                     _Genre = value;
-                    NotifyPropertyChanged("Genre");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace zvs.Entities
                 if (value != _Index)
                 {
                     _Index = value;
-                    NotifyPropertyChanged("Index");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -75,7 +75,7 @@ namespace zvs.Entities
                 if (value != _CommandClass)
                 {
                     _CommandClass = value;
-                    NotifyPropertyChanged("CommandClass");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -92,7 +92,7 @@ namespace zvs.Entities
                 if (value != _isReadOnly)
                 {
                     _isReadOnly = value;
-                    NotifyPropertyChanged("isReadOnly");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -110,7 +110,7 @@ namespace zvs.Entities
                 if (value != _CustomData1)
                 {
                     _CustomData1 = value;
-                    NotifyPropertyChanged("CustomData1");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -128,7 +128,7 @@ namespace zvs.Entities
                 if (value != _CustomData2)
                 {
                     _CustomData2 = value;
-                    NotifyPropertyChanged("CustomData2");
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -137,13 +137,12 @@ namespace zvs.Entities
         /// <summary>
         /// Called after the Value has been changed in the database
         /// </summary>
-        public static event ValueDataChangedEventHandler DeviceValueDataChangedEvent;
-        public delegate void ValueDataChangedEventHandler(object sender, ValueDataChangedEventArgs args);
+        public static event ValueDataChangedEventHandler DeviceValueDataChangedEvent = delegate { };
+        public delegate void ValueDataChangedEventHandler(object sender, ValueDataChangedEventArgs e);
 
         public void DeviceValueDataChanged(ValueDataChangedEventArgs args)
         {
-            if (DeviceValueDataChangedEvent != null)
-                DeviceValueDataChangedEvent(this, args);
+            DeviceValueDataChangedEvent(this, args);
         }
 
         public class ValueDataChangedEventArgs : System.EventArgs
@@ -160,13 +159,12 @@ namespace zvs.Entities
             }
         }
 
-        public static event DeviceValueAddedEventHandler DeviceValueAddedEvent;
+        public static event DeviceValueAddedEventHandler DeviceValueAddedEvent = delegate { };
         public delegate void DeviceValueAddedEventHandler(object sender, EventArgs e);
 
         public void DeviceValueAdded(EventArgs e)
         {
-            if (DeviceValueAddedEvent != null)
-                DeviceValueAddedEvent(this, e);
+            DeviceValueAddedEvent(this, e);
         }
     }
 }

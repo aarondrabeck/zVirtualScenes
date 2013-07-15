@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -32,13 +33,13 @@ namespace zvs.WPF.TriggerControls
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 context = new zvsContext();
-                
+
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
 
                 myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
-                 context.DeviceValueTriggers.ToList();
+                context.DeviceValueTriggers.ToList();
             }
             zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
         }
@@ -69,7 +70,7 @@ namespace zvs.WPF.TriggerControls
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         context.DeviceValueTriggers.ToList();
@@ -84,14 +85,14 @@ namespace zvs.WPF.TriggerControls
             }));
         }
 
-        private void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        private async void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
 
@@ -107,20 +108,20 @@ namespace zvs.WPF.TriggerControls
                     new_window.Owner = app.zvsWindow;
                     new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
                     new_window.Show();
-                    new_window.Closing += (s, a) =>
+                    new_window.Closing += async (s, a) =>
                     {
                         if (!new_window.Canceled)
                         {
-                            string SaveError = string.Empty;
-                            if (!context.TrySaveChanges(out SaveError))
-                                ((App)App.Current).zvsCore.log.Error(SaveError);
+                            var result = await context.TrySaveChangesAsync();
+                            if (result.HasError)
+                                ((App)App.Current).zvsCore.log.Error(result.Message);
                         }
                     };
                 }
             }
         }
 
-        private void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        private async void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
             {
@@ -131,9 +132,10 @@ namespace zvs.WPF.TriggerControls
                         MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         context.DeviceValueTriggers.Local.Remove(trigger);
-                        string SaveError = string.Empty;
-                        if (!context.TrySaveChanges(out SaveError))
-                            ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                        var result = await context.TrySaveChangesAsync();
+                        if (result.HasError)
+                            ((App)App.Current).zvsCore.log.Error(result.Message);
                     }
                 }
 
@@ -149,14 +151,15 @@ namespace zvs.WPF.TriggerControls
             new_window.Owner = app.zvsWindow;
             new_window.Title = "Add Trigger";
             new_window.Show();
-            new_window.Closing += (s, a) =>
+            new_window.Closing += async (s, a) =>
             {
                 if (!new_window.Canceled)
                 {
                     context.DeviceValueTriggers.Add(trigger);
-                    string SaveError = string.Empty;
-                    if (!context.TrySaveChanges(out SaveError))
-                        ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
             };
         }

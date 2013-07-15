@@ -17,6 +17,8 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using zvs.Entities;
 using System.Diagnostics;
+using System.Data.Entity;
+using System.Threading.Tasks;
 
 
 namespace zvs.WPF.DeviceControls
@@ -30,6 +32,14 @@ namespace zvs.WPF.DeviceControls
         public DeviceDataGridUC()
         {
             InitializeComponent();
+
+            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
+            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
+            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
+        }
+
+        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -37,13 +47,11 @@ namespace zvs.WPF.DeviceControls
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                myCollectionViewSource.Source = context.Devices.Local;
-                context.Devices.ToList();
-            }
 
-            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
-            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
+                await context.Devices.ToListAsync();
+ 
+                myCollectionViewSource.Source = context.Devices.Local;
+            }
         }
 
         ~DeviceDataGridUC()
@@ -111,9 +119,7 @@ namespace zvs.WPF.DeviceControls
             }
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
+
 
         void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
@@ -123,7 +129,7 @@ namespace zvs.WPF.DeviceControls
                 {
                     if (context != null)
                     {
-                        if (args.ChangeType == System.Data.EntityState.Added)
+                        if (args.ChangeType == EntityState.Added)
                         {
                             //Gets new devices
                             context.Groups.ToList();
@@ -147,7 +153,7 @@ namespace zvs.WPF.DeviceControls
                 {
                     if (context != null)
                     {
-                        if (args.ChangeType == System.Data.EntityState.Added)
+                        if (args.ChangeType == EntityState.Added)
                         {
                             //Gets new devices
                             context.Groups.ToList();
@@ -169,7 +175,7 @@ namespace zvs.WPF.DeviceControls
             {
                 if (context != null)
                 {
-                    if (args.ChangeType == System.Data.EntityState.Added)
+                    if (args.ChangeType == EntityState.Added)
                     {
                         //Gets new devices
                         context.Devices.ToList();
@@ -216,7 +222,7 @@ namespace zvs.WPF.DeviceControls
         }
 
         ////User Events
-        private void DeleteSelectedItems()
+        private async Task DeleteSelectedItemsAsync()
         {
             if (DeviceGrid.SelectedItems.Count > 0)
             {
@@ -225,11 +231,11 @@ namespace zvs.WPF.DeviceControls
 
                 foreach (Device selectedDevice in SelectedItemsCopy)
                 {
-                    Device d = context.Devices.FirstOrDefault(o => o.Id == selectedDevice.Id);
+                    Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == selectedDevice.Id);
                     if (d != null)
                     {
                         //Check for device dependencies
-                        foreach (DeviceValueTrigger dvt in context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id))
+                        foreach (DeviceValueTrigger dvt in await context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id).ToListAsync())
                         {
                             MessageBoxResult result = MessageBox.Show(
                                 string.Format("Deleting device '{0}' will delete trigger '{1}', would you like continue?",
@@ -241,18 +247,20 @@ namespace zvs.WPF.DeviceControls
                             if (result == MessageBoxResult.Yes)
                             {
                                 context.DeviceValueTriggers.Local.Remove(dvt);
-                                string SaveError = string.Empty;
-                                if (!context.TrySaveChanges(out SaveError))
-                                    ((App)App.Current).zvsCore.log.Error(SaveError);
+
+                                var saveResult = await context.TrySaveChangesAsync();
+                                if (saveResult.HasError)
+                                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
                             }
                             else
                                 return;
                         }
 
                         context.Devices.Local.Remove(d);
-                        string SaveError1 = string.Empty;
-                        if (!context.TrySaveChanges(out SaveError1))
-                            ((App)App.Current).zvsCore.log.Error(SaveError1);
+
+                        var r = await context.TrySaveChangesAsync();
+                        if (r.HasError)
+                            ((App)App.Current).zvsCore.log.Error(r.Message);
                     }
                 }
             }
@@ -306,14 +314,14 @@ namespace zvs.WPF.DeviceControls
             }
         }
 
-        private void DeviceGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
+        private async void DeviceGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
-                string SaveError = string.Empty;
-                if (!context.TrySaveChanges(out SaveError))
-                    ((App)App.Current).zvsCore.log.Error(SaveError);
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
                 ////device.CallOnContextUpdated();
             }
         }
@@ -384,7 +392,7 @@ namespace zvs.WPF.DeviceControls
             ShowMore = false;
         }
 
-        private void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
+        private async void Grid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
             {
@@ -394,7 +402,7 @@ namespace zvs.WPF.DeviceControls
                     if (MessageBox.Show("Are you sure you want to delete the selected devices?",
                                         "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        DeleteSelectedItems();
+                        await DeleteSelectedItemsAsync();
                     }
                 }
                 e.Handled = true;

@@ -149,7 +149,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportScheduledTaskAsync(string PathFileName, Action<string> Callback)
+        public static async Task ImportScheduledTaskAsync(string PathFileName, Action<string> Callback)
         {
             List<ScheduledTaskBackup> tasks = new List<ScheduledTaskBackup>();
             int ImportedCount = 0;
@@ -169,7 +169,7 @@ namespace zvs.Processor.Backup
                         foreach (ScheduledTaskBackup t in tasks)
                         {
                             ScheduledTask task = new ScheduledTask();
-                            task.StoredCommand = StoredCMDBackup.RestoreStoredCommand(context, t.StoredCommand);
+                            task.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, t.StoredCommand);
                             task.Frequency = (TaskFrequency)t.Frequency;
                             task.Name = t.Name;
                             task.isEnabled = t.isEnabled;
@@ -223,7 +223,7 @@ namespace zvs.Processor.Backup
                             context.ScheduledTasks.Add(task);
                             ImportedCount++;
                         }
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
                     Callback(string.Format("Imported {0} scheduled tasks from '{1}'", ImportedCount, Path.GetFileName(PathFileName)));
                 }

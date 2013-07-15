@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using zvs.Entities;
+using System.Data.Entity;
 
 namespace zvs.Processor.Backup
 {
@@ -39,8 +40,11 @@ namespace zvs.Processor.Backup
                 bcmd.CommandType = Command_Types.DeviceType;
                 using (zvsContext context = new zvsContext())
                 {
-                    Device d = null;
-                    if (Device.TryGetDevice(context, m.Argument2, out d))
+                    int d_id = int.TryParse(m.Argument2, out d_id) ? d_id : 0;
+
+                    //TODO: FIX BLOCKING CALL 
+                    Device d = context.Devices.FirstOrDefault(o => o.Id == d_id);
+                    if (d != null)
                         bcmd.NodeNumber = d.NodeNumber;
                 }
             }
@@ -66,7 +70,7 @@ namespace zvs.Processor.Backup
         /// <param name="context"></param>
         /// <param name="backupStoredCMD"></param>
         /// <returns></returns>
-        public static StoredCommand RestoreStoredCommand(zvsContext context, StoredCMDBackup backupStoredCMD)
+        public async static Task<StoredCommand> RestoreStoredCommandAsync(zvsContext context, StoredCMDBackup backupStoredCMD)
         {
             if (backupStoredCMD == null)
                 return null;
@@ -76,17 +80,22 @@ namespace zvs.Processor.Backup
             {
                 StoredCommand sc = new StoredCommand();
 
-                Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupStoredCMD.NodeNumber);
-                if (d == null)
+                var device = await context.Devices
+                    .Include(o => o.Commands)
+                    .Include(o => o.Type.Commands)
+                    .FirstOrDefaultAsync(o => o.NodeNumber == backupStoredCMD.NodeNumber);
+                if (device == null)
                     return null;
 
                 Command c = null;
                 if (backupStoredCMD.CommandType == Command_Types.Device)
-                    c = d.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                {
+                    c = device.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                }
                 if (backupStoredCMD.CommandType == Command_Types.DeviceType)
                 {
-                    c = d.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
-                    sc.Argument2 = d.Id.ToString();
+                    c = device.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                    sc.Argument2 = device.Id.ToString();
                 }
 
                 if (c == null)
@@ -95,8 +104,9 @@ namespace zvs.Processor.Backup
                 sc.Argument = backupStoredCMD.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
-                string saveError = string.Empty;
-                if (!context.TrySaveChanges(out saveError))
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
                     return null;
 
                 return sc;
@@ -106,10 +116,10 @@ namespace zvs.Processor.Backup
             {
                 Command c = null;
                 if (backupStoredCMD.CommandType == Command_Types.Builtin)
-                    c = context.BuiltinCommands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                    c = await context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
 
                 if (backupStoredCMD.CommandType == Command_Types.JavaScript)
-                    c = context.JavaScriptCommands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                    c = await context.JavaScriptCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
 
                 if (c == null)
                     return null;
@@ -118,9 +128,11 @@ namespace zvs.Processor.Backup
                 sc.Argument = backupStoredCMD.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
-                string saveError = string.Empty;
-                if (!context.TrySaveChanges(out saveError))
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
                     return null;
+
                 return sc;
             }
 

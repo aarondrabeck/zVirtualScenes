@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zvs.WPF.DynamicActionControls;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.WPF.SceneControls
 {
@@ -26,7 +26,6 @@ namespace zvs.WPF.SceneControls
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
         private zvsContext context = null;
 
-
         private int _SceneID = 0;
         public int SceneID
         {
@@ -36,14 +35,16 @@ namespace zvs.WPF.SceneControls
             }
             set
             {
+
                 this._SceneID = value;
-                LoadCommands();
+                //TODO: CHANGE
+                //LoadCommandsAsync();
             }
         }
 
         public SceneProperties()
         {
-            
+
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 InitializeComponent();
@@ -54,16 +55,15 @@ namespace zvs.WPF.SceneControls
         public SceneProperties(int SceneID)
             : base()
         {
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                this.SceneID = SceneID;
-                LoadCommands();
-            }
+            this.SceneID = SceneID;
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            LoadCommands();
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                await LoadCommandsAsync();
+            }
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
@@ -71,237 +71,243 @@ namespace zvs.WPF.SceneControls
 
         }
 
-        private void LoadCommands()
+        private async Task LoadCommandsAsync()
         {
             PropertiesStkPnl.Children.Clear();
 
-            Scene s = context.Scenes.FirstOrDefault(sc => sc.Id == SceneID);
-            if (s != null)
+            var scene = await context.Scenes
+                .Include(o => o.SettingValues)
+                .FirstOrDefaultAsync(sc => sc.Id == SceneID);
+
+            if (scene == null)
+                return;
+
+            #region Scene Properties
+            foreach (var sp in await context.SceneSettings.ToListAsync())
             {
-                #region Scene Properties
-                foreach (SceneProperty sp in context.SceneProperties)
+                var sceneSetting = sp;
+                var sceneSettingValue = await context.SceneSettingValues
+                    .FirstOrDefaultAsync(v => v.SceneProperty == sceneSetting &&
+                        v.SceneId == scene.Id);
+
+                string _default = sceneSettingValue == null ? sceneSetting.Value : sceneSettingValue.Value;
+
+                switch (sceneSetting.ValueType)
                 {
-                    SceneProperty _property = sp;
-                    ScenePropertyValue _property_value = s.PropertyValues.FirstOrDefault(v => v.SceneProperty == _property);
-                    string _default = _property_value == null ? _property.Value : _property_value.Value;
+                    case DataType.BOOL:
+                        {
+                            //get the current value from the value table list
+                            bool DefaultValue = false;
+                            bool.TryParse(_default, out DefaultValue);
 
-                    switch (_property.ValueType)
-                    {
-                        case DataType.BOOL:
+                            CheckboxControl control = new CheckboxControl(sceneSetting.Name, string.Empty, DefaultValue, async (isChecked) =>
                             {
-                                //get the current value from the value table list
-                                bool DefaultValue = false;
-                                bool.TryParse(_default, out DefaultValue);
-
-                                CheckboxControl control = new CheckboxControl(_property.Name, string.Empty, DefaultValue, (isChecked) =>
+                                if (sceneSettingValue != null)
                                 {
-                                    if (_property_value != null)
+                                    sceneSettingValue.Value = isChecked.ToString();
+                                }
+                                else
+                                {
+                                    scene.SettingValues.Add(new SceneSettingValue()
                                     {
-                                        _property_value.Value = isChecked.ToString();
+                                        SceneProperty = sceneSetting,
+                                        Value = isChecked.ToString()
+                                    });
+                                }
+
+                                var result = await context.TrySaveChangesAsync();
+                                if (result.HasError)
+                                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                            },
+                            icon);
+                            PropertiesStkPnl.Children.Add(control);
+
+                            break;
+                        }
+                    case DataType.DECIMAL:
+                        {
+                            NumericControl control = new NumericControl(sceneSetting.Name,
+                                string.Empty,
+                                _default,
+                                NumericControl.NumberType.Decimal,
+                                async (value) =>
+                                {
+                                    if (sceneSettingValue != null)
+                                    {
+                                        sceneSettingValue.Value = value;
                                     }
                                     else
                                     {
-                                        s.PropertyValues.Add(new ScenePropertyValue()
+                                        scene.SettingValues.Add(new SceneSettingValue()
                                         {
-                                            SceneProperty = _property,
-                                            Value = isChecked.ToString()
+                                            SceneProperty = sceneSetting,
+                                            Value = value
                                         });
                                     }
 
-                                    string SaveError = string.Empty;
-                                    if (!context.TrySaveChanges(out SaveError))
-                                        ((App)App.Current).zvsCore.log.Error(SaveError);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
                                 },
                                 icon);
-                                PropertiesStkPnl.Children.Add(control);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-                        case DataType.DECIMAL:
-                            {
-                                NumericControl control = new NumericControl(_property.Name,
-                                    string.Empty,
-                                    _default,
-                                    NumericControl.NumberType.Decimal,
-                                    (value) =>
+                            break;
+                        }
+                    case DataType.INTEGER:
+                        {
+                            NumericControl control = new NumericControl(sceneSetting.Name,
+                                string.Empty,
+                                _default,
+                                NumericControl.NumberType.Integer,
+                                async (value) =>
+                                {
+                                    if (sceneSettingValue != null)
                                     {
-                                        if (_property_value != null)
-                                        {
-                                            _property_value.Value = value;
-                                        }
-                                        else
-                                        {
-                                            s.PropertyValues.Add(new ScenePropertyValue()
-                                            {
-                                                SceneProperty = _property,
-                                                Value = value
-                                            });
-                                        }
-
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
-
-                                break;
-                            }
-                        case DataType.INTEGER:
-                            {
-                                NumericControl control = new NumericControl(_property.Name,
-                                    string.Empty,
-                                    _default,
-                                    NumericControl.NumberType.Integer,
-                                    (value) =>
+                                        sceneSettingValue.Value = value;
+                                    }
+                                    else
                                     {
-                                        if (_property_value != null)
+                                        scene.SettingValues.Add(new SceneSettingValue()
                                         {
-                                            _property_value.Value = value;
-                                        }
-                                        else
-                                        {
-                                            s.PropertyValues.Add(new ScenePropertyValue()
-                                            {
-                                                SceneProperty = _property,
-                                                Value = value
-                                            });
-                                        }
+                                            SceneProperty = sceneSetting,
+                                            Value = value
+                                        });
+                                    }
 
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-                        case DataType.BYTE:
-                            {
-                                NumericControl control = new NumericControl(_property.Name,
-                                    string.Empty,
-                                    _default,
-                                    NumericControl.NumberType.Byte,
-                                    (value) =>
+                            break;
+                        }
+                    case DataType.BYTE:
+                        {
+                            NumericControl control = new NumericControl(sceneSetting.Name,
+                                string.Empty,
+                                _default,
+                                NumericControl.NumberType.Byte,
+                                async (value) =>
+                                {
+                                    if (sceneSettingValue != null)
                                     {
-                                        if (_property_value != null)
-                                        {
-                                            _property_value.Value = value;
-                                        }
-                                        else
-                                        {
-                                            s.PropertyValues.Add(new ScenePropertyValue()
-                                            {
-                                                SceneProperty = _property,
-                                                Value = value
-                                            });
-                                        }
-
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
-
-                                break;
-                            }
-                        case DataType.SHORT:
-                            {
-                                NumericControl control = new NumericControl(_property.Name,
-                                    string.Empty,
-                                    _default,
-                                    NumericControl.NumberType.Short,
-                                    (value) =>
+                                        sceneSettingValue.Value = value;
+                                    }
+                                    else
                                     {
-                                        if (_property_value != null)
+                                        scene.SettingValues.Add(new SceneSettingValue()
                                         {
-                                            _property_value.Value = value;
-                                        }
-                                        else
-                                        {
-                                            s.PropertyValues.Add(new ScenePropertyValue()
-                                            {
-                                                SceneProperty = _property,
-                                                Value = value
-                                            });
-                                        }
+                                            SceneProperty = sceneSetting,
+                                            Value = value
+                                        });
+                                    }
 
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-
-                        case DataType.STRING:
-                            {
-                                StringControl control = new StringControl(_property.Name,
-                                    string.Empty,
-                                    _default,
-                                    (value) =>
+                            break;
+                        }
+                    case DataType.SHORT:
+                        {
+                            NumericControl control = new NumericControl(sceneSetting.Name,
+                                string.Empty,
+                                _default,
+                                NumericControl.NumberType.Short,
+                                async (value) =>
+                                {
+                                    if (sceneSettingValue != null)
                                     {
-                                        if (_property_value != null)
-                                        {
-                                            _property_value.Value = value;
-                                        }
-                                        else
-                                        {
-                                            s.PropertyValues.Add(new ScenePropertyValue()
-                                            {
-                                                SceneProperty = _property,
-                                                Value = value
-                                            });
-                                        }
-
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
-
-                                break;
-                            }
-
-                        case DataType.LIST:
-                            {
-                                ComboboxControl control = new ComboboxControl(_property.Name,
-                                    string.Empty,
-                                    _property.Options.Select(o => o.Name).ToList(),
-                                    _default,
-                                    (value) =>
+                                        sceneSettingValue.Value = value;
+                                    }
+                                    else
                                     {
-                                        if (_property_value != null)
+                                        scene.SettingValues.Add(new SceneSettingValue()
                                         {
-                                            _property_value.Value = value;
-                                        }
-                                        else
+                                            SceneProperty = sceneSetting,
+                                            Value = value
+                                        });
+                                    }
+
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
+
+                            break;
+                        }
+
+                    case DataType.STRING:
+                        {
+                            StringControl control = new StringControl(sceneSetting.Name,
+                                string.Empty,
+                                _default,
+                               async (value) =>
+                               {
+                                   if (sceneSettingValue != null)
+                                   {
+                                       sceneSettingValue.Value = value;
+                                   }
+                                   else
+                                   {
+                                       scene.SettingValues.Add(new SceneSettingValue()
+                                       {
+                                           SceneProperty = sceneSetting,
+                                           Value = value
+                                       });
+                                   }
+
+                                   var result = await context.TrySaveChangesAsync();
+                                   if (result.HasError)
+                                       ((App)App.Current).zvsCore.log.Error(result.Message);
+                               },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
+
+                            break;
+                        }
+
+                    case DataType.LIST:
+                        {
+                            ComboboxControl control = new ComboboxControl(sceneSetting.Name,
+                                string.Empty,
+                                sceneSetting.Options.Select(o => o.Name).ToList(),
+                                _default,
+                                async (value) =>
+                                {
+                                    if (sceneSettingValue != null)
+                                    {
+                                        sceneSettingValue.Value = value;
+                                    }
+                                    else
+                                    {
+                                        scene.SettingValues.Add(new SceneSettingValue()
                                         {
-                                            s.PropertyValues.Add(new ScenePropertyValue()
-                                            {
-                                                SceneProperty = _property,
-                                                Value = value
-                                            });
-                                        }
+                                            SceneProperty = sceneSetting,
+                                            Value = value
+                                        });
+                                    }
 
-                                        string SaveError = string.Empty;
-                                        if (!context.TrySaveChanges(out SaveError))
-                                            ((App)App.Current).zvsCore.log.Error(SaveError);
-                                    },
-                                    icon);
-                                PropertiesStkPnl.Children.Add(control);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                },
+                                icon);
+                            PropertiesStkPnl.Children.Add(control);
 
-                                break;
-                            }
-                    }
+                            break;
+                        }
                 }
-                #endregion
             }
+            #endregion
         }
     }
 }
