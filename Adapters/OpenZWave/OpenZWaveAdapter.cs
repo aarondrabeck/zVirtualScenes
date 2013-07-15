@@ -1111,8 +1111,9 @@ namespace OpenZWavePlugin
                                     switch (value.Label)
                                     {
                                         case "Basic":
+                                            var valID = vid.GetId().ToString();
                                             var dv_basic = await context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
-                                                o.UniqueIdentifier == vid.GetId().ToString());
+                                                o.UniqueIdentifier == valID);
 
                                             if (dv_basic == null)
                                                 break;
