@@ -11,34 +11,26 @@ namespace zvs.Processor
     public class DeviceValueBuilder : AdapterBuilder
     {
         public DeviceValueBuilder(zvsAdapter zvsAdapter, Core core) : base(zvsAdapter, core) { }
-        public async Task RegisterAsync(DeviceValue deviceValue, zvsContext context, bool ignoreValueChange = false)
+        public async Task RegisterAsync(DeviceValue deviceValue, Device device, zvsContext context, bool ignoreValueChange = false)
         {
             if (context == null)
                 throw new ArgumentNullException("context");
 
-            if (deviceValue.Device == null)
+            if (device == null)
             {
                 Core.log.Error("You must send a device when registering a device value!");
                 return;
             }
 
-            Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == deviceValue.Device.Id);
-
-            if (d == null)
-            {
-                Core.log.ErrorFormat("Device value change event on '{0}' occurred but could not find a device value with id {1} in database.", deviceValue.Name, deviceValue.Id);
-                return;
-            }
-
             var existing_dv = await context.DeviceValues.FirstOrDefaultAsync(o => o.UniqueIdentifier == deviceValue.UniqueIdentifier
-                && o.DeviceId == d.Id);
+                && o.DeviceId == device.Id);
 
             string prev_value = string.Empty;
 
             if (existing_dv == null)
             {
                 //NEW VALUE
-                d.Values.Add(deviceValue);
+                context.DeviceValues.Add(deviceValue);
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
@@ -74,10 +66,10 @@ namespace zvs.Processor
                 {
                     //LOG IT
                     string device_name = "Unknown";
-                    if (String.IsNullOrEmpty(d.Name))
-                        device_name = "Device #" + d.Id;
+                    if (String.IsNullOrEmpty(device.Name))
+                        device_name = "Device #" + device.Id;
                     else
-                        device_name = d.Name;
+                        device_name = device.Name;
 
                     if (!String.IsNullOrEmpty(prev_value))
                         Core.log.InfoFormat("{0} {1} changed from {2} to {3}.", device_name, deviceValue.Name, prev_value, deviceValue.Value);//event

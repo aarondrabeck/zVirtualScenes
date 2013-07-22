@@ -232,6 +232,7 @@ namespace OpenZWavePlugin
         //Settings Cache 
         private bool UseHID = false;
         private string ComPort = "3";
+        private bool InitialPollingComplete = false;
         private int PollingInterval = 0;
 
         //OpenzWave Data
@@ -320,6 +321,7 @@ namespace OpenZWavePlugin
             if (!isShuttingDown)
             {
                 isShuttingDown = true;
+                InitialPollingComplete = false;
 
                 await Task.Run(() =>
                 {
@@ -858,7 +860,7 @@ namespace OpenZWavePlugin
                                 //Node event value placeholder 
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
-                                    Device = ozw_device,
+                                    DeviceId = ozw_device.Id,
                                     UniqueIdentifier = LastEventNameValueId,
                                     Name = "Last Node Event Value",
                                     Genre = "Custom",
@@ -867,7 +869,7 @@ namespace OpenZWavePlugin
                                     CommandClass = "0",
                                     Value = "0",
                                     isReadOnly = true
-                                }, context);
+                                }, ozw_device, context);
 
                                 #endregion
                             }
@@ -912,7 +914,7 @@ namespace OpenZWavePlugin
                             //Values are 'unknown' at this point so don't report a value change. 
                             await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
-                                Device = d,
+                                DeviceId = d.Id,
                                 UniqueIdentifier = vid.GetId().ToString(),
                                 Name = value.Label,
                                 Genre = value.Genre,
@@ -921,7 +923,7 @@ namespace OpenZWavePlugin
                                 Value = data,
                                 ValueType = ConvertType(vid),
                                 isReadOnly = read_only
-                            }, context, true);
+                            }, d, context, true);
 
                             #region Install Dynamic Commands
 
@@ -1065,77 +1067,19 @@ namespace OpenZWavePlugin
                                 break;
                             }
 
-                            #region Update Device Commands
-                            if (!read_only)
+                            //Update device value
+                            await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
-                                //User commands are more important so lets see them first in the GUIs
-                                int order;
-                                switch (value.Genre)
-                                {
-                                    case "User":
-                                        order = 1;
-                                        break;
-                                    case "Config":
-                                        order = 2;
-                                        break;
-                                    default:
-                                        order = 99;
-                                        break;
-                                }
-
-                                var vidId = vid.GetId().ToString();
-                                var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
-                                    o.CustomData2 == vidId);
-
-                                if (dc != null)
-                                {
-                                    //After Value is Added, Value Name other values properties can change so update.
-                                    dc.Name = "Set " + value.Label;
-                                    dc.Help = value.Help;
-                                    dc.CustomData1 = value.Label;
-                                    dc.SortOrder = order;
-                                }
-                            }
-                            #endregion
-
-                            #region Repoll Dimmers
-                            //Some dimmers take x number of seconds to dim to desired level.  Therefore the level received here initially is a 
-                            //level between old level and new level. (if going from 0 to 100 we get 84 here).
-                            //To get the real level re-poll the device a second or two after a level change was received.     
-                            bool EnableDimmerRepoll = bool.TryParse(await device.GetDeviceSettingAsync(OpenzWaveDeviceTypeSettings.ENABLE_REPOLL_ON_LEVEL_CHANGE.ToString(), context), out EnableDimmerRepoll) ? EnableDimmerRepoll : false;
-
-                            if (EnableDimmerRepoll)
-                            {
-                                if (device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.DIMMER.ToString())
-                                {
-                                    switch (value.Label)
-                                    {
-                                        case "Basic":
-                                            var valID = vid.GetId().ToString();
-                                            var dv_basic = await context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
-                                                o.UniqueIdentifier == valID);
-
-                                            if (dv_basic == null)
-                                                break;
-
-                                            //If it is truly new
-                                            if (!dv_basic.Value.Equals(data))
-                                            {
-                                                //only allow each device to re-poll 1 time.
-                                                if (!NodeValuesRepolling.Contains(device.NodeNumber))
-                                                {
-                                                    NodeValuesRepolling.Add(device.NodeNumber);
-                                                    await Task.Delay(3500);
-                                                    m_manager.RefreshValue(vid);
-                                                    Debug.WriteLine(string.Format("Node {0} value re-polled", device.NodeNumber));
-                                                    NodeValuesRepolling.Remove(device.NodeNumber);
-                                                }
-                                            }
-                                            break;
-                                    }
-                                }
-                            }
-                            #endregion
+                                DeviceId = device.Id,
+                                UniqueIdentifier = vid.GetId().ToString(),
+                                Name = value.Label,
+                                Genre = value.Genre,
+                                Index = value.Index,
+                                CommandClass = value.CommandClassID,
+                                Value = data,
+                                ValueType = ConvertType(vid),
+                                isReadOnly = read_only
+                            }, device, context);
 
                             #region Update Device Status Properties
                             //Update Current Status Field
@@ -1201,20 +1145,67 @@ namespace OpenZWavePlugin
                             }
                             #endregion
 
-                            //Update device value
-                            await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                            #region Update Device Commands
+                            if (!read_only)
                             {
-                                Device = device,
-                                UniqueIdentifier = vid.GetId().ToString(),
-                                Name = value.Label,
-                                Genre = value.Genre,
-                                Index = value.Index,
-                                CommandClass = value.CommandClassID,
-                                Value = data,
-                                ValueType = ConvertType(vid),
-                                isReadOnly = read_only
-                            }, context);
+                                //User commands are more important so lets see them first in the GUIs
+                                int order;
+                                switch (value.Genre)
+                                {
+                                    case "User":
+                                        order = 1;
+                                        break;
+                                    case "Config":
+                                        order = 2;
+                                        break;
+                                    default:
+                                        order = 99;
+                                        break;
+                                }
 
+                                var vidId = vid.GetId().ToString();
+                                var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.DeviceId == device.Id &&
+                                    o.CustomData2 == vidId);
+
+                                if (dc != null)
+                                {
+                                    //After Value is Added, Value Name other values properties can change so update.
+                                    dc.Name = "Set " + value.Label;
+                                    dc.Help = value.Help;
+                                    dc.CustomData1 = value.Label;
+                                    dc.SortOrder = order;
+                                }
+                            }
+                            #endregion
+
+                            #region Repoll Dimmers
+
+                            //Some dimmers take x number of seconds to dim to desired level.  Therefore the level received here initially is a 
+                            //level between old level and new level. (if going from 0 to 100 we get 84 here).
+                            //To get the real level re-poll the device a second or two after a level change was received.     
+                            bool EnableDimmerRepoll = bool.TryParse(await device.GetDeviceSettingAsync(OpenzWaveDeviceTypeSettings.ENABLE_REPOLL_ON_LEVEL_CHANGE.ToString(), context), out EnableDimmerRepoll) ? EnableDimmerRepoll : false;
+
+                            if (InitialPollingComplete && 
+                                EnableDimmerRepoll && 
+                                device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.DIMMER.ToString() && 
+                                value.Label == "Basic")
+                            {
+                                //only allow each device to re-poll 1 time.
+                                if (!NodeValuesRepolling.Contains(device.NodeNumber))
+                                {
+                                    NodeValuesRepolling.Add(device.NodeNumber);
+
+                                    await Task.Delay(3500);
+                                    m_manager.RefreshValue(vid);
+                                    Debug.WriteLine(string.Format("Node {0} value re-polled", device.NodeNumber));
+
+                                    //Do not allow another re-poll for 10 seconds
+                                    await Task.Delay(10000);
+                                    NodeValuesRepolling.Remove(device.NodeNumber);
+                                }
+                            }
+                            #endregion
+                                                      
                         }
 
                         break;
@@ -1303,7 +1294,7 @@ namespace OpenZWavePlugin
                                 //Giving ManufacturerName a random value_id 9999058723211334120                                                           
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
-                                    Device = device,
+                                    DeviceId = device.Id,
                                     UniqueIdentifier = ManufacturerNameValueId,
                                     Name = "Manufacturer Name",
                                     Genre = "Custom",
@@ -1312,11 +1303,11 @@ namespace OpenZWavePlugin
                                     CommandClass = "0",
                                     Value = node.Manufacturer,
                                     isReadOnly = true
-                                }, context);
+                                }, device, context);
 
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
-                                    Device = device,
+                                    DeviceId = device.Id,
                                     UniqueIdentifier = ProductNameValueId,
                                     Name = "Product Name",
                                     Genre = "Custom",
@@ -1325,10 +1316,10 @@ namespace OpenZWavePlugin
                                     CommandClass = "0",
                                     Value = node.Product,
                                     isReadOnly = true
-                                }, context);
+                                }, device, context);
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
-                                    Device = device,
+                                    DeviceId = device.Id,
                                     UniqueIdentifier = NodeLocationValueId,
                                     Name = "Node Location",
                                     Genre = "Custom",
@@ -1337,10 +1328,10 @@ namespace OpenZWavePlugin
                                     CommandClass = "0",
                                     Value = node.Location,
                                     isReadOnly = true
-                                }, context);
+                                }, device, context);
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
-                                    Device = device,
+                                    DeviceId = device.Id,
                                     UniqueIdentifier = NodeNameValueId,
                                     Name = "Node Name",
                                     Genre = "Custom",
@@ -1349,7 +1340,7 @@ namespace OpenZWavePlugin
                                     CommandClass = "0",
                                     Value = node.Name,
                                     isReadOnly = true
-                                }, context);
+                                }, device, context);
                             }
                         }
                         Debug.WriteLine("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
@@ -1450,6 +1441,7 @@ namespace OpenZWavePlugin
                         #region AllNodesQueried
                         //This is an important message to see.  It tells you that you can start issuing commands
                         log.Info("Ready:  All nodes queried");
+                        InitialPollingComplete = true;
                         m_manager.WriteConfig(m_notification.GetHomeId());
                         await EnablePollingOnDevices();
                         break;
@@ -1460,6 +1452,7 @@ namespace OpenZWavePlugin
                         #region AllNodesQueriedSomeDead
                         //This is an important message to see.  It tells you that you can start issuing commands
                         log.Info("Ready:  All nodes queried but some are dead.");
+                        InitialPollingComplete = true;
                         m_manager.WriteConfig(m_notification.GetHomeId());
                         await EnablePollingOnDevices();
                         break;
@@ -1469,6 +1462,7 @@ namespace OpenZWavePlugin
                     {
                         #region AwakeNodesQueried
                         log.Info("Ready:  Awake nodes queried (but not some sleeping nodes)");
+                        InitialPollingComplete = true;
                         m_manager.WriteConfig(m_notification.GetHomeId());
                         await EnablePollingOnDevices();
                         break;
