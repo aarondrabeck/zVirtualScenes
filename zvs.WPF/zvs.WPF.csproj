@@ -97,12 +97,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="PluginManager\PluginManagerWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
+      <DependentUpon>PluginManagerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands\CommandBuilder.xaml.cs">
       <DependentUpon>CommandBuilder.xaml</DependentUpon>

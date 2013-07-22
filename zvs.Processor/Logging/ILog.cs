@@ -348,7 +348,7 @@ namespace zvs.Processor.Logging
         /// </para>
         /// <para> For some ILog interface <c>log</c>, when you write:</para>
         /// <code lang="C#">
-        /// log.Debug("This is entry number: " + i );
+        /// Debug.WriteLine("This is entry number: " + i );
         /// </code>
         /// <para>
         /// You incur the cost constructing the message, string construction and concatenation in
@@ -360,7 +360,7 @@ namespace zvs.Processor.Logging
         /// <code lang="C#">
         /// if (log.IsDebugEnabled)
         /// { 
-        ///     log.Debug("This is entry number: " + i );
+        ///     Debug.WriteLine("This is entry number: " + i );
         /// }
         /// </code>
         /// <para>
@@ -385,7 +385,7 @@ namespace zvs.Processor.Logging
         /// <code lang="C#">
         /// if (isDebugEnabled)
         /// { 
-        ///     log.Debug("This is entry number: " + i );
+        ///     Debug.WriteLine("This is entry number: " + i );
         /// }
         /// </code>
         /// <para>

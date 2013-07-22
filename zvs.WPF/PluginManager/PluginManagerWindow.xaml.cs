@@ -18,26 +18,26 @@ using System.Diagnostics;
 using zvs.Entities;
 using System.Data.Entity;
 
-namespace zvs.WPF.AdapterManager
+namespace zvs.WPF
 {
     /// <summary>
     /// Interaction logic for PluginManager.xaml
     /// </summary>
-    public partial class AdapterManagerWindow : Window
+    public partial class PluginManagerWindow : Window
     {
         private App application = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
         private zvsContext context;
 
-        public AdapterManagerWindow()
+        public PluginManagerWindow()
         {
             InitializeComponent();
         }
 
-        ~AdapterManagerWindow()
+        ~PluginManagerWindow()
         {
             //Cannot write to log here, it has been disposed. 
-            Debug.WriteLine("AdapterManagerWindow Deconstructed.");
+            Debug.WriteLine("PluginManagerWindow Deconstructed.");
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
@@ -48,18 +48,14 @@ namespace zvs.WPF.AdapterManager
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 //Load your data here and assign the result to the CollectionViewSource.
-                var zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2adapterViewSource")));
-
-                //Get plug-ins from database where currently loaded plug-ins match plug-ins from the db.  
-                //This will prevent plug-ins that are in the DB but not loaded from being configurable.
-                //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
+                var zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2PluginViewSource")));
 
                 //Get a list of loaded plug-ins
-                var loadedAdapterGuids = application.zvsCore.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
-                await context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
+                var loadedPluginsGuids = application.zvsCore.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
+                await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
 
                 //Only load the plug-in options for the plug-ins that are currently loaded.
-                zvsEntities2ViewSource.Source = context.Adapters.Local;
+                zvsEntities2ViewSource.Source = context.Plugins.Local;
             }
 
             zvsContext.onPluginsChanged += zvsContext_onPluginsChanged;
@@ -73,8 +69,8 @@ namespace zvs.WPF.AdapterManager
 
         async void zvsContext_onPluginsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
         {
-            var loadedAdapterGuids = application.zvsCore.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
-            await context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
+            var loadedPluginsGuids = application.zvsCore.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
+            await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
         }
 
         private void Window_Closed_1(object sender, EventArgs e)
@@ -92,17 +88,17 @@ namespace zvs.WPF.AdapterManager
         {
             this.ControlsStkPnl.Children.Clear();
 
-            var adapter = (Adapter)AdapterLstVw.SelectedItem;
-            if (adapter != null)
+            var plugin = (Plugin)PluginLstVw.SelectedItem;
+            if (plugin != null)
             {
                 //ADD THE ENABLED BUTTON
-                CheckboxControl c = new CheckboxControl(string.Format("{0} is enabled", adapter.Name),
-                    "Starts and stops the selected adapter",
-                    adapter.IsEnabled,
+                CheckboxControl c = new CheckboxControl(string.Format("{0} is enabled", plugin.Name),
+                    "Starts and stops the selected plug-in",
+                    plugin.IsEnabled,
                     async (isChecked) =>
                     {
                         //Save to the database
-                        adapter.IsEnabled = isChecked;
+                        plugin.IsEnabled = isChecked;
 
                         var result = await context.TrySaveChangesAsync();
                         if (result.HasError)
@@ -110,37 +106,37 @@ namespace zvs.WPF.AdapterManager
 
                         //STOP OR START
                         if (isChecked)
-                            application.zvsCore.AdapterManager.EnableAdapterAsync(adapter.AdapterGuid);
+                            application.zvsCore.PluginManager.EnablePluginAsync(plugin.PluginGuid);
                         else
-                            application.zvsCore.AdapterManager.DisableAdapterAsync(adapter.AdapterGuid);
+                            application.zvsCore.PluginManager.DisablePluginAsync(plugin.PluginGuid);
                     },
                 icon);
                 ControlsStkPnl.Children.Add(c);
 
 
                 //Add all the settings
-                foreach (AdapterSetting a in adapter.Settings)
+                foreach (var a in plugin.Settings)
                 {
-                    AdapterSetting adapterSetting = a;
+                    var pluginSettings = a;
 
-                    switch (adapterSetting.ValueType)
+                    switch (pluginSettings.ValueType)
                     {
                         case DataType.BOOL:
                             {
                                 bool DefaultValue = false;
-                                bool.TryParse(adapterSetting.Value, out DefaultValue);
+                                bool.TryParse(pluginSettings.Value, out DefaultValue);
 
-                                CheckboxControl control = new CheckboxControl(adapterSetting.Name,
-                                    adapterSetting.Description,
+                                CheckboxControl control = new CheckboxControl(pluginSettings.Name,
+                                    pluginSettings.Description,
                                     DefaultValue,
                                     async (isChecked) =>
                                     {
-                                        adapterSetting.Value = isChecked.ToString();
+                                        pluginSettings.Value = isChecked.ToString();
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -148,18 +144,18 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.DECIMAL:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Value,
+                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Value,
                                     NumericControl.NumberType.Decimal,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -167,19 +163,19 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.BYTE:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Value,
+                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Value,
                                     NumericControl.NumberType.Byte,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
 
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -187,19 +183,19 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.INTEGER:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Value,
+                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Value,
                                     NumericControl.NumberType.Integer,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
 
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -207,18 +203,18 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.SHORT:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Value,
+                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Value,
                                     NumericControl.NumberType.Short,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -226,18 +222,18 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.COMPORT:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Value,
+                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Value,
                                     NumericControl.NumberType.ComPort,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -245,17 +241,17 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.STRING:
                             {
-                                StringControl control = new StringControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Value,
+                                StringControl control = new StringControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Value,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -263,18 +259,18 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.LIST:
                             {
-                                ComboboxControl control = new ComboboxControl(adapterSetting.Name,
-                                    adapterSetting.Description,
-                                    adapterSetting.Options.Select(o => o.Name).ToList(),
-                                    adapterSetting.Value,
+                                ComboboxControl control = new ComboboxControl(pluginSettings.Name,
+                                    pluginSettings.Description,
+                                    pluginSettings.Options.Select(o => o.Name).ToList(),
+                                    pluginSettings.Value,
                                     async (value) =>
                                     {
-                                        adapterSetting.Value = value;
+                                        pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
                                             ((App)App.Current).zvsCore.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);

@@ -120,7 +120,7 @@ namespace OpenZWavePlugin
             await deviceTypeBuilder.RegisterAsync(sensor_dt);
         }
 
-        public override async Task OnSettingsCreating(SettingBuilder settingBuilder)
+        public override async Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
         {
             await settingBuilder.RegisterAdapterSettingAsync(new AdapterSetting
              {
@@ -265,13 +265,13 @@ namespace OpenZWavePlugin
         {
             if (isShuttingDown)
             {
-                log.DebugFormat("{0} driver cannot start because it is still shutting down", this.Name);
+                Debug.WriteLine("{0} driver cannot start because it is still shutting down", this.Name);
                 return;
             }
 
             try
             {
-                log.DebugFormat("OpenZwave driver starting on {0}", UseHID ? "HID" : "COM" + ComPort);
+                Debug.WriteLine("OpenZwave driver starting on {0}", UseHID ? "HID" : "COM" + ComPort);
 
                 // Environment.CurrentDirectory returns wrong directory in Service environment so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
@@ -340,7 +340,7 @@ namespace OpenZWavePlugin
                 });
 
                 isShuttingDown = false;
-                log.DebugFormat("OpenZwave driver stopped");
+                Debug.WriteLine("OpenZwave driver stopped");
             }
         }
 
@@ -665,7 +665,7 @@ namespace OpenZWavePlugin
             var devices = await context.Devices
                 .Include(d => d.Type)
                 .Where(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid)
-                .Where(o => o.Groups.Contains(group))
+                .Where(o => o.Groups.Any(g => g.Id == group.Id))
                 .ToListAsync();
 
             foreach (var device in devices)
@@ -697,7 +697,7 @@ namespace OpenZWavePlugin
         {
             var devices = await context.Devices
                 .Where(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid)
-                .Where(o => o.Groups.Contains(group))
+                .Where(o => o.Groups.Any(g => g.Id == group.Id))
                 .ToListAsync();
 
             foreach (var device in devices)
@@ -745,7 +745,7 @@ namespace OpenZWavePlugin
                         {
                             node.Label = m_manager.GetNodeType(m_homeId, node.ID);
 
-                            log.Debug("[Node Protocol Info] " + node.Label);
+                            Debug.WriteLine("[Node Protocol Info] " + node.Label);
 
                             switch (node.Label)
                             {
@@ -1009,7 +1009,6 @@ namespace OpenZWavePlugin
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.ValueRemoved:
                     {
                         #region ValueRemoved
@@ -1020,7 +1019,7 @@ namespace OpenZWavePlugin
                             ZWValueID vid = m_notification.GetValueID();
                             Value val = node.GetValue(vid);
 
-                            log.Debug("[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
+                            Debug.WriteLine("[ValueRemoved] Node:" + node.ID + ",Label:" + m_manager.GetValueLabel(vid));
 
                             node.RemoveValue(val);
                             //TODO: Remove from values and command table
@@ -1051,7 +1050,7 @@ namespace OpenZWavePlugin
                         string data = GetValue(vid);
                         //m_manager.GetValueAsString(vid, out data);                          
 
-                        log.Debug("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
+                        Debug.WriteLine("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
 
                         using (zvsContext context = new zvsContext())
                         {
@@ -1099,6 +1098,7 @@ namespace OpenZWavePlugin
                             }
                             #endregion
 
+                            #region Repoll Dimmers
                             //Some dimmers take x number of seconds to dim to desired level.  Therefore the level received here initially is a 
                             //level between old level and new level. (if going from 0 to 100 we get 84 here).
                             //To get the real level re-poll the device a second or two after a level change was received.     
@@ -1127,7 +1127,7 @@ namespace OpenZWavePlugin
                                                     NodeValuesRepolling.Add(device.NodeNumber);
                                                     await Task.Delay(3500);
                                                     m_manager.RefreshValue(vid);
-                                                    log.Debug(string.Format("Node {0} value re-polled", device.NodeNumber));
+                                                    Debug.WriteLine(string.Format("Node {0} value re-polled", device.NodeNumber));
                                                     NodeValuesRepolling.Remove(device.NodeNumber);
                                                 }
                                             }
@@ -1135,7 +1135,9 @@ namespace OpenZWavePlugin
                                     }
                                 }
                             }
+                            #endregion
 
+                            #region Update Device Status Properties
                             //Update Current Status Field
                             if (device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.THERMOSTAT.ToString())
                             {
@@ -1154,7 +1156,7 @@ namespace OpenZWavePlugin
                             }
                             else if (device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.SWITCH.ToString())
                             {
-                                if (value.Label == "Level")
+                                if (value.Label == "Basic")
                                 {
                                     double level = 0;
                                     if (double.TryParse(data, out level))
@@ -1167,7 +1169,7 @@ namespace OpenZWavePlugin
                                             Core.log.Error(result.Message);
                                     }
                                 }
-                                else if (value.Label == "Switch") //Some Intermatic devices do not set basic when changing status
+                                else if (value.Label == "Switch" || value.Label == "Level") //Some Intermatic devices do not set basic when changing status
                                 {
                                     bool state = false;
                                     if (bool.TryParse(data, out state))
@@ -1184,7 +1186,7 @@ namespace OpenZWavePlugin
                             }
                             else
                             {
-                                if (value.Label == "Level")
+                                if (value.Label == "Basic")
                                 {
                                     double level = 0;
                                     double.TryParse(data, out level);
@@ -1197,7 +1199,9 @@ namespace OpenZWavePlugin
                                         Core.log.Error(result.Message);
                                 }
                             }
+                            #endregion
 
+                            //Update device value
                             await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
                                 Device = device,
@@ -1216,15 +1220,13 @@ namespace OpenZWavePlugin
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.Group:
                     {
                         #region Group
-                        log.Debug("[Group]"); ;
+                        Debug.WriteLine("[Group]"); ;
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.NodeAdded:
                     {
                         #region NodeAdded
@@ -1237,12 +1239,11 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                        log.Debug("[NodeAdded] ID:" + node.ID.ToString() + " Added");
+                        Debug.WriteLine("[NodeAdded] ID:" + node.ID.ToString() + " Added");
                         //}
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.NodeNew:
                     {
                         #region NodeNew
@@ -1252,11 +1253,10 @@ namespace OpenZWavePlugin
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
 
-                        log.Debug("[NodeNew] ID:" + node.ID.ToString() + " Added");
+                        Debug.WriteLine("[NodeNew] ID:" + node.ID.ToString() + " Added");
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.NodeRemoved:
                     {
                         #region NodeRemoved
@@ -1264,7 +1264,7 @@ namespace OpenZWavePlugin
                         {
                             if (node.ID == m_notification.GetNodeId())
                             {
-                                log.Debug("[NodeRemoved] ID:" + node.ID.ToString());
+                                Debug.WriteLine("[NodeRemoved] ID:" + node.ID.ToString());
                                 m_nodeList.Remove(node);
                                 break;
                             }
@@ -1272,9 +1272,6 @@ namespace OpenZWavePlugin
                         break;
                         #endregion
                     }
-
-
-
                 case ZWNotification.Type.NodeNaming:
                     {
                         #region NodeNaming
@@ -1355,12 +1352,11 @@ namespace OpenZWavePlugin
                                 }, context);
                             }
                         }
-                        log.Debug("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
+                        Debug.WriteLine("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.NodeEvent:
                     {
                         #region NodeEvent
@@ -1426,7 +1422,7 @@ namespace OpenZWavePlugin
                             if (!NodesReady.Contains(node.ID))
                                 NodesReady.Add(node.ID);
 
-                            UpdateLastHeardFrom(node.ID);
+                            await UpdateLastHeardFrom(node.ID);
                         }
 
                         break;
@@ -1443,7 +1439,7 @@ namespace OpenZWavePlugin
                             if (!NodesReady.Contains(node.ID))
                                 NodesReady.Add(node.ID);
 
-                            UpdateLastHeardFrom(node.ID);
+                            await UpdateLastHeardFrom(node.ID);
                         }
 
                         break;
@@ -1468,7 +1464,6 @@ namespace OpenZWavePlugin
                         await EnablePollingOnDevices();
                         break;
                         #endregion
-
                     }
                 case ZWNotification.Type.AwakeNodesQueried:
                     {

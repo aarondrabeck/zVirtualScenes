@@ -62,7 +62,8 @@
                 <MenuItem Header="Clear Logs" Name="ClearLogsMI"   Click="ClearLogsMI_Click" />
                 <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                 <Separator />
-                <MenuItem Header="Adapter Manager" Click="MenuItem_Click_1" />
+                <MenuItem Header="Manage Plug-in" Click="ManagePluginsMI" />
+                <MenuItem Header="Manage Adapters" Click="MenuItem_Click_1" />
                 <MenuItem Name="SettingMI" Header="Settings" Click="SettingMI_Click_1" />
 
             </MenuItem>

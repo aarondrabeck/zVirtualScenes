@@ -35,14 +35,12 @@ namespace zvs.Processor
                 var dtb = new DeviceTypeBuilder(this, core, context);
                 await OnDeviceTypesCreating(dtb);
 
-                var sb = new SettingBuilder(this, core, context);
+                var sb = new AdapterSettingBuilder(this, core, context);
                 await OnSettingsCreating(sb);
-            }
-
-            await Task.FromResult(0);
+            }                       
         }
 
-        public virtual Task OnSettingsCreating(SettingBuilder settingBuilder)
+        public virtual Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
         {
             return Task.FromResult(0);
         }

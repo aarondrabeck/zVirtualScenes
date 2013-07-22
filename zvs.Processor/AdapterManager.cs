@@ -28,7 +28,7 @@ namespace zvs.Processor
 
         private Dictionary<Guid, zvsAdapter> AdapterLookup = new Dictionary<Guid, zvsAdapter>();
 
-        public async Task LoadPluginsAsync(Core core)
+        public async Task LoadAdaptersAsync(Core core)
         {
             Core = core;
             SafeDirectoryCatalog catalog = new SafeDirectoryCatalog("adapters");
@@ -37,7 +37,7 @@ namespace zvs.Processor
 
             if (catalog.LoadExceptionTypeNames.Count > 0)
             {
-                Core.log.WarnFormat(@"The following adapters could not be loaded because they are incompatible: {0}. To resolve this issue, update or uninstall the listed plug-in's.",
+                Core.log.WarnFormat(@"The following adapters could not be loaded because they are incompatible: {0}. To resolve this issue, update or uninstall the listed adapter's.",
                     string.Join(", ", catalog.LoadExceptionTypeNames));
             }
 

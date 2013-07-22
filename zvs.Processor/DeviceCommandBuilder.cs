@@ -8,7 +8,7 @@ using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class DeviceCommandBuilder : Builder
+    public class DeviceCommandBuilder : AdapterBuilder
     {
         public DeviceCommandBuilder(zvsAdapter zvsAdapter, Core core) : base(zvsAdapter, core) { }
         public async Task RegisterAsync(DeviceCommand deviceCommand, zvsContext context)

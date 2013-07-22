@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace zvs.Processor
 {
-    public abstract class Builder
+    public abstract class AdapterBuilder
     {
         protected Core Core { get; set; }
         protected zvsAdapter Adapter { get; set; }
 
-        public Builder(zvsAdapter zvsAdapter, Core core)
+        public AdapterBuilder(zvsAdapter zvsAdapter, Core core)
         {
             Adapter = zvsAdapter;
             Core = core;

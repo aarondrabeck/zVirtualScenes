@@ -131,50 +131,36 @@ namespace zvs.WPF
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in app.Windows)
-            {
-                if (window.GetType() == typeof(GroupEditor))
-                {
-                    window.Activate();
-                    return;
-                }
-            }
-
-            GroupEditor groupEditor = new GroupEditor();
-            groupEditor.Owner = this;
-            groupEditor.Show();
+            ShowOrCreateWindow<GroupEditor>();
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in app.Windows)
+            ShowOrCreateWindow<AdapterManagerWindow>();
+        }
+
+        private void ManagePluginsMI(object sender, RoutedEventArgs e)
+        {
+            ShowOrCreateWindow<PluginManagerWindow>();
+        }
+
+        private void ShowOrCreateWindow<T>() where T : Window, new()
+        {
+            var w = app.Windows.OfType<T>().FirstOrDefault();
+            if (w != null)
             {
-                if (window.GetType() == typeof(AdapterManagerWindow))
-                {
-                    window.Activate();
-                    return;
-                }
+                w.Activate();
+                return;
             }
 
-            AdapterManagerWindow new_window = new AdapterManagerWindow();
+            var new_window = new T();
             new_window.Owner = this;
             new_window.Show();
         }
 
         private void ActivateGroupMI_Click_1(object sender, RoutedEventArgs e)
         {
-            foreach (Window window in app.Windows)
-            {
-                if (window is ActivateGroup)
-                {
-                    window.Activate();
-                    return;
-                }
-            }
-
-            ActivateGroup groupEditor = new ActivateGroup();
-            groupEditor.Owner = this;
-            groupEditor.Show();
+            ShowOrCreateWindow<ActivateGroup>();
         }
 
         private void Window_Closing_1(object sender, CancelEventArgs e)
@@ -537,6 +523,8 @@ namespace zvs.WPF
         {
             logSource.Clear();
         }
+
+
 
 
     }

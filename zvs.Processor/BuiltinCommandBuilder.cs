@@ -8,7 +8,7 @@ using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class BuiltinCommandBuilder : Builder
+    public class BuiltinCommandBuilder : AdapterBuilder
     {
         protected zvsContext Context { get; set; }
         public BuiltinCommandBuilder(zvsAdapter zvsAdapter, Core core, zvsContext context)

@@ -8,7 +8,7 @@ using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class DeviceValueBuilder : Builder
+    public class DeviceValueBuilder : AdapterBuilder
     {
         public DeviceValueBuilder(zvsAdapter zvsAdapter, Core core) : base(zvsAdapter, core) { }
         public async Task RegisterAsync(DeviceValue deviceValue, zvsContext context, bool ignoreValueChange = false)

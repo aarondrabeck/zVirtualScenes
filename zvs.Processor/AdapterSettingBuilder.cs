@@ -8,10 +8,10 @@ using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class SettingBuilder : Builder
+    public class AdapterSettingBuilder : AdapterBuilder
     {
         protected zvsContext Context { get; set; }
-        public SettingBuilder(zvsAdapter zvsAdapter, Core core, zvsContext context)
+        public AdapterSettingBuilder(zvsAdapter zvsAdapter, Core core, zvsContext context)
             : base(zvsAdapter, core)
         {
             Context = context;

@@ -8,7 +8,7 @@ using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class DeviceTypeBuilder : Builder
+    public class DeviceTypeBuilder : AdapterBuilder
     {
         protected zvsContext Context { get; set; }
         public DeviceTypeBuilder(zvsAdapter zvsAdapter, Core core, zvsContext context)

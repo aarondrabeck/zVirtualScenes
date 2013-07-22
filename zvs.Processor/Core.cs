@@ -18,6 +18,7 @@ namespace zvs.Processor
     public class Core
     {
         public AdapterManager AdapterManager;
+        public PluginManager PluginManager;
         private TriggerManager TriggerManager;
         private ScheduledTaskManager ScheduledTaskManager;
         public Logging.ILog log;
@@ -26,6 +27,7 @@ namespace zvs.Processor
         {
             AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
             AdapterManager = new Processor.AdapterManager();
+            PluginManager = new Processor.PluginManager();
 
             //Create a instance of the logger
             log = Logging.LogManager.GetLogger<Core>();
@@ -92,7 +94,16 @@ namespace zvs.Processor
 
             try
             {
-                await AdapterManager.LoadPluginsAsync(this);
+                await AdapterManager.LoadAdaptersAsync(this);
+            }
+            catch (Exception ex)
+            {
+                Core.ProgramHasToClosePrompt(ex.Message);
+            }
+
+            try
+            {
+                await PluginManager.LoadPluginsAsync(this);
             }
             catch (Exception ex)
             {

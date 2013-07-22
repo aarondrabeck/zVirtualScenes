@@ -21,11 +21,11 @@ namespace zvs.Entities
     /// </summary>
     public partial class zvsContext : DbContext
     {
-        public zvsContext()
-            : base("zvsDBEFCF6")
-        {
+        public zvsContext() : base("zvsDBEFCF6") { }
 
-        }
+        public DbSet<Adapter> Adapters { get; set; }
+        public DbSet<AdapterSetting> AdapterSettings { get; set; }
+        public DbSet<AdapterSettingOption> AdapterSettingOptions { get; set; }
 
         public DbSet<BuiltinCommand> BuiltinCommands { get; set; }
         public DbSet<DbInfo> DbInfo { get; set; }
@@ -39,7 +39,6 @@ namespace zvs.Entities
         public DbSet<DeviceSetting> DeviceSettings { get; set; }
         public DbSet<DeviceSettingOption> DeviceSettingOptions { get; set; }
         public DbSet<DeviceSettingValue> DeviceSettingValues { get; set; }
-
 
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<DeviceTypeCommand> DeviceTypeCommands { get; set; }
@@ -55,9 +54,9 @@ namespace zvs.Entities
 
         public DbSet<JavaScriptCommand> JavaScriptCommands { get; set; }
 
-        public DbSet<Adapter> Adapters { get; set; }
-        public DbSet<AdapterSetting> AdapterSettings { get; set; }
-        public DbSet<AdapterSettingOption> AdapterSettingOptions { get; set; }
+        public DbSet<Plugin> Plugins { get; set; }
+        public DbSet<PluginSetting> PluginSettings { get; set; }
+        public DbSet<PluginSettingOption> PluginSettingOptions { get; set; }
 
         public DbSet<ProgramOption> ProgramOptions { get; set; }
 

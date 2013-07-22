@@ -84,10 +84,11 @@
     <Compile Include="Backup\BackupGroup.cs" />
     <Compile Include="Backup\BackupScheduledTask.cs" />
     <Compile Include="Backup\BackupJavaScript.cs" />
-    <Compile Include="Builder.cs" />
+    <Compile Include="AdapterBuilder.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="AdapterManager.cs" />
     <Compile Include="BuiltinCommandBuilder.cs" />
+    <Compile Include="PluginSettingBuilder.cs" />
     <Compile Include="DetectVCRedist.cs" />
     <Compile Include="Backup\BackupScene.cs" />
     <Compile Include="Backup\BackupDevice.cs" />
@@ -102,7 +103,7 @@
     <Compile Include="Logging\LogManager.cs" />
     <Compile Include="Logging\ObservableLog.cs" />
     <Compile Include="SafeDirectoryCatalog.cs" />
-    <Compile Include="SettingBuilder.cs" />
+    <Compile Include="AdapterSettingBuilder.cs" />
     <Compile Include="zvsAdapter.cs" />
     <Compile Include="zvsPlugin.cs" />
     <Compile Include="SceneRunner.cs" />
