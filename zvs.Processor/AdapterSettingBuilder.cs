@@ -5,42 +5,39 @@ using System.Text;
 using System.Threading.Tasks;
 using zvs.Entities;
 using System.Data.Entity;
+using System.Reflection;
+using System.Linq.Expressions;
 
 namespace zvs.Processor
 {
-    public class AdapterSettingBuilder : AdapterBuilder
+    public class AdapterSettingBuilder
     {
-        protected zvsContext Context { get; set; }
-        public AdapterSettingBuilder(zvsAdapter zvsAdapter, Core core, zvsContext context)
-            : base(zvsAdapter, core)
+        public Core Core { get; private set; }
+        public zvsContext Context { get; private set; }
+
+        public AdapterSettingBuilder(Core core, zvsContext context)
         {
+            Core = core;
             Context = context;
         }
 
-        public async Task RegisterAdapterSettingAsync(AdapterSetting adapterSetting)
+        public AdapterTypeConfiguration<T> Adapter<T>(T adapter) where T : zvsAdapter
         {
-            var adapter = await Context.Adapters.FirstOrDefaultAsync(p => p.AdapterGuid == Adapter.AdapterGuid);
-            if (adapter != null)
-            {
-                AdapterSetting existing_ps = await Context.AdapterSettings.FirstOrDefaultAsync(o => o.Adapter.Id == adapter.Id && o.UniqueIdentifier == adapterSetting.UniqueIdentifier);
-                if (existing_ps == null)
-                {
-                    adapter.Settings.Add(adapterSetting);
-                }
-                else
-                {
-                    existing_ps.Description = adapterSetting.Description;
-                    existing_ps.Name = adapterSetting.Name;
-                    existing_ps.ValueType = adapterSetting.ValueType;
-                    existing_ps.Options = adapterSetting.Options;
-                }
-
-                var result = await Context.TrySaveChangesAsync();
-                if (result.HasError)
-                    Core.log.Error(result.Message);
-            }
+            return new AdapterTypeConfiguration<T>(adapter, this);
         }
 
+        public class AdapterTypeConfiguration<T> where T : zvsAdapter
+        {
+            public T Adapter { get; private set; }
+            public AdapterSettingBuilder AdapterSettingBuilder { get; private set; }
+
+            public AdapterTypeConfiguration(T adapter, AdapterSettingBuilder sb)
+            {
+                Adapter = adapter;
+                AdapterSettingBuilder = sb;
+            }
+        }
+        
         public async Task RegisterDeviceSettingAsync(DeviceSetting deviceSetting)
         {
             var existing_dp = await Context.DeviceSettings.FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier);
@@ -93,5 +90,48 @@ namespace zvs.Processor
                 Core.log.Error(result.Message);
         }
 
+    }
+
+    public static class AdapterTypeConfigurationExtensions
+    {
+        public static async Task RegisterAdapterSettingAsync<T, R>(this zvs.Processor.AdapterSettingBuilder.AdapterTypeConfiguration<T> adsb, AdapterSetting adapterSetting, 
+            Expression<Func<T, R>> property) where T : zvsAdapter
+        {
+            var propertyInfo = (property.Body as MemberExpression).Member as PropertyInfo;
+            if (propertyInfo == null)
+            {
+                throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
+            }
+
+            adapterSetting.UniqueIdentifier = propertyInfo.Name;
+
+
+            var adapter = await adsb.AdapterSettingBuilder.Context.Adapters.FirstOrDefaultAsync(p => p.AdapterGuid == adsb.Adapter.AdapterGuid);
+            if (adapter == null)
+                return;
+
+            AdapterSetting existingAdapter = await adsb.AdapterSettingBuilder.Context.AdapterSettings.FirstOrDefaultAsync(o => o.Adapter.Id == adapter.Id &&
+                o.UniqueIdentifier == adapterSetting.UniqueIdentifier);
+
+            if (existingAdapter == null)
+            {
+                adapter.Settings.Add(adapterSetting);
+            }
+            else
+            {
+                existingAdapter.Description = adapterSetting.Description;
+                existingAdapter.Name = adapterSetting.Name;
+                existingAdapter.ValueType = adapterSetting.ValueType;
+                adsb.AdapterSettingBuilder.Context.AdapterSettingOptions.RemoveRange(existingAdapter.Options);
+
+                foreach (var option in existingAdapter.Options)
+                    existingAdapter.Options.Add(option);
+            }
+
+            var result = await adsb.AdapterSettingBuilder.Context.TrySaveChangesAsync();
+            if (result.HasError)
+                adsb.AdapterSettingBuilder.Core.log.Error(result.Message);
+
+        }
     }
 }

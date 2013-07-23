@@ -26,6 +26,16 @@ namespace OpenZWavePlugin
     [Export(typeof(zvsAdapter))]
     public class OpenZWaveAdapter : zvsAdapter
     {
+        private async void OpenZWaveAdapter_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+
+            if (IsEnabled)
+            {
+                await StopOpenzwaveAsync();
+                await StartOpenzwaveAsync();
+            }
+        }
+
         public override Guid AdapterGuid
         {
             get { return Guid.Parse("70f91ca6-08bb-406a-a60f-aeb13f50aae8"); }
@@ -39,13 +49,6 @@ namespace OpenZWavePlugin
         public override string Description
         {
             get { return "This adapter provides OpenZWave functionality in zVirtualScenes using the OpenZWave open-source project."; }
-        }
-
-        private enum OpenzWaveSettings
-        {
-            COM_Port,
-            HID,
-            Poll_Interval
         }
 
         private enum OpenzWaveDeviceTypes
@@ -122,32 +125,32 @@ namespace OpenZWavePlugin
 
         public override async Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
         {
-            await settingBuilder.RegisterAdapterSettingAsync(new AdapterSetting
+            var comSetting = new AdapterSetting
              {
-                 UniqueIdentifier = OpenzWaveSettings.COM_Port.ToString(),
                  Name = "Com Port",
                  Value = (3).ToString(),
                  ValueType = DataType.COMPORT,
                  Description = "The COM port that your z-wave controller is assigned to."
-             });
+             };
 
-            await settingBuilder.RegisterAdapterSettingAsync(new AdapterSetting
+            var useHIDsetting = new AdapterSetting
            {
-               UniqueIdentifier = OpenzWaveSettings.HID.ToString(),
                Name = "Use HID",
                Value = false.ToString(),
                ValueType = DataType.BOOL,
                Description = "Use HID rather than COM port. (use this for ControlThink Sticks)"
-           });
-
-            await settingBuilder.RegisterAdapterSettingAsync(new AdapterSetting
+           };
+            var pollIntSetting = new AdapterSetting
            {
-               UniqueIdentifier = OpenzWaveSettings.Poll_Interval.ToString(),
                Name = "Polling interval",
                Value = (360).ToString(),
                ValueType = DataType.INTEGER,
                Description = "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. "
-           });
+           };
+
+            await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(comSetting, o => o.ComportSetting);
+            await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(useHIDsetting, o => o.UseHIDSetting);
+            await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
 
             using (zvsContext context = new zvsContext())
             {
@@ -189,34 +192,8 @@ namespace OpenZWavePlugin
                     });
                 }
 
-                #region Cache adapter settings locally
-
-                //HID
-                var hidUId = OpenzWaveSettings.HID.ToString();
-                var HIDSetting = await context.AdapterSettings.FirstOrDefaultAsync(o =>
-                    o.Adapter.AdapterGuid == this.AdapterGuid &&
-                    o.UniqueIdentifier == hidUId);
-                if (HIDSetting != null)
-                    bool.TryParse(HIDSetting.Value, out UseHID);
-
-                //COM
-                var comUId = OpenzWaveSettings.COM_Port.ToString();
-                var ComPortSetting = await context.AdapterSettings.FirstOrDefaultAsync(o =>
-                     o.Adapter.AdapterGuid == this.AdapterGuid &&
-                     o.UniqueIdentifier == comUId);
-                if (ComPortSetting != null)
-                    ComPort = ComPortSetting.Value;
-
-                //POLL
-                var pollUId = OpenzWaveSettings.Poll_Interval.ToString();
-                var PollIntervalSetting = await context.AdapterSettings.FirstOrDefaultAsync(o =>
-                     o.Adapter.AdapterGuid == this.AdapterGuid &&
-                     o.UniqueIdentifier == pollUId);
-                if (PollIntervalSetting != null)
-                    int.TryParse(PollIntervalSetting.Value, out PollingInterval);
-
-                #endregion
             }
+            this.PropertyChanged += OpenZWaveAdapter_PropertyChanged;
         }
 
         public override async Task StartAsync()
@@ -230,10 +207,49 @@ namespace OpenZWavePlugin
         }
 
         //Settings Cache 
-        private bool UseHID = false;
-        private string ComPort = "3";
+        private bool _UseHIDSetting = false;
+        public bool UseHIDSetting
+        {
+            get { return _UseHIDSetting; }
+            set
+            {
+                if (value != _UseHIDSetting)
+                {
+                    _UseHIDSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private string _ComportSetting = "10";
+        public string ComportSetting
+        {
+            get { return _ComportSetting; }
+            set
+            {
+                if (value != _ComportSetting)
+                {
+                    _ComportSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private int _PollingIntervalSetting = 0;
+        public int PollingIntervalSetting
+        {
+            get { return _PollingIntervalSetting; }
+            set
+            {
+                if (value != _PollingIntervalSetting)
+                {
+                    _PollingIntervalSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         private bool InitialPollingComplete = false;
-        private int PollingInterval = 0;
 
         //OpenzWave Data
         private ZWManager m_manager = null;
@@ -266,13 +282,13 @@ namespace OpenZWavePlugin
         {
             if (isShuttingDown)
             {
-                Debug.WriteLine("{0} driver cannot start because it is still shutting down", this.Name);
+                Core.log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
                 return;
             }
 
             try
             {
-                Debug.WriteLine("OpenZwave driver starting on {0}", UseHID ? "HID" : "COM" + ComPort);
+                Core.log.InfoFormat("OpenZwave driver starting on {0}", UseHIDSetting ? "HID" : "COM" + ComportSetting);
 
                 // Environment.CurrentDirectory returns wrong directory in Service environment so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
@@ -290,11 +306,11 @@ namespace OpenZWavePlugin
                     m_manager.Create();
                     m_manager.OnNotification += NotificationHandler;
 
-                    if (!UseHID)
+                    if (!UseHIDSetting)
                     {
-                        if (ComPort != "0")
+                        if (ComportSetting != "0")
                         {
-                            m_manager.AddDriver(@"\\.\COM" + ComPort);
+                            m_manager.AddDriver(@"\\.\COM" + ComportSetting);
                         }
                     }
                     else
@@ -303,9 +319,9 @@ namespace OpenZWavePlugin
                     }
 
 
-                    if (PollingInterval != 0)
+                    if (PollingIntervalSetting != 0)
                     {
-                        m_manager.SetPollInterval(PollingInterval, true);
+                        m_manager.SetPollInterval(PollingIntervalSetting, true);
                     }
                 });
 
@@ -329,7 +345,7 @@ namespace OpenZWavePlugin
                     if (m_manager != null)
                     {
                         m_manager.OnNotification -= NotificationHandler;
-                        m_manager.RemoveDriver(@"\\.\COM" + ComPort);
+                        m_manager.RemoveDriver(@"\\.\COM" + ComportSetting);
                         m_manager.Destroy();
                         m_manager = null;
                     }
@@ -342,44 +358,10 @@ namespace OpenZWavePlugin
                 });
 
                 isShuttingDown = false;
-                Debug.WriteLine("OpenZwave driver stopped");
+                Core.log.Info("OpenZwave driver stopped");
             }
         }
-
-        public override async Task SettingChangedAsync(string settingUniqueIdentifier, string settingValue)
-        {
-            if (settingUniqueIdentifier == OpenzWaveSettings.COM_Port.ToString())
-            {
-                if (IsEnabled)
-                    await StopOpenzwaveAsync();
-
-                ComPort = settingValue;
-
-                if (IsEnabled)
-                    await StartOpenzwaveAsync();
-            }
-            else if (settingUniqueIdentifier == OpenzWaveSettings.HID.ToString())
-            {
-                if (IsEnabled)
-                    await StopOpenzwaveAsync();
-
-                bool.TryParse(settingValue, out UseHID);
-
-                if (IsEnabled)
-                    await StartOpenzwaveAsync();
-            }
-            else if (settingUniqueIdentifier == OpenzWaveSettings.Poll_Interval.ToString())
-            {
-                if (IsEnabled)
-                    await StopOpenzwaveAsync();
-
-                int.TryParse(settingValue, out PollingInterval);
-
-                if (IsEnabled)
-                    await StartOpenzwaveAsync();
-            }
-        }
-
+           
         public override async Task ProcessCommandAsync(int queuedCommandId)
         {
             using (zvsContext context = new zvsContext())
@@ -1185,9 +1167,9 @@ namespace OpenZWavePlugin
                             //To get the real level re-poll the device a second or two after a level change was received.     
                             bool EnableDimmerRepoll = bool.TryParse(await device.GetDeviceSettingAsync(OpenzWaveDeviceTypeSettings.ENABLE_REPOLL_ON_LEVEL_CHANGE.ToString(), context), out EnableDimmerRepoll) ? EnableDimmerRepoll : false;
 
-                            if (InitialPollingComplete && 
-                                EnableDimmerRepoll && 
-                                device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.DIMMER.ToString() && 
+                            if (InitialPollingComplete &&
+                                EnableDimmerRepoll &&
+                                device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.DIMMER.ToString() &&
                                 value.Label == "Basic")
                             {
                                 //only allow each device to re-poll 1 time.
@@ -1205,7 +1187,7 @@ namespace OpenZWavePlugin
                                 }
                             }
                             #endregion
-                                                      
+
                         }
 
                         break;

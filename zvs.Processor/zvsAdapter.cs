@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using zvs.Entities;
 using System.Data.Entity;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace zvs.Processor
 {
-    public abstract class zvsAdapter
+    public abstract class zvsAdapter : INotifyPropertyChanged
     {
         public bool IsEnabled { get; set; }
         public abstract Guid AdapterGuid { get; }
@@ -22,7 +24,6 @@ namespace zvs.Processor
 
         public abstract Task StartAsync();
         public abstract Task StopAsync();
-        public abstract Task SettingChangedAsync(string settingUniqueIdentifier, string settingValue);
 
         public async Task Initialize(Core core)
         {
@@ -35,7 +36,7 @@ namespace zvs.Processor
                 var dtb = new DeviceTypeBuilder(this, core, context);
                 await OnDeviceTypesCreating(dtb);
 
-                var sb = new AdapterSettingBuilder(this, core, context);
+                var sb = new AdapterSettingBuilder(core, context);
                 await OnSettingsCreating(sb);
             }                       
         }
@@ -54,5 +55,11 @@ namespace zvs.Processor
         public abstract Task RepollAsync(Device device, zvsContext context);
         public abstract Task ActivateGroupAsync(Group group, zvsContext context);
         public abstract Task DeactivateGroupAsync(Group group, zvsContext context);
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

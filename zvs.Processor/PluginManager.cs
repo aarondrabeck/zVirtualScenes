@@ -67,7 +67,7 @@ namespace zvs.Processor
 
                     //Check Database for this plug-in
                     var dbPlugin = await context.Plugins
-                        .Include(o=>o.Settings)
+                        .Include(o => o.Settings)
                         .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid);
 
                     if (dbPlugin == null)
@@ -150,7 +150,7 @@ namespace zvs.Processor
         public void NotifyPluginSettingsChanged(PluginSetting pluginSetting)
         {
             if (!PluginLookup.ContainsKey(pluginSetting.Plugin.PluginGuid))
-            return; 
+                return;
 
             var plugin = PluginLookup[pluginSetting.Plugin.PluginGuid];
             SetPluginProperty(plugin, pluginSetting.UniqueIdentifier, pluginSetting.Value);
@@ -165,8 +165,15 @@ namespace zvs.Processor
                 return;
             }
 
-            //TODO: CAST TO TYPES HERE
-            prop.SetValue(zvsPlugin, value);
+            try
+            {
+                var convertedValue = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(value);
+                prop.SetValue(zvsPlugin, convertedValue);
+            }
+            catch
+            {
+                Core.log.ErrorFormat("Cannot cast value on {0} on this adapter", PropertyName);
+            }
         }
     }
 }

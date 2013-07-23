@@ -41,7 +41,8 @@ namespace zvs.Processor
 
     public static class PlugingTypeConfigurationExtensions
     {
-        public static async Task RegisterPluginSettingAsync<T>(this zvs.Processor.PluginSettingBuilder.PlugingTypeConfiguration<T> pspb, PluginSetting pluginSetting, Expression<Func<T, object>> property) where T : zvsPlugin
+        public static async Task RegisterPluginSettingAsync<T,R>(this zvs.Processor.PluginSettingBuilder.PlugingTypeConfiguration<T> pspb, PluginSetting pluginSetting, 
+            Expression<Func<T, R>> property) where T : zvsPlugin
         {
             var propertyInfo = (property.Body as MemberExpression).Member as PropertyInfo;
             if (propertyInfo == null)

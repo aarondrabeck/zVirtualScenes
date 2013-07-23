@@ -66,7 +66,12 @@ namespace zvs.Processor
                     dbAdapter.Name = zvsAdapter.Name;
                     dbAdapter.Description = zvsAdapter.Description;
 
-                    //TODO: DO SOMETHING ELSE HERE
+                    //Set plug-in settings from database values
+                    foreach (var setting in dbAdapter.Settings)
+                    {
+                        SetAdapterProperty(zvsAdapter, setting.UniqueIdentifier, setting.Value);
+                    }
+
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
                         core.log.Error(result.Message);
@@ -128,9 +133,30 @@ namespace zvs.Processor
 
         public void NotifyAdapterSettingsChanged(AdapterSetting adapterSetting)
         {
-            if (AdapterLookup.ContainsKey(adapterSetting.Adapter.AdapterGuid))
+            if (!AdapterLookup.ContainsKey(adapterSetting.Adapter.AdapterGuid))
+                return;
+
+            var adapter = AdapterLookup[adapterSetting.Adapter.AdapterGuid];
+            SetAdapterProperty(adapter, adapterSetting.UniqueIdentifier, adapterSetting.Value);
+        }
+
+        private void SetAdapterProperty(object zvsAdapter, string PropertyName, object value)
+        {
+            var prop = zvsAdapter.GetType().GetProperty(PropertyName);
+            if (prop == null)
             {
-                AdapterLookup[adapterSetting.Adapter.AdapterGuid].SettingChangedAsync(adapterSetting.UniqueIdentifier, adapterSetting.Value);
+                Core.log.ErrorFormat("Cannot find property called {0} on this adapter", PropertyName);
+                return;
+            }
+
+            try
+            {
+                var convertedValue = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(value);
+                prop.SetValue(zvsAdapter, convertedValue);
+            }
+            catch
+            {
+                Core.log.ErrorFormat("Cannot cast value on {0} on this adapter", PropertyName);
             }
         }
     }
