@@ -54,7 +54,6 @@ namespace zvs.Processor
 
                     //Check Database for this adapter
                     var dbAdapter = await context.Adapters
-                        .Include(o=> o.Settings)
                         .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
 
                     if (dbAdapter == null)
@@ -69,12 +68,6 @@ namespace zvs.Processor
                     dbAdapter.Name = zvsAdapter.Name;
                     dbAdapter.Description = zvsAdapter.Description;
 
-                    //Set plug-in settings from database values
-                    foreach (var setting in dbAdapter.Settings)
-                    {
-                        SetAdapterProperty(zvsAdapter, setting.UniqueIdentifier, setting.Value);
-                    }
-
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
                         core.log.Error(result.Message);
@@ -84,6 +77,17 @@ namespace zvs.Processor
 
                     //Plug-in need access to the core in order to use the Logger
                     await zvsAdapter.Initialize(Core);
+
+                    //Reload just installed settings
+                    dbAdapter = await context.Adapters
+                        .Include(o => o.Settings)
+                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
+
+                    //Set plug-in settings from database values
+                    foreach (var setting in dbAdapter.Settings)
+                    {
+                        SetAdapterProperty(zvsAdapter, setting.UniqueIdentifier, setting.Value);
+                    }
 
                     if (dbAdapter.IsEnabled)
                         await zvsAdapter.StartAsync();

@@ -966,6 +966,7 @@ namespace OpenZWavePlugin
                                     DeviceCommand dynamic_dc = new DeviceCommand
                                     {
                                         Device = d,
+                                        DeviceId = d.Id,
                                         UniqueIdentifier = string.Format("DYNAMIC_CMD_{0}_{1}", label.ToUpper(), vid.GetId().ToString()),
                                         Name = string.Format("Set {0}", value.Label),
                                         ArgumentType = pType,

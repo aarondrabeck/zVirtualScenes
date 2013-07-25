@@ -22,7 +22,7 @@ namespace zvs.Processor
                 return;
             }
 
-            if (deviceCommand.DeviceId == 0)
+            if (deviceCommand.Device.Id == 0)
             {
                 Core.log.ErrorFormat("Command builder cannot find device in database with id of {0}", deviceCommand.Device.Id);
                 return;

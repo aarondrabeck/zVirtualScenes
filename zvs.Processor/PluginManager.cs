@@ -67,7 +67,6 @@ namespace zvs.Processor
 
                     //Check Database for this plug-in
                     var dbPlugin = await context.Plugins
-                        .Include(o => o.Settings)
                         .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid);
 
                     if (dbPlugin == null)
@@ -82,12 +81,6 @@ namespace zvs.Processor
                     dbPlugin.Name = zvsPlugin.Name;
                     dbPlugin.Description = zvsPlugin.Description;
 
-                    //Set plug-in settings from database values
-                    foreach (var setting in dbPlugin.Settings)
-                    {
-                        SetPluginProperty(zvsPlugin, setting.UniqueIdentifier, setting.Value);
-                    }
-
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
                         core.log.Error(result.Message);
@@ -97,6 +90,17 @@ namespace zvs.Processor
 
                     //Plug-in need access to the core in order to use the Logger
                     await zvsPlugin.Initialize(Core);
+
+                    //Reload just installed settings
+                    dbPlugin = await context.Plugins
+                      .Include(o => o.Settings)
+                      .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid);
+
+                    //Set plug-in settings from database values
+                    foreach (var setting in dbPlugin.Settings)
+                    {
+                        SetPluginProperty(zvsPlugin, setting.UniqueIdentifier, setting.Value);
+                    }
 
                     if (dbPlugin.IsEnabled)
                         await zvsPlugin.StartAsync();
