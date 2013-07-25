@@ -82,14 +82,6 @@ namespace zvs.WPF.AdapterManager
                 //Only load the plug-in options for the plug-ins that are currently loaded.
                 zvsEntities2ViewSource.Source = context.Adapters.Local;
             }
-
-            this.SizeChanged += PluginManagerWindow_SizeChanged;
-        }
-
-        void PluginManagerWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-           //TODO: Why are we doing this?
-            ControlsStackPanelParent.Height = this.Height - 50;
         }
 
         private void UpdateAdapterList()
@@ -311,8 +303,6 @@ namespace zvs.WPF.AdapterManager
                             }
                     }
                 }
-                (ControlsStkPnl.Parent as ScrollViewer).UpdateLayout();
-                ((ControlsStkPnl.Parent as ScrollViewer).Parent as StackPanel).UpdateLayout();
             }
         }
     }

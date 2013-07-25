@@ -38,7 +38,6 @@ namespace zvs.WPF
             zvsContext.ChangeNotifications<Plugin>.onEntityUpdated += PluginManagerWindow_onEntityUpdated;
             zvsContext.ChangeNotifications<Plugin>.onEntityAdded += PluginManagerWindow_onEntityAdded;
             zvsContext.ChangeNotifications<Plugin>.onEntityDeleted += PluginManagerWindow_onEntityDeleted;
-            this.SizeChanged += PluginManagerWindow_SizeChanged;
         }
 
 #if DEBUG
@@ -102,11 +101,6 @@ namespace zvs.WPF
             {
                 await GetLoadedPlugins();
             }));
-        }
-
-        void PluginManagerWindow_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            ControlsStackPanelParent.Height = this.Height - 50;
         }
 
         private void Window_Closed_1(object sender, EventArgs e)
@@ -316,8 +310,6 @@ namespace zvs.WPF
                             }
                     }
                 }
-                (ControlsStkPnl.Parent as ScrollViewer).UpdateLayout();
-                ((ControlsStkPnl.Parent as ScrollViewer).Parent as StackPanel).UpdateLayout();
             }
         }
     }

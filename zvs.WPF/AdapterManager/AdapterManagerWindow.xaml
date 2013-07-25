@@ -1,21 +1,27 @@
 ﻿<Window x:Class="zvs.WPF.AdapterManager.AdapterManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Adapter Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs32.ico" Background="#FFF0F0F0" MinHeight="300" MinWidth="675" WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
+        Title="Adapter Manager" Width="800" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
+        Loaded="Window_Loaded" Icon="/zVirtualScenes;component/Images/zvs32.ico" Background="#FFF0F0F0" MinHeight="300" MinWidth="675" 
+        WindowStyle="ToolWindow" d:DesignHeight="312" Height="500" WindowStartupLocation="CenterOwner" Closed="Window_Closed_1">
     <Window.Resources>
         <CollectionViewSource x:Key="zvsEntities2adapterViewSource"  />
     </Window.Resources>
     <Grid DataContext="{StaticResource zvsEntities2adapterViewSource}">
-        <ListView HorizontalAlignment="Left" Margin="8,7,0,44" Name="AdapterLstVw" Width="219" DisplayMemberPath="Name" ItemsSource="{Binding}" SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="PluginLstVw_SelectionChanged" />
+        <ListView HorizontalAlignment="Left" Margin="8,7,0,44" Name="AdapterLstVw" Width="219" DisplayMemberPath="Name" ItemsSource="{Binding}" 
+                  SelectedValuePath="Description" SelectionMode="Single" SelectionChanged="PluginLstVw_SelectionChanged" />
 
-        <StackPanel Name="ControlsStackPanelParent"  VerticalAlignment="Top"  Margin="233,8,12,0" Orientation="Vertical">
-            <TextBlock Name="AdapterNameTxt" Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes}" FontSize="15" FontWeight="Bold" Margin="0,0,0,5" />
-            <TextBlock Name="DescriptionTxt" Text="{Binding Path=Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis" Margin="0,0,0,10"/>
-            <Rectangle Stroke="#FFA0A0A0" Height="1" Margin="0,0,0,10"  />
-            <ScrollViewer HorizontalScrollBarVisibility="Disabled"  Height="344" VerticalScrollBarVisibility="Auto">
-                <StackPanel Name="ControlsStkPnl" Height="5000" Orientation="Vertical" Margin="0,10,0,20"></StackPanel>
+        <DockPanel Name="ControlsStackPanelParent"    Margin="233,8,12,63" >
+            <StackPanel DockPanel.Dock="Top">
+                <TextBlock Name="AdapterNameTxt" Text="{Binding Path=Name, StringFormat={}{0} for zVirtualScenes}" FontSize="15" FontWeight="Bold" Margin="0,0,0,5" />
+                <TextBlock Name="DescriptionTxt" Text="{Binding Path=Description}" TextWrapping="Wrap" TextTrimming="WordEllipsis" Margin="0,0,0,10"/>
+                <Rectangle Stroke="#FFA0A0A0" Height="1" Margin="0,0,0,10"  />
+            </StackPanel>
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto">
+                <StackPanel Name="ControlsStkPnl"  Orientation="Vertical" Margin="0,10,0,20"></StackPanel>
             </ScrollViewer>
-        </StackPanel>
+        </DockPanel>
         <Button Content="Done" Height="23" HorizontalAlignment="Right" Margin="0,0,12,12" Name="CancelBtn" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click" />
         <Rectangle Height="1" Margin="240,0,12,47" Name="rectangle1" Stroke="#FFA0A0A0" VerticalAlignment="Bottom" />
         

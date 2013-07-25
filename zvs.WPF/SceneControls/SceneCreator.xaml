@@ -91,8 +91,6 @@
                             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="3,0">
                                 <Button Name="ActivateScene" Click="ActivateScene_Click_1" Height="32"  ToolTip="Activate" Padding="3,0">
                                     <Image Name="actimg" Source="../Images/run.png"></Image>
-
-
                                 </Button>
                                 <Button Name="SortUp" Height="32" Width="20"  ToolTip="Move Up" Click="SortUp_Click_1" Margin="5,0,0,0">
                                     <Image Source="../Images/arrow_up.png" ></Image>
@@ -141,7 +139,7 @@
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <DataGrid MinHeight="100"  MinWidth="400" Grid.Row="0" Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
+                <DataGrid MinHeight="100"  MinWidth="400" Grid.Row="0" x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
                   ItemsSource="{Binding Source={StaticResource scenescene_commandsViewSource}}"
                 AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
@@ -164,7 +162,7 @@
 
                                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                                     <Setter Property="TextWrapping"  Value="NoWrap" />
-                                   
+
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="ToolTip" Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
                                 </Style>

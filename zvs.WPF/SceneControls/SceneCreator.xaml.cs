@@ -143,10 +143,12 @@ namespace zvs.WPF.SceneControls
             {
                 await context.Scenes
                    .Include(o => o.Commands)
+                   .OrderBy(o => o.SortOrder)
                    .ToListAsync();
 
                 await context.SceneCommands
                     .Include(o => o.StoredCommand)
+                    .OrderBy(o => o.SortOrder)
                     .ToListAsync();
 
                 SceneCollection = context.Scenes.Local;
@@ -158,8 +160,6 @@ namespace zvs.WPF.SceneControls
                 myCollectionViewSource.Source = context.Scenes.Local;
             }
         }
-
-
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
@@ -211,12 +211,8 @@ namespace zvs.WPF.SceneControls
             {
                 Scene s = e.Row.DataContext as Scene;
                 if (s != null)
-                {
                     if (string.IsNullOrEmpty(s.Name))
-                    {
                         s.Name = "New Scene";
-                    }
-                }
 
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 var result = await context.TrySaveChangesAsync();
@@ -548,7 +544,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private async Task NormalizeSortOrderSceneCmdsAsync()
+        private async Task SaveSceneCmdAsync()
         {
             if (SceneGrid.SelectedItem is Scene)
             {
@@ -601,7 +597,7 @@ namespace zvs.WPF.SceneControls
                     scene_command.SortOrder--;
 
                     SortSceneCMDsGridBySortOrder();
-                    await NormalizeSortOrderSceneCmdsAsync();
+                    await SaveSceneCmdAsync();
                     SortSceneCMDsGridBySortOrder();
 
                     SceneCmdsGrid.SelectedItem = scene_command;
@@ -625,7 +621,7 @@ namespace zvs.WPF.SceneControls
                     scene_command.SortOrder++;
 
                     SortSceneCMDsGridBySortOrder();
-                    await NormalizeSortOrderSceneCmdsAsync();
+                    await SaveSceneCmdAsync();
                     SortSceneCMDsGridBySortOrder();
 
                     SceneCmdsGrid.SelectedItem = scene_command;
@@ -634,7 +630,7 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private async void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
             if (SceneGrid.SelectedItem == null || SceneGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
@@ -647,10 +643,6 @@ namespace zvs.WPF.SceneControls
                 SceneCommandGrid.Visibility = System.Windows.Visibility.Visible;
             }
 
-            await Task.Delay(10);
-
-            SortSceneCMDsGridBySortOrder();
-            await NormalizeSortOrderSceneCmdsAsync();
             SortSceneCMDsGridBySortOrder();
 
             if (SceneCmdsGrid.Items.Count > 0)
@@ -797,5 +789,7 @@ namespace zvs.WPF.SceneControls
 
 
     }
+
+    
 }
 
