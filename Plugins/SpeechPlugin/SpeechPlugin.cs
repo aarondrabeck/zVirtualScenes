@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace SpeechPlugin
 {
     [Export(typeof(zvsPlugin))]
-    public class SpeechPlugin : zvsPlugin, INotifyPropertyChanged
+    public class SpeechPlugin : zvsPlugin, INotifyPropertyChanged, IDisposable
     {
         private SpeechSynthesizer _synth;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<SpeechPlugin>();
@@ -157,6 +157,25 @@ namespace SpeechPlugin
         public void Announce(String announceText)
         {
             _synth.SpeakAsync(announceText);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this._synth == null)
+                {
+                    return;
+                }
+
+                _synth.Dispose();
+            }
         }
     }
 }

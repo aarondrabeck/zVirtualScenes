@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.WPF.DeviceControls;
 using System.ComponentModel;
-
+using System.Data.Entity;
 using System.Diagnostics;
 using zvs.Entities;
 
@@ -33,26 +33,29 @@ namespace zvs.WPF.JavaScript
             InitializeComponent();
         }
 
+#if DEBUG
         ~JavaScriptSelector()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("JavaScriptSelector Deconstructed.");
         }
+#endif
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("CmdsViewSource")));
-                context.JavaScriptCommands.ToList();
+                await context.JavaScriptCommands.ToListAsync();
+
                 CmdsViewSource.Source = context.JavaScriptCommands.Local;
             }
 
             if (SelectedCommand != null)
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == SelectedCommand.Name);
         }
-      
+
         private void SelectBtn_Click_1(object sender, RoutedEventArgs e)
         {
             SelectedCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.Processor.Backup
 {
@@ -26,7 +26,7 @@ namespace zvs.Processor.Backup
             public int NodeNumber;
         }
 
-        public static void ExportTriggerAsync(string PathFileName, Action<string> Callback)
+        public async static void ExportTriggerAsync(string PathFileName, Action<string> Callback)
         {
             List<TriggerBackup> triggers = new List<TriggerBackup>();
             using (zvsContext context = new zvsContext())
@@ -38,7 +38,7 @@ namespace zvs.Processor.Backup
                     triggerBackup.isEnabled = trigger.isEnabled;
                     triggerBackup.DeviceValueName = trigger.DeviceValue.Name;
                     triggerBackup.NodeNumber = trigger.DeviceValue.Device.NodeNumber;
-                    triggerBackup.StoredCommand = (StoredCMDBackup)trigger.StoredCommand;
+                    triggerBackup.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(trigger.StoredCommand);
                     triggerBackup.Operator = (int?)trigger.Operator;
                     triggerBackup.Value = trigger.Value;
                     triggers.Add(triggerBackup);
@@ -51,7 +51,6 @@ namespace zvs.Processor.Backup
                 stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<TriggerBackup>));
                 xmlSerializer.Serialize(stream, triggers);
-                stream.Close();
                 Callback(string.Format("Exported {0} triggers to '{1}'", triggers.Count, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)
@@ -79,28 +78,26 @@ namespace zvs.Processor.Backup
                     XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<TriggerBackup>));
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
                     triggers = (List<TriggerBackup>)ScenesSerializer.Deserialize(myFileStream);
-                   
+
 
                     using (zvsContext context = new zvsContext())
                     {
                         foreach (TriggerBackup backupTrigger in triggers)
                         {
-                            Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == backupTrigger.NodeNumber);
-                            if (d != null )
+                            var dv = await context.DeviceValues.FirstOrDefaultAsync(o => o.Device.NodeNumber == backupTrigger.NodeNumber 
+                                && o.Name == backupTrigger.DeviceValueName);
+
+                            if (dv != null)
                             {
-                                DeviceValue dv = d.Values.FirstOrDefault(o => o.Name == backupTrigger.DeviceValueName);
-                                if (dv != null)
-                                {
-                                    DeviceValueTrigger trigger = new DeviceValueTrigger();
-                                    trigger.DeviceValue = dv;
-                                    trigger.isEnabled = backupTrigger.isEnabled;
-                                    trigger.Name = backupTrigger.Name;
-                                    trigger.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupTrigger.StoredCommand);
-                                    trigger.Operator = (TriggerOperator)backupTrigger.Operator;
-                                    trigger.Value = backupTrigger.Value;
-                                    context.DeviceValueTriggers.Add(trigger);
-                                    ImportedCount++; 
-                                }
+                                DeviceValueTrigger trigger = new DeviceValueTrigger();
+                                trigger.DeviceValue = dv;
+                                trigger.isEnabled = backupTrigger.isEnabled;
+                                trigger.Name = backupTrigger.Name;
+                                trigger.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupTrigger.StoredCommand);
+                                trigger.Operator = (TriggerOperator)backupTrigger.Operator;
+                                trigger.Value = backupTrigger.Value;
+                                context.DeviceValueTriggers.Add(trigger);
+                                ImportedCount++;
                             }
                         }
                         await context.SaveChangesAsync();

@@ -53,7 +53,6 @@ namespace zvs.Processor.Backup
                 stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<JavaScriptBackup>));
                 xmlSerializer.Serialize(stream, scripts);
-                stream.Close();
                 Callback(string.Format("Exported {0} JavaScript commands to '{1}'", scripts.Count, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)
@@ -67,7 +66,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportJavaScriptAsync(string PathFileName, Action<string> Callback)
+        public async static void ImportJavaScriptAsync(string PathFileName, Action<string> Callback)
         {
             List<JavaScriptBackup> scripts = new List<JavaScriptBackup>();
             int ImportedCount = 0;
@@ -96,11 +95,12 @@ namespace zvs.Processor.Backup
                             jsCommand.CustomData2 = jsBackup.CustomData2;
                             jsCommand.Help = jsBackup.Help;
                             jsCommand.SortOrder = jsBackup.SortOrder;
+
                             context.JavaScriptCommands.Add(jsCommand);
                             ImportedCount++; 
                             
                         }
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
                     Callback(string.Format("Imported {0} JavaScript commands from '{1}'", ImportedCount, Path.GetFileName(PathFileName)));
                 }

@@ -23,32 +23,38 @@ namespace zvs.WPF.Groups
     /// <summary>
     /// Interaction logic for GroupEditor.xaml
     /// </summary>
-    public partial class GroupEditor : Window
+    public partial class GroupEditor : Window, IDisposable
     {
         private zvsContext context;
 
         public GroupEditor()
         {
+            context = new zvsContext();
+
             InitializeComponent();
+
+            zvsContext.ChangeNotifications<Device>.onEntityAdded += GroupEditor_onEntityAdded;
         }
 
+#if DEBUG
         ~GroupEditor()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("GroupEditor Deconstructed.");
         }
+#endif
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
-            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
-                context.Groups.ToList();
-                context.Devices.ToList();
+                await context.Groups
+                    .Include(o => o.Devices)
+                    .ToListAsync();
+
+                await context.Devices.ToListAsync();
                 groupsViewSource.Source = context.Groups.Local;
             }
 
@@ -59,26 +65,21 @@ namespace zvs.WPF.Groups
             EvaluategroupsDevicesLstVwEnable();
         }
 
+        void GroupEditor_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                foreach (var ent in context.ChangeTracker.Entries<Device>())
+                    await ent.ReloadAsync();
+            }));
+        }
         private void GroupEditor_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
+            zvsContext.ChangeNotifications<Device>.onEntityAdded -= GroupEditor_onEntityAdded;
             context.Dispose();
-        }
-
-        void zvsContext_onDevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType != EntityState.Added)
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<Device>())
-                            ent.Reload();
-                    }
-                }
-            }));
         }
 
         private void EvaluateAddEditBtnsUsability()
@@ -141,19 +142,19 @@ namespace zvs.WPF.Groups
         private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
             Group g = (Group)GroupCmbBx.SelectedItem;
-            if (g != null)
+            if (g == null)
+                return;
+
+            GroupNameEditor nameWindow = new GroupNameEditor(g.Name);
+            nameWindow.Owner = this;
+
+            if (nameWindow.ShowDialog() ?? false)
             {
-                GroupNameEditor nameWindow = new GroupNameEditor(g.Name);
-                nameWindow.Owner = this;
+                g.Name = nameWindow.GroupName;
 
-                if (nameWindow.ShowDialog() ?? false)
-                {
-                    g.Name = nameWindow.GroupName;
-
-                    var result = await context.TrySaveChangesAsync();
-                    if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
-                }
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
 
@@ -179,7 +180,7 @@ namespace zvs.WPF.Groups
 
                     foreach (Device device in devices)
                     {
-                        Device d2 = await context.Devices.FirstOrDefaultAsync(o => o.Id == device.Id); ;
+                        Device d2 = await context.Devices.FirstOrDefaultAsync(o => o.Id == device.Id);
                         if (d2 != null)
                         {
                             //If not already in the group...
@@ -198,6 +199,7 @@ namespace zvs.WPF.Groups
                             }
                         }
                     }
+
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
                         ((App)App.Current).zvsCore.log.Error(result.Message);
@@ -272,6 +274,23 @@ namespace zvs.WPF.Groups
                 groupsDevicesLstVw.IsEnabled = true;
         }
 
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
+            }
+        }
     }
 }

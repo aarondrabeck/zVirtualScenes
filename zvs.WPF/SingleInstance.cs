@@ -25,6 +25,7 @@ namespace Microsoft.Shell
     using System.Security;
     using System.Runtime.InteropServices;
     using System.ComponentModel;
+    using System.Threading.Tasks;
 
     internal enum WM
     {
@@ -194,7 +195,7 @@ namespace Microsoft.Shell
 
     public interface ISingleInstanceApp
     {
-        bool SignalExternalCommandLineArgs(IList<string> args);
+        Task<bool> SignalExternalCommandLineArgs(IList<string> args);
     }
 
     /// <summary>

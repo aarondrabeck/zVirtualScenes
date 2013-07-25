@@ -22,9 +22,7 @@ namespace zvs.Processor
                 return;
             }
 
-            Device d = context.Devices.FirstOrDefault(o => o.Id == deviceCommand.Device.Id);
-
-            if (d == null)
+            if (deviceCommand.DeviceId == 0)
             {
                 Core.log.ErrorFormat("Command builder cannot find device in database with id of {0}", deviceCommand.Device.Id);
                 return;
@@ -32,11 +30,11 @@ namespace zvs.Processor
 
             //Does device type exist? 
             var existing_dc = await context.DeviceCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == deviceCommand.UniqueIdentifier &&
-                c.DeviceId == d.Id);
+                c.DeviceId == deviceCommand.DeviceId);
 
             if (existing_dc == null)
             {
-                d.Commands.Add(deviceCommand);
+                context.DeviceCommands.Add(deviceCommand);
             }
             else
             {

@@ -22,76 +22,122 @@ namespace zvs.WPF.DeviceControls
     /// <summary>
     /// Interaction logic for DeviceValues.xaml
     /// </summary>
-    public partial class DeviceValues : UserControl
+    public partial class DeviceValues : UserControl, IDisposable
     {
         private App app = (App)Application.Current;
         private zvsContext context;
         private int DeviceID = 0;
-        private Device d;
+        private Device device;
 
-        public DeviceValues(int DeviceID)
+        public DeviceValues(int deviceID)
         {
-            this.DeviceID = DeviceID;
-            InitializeComponent();
-        }
-
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
-        {
+            this.DeviceID = deviceID;
             context = new zvsContext();
-            zvsContext.onDeviceValueChanged += zvsContext_onDeviceValueChanged;
 
-            d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
-            if (d != null)
+            InitializeComponent();
+
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityAdded += DeviceValues_onEntityAdded;
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityUpdated += DeviceValues_onEntityUpdated;
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityDeleted += DeviceValues_onEntityDeleted;
+        }
+                
+        private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        {           
+            device = await context.Devices
+                .Include(o => o.Values)
+                .FirstOrDefaultAsync(dv => dv.Id == DeviceID);
+
+            if (device == null)
             {
-                d.Values.OrderBy(dv => dv.Id).ToList();
-
-                // Do not load your data at design time.
-                if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-                {
-                    //Load your data here and assign the result to the CollectionViewSource.
-                    System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["DeviceValueViewSource"];
-                    myCollectionViewSource.Source = d.Values;
-                }
+                MessageBox.Show("Device not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+
+            device.Values.OrderBy(dv => dv.Id);
+
+            // Do not load your data at design time.
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["DeviceValueViewSource"];
+                myCollectionViewSource.Source = device.Values;
+            }
+
         }
 
-        void zvsContext_onDeviceValueChanged(object sender, zvsContext.onEntityChangedEventArgs args)
+        void DeviceValues_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityUpdatedArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() =>
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
             {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        d.Values.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<DeviceValue>())
-                            ent.Reload();
-                    }
-                }
+                foreach (var ent in context.ChangeTracker.Entries<DeviceValue>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void DeviceValues_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                foreach (var ent in context.ChangeTracker.Entries<DeviceValue>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void DeviceValues_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityAddedArgs e)
+        {
+            if (context == null || device == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await context.DeviceValues
+                   .Where(o => o.DeviceId == device.Id)
+                   .ToListAsync();
             }));
         }
 
         private void DataGrid_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onDeviceValueChanged -= zvsContext_onDeviceValueChanged;
-           
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityAdded -= DeviceValues_onEntityAdded;
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityUpdated -= DeviceValues_onEntityUpdated;
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityDeleted -= DeviceValues_onEntityDeleted;
         }
 
         private async void RepollLnk_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
-            if (d != null)
+            if (device != null)
             {
-                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ME");
+                BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ME");
                 if (cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    await cp.RunCommandAsync(this, cmd.Id, d.Id.ToString());
+                    await cp.RunCommandAsync(this, cmd.Id, device.Id.ToString());
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
             }
         }
     }

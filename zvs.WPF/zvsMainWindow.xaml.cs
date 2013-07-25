@@ -17,7 +17,7 @@ using zvs.Processor;
 using zvs.WPF.DeviceControls;
 using zvs.WPF.Groups;
 using zvs.WPF.AdapterManager;
-
+using System.Data.Entity;
 using System.Threading;
 using System.Diagnostics;
 using zvs.Processor.Backup;
@@ -43,6 +43,9 @@ namespace zvs.WPF
 
             context = new zvsContext();
 
+            RefreshCommandDescripitions();
+            RefreshTriggerDescripitions();
+
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -55,8 +58,12 @@ namespace zvs.WPF
 
         }
 
+        private void EventedLog_OnLogItemsCleared(object sender, EventedLog.LogItemsClearedEventArgs e)
+        {
+            logSource.Clear();
+        }
 
-        void EventedLog_OnLogItemArrived(List<LogItem> NewItems)
+        private void EventedLog_OnLogItemArrived(object sender, EventedLog.LogItemArrivedEventArgs e)
         {
             if (!this.Dispatcher.HasShutdownStarted)
             {
@@ -65,11 +72,11 @@ namespace zvs.WPF
                     this.Dispatcher.Invoke(new Action(() =>
                     {
                         logSource.Clear();
-                        foreach (var item in NewItems)
+                        foreach (var item in e.NewItems)
                         {
                             logSource.Add(item);
                         }
-                        var entry = NewItems.LastOrDefault();
+                        var entry = e.NewItems.LastOrDefault();
                         if (entry != null)
                         {
                             StatusBarDescriptionTxt.Text = entry.Description;
@@ -83,16 +90,17 @@ namespace zvs.WPF
                 }
             }
         }
-
+#if DEBUG
         ~zvsMainWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("zvsMainWindow Deconstructed.");
         }
+#endif
 
         private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
 
@@ -105,8 +113,8 @@ namespace zvs.WPF
             //create a new sort order for the sorting that is done lastly            
             ListSortDirection dir = ListSortDirection.Ascending;
 
-            string direction = ProgramOption.GetProgramOption(context, "LOGDIRECTION");
-            if (direction != null && direction == "Descending")
+            var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
+            if (option != null && option.Value == "Descending")
                 dir = ListSortDirection.Descending;
 
             dataView.SortDescriptions.Add(new SortDescription("Datetime", dir));
@@ -116,6 +124,40 @@ namespace zvs.WPF
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
+
+
+
+        }
+
+        private async void RefreshTriggerDescripitions()
+        {
+            var triggers = await context.DeviceValueTriggers
+                .Include(o => o.DeviceValue)
+                .Include(o => o.DeviceValue.Device)
+                .ToListAsync();
+
+            foreach (var trigger in triggers)
+                trigger.SetDescription(context);
+
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
+        }
+        private async void RefreshCommandDescripitions()
+        {
+            var storedCommands = await context.StoredCommands
+                .Include(o => o.Command)
+                .ToListAsync();
+
+            foreach (var storedCommand in storedCommands)
+            {
+                await storedCommand.SetTargetObjectNameAsync(context);
+                await storedCommand.SetDescriptionAsync(context);
+            }
+
+            var result = await context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)App.Current).zvsCore.log.Error(result.Message);
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -190,12 +232,12 @@ namespace zvs.WPF
 
         private async void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
         {
-            BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "REPOLL_ALL");
-            if (cmd != null)
-            {
-                CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                await cp.RunCommandAsync(this, cmd.Id);
-            }
+            BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ALL");
+            if (cmd == null)
+                return;
+
+            CommandProcessor cp = new CommandProcessor(app.zvsCore);
+            await cp.RunCommandAsync(this, cmd.Id);
         }
 
         private void ExitMI_Click_1(object sender, RoutedEventArgs e)
@@ -316,7 +358,7 @@ namespace zvs.WPF
             }
         }
 
-        private void ImportScenesMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ImportScenesMI_Click_1(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -328,7 +370,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportScenesAsync(dlg.FileName, (result) =>
+                await Backup.ImportScenesAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -357,7 +399,7 @@ namespace zvs.WPF
             }
         }
 
-        private void ImportTriggersMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ImportTriggersMI_Click_1(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -369,7 +411,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportTriggersAsync(dlg.FileName, (result) =>
+                await Backup.ImportTriggersAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -439,7 +481,7 @@ namespace zvs.WPF
             }
         }
 
-        private void ImportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ImportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -451,7 +493,7 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportScheduledTaskAsync(dlg.FileName, (result) =>
+                await Backup.ImportScheduledTaskAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });
@@ -519,10 +561,7 @@ namespace zvs.WPF
 
         }
 
-        void EventedLog_OnLogItemsCleared()
-        {
-            logSource.Clear();
-        }
+
 
 
 

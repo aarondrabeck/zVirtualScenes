@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.Processor.Backup
 {
@@ -53,7 +53,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportDevicesAsync(string PathFileName, Action<string> Callback)
+        public async static void ImportDevicesAsync(string PathFileName, Action<string> Callback)
         {
             List<DeviceBackup> devices = new List<DeviceBackup>();
             int ImportedCount = 0;
@@ -61,8 +61,10 @@ namespace zvs.Processor.Backup
             FileStream myFileStream = null;
             try
             {
+                //TODO: ASYNC THIS
                 if (File.Exists(PathFileName))
                 {
+                    //TODO: ASYNC THIS
                     //Open the file written above and read values from it.       
                     XmlSerializer ScenesSerializer = new XmlSerializer(typeof(List<DeviceBackup>));
                     myFileStream = new FileStream(PathFileName, FileMode.Open);
@@ -70,7 +72,7 @@ namespace zvs.Processor.Backup
                    
                     using (zvsContext context = new zvsContext())
                     {
-                        foreach (Device d in context.Devices)
+                        foreach (Device d in await context.Devices.ToListAsync())
                         {
                             DeviceBackup dev = devices.FirstOrDefault(o => o.NodeNumber == d.NodeNumber);
                             if (dev != null)
@@ -79,7 +81,7 @@ namespace zvs.Processor.Backup
                                 ImportedCount++;
                             }
                         }
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
                     Callback(string.Format("Imported {0} device names from '{1}'", ImportedCount, Path.GetFileName(PathFileName)));
                 }

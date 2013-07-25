@@ -29,74 +29,98 @@ namespace zvs.WPF.TriggerControls
 
         public TriggerGridUC()
         {
+            context = new zvsContext();
+
             InitializeComponent();
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                context = new zvsContext();
 
-
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
-
-                myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
-                context.DeviceValueTriggers.ToList();
-            }
-            zvsContext.onDeviceValueTriggersChanged += zvsContext_onDeviceValueTriggersChanged;
+            zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityAdded += TriggerGridUC_onEntityAdded;
+            zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityDeleted += TriggerGridUC_onEntityDeleted;
+            zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityUpdated += TriggerGridUC_onEntityUpdated;
         }
 
+        void TriggerGridUC_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValueTrigger>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                foreach (var ent in context.ChangeTracker.Entries<DeviceValueTrigger>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void TriggerGridUC_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValueTrigger>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                foreach (var ent in context.ChangeTracker.Entries<DeviceValueTrigger>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void TriggerGridUC_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValueTrigger>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await context.DeviceValueTriggers.ToListAsync();
+            }));
+        }
+
+#if DEBUG
         ~TriggerGridUC()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("TriggerGridUC Deconstructed");
         }
+#endif
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        private async void UserControl_Initialized(object sender, EventArgs e)
         {
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                await context.DeviceValueTriggers
+                    .Include(o => o.DeviceValue)
+                    .ToListAsync();
+
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["device_value_triggersViewSource"];
+
+                myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
+            }
         }
 
+        private void UserControl_Loaded_1(object sender, RoutedEventArgs e) { }
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
             Window parent = Window.GetWindow(this);
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.onDeviceValueTriggersChanged -= zvsContext_onDeviceValueTriggersChanged;
+                zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityAdded -= TriggerGridUC_onEntityAdded;
+                zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityDeleted -= TriggerGridUC_onEntityDeleted;
+                zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityUpdated -= TriggerGridUC_onEntityUpdated;
             }
-        }
-
-        private void zvsContext_onDeviceValueTriggersChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.DeviceValueTriggers.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<DeviceValueTrigger>())
-                            ent.Reload();
-                    }
-                }
-            }));
         }
 
         private async void TriggerGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
+                //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
                     ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
 
-        private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
+        private async void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is DeviceValueTrigger)
@@ -104,7 +128,7 @@ namespace zvs.WPF.TriggerControls
                 var trigger = (DeviceValueTrigger)obj;
                 if (trigger != null)
                 {
-                    TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
+                    TriggerEditorWindow new_window = new TriggerEditorWindow(trigger.Id, context);
                     new_window.Owner = app.zvsWindow;
                     new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
                     new_window.Show();
@@ -115,6 +139,8 @@ namespace zvs.WPF.TriggerControls
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
                                 ((App)App.Current).zvsCore.log.Error(result.Message);
+
+
                         }
                     };
                 }
@@ -147,7 +173,7 @@ namespace zvs.WPF.TriggerControls
         {
             DeviceValueTrigger trigger = new DeviceValueTrigger();
             trigger.Name = "New Trigger";
-            TriggerEditorWindow new_window = new TriggerEditorWindow(trigger, context);
+            TriggerEditorWindow new_window = new TriggerEditorWindow(trigger.Id, context);
             new_window.Owner = app.zvsWindow;
             new_window.Title = "Add Trigger";
             new_window.Show();
@@ -163,6 +189,5 @@ namespace zvs.WPF.TriggerControls
                 }
             };
         }
-
     }
 }

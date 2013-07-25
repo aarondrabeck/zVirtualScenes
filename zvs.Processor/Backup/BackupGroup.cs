@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.Processor.Backup
 {
@@ -42,8 +42,6 @@ namespace zvs.Processor.Backup
                 stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<GroupBackup>));
                 xmlSerializer.Serialize(stream, groups);
-                stream.Close();
-
                 Callback(string.Format("Exported {0} groups to '{1}'", groups.Count, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)
@@ -57,7 +55,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static void ImportGroupsAsync(string PathFileName, Action<string> Callback)
+        public async static void ImportGroupsAsync(string PathFileName, Action<string> Callback)
         {
             List<GroupBackup> groups = new List<GroupBackup>();
             int ImportedCount = 0;
@@ -81,7 +79,8 @@ namespace zvs.Processor.Backup
 
                             foreach (int NodeID in backupGroup.NodeNumbers) 
                             {
-                                Device d = context.Devices.FirstOrDefault(o => o.NodeNumber == NodeID);
+                                Device d = await context.Devices.FirstOrDefaultAsync(o => o.NodeNumber == NodeID);
+
                                 if (d != null)
                                     g.Devices.Add(d);
                             }
@@ -89,7 +88,7 @@ namespace zvs.Processor.Backup
                             context.Groups.Add(g);
                             ImportedCount++;
                         }
-                        context.SaveChanges();
+                        await context.SaveChangesAsync();
                     }
 
                     Callback(string.Format("Imported {0} groups from '{1}'",ImportedCount, Path.GetFileName(PathFileName)));

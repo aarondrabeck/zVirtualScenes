@@ -31,25 +31,72 @@ namespace zvs.WPF.ScheduledTaskControls
         private App app = (App)Application.Current;
         public ScheduledTaskCreator()
         {
+            context = new zvsContext();
             InitializeComponent();
-
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                context = new zvsContext();
-
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
-                myCollectionViewSource.Source = context.ScheduledTasks.Local;
-
-                context.ScheduledTasks.ToList();
-            }
-            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded += ScheduledTaskCreator_onEntityAdded;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
+        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<ScheduledTask>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void ScheduledTaskCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<ScheduledTask>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void ScheduledTaskCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await context.ScheduledTasks
+                   .Include(o => o.StoredCommand)
+                   .ToListAsync();
+            }));
+        }
+
+#if DEBUG
         ~ScheduledTaskCreator()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("ScheduledTaskCreator Deconstructed");
+        }
+#endif
+
+        private async void UserControl_Initialized(object sender, EventArgs e)
+        {
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                await context.ScheduledTasks
+                       .Include(o => o.StoredCommand)
+                       .ToListAsync();
+
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
+                myCollectionViewSource.Source = context.ScheduledTasks.Local;
+            }
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
@@ -64,29 +111,10 @@ namespace zvs.WPF.ScheduledTaskControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
+                zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded -= ScheduledTaskCreator_onEntityAdded;
+                zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
+                zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
             }
-        }
-
-        void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.ScheduledTasks.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<ScheduledTask>())
-                            ent.Reload();
-                    }
-                }
-            }));
         }
 
         private async void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
@@ -351,5 +379,7 @@ namespace zvs.WPF.ScheduledTaskControls
                     ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
+
+
     }
 }

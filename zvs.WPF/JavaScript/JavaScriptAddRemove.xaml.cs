@@ -22,63 +22,87 @@ namespace zvs.WPF.JavaScript
     /// <summary>
     /// Interaction logic for GroupEditor.xaml
     /// </summary>
-    public partial class JavaScriptAddRemove : Window
+    public partial class JavaScriptAddRemove : Window, IDisposable
     {
         private zvsContext context;
 
         public JavaScriptAddRemove()
         {
+            context = new zvsContext();
             InitializeComponent();
+
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded += JavaScriptAddRemove_onEntityAdded;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
         }
 
+#if DEBUG
         ~JavaScriptAddRemove()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("JavaScriptAddRemove Deconstructed.");
         }
+#endif
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
-            zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommands;
-
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("CmdsViewSource")));
-                context.JavaScriptCommands.ToList();
+
+                await context.JavaScriptCommands
+                    .ToListAsync();
+
                 CmdsViewSource.Source = context.JavaScriptCommands.Local;
             }
 
             EvaluateAddEditBtnsUsability();
         }
 
-        void zvsContext_onJavaScriptCommands(object sender, zvsContext.onEntityChangedEventArgs args)
+        private void JavaScriptAddRemove_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityAddedArgs e)
         {
-            this.Dispatcher.Invoke(new Action(() =>
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
             {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.JavaScriptCommands.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
-                            ent.Reload();
-                    }
-                }
+                await context.JavaScriptCommands
+                   .ToListAsync();
+            }));
+        }
+
+        void JavaScriptAddRemove_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                    await ent.ReloadAsync();
             }));
         }
 
 
+        private void JavaScriptAddRemove_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                    await ent.ReloadAsync();
+            }));
+
+        }
 
         private void JavaScriptAddRemove_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommands;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded -= JavaScriptAddRemove_onEntityAdded;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
             context.Dispose();
         }
 
@@ -140,9 +164,9 @@ namespace zvs.WPF.JavaScript
                 foreach (StoredCommand sc in await context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync())
                 {
                     string error = string.Empty;
-                    
-                    var result = await StoredCommand.TryRemoveDependenciesAsync(context, sc);
-                    if(result.HasError)
+
+                    var result = await sc.TryRemoveDependenciesAsync(context);
+                    if (result.HasError)
                         ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
 
@@ -182,6 +206,25 @@ namespace zvs.WPF.JavaScript
                     ((App)App.Current).zvsCore.log.Error(saveResult.Message);
 
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
             }
         }
     }

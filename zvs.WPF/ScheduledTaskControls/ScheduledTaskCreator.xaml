@@ -10,7 +10,7 @@
              xmlns:System="clr-namespace:System;assembly=mscorlib"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1">
+             d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1" Initialized="UserControl_Initialized">
     <UserControl.Resources>
         <converters:NullableIntConverter x:Key="NullableIntConverter"/>
 
@@ -98,7 +98,17 @@
 
                 <TextBlock Text="Command to Run" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,81,0,0"/>
 
-                <TextBlock x:Name="CommandSummary" FontSize="14" Height="20" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Text="{Binding StoredCommand.Summary, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Margin="144,100,25,0"/>
+                <TextBlock x:Name="CommandSummary" FontSize="14" Height="20" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" 
+                           VerticalAlignment="Top" Margin="144,100,25,0">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} '{1}'"  >
+                            <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                            <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+
+
                 <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" VerticalAlignment="Top" Width="116" Click="AddUpdateCommand_Click" Margin="12,100,0,0" />
 
                 <TextBlock Text="Start Time" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,35,0,0"/>

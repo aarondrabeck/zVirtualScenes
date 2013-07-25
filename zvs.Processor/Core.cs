@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using zvs.Context;
 using zvs.Entities;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.Processor
 {
@@ -112,11 +113,14 @@ namespace zvs.Processor
 
             TriggerManager = new TriggerManager(this);
             ScheduledTaskManager = new ScheduledTaskManager(this);
+            ScheduledTaskManager.StartAsync();
 
+            //TODO: MAKE A NICE INTERFACE FOR THIS
             //Install Program Options
             using (zvsContext context = new zvsContext())
             {
-                if (ProgramOption.GetProgramOption(context, "LOGDIRECTION") == null)
+                var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
+                if (option == null)
                 {
                     var result = await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
                     {

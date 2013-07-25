@@ -26,11 +26,13 @@ namespace zvs.WPF.Groups
             this.GroupName = GroupName;
         }
 
+#if DEBUG
         ~GroupNameEditor()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("GroupNameEditor Deconstructed.");
         }
+#endif
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -85,6 +87,6 @@ namespace zvs.WPF.Groups
             }
         }
 
-        
+
     }
 }

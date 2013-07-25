@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.WPF
 {
@@ -27,12 +27,12 @@ namespace zvs.WPF
             InitializeComponent();
         }
 
-        private void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
+        private async void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
             using (zvsContext context = new zvsContext())
             {
-                string direction = ProgramOption.GetProgramOption(context, "LOGDIRECTION");
-                if (direction != null && direction == "Descending")
+                var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
+                if (option != null && option.Value == "Descending")
                     DecenLogOrderRadioBtn.IsChecked = true;
                 else
                     AcenLogOrderRadioBtn.IsChecked = true;

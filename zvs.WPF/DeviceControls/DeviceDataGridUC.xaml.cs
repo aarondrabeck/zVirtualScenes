@@ -31,34 +31,142 @@ namespace zvs.WPF.DeviceControls
         private zvsContext context;
         public DeviceDataGridUC()
         {
+            context = new zvsContext();
+
             InitializeComponent();
 
-            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-            zvsContext.onGroup_DevicesChanged += zvsContext_onGroup_DevicesChanged;
-            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
+            zvsContext.ChangeNotifications<Device>.onEntityAdded += DeviceDataGridUC_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.onEntityDeleted += DeviceDataGridUC_onEntityDeleted;
+            zvsContext.ChangeNotifications<Device>.onEntityUpdated += DeviceDataGridUC_onEntityUpdated;
+
+            zvsContext.ChangeNotifications<Group>.onEntityAdded += DeviceDataGridUC_onEntityAdded;
+            zvsContext.ChangeNotifications<Group>.onEntityDeleted += DeviceDataGridUC_onEntityDeleted;
+            zvsContext.ChangeNotifications<Group>.onEntityUpdated += DeviceDataGridUC_onEntityUpdated;
+
+            //TODO: LISTEN FOR CHANGES TO THE DEVICE_GROUPS LINKING TABLE
+
         }
 
-        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+        void DeviceDataGridUC_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityUpdatedArgs e)
         {
+            if (context == null)
+                return;
+
+            if (!MinimalistDisplay)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Group>())
+                    await ent.ReloadAsync();
+            }));
+           
+        }
+
+        void DeviceDataGridUC_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            if (!MinimalistDisplay)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Group>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void DeviceDataGridUC_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            if (!MinimalistDisplay)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await context.Groups.ToListAsync();
+            }));
+        }
+
+        void DeviceDataGridUC_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Device>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void DeviceDataGridUC_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Device>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void DeviceDataGridUC_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Gets new devices
+                await context.Devices.ToListAsync();
+            }));
+        }
+
+        private async void UserControl_Initialized(object sender, EventArgs e)
+        {
+
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                context = new zvsContext();
+                await context.Devices
+                       .Include(o => o.Groups)
+                       .Include(o => o.Type)
+                       .ToListAsync();
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-
-                await context.Devices.ToListAsync();
- 
                 myCollectionViewSource.Source = context.Devices.Local;
             }
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine("Device grid initialized in {0}", sw.Elapsed.ToString());
+#endif
         }
 
+        private void UserControl_Loaded(object sender, RoutedEventArgs e) { }
+
+#if DEBUG
         ~DeviceDataGridUC()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("DeviceDataGridUC Deconstructed");
         }
+#endif
 
         private bool _ShowMore = false;
         public bool ShowMore
@@ -119,86 +227,19 @@ namespace zvs.WPF.DeviceControls
             }
         }
 
-
-
-        void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            if (MinimalistDisplay)
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (context != null)
-                    {
-                        if (args.ChangeType == EntityState.Added)
-                        {
-                            //Gets new devices
-                            context.Groups.ToList();
-                        }
-                        else
-                        {
-                            //Reloads context from DB when modifications happen
-                            foreach (var ent in context.ChangeTracker.Entries<Group>())
-                                ent.Reload();
-                        }
-                    }
-                }));
-            }
-        }
-
-        void zvsContext_onGroup_DevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            if (MinimalistDisplay)
-            {
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    if (context != null)
-                    {
-                        if (args.ChangeType == EntityState.Added)
-                        {
-                            //Gets new devices
-                            context.Groups.ToList();
-                        }
-                        else
-                        {
-                            //Reloads context from DB when modifications happen
-                            foreach (var ent in context.ChangeTracker.Entries<Group>())
-                                ent.Reload();
-                        }
-                    }
-                }));
-            }
-        }
-
-        void zvsContext_onDevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.Devices.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<Device>())
-                            ent.Reload();
-                    }
-                }
-            }));
-        }
-
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
             Window parent = Window.GetWindow(this);
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;
-                zvsContext.onGroup_DevicesChanged -= zvsContext_onGroup_DevicesChanged;
-                zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
+                zvsContext.ChangeNotifications<Device>.onEntityAdded -= DeviceDataGridUC_onEntityAdded;
+                zvsContext.ChangeNotifications<Device>.onEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
+                zvsContext.ChangeNotifications<Device>.onEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
+
+                zvsContext.ChangeNotifications<Group>.onEntityAdded -= DeviceDataGridUC_onEntityAdded;
+                zvsContext.ChangeNotifications<Group>.onEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
+                zvsContext.ChangeNotifications<Group>.onEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
             }
         }
 
@@ -408,5 +449,7 @@ namespace zvs.WPF.DeviceControls
                 e.Handled = true;
             }
         }
+
+
     }
 }

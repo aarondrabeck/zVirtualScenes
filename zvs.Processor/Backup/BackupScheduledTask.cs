@@ -67,7 +67,7 @@ namespace zvs.Processor.Backup
             public DateTime? startTime;
         }
 
-        public static void ExportScheduledTaskAsync(string PathFileName, Action<string> Callback)
+        public static async Task ExportScheduledTaskAsync(string PathFileName, Action<string> Callback)
         {
             List<ScheduledTaskBackup> tasks = new List<ScheduledTaskBackup>();
             using (zvsContext context = new zvsContext())
@@ -75,7 +75,7 @@ namespace zvs.Processor.Backup
                 foreach (ScheduledTask t in context.ScheduledTasks)
                 {
                     ScheduledTaskBackup task = new ScheduledTaskBackup();
-                    task.StoredCommand = (StoredCMDBackup)t.StoredCommand;
+                    task.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(t.StoredCommand);
                     task.Frequency = (int)t.Frequency;
                     task.Name = t.Name;
                     task.isEnabled = t.isEnabled;
@@ -135,7 +135,6 @@ namespace zvs.Processor.Backup
                 stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<ScheduledTaskBackup>));
                 xmlSerializer.Serialize(stream, tasks);
-                stream.Close();
                 Callback(string.Format("Exported {0} scheduled tasks to '{1}'", tasks.Count, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)

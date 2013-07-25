@@ -22,19 +22,20 @@ namespace zvs.WPF.SceneControls
     /// </summary>
     public partial class ScenePropertiesWindow : Window
     {
-        private int SceneID = 0; 
+        private int SceneID = 0;
 
         public ScenePropertiesWindow(int SceneID)
         {
             this.SceneID = SceneID;
-            InitializeComponent();          
+            InitializeComponent();
         }
-
+#if DEBUG
         ~ScenePropertiesWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("ScenePropertiesWindow Deconstructed.");
         }
+#endif
 
         private void DoneBtn_Click(object sender, RoutedEventArgs e)
         {

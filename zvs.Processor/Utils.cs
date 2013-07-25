@@ -9,7 +9,7 @@ using Microsoft.Win32;
 using zvs.Entities;
 using System.Data.Entity.Migrations;
 using zvs.Context.Migrations;
-
+using System.Data.Entity;
 
 namespace zvs.Processor
 {
@@ -118,7 +118,7 @@ namespace zvs.Processor
         /// Returns null if no error, else the error
         /// </summary>
         /// <returns></returns>
-        public static string PreReqChecks()
+        public async static Task<string> PreReqChecksAsync()
         {
             #region Pre App Start Checks
 
@@ -157,117 +157,14 @@ namespace zvs.Processor
             {
                 try
                 {
-                    string name = context.Database.SqlQuery<string>(@"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'devices'").SingleOrDefault();
+                    string name = await context.Database.SqlQuery<string>(@"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'devices'").SingleOrDefaultAsync();
+                    
                     if (string.IsNullOrEmpty(name))
-                    {
                         throw new Exception("Database Empty!");
-                    }
                 }
                 catch
                 {
                     return string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following DB: {0}.", Utils.DBNamePlusFullPath);
-
-                }
-            }
-
-            ////Check DB version
-            String upgradeScriptPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"upgrade.sql");
-
-            if (File.Exists(upgradeScriptPath))
-            {
-                StreamReader upgradeScriptSR = new StreamReader(upgradeScriptPath);
-                String upgradeScript = upgradeScriptSR.ReadToEnd();
-                upgradeScriptSR.Close();
-
-                if (upgradeScript.ToLower().StartsWith("db_version"))
-                {
-                    int new_db_version;
-                    int.TryParse(upgradeScript.Substring(upgradeScript.IndexOf("=") + 1, upgradeScript.IndexOf('\n') - upgradeScript.IndexOf("=")), out new_db_version);
-                    try
-                    {
-                        using (zvsContext context = new zvsContext())
-                        {
-                            var ver = context.DbInfo.FirstOrDefault(o => o.UniqueIdentifier == "Version");
-                            if (ver != null)
-                            {
-                                int curr_db_version = 1;
-                                int.TryParse(ver.Value, out curr_db_version);
-
-                                if (new_db_version > curr_db_version)
-                                {
-                                    if (new_db_version == curr_db_version + 1)
-                                    {
-                                        upgradeScript = upgradeScript.Replace(upgradeScript.Substring(0, upgradeScript.IndexOf('\n') + 1), "");
-                                        List<string> SQLCommands = new List<string>(upgradeScript.Split(';').ToArray());
-                                        SQLCommands.Where(o => !string.IsNullOrEmpty(o)).ToList().ForEach(o => context.Database.ExecuteSqlCommand(o));
-                                        context.Database.ExecuteSqlCommand(@"UPDATE db_info SET info_value = '" + new_db_version + "' WHERE info_name='Version';");
-                                    }
-                                    else
-                                    {
-                                        Window WpfBugWindow = new Window()
-                                        {
-                                            AllowsTransparency = true,
-                                            Background = System.Windows.Media.Brushes.Transparent,
-                                            WindowStyle = WindowStyle.None,
-                                            Top = 0,
-                                            Left = 0,
-                                            Width = 1,
-                                            Height = 1,
-                                            ShowInTaskbar = false
-                                        };
-                                        WpfBugWindow.Show();
-                                        if (MessageBox.Show("Your database is over 1 version old. Upgrading is not supported. Would you like to replace your database with a new blank one?", "Database too old", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                                        {
-                                            FileInfo database = new FileInfo(Utils.DBNamePlusFullPath);
-                                            if (!database.Exists)
-                                            {
-                                                WpfBugWindow.Close();
-                                                return string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", Utils.DBNamePlusFullPath);
-                                            }
-
-                                            database.CopyTo(Utils.DBNamePlusFullPath);
-                                        }
-                                        else
-                                        {
-                                            WpfBugWindow.Close();
-                                            Environment.Exit(1);
-                                        }
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch
-                    {
-                        Window WpfBugWindow = new Window()
-                        {
-                            AllowsTransparency = true,
-                            Background = System.Windows.Media.Brushes.Transparent,
-                            WindowStyle = WindowStyle.None,
-                            Top = 0,
-                            Left = 0,
-                            Width = 1,
-                            Height = 1,
-                            ShowInTaskbar = false
-                        };
-                        WpfBugWindow.Show();
-                        if (MessageBox.Show("We can't auto upgrade your database. Would you like to replace your database with a new blank one?", "Database too old.", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        {
-                            FileInfo database = new FileInfo(Utils.DBNamePlusFullPath);
-                            if (!database.Exists)
-                            {
-                                return string.Format("Database Missing!\n\n zVirtualScenes cannot open because the database is missing.\n\nPlease check the following path: {0}.", Utils.DBNamePlusFullPath);
-                            }
-
-                            database.CopyTo(Utils.DBNamePlusFullPath);
-                        }
-                        else
-                        {
-                            WpfBugWindow.Close();
-                            Environment.Exit(1);
-                        }
-                    }
                 }
             }
             #endregion

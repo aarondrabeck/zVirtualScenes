@@ -53,7 +53,10 @@ namespace zvs.Processor
                         AdapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
 
                     //Check Database for this adapter
-                    var dbAdapter = await context.Adapters.FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
+                    var dbAdapter = await context.Adapters
+                        .Include(o=> o.Settings)
+                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
+
                     if (dbAdapter == null)
                     {
                         dbAdapter = new Adapter();

@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.WPF.DeviceControls;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.WPF
 {
@@ -26,101 +26,132 @@ namespace zvs.WPF
     {
         private int DeviceID = 0;
 
-        public DeviceDetailsWindow(int DeviceID)
+        public DeviceDetailsWindow(int deviceID)
         {
-            this.DeviceID = DeviceID;
+            this.DeviceID = deviceID;
             InitializeComponent();
+
+            zvsContext.ChangeNotifications<Device>.onEntityAdded += DeviceDetailsWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.onEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Device>.onEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
         }
 
+#if DEBUG
         ~DeviceDetailsWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("DeviceDetailsWindow Deconstructed.");
         }
+#endif
 
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        private async void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.onDevicesChanged += zvsContext_onDevicesChanged;
-            LoadDevice();
+            await LoadDeviceAsync();
             SelectionList.SelectedIndex = 0;
+        }
+
+        void DeviceDetailsWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityUpdatedArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                if (e.NewEntity.Id == DeviceID)
+                    await LoadDeviceAsync();
+            }));
+        }
+
+        void DeviceDetailsWindow_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityDeletedArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                if (e.DeletedEntity.Id == DeviceID)
+                    await LoadDeviceAsync();
+            }));
+        }
+
+        void DeviceDetailsWindow_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityAddedArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                if (e.AddedEntity.Id == DeviceID)
+                    await LoadDeviceAsync();
+            }));
         }
 
         private void DeviceDetailsWindow_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.onDevicesChanged -= zvsContext_onDevicesChanged;           
+            zvsContext.ChangeNotifications<Device>.onEntityAdded -= DeviceDetailsWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.onEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Device>.onEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
         }
 
-        void zvsContext_onDevicesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                LoadDevice();
-            }));
-        }
-
-        private void LoadDevice()
+        private async Task LoadDeviceAsync()
         {
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
+                Device d = await context.Devices
+                    .Include(o => o.Type)
+                    .FirstOrDefaultAsync(dv => dv.Id == DeviceID);
 
                 if (d == null)
-                    this.Close();
-                else
                 {
-                    DeviceNameTextBlock.Text = d.Name;
-                    this.Title = string.Format("'{0}' Details", d.Name);
-                    DeviceCurrentStatus.Text = d.CurrentLevelText;
+                    MessageBox.Show("Device not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    this.Close();
+                    return;
+                }
 
-                    switch (d.Type.UniqueIdentifier)
-                    {
-                        case "THERMOSTAT":
-                            {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/thermometer.png"));                                                              
-                                break;
-                            }
-                        case "DIMMER":
-                            {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/bulb.png"));                                
-                                break;
-                            }
-                        case "SWITCH":
-                            {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/switch.png"));
-                                break;
-                            }
-                        case "CONTROLLER":
-                            {
-                                DeviceCurrentStatus.Visibility = System.Windows.Visibility.Collapsed;
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/controler.png"));
-                                break;
-                            }
-                        case "DOORLOCK":
-                            {
-                                IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/doorlock.png"));
-                                break;
-                            }
-                    }
+                DeviceNameTextBlock.Text = d.Name;
+                this.Title = string.Format("'{0}' Details", d.Name);
+                DeviceCurrentStatus.Text = d.CurrentLevelText;
 
-                    if (d.Type.UniqueIdentifier.Equals("DIMMER"))
-                    {
-                        if (d.CurrentLevelInt.HasValue)
+                switch (d.Type.UniqueIdentifier)
+                {
+                    case "THERMOSTAT":
                         {
-                            double level = d.CurrentLevelInt.Value;
-
-                            if (level >= 0 && level <= 20)
-                                level = 21;
-
-                            level = level / 100;
-
-                            DoubleAnimation da = new DoubleAnimation();
-                            da.From = IconImg.Opacity;
-                            da.To = level;
-                            da.Duration = new Duration(TimeSpan.FromSeconds(1));
-                            IconImg.BeginAnimation(OpacityProperty, da);
+                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/thermometer.png"));
+                            break;
                         }
+                    case "DIMMER":
+                        {
+                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/bulb.png"));
+                            break;
+                        }
+                    case "SWITCH":
+                        {
+                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/switch.png"));
+                            break;
+                        }
+                    case "CONTROLLER":
+                        {
+                            DeviceCurrentStatus.Visibility = System.Windows.Visibility.Collapsed;
+                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/controler.png"));
+                            break;
+                        }
+                    case "DOORLOCK":
+                        {
+                            IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/doorlock.png"));
+                            break;
+                        }
+                }
+
+                if (d.Type.UniqueIdentifier.Equals("DIMMER"))
+                {
+                    if (d.CurrentLevelInt.HasValue)
+                    {
+                        double level = d.CurrentLevelInt.Value;
+
+                        if (level >= 0 && level <= 20)
+                            level = 21;
+
+                        level = level / 100;
+
+                        DoubleAnimation da = new DoubleAnimation();
+                        da.From = IconImg.Opacity;
+                        da.To = level;
+                        da.Duration = new Duration(TimeSpan.FromSeconds(1));
+                        IconImg.BeginAnimation(OpacityProperty, da);
                     }
                 }
+
             }
         }
 

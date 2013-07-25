@@ -77,14 +77,14 @@ namespace zvs.Entities
         }
 
         //TODO: MOVE TO EXTENSION METHOD
-        public static string GetProgramOption(zvsContext context, string UniqueIdentifier)
-        {
-            ProgramOption option = context.ProgramOptions.FirstOrDefault(o => o.UniqueIdentifier == UniqueIdentifier);
+        //public async static Task<string> GetProgramOptionAsync(zvsContext context, string UniqueIdentifier)
+        //{
+        //    ProgramOption option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == UniqueIdentifier);
 
-            if (option != null)
-                return option.Value;
+        //    if (option != null)
+        //        return option.Value;
 
-            return null;
-        }
+        //    return null;
+        //}
     }
 }

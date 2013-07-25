@@ -22,7 +22,7 @@ namespace zvs.WPF.Groups
     /// <summary>
     /// Interaction logic for ActivateGroup.xaml
     /// </summary>
-    public partial class ActivateGroup : Window
+    public partial class ActivateGroup : Window, IDisposable
     {
         private App app = (App)Application.Current;
         private zvsContext context;
@@ -30,54 +30,77 @@ namespace zvs.WPF.Groups
 
         public ActivateGroup()
         {
+            context = new zvsContext();
             InitializeComponent();
+
+            zvsContext.ChangeNotifications<Group>.onEntityUpdated += ActivateGroup_onEntityUpdated;
+            zvsContext.ChangeNotifications<Group>.onEntityAdded += ActivateGroup_onEntityAdded;
+            zvsContext.ChangeNotifications<Group>.onEntityDeleted += ActivateGroup_onEntityDeleted;
         }
 
+#if DEBUG
         ~ActivateGroup()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("ActivateGroup Deconstructed.");
         }
+#endif
 
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        private void ActivateGroup_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityAddedArgs e)
         {
-            zvsContext.onGroupsChanged += zvsContext_onGroupsChanged;
-            context = new zvsContext();
-            context.Groups.ToList();
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Get new groups
+                await context.Groups.ToListAsync();
+            }));
+        }
+
+        private void ActivateGroup_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Group>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        private void ActivateGroup_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Group>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        private async void Window_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            await context.Groups.ToListAsync();
 
             System.Windows.Data.CollectionViewSource groupViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
             groupViewSource.Source = context.Groups.Local;
 
             isLoaded = true;
-
             EvaluateSlection();
-        }
-
-        void zvsContext_onGroupsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.Groups.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<Group>())
-                            ent.Reload();
-                    }
-                }
-            }));
         }
 
         private void ActivateGroup_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.onGroupsChanged -= zvsContext_onGroupsChanged;
+            zvsContext.ChangeNotifications<Group>.onEntityUpdated -= ActivateGroup_onEntityUpdated;
+            zvsContext.ChangeNotifications<Group>.onEntityAdded -= ActivateGroup_onEntityAdded;
+            zvsContext.ChangeNotifications<Group>.onEntityDeleted -= ActivateGroup_onEntityDeleted;
             context.Dispose();
         }
 
@@ -91,7 +114,7 @@ namespace zvs.WPF.Groups
             Group g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
             {
-                BuiltinCommand group_on_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_ON");
+                BuiltinCommand group_on_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_ON");
                 if (group_on_cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
@@ -103,15 +126,15 @@ namespace zvs.WPF.Groups
         private async void AllOffBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Group g = (Group)GroupsCmbBx.SelectedItem;
-            if (g != null)
-            {
-                BuiltinCommand group_off_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "GROUP_OFF");
-                if (group_off_cmd != null)
-                {
-                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    await cp.RunCommandAsync(this, group_off_cmd.Id, g.Id.ToString());
-                }
-            }
+            if (g == null)
+                return;
+
+            BuiltinCommand group_off_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_OFF");
+            if (group_off_cmd == null)
+                return;
+
+            CommandProcessor cp = new CommandProcessor(app.zvsCore);
+            await cp.RunCommandAsync(this, group_off_cmd.Id, g.Id.ToString());
         }
 
         private void Window_PreviewKeyDown_1(object sender, KeyEventArgs e)
@@ -142,6 +165,23 @@ namespace zvs.WPF.Groups
             }
         }
 
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
+            }
+        }
     }
 }

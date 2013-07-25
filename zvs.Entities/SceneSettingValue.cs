@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.Entities
 {
@@ -48,15 +49,15 @@ namespace zvs.Entities
         }
 
         //TODO: MOve to extension method...
-        public static string GetPropertyValue(zvsContext Context, Scene scene, string scenePropertyUniqueIdentifier)
+        public async static Task<string> GetPropertyValueAsync(zvsContext Context, Scene scene, string scenePropertyUniqueIdentifier)
         {
             //Find the property
-            SceneSetting property = Context.SceneSettings.FirstOrDefault(p => p.UniqueIdentifier == scenePropertyUniqueIdentifier);
+            SceneSetting property = await Context.SceneSettings.FirstOrDefaultAsync(p => p.UniqueIdentifier == scenePropertyUniqueIdentifier);
             
             if (property == null)
                 return string.Empty;
 
-            Scene s2 = Context.Scenes.FirstOrDefault(o => o.Id == scene.Id);
+            Scene s2 = await Context.Scenes.Include(o=> o.SettingValues).FirstOrDefaultAsync(o => o.Id == scene.Id);
 
             if (s2 == null)
                 return string.Empty;

@@ -12,10 +12,21 @@ namespace zvs.Processor.Logging
 {
     public class EventedLog
     {
-        public delegate void LogItemArrived(List<LogItem> NewItems);
-        public static event LogItemArrived OnLogItemArrived;
-        public delegate void LogItemsCleared();
-        public static event LogItemsCleared OnLogItemsCleared;
+        public class LogItemsClearedEventArgs : EventArgs { }       
+        public class LogItemArrivedEventArgs : EventArgs
+        {
+            public IEnumerable<LogItem> NewItems { get; private set; }
+            public LogItemArrivedEventArgs(IEnumerable<LogItem> newItems)
+            {
+                NewItems = newItems;
+            }
+        }
+
+        public delegate void LogItemArrivedHandler(object sender, LogItemArrivedEventArgs e);
+        public static event LogItemArrivedHandler OnLogItemArrived = delegate { };
+
+        public delegate void LogItemsClearedHandler(object sender, LogItemsClearedEventArgs e);
+        public static event LogItemsClearedHandler OnLogItemsCleared = delegate { };
 
         private static log4net.Appender.MemoryAppender logger;
         private static bool _Enabled = true;
@@ -63,8 +74,9 @@ namespace zvs.Processor.Logging
         {
             items.Clear();
             logger.Clear();
-            if (OnLogItemsCleared != null) OnLogItemsCleared();
+            OnLogItemsCleared(null, new LogItemsClearedEventArgs());
         }
+
         private static Thread logWatcher;
 
         static EventedLog()
@@ -83,7 +95,7 @@ namespace zvs.Processor.Logging
                     items.Add(new LogItem(e));
                 }
                 logger.Clear();
-                if (events.Length > 0 && OnLogItemArrived != null) OnLogItemArrived(items);
+                if (events.Length > 0) OnLogItemArrived(null, new LogItemArrivedEventArgs(Items));
                 // nap for a while, don't need the events on the millisecond.  
                 Thread.Sleep(1000);
 

@@ -26,7 +26,7 @@ namespace zvs.Processor.Backup
         public string Argument2;
         public int NodeNumber;
 
-        public static implicit operator StoredCMDBackup(StoredCommand m)
+        public async static Task<StoredCMDBackup> ConvertToBackupCommand(StoredCommand m)
         {
             if (m == null)
                 return null;
@@ -42,8 +42,7 @@ namespace zvs.Processor.Backup
                 {
                     int d_id = int.TryParse(m.Argument2, out d_id) ? d_id : 0;
 
-                    //TODO: FIX BLOCKING CALL 
-                    Device d = context.Devices.FirstOrDefault(o => o.Id == d_id);
+                    Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == d_id);
                     if (d != null)
                         bcmd.NodeNumber = d.NodeNumber;
                 }
@@ -84,6 +83,7 @@ namespace zvs.Processor.Backup
                     .Include(o => o.Commands)
                     .Include(o => o.Type.Commands)
                     .FirstOrDefaultAsync(o => o.NodeNumber == backupStoredCMD.NodeNumber);
+
                 if (device == null)
                     return null;
 

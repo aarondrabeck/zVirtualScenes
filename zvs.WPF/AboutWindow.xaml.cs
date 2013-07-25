@@ -26,11 +26,13 @@ namespace zvs.WPF
             InitializeComponent();
         }
 
+#if DEBUG        
         ~AboutWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("AboutWindow Deconstructed.");
         }
+#endif
 
         private void AboutWindow_Loaded_1(object sender, RoutedEventArgs e)
         {

@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Entities;
 using zvs.WPF.Commands;
-
+using System.Data.Entity;
 
 namespace zvs.WPF.TriggerControls
 {
@@ -25,25 +25,37 @@ namespace zvs.WPF.TriggerControls
     public partial class TriggerEditorWindow : Window
     {
         private zvsContext context;
+        private Int64 DeviceValueTriggerId;
         private DeviceValueTrigger trigger;
         public bool Canceled = true;
 
-        public TriggerEditorWindow(DeviceValueTrigger trigger, zvsContext context)
+        public TriggerEditorWindow(Int64 deviceValueTriggerId, zvsContext context)
         {
             this.context = context;
-            this.trigger = trigger;
+            this.DeviceValueTriggerId = deviceValueTriggerId;
             InitializeComponent();
         }
 
+#if DEBUG
         ~TriggerEditorWindow()
         {
             Debug.WriteLine("TriggerEditorWindow Deconstructed.");
         }
+#endif
 
-        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        private async void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context.Devices.ToList();
-            context.Scenes.ToList();
+            trigger = await context.DeviceValueTriggers
+                .Include(o => o.DeviceValue)
+                .Include(o => o.StoredCommand)
+                .Include(o => o.DeviceValue.Device)
+                .FirstOrDefaultAsync(o => o.Id == DeviceValueTriggerId);
+
+            var eagarLoad2 = await context.Devices
+                .Include(o => o.Values)
+                .ToListAsync();
+
+            var scene = await context.Scenes.ToListAsync();
 
             System.Windows.Data.CollectionViewSource deviceViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("deviceViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
@@ -72,9 +84,11 @@ namespace zvs.WPF.TriggerControls
                 ValueTxtBx.Text = trigger.Value;
 
             if (trigger.StoredCommand != null)
-                CommandSummary.Text = string.Format("{0} '{1}'", trigger.StoredCommand.ActionableObject, trigger.StoredCommand.ActionDescription);
+                CommandSummary.Text = string.Format("{0} '{1}'",
+                    trigger.StoredCommand.TargetObjectName,
+                    trigger.StoredCommand.Description);
             else
-                CommandSummary.Text =  "No command selected.";
+                CommandSummary.Text = "No command selected.";
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -139,6 +153,9 @@ namespace zvs.WPF.TriggerControls
 
             trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
+            //Update the description
+            trigger.SetDescription(context);
+
             Canceled = false;
             this.Close();
         }
@@ -149,12 +166,12 @@ namespace zvs.WPF.TriggerControls
             StoredCommand newSC = new StoredCommand();
 
             //Send it to the command builder to get filled with a command
-            CommandBuilder cbWindow ;
+            CommandBuilder cbWindow;
             if (trigger.StoredCommand == null)
                 cbWindow = new CommandBuilder(context, newSC);
             else
                 cbWindow = new CommandBuilder(context, trigger.StoredCommand);
-           
+
             cbWindow.Owner = this;
 
             if (cbWindow.ShowDialog() ?? false)
@@ -170,7 +187,9 @@ namespace zvs.WPF.TriggerControls
             }
 
             if (trigger.StoredCommand != null)
-                CommandSummary.Text = string.Format("{0} '{1}'", trigger.StoredCommand.ActionableObject, trigger.StoredCommand.ActionDescription);
+                CommandSummary.Text = string.Format("{0} '{1}'",
+                    trigger.StoredCommand.TargetObjectName,
+                    trigger.StoredCommand.Description);
             else
                 CommandSummary.Text = "No command selected.";
         }

@@ -106,7 +106,7 @@
                     <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
                 </Grid>
             </TabItem>
-
+             
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
@@ -127,8 +127,8 @@
                 </TabItem.Header>
                 <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
             </TabItem>
+            
             <TabItem>
-
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <Image Height="18" Source="Images/scheduled_task.png"  />
@@ -137,6 +137,7 @@
                 </TabItem.Header>
                 <ScheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></ScheduledTaskControls:ScheduledTaskCreator>
             </TabItem>
+           
             <TabItem >
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">

@@ -5,9 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using zvs.Entities;
-
+using System.Data.Entity;
 
 namespace zvs.Processor
 {
@@ -62,24 +61,22 @@ namespace zvs.Processor
         /// <summary>
         /// Called when a scene has been called to be executed.
         /// </summary>
-        public event onReportProgressEventHandler onReportProgress;
+        public event onReportProgressEventHandler onReportProgress = delegate { };
         #endregion
 
         #region Event Helper Methods
         private void ReportProgress(onReportProgressEventArgs args)
         {
-            if (onReportProgress != null)
-                onReportProgress(this, args);
+            onReportProgress(this, args);
         }
         #endregion
 
         //Methods
         public async Task<SceneResult> RunSceneAsync(int sceneId)
         {
-            await Task.Factory.StartNew(() =>
-             {
-                 _scene = context.Scenes.FirstOrDefault(o => o.Id == sceneId);
-             });
+            _scene = await context.Scenes
+                .Include(o => o.Commands)
+                .FirstOrDefaultAsync(o => o.Id == sceneId);
 
             if (_scene == null)
                 return new SceneResult(sceneId, true, "Failed to run scene '" + sceneId + "' because it was not found in the database!");
@@ -91,15 +88,14 @@ namespace zvs.Processor
                 return new SceneResult(_scene.Id, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!");
 
             ReportProgress(new onReportProgressEventArgs(_scene.Id, "Scene '" + _scene.Name + "' started."));
-            await Task.Factory.StartNew(() =>
-             {
-                 _scene.isRunning = true;
-                 context.SaveChanges();
 
-                 ExecutionErrors = 0;
-                 ExecutedCommands = 0;
-                 CommandsToExecute = _scene.Commands.OrderBy(o => o.SortOrder).ToList();
-             });
+            _scene.isRunning = true;
+            await context.SaveChangesAsync();
+
+            ExecutionErrors = 0;
+            ExecutedCommands = 0;
+
+            CommandsToExecute = _scene.Commands.OrderBy(o => o.SortOrder).ToList();
 
             return await ProcessNextCommandAsync();
         }
@@ -121,11 +117,8 @@ namespace zvs.Processor
             }
             else
             {
-                await Task.Factory.StartNew(() =>
-                {
-                    _scene.isRunning = false;
-                    context.SaveChanges();
-                });
+                _scene.isRunning = false;
+                await context.SaveChangesAsync();
 
                 return new SceneResult(_scene.Id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors));
             }

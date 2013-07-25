@@ -35,31 +35,98 @@ namespace zvs.WPF.SceneControls
         private App app = (App)Application.Current;
         public SceneCreator()
         {
+            context = new zvsContext();
             InitializeComponent();
 
-            context = new zvsContext();
-
-            //Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                SceneCollection = context.Scenes.Local;
-
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
-                myCollectionViewSource.Source = context.Scenes.Local;
-                context.Scenes.ToList();
-
-            }
-            SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
-            zvsContext.onScenesChanged += zvsContext_onScenesChanged;
-            zvsContext.onJavaScriptCommandsChanged += zvsContext_onJavaScriptCommandsChanged;
+            zvsContext.ChangeNotifications<Scene>.onEntityAdded += SceneCreator_onEntityAdded;
+            zvsContext.ChangeNotifications<Scene>.onEntityDeleted += SceneCreator_onEntityDeleted;
+            zvsContext.ChangeNotifications<Scene>.onEntityUpdated += SceneCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded += SceneCreator_onEntityAdded;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted += SceneCreator_onEntityDeleted;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += SceneCreator_onEntityUpdated;
         }
 
+        void SceneCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void SceneCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void SceneCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await context.JavaScriptCommands.ToListAsync();
+            }));
+        }
+
+        void SceneCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Scene>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Scene>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void SceneCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Scene>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<Scene>())
+                    await ent.ReloadAsync();
+            }));
+        }
+
+        void SceneCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Scene>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await context.Scenes.ToListAsync();
+            }));
+        }
+
+#if DEBUG
         ~SceneCreator()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("SceneCreator Deconstructed");
         }
+#endif
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
@@ -69,6 +136,31 @@ namespace zvs.WPF.SceneControls
             SceneGrid.Focus();
         }
 
+        private async void UserControl_Initialized(object sender, EventArgs e)
+        {
+            //Do not load your data at design time.
+            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            {
+                await context.Scenes
+                   .Include(o => o.Commands)
+                   .ToListAsync();
+
+                await context.SceneCommands
+                    .Include(o => o.StoredCommand)
+                    .ToListAsync();
+
+                SceneCollection = context.Scenes.Local;
+                SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
+
+                //Load your data here and assign the result to the CollectionViewSource.
+                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
+
+                myCollectionViewSource.Source = context.Scenes.Local;
+            }
+        }
+
+
+
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
             Window parent = Window.GetWindow(this);
@@ -77,51 +169,15 @@ namespace zvs.WPF.SceneControls
             {
                 if (SceneCollection != null)
                     SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
-                zvsContext.onJavaScriptCommandsChanged -= zvsContext_onJavaScriptCommandsChanged;
-                zvsContext.onScenesChanged -= zvsContext_onScenesChanged;
+
+                zvsContext.ChangeNotifications<Scene>.onEntityAdded -= SceneCreator_onEntityAdded;
+                zvsContext.ChangeNotifications<Scene>.onEntityDeleted -= SceneCreator_onEntityDeleted;
+                zvsContext.ChangeNotifications<Scene>.onEntityUpdated -= SceneCreator_onEntityUpdated;
+                zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded -= SceneCreator_onEntityAdded;
+                zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted -= SceneCreator_onEntityDeleted;
+                zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated -= SceneCreator_onEntityUpdated;
             }
-        }
-
-        private void zvsContext_onJavaScriptCommandsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.JavaScriptCommands.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
-                            ent.Reload();
-                    }
-                }
-            }));
-        }
-
-        private void zvsContext_onScenesChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                if (context != null)
-                {
-                    if (args.ChangeType == EntityState.Added)
-                    {
-                        //Gets new devices
-                        context.Scenes.ToList();
-                    }
-                    else
-                    {
-                        //Reloads context from DB when modifications happen
-                        foreach (var ent in context.ChangeTracker.Entries<Scene>())
-                            ent.Reload();
-                    }
-                }
-            }));
+            SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
         }
 
         private async void SceneCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -175,21 +231,22 @@ namespace zvs.WPF.SceneControls
             if (obj is Scene)
             {
                 var scene = (Scene)obj;
-                if (scene != null)
-                {
-                    Scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder - 1);
-                    if (scene_we_are_replacing != null)
-                        scene_we_are_replacing.SortOrder++;
 
-                    scene.SortOrder--;
+                if (scene == null)
+                    return;
 
-                    SortSceneGridBySortOrder();
-                    await NormalizeSortOrderAsync();
-                    SortSceneGridBySortOrder();
+                Scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder - 1);
+                if (scene_we_are_replacing != null)
+                    scene_we_are_replacing.SortOrder++;
 
-                    SceneGrid.SelectedItem = scene;
-                    SceneGrid.Focus();
-                }
+                scene.SortOrder--;
+
+                SortSceneGridBySortOrder();
+                await NormalizeSortOrderAsync();
+                SortSceneGridBySortOrder();
+
+                SceneGrid.SelectedItem = scene;
+                SceneGrid.Focus();
             }
         }
 
@@ -252,7 +309,7 @@ namespace zvs.WPF.SceneControls
                 var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                    BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                     if (cmd != null)
                     {
                         CommandProcessor cp = new CommandProcessor(app.zvsCore);
@@ -495,23 +552,20 @@ namespace zvs.WPF.SceneControls
         {
             if (SceneGrid.SelectedItem is Scene)
             {
-                Scene selectedscene = (Scene)SceneGrid.SelectedItem;
-                if (selectedscene != null)
+                Scene selectedscene = SceneGrid.SelectedItem as Scene;
+                //normalize sort order
+                foreach (SceneCommand cmd in selectedscene.Commands)
                 {
-                    //normalize sort order
-                    foreach (SceneCommand cmd in selectedscene.Commands)
+                    foreach (SceneCommand item in SceneCmdsGrid.Items)
                     {
-                        foreach (SceneCommand item in SceneCmdsGrid.Items)
-                        {
-                            if (item.Id == cmd.Id)
-                                cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
-                        }
+                        if (item.Id == cmd.Id)
+                            cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
                     }
-
-                    var result = await context.TrySaveChangesAsync();
-                    if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
                 }
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
             }
         }
 
@@ -594,7 +648,6 @@ namespace zvs.WPF.SceneControls
             }
 
             await Task.Delay(10);
-
 
             SortSceneCMDsGridBySortOrder();
             await NormalizeSortOrderSceneCmdsAsync();
@@ -741,6 +794,8 @@ namespace zvs.WPF.SceneControls
                 }
             }
         }
+
+
     }
 }
 

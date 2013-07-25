@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.Entities
 {
@@ -49,8 +50,8 @@ namespace zvs.Entities
                 if (value != _Command)
                 {
                     _Command = value;
-                    NotifyPropertyChanged("ActionDescription");
-                    NotifyPropertyChanged("ActionableObject");
+                    //NotifyPropertyChanged("ActionDescription");
+                    //NotifyPropertyChanged("ActionableObject");
                     NotifyPropertyChanged("Command");
                     NotifyPropertyChanged("Summary");
                 }
@@ -102,180 +103,176 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public string Summary
+        private string _TargetObjectName;
+        public string TargetObjectName
         {
-            get
+            get { return _TargetObjectName; }
+            set
             {
-                return string.Format("{0} '{1}'", this.ActionableObject, this.ActionDescription);
-            }
-        }
-
-        //TODO: MOVE TO ASYNC METHOD
-        public string ActionableObject
-        {
-            get
-            {
-                if (this.Command is BuiltinCommand)
+                if (value != _TargetObjectName)
                 {
-                    return this.Command.Name;
-                }
-                else if (this.Command is DeviceCommand)
-                {
-                    using (zvsContext context = new zvsContext())
-                    {
-                        DeviceCommand dc = context.DeviceCommands.Find(this.Command.Id);
-                        return dc.Device.Name;
-                    }
-                }
-                else if (this.Command is DeviceTypeCommand)
-                {
-                    using (zvsContext context = new zvsContext())
-                    {
-                        int d_id = int.TryParse(this.Argument2, out d_id) ? d_id : 0;
-                        Device d = context.Devices.FirstOrDefault(o => o.Id == d_id);
-
-                        if(d!= null)
-                            return d.Name;
-                        else
-                            return "Unknown Device";
-                    }
-                }
-                else if (this.Command is JavaScriptCommand)
-                {
-                    return "Execute JavaScript";
-                }
-                return string.Empty;
-            }
-        }
-
-        public string ActionDescription
-        {
-            get
-            {
-                using (zvsContext context = new zvsContext())
-                {
-                    if (this.Command is BuiltinCommand)
-                    {
-                        BuiltinCommand bc = (BuiltinCommand)this.Command;
-                        if (bc != null)
-                        {
-                            switch (bc.UniqueIdentifier)
-                            {
-                                case "REPOLL_ME":
-                                    {
-                                        int d_id = 0;
-                                        int.TryParse(this.Argument, out d_id);
-
-                                        Device device_to_repoll = context.Devices.FirstOrDefault(d => d.Id == d_id);
-                                        if (device_to_repoll != null)
-                                            return device_to_repoll.Name;
-
-                                        break;
-                                    }
-                                case "GROUP_ON":
-                                case "GROUP_OFF":
-                                    {
-                                        int g_id = 0;
-                                        int.TryParse(this.Argument, out g_id);
-                                        Group g = context.Groups.FirstOrDefault(gr => gr.Id == g_id);
-
-                                        if (g != null)
-                                            return g.Name;
-                                        break;
-                                    }
-                                case "RUN_SCENE":
-                                    {
-                                        int SceneId = 0;
-                                        int.TryParse(this.Argument, out SceneId);
-
-                                        Scene Scene = context.Scenes.FirstOrDefault(d => d.Id == SceneId);
-                                        if (Scene != null)
-                                            return Scene.Name;
-                                        break;
-                                    }
-                            }
-                        }
-                        return this.Argument;
-                    }
-                    else if (this.Command is DeviceCommand)
-                    {
-                        DeviceCommand bc = (DeviceCommand)this.Command;
-                        if (bc != null)
-                        {
-                            switch (bc.ArgumentType)
-                            {
-                                case DataType.NONE:
-                                    return bc.Name;
-                                case DataType.SHORT:
-                                case DataType.STRING:
-                                case DataType.LIST:
-                                case DataType.INTEGER:
-                                case DataType.DECIMAL:
-                                case DataType.BYTE:
-                                case DataType.BOOL:
-                                    return string.Format("{0} to '{1}'", bc.Name, this.Argument);
-                            }
-                        }
-
-                    }
-                    else if (this.Command is DeviceTypeCommand)
-                    {
-                        DeviceTypeCommand bc = (DeviceTypeCommand)this.Command;
-                        if (bc != null)
-                        {
-                            switch (bc.ArgumentType)
-                            {
-                                case DataType.NONE:
-                                    return bc.Name;
-                                case DataType.SHORT:
-                                case DataType.STRING:
-                                case DataType.LIST:
-                                case DataType.INTEGER:
-                                case DataType.DECIMAL:
-                                case DataType.BYTE:
-                                case DataType.BOOL:
-                                    return string.Format("{0} to '{1}'", bc.Name, this.Argument);
-                            }
-                        }
-                    }
-                    else if (this.Command is JavaScriptCommand)
-                    {
-                        JavaScriptCommand JSCmd = (JavaScriptCommand)this.Command;
-                        return string.Format("{0} '{1}'", JSCmd.Name, JSCmd.Script);
-                    }
-                    return string.Empty;
+                    _TargetObjectName = value;
+                    NotifyPropertyChanged();
                 }
             }
         }
 
+        private string _Description;
+        public string Description
+        {
+            get { return _Description; }
+            set
+            {
+                if (value != _Description)
+                {
+                    _Description = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+    }
+
+    public static class StoredCommandExtensionMethods
+    {
         /// <summary>
         /// Helper to find where the stored command is used and remove its use.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="sc"></param>
-        public static async Task<Result> TryRemoveDependenciesAsync(zvsContext context, StoredCommand sc)
+        /// <param name="storedCommand"></param>
+        public static async Task<Result> TryRemoveDependenciesAsync(this StoredCommand storedCommand, zvsContext context)
         {
-            if (sc.ScheduledTask != null)
+            if (storedCommand.ScheduledTask != null)
             {
-                sc.ScheduledTask.isEnabled = false;
-                sc.ScheduledTask = null;
+                storedCommand.ScheduledTask.isEnabled = false;
+                storedCommand.ScheduledTask = null;
             }
 
-            if (sc.DeviceValueTrigger != null)
+            if (storedCommand.DeviceValueTrigger != null)
             {
-                sc.DeviceValueTrigger.isEnabled = false;
-                sc.DeviceValueTrigger = null;
+                storedCommand.DeviceValueTrigger.isEnabled = false;
+                storedCommand.DeviceValueTrigger = null;
             }
 
             // if (sc.SceneCommand != null)
             //     context.SceneCommands.Local.Remove(sc.SceneCommand);
 
-            foreach (SceneCommand sceneCommand in context.SceneCommands.Where(o => o.StoredCommand.Id == sc.Id))
-            {
-                context.SceneCommands.Local.Remove(sceneCommand);
-            }
+            context.SceneCommands.RemoveRange(await context.SceneCommands.Where(o => o.StoredCommand.Id == storedCommand.Id).ToListAsync());
 
             return await context.TrySaveChangesAsync();
+        }
+
+        public static async Task SetDescriptionAsync(this StoredCommand storedCommand, zvsContext context)
+        {
+            if (storedCommand.Command is BuiltinCommand)
+            {
+                #region Built-in Command
+                BuiltinCommand bc = storedCommand.Command as BuiltinCommand;
+
+                switch (bc.UniqueIdentifier)
+                {
+                    case "REPOLL_ME":
+                        {
+                            int d_id = 0;
+                            int.TryParse(storedCommand.Argument, out d_id);
+
+                            Device device_to_repoll = await context.Devices.FirstOrDefaultAsync(d => d.Id == d_id);
+                            if (device_to_repoll != null)
+                                storedCommand.Description = device_to_repoll.Name;
+
+                            break;
+                        }
+                    case "GROUP_ON":
+                    case "GROUP_OFF":
+                        {
+                            int g_id = 0;
+                            int.TryParse(storedCommand.Argument, out g_id);
+                            Group g = await context.Groups.FirstOrDefaultAsync(gr => gr.Id == g_id);
+                            if (g != null)
+                                storedCommand.Description = g.Name;
+
+                            break;
+                        }
+                    case "RUN_SCENE":
+                        {
+                            int SceneId = 0;
+                            int.TryParse(storedCommand.Argument, out SceneId);
+
+                            Scene Scene = await context.Scenes.FirstOrDefaultAsync(d => d.Id == SceneId);
+                            if (Scene != null)
+                                storedCommand.Description = Scene.Name;
+                            break;
+                        }
+                    default:
+                        storedCommand.Description = storedCommand.Argument;
+                        break;
+                }
+                #endregion
+            }
+            else if (storedCommand.Command is DeviceCommand)
+            {
+                #region DeviceCommand
+                DeviceCommand bc = storedCommand.Command as DeviceCommand;
+                switch (bc.ArgumentType)
+                {
+                    case DataType.NONE:
+                        storedCommand.Description = bc.Name;
+                        break;
+                    default:
+                        storedCommand.Description = string.Format("{0} to '{1}'", bc.Name, storedCommand.Argument);
+                        break;
+                }
+                #endregion
+            }
+            else if (storedCommand.Command is DeviceTypeCommand)
+            {
+                #region DeviceTypeCommand
+                DeviceTypeCommand bc = storedCommand.Command as DeviceTypeCommand;
+                switch (bc.ArgumentType)
+                {
+                    case DataType.NONE:
+                        storedCommand.Description = bc.Name;
+                        break;
+                    default:
+                        storedCommand.Description = string.Format("{0} to '{1}'", bc.Name, storedCommand.Argument);
+                        break;
+                }
+                #endregion
+            }
+            else if (storedCommand.Command is JavaScriptCommand)
+            {
+                JavaScriptCommand JSCmd = storedCommand.Command as JavaScriptCommand;
+                storedCommand.Description = string.Format("{0} '{1}'", JSCmd.Name, JSCmd.Script);
+            }
+        }
+
+        public static async Task SetTargetObjectNameAsync(this StoredCommand storedCommand, zvsContext context)
+        {
+            storedCommand.TargetObjectName = string.Empty;
+
+            if (storedCommand.Command is BuiltinCommand)
+            {
+                storedCommand.TargetObjectName = storedCommand.Command.Name;
+            }
+            else if (storedCommand.Command is DeviceCommand)
+            {
+                var dc = storedCommand.Command as DeviceCommand;
+                var device = await context.Devices.FirstOrDefaultAsync(o => o.Commands.Any(p => p.Id == storedCommand.Command.Id));
+                storedCommand.TargetObjectName = device.Name;
+            }
+            else if (storedCommand.Command is DeviceTypeCommand)
+            {
+                int d_id = int.TryParse(storedCommand.Argument2, out d_id) ? d_id : 0;
+                Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == d_id);
+
+                if (d != null)
+                    storedCommand.TargetObjectName = d.Name;
+                else
+                    storedCommand.TargetObjectName = "Unknown Device";
+            }
+            else if (storedCommand.Command is JavaScriptCommand)
+            {
+                storedCommand.TargetObjectName = "Execute JavaScript";
+            }
         }
     }
 }

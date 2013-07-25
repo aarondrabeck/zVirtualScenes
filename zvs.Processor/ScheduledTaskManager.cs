@@ -7,7 +7,9 @@ using System.Threading;
 using System.Windows.Data;
 using System.Windows.Threading;
 using zvs.Entities;
-
+using System.Data.Entity;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace zvs.Processor
 {
@@ -15,7 +17,7 @@ namespace zvs.Processor
     {
         private Core Core;
         private List<ScheduledTask> scheduledTasks = new List<ScheduledTask>();
-        private Timer TaskTimer;
+        public bool IsRunning { get; private set; }
 
         #region Events
         public delegate void onScheduledTaskEventHandler(object sender, onScheduledTaskEventArgs args);
@@ -66,137 +68,155 @@ namespace zvs.Processor
         public ScheduledTaskManager(Core core)
         {
             Core = core;
-            using (zvsContext context = new zvsContext())
-            {
-                lock (scheduledTasks)
-                {
-                    scheduledTasks = context.ScheduledTasks.ToList();
-                }
-            }
 
             //Keep the local context in sync with other contexts
-            zvsContext.onScheduledTasksChanged += zvsContext_onScheduledTasksChanged;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated += ScheduledTaskManager_onEntityUpdated;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted += ScheduledTaskManager_onEntityDeleted;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded += ScheduledTaskManager_onEntityAdded;
+        }
 
-            TaskTimer = new Timer((state) =>
+        private async void ScheduledTaskManager_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityAddedArgs e)
+        {
+            await RefreshLocalCopyOfTasksAsync();
+        }
+
+        private async void ScheduledTaskManager_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityDeletedArgs e)
+        {
+            await RefreshLocalCopyOfTasksAsync();
+        }
+
+        private async void ScheduledTaskManager_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityUpdatedArgs e)
+        {
+            await RefreshLocalCopyOfTasksAsync();
+        }
+
+        private async Task RefreshLocalCopyOfTasksAsync()
+        {
+            using (zvsContext context = new zvsContext())
+                scheduledTasks = await context.ScheduledTasks.ToListAsync();
+        }
+
+        public void StopAsync(Core core)
+        {
+            IsRunning = false;
+        }
+
+        public async void StartAsync()
+        {
+            using (zvsContext context = new zvsContext())
+                scheduledTasks = await context.ScheduledTasks.ToListAsync();
+
+            IsRunning = true;
+
+            await Task.Delay(5000);
+
+            while (IsRunning)
             {
-                lock (scheduledTasks)
+                await Task.Delay(1000);
+                Debug.WriteLine("Checking for tasks to run...");
+                CheckForTasks();
+            }
+        }
+
+        public void CheckForTasks()
+        {
+            foreach (ScheduledTask task in scheduledTasks)
+            {
+                #region Actions
+                if (task.isEnabled)
                 {
-                    foreach (ScheduledTask task in scheduledTasks)
+                    switch (task.Frequency)
                     {
-                        #region Actions
-                        if (task.isEnabled)
-                        {
-
-                            switch (task.Frequency)
+                        case TaskFrequency.Seconds:
                             {
-                                case TaskFrequency.Seconds:
+                                if (task.StartTime.HasValue && task.RecurSeconds.Value > 0)
+                                {
+                                    int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                    if (sec % task.RecurSeconds.Value == 0)
+                                        RunTask(task.Id);
+                                }
+                                break;
+                            }
+                        case TaskFrequency.Daily:
+                            {
+                                if (task.StartTime.HasValue && task.RecurDays.HasValue && task.RecurDays.Value > 0)
+                                {
+                                    //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
+                                    if (task.RecurDays.Value > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays.Value == 0))
                                     {
-                                        if (task.StartTime.HasValue && task.RecurSeconds.Value > 0)
-                                        {
-                                            int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
-                                            if (sec % task.RecurSeconds.Value == 0)
-                                                RunTask(task);
-                                        }
-                                        break;
-                                    }
-                                case TaskFrequency.Daily:
-                                    {
-                                        if (task.StartTime.HasValue && task.RecurDays.HasValue && task.RecurDays.Value > 0)
-                                        {
-                                            //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
-                                            if (task.RecurDays.Value > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays.Value == 0))
-                                            {
-                                                TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
+                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                        TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
 
-                                                //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
-                                                if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
-                                                    RunTask(task);
-                                            }
-                                        }
-                                        break;
+                                        //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
+                                        if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                            RunTask(task.Id);
                                     }
-                                case TaskFrequency.Weekly:
+                                }
+                                break;
+                            }
+                        case TaskFrequency.Weekly:
+                            {
+                                if (task.StartTime.HasValue && task.RecurWeeks.HasValue && task.RecurWeeks.Value > 0)
+                                {
+                                    if (task.RecurWeeks.Value > 0 && (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks.Value == 0))  //IF RUN THIS WEEK
                                     {
-                                        if (task.StartTime.HasValue && task.RecurWeeks.HasValue && task.RecurWeeks.Value > 0)
-                                        {
-                                            if (task.RecurWeeks.Value > 0 && (((Int32)(DateTime.Now.Date - task.StartTime.Value.Date).TotalDays / 7) % task.RecurWeeks.Value == 0))  //IF RUN THIS WEEK
-                                            {
-                                                if (ShouldRunToday(task))  //IF RUN THIS DAY 
-                                                {
-                                                    TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                    TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
-
-                                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
-                                                        RunTask(task);
-                                                }
-                                            }
-                                        }
-                                        break;
-                                    }
-                                case TaskFrequency.Monthly:
-                                    {
-                                        if (task.StartTime.HasValue && task.RecurMonth.HasValue && task.RecurMonth.Value > 0)
-                                        {
-                                            int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
-                                            //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
-                                            if (task.RecurMonth.Value > 0 && monthsapart > -1 && monthsapart % task.RecurMonth.Value == 0)  //IF RUN THIS Month
-                                            {
-                                                if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
-                                                {
-                                                    TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
-                                                    TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
-
-                                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
-                                                        RunTask(task);
-                                                }
-                                            }
-                                        }
-
-                                        break;
-                                    }
-                                case TaskFrequency.Once:
-                                    {
-                                        if (task.StartTime.HasValue)
+                                        if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                         {
                                             TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                             TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
                                             if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
-                                                RunTask(task);
+                                                RunTask(task.Id);
                                         }
-                                        break;
                                     }
+                                }
+                                break;
                             }
+                        case TaskFrequency.Monthly:
+                            {
+                                if (task.StartTime.HasValue && task.RecurMonth.HasValue && task.RecurMonth.Value > 0)
+                                {
+                                    int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
+                                    //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
+                                    if (task.RecurMonth.Value > 0 && monthsapart > -1 && monthsapart % task.RecurMonth.Value == 0)  //IF RUN THIS Month
+                                    {
+                                        if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
+                                        {
+                                            TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                            TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
-                        }
-                        #endregion
+                                            if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                                RunTask(task.Id);
+                                        }
+                                    }
+                                }
+
+                                break;
+                            }
+                        case TaskFrequency.Once:
+                            {
+                                if (task.StartTime.HasValue)
+                                {
+                                    TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                    TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
+
+                                    if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
+                                        RunTask(task.Id);
+                                }
+                                break;
+                            }
                     }
-                }
-            }, null, 5000, 1000);
 
+                }
+                #endregion
+            }
         }
 
         public void Dispose()
         {
-            zvsContext.onScheduledTasksChanged -= zvsContext_onScheduledTasksChanged;
-            TaskTimer.Dispose();
-        }
-
-        void zvsContext_onScheduledTasksChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            BackgroundWorker bw = new BackgroundWorker();
-            bw.DoWork += (s, a) =>
-            {
-                using (zvsContext context = new zvsContext())
-                {
-                    lock (scheduledTasks)
-                    {
-                        scheduledTasks = context.ScheduledTasks.ToList();
-                    }
-                }
-            };
-            bw.RunWorkerAsync();
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated -= ScheduledTaskManager_onEntityUpdated;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted -= ScheduledTaskManager_onEntityDeleted;
+            zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded -= ScheduledTaskManager_onEntityAdded;
         }
 
         private bool ShouldRunThisDayOfMonth(ScheduledTask task)
@@ -300,20 +320,21 @@ namespace zvs.Processor
             return false;
         }
 
-        private async void RunTask(ScheduledTask task)
+        private async void RunTask(Int64 taskId)
         {
             ScheduledTask _task = null;
 
             using (zvsContext context = new zvsContext())
             {
-                _task = context.ScheduledTasks.FirstOrDefault(o => o.Id == task.Id);
+                _task = await context.ScheduledTasks.FirstOrDefaultAsync(o => o.Id == taskId);
+
                 if (_task == null)
                 {
                     ScheduledTaskBegin(new onScheduledTaskEventArgs(_task.Id,
-                          string.Format("Scheduled task '{0}' started.", task.Id), true));
+                          string.Format("Scheduled task '{0}' started.", taskId), true));
 
                     ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
-                          string.Format("Scheduled task '{0}' has been deleted.", task.Id), true));
+                          string.Format("Scheduled task '{0}' has been deleted.", taskId), true));
                     return;
                 }
 

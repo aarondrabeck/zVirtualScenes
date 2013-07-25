@@ -88,6 +88,7 @@
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="AdapterManager.cs" />
     <Compile Include="BuiltinCommandBuilder.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="PluginSettingBuilder.cs" />
     <Compile Include="DetectVCRedist.cs" />
     <Compile Include="Backup\BackupScene.cs" />

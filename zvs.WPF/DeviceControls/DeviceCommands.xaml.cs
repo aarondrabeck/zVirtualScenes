@@ -16,14 +16,14 @@ using zvs.WPF.DynamicActionControls;
 using zvs.Entities;
 using zvs.Processor;
 using zvs.Processor.Logging;
-
+using System.Data.Entity;
 
 namespace zvs.WPF.DeviceControls
 {
     /// <summary>
     /// Interaction logic for DeviceCommands.xaml
     /// </summary>
-    public partial class DeviceCommands : UserControl
+    public partial class DeviceCommands : UserControl, IDisposable
     {
         ILog log = LogManager.GetLogger<DeviceCommands>();
         App app = (App)Application.Current;
@@ -37,10 +37,10 @@ namespace zvs.WPF.DeviceControls
             InitializeComponent();
         }
 
-        private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
+        private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
             context = new zvsContext();
-            LoadCommands();
+            await LoadCommandsAsync();
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
@@ -48,12 +48,16 @@ namespace zvs.WPF.DeviceControls
 
         }
 
-        private void LoadCommands()
+        private async Task LoadCommandsAsync()
         {
             DeviceCommandsStkPnl.Children.Clear();
             TypeCommandsStkPnl.Children.Clear();
 
-            Device d = context.Devices.FirstOrDefault(dv => dv.Id == DeviceID);
+            Device d = await context.Devices
+                .Include(o=> o.Values)
+                .Include(o => o.Type.Commands)
+                .FirstOrDefaultAsync(dv => dv.Id == DeviceID);
+
             if (d != null)
             {
                 #region Device Commands
@@ -61,7 +65,6 @@ namespace zvs.WPF.DeviceControls
                 {
                     //log.InfoFormat("d_cmd.ArgumentType.ToString():{0}, d_cmd.CommandId:{1}, d_cmd.CustomData1:{2}, d_cmd.CustomData2:{3}, d_cmd.Description:{4}, d_cmd.Device.Name:{5}, d_cmd.Help:{6}, d_cmd.Name:{7}, d_cmd.Options.Count:{8}, d_cmd.UniqueIdentifier:{9}, d_cmd.Value:{10}",
                     //    d_cmd.ArgumentType.ToString(), d_cmd.CommandId, d_cmd.CustomData1, d_cmd.CustomData2, d_cmd.Description, d_cmd.Device.Name, d_cmd.Help, d_cmd.Name, d_cmd.Options.Count, d_cmd.UniqueIdentifier, d_cmd.Value);
-
 
                     DeviceCommand device_command = d_cmd;
                     switch ((DataType)d_cmd.ArgumentType)
@@ -436,6 +439,23 @@ namespace zvs.WPF.DeviceControls
 
         }
 
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
+            }
+        }
     }
 }

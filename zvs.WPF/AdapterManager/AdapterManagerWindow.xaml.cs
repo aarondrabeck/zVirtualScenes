@@ -17,6 +17,7 @@ using zvs.WPF.DynamicActionControls;
 using System.Diagnostics;
 using zvs.Entities;
 using System.Data.Entity;
+using System.Threading.Tasks;
 
 namespace zvs.WPF.AdapterManager
 {
@@ -31,19 +32,40 @@ namespace zvs.WPF.AdapterManager
 
         public AdapterManagerWindow()
         {
+            context = new zvsContext();
+
             InitializeComponent();
+
+            zvsContext.ChangeNotifications<Adapter>.onEntityAdded += AdapterManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Adapter>.onEntityDeleted += AdapterManagerWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Adapter>.onEntityUpdated += AdapterManagerWindow_onEntityUpdated;
         }
 
+        void AdapterManagerWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Adapter>.EntityUpdatedArgs e)
+        {
+            UpdateAdapterList();
+        }
+
+        void AdapterManagerWindow_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Adapter>.EntityDeletedArgs e)
+        {
+            UpdateAdapterList();
+        }
+
+        void AdapterManagerWindow_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Adapter>.EntityAddedArgs e)
+        {
+            UpdateAdapterList();
+        }
+
+#if DEBUG
         ~AdapterManagerWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("AdapterManagerWindow Deconstructed.");
         }
+#endif
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
-
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -55,31 +77,38 @@ namespace zvs.WPF.AdapterManager
                 //zvsEntities2ViewSource.Source = context.plugins.Local.Where(p=> mainWindow.manager.pluginManager.GetPlugins().Any(o => o.Name == p.name));
 
                 //Get a list of loaded plug-ins
-                var loadedAdapterGuids = application.zvsCore.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
-                await context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
+                UpdateAdapterList();
 
                 //Only load the plug-in options for the plug-ins that are currently loaded.
                 zvsEntities2ViewSource.Source = context.Adapters.Local;
             }
 
-            zvsContext.onPluginsChanged += zvsContext_onPluginsChanged;
             this.SizeChanged += PluginManagerWindow_SizeChanged;
         }
 
         void PluginManagerWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+           //TODO: Why are we doing this?
             ControlsStackPanelParent.Height = this.Height - 50;
         }
 
-        async void zvsContext_onPluginsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
+        private void UpdateAdapterList()
         {
-            var loadedAdapterGuids = application.zvsCore.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
-            await context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                var loadedAdapterGuids = application.zvsCore.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
+                await context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
+            }));
         }
 
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.onPluginsChanged -= zvsContext_onPluginsChanged;
+            zvsContext.ChangeNotifications<Adapter>.onEntityAdded -= AdapterManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Adapter>.onEntityDeleted -= AdapterManagerWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Adapter>.onEntityUpdated -= AdapterManagerWindow_onEntityUpdated;
             context.Dispose();
         }
 

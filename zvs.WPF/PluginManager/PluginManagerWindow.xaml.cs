@@ -17,6 +17,7 @@ using zvs.WPF.DynamicActionControls;
 using System.Diagnostics;
 using zvs.Entities;
 using System.Data.Entity;
+using System.Threading.Tasks;
 
 namespace zvs.WPF
 {
@@ -31,19 +32,25 @@ namespace zvs.WPF
 
         public PluginManagerWindow()
         {
+            context = new zvsContext();
             InitializeComponent();
+
+            zvsContext.ChangeNotifications<Plugin>.onEntityUpdated += PluginManagerWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Plugin>.onEntityAdded += PluginManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Plugin>.onEntityDeleted += PluginManagerWindow_onEntityDeleted;
+            this.SizeChanged += PluginManagerWindow_SizeChanged;
         }
 
+#if DEBUG
         ~PluginManagerWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("PluginManagerWindow Deconstructed.");
         }
+#endif
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
-
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -51,15 +58,50 @@ namespace zvs.WPF
                 var zvsEntities2ViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("zvsEntities2PluginViewSource")));
 
                 //Get a list of loaded plug-ins
-                var loadedPluginsGuids = application.zvsCore.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
-                await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
+                await GetLoadedPlugins();
 
                 //Only load the plug-in options for the plug-ins that are currently loaded.
                 zvsEntities2ViewSource.Source = context.Plugins.Local;
             }
+        }
 
-            zvsContext.onPluginsChanged += zvsContext_onPluginsChanged;
-            this.SizeChanged += PluginManagerWindow_SizeChanged;
+        private async Task GetLoadedPlugins()
+        {
+            var loadedPluginsGuids = application.zvsCore.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
+            await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
+        }
+
+        void PluginManagerWindow_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Plugin>.EntityAddedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await GetLoadedPlugins();
+            }));
+        }
+
+        void PluginManagerWindow_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Plugin>.EntityDeletedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await GetLoadedPlugins();
+            }));
+        }
+
+        void PluginManagerWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Plugin>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                await GetLoadedPlugins();
+            }));
         }
 
         void PluginManagerWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -67,15 +109,11 @@ namespace zvs.WPF
             ControlsStackPanelParent.Height = this.Height - 50;
         }
 
-        async void zvsContext_onPluginsChanged(object sender, zvsContext.onEntityChangedEventArgs args)
-        {
-            var loadedPluginsGuids = application.zvsCore.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
-            await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
-        }
-
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.onPluginsChanged -= zvsContext_onPluginsChanged;
+            zvsContext.ChangeNotifications<Plugin>.onEntityUpdated -= PluginManagerWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Plugin>.onEntityAdded -= PluginManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Plugin>.onEntityDeleted -= PluginManagerWindow_onEntityDeleted;
             context.Dispose();
         }
 

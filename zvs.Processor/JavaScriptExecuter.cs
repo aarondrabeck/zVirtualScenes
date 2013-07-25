@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.Entities;
+using System.Data.Entity;
 
 namespace zvs.Processor
 {
@@ -30,7 +31,7 @@ namespace zvs.Processor
             }
         }
 
-        public delegate void onReportProgressEventHandler(object sender, onReportProgressEventArgs args);
+        public delegate void onReportProgressEventHandler(object sender, onReportProgressEventArgs e);
         public class onReportProgressEventArgs : EventArgs
         {
             public string Progress { get; private set; }
@@ -41,12 +42,11 @@ namespace zvs.Processor
             }
         }
 
-        public event onReportProgressEventHandler onReportProgress;
+        public event onReportProgressEventHandler onReportProgress = delegate { };
 
         private void ReportProgress(string progress, params object[] args)
         {
-            if (onReportProgress != null)
-                onReportProgress(this, new onReportProgressEventArgs(string.Format(progress, args)));
+            onReportProgress(this, new onReportProgressEventArgs(string.Format(progress, args)));
         }
 
         #endregion
@@ -58,9 +58,9 @@ namespace zvs.Processor
 
             engine.Step += (s, info) =>
             {
-                ReportProgress("JSE{0}:{1} '{2}'", 
-                    id, 
-                    info.CurrentStatement.Source.Start.Line, 
+                ReportProgress("JSE{0}:{1} '{2}'",
+                    id,
+                    info.CurrentStatement.Source.Start.Line,
                     info.CurrentStatement.Source.Code.Replace(Environment.NewLine, ""));
             };
             Random random = new Random();
@@ -76,7 +76,7 @@ namespace zvs.Processor
 
         //private System.Diagnostics.Process Shell(string Path)
         //{
-         //   return System.Diagnostics.Process.Start(Path);
+        //   return System.Diagnostics.Process.Start(Path);
         //}
 
         private string MapPath(string Path)
@@ -114,8 +114,8 @@ namespace zvs.Processor
                 engine.SetParameter("senderType", Sender.GetType().Name);
 
             engine.SetParameter("senderObject", Sender);
-            
-           
+
+
             try
             {
                 //pull out import statements
@@ -169,28 +169,22 @@ namespace zvs.Processor
         }
 
         //Delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
-        public void Delay(string script, double time, bool Async)
+        public async void Delay(string script, double time, bool Async)
         {
             AutoResetEvent mutex = new AutoResetEvent(false);
-            System.Timers.Timer t = new System.Timers.Timer();
-            t.Interval = time;
-            t.Elapsed += (sender, e) =>
+            await Task.Delay((int)time);
+
+            JavaScriptExecuter je = new JavaScriptExecuter(Sender, Core);
+            je.onReportProgress += (s, a) =>
             {
-                t.Stop();
-                JavaScriptExecuter je = new JavaScriptExecuter(Sender, Core);
-                je.onReportProgress += (s, a) =>
-                {
-                    Core.log.Info(a.Progress);
-                };
-
-                // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                JavaScriptResult result = Task.Run(() => je.ExecuteScriptAsync(script, Context)).Result;
-                Core.log.Info(result.Details);
-
-                mutex.Set();
-                t.Dispose();
+                Core.log.Info(a.Progress);
             };
-            t.Start();
+
+            // invoked on the ThreadPool, where there won’t be a SynchronizationContext
+            JavaScriptResult result = await je.ExecuteScriptAsync(script, Context);
+            Core.log.Info(result.Details);
+
+            mutex.Set();
 
             if (!Async)
                 mutex.WaitOne();
@@ -203,11 +197,11 @@ namespace zvs.Processor
         }
 
         //RunDeviceCommand('Office Light','Set Level', '99');
-        public void RunDeviceCommandJS(string DeviceName, string CommandName, string Value)
+        public async void RunDeviceCommandJS(string DeviceName, string CommandName, string Value)
         {
             Device d = null;
             using (zvsContext context = new zvsContext())
-                d = context.Devices.FirstOrDefault(o => o.Name == DeviceName);
+                d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
 
             if (d == null)
             {
@@ -224,19 +218,12 @@ namespace zvs.Processor
             RunDeviceCommand(DeviceId, CommandName, Value);
         }
 
-        private void RunDeviceCommand(double DeviceId, string CommandName, string Value)
+        private async void RunDeviceCommand(double DeviceId, string CommandName, string Value)
         {
             int dId = Convert.ToInt32(DeviceId);
             using (zvsContext context = new zvsContext())
             {
-                Device device = context.Devices.Find(dId);
-                if (device == null)
-                {
-                    ReportProgress("Cannot find device with DeviceId of {0}", dId);
-                    return;
-                }
-
-                DeviceCommand dc = device.Commands.FirstOrDefault(o => o.Name == CommandName);
+                DeviceCommand dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Name == CommandName && o.DeviceId == dId);
                 if (dc == null)
                 {
                     ReportProgress("Cannot find device command '{0}'", CommandName);
@@ -245,7 +232,7 @@ namespace zvs.Processor
 
                 CommandProcessor cp = new CommandProcessor(Core);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                CommandProcessorResult result = Task.Run(() => cp.RunCommandAsync(this, dc.Id, Value)).Result;
+                CommandProcessorResult result = await cp.RunCommandAsync(this, dc.Id, Value);
             }
         }
 
@@ -269,27 +256,27 @@ namespace zvs.Processor
         }
 
         //RunScene("Energy Save");
-        public void RunSceneJS(string SceneName)
+        public async void RunSceneJS(string SceneName)
         {
             Scene s = null;
             using (zvsContext context = new zvsContext())
-                s = context.Scenes.FirstOrDefault(o => o.Name == SceneName);
+                s = await context.Scenes.FirstOrDefaultAsync(o => o.Name == SceneName);
 
             if (s == null)
             {
-                ReportProgress("JSE{0} Warning cannot find scene {1}",id, SceneName);
+                ReportProgress("JSE{0} Warning cannot find scene {1}", id, SceneName);
                 return;
             }
 
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            CommandProcessorResult result =  Task.Run(() => RunSceneAsync(s.Id)).Result;
+            CommandProcessorResult result = await RunSceneAsync(s.Id);
         }
 
         //RunScene(1);
-        public void RunSceneJS(double SceneID)
+        public async void RunSceneJS(double SceneID)
         {
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            CommandProcessorResult result = Task.Run(() => RunSceneAsync(SceneID)).Result;
+            CommandProcessorResult result = await RunSceneAsync(SceneID);
         }
 
         public async Task<CommandProcessorResult> RunSceneAsync(double SceneID)

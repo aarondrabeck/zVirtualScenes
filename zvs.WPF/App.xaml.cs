@@ -15,6 +15,7 @@ using System.Windows.Shell;
 using System.Reflection;
 using zvs.Entities;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.WPF
 {
@@ -77,7 +78,7 @@ namespace zvs.WPF
             }
         }
 
-        public bool SignalExternalCommandLineArgs(IList<string> args)
+        public async Task<bool> SignalExternalCommandLineArgs(IList<string> args)
         {
 
             if (args == null || args.Count == 0)
@@ -94,23 +95,21 @@ namespace zvs.WPF
                     {
                         Scene scene = null;
                         if (int.TryParse(SearchQuery, out SceneId))
-                            scene = context.Scenes.FirstOrDefault(s => s.Id == SceneId);
+                            scene = await context.Scenes.FirstOrDefaultAsync(s => s.Id == SceneId);
                         else if (SearchQuery != null)
-                            scene = context.Scenes.FirstOrDefault(s => s.Name.ToLower().Equals(SearchQuery));
+                            scene = await context.Scenes.FirstOrDefaultAsync(s => s.Name.ToLower().Equals(SearchQuery));
 
                         if (scene != null)
                         {
-                            BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                            BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(zvsCore);
-                                cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
+                                await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
                             }
                         }
                         else
                             log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
-
-
                     }
                 }
             }
@@ -137,7 +136,7 @@ namespace zvs.WPF
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
 
-            string error = Utils.PreReqChecks();
+            string error = await Utils.PreReqChecksAsync();
 
             if (error != null)
             {

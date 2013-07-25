@@ -77,6 +77,7 @@
     <Compile Include="BuiltinCommand.cs" />
     <Compile Include="CommandOption.cs" />
     <Compile Include="ConfidentialDataAttribute.cs" />
+    <Compile Include="NotifyEntityChangeContext.cs" />
     <Compile Include="PluginSettingOption.cs" />
     <Compile Include="PluginSetting.cs" />
     <Compile Include="Plugin.cs" />

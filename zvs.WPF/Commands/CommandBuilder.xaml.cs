@@ -118,7 +118,7 @@ namespace zvs.WPF.Commands
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 System.Windows.Data.CollectionViewSource CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("JSCmdsViewSource")));
-                await Context.JavaScriptCommands.ToListAsync();
+                await Context.JavaScriptCommands.Include(o => o.Options).ToListAsync();
                 CmdsViewSource.Source = Context.JavaScriptCommands.Local;
             }
 
@@ -182,7 +182,7 @@ namespace zvs.WPF.Commands
                         int groupID = int.TryParse(StoredCommand.Argument, out groupID) ? groupID : 0;
                         var group = await Context.Groups.FirstOrDefaultAsync(o => o.Id == groupID);
 
-                        if(group == null) 
+                        if (group == null)
                             group = await Context.Groups.FirstOrDefaultAsync(); //If this is a new command or we cannot find the old group, just preselect the first group.
 
                         if (group != null)
@@ -210,11 +210,11 @@ namespace zvs.WPF.Commands
 
                         //Try to match supplied arg (sceneID) with a scene
                         int sceneID = int.TryParse(StoredCommand.Argument, out sceneID) ? sceneID : 0;
-                            var scene = await Context.Scenes.FirstOrDefaultAsync(o => o.Id == sceneID);
-                            
+                        var scene = await Context.Scenes.FirstOrDefaultAsync(o => o.Id == sceneID);
+
                         //If this is a new command or we cannot find the old scene, 
                         //just preselect the first scene.
-                        if(scene == null)
+                        if (scene == null)
                             scene = await Context.Scenes.FirstOrDefaultAsync();
 
                         if (scene != null)
@@ -396,7 +396,7 @@ namespace zvs.WPF.Commands
             }
         }
 
-        private void OKBtn_Click(object sender, RoutedEventArgs e)
+        private async void OKBtn_Click(object sender, RoutedEventArgs e)
         {
             if (DeviceTab.IsSelected)
             {
@@ -425,6 +425,9 @@ namespace zvs.WPF.Commands
                     StoredCommand.Argument2 = ((Device)DevicesCmboBox.SelectedItem).Id.ToString();
                 }
 
+                await StoredCommand.SetTargetObjectNameAsync(Context);
+                await StoredCommand.SetDescriptionAsync(Context);
+
                 this.DialogResult = true;
                 this.Close();
             }
@@ -444,6 +447,9 @@ namespace zvs.WPF.Commands
                     StoredCommand.Argument = SelectedBuiltinArg;
                 }
 
+                await StoredCommand.SetTargetObjectNameAsync(Context);
+                await StoredCommand.SetDescriptionAsync(Context);
+
                 this.DialogResult = true;
                 this.Close();
             }
@@ -460,11 +466,12 @@ namespace zvs.WPF.Commands
                 if (JavaScriptCmboBox.SelectedItem is JavaScriptCommand)
                     StoredCommand.Command = (JavaScriptCommand)JavaScriptCmboBox.SelectedItem;
 
+                await StoredCommand.SetTargetObjectNameAsync(Context);
+                await StoredCommand.SetDescriptionAsync(Context);
+
                 this.DialogResult = true;
                 this.Close();
             }
-
-
         }
 
         private void DevicesCmboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
@@ -484,7 +491,7 @@ namespace zvs.WPF.Commands
             }
         }
 
-        private void DeviceCmdsCmboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        private async void DeviceCmdsCmboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
             Device selectedDevice = (Device)DevicesCmboBox.SelectedItem;
             DeviceArgSckPnl.Children.Clear();
@@ -511,7 +518,7 @@ namespace zvs.WPF.Commands
                                 bool DefaultValue = false;
                                 if (!bool.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
                                         bool.TryParse(dv.Value, out DefaultValue);
@@ -533,7 +540,7 @@ namespace zvs.WPF.Commands
                                 decimal DefaultValue = 0;
                                 if (!decimal.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         decimal.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -556,7 +563,7 @@ namespace zvs.WPF.Commands
                                 int DefaultValue = 0;
                                 if (!int.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         int.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -579,7 +586,7 @@ namespace zvs.WPF.Commands
                                 short DefaultValue = 0;
                                 if (!short.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         short.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -602,7 +609,7 @@ namespace zvs.WPF.Commands
                                 byte DefaultValue = 0;
                                 if (!byte.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         byte.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -629,7 +636,7 @@ namespace zvs.WPF.Commands
                                 }
                                 else
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
                                         DefaultValue = dv.Value;
@@ -657,7 +664,7 @@ namespace zvs.WPF.Commands
                                 }
                                 else
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
                                         DefaultValue = dv.Value;
@@ -703,7 +710,7 @@ namespace zvs.WPF.Commands
                                 bool DefaultValue = false;
                                 if (!bool.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         bool.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -723,7 +730,7 @@ namespace zvs.WPF.Commands
                                 decimal DefaultValue = 0;
                                 if (!decimal.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         decimal.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -747,7 +754,7 @@ namespace zvs.WPF.Commands
                                 int DefaultValue = 0;
                                 if (!int.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         int.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -770,7 +777,7 @@ namespace zvs.WPF.Commands
                                 byte DefaultValue = 0;
                                 if (!byte.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         byte.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -793,7 +800,7 @@ namespace zvs.WPF.Commands
                                 short DefaultValue = 0;
                                 if (!short.TryParse(StoredCommand.Argument, out DefaultValue))
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                         short.TryParse(dv.Value, out DefaultValue);
                                 }
@@ -821,7 +828,7 @@ namespace zvs.WPF.Commands
                                 }
                                 else
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
                                         DefaultValue = dv.Value;
@@ -849,7 +856,7 @@ namespace zvs.WPF.Commands
                                 }
                                 else
                                 {
-                                    DeviceValue dv = selectedDevice.Values.FirstOrDefault(v => v.UniqueIdentifier == d_cmd.CustomData2);
+                                    var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == d_cmd.CustomData2);
                                     if (dv != null)
                                     {
                                         DefaultValue = dv.Value;

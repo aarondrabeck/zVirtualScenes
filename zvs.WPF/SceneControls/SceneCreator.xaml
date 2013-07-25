@@ -9,7 +9,8 @@
     xmlns:DeviceControls="clr-namespace:zvs.WPF.DeviceControls" x:Class="zvs.WPF.SceneControls.SceneCreator" 
     mc:Ignorable="d" 
     Loaded="UserControl_Loaded_1" 
-    Unloaded="UserControl_Unloaded_1">
+    Unloaded="UserControl_Unloaded_1"
+    Initialized="UserControl_Initialized">
 
     <UserControl.Resources>
 
@@ -148,7 +149,7 @@
                           Background="#FFF9F9F9"  >
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="150" MinWidth="150" Binding="{Binding Path=StoredCommand.ActionableObject, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
+                        <DataGridTextColumn Width="150" MinWidth="150" Binding="{Binding Path=StoredCommand.TargetObjectName, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Padding" Value="5,0,0,0"/>
@@ -156,7 +157,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Width="*"   MinWidth="150" 
-                                            Binding="{Binding Path=StoredCommand.ActionDescription,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  
+                                            Binding="{Binding Path=StoredCommand.Description,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  
                                             CanUserReorder="False" CanUserSort="False"  >
 
                             <DataGridTextColumn.ElementStyle>
@@ -165,7 +166,7 @@
                                     <Setter Property="TextWrapping"  Value="NoWrap" />
                                    
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                    <Setter Property="ToolTip" Value="{Binding Path=StoredCommand.ActionDescription, Mode=OneWay}"/>
+                                    <Setter Property="ToolTip" Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>

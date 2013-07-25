@@ -8,27 +8,6 @@ namespace zvs.Processor
 {
     public static class DetectVCRedist
     {
-        public enum INSTALLSTATE
-        {
-            INSTALLSTATE_NOTUSED = -7,  // component disabled
-            INSTALLSTATE_BADCONFIG = -6,  // configuration datacorrupt
-            INSTALLSTATE_INCOMPLETE = -5,  // installationsuspended or in progress
-            INSTALLSTATE_SOURCEABSENT = -4,  // run from source,source is unavailable
-            INSTALLSTATE_MOREDATA = -3,  // return bufferoverflow
-            INSTALLSTATE_INVALIDARG = -2,  // invalid functionargument
-            INSTALLSTATE_UNKNOWN = -1,  // unrecognized productor feature
-            INSTALLSTATE_BROKEN = 0,  // broken
-            INSTALLSTATE_ADVERTISED = 1,  // advertised feature
-            INSTALLSTATE_REMOVED = 1,  // component being removed(action state, not settable)
-            INSTALLSTATE_ABSENT = 2,  // uninstalled (or actionstate absent but clients remain)
-            INSTALLSTATE_LOCAL = 3,  // installed on local drive
-            INSTALLSTATE_SOURCE = 4,  // run from source, CD ornet
-            INSTALLSTATE_DEFAULT = 5,  // use default, local orsource
-        }
-
-        [DllImport("msi.dll")]
-        private static extern INSTALLSTATE MsiQueryProductState(string product);
-
         public static bool IsVCRedistInstalled()
         {
             string[] strCodes = new string[]
@@ -82,12 +61,12 @@ namespace zvs.Processor
                //"{678835D7-D524-3C0E-9C33-1D3767FDA6BF}"
            };
 
-            INSTALLSTATE state;
+            NativeMethods.INSTALLSTATE state;
             for (int i = 0; i < strCodes.Length; i++)
             {
-                state = MsiQueryProductState(strCodes[i]);
-                if (state == INSTALLSTATE.INSTALLSTATE_LOCAL ||
-                    state == INSTALLSTATE.INSTALLSTATE_DEFAULT)
+                state = NativeMethods.MsiQueryProductState(strCodes[i]);
+                if (state == NativeMethods.INSTALLSTATE.INSTALLSTATE_LOCAL ||
+                    state == NativeMethods.INSTALLSTATE.INSTALLSTATE_DEFAULT)
                 {
                     return true;
                 }

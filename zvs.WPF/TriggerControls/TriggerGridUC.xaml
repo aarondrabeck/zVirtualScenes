@@ -6,7 +6,10 @@
              xmlns:zVirtualScenesModel="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
              x:Class="zvs.WPF.TriggerControls.TriggerGridUC" 
              mc:Ignorable="d" 
-             d:DesignHeight="489" d:DesignWidth="627" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
+             d:DesignHeight="489" d:DesignWidth="627" 
+    Loaded="UserControl_Loaded_1" 
+    Unloaded="UserControl_Unloaded_1"
+    Initialized="UserControl_Initialized">
     <UserControl.Resources>
 
         <Style x:Key="Body_Hoz_Center"
@@ -75,7 +78,7 @@
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Width="Auto" MinWidth="25"  Header="Trigger" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
-                                        FontSize="14" Binding="{Binding TriggerDescription, StringFormat={}When {0} then}" IsReadOnly="True"   >
+                                        FontSize="14" Binding="{Binding Description, StringFormat={}When {0} then}" IsReadOnly="True"   >
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter  Property="TextTrimming" Value="CharacterEllipsis" />
@@ -85,8 +88,13 @@
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Width="*" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
-                                        Binding="{Binding Path=StoredCommand.Summary, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  
                                         IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}{0} '{1}'"  >
+                                <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
                         <DataGridTextColumn.ElementStyle>
 
                             <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -94,7 +102,7 @@
                                 <Setter Property="Padding" Value="5,0,0,0"/>
                                 <Setter Property="Height" Value="20" />
                                 <Setter Property="TextTrimming"  Value="CharacterEllipsis"/>
-                                <Setter Property="ToolTip"  Value="{Binding Path=StoredCommand.ActionDescription, Mode=OneWay}"/>
+                                <Setter Property="ToolTip"  Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
                                 <Setter Property="Padding" Value="5,0,0,0"/>
                             </Style>
 

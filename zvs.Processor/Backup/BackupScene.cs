@@ -26,7 +26,7 @@ namespace zvs.Processor.Backup
             public int? Order;
         }
 
-        public static void ExportScenesAsync(string PathFileName, Action<string> Callback)
+        public async static void ExportScenesAsync(string PathFileName, Action<string> Callback)
         {
             List<SceneBackup> scenes = new List<SceneBackup>();
             int CmdCount = 0;
@@ -41,7 +41,7 @@ namespace zvs.Processor.Backup
                     {
                         SceneCMDBackup SceneCmdBackup = new SceneCMDBackup();
                         SceneCmdBackup.Order = scmd.SortOrder;
-                        SceneCmdBackup.StoredCommand = (StoredCMDBackup)scmd.StoredCommand;
+                        SceneCmdBackup.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(scmd.StoredCommand);
                         SceneBackup.Commands.Add(SceneCmdBackup);
                         CmdCount++;
                     }
@@ -55,7 +55,6 @@ namespace zvs.Processor.Backup
                 stream = File.Open(PathFileName, FileMode.Create);
                 XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<SceneBackup>));
                 xmlSerializer.Serialize(stream, scenes);
-                stream.Close();
                 Callback(string.Format("Exported {0} scenes and {1} scene commands to '{2}'", scenes.Count, CmdCount, Path.GetFileName(PathFileName)));
             }
             catch (Exception e)

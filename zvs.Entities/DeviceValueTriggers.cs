@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.Entities
 {
@@ -135,21 +136,36 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public string TriggerDescription
+        private string _Description;
+        public string Description
         {
-            get
+            get { return _Description; }
+            set
             {
-                string trigger_op_name = Operator.ToString();
-
-                if (this.StoredCommand == null || this.DeviceValue == null || this.DeviceValue.Device == null)
-                    return "Incomplete Trigger";
-
-                return string.Format("'{0}' {1} is {2} {3}", this.DeviceValue.Device.Name,
-                                                                this.DeviceValue.Name,
-                                                                trigger_op_name,
-                                                                this.Value
-                                                                );
+                if (value != _Description)
+                {
+                    _Description = value;
+                    NotifyPropertyChanged();
+                }
             }
+        }
+
+    }
+
+    public static class DeviceValueTriggerExtensionMethods
+    {
+        public static void SetDescription(this DeviceValueTrigger trigger, zvsContext context)
+        {
+            string trigger_op_name = trigger.Operator.ToString();
+
+            if (trigger.StoredCommand == null || trigger.DeviceValue == null || trigger.DeviceValue.Device == null)
+                trigger.Description = "Incomplete Trigger";
+
+            trigger.Description = string.Format("'{0}' {1} is {2} {3}", trigger.DeviceValue.Device.Name,
+                                                        trigger.DeviceValue.Name,
+                                                        trigger_op_name,
+                                                        trigger.Value
+                                                        );
         }
     }
 }
