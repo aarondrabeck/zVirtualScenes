@@ -53,6 +53,7 @@ namespace OpenZWavePlugin
 
         private enum OpenzWaveDeviceTypes
         {
+            UKNOWN,
             CONTROLLER,
             SWITCH,
             DIMMER,
@@ -113,6 +114,10 @@ namespace OpenZWavePlugin
             thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETENERGYMODE", Name = "Set Energy Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Energy Mode. Argument2 = DeviceId." });
             thermo_dt.Commands.Add(new DeviceTypeCommand { UniqueIdentifier = "SETCONFORTMODE", Name = "Set Comfort Mode", ArgumentType = DataType.NONE, Description = "Set thermostat to Comfort Mode. (Run) Argument2 = DeviceId." });
             await deviceTypeBuilder.RegisterAsync(thermo_dt);
+
+
+            DeviceType unknwon_dt = new DeviceType { UniqueIdentifier = OpenzWaveDeviceTypes.UKNOWN.ToString(), Name = "OpenZWave Unknown", ShowInList = true };
+            await deviceTypeBuilder.RegisterAsync(unknwon_dt);
 
             //Door Lock Type Devices
             DeviceType lock_dt = new DeviceType { UniqueIdentifier = OpenzWaveDeviceTypes.DOORLOCK.ToString(), Name = "OpenZWave Door lock", ShowInList = true };
@@ -361,7 +366,7 @@ namespace OpenZWavePlugin
                 Core.log.Info("OpenZwave driver stopped");
             }
         }
-           
+
         public override async Task ProcessCommandAsync(int queuedCommandId)
         {
             using (zvsContext context = new zvsContext())
@@ -716,6 +721,7 @@ namespace OpenZWavePlugin
         {
             switch (m_notification.GetType())
             {
+                    
                 case ZWNotification.Type.NodeProtocolInfo:
                     {
                         #region NodeProtocolInfo
@@ -816,23 +822,15 @@ namespace OpenZWavePlugin
                                         d.NodeNumber == node.ID);
 
                                 //If we don't already have the device
-                                if (ozw_device == null)
+                                if (ozw_device != null)
                                 {
                                     var typeUId = openzWaveDeviceTypes.ToString();
                                     var deviceType = await context.DeviceTypes.FirstOrDefaultAsync(o =>
                                             o.Adapter.AdapterGuid == this.AdapterGuid &&
                                             o.UniqueIdentifier == typeUId);
 
-                                    ozw_device = new Device
-                                    {
-                                        NodeNumber = node.ID,
-                                        Type = deviceType,
-                                        Name = deviceName,
-                                        CurrentLevelInt = 0,
-                                        CurrentLevelText = ""
-                                    };
-
-                                    context.Devices.Add(ozw_device);
+                                    ozw_device.Type = deviceType;
+                                   
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
                                         Core.log.Error(result.Message);
@@ -859,7 +857,6 @@ namespace OpenZWavePlugin
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.ValueAdded:
                     {
                         #region ValueAdded
@@ -880,6 +877,9 @@ namespace OpenZWavePlugin
                         string data = "";
                         bool b = m_manager.GetValueAsString(vid, out data);
 
+                        Debug.WriteLine("[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
+
+
                         using (zvsContext context = new zvsContext())
                         {
                             Device d = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
@@ -890,8 +890,6 @@ namespace OpenZWavePlugin
                                 log.Warn("ValueAdded called on a node id that was not found in the database");
                                 break;
                             }
-
-                            Debug.WriteLine("[ValueAdded] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data + ", result: " + b.ToString());
 
                             //Values are 'unknown' at this point so don't report a value change. 
                             await DeviceValueBuilder.RegisterAsync(new DeviceValue
@@ -1016,7 +1014,6 @@ namespace OpenZWavePlugin
                         break;
                         #endregion
                     }
-
                 case ZWNotification.Type.ValueChanged:
                     {
                         #region ValueChanged
@@ -1212,9 +1209,40 @@ namespace OpenZWavePlugin
                         node.ID = m_notification.GetNodeId();
                         node.HomeID = m_notification.GetHomeId();
                         m_nodeList.Add(node);
-
                         Debug.WriteLine("[NodeAdded] ID:" + node.ID.ToString() + " Added");
-                        //}
+
+                        #region Add device
+
+                        using (zvsContext context = new zvsContext())
+                        {
+                            Device ozw_device = await context.Devices
+                                .FirstOrDefaultAsync(d => d.Type.Adapter.AdapterGuid == this.AdapterGuid &&
+                                    d.NodeNumber == node.ID);
+
+                            //If we don't already have the device
+                            if (ozw_device == null)
+                            {
+                                var typeUId = OpenzWaveDeviceTypes.UKNOWN.ToString();
+                                var deviceType = await context.DeviceTypes.FirstOrDefaultAsync(o =>
+                                        o.Adapter.AdapterGuid == this.AdapterGuid &&
+                                        o.UniqueIdentifier == typeUId);
+
+                                ozw_device = new Device
+                                {
+                                    NodeNumber = node.ID,
+                                    Type = deviceType,
+                                    Name = "Unknown OpenZwave Device",
+                                    CurrentLevelInt = 0,
+                                    CurrentLevelText = ""
+                                };
+
+                                context.Devices.Add(ozw_device);
+                                var result = await context.TrySaveChangesAsync();
+                                if (result.HasError)
+                                    Core.log.Error(result.Message);
+                            }
+                        }
+                        #endregion
                         break;
                         #endregion
                     }
@@ -1255,12 +1283,15 @@ namespace OpenZWavePlugin
                         string NodeNameValueId = "NN1";
 
                         Node node = GetNode(m_notification.GetHomeId(), m_notification.GetNodeId());
+
                         if (node != null)
                         {
                             node.Manufacturer = m_manager.GetNodeManufacturerName(m_homeId, node.ID);
                             node.Product = m_manager.GetNodeProductName(m_homeId, node.ID);
                             node.Location = m_manager.GetNodeLocation(m_homeId, node.ID);
                             node.Name = m_manager.GetNodeName(m_homeId, node.ID);
+
+                            Debug.WriteLine("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
                             using (zvsContext context = new zvsContext())
                             {
@@ -1326,7 +1357,6 @@ namespace OpenZWavePlugin
                                 }, device, context);
                             }
                         }
-                        Debug.WriteLine("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
                         break;
                         #endregion
