@@ -50,6 +50,21 @@ namespace zvs.Processor
             }
         }
 
+        public static string GetHostDetails
+        {
+            get
+            {
+                StringBuilder Data = new StringBuilder();
+                Data.AppendLine(string.Format("OSVersion: {0}", System.Environment.OSVersion));
+                Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", System.Environment.Is64BitOperatingSystem));
+                Data.AppendLine(string.Format("MachineName: {0}", System.Environment.MachineName));
+                Data.AppendLine(string.Format("UserDomainName: {0}", System.Environment.UserDomainName));
+                Data.AppendLine(string.Format("UserName: {0}", System.Environment.UserName));
+                Data.AppendLine(string.Format("Version: {0}", System.Environment.Version));
+                return Data.ToString();
+            }
+        }
+
         public static string ApplicationNameAndVersion
         {
             get
@@ -112,63 +127,6 @@ namespace zvs.Processor
                 }
             }
             return false;
-        }
-
-        /// <summary>
-        /// Returns null if no error, else the error
-        /// </summary>
-        /// <returns></returns>
-        public async static Task<string> PreReqChecksAsync()
-        {
-            #region Pre App Start Checks
-
-            //.net 4.5
-            if (!Utils.HasDotNet45())
-            {
-                return string.Format("Microsoft .NET Framework 4.5 Full/Extended is required to run {0}. \r\n\r\nPlease install Microsoft .NET Framework 4.5 and re-launch the application.", Utils.ApplicationName);
-            }
-
-            if (!Utils.HasSQLCE4())
-            {
-                return string.Format("Microsoft® SQL Server® Compact 4.0 SP1 is required to run {0}. \r\n\r\nPlease install Microsoft® SQL Server® Compact 4.0 SP1 and re-launch the application.", Utils.ApplicationName);
-            }
-
-            //Check for VCRedist
-            //TODO: Find a better way to check for this...
-            //if (!DetectVCRedist.IsVCRedistInstalled())
-            //{
-            //    return "Visual C++ 2012 Redistributable Missing!\n\n zVirtualScenes cannot open because Visual C++ Redistributable is not installed.";
-            //}
-
-            using (zvsContext context = new zvsContext())
-            {
-                var configuration = new Configuration();
-
-               // System.Data.Entity.Database.SetInitializer(new System.Data.Entity.MigrateDatabaseToLatestVersion<zvsContext, zvs.Context.Migrations.Configuration>());
-
-                var migrator = new DbMigrator(configuration);
-                
-                migrator.Update();
-                context.Database.Initialize(true);
-            }
-
-            //Check DB integrity
-            using (zvsContext context = new zvsContext())
-            {
-                try
-                {
-                    string name = await context.Database.SqlQuery<string>(@"SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'devices'").SingleOrDefaultAsync();
-                    
-                    if (string.IsNullOrEmpty(name))
-                        throw new Exception("Database Empty!");
-                }
-                catch
-                {
-                    return string.Format("Database Empty!\n\n zVirtualScenes cannot open because the database is empty or corrupt.\n\nPlease check the following DB: {0}.", Utils.DBNamePlusFullPath);
-                }
-            }
-            #endregion
-            return null;
         }
     }
 }

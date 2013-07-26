@@ -91,8 +91,8 @@
                                         IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
                         <DataGridTextColumn.Binding>
                             <MultiBinding StringFormat="{}{0} '{1}'"  >
-                                <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
                                 <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
                             </MultiBinding>
                         </DataGridTextColumn.Binding>
                         <DataGridTextColumn.ElementStyle>

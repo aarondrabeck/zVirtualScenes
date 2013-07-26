@@ -120,7 +120,7 @@ namespace zvs.WPF.TriggerControls
             }
         }
 
-        private async void SettingBtn_Click_1(object sender, RoutedEventArgs e)
+        private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
             if (obj is DeviceValueTrigger)
@@ -139,8 +139,6 @@ namespace zvs.WPF.TriggerControls
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
                                 ((App)App.Current).zvsCore.log.Error(result.Message);
-
-
                         }
                     };
                 }

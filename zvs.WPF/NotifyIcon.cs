@@ -48,7 +48,6 @@ namespace zvs.WPF
             // app.ShowzvsWindow();
         }
 
-
         public void ShowBalloonTip(string Title, string TipText, int timeout, System.Windows.Forms.ToolTipIcon icon)
         {
             if (Notify != null)

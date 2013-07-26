@@ -97,6 +97,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Resources\ChromeStyledWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="PluginManager\PluginManagerWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -108,6 +112,11 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Resources\ChromeStyledWindow.xaml.cs">
+      <DependentUpon>ChromeStyledWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChromeWindow.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="PluginManager\PluginManagerWindow.xaml.cs">
       <DependentUpon>PluginManagerWindow.xaml</DependentUpon>
     </Compile>
@@ -147,6 +156,9 @@
     <Compile Include="SingleInstance.cs" />
     <Compile Include="JavaScript\JavaScriptEditorWindow.xaml.cs">
       <DependentUpon>JavaScriptEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SplashScreen.xaml.cs">
+      <DependentUpon>SplashScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="TriggerControls\TriggerEditorWindow.xaml.cs">
       <DependentUpon>TriggerEditorWindow.xaml</DependentUpon>
@@ -230,6 +242,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\Themes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SettingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -237,6 +253,10 @@
     <Page Include="JavaScript\JavaScriptEditorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SplashScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="zvsMainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -350,6 +370,7 @@
     <Resource Include="Images\zvs32.ico" />
     <Resource Include="Images\JavaScriptIcon.png" />
     <Resource Include="Images\multipleIcon.png" />
+    <Resource Include="Images\settingIcon.png" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

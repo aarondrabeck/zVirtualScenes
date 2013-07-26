@@ -30,7 +30,7 @@ namespace zvs.WPF
     /// <summary>
     /// interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class zvsMainWindow : Window
+    public partial class zvsMainWindow : ChromeWindow
     {
         private App app = (App)Application.Current;
         private zvsContext context;
@@ -42,9 +42,6 @@ namespace zvs.WPF
             InitializeComponent();
 
             context = new zvsContext();
-
-            RefreshCommandDescripitions();
-            RefreshTriggerDescripitions();
 
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
@@ -124,42 +121,8 @@ namespace zvs.WPF
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
-
-
-
         }
-
-        private async void RefreshTriggerDescripitions()
-        {
-            var triggers = await context.DeviceValueTriggers
-                .Include(o => o.DeviceValue)
-                .Include(o => o.DeviceValue.Device)
-                .ToListAsync();
-
-            foreach (var trigger in triggers)
-                trigger.SetDescription(context);
-
-            var result = await context.TrySaveChangesAsync();
-            if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
-        }
-        private async void RefreshCommandDescripitions()
-        {
-            var storedCommands = await context.StoredCommands
-                .Include(o => o.Command)
-                .ToListAsync();
-
-            foreach (var storedCommand in storedCommands)
-            {
-                await storedCommand.SetTargetObjectNameAsync(context);
-                await storedCommand.SetDescriptionAsync(context);
-            }
-
-            var result = await context.TrySaveChangesAsync();
-            if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
-        }
-
+        
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;

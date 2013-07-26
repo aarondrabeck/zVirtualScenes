@@ -11,7 +11,7 @@
         <CollectionViewSource x:Key="groupsgroup_devicesViewSource" Source="{Binding Path=Devices, Source={StaticResource groupsViewSource}}" />
     </Window.Resources>
     <Grid DataContext="{StaticResource groupsViewSource}">
-        <ComboBox DisplayMemberPath="Name"  Name="GroupCmbBx" VerticalAlignment="Top" Margin="57,10,227,0" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="GroupId" SelectionChanged="GroupCmbBx_SelectionChanged"></ComboBox>
+        <ComboBox DisplayMemberPath="Name"  Name="GroupCmbBx" VerticalAlignment="Top" Margin="57,10,227,0" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" SelectionChanged="GroupCmbBx_SelectionChanged"></ComboBox>
         <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,10,161,0" Click="AddBtn_Click"></Button>
         <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,10,95,0"  VerticalAlignment="Top" Width="60" Click="EditBtn_Click" />
         <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,10,29,0" VerticalAlignment="Top" Width="60" Click="RemoveBtn_Click" />

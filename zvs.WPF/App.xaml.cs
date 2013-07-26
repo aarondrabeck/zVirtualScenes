@@ -16,6 +16,8 @@ using System.Reflection;
 using zvs.Entities;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using zvs.Context.Migrations;
+using System.Data.Entity.Migrations;
 
 namespace zvs.WPF
 {
@@ -49,38 +51,10 @@ namespace zvs.WPF
         public void Init()
         {
             this.InitializeComponent();
-            zvs.Processor.Logging.LogManager.ConfigureLogging();
-            log = zvs.Processor.Logging.LogManager.GetLogger<App>();
-
-            log.InfoFormat("Init Complete ({0})", (Utils.DebugMode ? "Debug Mode" : "Release Mode"));
-            if (Utils.DebugMode)
-            {
-                log.Info("--------------DUMPING ENVIRONMENT--------------");
-                log.InfoFormat("AppDataPath:{0}", Utils.AppDataPath);
-                log.InfoFormat("AppPath:{0}", Utils.AppPath);
-                log.InfoFormat("ApplicationNameAndVersion:{0}", Utils.ApplicationNameAndVersion);
-                log.InfoFormat("ApplicationVersionLong:{0}", Utils.ApplicationVersionLong);
-                log.InfoFormat("HasDotNet45:{0}", Utils.HasDotNet45());
-                log.InfoFormat("HasSQLCE4:{0}", Utils.HasSQLCE4());
-                log.InfoFormat("CommandLine:{0}", System.Environment.CommandLine);
-                log.InfoFormat("CurrentDirectory:{0}", System.Environment.CurrentDirectory);
-                log.InfoFormat("Is64BitOperatingSystem:{0}", System.Environment.Is64BitOperatingSystem);
-                log.InfoFormat("Is64BitProcess:{0}", System.Environment.Is64BitProcess);
-                log.InfoFormat("MachineName:{0}", System.Environment.MachineName);
-                log.InfoFormat("OSVersion:{0}", System.Environment.OSVersion);
-                log.InfoFormat("ProcessorCount:{0}", System.Environment.ProcessorCount);
-                log.InfoFormat("UserDomainName:{0}", System.Environment.UserDomainName);
-                log.InfoFormat("UserInteractive:{0}", System.Environment.UserInteractive);
-                log.InfoFormat("UserName:{0}", System.Environment.UserName);
-                log.InfoFormat("Version:{0}", System.Environment.Version);
-                log.InfoFormat("WorkingSet:{0}", System.Environment.WorkingSet);
-                log.Info("--------------/DUMPING ENVIRONMENT--------------");
-            }
         }
 
         public async Task<bool> SignalExternalCommandLineArgs(IList<string> args)
         {
-
             if (args == null || args.Count == 0)
                 return true;
             if ((args.Count > 2))
@@ -118,6 +92,55 @@ namespace zvs.WPF
 
         protected async override void OnStartup(StartupEventArgs e)
         {
+            SplashScreen splashscreen = new SplashScreen();
+            splashscreen.SetLoadingTextFormat("Starting {0}", Utils.ApplicationNameAndVersion);
+            splashscreen.Show();
+            await Task.Delay(10);
+
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
+
+#if (RELEASE)
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+#endif
+
+            #region Create Logger
+            zvs.Processor.Logging.LogManager.ConfigureLogging();
+            log = zvs.Processor.Logging.LogManager.GetLogger<App>();
+
+            log.InfoFormat("Init Complete ({0})", (Utils.DebugMode ? "Debug Mode" : "Release Mode"));
+#if DEBUG
+            log.Info("--------------DUMPING ENVIRONMENT--------------");
+            log.InfoFormat("AppDataPath:{0}", Utils.AppDataPath);
+            log.InfoFormat("AppPath:{0}", Utils.AppPath);
+            log.InfoFormat("ApplicationNameAndVersion:{0}", Utils.ApplicationNameAndVersion);
+            log.InfoFormat("ApplicationVersionLong:{0}", Utils.ApplicationVersionLong);
+            log.InfoFormat("HasDotNet45:{0}", Utils.HasDotNet45());
+            log.InfoFormat("HasSQLCE4:{0}", Utils.HasSQLCE4());
+            log.InfoFormat("CommandLine:{0}", System.Environment.CommandLine);
+            log.InfoFormat("CurrentDirectory:{0}", System.Environment.CurrentDirectory);
+            log.InfoFormat("Is64BitOperatingSystem:{0}", System.Environment.Is64BitOperatingSystem);
+            log.InfoFormat("Is64BitProcess:{0}", System.Environment.Is64BitProcess);
+            log.InfoFormat("MachineName:{0}", System.Environment.MachineName);
+            log.InfoFormat("OSVersion:{0}", System.Environment.OSVersion);
+            log.InfoFormat("ProcessorCount:{0}", System.Environment.ProcessorCount);
+            log.InfoFormat("UserDomainName:{0}", System.Environment.UserDomainName);
+            log.InfoFormat("UserInteractive:{0}", System.Environment.UserInteractive);
+            log.InfoFormat("UserName:{0}", System.Environment.UserName);
+            log.InfoFormat("Version:{0}", System.Environment.Version);
+            log.InfoFormat("WorkingSet:{0}", System.Environment.WorkingSet);
+            log.Info("--------------/DUMPING ENVIRONMENT--------------");
+#endif
+            AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
+            #endregion
+
+            #region Checking for other running instances
+            await Task.Delay(10);
+            splashscreen.SetLoadingTextFormat("Checking for other running instances");
+            await Task.Delay(10);
+
             try
             {
                 zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");
@@ -128,39 +151,113 @@ namespace zvs.WPF
                 //the specified mutex doesn't exist, we should create it
                 zvsMutex = new System.Threading.Mutex(true, "zVirtualScenesGUIMutex"); //these names need to match.
             }
+            #endregion
 
+            #region Check for .Net Framework 4.5
+            await Task.Delay(10);
+            splashscreen.SetLoadingTextFormat("Checking for .Net framework 4.5");
+            await Task.Delay(10);
 
-            AppDomain.CurrentDomain.SetData("DataDirectory", Utils.AppDataPath);
-#if DEBUG
-#else
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-#endif
-
-            string error = await Utils.PreReqChecksAsync();
-
-            if (error != null)
+            if (!Utils.HasDotNet45())
             {
-                Core.ProgramHasToClosePrompt(error);
+                Core.ProgramHasToClosePrompt(string.Format("Microsoft .NET Framework 4.5 Full/Extended is required to run {0}. \r\n\r\nPlease install Microsoft .NET Framework 4.5 and re-launch the application.",
+                    Utils.ApplicationName));
             }
+            #endregion
 
-            //throw new Exception("Exception Test!");
-            //Initilize the core
+            #region Checking for Microsoft® SQL Server® Compact 4.0 SP1
+            await Task.Delay(10);
+            splashscreen.SetLoadingTextFormat("Checking for Microsoft® SQL Server® Compact 4.0 SP1");
+            await Task.Delay(10);
+
+            if (!Utils.HasSQLCE4())
+            {
+                Core.ProgramHasToClosePrompt(string.Format("Microsoft® SQL Server® Compact 4.0 SP1 is required to run {0}. \r\n\r\nPlease install Microsoft® SQL Server® Compact 4.0 SP1 and re-launch the application.",
+                    Utils.ApplicationName));
+            }
+            #endregion
+
+            #region Initializing and upgrading local database
+            await Task.Delay(10);
+            splashscreen.SetLoadingTextFormat("Initializing and upgrading local database");
+            await Task.Delay(10);
+
+            using (zvsContext context = new zvsContext())
+            {
+                var configuration = new Configuration();
+                var migrator = new DbMigrator(configuration);
+
+                migrator.Update();
+                context.Database.Initialize(true);
+            }
+            #endregion
+
+            //TODO: Check for VCRedist
+
+            #region Start Core Services
+            await Task.Delay(10);
+            splashscreen.SetLoadingTextFormat("Starting core services");
+            await Task.Delay(10);
+
+            //Initialize the core
             zvsCore = new Core();
             await zvsCore.StartAsync();
-
-            //This is a placeholder for a main window. Application.Current.MainWindow
-            firstWindow = new Window();
+            #endregion
 
             //Create taskbar Icon 
             taskbarIcon = new ZVSTaskbarIcon();
-
             taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
+
+            //close Splash Screen
+            splashscreen.Close();
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine("App Startup initialized in {0}", sw.Elapsed.ToString() as object);
+#endif
 
             base.OnStartup(e);
         }
 
-#if DEBUG
-#else
+        private async void RefreshTriggerDescripitions()
+        {
+            using (zvsContext context = new zvsContext())
+            {
+                var triggers = await context.DeviceValueTriggers
+                    .Include(o => o.DeviceValue)
+                    .Include(o => o.DeviceValue.Device)
+                    .ToListAsync();
+
+                foreach (var trigger in triggers)
+                    trigger.SetDescription(context);
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
+            }
+        }
+
+        private async void RefreshCommandDescripitions()
+        {
+            using (zvsContext context = new zvsContext())
+            {
+                var storedCommands = await context.StoredCommands
+                    .Include(o => o.Command)
+                    .ToListAsync();
+
+                foreach (var storedCommand in storedCommands)
+                {
+                    await storedCommand.SetTargetObjectNameAsync(context);
+                    await storedCommand.SetDescriptionAsync(context);
+                }
+
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    ((App)App.Current).zvsCore.log.Error(result.Message);
+            }
+        }
+
+#if (RELEASE)
         void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             log.Fatal(sender.ToString(), (System.Exception)e.ExceptionObject);
@@ -172,41 +269,51 @@ namespace zvs.WPF
         }
 #endif
 
-        public static string GetHostDetails
-        {
-            get
-            {
-                StringBuilder Data = new StringBuilder();
-                Data.AppendLine(string.Format("OSVersion: {0}", System.Environment.OSVersion));
-                Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", System.Environment.Is64BitOperatingSystem));
-                Data.AppendLine(string.Format("MachineName: {0}", System.Environment.MachineName));
-                Data.AppendLine(string.Format("UserDomainName: {0}", System.Environment.UserDomainName));
-                Data.AppendLine(string.Format("UserName: {0}", System.Environment.UserName));
-                Data.AppendLine(string.Format("Version: {0}", System.Environment.Version));
-                return Data.ToString();
-            }
-        }
+        bool MainWindowCreated = false;
 
-        bool isLoading = false;
-        public void ShowzvsWindow()
+        public async void ShowzvsWindow()
         {
-            if (zvsWindow == null || !isLoading)
+            if (zvsWindow == null || !MainWindowCreated)
             {
-                isLoading = true;
+#if DEBUG
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+#endif
+
+                MainWindowCreated = true;
+
+                SplashScreen splashscreen = new SplashScreen();
+                splashscreen.SetLoadingText("Initializing user interface");
+                splashscreen.Show();
+
+                //TODO: REMOVE THE NEED FOR STATIC DESCIPTIONS  DB DESIGN? - CHANGE UI??
+                RefreshCommandDescripitions();
+                RefreshTriggerDescripitions();
+
+                await Task.Delay(10);
+                splashscreen.SetLoadingTextFormat("Fetching settings");
+                await Task.Delay(10);
+
                 zvsWindow = new zvsMainWindow();
+                zvsWindow.Loaded += (a, s) =>
+                {
+                    splashscreen.Close();
+                };
                 zvsWindow.Closed += (a, s) =>
                 {
                     zvsWindow = null;
-                    log.InfoFormat("{0} User Interface Unloaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
-                    isLoading = false;
+                    log.InfoFormat("{0} User Interface Unloaded", Utils.ApplicationName); //, Utils.ApplicationName + " GUI");
+                    MainWindowCreated = false;
 
                 };
                 zvsWindow.Show();
+#if DEBUG
+                sw.Stop();
+                Debug.WriteLine("ZVS window created in {0}", sw.Elapsed.ToString() as object);
+#endif
             }
-            else
-            {
-                zvsWindow.Activate();
-            }
+
+            zvsWindow.Activate();
         }
 
         public void ShutdownZVS()

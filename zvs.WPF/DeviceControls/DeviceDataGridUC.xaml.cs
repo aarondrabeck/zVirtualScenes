@@ -154,7 +154,7 @@ namespace zvs.WPF.DeviceControls
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine("Device grid initialized in {0}", sw.Elapsed.ToString());
+            Debug.WriteLine("Device grid initialized in {0}", sw.Elapsed.ToString() as object);
 #endif
         }
 

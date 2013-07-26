@@ -1,76 +1,46 @@
-﻿<Window
+﻿<zvsWPF:ChromeWindow
+    xmlns:zvsWPF="clr-namespace:zvs.WPF"
+    x:Class="zvs.WPF.zvsMainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:DeviceControls="clr-namespace:zvs.WPF.DeviceControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
-    
     xmlns:SceneControls="clr-namespace:zvs.WPF.SceneControls" 
     xmlns:TriggerControl="clr-namespace:zvs.WPF.TriggerControls"
     xmlns:ScheduledTaskControls="clr-namespace:zvs.WPF.ScheduledTaskControls"
-    x:Class="zvs.WPF.zvsMainWindow"
-        Title="MainWindow"  MinWidth="800" MinHeight="570" Closed="MainWindow_Closed_1" Unloaded="Window_Unloaded" Loaded="Window_Loaded" Icon="Images/32zvsIcon.png" PreviewKeyDown="Window_PreviewKeyDown" mc:Ignorable="d" Closing="Window_Closing_1" StateChanged="Window_StateChanged_1" WindowStartupLocation="CenterScreen">
-    <Window.Resources>
+    Title="MainWindow" 
+    MinWidth="800" 
+    MinHeight="570" 
+    Closed="MainWindow_Closed_1" 
+    Unloaded="Window_Unloaded" 
+    Loaded="Window_Loaded" 
+    Icon="Images/32zvsIcon.png" 
+    PreviewKeyDown="Window_PreviewKeyDown"
+    mc:Ignorable="d" 
+    Closing="Window_Closing_1" 
+    StateChanged="Window_StateChanged_1" 
+    WindowStartupLocation="CenterScreen"
+    Background="Transparent"
+    Style="{StaticResource ChromeWindowStyle}">
+
+    <zvsWPF:ChromeWindow.CommandBindings>
+        <CommandBinding Command="{x:Static zvsWPF:ChromeWindow.onMinimizeCommand }" Executed="onMinimizeCommandExecuted" />
+        <CommandBinding Command="{x:Static zvsWPF:ChromeWindow.onRestoreCommand }" Executed="onRestoreCommandExecuted" />
+        <CommandBinding Command="{x:Static zvsWPF:ChromeWindow.onMaximizeCommand }" Executed="onMaximizeCommandExecuted" />
+        <CommandBinding Command="{x:Static zvsWPF:ChromeWindow.onCloseCommand }" Executed="onCloseCommandExecuted" />
+    </zvsWPF:ChromeWindow.CommandBindings>
+
+    <zvsWPF:ChromeWindow.Resources>
         <Style TargetType="{x:Type ListViewItem}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
         <CollectionViewSource x:Key="ListViewSource" >
             <!--d:DesignSource="{d:DesignInstance my:device, CreateList=True}"-->
         </CollectionViewSource>
-    </Window.Resources>
-
-    <DockPanel>
-        <Menu DockPanel.Dock="Top" Margin="0,0,0,10">
-            <MenuItem Header="File" >
-                <MenuItem Header="Backup" >
-                    <MenuItem Header="Device Names" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
-                    <MenuItem Header="JavaScript Commands" x:Name="ExportJSMI" Click="ExportJSMI_Click_1" />
-                    <MenuItem Header="Scenes" x:Name="ExportScenesMI" Click="ExportScenesMI_Click_1" />
-                    <MenuItem Header="Triggers" x:Name="ExportTriggersMI" Click="ExportTriggersMI_Click_1" />
-                    <MenuItem Header="Groups" x:Name="ExportGroupsMI" Click="ExportGroupsMI_Click_1" />
-                    <MenuItem Header="Scheduled Tasks" x:Name="ExportScheduledTaskMI" Click="ExportScheduledTaskMI_Click_1" />
-                </MenuItem>
-                <MenuItem Header="Restore" >
-                    <MenuItem Header="Device Names" x:Name="ImportDeviceNamesMI" Click="ImportDeviceNamesMI_Click_1" />
-                    <MenuItem Header="JavaScript Commands" x:Name="ImportJSMI" Click="ImportJSMI_Click_1" />
-                    <MenuItem Header="Scenes" x:Name="ImportScenesMI" Click="ImportScenesMI_Click_1" />
-                    <MenuItem Header="Triggers" x:Name="ImportTriggersMI" Click="ImportTriggersMI_Click_1" />
-                    <MenuItem Header="Groups" x:Name="ImportGroupsMI" Click="ImportGroupsMI_Click_1" />
-                    <MenuItem Header="Scheduled Tasks" x:Name="ImportScheduledTaskMI" Click="ImportScheduledTaskMI_Click_1" />
-                </MenuItem>
-                <Separator />
-                <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
-
-            </MenuItem>
-            <MenuItem Header="Commands">
-                <MenuItem Header="Built-in">
-                    <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-                </MenuItem>
-                <MenuItem Header="JavaScript">
-                    <MenuItem Name="AddEditJSCmds" Header="Add / Edit" Click="AddEditJSCmds_Click_1" />
-                </MenuItem>
-            </MenuItem>
-            <MenuItem Header="Groups">
-                <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
-                <MenuItem Header="Group Editor" Click="MenuItem_Click" />
-            </MenuItem>
-
-
-            <MenuItem Header="Tools">
-                <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
-                <MenuItem Header="Clear Logs" Name="ClearLogsMI"   Click="ClearLogsMI_Click" />
-                <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
-                <Separator />
-                <MenuItem Header="Manage Plug-in" Click="ManagePluginsMI" />
-                <MenuItem Header="Manage Adapters" Click="MenuItem_Click_1" />
-                <MenuItem Name="SettingMI" Header="Settings" Click="SettingMI_Click_1" />
-
-            </MenuItem>
-            <MenuItem Header="Help">
-                <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
-            </MenuItem>
-        </Menu>
+    </zvsWPF:ChromeWindow.Resources>
+    <DockPanel Background="White">
         <StatusBar  DockPanel.Dock="Bottom" Height="23">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
@@ -94,79 +64,146 @@
             </StatusBarItem>
 
         </StatusBar>
-        <TabControl>
-            <TabItem >
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="18" Source="Images/radio.png"  />
-                        <TextBlock Text="Devices" Margin="2,0,0,0" VerticalAlignment="Center" />
-                    </StackPanel>
-                </TabItem.Header>
-                <Grid>
-                    <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
-                </Grid>
-            </TabItem>
-             
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="18" Source="Images/scene64.png"  />
-                        <TextBlock Text="Scenes" Margin="2,0,0,0" VerticalAlignment="Center" />
-                    </StackPanel>
-                </TabItem.Header>
-
-                <SceneControls:SceneCreator x:Name="SceneControl" />
-
-            </TabItem>
-            <TabItem >
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="18" Source="Images/trigger.png"  />
-                        <TextBlock Text="Triggers" Margin="2,0,0,0" VerticalAlignment="Center" />
-                    </StackPanel>
-                </TabItem.Header>
-                <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
-            </TabItem>
+        <Grid>
             
-            <TabItem>
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="18" Source="Images/scheduled_task.png"  />
-                        <TextBlock Text="Scheduled Tasks" Margin="2,0,0,0" VerticalAlignment="Center" />
-                    </StackPanel>
-                </TabItem.Header>
-                <ScheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></ScheduledTaskControls:ScheduledTaskCreator>
-            </TabItem>
-           
-            <TabItem >
-                <TabItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Image Height="18" Source="Images/log.png"  />
-                        <TextBlock Text="Log" Margin="2,0,0,0" VerticalAlignment="Center" />
-                    </StackPanel>
-                </TabItem.Header>
-                <Grid DataContext="{StaticResource ListViewSource}">
-                    <Border VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
-                        <Border.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="White" Offset="0.969"/>
-                                <GradientStop Color="#FFF2F3F5"/>
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Log" VerticalAlignment="Center" Margin="5,0,0,0" />
-                    </Border>
-                    <DataGrid  x:Name="logListView"  Margin="0,25,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
+
+            <TabControl>
+                <TabItem >
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="18" Source="Images/radio.png"  />
+                            <TextBlock Text="Devices" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid>
+                        <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
+                    </Grid>
+                </TabItem>
+
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="18" Source="Images/scene64.png"  />
+                            <TextBlock Text="Scenes" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </TabItem.Header>
+
+                    <SceneControls:SceneCreator x:Name="SceneControl" />
+
+                </TabItem>
+                <TabItem >
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="18" Source="Images/trigger.png"  />
+                            <TextBlock Text="Triggers" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
+                </TabItem>
+
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="18" Source="Images/scheduled_task.png"  />
+                            <TextBlock Text="Scheduled Tasks" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <ScheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></ScheduledTaskControls:ScheduledTaskCreator>
+                </TabItem>
+
+                <TabItem >
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Height="18" Source="Images/log.png"  />
+                            <TextBlock Text="Log" Margin="2,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid DataContext="{StaticResource ListViewSource}">
+                        <Border VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="White" Offset="0.969"/>
+                                    <GradientStop Color="#FFF2F3F5"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Log" VerticalAlignment="Center" Margin="5,0,0,0" />
+                        </Border>
+                        <DataGrid  x:Name="logListView"  Margin="0,25,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
-                            <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
-                            <DataGridTextColumn Width="48"  Header="Thread" Binding="{Binding ThreadName}" IsReadOnly="True"/>
-                            <DataGridTextColumn Width="150"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
-                            <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-        </TabControl>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
+                                <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
+                                <DataGridTextColumn Width="48"  Header="Thread" Binding="{Binding ThreadName}" IsReadOnly="True"/>
+                                <DataGridTextColumn Width="150"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
+                                <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+            <ToggleButton x:Name="SettingsButton" Height="25" Width="25" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 0 0 0">
+                <ToggleButton.Background>
+                    <ImageBrush ImageSource="Images/settingIcon.png"/>
+                </ToggleButton.Background>
+
+            </ToggleButton>
+            <Popup Name="SettingsPopup"
+                PlacementTarget="{Binding ElementName=SettingsButton}" 
+                Placement="Bottom"   
+                AllowsTransparency="True"
+                IsOpen="{Binding IsChecked, ElementName=SettingsButton}"
+                StaysOpen="False"
+                PopupAnimation="Slide"  >
+                <Menu>
+                    <MenuItem Header="_File"  >
+                        <MenuItem Header="Backup" >
+                            <MenuItem Header="Device Names" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
+                            <MenuItem Header="JavaScript Commands" x:Name="ExportJSMI" Click="ExportJSMI_Click_1" />
+                            <MenuItem Header="Scenes" x:Name="ExportScenesMI" Click="ExportScenesMI_Click_1" />
+                            <MenuItem Header="Triggers" x:Name="ExportTriggersMI" Click="ExportTriggersMI_Click_1" />
+                            <MenuItem Header="Groups" x:Name="ExportGroupsMI" Click="ExportGroupsMI_Click_1" />
+                            <MenuItem Header="Scheduled Tasks" x:Name="ExportScheduledTaskMI" Click="ExportScheduledTaskMI_Click_1" />
+                        </MenuItem>
+                        <MenuItem Header="Restore" >
+                            <MenuItem Header="Device Names" x:Name="ImportDeviceNamesMI" Click="ImportDeviceNamesMI_Click_1" />
+                            <MenuItem Header="JavaScript Commands" x:Name="ImportJSMI" Click="ImportJSMI_Click_1" />
+                            <MenuItem Header="Scenes" x:Name="ImportScenesMI" Click="ImportScenesMI_Click_1" />
+                            <MenuItem Header="Triggers" x:Name="ImportTriggersMI" Click="ImportTriggersMI_Click_1" />
+                            <MenuItem Header="Groups" x:Name="ImportGroupsMI" Click="ImportGroupsMI_Click_1" />
+                            <MenuItem Header="Scheduled Tasks" x:Name="ImportScheduledTaskMI" Click="ImportScheduledTaskMI_Click_1" />
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
+
+                    </MenuItem>
+                    <MenuItem Header="Commands">
+                        <MenuItem Header="Built-in">
+                            <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
+                        </MenuItem>
+                        <MenuItem Header="JavaScript">
+                            <MenuItem Name="AddEditJSCmds" Header="Add / Edit" Click="AddEditJSCmds_Click_1" />
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="Groups">
+                        <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
+                        <MenuItem Header="Group Editor" Click="MenuItem_Click" />
+                    </MenuItem>
+                    <MenuItem Header="Tools">
+                        <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
+                        <MenuItem Header="Clear Logs" Name="ClearLogsMI"   Click="ClearLogsMI_Click" />
+                        <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
+                        <Separator />
+                        <MenuItem Header="Manage Plug-in" Click="ManagePluginsMI" />
+                        <MenuItem Header="Manage Adapters" Click="MenuItem_Click_1" />
+                        <MenuItem Name="SettingMI" Header="Settings" Click="SettingMI_Click_1" />
+
+                    </MenuItem>
+                    <MenuItem Header="Help">
+                        <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
+                    </MenuItem>
+                </Menu>
+
+            </Popup>
+        </Grid>
     </DockPanel>
-</Window>
+</zvsWPF:ChromeWindow>
