@@ -40,7 +40,9 @@ namespace zvs.Processor
         
         public async Task RegisterDeviceSettingAsync(DeviceSetting deviceSetting)
         {
-            var existing_dp = await Context.DeviceSettings.FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier);
+            var existing_dp = await Context.DeviceSettings
+                .Include(o=> o.Options)
+                .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier);
 
             if (existing_dp == null)
             {
@@ -65,9 +67,11 @@ namespace zvs.Processor
 
         public async Task RegisterDeviceTypeSettingAsync(DeviceTypeSetting deviceTypeSetting)
         {
-            var existing_dp = await Context.DeviceTypeSettings.FirstOrDefaultAsync(d =>
-                d.UniqueIdentifier == deviceTypeSetting.UniqueIdentifier &&
-                d.DeviceTypeId == deviceTypeSetting.DeviceTypeId);
+            var existing_dp = await Context.DeviceTypeSettings
+                .Include(o => o.Options)
+                .FirstOrDefaultAsync(d =>
+                    d.UniqueIdentifier == deviceTypeSetting.UniqueIdentifier &&
+                    d.DeviceTypeId == deviceTypeSetting.DeviceTypeId);
 
             if (existing_dp == null)
             {

@@ -29,7 +29,9 @@ namespace zvs.Processor
             }
 
             //Does device type exist? 
-            var existing_dc = await context.DeviceCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == deviceCommand.UniqueIdentifier &&
+            var existing_dc = await context.DeviceCommands
+                .Include(o => o.Options)
+                .FirstOrDefaultAsync(c => c.UniqueIdentifier == deviceCommand.UniqueIdentifier &&
                 c.DeviceId == deviceCommand.DeviceId);
 
             if (existing_dc == null)
@@ -45,6 +47,7 @@ namespace zvs.Processor
                 existing_dc.Name = deviceCommand.Name;
                 existing_dc.Help = deviceCommand.Help;
                 existing_dc.SortOrder = deviceCommand.SortOrder;
+
                 context.CommandOptions.RemoveRange(existing_dc.Options.ToList());
                 existing_dc.Options.Clear();
                 deviceCommand.Options.ToList().ForEach(o => existing_dc.Options.Add(o));

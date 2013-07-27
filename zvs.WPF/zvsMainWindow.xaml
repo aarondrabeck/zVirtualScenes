@@ -33,6 +33,94 @@
     </zvsWPF:ChromeWindow.CommandBindings>
 
     <zvsWPF:ChromeWindow.Resources>
+        <zvsWPF:ContentToPathConverter x:Key="content2PathConverter"/>
+        <zvsWPF:ContentToMarginConverter x:Key="content2MarginConverter"/>
+
+        <SolidColorBrush x:Key="BorderBrush" Color="#FFEBEBEB"/>
+        <SolidColorBrush x:Key="TabControlBackgroundBrush"  Color="White"/>
+        <LinearGradientBrush x:Key="HoverBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#FFF7F7F7" Offset="0"/>
+            <GradientStop Color="#FFFBFFFF" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="SelectedBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="White" Offset="0"/>
+            <GradientStop Color="#FFF9F9F9" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="TabItemPathBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#FFF2F3F5" Offset="0"/>
+            <GradientStop Color="White" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- TabControl style -->
+        <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="1" BorderThickness="1,0,1,1" Panel.ZIndex="2" CornerRadius="0,0,2,2"
+                                BorderBrush="{StaticResource BorderBrush}"
+                                Background="{StaticResource TabControlBackgroundBrush}">
+                                <ContentPresenter ContentSource="SelectedContent"/>
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Panel.ZIndex="1" IsItemsHost="true"/>
+                            <Rectangle Grid.Row="0" Height="2" VerticalAlignment="Bottom"
+                                   Fill="{StaticResource BorderBrush}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!-- TabItem style -->
+        <Style x:Key="{x:Type TabItem}" TargetType="{x:Type TabItem}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Grid x:Name="grd">
+                            <Path x:Name="TabPath" StrokeThickness="1"
+      Margin="{Binding ElementName=TabItemContent,
+               Converter={StaticResource content2MarginConverter}}"
+      Stroke="{StaticResource BorderBrush}"
+      Fill="{StaticResource TabItemPathBrush}"
+      Data="{Binding ElementName=TabItemContent,
+             Converter={StaticResource content2PathConverter}}">
+                                <Path.LayoutTransform>
+                                    <ScaleTransform ScaleY="-1"/>
+                                </Path.LayoutTransform>
+                            </Path>
+                            <Rectangle x:Name="TabItemTopBorder" Height="2" Visibility="Visible"
+                                   VerticalAlignment="Bottom" Fill="{StaticResource BorderBrush}"
+                                   Margin="{Binding ElementName=TabItemContent, Converter={StaticResource content2MarginConverter}}" />
+                            <ContentPresenter x:Name="TabItemContent" ContentSource="Header"
+                                          Margin="10,2,10,2" VerticalAlignment="Center"
+                                          TextElement.Foreground="#FF000000"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True" SourceName="grd">
+                                <Setter Property="Fill" Value="{StaticResource HoverBrush}" TargetName="TabPath"/>
+                            </Trigger>
+                            <Trigger Property="Selector.IsSelected" Value="True">
+                                <Setter Property="Fill" TargetName="TabPath" Value="{StaticResource SelectedBrush}">
+                                </Setter>
+                                <Setter Property="BitmapEffect">
+                                    <Setter.Value>
+                                        <DropShadowBitmapEffect Direction="302" Opacity="0.4" 
+                                                        ShadowDepth="4" Softness="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Panel.ZIndex" Value="2"/>
+                                <Setter Property="Visibility" Value="Hidden" TargetName="TabItemTopBorder"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="{x:Type ListViewItem}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
@@ -41,7 +129,7 @@
         </CollectionViewSource>
     </zvsWPF:ChromeWindow.Resources>
     <DockPanel Background="White">
-        <StatusBar  DockPanel.Dock="Bottom" Height="23">
+        <StatusBar  DockPanel.Dock="Bottom" Height="30" Background="White" BorderBrush="#FFA0A0A0" BorderThickness="0 1 0 0">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>
@@ -54,82 +142,71 @@
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem>
-                <TextBlock Name="StatusBarDescriptionTxt" TextTrimming="CharacterEllipsis" Margin="5,0,0,0" >GUI Loaded</TextBlock>
+                <TextBlock Name="StatusBarDescriptionTxt" FontSize="14" Foreground="#FF707070" TextTrimming="CharacterEllipsis" Margin="5,0,0,0" >GUI Loaded</TextBlock>
             </StatusBarItem>
             <StatusBarItem Grid.Column="1" Margin="10,0" >
-                <TextBlock Name="StatusBarSourceTxt" >Main GUI</TextBlock>
+                <TextBlock Name="StatusBarSourceTxt" FontSize="14" Foreground="#FF707070">Main GUI</TextBlock>
             </StatusBarItem>
             <StatusBarItem Grid.Column="2">
-                <TextBlock Name="StatusBarUrgencyTxt" Margin="0,0,10,0" >Error</TextBlock>
+                <TextBlock Name="StatusBarUrgencyTxt" Margin="0,0,10,0" FontSize="14" Foreground="#FF707070">Error</TextBlock>
             </StatusBarItem>
 
         </StatusBar>
-        <Grid>
-            
-
-            <TabControl>
-                <TabItem >
+        <Grid >
+            <TabControl Margin="0 5 0 0" BorderThickness="0 1 0 0" Style="{StaticResource TabControlStyle}" >
+                <TabItem  Height="28">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Height="18" Source="Images/radio.png"  />
-                            <TextBlock Text="Devices" Margin="2,0,0,0" VerticalAlignment="Center" />
+                            <Image Height="20" Source="Images/radio.png"  />
+                            <TextBlock FontSize="14"  Text="Devices" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
                     <Grid>
-                        <DeviceControls:DeviceDataGridUC  x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
+                        <DeviceControls:DeviceDataGridUC x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
                     </Grid>
                 </TabItem>
-
-                <TabItem>
+                <TabItem Height="28">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Height="18" Source="Images/scene64.png"  />
-                            <TextBlock Text="Scenes" Margin="2,0,0,0" VerticalAlignment="Center" />
+                            <Image Height="20" Source="Images/scene64.png"  />
+                            <TextBlock FontSize="14" Text="Scenes" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
 
                     <SceneControls:SceneCreator x:Name="SceneControl" />
 
                 </TabItem>
-                <TabItem >
+                <TabItem Height="28">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Height="18" Source="Images/trigger.png"  />
-                            <TextBlock Text="Triggers" Margin="2,0,0,0" VerticalAlignment="Center" />
+                            <TextBlock FontSize="14" Text="Triggers" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
                     <TriggerControl:TriggerGridUC x:Name="triggerControl"></TriggerControl:TriggerGridUC>
                 </TabItem>
-
-                <TabItem>
+                <TabItem Height="28">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <Image Height="18" Source="Images/scheduled_task.png"  />
-                            <TextBlock Text="Scheduled Tasks" Margin="2,0,0,0" VerticalAlignment="Center" />
+                            <Image Height="22" Source="Images/scheduled_task.png"  />
+                            <TextBlock FontSize="14" Text="Scheduled Tasks" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
                     <ScheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></ScheduledTaskControls:ScheduledTaskCreator>
                 </TabItem>
-
-                <TabItem >
+                <TabItem Height="28">
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Height="18" Source="Images/log.png"  />
-                            <TextBlock Text="Log" Margin="2,0,0,0" VerticalAlignment="Center" />
+                            <TextBlock FontSize="14" Text="Log" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
                     <Grid DataContext="{StaticResource ListViewSource}">
-                        <Border VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
-                            <Border.Background>
-                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                    <GradientStop Color="White" Offset="0.969"/>
-                                    <GradientStop Color="#FFF2F3F5"/>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Log" VerticalAlignment="Center" Margin="5,0,0,0" />
-                        </Border>
-                        <DataGrid  x:Name="logListView"  Margin="0,25,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
-                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
+                       
+                        <DataGrid  x:Name="logListView"  Margin="0,0,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" 
+                                   HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
+                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" 
+                                   ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False" BorderThickness="0" >
                             <DataGrid.Columns>
                                 <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
                                 <DataGridTextColumn Width="75" Header="Urgency" Binding="{Binding Urgency}" IsReadOnly="True"/>
@@ -141,20 +218,14 @@
                     </Grid>
                 </TabItem>
             </TabControl>
-            <ToggleButton x:Name="SettingsButton" Height="25" Width="25" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 0 0 0">
-                <ToggleButton.Background>
-                    <ImageBrush ImageSource="Images/settingIcon.png"/>
-                </ToggleButton.Background>
+            <Menu VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 1 3 0" Background="White">
+                <MenuItem >
+                    <MenuItem.Header>
+                        <Grid>
+                            <Image Width="25" Height="25" Source="Images/settingIcon.png" />
+                        </Grid>
+                    </MenuItem.Header>
 
-            </ToggleButton>
-            <Popup Name="SettingsPopup"
-                PlacementTarget="{Binding ElementName=SettingsButton}" 
-                Placement="Bottom"   
-                AllowsTransparency="True"
-                IsOpen="{Binding IsChecked, ElementName=SettingsButton}"
-                StaysOpen="False"
-                PopupAnimation="Slide"  >
-                <Menu>
                     <MenuItem Header="_File"  >
                         <MenuItem Header="Backup" >
                             <MenuItem Header="Device Names" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
@@ -201,9 +272,8 @@
                     <MenuItem Header="Help">
                         <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
                     </MenuItem>
-                </Menu>
-
-            </Popup>
+                </MenuItem>
+            </Menu>
         </Grid>
     </DockPanel>
 </zvsWPF:ChromeWindow>

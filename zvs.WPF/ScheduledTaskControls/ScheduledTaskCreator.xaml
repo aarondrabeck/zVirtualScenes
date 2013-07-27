@@ -48,22 +48,22 @@
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
-
-        <Border Width="350" HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
+        <Border   VerticalAlignment="Top" Height="25" >
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="White" Offset="0.969"/>
-                    <GradientStop Color="#FFF2F3F5"/>
+                    <GradientStop Color="#FFF2F3F5" Offset="0.49"/>
+                    <GradientStop Color="White" Offset="0.262"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Scheduled Tasks" VerticalAlignment="Center" Margin="5,0,0,0" />
+            <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Scenes" VerticalAlignment="Center" Margin="5,0,0,0" />
         </Border>
+        
         <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"
                     HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" 
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
                   CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single" 
                   PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
-                  SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFF9F9F9" Margin="0,25,0,0" >
+                  SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFF9F9F9" Margin="0,0,0,0" BorderThickness="0" >
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn MaxWidth="45" MinWidth="45" Width="45"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
@@ -88,7 +88,7 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <Border Name="TaskDetails" Grid.Column="1" BorderThickness="1" CornerRadius="10" BorderBrush="Gray" Margin="355,0,0,0" Background="#FFFDFDFD">
+        <Border Name="TaskDetails" Grid.Column="1" BorderBrush="Gray" Margin="355,25,0,0" BorderThickness="0" Background="#FFFDFDFD">
             <Grid>
                 <TextBlock Name="TaskNameTxtBl" Text="{Binding Name, StringFormat={}{0} Details}"  Margin="10,5,10,0" VerticalAlignment="Top"
                            FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis" ></TextBlock>

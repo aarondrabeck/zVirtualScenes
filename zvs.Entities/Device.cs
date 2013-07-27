@@ -109,8 +109,33 @@ namespace zvs.Entities
             }
         }
 
-        public int DeviceTypeId { get; set; }
-        public virtual DeviceType Type { get; set; }
+        private int _DeviceTypeId;
+        public int DeviceTypeId
+        {
+            get { return _DeviceTypeId; }
+            set
+            {
+                if (value != _DeviceTypeId)
+                {
+                    _DeviceTypeId = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private DeviceType _Type;
+        public virtual DeviceType Type
+        {
+            get { return _Type; }
+            set
+            {
+                if (value != _Type)
+                {
+                    _Type = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         private ObservableCollection<DeviceCommand> _Commands = new ObservableCollection<DeviceCommand>();
         [ConfidentialData]

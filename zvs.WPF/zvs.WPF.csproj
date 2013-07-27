@@ -371,6 +371,7 @@
     <Resource Include="Images\JavaScriptIcon.png" />
     <Resource Include="Images\multipleIcon.png" />
     <Resource Include="Images\settingIcon.png" />
+    <Resource Include="Images\unknown.png" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

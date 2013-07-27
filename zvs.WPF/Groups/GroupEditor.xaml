@@ -15,7 +15,8 @@
         <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,10,161,0" Click="AddBtn_Click"></Button>
         <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,10,95,0"  VerticalAlignment="Top" Width="60" Click="EditBtn_Click" />
         <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,10,29,0" VerticalAlignment="Top" Width="60" Click="RemoveBtn_Click" />
-        <DeviceControls:DeviceDataGridUC Margin="296,68,12,12" x:Name="DeviceLst" />
+        <Border Margin="296,68,12,12" BorderBrush="#FFABADB3" BorderThickness="1"><DeviceControls:DeviceDataGridUC  x:Name="DeviceLst" />
+        </Border>
         <TextBlock HorizontalAlignment="Left" Name="textBlock1" Text="Groups" VerticalAlignment="Top" Margin="12,12,0,0" />
         <Image HorizontalAlignment="Left" Margin="225,133,0,0" Name="image1" Stretch="None" VerticalAlignment="Top" Source="/zVirtualScenes;component/Images/drag_arrow.png" />
         <TextBlock Height="85" HorizontalAlignment="Left" Margin="206,182,0,0" Name="textBlock2" Text="Drag and drop to add devices to groups " VerticalAlignment="Top" TextWrapping="Wrap" Width="83" TextAlignment="Center" />

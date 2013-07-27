@@ -24,7 +24,7 @@ namespace zvs.WPF.AdapterManager
     /// <summary>
     /// Interaction logic for PluginManager.xaml
     /// </summary>
-    public partial class AdapterManagerWindow : Window
+    public partial class AdapterManagerWindow : Window, IDisposable
     {
         private App application = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
@@ -303,6 +303,25 @@ namespace zvs.WPF.AdapterManager
                             }
                     }
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
             }
         }
     }

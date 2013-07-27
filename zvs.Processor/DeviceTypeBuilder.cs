@@ -17,19 +17,21 @@ namespace zvs.Processor
             Context = context;
         }
 
-        public async Task RegisterAsync(DeviceType deviceType)
+        public async Task<int> RegisterAsync(DeviceType deviceType)
         {
             //Does device type exist? 
-            var existing_dt = await Context.DeviceTypes.Include(o => o.Commands).FirstOrDefaultAsync(o =>
+            var existing_dt = await Context.DeviceTypes.Include(o => o.Commands)
+                .FirstOrDefaultAsync(o =>
                 o.Adapter.AdapterGuid == Adapter.AdapterGuid
                 && o.UniqueIdentifier == deviceType.UniqueIdentifier);
 
             if (existing_dt == null)
             {
+                existing_dt = deviceType;
                 var adapter = await Context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == Adapter.AdapterGuid);
 
                 if (adapter != null)
-                    adapter.DeviceTypes.Add(deviceType);
+                    adapter.DeviceTypes.Add(existing_dt);
             }
             else
             {
@@ -38,9 +40,11 @@ namespace zvs.Processor
 
                 foreach (DeviceTypeCommand dtc in deviceType.Commands)
                 {
-                    DeviceTypeCommand existing_dtc = await Context.DeviceTypeCommands.SingleOrDefaultAsync(o =>
-                        o.DeviceTypeId == existing_dt.Id &&
-                        o.UniqueIdentifier == dtc.UniqueIdentifier);
+                    DeviceTypeCommand existing_dtc = await Context.DeviceTypeCommands
+                        .Include(o=> o.Options)
+                        .SingleOrDefaultAsync(o =>
+                            o.DeviceTypeId == existing_dt.Id &&
+                            o.UniqueIdentifier == dtc.UniqueIdentifier);
 
                     if (existing_dtc == null)
                     {
@@ -54,16 +58,33 @@ namespace zvs.Processor
                         existing_dtc.CustomData2 = dtc.CustomData2;
                         existing_dtc.ArgumentType = dtc.ArgumentType;
                         existing_dtc.Description = dtc.Description;
+
                         Context.CommandOptions.RemoveRange(existing_dtc.Options.ToList());
                         existing_dtc.Options.Clear();
                         dtc.Options.ToList().ForEach(o => existing_dtc.Options.Add(o));
                     }
                 }
             }
+
             var result = await Context.TrySaveChangesAsync();
             if (result.HasError)
                 Core.log.Error(result.Message);
+
+            return existing_dt.Id;
         }
 
+    }
+
+    public class CommandOptionComparer : IEqualityComparer<CommandOption>
+    {
+        public bool Equals(CommandOption x, CommandOption y)
+        {
+            return x.Name == y.Name;
+        }
+
+        public int GetHashCode(CommandOption obj)
+        {
+            return 37 * obj.Name.GetHashCode() + 19 * obj.Name.GetHashCode();
+        }
     }
 }

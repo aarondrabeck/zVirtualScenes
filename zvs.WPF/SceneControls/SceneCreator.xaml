@@ -41,14 +41,13 @@
     </UserControl.Resources>
     <Grid DataContext="{StaticResource sceneViewSource}">
 
-        <Border Width="350" HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
+        <Border   VerticalAlignment="Top" Height="25" >
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="White" Offset="0.969"/>
-                    <GradientStop Color="#FFF2F3F5"/>
+                    <GradientStop Color="#FFF2F3F5" Offset="0.49"/>
+                    <GradientStop Color="White" Offset="0.262"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Scenes" VerticalAlignment="Center" Margin="5,0,0,0" />
         </Border>
         <DataGrid AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" HeadersVisibility="None" 
                   GridLinesVisibility="Horizontal"   Background="#FFF9F9F9" 
@@ -133,7 +132,7 @@
             </DataGrid.Columns>
 
         </DataGrid>
-        <Border Name="SceneCommandGrid"  Margin="355,0,0,0"  BorderThickness="1" CornerRadius="10" BorderBrush="Gray" Background="#FFFDFDFD" >
+        <Border Name="SceneCommandGrid"  Margin="355,25,0,0"   Background="#FFFDFDFD" >
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"></RowDefinition>

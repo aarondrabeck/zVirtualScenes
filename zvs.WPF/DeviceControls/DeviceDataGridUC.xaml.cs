@@ -26,7 +26,7 @@ namespace zvs.WPF.DeviceControls
     /// <summary>
     /// Interaction logic for DeviceDataGridUC.xaml
     /// </summary>
-    public partial class DeviceDataGridUC : UserControl
+    public partial class DeviceDataGridUC : UserControl, IDisposable
     {
         private zvsContext context;
         public DeviceDataGridUC()
@@ -104,6 +104,11 @@ namespace zvs.WPF.DeviceControls
                 //Reloads context from DB when modifications happen
                 foreach (var ent in context.ChangeTracker.Entries<Device>())
                     await ent.ReloadAsync();
+
+                //Reloads device types on updated devices
+                await context.Devices
+                    .Include(o => o.Type)
+                    .FirstOrDefaultAsync(o=> o.Id == e.NewEntity.Id);
             }));
         }
 
@@ -450,6 +455,23 @@ namespace zvs.WPF.DeviceControls
             }
         }
 
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (this.context == null)
+                {
+                    return;
+                }
+
+                context.Dispose();
+            }
+        }
     }
 }

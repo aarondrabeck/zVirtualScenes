@@ -179,7 +179,7 @@ namespace zvs.WPF
 
             #region Initializing and upgrading local database
             await Task.Delay(10);
-            splashscreen.SetLoadingTextFormat("Initializing and upgrading local database");
+            splashscreen.SetLoadingTextFormat("Initializing and migrating database");
             await Task.Delay(10);
 
             using (zvsContext context = new zvsContext())
@@ -283,7 +283,7 @@ namespace zvs.WPF
                 MainWindowCreated = true;
 
                 SplashScreen splashscreen = new SplashScreen();
-                splashscreen.SetLoadingText("Initializing user interface");
+                splashscreen.SetLoadingText("Loading user interface");
                 splashscreen.Show();
 
                 //TODO: REMOVE THE NEED FOR STATIC DESCIPTIONS  DB DESIGN? - CHANGE UI??
@@ -291,7 +291,7 @@ namespace zvs.WPF
                 RefreshTriggerDescripitions();
 
                 await Task.Delay(10);
-                splashscreen.SetLoadingTextFormat("Fetching settings");
+                splashscreen.SetLoadingTextFormat("Loading user interface settings");
                 await Task.Delay(10);
 
                 zvsWindow = new zvsMainWindow();

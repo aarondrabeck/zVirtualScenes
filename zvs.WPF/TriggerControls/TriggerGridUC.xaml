@@ -44,19 +44,11 @@
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" DataContext="{StaticResource device_value_triggersViewSource}">
-            <Border  VerticalAlignment="Top" Height="25" BorderThickness="1,1,1,0" BorderBrush="#FF688CAF" CornerRadius="10,10,0,0" >
-                <Border.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0.969"/>
-                        <GradientStop Color="#FFF2F3F5"/>
-                    </LinearGradientBrush>
-                </Border.Background>
-                <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Triggers" VerticalAlignment="Center" Margin="5,0,0,0" />
-            </Border>
+         
             <DataGrid x:Name="TriggerGrid" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
                   HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
-                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,25,0,33" >
+                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,33" BorderThickness="0" >
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserSort="False" CanUserResize="False" CanUserReorder="False" IsReadOnly="True">

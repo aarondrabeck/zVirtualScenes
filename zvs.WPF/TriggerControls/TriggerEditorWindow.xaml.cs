@@ -65,7 +65,7 @@ namespace zvs.WPF.TriggerControls
             OperatorCmboBx.SelectedIndex = 0;
 
             //Set presets
-            if (trigger.DeviceValue != null)
+            if (trigger != null && trigger.DeviceValue != null)
             {
                 if (trigger.DeviceValue.Device != null)
                     DeviceCmboBx.SelectedItem = trigger.DeviceValue.Device;

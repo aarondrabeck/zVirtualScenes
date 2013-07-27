@@ -92,25 +92,21 @@ namespace zvs.Processor
                 });
             }
             #endregion
-
+#if (release)
             try
             {
-                await AdapterManager.LoadAdaptersAsync(this);
+#endif
+
+            await AdapterManager.LoadAdaptersAsync(this);
+
+            await PluginManager.LoadPluginsAsync(this);
+#if (release)
             }
             catch (Exception ex)
             {
                 Core.ProgramHasToClosePrompt(ex.Message);
             }
-
-            try
-            {
-                await PluginManager.LoadPluginsAsync(this);
-            }
-            catch (Exception ex)
-            {
-                Core.ProgramHasToClosePrompt(ex.Message);
-            }
-
+#endif
             TriggerManager = new TriggerManager(this);
             ScheduledTaskManager = new ScheduledTaskManager(this);
             ScheduledTaskManager.StartAsync();
