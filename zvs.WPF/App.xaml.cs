@@ -79,7 +79,7 @@ namespace zvs.WPF
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(zvsCore);
-                                await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
+                                await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                             }
                         }
                         else

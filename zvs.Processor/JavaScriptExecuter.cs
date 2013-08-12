@@ -232,7 +232,7 @@ namespace zvs.Processor
 
                 CommandProcessor cp = new CommandProcessor(Core);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                CommandProcessorResult result = await cp.RunCommandAsync(this, dc.Id, Value);
+                CommandProcessorResult result = await cp.RunCommandAsync(this, dc, Value);
             }
         }
 
@@ -285,7 +285,7 @@ namespace zvs.Processor
             {
                 BuiltinCommand cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
                 CommandProcessor cp = new CommandProcessor(Core);
-                return await cp.RunCommandAsync(this, cmd.Id, SceneID.ToString());
+                return await cp.RunCommandAsync(this, cmd, SceneID.ToString());
             }
         }
     }

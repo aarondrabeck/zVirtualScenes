@@ -48,12 +48,25 @@ namespace zvs.Processor
             if (sCmd.Command == null)
                 return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.");
 
-            return await RunCommandAsync(sender, sCmd.CommandId, sCmd.Argument, sCmd.Argument2);
+            return await RunCommandAsync(sender, sCmd.Command, sCmd.Argument, sCmd.Argument2);
         }
 
-        public async Task<CommandProcessorResult> RunCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
+        //public async Task<CommandProcessorResult> RunCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
+        //{
+        //    using (zvsContext context = new zvsContext())
+        //    {
+        //        var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == commandId);
+
+        //        if (command == null)
+        //            return new CommandProcessorResult(true, string.Format("Command {0} not found in database.", commandId));
+
+        //        return await RunCommandAsync(sender, command, argument, argument2);
+        //    }
+        //}
+
+        public async Task<CommandProcessorResult> RunCommandAsync(object sender, Command command, string argument = "", string argument2 = "")
         {
-            var result = await ProcessCommandAsync(sender, commandId, argument, argument2);
+            var result = await ProcessCommandAsync(sender, command, argument, argument2);
 
             if (result.HasErrors)
                 Core.log.Error(result.Details);
@@ -63,17 +76,12 @@ namespace zvs.Processor
         }
 
         //private Methods
-        private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
+        private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, Command command, string argument = "", string argument2 = "")
         {
             CommandProcessorResult result = new CommandProcessorResult(true, "Failed to process command. Command type unknown.");
 
             using (zvsContext context = new zvsContext())
             {
-                var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == commandId);
-
-                if (command == null)
-                    return new CommandProcessorResult(true, string.Format("Command {0} not found in database.", commandId));
-
                 #region DeviceCommand
                 if (command is DeviceCommand)
                 {
@@ -81,12 +89,12 @@ namespace zvs.Processor
                         .Include(o => o.Device)
                         .Include(o => o.Device.Type)
                         .Include(o => o.Device.Type.Adapter)
-                        .FirstOrDefaultAsync(o => o.Id == commandId);
+                        .FirstOrDefaultAsync(o => o.Id == command.Id);
 
                     var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
                     {
-                        return new CommandProcessorResult(true, string.Format("Device cmd {0} failed.  Could not locate the associated plug-in.", commandId));
+                        return new CommandProcessorResult(true, string.Format("Device cmd {0} failed.  Could not locate the associated plug-in.", command.Id));
                     }
 
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
@@ -190,12 +198,12 @@ namespace zvs.Processor
 
                                 if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(device.Type.Adapter.AdapterGuid))
                                 {
-                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Could not locate the associated adapter.", commandId));
+                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Could not locate the associated adapter.", command.Id));
                                 }
                                 var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[device.Type.Adapter.AdapterGuid];
 
                                 if (!adapter.IsEnabled)
-                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Adapter not enabled.", commandId));
+                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Adapter not enabled.", command.Id));
 
                                 await adapter.RepollAsync(device, context);
 
@@ -282,7 +290,7 @@ namespace zvs.Processor
                                                                  command.Name,
                                                                  group.Name);
 
-                                return new CommandProcessorResult(false, details );
+                                return new CommandProcessorResult(false, details);
 
                             }
                         case "RUN_SCENE":

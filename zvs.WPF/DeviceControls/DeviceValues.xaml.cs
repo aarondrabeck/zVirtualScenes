@@ -117,7 +117,7 @@ namespace zvs.WPF.DeviceControls
                 if (cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    await cp.RunCommandAsync(this, cmd.Id, device.Id.ToString());
+                    await cp.RunCommandAsync(this, cmd, device.Id.ToString());
                 }
             }
         }

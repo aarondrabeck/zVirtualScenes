@@ -200,7 +200,7 @@ namespace zvs.WPF
                 return;
 
             CommandProcessor cp = new CommandProcessor(app.zvsCore);
-            await cp.RunCommandAsync(this, cmd.Id);
+            await cp.RunCommandAsync(this, cmd);
         }
 
         private void ExitMI_Click_1(object sender, RoutedEventArgs e)

@@ -293,11 +293,14 @@ namespace LightSwitchPlugin
                     if (!ZVSTypeToLSType.ContainsKey(dv.Device.Type.UniqueIdentifier))
                         return;
 
-                    string level = ((int)dv.Device.CurrentLevelInt).ToString();
+                    string level = newValue;
                     var type = ZVSTypeToLSType[dv.Device.Type.UniqueIdentifier];
 
+                    int l = 0;
+                    int.TryParse(newValue, out l);
+
                     if (dv.Device.Type.UniqueIdentifier == "SWITCH")
-                        level = (dv.Device.CurrentLevelInt > 0 ? "255" : "0");
+                        level = (l > 0 ? "255" : "0");
 
                     await BroadcastCommandAsync(LightSwitchProtocol.CreateUpdateCmd(dv.Device.Name, dv.Device.Id.ToString(), level, type));
                     await BroadcastCommandAsync(LightSwitchProtocol.CreateEndListCmd());
@@ -480,7 +483,7 @@ namespace LightSwitchPlugin
 
                 string arg1 = null;
                 string arg2 = null;
-                int commandId = 0;
+                Command command = null;
                 string cmdMsg = string.Empty;
 
                 #region Find Command
@@ -502,7 +505,7 @@ namespace LightSwitchPlugin
                             }
 
                             cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dtcmd.Name, d.Name);
-                            commandId = dtcmd.Id;
+                            command = dtcmd;
                             arg1 = null;
                             arg2 = d.Id.ToString();
                             break;
@@ -531,7 +534,7 @@ namespace LightSwitchPlugin
                             }
 
                             cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
-                            commandId = dcmd.Id;
+                            command = dcmd;
                             arg1 = l;
                             arg2 = d.Id.ToString();
 
@@ -540,7 +543,7 @@ namespace LightSwitchPlugin
                 }
                 #endregion
 
-                if (commandId == 0)
+                if (command == null)
                 {
                     var error = "Cannot locate zvs command";
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
@@ -551,7 +554,7 @@ namespace LightSwitchPlugin
 
                 log.Info(cmdMsg);
                 CommandProcessor cp = new CommandProcessor(Core);
-                var commandResult = await cp.RunCommandAsync(this, commandId, arg1, arg2);
+                var commandResult = await cp.RunCommandAsync(this, command, arg1, arg2);
 
                 if (commandResult.HasErrors)
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
@@ -582,7 +585,7 @@ namespace LightSwitchPlugin
                     log.Info(result);
 
                     CommandProcessor cp = new CommandProcessor(Core);
-                    var r = await cp.RunCommandAsync(this, zvs_cmd.Id, g.Id.ToString());
+                    var r = await cp.RunCommandAsync(this, zvs_cmd, g.Id.ToString());
                     if (r.HasErrors)
                         await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
                     else
@@ -610,7 +613,7 @@ namespace LightSwitchPlugin
                 }
 
                 CommandProcessor cp = new CommandProcessor(Core);
-                var r = await cp.RunCommandAsync(this, bcmd.Id, sceneId.ToString());
+                var r = await cp.RunCommandAsync(this, bcmd, sceneId.ToString());
 
                 if (r.HasErrors)
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
@@ -667,7 +670,7 @@ namespace LightSwitchPlugin
                 var cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
                 log.Info(cmdMsg);
                 CommandProcessor cp = new CommandProcessor(Core);
-                var commandResult = await cp.RunCommandAsync(this, dcmd.Id, args.Temp);
+                var commandResult = await cp.RunCommandAsync(this, dcmd, args.Temp);
 
                 if (commandResult.HasErrors)
                     await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
@@ -685,7 +688,7 @@ namespace LightSwitchPlugin
 
             string arg1 = null;
             string arg2 = null;
-            int commandId = 0;
+            Command command = null;
             string cmdMsg = string.Empty;
 
             //PLUGINNAME-0 -->CmdName,Arg 
@@ -731,7 +734,7 @@ namespace LightSwitchPlugin
                         return;
                     }
 
-                    commandId = dcmd.Id;
+                    command = dcmd;
                     arg1 = cmd.arg;
                     cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
 
@@ -748,7 +751,7 @@ namespace LightSwitchPlugin
                         return;
                     }
 
-                    commandId = dcmd.Id;
+                    command = dcmd;
                     arg1 = null;
                     arg2 = d.Id.ToString();
                     cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
@@ -765,14 +768,14 @@ namespace LightSwitchPlugin
                         return;
                     }
 
-                    commandId = dcmd.Id;
+                    command = dcmd;
                     arg1 = null;
                     arg2 = d.Id.ToString();
                     cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
                 }
             }
 
-            if (commandId == 0)
+            if (command == null)
             {
                 var error = "Cannot locate zvs command";
                 await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(error));
@@ -783,7 +786,7 @@ namespace LightSwitchPlugin
 
             log.Info(cmdMsg);
             CommandProcessor cp = new CommandProcessor(Core);
-            var commandResult = await cp.RunCommandAsync(this, commandId, arg1, arg2);
+            var commandResult = await cp.RunCommandAsync(this, command, arg1, arg2);
 
             if (commandResult.HasErrors)
                 await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));

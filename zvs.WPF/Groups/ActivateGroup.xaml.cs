@@ -118,7 +118,7 @@ namespace zvs.WPF.Groups
                 if (group_on_cmd != null)
                 {
                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
-                    await cp.RunCommandAsync(this, group_on_cmd.Id, g.Id.ToString());
+                    await cp.RunCommandAsync(this, group_on_cmd, g.Id.ToString());
                 }
             }
         }
@@ -134,7 +134,7 @@ namespace zvs.WPF.Groups
                 return;
 
             CommandProcessor cp = new CommandProcessor(app.zvsCore);
-            await cp.RunCommandAsync(this, group_off_cmd.Id, g.Id.ToString());
+            await cp.RunCommandAsync(this, group_off_cmd, g.Id.ToString());
         }
 
         private void Window_PreviewKeyDown_1(object sender, KeyEventArgs e)
