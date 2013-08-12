@@ -154,9 +154,7 @@ namespace zvs.WPF.JavaScript
                 MessageBox.Show("Are you sure you want to delete the '" + jsCommand.Name + "' command?",
                                 "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                var commands = await context.QueuedCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync();
-                context.QueuedCommands.RemoveRange(commands);
-
+                
                 var saveResult = await context.TrySaveChangesAsync();
                 if (saveResult.HasError)
                     ((App)App.Current).zvsCore.log.Error(saveResult.Message);

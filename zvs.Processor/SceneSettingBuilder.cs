@@ -24,9 +24,7 @@ namespace zvs.Processor
         public async Task RegisterAsync(SceneSetting sceneSetting)
         {
             if (sceneSetting == null)
-            {
                 return;
-            }
 
             SceneSetting setting = await Context.SceneSettings
                 .Include(o=> o.Options)

@@ -30,7 +30,6 @@ namespace zvs.Entities
         public DbSet<BuiltinCommand> BuiltinCommands { get; set; }
         public DbSet<DbInfo> DbInfo { get; set; }
 
-        public DbSet<QueuedCommand> QueuedCommands { get; set; }
         public DbSet<Command> Commands { get; set; }
         public DbSet<CommandOption> CommandOptions { get; set; }
 

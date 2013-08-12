@@ -98,7 +98,6 @@
     <Compile Include="Scene.cs" />
     <Compile Include="ProgramOption.cs" />
     <Compile Include="DbInfo.cs" />
-    <Compile Include="QueuedCommand.cs" />
     <Compile Include="DeviceTypeCommand.cs" />
     <Compile Include="DeviceValueTriggers.cs" />
     <Compile Include="DeviceValue.cs" />

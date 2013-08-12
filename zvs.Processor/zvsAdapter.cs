@@ -38,7 +38,7 @@ namespace zvs.Processor
 
                 var sb = new AdapterSettingBuilder(core, context);
                 await OnSettingsCreating(sb);
-            }                       
+            }
         }
 
         public virtual Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
@@ -51,7 +51,8 @@ namespace zvs.Processor
             return Task.FromResult(0);
         }
 
-        public abstract Task ProcessCommandAsync(int queuedCommandId);
+        public abstract Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device, DeviceTypeCommand command, string argument);
+        public abstract Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2);
         public abstract Task RepollAsync(Device device, zvsContext context);
         public abstract Task ActivateGroupAsync(Group group, zvsContext context);
         public abstract Task DeactivateGroupAsync(Group group, zvsContext context);

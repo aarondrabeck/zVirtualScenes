@@ -14,11 +14,9 @@ namespace zvs.Processor
     {
         public bool HasErrors { get; private set; }
         public string Details { get; private set; }
-        public int QueueCommandId { get; private set; }
 
-        public CommandProcessorResult(bool Errors, string Details, int CommandQueueID)
+        public CommandProcessorResult(bool Errors, string Details)
         {
-            this.QueueCommandId = CommandQueueID;
             this.HasErrors = Errors;
             this.Details = Details;
         }
@@ -48,27 +46,15 @@ namespace zvs.Processor
             context.Dispose();
 
             if (sCmd.Command == null)
-                return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.", 0);
+                return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.");
 
             return await RunCommandAsync(sender, sCmd.CommandId, sCmd.Argument, sCmd.Argument2);
         }
 
         public async Task<CommandProcessorResult> RunCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
         {
-            zvsContext context = new zvsContext();
+            var result = await ProcessCommandAsync(sender, commandId, argument, argument2);
 
-            var queuedCommand = new QueuedCommand
-            {
-                Command = await context.Commands.SingleAsync(o => o.Id == commandId),
-                Argument = argument,
-                Argument2 = argument2
-            };
-
-            context.QueuedCommands.Add(queuedCommand);
-            await context.TrySaveChangesAsync();
-            context.Dispose();
-
-            CommandProcessorResult result = await ProcessCommandAsync(sender, queuedCommand.Id);
             if (result.HasErrors)
                 Core.log.Error(result.Details);
             else
@@ -77,64 +63,55 @@ namespace zvs.Processor
         }
 
         //private Methods
-        private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, int queuedCommandId)
+        private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
         {
-            CommandProcessorResult result = new CommandProcessorResult(true, "Failed to process queued command. Command type unknown.", 0);
+            CommandProcessorResult result = new CommandProcessorResult(true, "Failed to process command. Command type unknown.");
 
             using (zvsContext context = new zvsContext())
             {
-                QueuedCommand queuedCommand = await context.QueuedCommands
-                    .Include(o => o.Command)
-                    .FirstOrDefaultAsync(o => o.Id == queuedCommandId);
+                var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == commandId);
 
-                if (queuedCommand == null)
-                    return new CommandProcessorResult(true, string.Format("Queued command {0} not found in database.", queuedCommandId), queuedCommandId);
-
-                Command command = queuedCommand.Command;
+                if (command == null)
+                    return new CommandProcessorResult(true, string.Format("Command {0} not found in database.", commandId));
 
                 #region DeviceCommand
                 if (command is DeviceCommand)
                 {
-                    DeviceCommand deviceCommand = (DeviceCommand)command;
+                    var deviceCommand = await context.DeviceCommands
+                        .Include(o => o.Device)
+                        .Include(o => o.Device.Type)
+                        .Include(o => o.Device.Type.Adapter)
+                        .FirstOrDefaultAsync(o => o.Id == commandId);
 
                     var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
                     {
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-
-                        return new CommandProcessorResult(true, string.Format("Queued device cmd {0} failed.  Could not locate the associated plug-in.", queuedCommand.Id),
-                            queuedCommand.Id);
+                        return new CommandProcessorResult(true, string.Format("Device cmd {0} failed.  Could not locate the associated plug-in.", commandId));
                     }
 
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
                     if (adapter.IsEnabled)
                     {
-                        string details = string.Format("Queued device cmd {0}{1} on {2} processed.",
+                        string details = string.Format("Device cmd {0}{1} on {2} processed.",
                                                            deviceCommand.Name,
-                                                           string.IsNullOrEmpty(queuedCommand.Argument) ? "" : string.Format(" with arg '{0}'", queuedCommand.Argument),
+                                                           string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
                                                            deviceCommand.Device.Name
                                                            );
 
-                        await adapter.ProcessCommandAsync(queuedCommand.Id);
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-                        return new CommandProcessorResult(false, details, queuedCommand.Id);
-
+                        await adapter.ProcessDeviceCommandAsync(deviceCommand.Device, deviceCommand, argument, argument2);
+                        return new CommandProcessorResult(false, details);
                     }
                     else
                     {
-                        string err_str = string.Format("Queued device cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
+                        string err_str = string.Format("Device cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
                          deviceCommand.Name,
-                         string.IsNullOrEmpty(queuedCommand.Argument) ? "" : string.Format(" with arg '{0}'", queuedCommand.Argument),
+                         string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
                          deviceCommand.Device.Name,
                          deviceCommand.Device.Type.Adapter.Name,
                          adapter.IsEnabled ? "not ready" : "disabled"
                          );
 
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-                        return new CommandProcessorResult(true, err_str, queuedCommand.Id);
+                        return new CommandProcessorResult(true, err_str);
                     }
 
                 }
@@ -143,54 +120,44 @@ namespace zvs.Processor
                 #region DeviceTypeCommand
                 else if (command is DeviceTypeCommand)
                 {
-                    int dId = int.TryParse(queuedCommand.Argument2, out dId) ? dId : 0;
-                    var device = await context.Devices.FirstOrDefaultAsync(o => o.Id == dId);
+                    int dId = int.TryParse(argument2, out dId) ? dId : 0;
+
+                    var device = await context.Devices
+                        .Include(o => o.Type)
+                        .Include(o => o.Type.Adapter)
+                        .FirstOrDefaultAsync(o => o.Id == dId);
 
                     if (device == null)
-                    {
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-                        return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed. Invalid device id.", queuedCommand.Id), queuedCommand.Id);
-                    }
+                        return new CommandProcessorResult(true, string.Format("Ddevice type cmd {0} failed. Invalid device id.", command.Id));
 
                     var aGuid = device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
-                    {
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-                        return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed.  Could not locate the associated plug-in.", queuedCommand.Id),
-                            queuedCommand.Id);
-                    }
+                        return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Could not locate the associated plug-in.", command.Id));
 
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
 
                     if (adapter.IsEnabled)
                     {
-                        string details = string.Format("Queued device type cmd {0}{1} on {2} processed.",
+                        string details = string.Format("Device type cmd {0}{1} on {2} processed.",
                                                             command.Name,
-                                                            string.IsNullOrEmpty(queuedCommand.Argument) ? "" : string.Format(" with arg '{0}'", queuedCommand.Argument),
+                                                            string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
                                                             device.Name
                                                             );
 
-                        await adapter.ProcessCommandAsync(queuedCommand.Id);
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-                        return new CommandProcessorResult(false, details, queuedCommand.Id);
-
+                        await adapter.ProcessDeviceTypeCommandAsync(device.Type, device, command as DeviceTypeCommand, argument);
+                        return new CommandProcessorResult(false, details);
                     }
                     else
                     {
-                        string err_str = string.Format("Queued device type cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
+                        string err_str = string.Format("Device type cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
                         command.Name,
-                        string.IsNullOrEmpty(queuedCommand.Argument) ? "" : string.Format(" with arg '{0}'", queuedCommand.Argument),
+                        string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
                         device.Name,
                         device.Type.Adapter.Name,
                         adapter.IsEnabled ? "not ready" : "disabled"
                         );
 
-                        context.QueuedCommands.Remove(queuedCommand);
-                        await context.TrySaveChangesAsync();
-                        return new CommandProcessorResult(true, err_str, queuedCommand.Id);
+                        return new CommandProcessorResult(true, err_str);
                     }
 
                 }
@@ -204,23 +171,18 @@ namespace zvs.Processor
                         case "TIMEDELAY":
                             {
                                 int delay = 0;
-                                int.TryParse(queuedCommand.Argument, out delay);
+                                int.TryParse(argument, out delay);
 
                                 await Task.Delay(delay * 1000);
 
-                                string details = string.Format("Queued built-in cmd {0} second time delay processed.", delay);
+                                string details = string.Format("Built-in cmd {0} second time delay processed.", delay);
 
-
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return new CommandProcessorResult(false, details, queuedCommand.Id);
+                                return new CommandProcessorResult(false, details);
                             }
                         case "REPOLL_ME":
                             {
                                 int d_id = 0;
-                                int.TryParse(queuedCommand.Argument, out d_id);
+                                int.TryParse(argument, out d_id);
 
                                 var device = await context.Devices
                                     .Include(o => o.Type.Adapter)
@@ -228,30 +190,17 @@ namespace zvs.Processor
 
                                 if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(device.Type.Adapter.AdapterGuid))
                                 {
-                                    context.QueuedCommands.Remove(queuedCommand);
-                                    await context.TrySaveChangesAsync();
-                                    return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed.  Could not locate the associated adapter.", queuedCommand.Id),
-                                        queuedCommand.Id);
+                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Could not locate the associated adapter.", commandId));
                                 }
                                 var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[device.Type.Adapter.AdapterGuid];
 
                                 if (!adapter.IsEnabled)
-                                {
-                                    context.QueuedCommands.Remove(queuedCommand);
-                                    await context.TrySaveChangesAsync();
+                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Adapter not enabled.", commandId));
 
-                                    return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed.  Adapter not enabled.", queuedCommand.Id),
-                                        queuedCommand.Id);
-                                }
                                 await adapter.RepollAsync(device, context);
 
-                                string details = string.Format("Queued built-in cmd re-poll '{0}' processed.", device.Name);
-
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return new CommandProcessorResult(false, details, queuedCommand.Id);
+                                string details = string.Format("Built-in cmd re-poll '{0}' processed.", device.Name);
+                                return new CommandProcessorResult(false, details);
                             }
                         case "REPOLL_ALL":
                             {
@@ -280,28 +229,17 @@ namespace zvs.Processor
                                     await adapter.RepollAsync(d, context);
                                 }
 
-                                string details = "Queued built-in cmd re-poll all devices processed.";
-
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return new CommandProcessorResult(false, details, queuedCommand.Id);
+                                string details = "Built-in cmd re-poll all devices processed.";
+                                return new CommandProcessorResult(false, details);
 
                             }
                         case "GROUP_ON":
                             {
-                                int g_id = int.TryParse(queuedCommand.Argument, out g_id) ? g_id : 0;
+                                int g_id = int.TryParse(argument, out g_id) ? g_id : 0;
                                 Group group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
 
                                 if (group == null)
-                                {
-                                    context.QueuedCommands.Remove(queuedCommand);
-                                    await context.TrySaveChangesAsync();
-
-                                    return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed.  Invalid group id.", queuedCommand.Id),
-                                        queuedCommand.Id);
-                                }
+                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Invalid group id.", command.Id));
 
                                 //EXECUTE ON ALL API's
                                 foreach (var guid in Core.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
@@ -314,30 +252,20 @@ namespace zvs.Processor
                                     await adapter.ActivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("Queued built-in cmd {0} '{1}' processed.",
+                                string details = string.Format("Built-in cmd {0} '{1}' processed.",
                                                                  command.Name,
                                                                  group.Name);
 
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return new CommandProcessorResult(false, details, queuedCommand.Id);
+                                return new CommandProcessorResult(false, details);
 
                             }
                         case "GROUP_OFF":
                             {
-                                int g_id = int.TryParse(queuedCommand.Argument, out g_id) ? g_id : 0;
+                                int g_id = int.TryParse(argument, out g_id) ? g_id : 0;
                                 Group group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
 
                                 if (group == null)
-                                {
-                                    context.QueuedCommands.Remove(queuedCommand);
-                                    await context.TrySaveChangesAsync();
-
-                                    return new CommandProcessorResult(true, string.Format("Queued device type cmd {0} failed.  Invalid group id.", queuedCommand.Id),
-                                        queuedCommand.Id);
-                                }
+                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Invalid group id.", command.Id));
 
                                 //EXECUTE ON ALL API's
                                 foreach (var guid in Core.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
@@ -350,21 +278,17 @@ namespace zvs.Processor
                                     await adapter.DeactivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("Queued built-in cmd {0} '{1}' processed.",
+                                string details = string.Format("Built-in cmd {0} '{1}' processed.",
                                                                  command.Name,
                                                                  group.Name);
 
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return new CommandProcessorResult(false, details, queuedCommand.Id);
+                                return new CommandProcessorResult(false, details );
 
                             }
                         case "RUN_SCENE":
                             {
                                 int id = 0;
-                                int.TryParse(queuedCommand.Argument, out id);
+                                int.TryParse(argument, out id);
 
                                 SceneRunner sr = new SceneRunner(Core);
                                 sr.onReportProgress += (s, a) =>
@@ -373,32 +297,22 @@ namespace zvs.Processor
                                 };
                                 SceneRunner.SceneResult sceneResult = await sr.RunSceneAsync(id);
 
-                                string details = string.Format("{0} Queued built-in cmd '{1}' processed.",
+                                string details = string.Format("{0} Built-in cmd '{1}' processed.",
                                     sceneResult.Details,
                                     command.Name);
 
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return new CommandProcessorResult(sceneResult.Errors, details, queuedCommand.Id);
+                                return new CommandProcessorResult(sceneResult.Errors, details);
 
                             }
                         default:
                             {
-                                var err = new CommandProcessorResult(true, string.Format("Queued built-in cmd {0} failed. No logic defined for this built-in command.", queuedCommand.Id), queuedCommand.Id);
-
-                                //Remove processed command from queue
-                                context.QueuedCommands.Remove(queuedCommand);
-                                await context.TrySaveChangesAsync();
-
-                                return err;
+                                return new CommandProcessorResult(true, string.Format("Built-in cmd {0} failed. No logic defined for this built-in command.", command.Id));
                             }
                     }
                 }
                 #endregion
 
-                #region QueuedJavaScriptCommand
+                #region JavaScriptCommand
                 else if (command is JavaScriptCommand)
                 {
                     JavaScriptCommand javaScriptCommand = (JavaScriptCommand)command;
@@ -411,22 +325,13 @@ namespace zvs.Processor
 
                     JavaScriptExecuter.JavaScriptResult jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);
 
-                    string details = string.Format("{0}. Queued JavaScript cmd '{1}' processed.",
+                    string details = string.Format("{0}. JavaScript cmd '{1}' processed.",
                                     jsResult.Details,
                                     command.Name);
 
-                    //Remove processed command from queue
-                    context.QueuedCommands.Remove(queuedCommand);
-                    await context.TrySaveChangesAsync();
-
-                    return new CommandProcessorResult(false, details, queuedCommand.Id);
+                    return new CommandProcessorResult(false, details);
                 }
                 #endregion
-
-
-                context.QueuedCommands.Remove(queuedCommand);
-                await context.TrySaveChangesAsync();
-
 
                 return result;
             }
