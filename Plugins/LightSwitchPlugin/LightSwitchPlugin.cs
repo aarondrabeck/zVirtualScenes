@@ -249,44 +249,6 @@ namespace LightSwitchPlugin
             await StopLightSwitchServer();
         }
 
-        //protected async override void SettingChanged(string UniqueIdentifier, string settingValue)
-        //{
-        //    if (UniqueIdentifier == "VERBOSE")
-        //    {
-        //        bool.TryParse(settingValue, out VerboseSetting);
-        //    }
-        //    else if (UniqueIdentifier == "PUBLISHZEROCFG")
-        //    {
-        //        bool.TryParse(settingValue, out UseBonjourSetting);
-        //        publishZeroConf();
-        //    }
-        //    else if (UniqueIdentifier == "SORTLIST")
-        //    {
-        //        bool.TryParse(settingValue, out SortListSetting);
-        //    }
-        //    else if (UniqueIdentifier == "PORT")
-        //    {
-        //        if (this.Enabled)
-        //            await StopLightSwitchServer();
-
-        //        int.TryParse(settingValue, out PortSetting);
-
-        //        if (this.Enabled)
-        //            StartLightSwitchServer();
-
-        //    }
-        //    else if (UniqueIdentifier == "MAXCONN")
-        //    {
-        //        if (this.Enabled)
-        //            await StopLightSwitchServer();
-
-        //        int.TryParse(settingValue, out MaxConnectionsSettings);
-
-        //        if (this.Enabled)
-        //            StartLightSwitchServer();
-        //    }
-        //}
-
         //private void publishZeroConf()
         //{
         //    if (UseBonjourSetting)
@@ -416,25 +378,23 @@ namespace LightSwitchPlugin
             args.LightSwitchClient.isAuthenticated = false;
             await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateCookieCmd(args.LightSwitchClient.Nonce.ToString()));
         }
+
         async void lightSwitchClient_onCmdPassword(object sender, onPasswordEventArgs args)
         {
-            using (zvsContext context = new zvsContext())
+            var lightSwitchClient = args.LightSwitchClient;
+            string hashedPassword = EncodePassword(string.Format("{0}:{1}", lightSwitchClient.Nonce, PasswordSetting));
+
+            if (args.Password.StartsWith(hashedPassword))
             {
-                var lightSwitchClient = args.LightSwitchClient;
-                string hashedPassword = EncodePassword(string.Format("{0}:{1}", lightSwitchClient.Nonce, PasswordSetting));
+                lightSwitchClient.isAuthenticated = true;
+                await lightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateVersionCmd(Utils.ApplicationNameAndVersion));
 
-                if (args.Password.StartsWith(hashedPassword))
-                {
-                    lightSwitchClient.isAuthenticated = true;
-                    await lightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateVersionCmd(Utils.ApplicationNameAndVersion));
-
-                    log.InfoFormat("Received [{0}] User Authenticated", lightSwitchClient.RemoteEndPoint);
-                }
-                else
-                {
-                    lightSwitchClient.isAuthenticated = false;
-                    lightSwitchClient.Disconnect();
-                }
+                log.InfoFormat("Received [{0}] User Authenticated", lightSwitchClient.RemoteEndPoint);
+            }
+            else
+            {
+                lightSwitchClient.isAuthenticated = false;
+                lightSwitchClient.Disconnect();
             }
         }
 
@@ -505,7 +465,10 @@ namespace LightSwitchPlugin
 
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
+                Device d = await context.Devices
+                    .Include(o => o.Type)
+                    .Include(o => o.Type.Commands)
+                    .FirstOrDefaultAsync(o => o.Id == deviceId);
                 if (d == null)
                 {
                     var error = "Cannot locate device";
@@ -603,10 +566,10 @@ namespace LightSwitchPlugin
 
             using (zvsContext context = new zvsContext())
             {
-                Group g = context.Groups.FirstOrDefault(o => o.Id == groupId);
+                Group g = await context.Groups.FirstOrDefaultAsync(o => o.Id == groupId);
                 if (g != null)
                 {
-                    BuiltinCommand zvs_cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == cmdUniqId);
+                    BuiltinCommand zvs_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == cmdUniqId);
                     if (zvs_cmd == null)
                     {
                         var error = "Cannot locate zvs command";
@@ -636,7 +599,7 @@ namespace LightSwitchPlugin
             int sceneId = int.TryParse(args.SceneId, out sceneId) ? sceneId : 0;
             using (zvsContext context = new zvsContext())
             {
-                BuiltinCommand bcmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                BuiltinCommand bcmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                 if (bcmd == null)
                 {
                     var error = "Cannot locate zvs command";
@@ -665,7 +628,11 @@ namespace LightSwitchPlugin
 
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
+                Device d = await context.Devices
+                    .Include(o => o.Type.Adapter)
+                    .Include(o => o.Commands)
+                    .FirstOrDefaultAsync(o => o.Id == deviceId);
+
                 if (d == null)
                 {
                     var error = "Cannot locate thermostat";
@@ -724,7 +691,12 @@ namespace LightSwitchPlugin
             //PLUGINNAME-0 -->CmdName,Arg 
             using (zvsContext context = new zvsContext())
             {
-                Device d = context.Devices.FirstOrDefault(o => o.Id == deviceId);
+                Device d = await context.Devices
+                    .Include(o => o.Type.Adapter)
+                    .Include(o => o.Type.Commands)
+                    .Include(o => o.Commands)
+                    .FirstOrDefaultAsync(o => o.Id == deviceId);
+
                 if (d == null)
                 {
                     var error = "Cannot locate thermostat";
@@ -922,7 +894,7 @@ namespace LightSwitchPlugin
         {
             using (zvsContext context = new zvsContext())
             {
-                foreach (Scene scene in context.Scenes.OrderBy(o => o.SortOrder))
+                foreach (Scene scene in await context.Scenes.OrderBy(o => o.SortOrder).ToListAsync())
                 {
                     bool show = false;
 
@@ -938,7 +910,7 @@ namespace LightSwitchPlugin
         private async Task SendZoneListAsync(LightSwitchClient client)
         {
             using (zvsContext context = new zvsContext())
-                foreach (Group g in context.Groups.OrderBy(o => o.Name))
+                foreach (Group g in await context.Groups.OrderBy(o => o.Name).ToListAsync())
                     await client.SendCommandAsync(LightSwitchProtocol.CreateZoneCmd(g.Name, g.Id.ToString()));
         }
 
@@ -955,7 +927,13 @@ namespace LightSwitchPlugin
             using (zvsContext context = new zvsContext())
             {
                 //Get Devices
-                foreach (Device device in context.Devices.OrderBy(o => o.Name).Where(o => o.Type.UniqueIdentifier != "CONTROLLER"))
+                var devices = await context.Devices
+                    .Include(o => o.Type)
+                    .OrderBy(o => o.Name)
+                    .Where(o => o.Type.UniqueIdentifier != "CONTROLLER")
+                    .ToListAsync();
+
+                foreach (var device in devices)
                 {
                     bool show = true;
                     bool.TryParse(await DeviceSettingValue.GetDevicePropertyValueAsync(context, device, DeviceSettingUids.SHOW_IN_LIGHTSWITCH.ToString()), out show);
