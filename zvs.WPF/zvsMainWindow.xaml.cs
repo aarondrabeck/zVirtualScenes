@@ -280,7 +280,7 @@ namespace zvs.WPF
             }
         }
 
-        private void ImportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ImportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
@@ -292,10 +292,12 @@ namespace zvs.WPF
 
             if (r ?? true)
             {
-                Backup.ImportDevicesAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
+
+                var result = await Backup.ImportDevicesAsync(dlg.FileName);
+                if (result.HasError)
+                    log.Error(result.Message);
+                else
+                    log.Info(result.Summary);
             }
         }
 

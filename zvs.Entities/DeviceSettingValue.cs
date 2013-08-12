@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace zvs.Entities
 {
@@ -39,6 +40,28 @@ namespace zvs.Entities
                     NotifyPropertyChanged();
                 }
             }
+        }
+
+        //TODO: MOVE 
+        public static async Task<string> GetDevicePropertyValueAsync(zvsContext context, Device device, string SettingName)
+        {
+            Device d2 = await context.Devices
+                .Include(o=> o.DeviceSettingValues)
+                .FirstOrDefaultAsync(o => o.Id == device.Id);
+            if (d2 == null)
+                return string.Empty;
+
+            //See if the custom value is set.
+            var dpv = d2.DeviceSettingValues.FirstOrDefault(o => o.DeviceSetting.UniqueIdentifier == SettingName);
+            if (dpv != null)
+                return dpv.Value;
+
+            //default value from property
+            var dp = await context.DeviceSettings.FirstOrDefaultAsync(o => o.UniqueIdentifier == SettingName);
+            if (dp != null)
+                return dp.Value;
+
+            return string.Empty;
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

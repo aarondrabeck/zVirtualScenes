@@ -87,7 +87,7 @@ namespace zvs.WPF.SceneControls
             {
                 var sceneSetting = sp;
                 var sceneSettingValue = await context.SceneSettingValues
-                    .FirstOrDefaultAsync(v => v.SceneProperty == sceneSetting &&
+                    .FirstOrDefaultAsync(v => v.SceneProperty.Id == sceneSetting.Id &&
                         v.SceneId == scene.Id);
 
                 string _default = sceneSettingValue == null ? sceneSetting.Value : sceneSettingValue.Value;

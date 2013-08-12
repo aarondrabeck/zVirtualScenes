@@ -61,7 +61,7 @@ namespace zvs.WPF.DeviceControls
                 foreach (var ent in context.ChangeTracker.Entries<Group>())
                     await ent.ReloadAsync();
             }));
-           
+
         }
 
         void DeviceDataGridUC_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityDeletedArgs e)
@@ -99,17 +99,22 @@ namespace zvs.WPF.DeviceControls
             if (context == null)
                 return;
 
-            this.Dispatcher.Invoke(new Action(async () =>
+            this.Dispatcher.Invoke(async () =>
             {
-                //Reloads context from DB when modifications happen
-                foreach (var ent in context.ChangeTracker.Entries<Device>())
-                    await ent.ReloadAsync();
+                //Update the primitives used in this user control
+                var entry = context.Entry(e.NewEntity);
+                entry.Entity.DeviceTypeId = e.NewEntity.DeviceTypeId;
+                entry.Entity.CurrentLevelInt = e.NewEntity.CurrentLevelInt;
+                entry.Entity.CurrentLevelText = e.NewEntity.CurrentLevelText;
+                entry.Entity.LastHeardFrom = e.NewEntity.LastHeardFrom;
+                entry.Entity.NodeNumber = e.NewEntity.NodeNumber;
+                entry.Entity.Name = e.NewEntity.Name;
+                entry.State = EntityState.Unchanged;
 
-                //Reloads device types on updated devices
-                await context.Devices
-                    .Include(o => o.Type)
-                    .FirstOrDefaultAsync(o=> o.Id == e.NewEntity.Id);
-            }));
+                if (e.NewEntity.DeviceTypeId != e.OldEntity.DeviceTypeId)
+                    await context.DeviceTypes.FirstOrDefaultAsync(o => o.Id == e.NewEntity.DeviceTypeId);
+
+            });
         }
 
         void DeviceDataGridUC_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityDeletedArgs e)
@@ -119,6 +124,9 @@ namespace zvs.WPF.DeviceControls
 
             this.Dispatcher.Invoke(new Action(async () =>
             {
+                context.Devices.Local.Remove(e.DeletedEntity);
+                var entry = context.Entry(e.DeletedEntity).State = EntityState.Unchanged;
+
                 //Reloads context from DB when modifications happen
                 foreach (var ent in context.ChangeTracker.Entries<Device>())
                     await ent.ReloadAsync();
@@ -130,11 +138,12 @@ namespace zvs.WPF.DeviceControls
             if (context == null)
                 return;
 
-            this.Dispatcher.Invoke(new Action(async () =>
+            this.Dispatcher.Invoke(() =>
             {
-                //Gets new devices
-                await context.Devices.ToListAsync();
-            }));
+                context.Devices.Local.Add(e.AddedEntity);
+                context.Entry(e.AddedEntity).State = EntityState.Unchanged;
+
+            });
         }
 
         private async void UserControl_Initialized(object sender, EventArgs e)

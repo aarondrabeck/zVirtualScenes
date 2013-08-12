@@ -31,7 +31,23 @@ namespace zvs.Processor
             {
                 var sb = new PluginSettingBuilder(core, context);
                 await OnSettingsCreating(sb);
+
+                var ssb = new SceneSettingBuilder(core, context);
+                await OnSceneSettingsCreating(ssb);
+
+                var dsb = new DeviceSettingBuilder(core, context);
+                await OnDeviceSettingsCreating(dsb);
             }        
+        }
+
+        public virtual Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)
+        {
+            return Task.FromResult(0);
+        }
+
+        public virtual Task OnSceneSettingsCreating(SceneSettingBuilder settingBuilder)
+        {
+            return Task.FromResult(0);
         }
 
         public virtual Task OnSettingsCreating(PluginSettingBuilder settingBuilder)

@@ -133,47 +133,47 @@ namespace LightSwitchPlugin
                 }
             }
         }
-
-
         #endregion
 
         private HashSet<LightSwitchClient> LightSwitchClients = new HashSet<LightSwitchClient>();
         private CancellationTokenSource _cts = new CancellationTokenSource();
-       // private NetService netservice = null;
+        // private NetService netservice = null;
 
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<LightSwitchPlugin>();
 
-        //public override void Initialize()
-        //{
-        //    using (zvsContext context = new zvsContext())
-        //    {
+        public enum DeviceSettingUids
+        {
+            SHOW_IN_LIGHTSWITCH
+        }
 
+        public override async Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new DeviceSetting
+                {
+                    UniqueIdentifier = DeviceSettingUids.SHOW_IN_LIGHTSWITCH.ToString(),
+                    Name = "Show device in LightSwitch",
+                    Description = "If enabled this device will show in the LightSwitch device tab.",
+                    ValueType = DataType.BOOL,
+                    Value = "true"
+                });
+        }
 
-        //        string error = null;
-        //        DeviceProperty.TryAddOrEdit(new DeviceProperty
-        //        {
-        //            UniqueIdentifier = "SHOWINLSLIST",
-        //            Name = "Show device in LightSwitch",
-        //            Description = "If enabled this device will show in the LightSwitch device tab.",
-        //            ValueType = DataType.BOOL,
-        //            Value = "true"
-        //        }, context, out error);
+        public enum SceneSettingUids
+        {
+            SHOW_IN_LIGHTSWITCH
+        }
 
-        //        SceneProperty.TryAddOrEdit(new SceneProperty
-        //        {
-        //            UniqueIdentifier = "SHOWSCENEINLSLIST",
-        //            Name = "Show scene in LightSwitch",
-        //            Description = "If enabled this scene will show in the LightSwitch scene tab.",
-        //            Value = "true",
-        //            ValueType = DataType.BOOL
-        //        }, context, out error);
-
-        //        if (!string.IsNullOrEmpty(error))
-        //            log.Error(error);
-
-
-        //    }
-        //}
+        public override async Task OnSceneSettingsCreating(SceneSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new SceneSetting
+                {
+                    UniqueIdentifier = SceneSettingUids.SHOW_IN_LIGHTSWITCH.ToString(),
+                    Name = "Show scene in LightSwitch",
+                    Description = "If enabled this scene will show in the LightSwitch scene tab.",
+                    Value = "true",
+                    ValueType = DataType.BOOL
+                });
+        }
 
         public override async Task OnSettingsCreating(PluginSettingBuilder settingBuilder)
         {
@@ -233,13 +233,15 @@ namespace LightSwitchPlugin
 
         }
 
-        public override async Task StartAsync()
+        public override Task StartAsync()
         {
-            await Task.Run(() =>
+            Task.Run(() =>
                 {
                     StartLightSwitchServer();
                     //  publishZeroConf();
                 });
+
+            return Task.FromResult(0);
         }
 
         public async override Task StopAsync()
@@ -923,8 +925,8 @@ namespace LightSwitchPlugin
                 foreach (Scene scene in context.Scenes.OrderBy(o => o.SortOrder))
                 {
                     bool show = false;
-                    //TODO: FIX
-                    //bool.TryParse(ScenePropertyValue.GetPropertyValue(context, scene, "SHOWSCENEINLSLIST"), out show);
+
+                    bool.TryParse(await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.SHOW_IN_LIGHTSWITCH.ToString()), out show);
                     if (!show)
                         continue;
 
@@ -956,8 +958,7 @@ namespace LightSwitchPlugin
                 foreach (Device device in context.Devices.OrderBy(o => o.Name).Where(o => o.Type.UniqueIdentifier != "CONTROLLER"))
                 {
                     bool show = true;
-                   //TODO: FINISH
-                    //bool.TryParse(DevicePropertyValue.GetPropertyValue(context, device, "SHOWINLSLIST"), out show);
+                    bool.TryParse(await DeviceSettingValue.GetDevicePropertyValueAsync(context, device, DeviceSettingUids.SHOW_IN_LIGHTSWITCH.ToString()), out show);
                     if (!show)
                         continue;
 

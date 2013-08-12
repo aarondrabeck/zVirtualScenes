@@ -201,7 +201,10 @@ namespace OpenZWavePlugin
 
         public override async Task StartAsync()
         {
-            await StartOpenzwaveAsync();
+            await Task.Run(async () =>
+                {
+                    await StartOpenzwaveAsync();
+                });
         }
 
         public override async Task StopAsync()
@@ -369,8 +372,7 @@ namespace OpenZWavePlugin
                 m_options.Lock();
                 m_manager = new ZWManager();
 
-                await Task.Run(() =>
-                {
+                
                     m_manager.Create();
                     m_manager.OnNotification += NotificationHandler;
 
@@ -391,7 +393,7 @@ namespace OpenZWavePlugin
                     {
                         m_manager.SetPollInterval(PollingIntervalSetting, true);
                     }
-                });
+             
 
             }
             catch (Exception e)

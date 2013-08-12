@@ -101,9 +101,10 @@ namespace zvs.Processor
                     {
                         SetPluginProperty(zvsPlugin, setting.UniqueIdentifier, setting.Value);
                     }
-
+                    
                     if (dbPlugin.IsEnabled)
                         await zvsPlugin.StartAsync();
+
                 }
             }
         }
