@@ -91,30 +91,30 @@ namespace zvs.Processor
                         .Include(o => o.Device.Type.Adapter)
                         .FirstOrDefaultAsync(o => o.Id == command.Id);
 
+                    var commandAction = string.Format("{0}{1} on {2}",
+                                                           deviceCommand.Name,
+                                                           string.IsNullOrEmpty(argument) ? "" : " " + argument,
+                                                           deviceCommand.Device.Name);
+
                     var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
                     {
-                        return new CommandProcessorResult(true, string.Format("Device cmd {0} failed.  Could not locate the associated plug-in.", command.Id));
+                        return new CommandProcessorResult(true, string.Format("{0} failed, device adapter is not loaded!",
+                            commandAction));
                     }
 
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
                     if (adapter.IsEnabled)
                     {
-                        string details = string.Format("Device cmd {0}{1} on {2} processed.",
-                                                           deviceCommand.Name,
-                                                           string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
-                                                           deviceCommand.Device.Name
-                                                           );
+                        string details = string.Format("{0} complete", commandAction);
 
                         await adapter.ProcessDeviceCommandAsync(deviceCommand.Device, deviceCommand, argument, argument2);
                         return new CommandProcessorResult(false, details);
                     }
                     else
                     {
-                        string err_str = string.Format("Device cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
-                         deviceCommand.Name,
-                         string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
-                         deviceCommand.Device.Name,
+                        string err_str = string.Format("{0} failed because the '{1}' adapter is {2}",
+                         commandAction,
                          deviceCommand.Device.Type.Adapter.Name,
                          adapter.IsEnabled ? "not ready" : "disabled"
                          );
@@ -136,34 +136,34 @@ namespace zvs.Processor
                         .FirstOrDefaultAsync(o => o.Id == dId);
 
                     if (device == null)
-                        return new CommandProcessorResult(true, string.Format("Ddevice type cmd {0} failed. Invalid device id.", command.Id));
+                        return new CommandProcessorResult(true, string.Format("{0}{1} failed. Invalid device id.",
+                            command.Name,
+                            string.IsNullOrEmpty(argument) ? "" : " " + argument));
+
+                    var commandAction = string.Format("{0}{1} on {2}",
+                                                           command.Name,
+                                                           string.IsNullOrEmpty(argument) ? "" : " " + argument,
+                                                           device.Name);
 
                     var aGuid = device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
-                        return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Could not locate the associated plug-in.", command.Id));
+                        return new CommandProcessorResult(true, string.Format("{0} failed.  Could not locate the associated plug-in.", commandAction));
 
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
 
                     if (adapter.IsEnabled)
                     {
-                        string details = string.Format("Device type cmd {0}{1} on {2} processed.",
-                                                            command.Name,
-                                                            string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
-                                                            device.Name
-                                                            );
+                        string details = string.Format("{0} complete", commandAction);
 
                         await adapter.ProcessDeviceTypeCommandAsync(device.Type, device, command as DeviceTypeCommand, argument);
                         return new CommandProcessorResult(false, details);
                     }
                     else
                     {
-                        string err_str = string.Format("Device type cmd {0}{1} on {2} failed because the '{3}' plug-in is {4}. Removing command from queue...",
-                        command.Name,
-                        string.IsNullOrEmpty(argument) ? "" : string.Format(" with arg '{0}'", argument),
-                        device.Name,
+                        string err_str = string.Format("{0} failed because the {1} plug-in is {2}",
+                        commandAction,
                         device.Type.Adapter.Name,
-                        adapter.IsEnabled ? "not ready" : "disabled"
-                        );
+                        adapter.IsEnabled ? "not ready" : "disabled");
 
                         return new CommandProcessorResult(true, err_str);
                     }
@@ -183,7 +183,7 @@ namespace zvs.Processor
 
                                 await Task.Delay(delay * 1000);
 
-                                string details = string.Format("Built-in cmd {0} second time delay processed.", delay);
+                                string details = string.Format("{0} second time delay complete.", delay);
 
                                 return new CommandProcessorResult(false, details);
                             }
@@ -198,16 +198,16 @@ namespace zvs.Processor
 
                                 if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(device.Type.Adapter.AdapterGuid))
                                 {
-                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Could not locate the associated adapter.", command.Id));
+                                    return new CommandProcessorResult(true, string.Format("Re-poll of {0} failed, could not locate the associated adapter.", device.Name));
                                 }
                                 var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[device.Type.Adapter.AdapterGuid];
 
                                 if (!adapter.IsEnabled)
-                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Adapter not enabled.", command.Id));
+                                    return new CommandProcessorResult(true, string.Format("Re-poll of {0} failed, adapter not enabled.", device.Name));
 
                                 await adapter.RepollAsync(device, context);
 
-                                string details = string.Format("Built-in cmd re-poll '{0}' processed.", device.Name);
+                                string details = string.Format("Re-poll of {0} complete", device.Name);
                                 return new CommandProcessorResult(false, details);
                             }
                         case "REPOLL_ALL":
@@ -237,7 +237,7 @@ namespace zvs.Processor
                                     await adapter.RepollAsync(d, context);
                                 }
 
-                                string details = "Built-in cmd re-poll all devices processed.";
+                                string details = "Built-in cmd re-poll all devices complete";
                                 return new CommandProcessorResult(false, details);
 
                             }
@@ -247,7 +247,7 @@ namespace zvs.Processor
                                 Group group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
 
                                 if (group == null)
-                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Invalid group id.", command.Id));
+                                    return new CommandProcessorResult(true, string.Format("Device type command Group On failed.  Invalid group id."));
 
                                 //EXECUTE ON ALL API's
                                 foreach (var guid in Core.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
@@ -260,7 +260,7 @@ namespace zvs.Processor
                                     await adapter.ActivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("Built-in cmd {0} '{1}' processed.",
+                                string details = string.Format("{0} '{1}' complete",
                                                                  command.Name,
                                                                  group.Name);
 
@@ -273,7 +273,7 @@ namespace zvs.Processor
                                 Group group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
 
                                 if (group == null)
-                                    return new CommandProcessorResult(true, string.Format("Device type cmd {0} failed.  Invalid group id.", command.Id));
+                                    return new CommandProcessorResult(true, string.Format("Device type command Group Off failed. Invalid group id."));
 
                                 //EXECUTE ON ALL API's
                                 foreach (var guid in Core.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
@@ -286,7 +286,7 @@ namespace zvs.Processor
                                     await adapter.DeactivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("Built-in cmd {0} '{1}' processed.",
+                                string details = string.Format("{0} '{1}' complete",
                                                                  command.Name,
                                                                  group.Name);
 
@@ -305,7 +305,7 @@ namespace zvs.Processor
                                 };
                                 SceneRunner.SceneResult sceneResult = await sr.RunSceneAsync(id);
 
-                                string details = string.Format("{0} Built-in cmd '{1}' processed.",
+                                string details = string.Format("{0} Built-in cmd '{1}' complete",
                                     sceneResult.Details,
                                     command.Name);
 

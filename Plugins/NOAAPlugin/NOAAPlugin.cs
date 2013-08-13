@@ -11,24 +11,16 @@ using System.ComponentModel;
 using System.Linq;
 using zvs.Processor;
 using zvs.Entities;
-
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace NOAAPlugin
 {
     [Export(typeof(zvsPlugin))]
     public class NOAAPlugin : zvsPlugin
     {
-        public DateTime Sunrise { get { return _sunrise; } }
-        public DateTime Sunset { get { return _sunset; } }
-        public Double Lat { get { return _Lat; } }
-        public Double Long { get { return _Long; } }
-
         public volatile bool isActive;
         private System.Timers.Timer timerNOAA = new System.Timers.Timer();
-        private Double _Lat = 30.6772222222222;
-        private Double _Long = -100.061666666667;
-        private Double _SunriseDelay = 0;
-        private Double _SunsetDelay = 0;
 
         private DateTime _date = DateTime.Today;
         private bool _isSunrise = false;
@@ -36,147 +28,205 @@ namespace NOAAPlugin
         private DateTime _sunrise = DateTime.Now;
         private DateTime _sunset = DateTime.Now;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<NOAAPlugin>();
-        public NOAAPlugin()
-            : base("NOAA",
-               "NOAA Plug-in",
-                "This plug-in will add Sunrise and Sunset control to zVirtualScenes."
-                ) { }
 
-        public override void Initialize()
+        private double _LatitudeSetting = 30.6772222222222;
+        public double LatitudeSetting
         {
-            using (zvsContext context = new zvsContext())
+            get { return _LatitudeSetting; }
+            set
             {
-                DefineOrUpdateSetting(new PluginSetting
+                if (value != _LatitudeSetting)
                 {
-                    UniqueIdentifier = "LAT",
-                    Name = "Latitude",
-                    Value = "37.6772222222222",
-                    ValueType = DataType.DECIMAL,
-                    Description = "Your Latitude in Decimal Notation. ex. 37.6772222222222"
-                }, context);
-
-                DefineOrUpdateSetting(new PluginSetting
-                {
-                    UniqueIdentifier = "LOG",
-                    Name = "Longitude",
-                    Value = "-113.061666666667",
-                    ValueType = DataType.DECIMAL,
-                    Description = "Your Longitude in Decimal Notation. ex. -113.061666666667"
-                }, context);
-
-                DefineOrUpdateSetting(new PluginSetting
-                {
-                    UniqueIdentifier = "DELAY_SUNRISE",
-                    Name = "Minutes to delay sunrise",
-                    Value = (0).ToString(),
-                    ValueType = DataType.DECIMAL,
-                    Description = "The minutes to delay sunrise as a positive or negative number"
-                }, context);
-
-                DefineOrUpdateSetting(new PluginSetting
-                {
-                    UniqueIdentifier = "DELAY_SUNSET",
-                    Name = "Minutes to delay sunset",
-                    Value = (0).ToString(),
-                    ValueType = DataType.DECIMAL,
-                    Description = "The minutes to delay sunset as a positive or negative number"
-                }, context);
-
-                string error = null;
-                SceneProperty.TryAddOrEdit(new SceneProperty
-                {
-                    UniqueIdentifier = "ACTIVATE_SUNRISE",
-                    Name = "Activate at Sunrise",
-                    Description = "Activates this scene at sunrise",
-                    Value = "false",
-                    ValueType = DataType.BOOL
-                }, context, out error);
-
-                SceneProperty.TryAddOrEdit(new SceneProperty
-                {
-                    UniqueIdentifier = "ACTIVATE_SUNSET",
-                    Name = "Activate at Sunset",
-                    Description = "Activates this scene at sunset",
-                    Value = "false",
-                    ValueType = DataType.BOOL
-                }, context, out error);
-
-                if (!string.IsNullOrEmpty(error))
-                    log.Error(error);
-
-                Double.TryParse(GetSettingValue("DELAY_SUNRISE", context), out _SunriseDelay);
-                Double.TryParse(GetSettingValue("DELAY_SUNSET", context), out _SunsetDelay);
-                Double.TryParse(GetSettingValue("LAT", context), out _Lat);
-                Double.TryParse(GetSettingValue("LOG", context), out _Long);
-                CalculateSunriseSet();
+                    _LatitudeSetting = value;
+                    NotifyPropertyChanged();
+                }
             }
         }
 
-        protected override void StartPlugin()
+        private Double _LongitudeSetting = -100.061666666667;
+        public Double LongitudeSetting
         {
+            get { return _LongitudeSetting; }
+            set
+            {
+                if (value != _LongitudeSetting)
+                {
+                    _LongitudeSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private Double _SunriseDelaySetting = 0;
+        public Double SunriseDelaySetting
+        {
+            get { return _SunriseDelaySetting; }
+            set
+            {
+                if (value != _SunriseDelaySetting)
+                {
+                    _SunriseDelaySetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private Double _SunsetDelaySetting = 0;
+        public Double SunsetDelaySetting
+        {
+            get { return _SunsetDelaySetting; }
+            set
+            {
+                if (value != _SunsetDelaySetting)
+                {
+                    _SunsetDelaySetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public override Guid PluginGuid
+        {
+            get { return Guid.Parse("568fe426-577f-43f9-a329-9924db98a72a"); }
+        }
+
+        public override string Name
+        {
+            get { return "NOAA Plug-in for ZVS"; }
+        }
+
+        public override string Description
+        {
+            get { return "This plug-in adds Sunrise and Sunset control to zVirtualScenes."; }
+        }
+
+        public override async Task OnSettingsCreating(PluginSettingBuilder settingBuilder)
+        {
+            var latSetting = new PluginSetting
+            {
+                UniqueIdentifier = "LAT",
+                Name = "Latitude",
+                Value = "37.6772222222222",
+                ValueType = DataType.DECIMAL,
+                Description = "Your Latitude in Decimal Notation. ex. 37.6772222222222"
+            };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(latSetting, o => o.LatitudeSetting);
+
+            var longSetting = new PluginSetting
+            {
+                UniqueIdentifier = "LOG",
+                Name = "Longitude",
+                Value = "-113.061666666667",
+                ValueType = DataType.DECIMAL,
+                Description = "Your Longitude in Decimal Notation. ex. -113.061666666667"
+            };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(longSetting, o => o.LongitudeSetting);
+
+            var delaySunriseSetting = new PluginSetting
+            {
+                UniqueIdentifier = "DELAY_SUNRISE",
+                Name = "Minutes to delay sunrise",
+                Value = (0).ToString(),
+                ValueType = DataType.DECIMAL,
+                Description = "The minutes to delay sunrise as a positive or negative number"
+            };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(delaySunriseSetting, o => o.SunriseDelaySetting);
+
+            var delaySunsetSetting = new PluginSetting
+            {
+                UniqueIdentifier = "DELAY_SUNSET",
+                Name = "Minutes to delay sunset",
+                Value = (0).ToString(),
+                ValueType = DataType.DECIMAL,
+                Description = "The minutes to delay sunset as a positive or negative number"
+            };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(delaySunsetSetting, o => o.SunsetDelaySetting);
+        }
+
+        public enum SceneSettingUids
+        {
+            ACTIVATE_AT_SUNRISE,
+            ACTIVATE_AT_SUNSET
+        }
+
+        public override async Task OnSceneSettingsCreating(SceneSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new SceneSetting
+            {
+                UniqueIdentifier = SceneSettingUids.ACTIVATE_AT_SUNRISE.ToString(),
+                Name = "Activate at Sunrise",
+                Description = "Activates this scene at sunrise",
+                Value = "false",
+                ValueType = DataType.BOOL
+            });
+
+            await settingBuilder.RegisterAsync(new SceneSetting
+            {
+                UniqueIdentifier = SceneSettingUids.ACTIVATE_AT_SUNSET.ToString(),
+                Name = "Activate at Sunset",
+                Description = "Activates this scene at sunset",
+                Value = "false",
+                ValueType = DataType.BOOL
+            });
+        }
+
+        private void RecalcAndLogNewTimes()
+        {
+            CalculateSunriseSet();
             log.InfoFormat("{0} started. Today's Sunrise: {1}, Today's Sunset: {2}", this.Name, _sunrise.ToString("T"), _sunset.ToString("T"));
+        }
+
+        void NOAAPlugin_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("LatitudeSetting") ||
+                e.PropertyName.Equals("LongitudeSetting") ||
+                e.PropertyName.Equals("SunriseDelaySetting") ||
+                e.PropertyName.Equals("SunsetDelaySetting"))
+
+                RecalcAndLogNewTimes();
+        }
+
+        public override Task StartAsync()
+        {
+            RecalcAndLogNewTimes();
 
             timerNOAA.Interval = 60000;
 
+            PropertyChanged += NOAAPlugin_PropertyChanged;
             timerNOAA.Elapsed += new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = true;
 
-            IsReady = true;
+            return Task.FromResult(0);
         }
 
-        protected override void StopPlugin()
+        public override Task StopAsync()
         {
+            PropertyChanged -= NOAAPlugin_PropertyChanged;
             timerNOAA.Elapsed -= new ElapsedEventHandler(timerNOAA_Elapsed);
             timerNOAA.Enabled = false;
 
             log.InfoFormat("{0} plug-in stopped.", this.Name);
-
-            IsReady = false;
+            return Task.FromResult(0);
         }
 
-        protected override void SettingChanged(string settingUniqueIdentifier, string settingValue)
+        public override Task DeviceValueChangedAsync(long deviceValueId, string newValue, string oldValue)
         {
-            if (settingUniqueIdentifier == "DELAY_SUNRISE")
-            {
-                Double.TryParse(settingValue, out _SunriseDelay);
-            }
-            else if (settingUniqueIdentifier == "DELAY_SUNSET")
-            {
-                Double.TryParse(settingValue, out _SunsetDelay);
-            }
-            else if (settingUniqueIdentifier == "LAT")
-            {
-                Double.TryParse(settingValue, out _Lat);
-            }
-            else if (settingUniqueIdentifier == "LOG")
-            {
-                Double.TryParse(settingValue, out _Long);
-            }
-
-            CalculateSunriseSet();
-            log.Info(string.Format("Lat/Long updated.  New Sunrise: {0}, New Sunset: {1}", _sunrise.ToString("T"), _sunset.ToString("T")));
+            return Task.FromResult(0);
         }
-
-        public override void ProcessCommand(int queuedCommandId) { }
-     
-        public override void Repoll(zvs.Entities.Device device) { }
-
-        public override void ActivateGroup(int groupID) { }
-
-        public override void DeactivateGroup(int groupID) { }
 
         #region NOAA
 
         private void CalculateSunriseSet()
         {
             _date = DateTime.Now;
-            SunTimes.Instance.CalculateSunRiseSetTimes(_Lat, _Long, _date, ref _sunrise, ref _sunset, ref _isSunrise, ref _isSunset);
+            SunTimes.Instance.CalculateSunRiseSetTimes(LatitudeSetting, LongitudeSetting, _date, ref _sunrise, ref _sunset, ref _isSunrise, ref _isSunset);
+
             //Add delays
             if (_sunrise != null)
-                _sunrise = _sunrise.AddMinutes(_SunriseDelay);
+                _sunrise = _sunrise.AddMinutes(_SunriseDelaySetting);
 
             if (_sunset != null)
-                _sunset = _sunset.AddMinutes(_SunsetDelay);
+                _sunset = _sunset.AddMinutes(_SunsetDelaySetting);
         }
 
         public bool isDark()
@@ -187,7 +237,7 @@ namespace NOAAPlugin
             return false;
         }
 
-        async void  timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
+        private async void timerNOAA_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
@@ -203,17 +253,17 @@ namespace NOAAPlugin
                         log.Info("It is now sunrise. Activating sunrise scenes.");
                         foreach (Scene scene in context.Scenes)
                         {
-                            string value = ScenePropertyValue.GetPropertyValue(context, scene, "ACTIVATE_SUNRISE");
+                            string value = await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.ACTIVATE_AT_SUNRISE.ToString());
                             bool activate = false;
                             bool.TryParse(value, out activate);
 
                             if (activate)
                             {
-                                BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                                BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
+                                    await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                                 }
                             }
                         }
@@ -229,7 +279,7 @@ namespace NOAAPlugin
                         log.Info("It is now sunset. Activating sunset scenes.");
                         foreach (Scene scene in context.Scenes)
                         {
-                            string value = ScenePropertyValue.GetPropertyValue(context, scene, "ACTIVATE_SUNSET");
+                            string value = await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.ACTIVATE_AT_SUNSET.ToString());
                             bool activate = false;
                             bool.TryParse(value, out activate);
 
@@ -239,7 +289,7 @@ namespace NOAAPlugin
                                 if (cmd != null)
                                 {
                                     CommandProcessor cp = new CommandProcessor(Core);
-                                    await cp.RunCommandAsync(this, cmd.Id, scene.Id.ToString());
+                                    await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                                 }
                             }
                         }
@@ -252,6 +302,8 @@ namespace NOAAPlugin
             }
         }
         #endregion
+
+
 
     }
 

@@ -31,7 +31,7 @@ namespace LightSwitchPlugin
     }
 
     [Export(typeof(zvsPlugin))]
-    public class LightSwitchPlugin : zvsPlugin, INotifyPropertyChanged
+    public class LightSwitchPlugin : zvsPlugin
     {
         public override Guid PluginGuid
         {
@@ -233,8 +233,22 @@ namespace LightSwitchPlugin
 
         }
 
+        private async void HttpAPIPlugin_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("PortSetting"))
+            {
+                if (IsEnabled)
+                {
+                    await StopAsync();
+                    await StartAsync();
+                }
+            }
+        }
+
         public override Task StartAsync()
         {
+            PropertyChanged += HttpAPIPlugin_PropertyChanged;
+
             Task.Run(() =>
                 {
                     StartLightSwitchServer();
@@ -246,6 +260,7 @@ namespace LightSwitchPlugin
 
         public async override Task StopAsync()
         {
+            PropertyChanged -= HttpAPIPlugin_PropertyChanged;
             await StopLightSwitchServer();
         }
 

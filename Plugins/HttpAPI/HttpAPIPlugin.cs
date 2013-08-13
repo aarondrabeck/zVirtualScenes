@@ -24,92 +24,182 @@ using zvs.Entities;
 using zvs.Processor.Logging;
 using System.Drawing;
 using System.Threading.Tasks;
+using System.Data.Entity;
+using zvs;
+using System.Runtime.CompilerServices;
 
 namespace HttpAPI
 {
     [Export(typeof(zvsPlugin))]
     public class HttpAPIPlugin : zvsPlugin
     {
+        public override Guid PluginGuid
+        {
+            get { return Guid.Parse("779f0fe1-5281-4d22-a87c-58a4ad65efd0"); }
+        }
+
+        public override string Name
+        {
+            get { return "HttpAPI Plug-in for ZVS"; }
+        }
+
+        public override string Description
+        {
+            get { return "This plug-in acts as a HTTP server to send respond to JSON AJAX requests."; }
+        }
+
+        public Dictionary<Guid, string> GuidToPluginName = new Dictionary<Guid, string>();
+
         public volatile bool isActive;
-        bool _verbose = true;
         private Guid CookieValue;
         private List<string> IssuedTokens = new List<string>();
         private static HttpListener httplistener = new HttpListener();
         private static System.Threading.AutoResetEvent listenForNextRequest = new System.Threading.AutoResetEvent(false);
-        private int _port = 9999;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<HttpAPIPlugin>();
-        public HttpAPIPlugin()
-            : base("HttpAPI",
-               "HttpAPI Plug-in",
-                "This plug-in acts as a HTTP server to send respond to JSON AJAX requests."
-                ) { }
 
-        public override void Initialize()
+        #region Settings
+        private bool _VerboseSetting = false;
+        public bool VerboseSetting
         {
-            using (zvsContext context = new zvsContext())
+            get { return _VerboseSetting; }
+            set
             {
-                DefineOrUpdateSetting(new PluginSetting
+                if (value != _VerboseSetting)
                 {
-                    UniqueIdentifier = "PORT",
-                    Name = "HTTP Port",
-                    Value = "8085",
-                    ValueType = DataType.INTEGER,
-                    Description = "The port that HTTP will listen for commands on."
-                }, context);
+                    _VerboseSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
-                DefineOrUpdateSetting(new PluginSetting
+        private int _PortSetting = 9909;
+        public int PortSetting
+        {
+            get { return _PortSetting; }
+            set
+            {
+                if (value != _PortSetting)
+                {
+                    _PortSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private string _PasswordSetting = "";
+        public string PasswordSetting
+        {
+            get { return _PasswordSetting; }
+            set
+            {
+                if (value != _PasswordSetting)
+                {
+                    _PasswordSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public override async Task OnSettingsCreating(PluginSettingBuilder settingBuilder)
+        {
+            var portSetting = new PluginSetting
+            {
+                UniqueIdentifier = "PORT",
+                Name = "HTTP Port",
+                Value = "8085",
+                ValueType = DataType.INTEGER,
+                Description = "The port that HTTP will listen for commands on."
+            };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(portSetting, o => o.PortSetting);
+
+            var pwSetting = new PluginSetting
                 {
                     UniqueIdentifier = "PASSWORD",
                     Name = "Password",
                     Value = "C52632B4BCDB6F8CF0F6E4545",
                     ValueType = DataType.STRING,
                     Description = "Password that protects public facing web services."
-                }, context);
+                };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(pwSetting, o => o.PasswordSetting);
 
-                DefineOrUpdateSetting(new PluginSetting
+            var verboseSetting = new PluginSetting
+            {
+                UniqueIdentifier = "VERBOSE",
+                Name = "Verbose Logging",
+                Value = false.ToString(),
+                ValueType = DataType.BOOL,
+                Description = "Writes all server client communication to the log for debugging."
+            };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(verboseSetting, o => o.VerboseSetting);
+        }
+
+        public enum DeviceSettingUids
+        {
+            SHOW_IN_HTTPAPI
+        }
+
+        public override async Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new DeviceSetting
+            {
+                UniqueIdentifier = DeviceSettingUids.SHOW_IN_HTTPAPI.ToString(),
+                Name = "Show device in HTTP API",
+                Description = "If enabled this device will show in the HTTPAPI device collection.",
+                ValueType = DataType.BOOL,
+                Value = "true"
+            });
+        }
+
+        public enum SceneSettingUids
+        {
+            SHOW_IN_HTTPAPI
+        }
+
+        public override async Task OnSceneSettingsCreating(SceneSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new SceneSetting
+            {
+                UniqueIdentifier = SceneSettingUids.SHOW_IN_HTTPAPI.ToString(),
+                Name = "Show scene in HTTP API",
+                Description = "If enabled this scene will show in the HTTPAPI scene collection.",
+                Value = "true",
+                ValueType = DataType.BOOL
+            });
+        }
+
+        #endregion
+        public override Task StartAsync()
+        {
+            GuidToPluginName.Add(Guid.Parse("70f91ca6-08bb-406a-a60f-aeb13f50aae8"), "OPENZWAVE");
+            GuidToPluginName.Add(Guid.Parse("c4e1c021-c49f-489d-88cb-ec52bbae3be5"), "THINKSTICK");
+
+            StartHTTP();
+            PropertyChanged += HttpAPIPlugin_PropertyChanged;
+            return Task.FromResult(0);
+        }
+
+        private async void HttpAPIPlugin_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("PortSetting"))
+            {
+                if (IsEnabled)
                 {
-                    UniqueIdentifier = "VERBOSE",
-                    Name = "Verbose Logging",
-                    Value = false.ToString(),
-                    ValueType = DataType.BOOL,
-                    Description = "Writes all server client communication to the log for debugging."
-                }, context);
-
-                string error = null;
-                DeviceProperty.TryAddOrEdit(new DeviceProperty
-                {
-                    UniqueIdentifier = "HTTPAPI_SHOW",
-                    Name = "Show device in HTTP API",
-                    Description = "If enabled this device will show in applications that use the HTTP API",
-                    ValueType = DataType.BOOL,
-                    Value = "true"
-                }, context, out error);
-
-                SceneProperty.TryAddOrEdit(new SceneProperty
-                {
-                    UniqueIdentifier = "HTTPAPI_SHOW",
-                    Name = "Show in HTTP API Applications",
-                    Description = "If enabled this scene will show in applications that use the HTTP API",
-                    Value = "true",
-                    ValueType = DataType.BOOL
-                }, context, out error);
-
-                if (!string.IsNullOrEmpty(error))
-                    log.Error(error);
-
-                bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
-                int.TryParse(GetSettingValue("PORT", context), out _port);
+                    await StopAsync();
+                    await StartAsync();
+                }
             }
         }
 
-        protected override void StartPlugin()
-        {
-            StartHTTP();
-        }
-
-        protected override void StopPlugin()
+        public override Task StopAsync()
         {
             StopHTTP();
+            PropertyChanged -= HttpAPIPlugin_PropertyChanged;
+            return Task.FromResult(0);
+        }
+
+        public override Task DeviceValueChangedAsync(long deviceValueId, string newValue, string oldValue)
+        {
+            return Task.FromResult(0);
         }
 
         private void StartHTTP()
@@ -126,17 +216,13 @@ namespace HttpAPI
                 if (!httplistener.IsListening)
                 {
                     CookieValue = Guid.NewGuid();
-
-
-                    httplistener.Prefixes.Add("http://*:" + _port + "/");
+                    httplistener.Prefixes.Add("http://*:" + PortSetting + "/");
                     //httplistener.AuthenticationSchemes = AuthenticationSchemes.Negotiate; 
                     //httplistener.IgnoreWriteExceptions = true; 
                     httplistener.Start();
 
                     ThreadPool.QueueUserWorkItem(new System.Threading.WaitCallback(HttpListen));
-
-                    this.IsReady = true;
-                    log.Info(string.Format("HTTP server started on port {0}", _port));
+                    log.Info(string.Format("HTTP server started on port {0}", PortSetting));
                 }
             }
             catch (Exception ex)
@@ -153,7 +239,6 @@ namespace HttpAPI
                 {
                     httplistener.Stop();
                     log.Info("HTTP server stopped");
-                    this.IsReady = false;
                 }
             }
             catch (Exception ex)
@@ -161,32 +246,6 @@ namespace HttpAPI
                 log.Error("Error while shutting down. " + ex.Message);
             }
         }
-
-        protected override void SettingChanged(string settingUniqueIdentifier, string settingValue)
-        {
-            if (settingUniqueIdentifier == "VERBOSE")
-            {
-                bool.TryParse(settingValue, out _verbose);
-            }
-            else if (settingUniqueIdentifier == "PORT")
-            {
-                if (this.Enabled)
-                    StopHTTP();
-
-                int.TryParse(settingValue, out _port);
-
-                if (this.Enabled)
-                    StartHTTP();
-            }
-        }
-
-        public override void ProcessCommand(int queuedCommandId) { }
-
-        public override void Repoll(zvs.Entities.Device device) { }
-
-        public override void ActivateGroup(int groupID) { }
-
-        public override void DeactivateGroup(int groupID) { }
 
         /// <summary>
         /// <para>128 bytes X 8  = 1024 bits = 2^1024 key space</para>
@@ -246,7 +305,7 @@ namespace HttpAPI
             return false;
         }
 
-        public void HttpListenerCallback(IAsyncResult result)
+        public async void HttpListenerCallback(IAsyncResult result)
         {
             try
             {
@@ -278,10 +337,8 @@ namespace HttpAPI
                     string ip = string.Empty;
                     if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
 
-                    if (_verbose)
+                    if (VerboseSetting)
                         log.Info(string.Format("[{0}] Incoming '{1}' request to '{2}' with user agent '{3}'", ip, httpListenerContext.Request.HttpMethod, httpListenerContext.Request.RawUrl, httpListenerContext.Request.UserAgent));
-
-
 
                     #region enabling CORS for HTTP clients and cross domain access
                     string origin = httpListenerContext.Request.Headers["Origin"];
@@ -300,10 +357,11 @@ namespace HttpAPI
                         response.Headers.Add("Access-Control-Allow-Headers", requestHeaders);
 
                         httpListenerContext.Response.StatusCode = (int)HttpStatusCode.OK;
+                        sendResponse((int)HttpStatusCode.OK, "202 OK", "", httpListenerContext);
                         httpListenerContext.Response.Close();
+                        //return;
+
                         return;
-                        //sendResponse((int)HttpStatusCode.OK, "202 OK", "", httpListenerContext);
-                        // return;
                     }
                     #endregion
 
@@ -356,13 +414,15 @@ namespace HttpAPI
                         }
                     }
 
-                    if (httpListenerContext.Request.Url.Segments.Length > 2 && httpListenerContext.Request.Url.Segments[1].ToLower().Equals("api/"))
+                    if (httpListenerContext.Request.Url.Segments.Length > 2 &&
+                        httpListenerContext.Request.Url.Segments[1].ToLower().Equals("api/"))
                     {
-                        object result_obj = GetResponse(httpListenerContext);
+                        object result_obj = await GetResponse(httpListenerContext);
 
                         //Serialize depending type
                         string RespondWith = "json";
-                        if (!string.IsNullOrEmpty(httpListenerContext.Request.QueryString["type"]) && httpListenerContext.Request.QueryString["type"].Trim().ToLower() == "xml")
+                        if (!string.IsNullOrEmpty(httpListenerContext.Request.QueryString["type"]) &&
+                            httpListenerContext.Request.QueryString["type"].Trim().ToLower() == "xml")
                             RespondWith = "xml";
 
                         switch (RespondWith)
@@ -422,9 +482,9 @@ namespace HttpAPI
 
                             response.ContentType = "image/png";
                             byte[] buffer;
-                            using (zvsContext context = new zvsContext())
+                            using (var context = new zvsContext())
                             {
-                                buffer = ShellTile(context, color, style);
+                                buffer = await ShellTile(context, color, style);
                             }
                             response.ContentLength64 = buffer.Length;
                             try
@@ -522,32 +582,51 @@ namespace HttpAPI
         private async Task<object> GetResponse(HttpListenerContext httpListenerContext)
         {
             string ip = string.Empty;
-            if (httpListenerContext.Request.RemoteEndPoint != null && httpListenerContext.Request.RemoteEndPoint.Address != null) { ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString(); };
-
+            if (httpListenerContext.Request.RemoteEndPoint != null &&
+                httpListenerContext.Request.RemoteEndPoint.Address != null)
+            {
+                ip = httpListenerContext.Request.RemoteEndPoint.Address.ToString();
+            };
 
             //TODO: Read from the in memory logger if available
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logentries") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logentries") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 return new { success = true, logentries = zvs.Processor.Logging.EventedLog.Items.OrderByDescending(o => o.Datetime).Take(30).ToArray() };
             }
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logentries") && httpListenerContext.Request.HttpMethod == "DELETE")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logentries") &&
+                httpListenerContext.Request.HttpMethod == "DELETE")
             {
                 zvs.Processor.Logging.EventedLog.Clear();
                 return new { success = true };
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("devices") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("devices") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
                 using (zvsContext context = new zvsContext())
                 {
-                    foreach (Device d in context.Devices.OrderBy(o => o.Name))
+                    var dbDevices = await context.Devices
+                        .Include(o => o.Type)
+                        .Include(o => o.Type.Adapter)
+                        .OrderBy(o => o.Name).ToListAsync();
+
+                    foreach (var d in dbDevices)
                     {
                         bool show = true;
-                        bool.TryParse(DevicePropertyValue.GetPropertyValue(context, d, "HTTPAPI_SHOW"), out show);
+                        bool.TryParse(await DeviceSettingValue.GetDevicePropertyValueAsync(context, d, DeviceSettingUids.SHOW_IN_HTTPAPI.ToString()), out show);
 
                         if (show)
                         {
+                            var pluginName = "unknown";
+
+                            if (GuidToPluginName.ContainsKey(d.Type.Adapter.AdapterGuid))
+                                pluginName = GuidToPluginName[d.Type.Adapter.AdapterGuid];
+
                             var device = new
                             {
                                 id = d.Id,
@@ -556,7 +635,7 @@ namespace HttpAPI
                                 level = d.CurrentLevelInt,
                                 level_txt = d.CurrentLevelText,
                                 type = d.Type.UniqueIdentifier,
-                                plugin_name = d.Type.Plugin.UniqueIdentifier
+                                plugin_name = pluginName
                             };
 
                             devices.Add(device);
@@ -566,107 +645,119 @@ namespace HttpAPI
                 return new { success = true, devices = devices.ToArray() };
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 int id = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
-                if (id > 0)
+
+                using (var context = new zvsContext())
                 {
-                    using (zvsContext context = new zvsContext())
+                    var d = await context.Devices
+                        .Include(o => o.Type)
+                        .Include(o => o.Values)
+                        .Include(o => o.Type.Adapter)
+                        .FirstOrDefaultAsync(o => o.Id == id);
+
+                    if (d != null)
                     {
-                        Device d = context.Devices.FirstOrDefault(o => o.Id == id);
+                        double level = 0;
 
-                        if (d != null)
-                        {
-                            double level = 0;
+                        if (d.CurrentLevelInt.HasValue)
+                            level = d.CurrentLevelInt.Value;
 
-                            if (d.CurrentLevelInt.HasValue)
-                                level = d.CurrentLevelInt.Value;
-
-                            string on_off = string.Empty;
-                            if (level == 0)
-                                on_off = "OFF";
-                            else if (level > 98)
-                                on_off = "ON";
-                            else
-                                on_off = "DIM";
-
-                            StringBuilder sb = new StringBuilder();
-                            d.Groups.ToList().ForEach((o) => sb.Append(o.Name + " "));
-
-                            var details = new
-                            {
-                                id = d.Id,
-                                name = d.Name,
-                                on_off = on_off,
-                                level = d.CurrentLevelInt,
-                                level_txt = d.CurrentLevelText,
-                                type = d.Type.UniqueIdentifier,
-                                type_txt = d.Type.Name,
-                                last_heard_from = d.LastHeardFrom.HasValue ? d.LastHeardFrom.Value.ToString() : "",
-                                groups = sb.ToString(),
-                                mode = d.Values.FirstOrDefault(o => o.Name == "Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Mode").Value,
-                                fan_mode = d.Values.FirstOrDefault(o => o.Name == "Fan Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan Mode").Value,
-                                op_state = d.Values.FirstOrDefault(o => o.Name == "Operating State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Operating State").Value,
-                                fan_state = d.Values.FirstOrDefault(o => o.Name == "Fan State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan State").Value,
-                                heat_p = d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1").Value,
-                                cool_p = d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1").Value,
-                                esm = d.Values.FirstOrDefault(o => o.Name == "SetBack Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "SetBack Mode").Value,
-                                plugin_name = d.Type.Plugin.UniqueIdentifier
-                            };
-                            return new { success = true, details = details };
-                        }
+                        string on_off = string.Empty;
+                        if (level == 0)
+                            on_off = "OFF";
+                        else if (level > 98)
+                            on_off = "ON";
                         else
-                            return new { success = false, reason = "Device not found." };
+                            on_off = "DIM";
+
+                        var sb = new StringBuilder();
+                        d.Groups.ToList().ForEach((o) => sb.Append(o.Name + " "));
+                        var pluginName = "unknown";
+
+                        if (GuidToPluginName.ContainsKey(d.Type.Adapter.AdapterGuid))
+                            pluginName = GuidToPluginName[d.Type.Adapter.AdapterGuid];
+
+                        var details = new
+                        {
+                            id = d.Id,
+                            name = d.Name,
+                            on_off = on_off,
+                            level = d.CurrentLevelInt,
+                            level_txt = d.CurrentLevelText,
+                            type = d.Type.UniqueIdentifier,
+                            type_txt = d.Type.Name,
+                            last_heard_from = d.LastHeardFrom.HasValue ? d.LastHeardFrom.Value.ToString() : "",
+                            groups = sb.ToString(),
+                            mode = d.Values.FirstOrDefault(o => o.Name == "Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Mode").Value,
+                            fan_mode = d.Values.FirstOrDefault(o => o.Name == "Fan Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan Mode").Value,
+                            op_state = d.Values.FirstOrDefault(o => o.Name == "Operating State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Operating State").Value,
+                            fan_state = d.Values.FirstOrDefault(o => o.Name == "Fan State") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan State").Value,
+                            heat_p = d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Heating 1" || o.Name == "Heating1").Value,
+                            cool_p = d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Cooling 1" || o.Name == "Cooling1").Value,
+                            esm = d.Values.FirstOrDefault(o => o.Name == "SetBack Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "SetBack Mode").Value,
+                            plugin_name = pluginName
+                        };
+                        return new { success = true, details = details };
                     }
+                    else
+                        return new { success = false, reason = "Device not found." };
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 5 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") && httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("values") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 5 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
+                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("values") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 int id = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
-                if (id > 0)
+
+                using (var context = new zvsContext())
                 {
-                    using (zvsContext context = new zvsContext())
+                    var deviceValues = await context.DeviceValues
+                        .Where(o => o.DeviceId == id)
+                        .ToListAsync();
+
+                    List<object> values = new List<object>();
+                    foreach (var v in deviceValues)
                     {
-                        Device d = context.Devices.FirstOrDefault(o => o.Id == id);
-
-                        if (d != null)
+                        values.Add(new
                         {
-                            List<object> values = new List<object>();
-                            foreach (DeviceValue v in d.Values)
-                            {
-                                values.Add(new
-                                {
-                                    value_id = v.UniqueIdentifier,
-                                    value = v.Value,
-                                    grene = v.Genre,
-                                    index2 = v.Index,
-                                    read_only = v.isReadOnly,
-                                    label_name = v.Name,
-                                    type = v.ValueType,
-                                    id = v.Id
-                                });
-                            }
-
-                            return new { success = true, values = values.ToArray() };
-                        }
-                        else
-                            return new { success = false, reason = "Device not found." };
+                            value_id = v.UniqueIdentifier,
+                            value = v.Value,
+                            grene = v.Genre,
+                            index2 = v.Index,
+                            read_only = v.isReadOnly,
+                            label_name = v.Name,
+                            type = v.ValueType,
+                            id = v.Id
+                        });
                     }
+                    return new { success = true, values = values.ToArray() };
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("scenes") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("scenes") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 using (zvsContext context = new zvsContext())
                 {
                     List<object> scenes = new List<object>();
-                    foreach (Scene scene in context.Scenes)
+
+                    var dbScenes = await context.Scenes
+                        .Include(o => o.Commands)
+                        .ToListAsync();
+
+                    foreach (var scene in dbScenes)
                     {
                         bool show = false;
-                        string prop = ScenePropertyValue.GetPropertyValue(context, scene, "HTTPAPI_SHOW");
+                        string prop = await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.SHOW_IN_HTTPAPI.ToString());
                         bool.TryParse(prop, out show);
 
                         if (show)
@@ -685,35 +776,39 @@ namespace HttpAPI
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("scene/") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("scene/") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 int sID = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3], out sID);
 
-                using (zvsContext context = new zvsContext())
+                using (var context = new zvsContext())
                 {
-                    Scene scene = context.Scenes.FirstOrDefault(s => s.Id == sID);
+                    var scene = await context.Scenes
+                        .Include(o => o.Commands)
+                        .FirstOrDefaultAsync(s => s.Id == sID);
+
+                    var sCmds = scene.Commands
+                                .OrderBy(o => o.SortOrder)
+                                .Select(sc => new
+                                {
+                                    device = sc.StoredCommand.TargetObjectName,
+                                    action = sc.StoredCommand.Description,
+                                    order = (sc.SortOrder + 1)
+                                }).ToArray();
 
                     if (scene != null)
                     {
-                        List<object> s_cmds = new List<object>();
-                        foreach (SceneCommand sc in scene.Commands.OrderBy(o => o.SortOrder))
-                        {
-                            s_cmds.Add(new
-                            {
-                                device = sc.StoredCommand.ActionableObject,
-                                action = sc.StoredCommand.ActionDescription,
-                                order = (sc.SortOrder + 1)
-                            });
-                        }
                         var s = new
                         {
                             id = scene.Id,
                             name = scene.Name,
                             is_running = scene.isRunning,
                             cmd_count = scene.Commands.Count(),
-                            cmds = s_cmds.ToArray()
+                            cmds = sCmds
                         };
+
                         return new { success = true, scene = s };
                     }
                     else
@@ -721,7 +816,9 @@ namespace HttpAPI
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("scene/") && httpListenerContext.Request.HttpMethod == "POST")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("scene/") &&
+                httpListenerContext.Request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(httpListenerContext.Request);
 
@@ -732,19 +829,20 @@ namespace HttpAPI
                 bool.TryParse(postData["is_running"], out is_running);
                 string name = postData["name"];
 
-                using (zvsContext context = new zvsContext())
+                using (var context = new zvsContext())
                 {
-                    Scene scene = context.Scenes.FirstOrDefault(s => s.Id == sID);
+                    var scene = await context.Scenes
+                        .FirstOrDefaultAsync(s => s.Id == sID);
 
                     if (scene != null)
                     {
                         if (is_running)
                         {
-                            BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
+                            var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                             if (cmd != null)
                             {
                                 CommandProcessor cp = new CommandProcessor(Core);
-                                await Task.Run(async () => await cp.RunCommandAsync(this, cmd.Id, sID.ToString()));
+                                await Task.Run(async () => await cp.RunCommandAsync(this, cmd, sID.ToString()));
                             }
                             return new { success = true, desc = "Scene Started." };
                         }
@@ -752,11 +850,12 @@ namespace HttpAPI
                         if (!string.IsNullOrEmpty(name))
                         {
                             scene.Name = name;
-                            string SaveError = string.Empty;
-                            if (!context.TrySaveChanges(out SaveError))
+
+                            var result = await context.TrySaveChangesAsync();
+                            if (result.HasError)
                             {
-                                log.Error(SaveError);
-                                return new { success = false, desc = SaveError };
+                                log.Error(result.Message);
+                                return new { success = false, desc = result.Message };
                             }
                             else
                                 return new { success = true, desc = "Scene Name Updated." };
@@ -772,45 +871,44 @@ namespace HttpAPI
             {
                 using (zvsContext db = new zvsContext())
                 {
-                    var q0 = from g in db.Groups
-                             select new
+                    var groups = await db.Groups.Select(o => new
                              {
-                                 id = g.Id,
-                                 name = g.Name,
-                                 count = g.Devices.Count()
-                             };
+                                 id = o.Id,
+                                 name = o.Name,
+                                 count = o.Devices.Count()
+                             })
+                             .ToListAsync();
 
-                    return new { success = true, groups = q0.ToArray() };
+                    return new { success = true, groups = groups };
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 4 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("group/") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 4 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("group/") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
 
                 int gID = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3], out gID);
 
-                using (zvsContext db = new zvsContext())
+                using (var db = new zvsContext())
                 {
-                    Group group = db.Groups.FirstOrDefault(g => g.Id == gID);
+                    var group = await db.Groups
+                        .Include(o => o.Devices)
+                        .FirstOrDefaultAsync(g => g.Id == gID);
 
                     if (group != null)
                     {
-                        List<object> group_devices = new List<object>();
-                        foreach (Device gd in group.Devices)
-                        {
-                            group_devices.Add(new
-                            {
-                                id = gd.Id,
-                                name = gd.Name,
-                                type = gd.Type.Name
-                            });
-                        }
                         var g = new
                         {
                             id = group.Id,
                             name = group.Name,
-                            devices = group_devices.ToArray()
+                            devices = group.Devices.Select(gd => new
+                            {
+                                id = gd.Id,
+                                name = gd.Name,
+                                type = gd.Type.Name
+                            }).ToArray()
                         };
                         return new { success = true, group = g };
                     }
@@ -819,45 +917,45 @@ namespace HttpAPI
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 5 && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
-                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("commands") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 5 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
+                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("commands") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 int id = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsContext db = new zvsContext())
+                    using (var db = new zvsContext())
                     {
-                        Device d = db.Devices.FirstOrDefault(o => o.Id == id);
+                        var d = await db.Devices
+                            .Include(o => o.Commands)
+                            .Include(o => o.Type.Commands)
+                            .FirstOrDefaultAsync(o => o.Id == id);
+
                         if (d != null)
                         {
-                            List<object> DeviceCommand = new List<object>();
-                            foreach (DeviceCommand cmd in d.Commands)
-                            {
-                                DeviceCommand.Add(new
+                            var deviceCommands = d.Commands.Select(cmd =>
+                                new
                                 {
                                     id = cmd.Id,
                                     type = "device",
                                     friendlyname = cmd.Name,
                                     helptext = cmd.Help,
                                     name = cmd.UniqueIdentifier
-                                });
-                            }
+                                }).ToList();
 
-                            foreach (DeviceTypeCommand cmd in d.Type.Commands)
-                            {
-                                DeviceCommand.Add(new
+
+                            deviceCommands.AddRange(d.Type.Commands.Select(cmd => new
                                 {
                                     id = cmd.Id,
                                     type = "device_type",
                                     friendlyname = cmd.Name,
                                     helptext = cmd.Help,
                                     name = cmd.UniqueIdentifier
-                                });
-                            }
+                                }));
 
-                            return new { success = true, DeviceCommand = DeviceCommand.ToArray() };
-
+                            return new { success = true, DeviceCommand = deviceCommands };
                         }
                         else
                             return new { success = false, reason = "Device not found." };
@@ -865,8 +963,11 @@ namespace HttpAPI
                 }
             }
 
-            if ((httpListenerContext.Request.Url.Segments.Length == 5 || httpListenerContext.Request.Url.Segments.Length == 6) && httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
-                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("command") && httpListenerContext.Request.HttpMethod == "POST")
+            if ((httpListenerContext.Request.Url.Segments.Length == 5 ||
+                httpListenerContext.Request.Url.Segments.Length == 6) &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().Equals("device/") &&
+                httpListenerContext.Request.Url.Segments[4].ToLower().StartsWith("command") &&
+                httpListenerContext.Request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(httpListenerContext.Request);
 
@@ -878,9 +979,12 @@ namespace HttpAPI
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (zvsContext context = new zvsContext())
+                    using (var context = new zvsContext())
                     {
-                        Device d = context.Devices.FirstOrDefault(o => o.Id == id);
+                        var d = await context.Devices
+                            .Include(o => o.Commands)
+                            .Include(o => o.Type.Commands)
+                            .FirstOrDefaultAsync(o => o.Id == id);
 
                         if (d != null)
                         {
@@ -905,7 +1009,7 @@ namespace HttpAPI
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            await Task.Run(async () => await  cp.RunCommandAsync(this, cmd.Id, arg));
+                                            await Task.Run(async () => await cp.RunCommandAsync(this, cmd, arg));
                                             return new { success = true };
                                         }
                                         else
@@ -927,7 +1031,7 @@ namespace HttpAPI
 
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                                             CommandProcessor cp = new CommandProcessor(Core);
-                                            await Task.Run(async () => await cp.RunCommandAsync(this, cmd.Id, arg, d.Id.ToString()));
+                                            await Task.Run(async () => await cp.RunCommandAsync(this, cmd, arg, d.Id.ToString()));
 
                                             return new { success = true };
                                         }
@@ -948,26 +1052,29 @@ namespace HttpAPI
 
             //TODO: add search for commands per device ID.
 
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("commands") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("commands") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 List<object> bi_commands = new List<object>();
-                using (zvsContext context = new zvsContext())
+                using (var context = new zvsContext())
                 {
-                    foreach (BuiltinCommand cmd in context.BuiltinCommands)
-                    {
-                        bi_commands.Add(new
+                    var bCommands = await context.BuiltinCommands.Select(cmd => new
                         {
                             id = cmd.Id,
                             friendlyname = cmd.Name,
                             helptext = cmd.Help,
                             name = cmd.UniqueIdentifier
-                        });
-                    }
-                    return new { success = true, builtin_commands = bi_commands.ToArray() };
+                        }).ToListAsync();
+
+                    return new { success = true, builtin_commands = bCommands.ToArray() };
                 }
             }
 
-            if ((httpListenerContext.Request.Url.Segments.Length == 3 || httpListenerContext.Request.Url.Segments.Length == 4) && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("command") && httpListenerContext.Request.HttpMethod == "POST")
+            if ((httpListenerContext.Request.Url.Segments.Length == 3 ||
+                httpListenerContext.Request.Url.Segments.Length == 4) &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("command") &&
+                httpListenerContext.Request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(httpListenerContext.Request);
                 string arg = postData["arg"];
@@ -978,28 +1085,30 @@ namespace HttpAPI
                 if (httpListenerContext.Request.Url.Segments.Length == 4)
                     int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
 
-                using (zvsContext context = new zvsContext())
+                using (var context = new zvsContext())
                 {
                     BuiltinCommand cmd = null;
                     if (!string.IsNullOrEmpty(Name))
-                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.Name.Equals(Name));
+                        cmd = await context.Commands.OfType<BuiltinCommand>().FirstOrDefaultAsync(c => c.Name.Equals(Name));
                     else if (!string.IsNullOrEmpty(cmdUniqId))
-                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.UniqueIdentifier.Contains(cmdUniqId));
+                        cmd = await context.Commands.OfType<BuiltinCommand>().FirstOrDefaultAsync(c => c.UniqueIdentifier.Contains(cmdUniqId));
                     else
-                        cmd = context.Commands.OfType<BuiltinCommand>().FirstOrDefault(c => c.Id == id);
+                        cmd = await context.Commands.OfType<BuiltinCommand>().FirstOrDefaultAsync(c => c.Id == id);
 
                     if (cmd != null)
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
                         CommandProcessor cp = new CommandProcessor(Core);
-                        await Task.Run(async () => await cp.RunCommandAsync(this, cmd.Id, arg));
+                        await Task.Run(async () => await cp.RunCommandAsync(this, cmd, arg));
 
                         return new { success = true };
                     }
                 }
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") && httpListenerContext.Request.HttpMethod == "POST")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("logout") &&
+                httpListenerContext.Request.HttpMethod == "POST")
             {
                 log.Info(string.Format("[{0}] Logged out.", ip));
                 Cookie c = new Cookie("zvs", "No Access");
@@ -1011,7 +1120,9 @@ namespace HttpAPI
                 return new { success = true, isLoggedIn = false };
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login") && httpListenerContext.Request.HttpMethod == "GET")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login") &&
+                httpListenerContext.Request.HttpMethod == "GET")
             {
                 bool isLoggedin;
 
@@ -1023,12 +1134,14 @@ namespace HttpAPI
                 return new { success = true, isLoggedIn = isLoggedin };
             }
 
-            if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login") && httpListenerContext.Request.HttpMethod == "POST")
+            if (httpListenerContext.Request.Url.Segments.Length == 3 &&
+                httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("login") &&
+                httpListenerContext.Request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(httpListenerContext.Request);
                 using (zvsContext context = new zvsContext())
                 {
-                    if (postData["password"] == GetSettingValue("PASSWORD", context))
+                    if (postData["password"] == PasswordSetting)
                     {
                         Cookie c = new Cookie("zvs", CookieValue.ToString());
                         c.Expires = DateTime.Today.AddDays(5);
@@ -1045,7 +1158,11 @@ namespace HttpAPI
                     }
                     else
                     {
-                        log.Info(string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'", ip, postData["password"], httpListenerContext.Request.UserAgent));
+                        log.Info(string.Format("[{0}] Login failed using password '{1}' and UserAgent '{2}'",
+                            ip,
+                            postData["password"],
+                            httpListenerContext.Request.UserAgent));
+
                         return new { success = false };
                     }
                 }
@@ -1091,30 +1208,26 @@ namespace HttpAPI
             return utf8;
         }
 
-        private byte[] ShellTile(zvsContext context, string color, string style)
+        private async Task<byte[]> ShellTile(zvsContext context, string color, string style)
         {
             int deviceOnCount = 0;
             int sceneRunningCount = 0;
-            foreach (Device d in context.Devices)
+            foreach (Device d in await context.Devices.ToListAsync())
             {
                 bool show = true;
-                bool.TryParse(DevicePropertyValue.GetPropertyValue(context, d, "HTTPAPI_SHOW"), out show);
+                bool.TryParse(await DeviceSettingValue.GetDevicePropertyValueAsync(context, d, DeviceSettingUids.SHOW_IN_HTTPAPI.ToString()), out show);
 
                 if (show)
-                {
                     if (d.CurrentLevelInt > 0) deviceOnCount++;
-                }
             }
-            foreach (Scene scene in context.Scenes)
+            foreach (Scene scene in await context.Scenes.ToListAsync())
             {
                 bool show = false;
-                string prop = ScenePropertyValue.GetPropertyValue(context, scene, "HTTPAPI_SHOW");
+                string prop = await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.SHOW_IN_HTTPAPI.ToString());
                 bool.TryParse(prop, out show);
 
                 if (show && scene.isRunning)
-                {
                     sceneRunningCount++;
-                }
             }
 
             var asm = typeof(HttpAPI.HttpAPIPlugin).Assembly;
@@ -1158,7 +1271,5 @@ namespace HttpAPI
                 get { return Encoding.UTF8; }
             }
         }
-
-
     }
 }

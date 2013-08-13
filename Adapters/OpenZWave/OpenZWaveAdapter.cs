@@ -349,12 +349,12 @@ namespace OpenZWavePlugin
             }
         }
 
-        private async Task StartOpenzwaveAsync()
+        private Task StartOpenzwaveAsync()
         {
             if (isShuttingDown)
             {
                 Core.log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
-                return;
+                return Task.FromResult(0);
             }
 
             try
@@ -393,13 +393,13 @@ namespace OpenZWavePlugin
                 {
                     m_manager.SetPollInterval(PollingIntervalSetting, true);
                 }
-
-
             }
             catch (Exception e)
             {
                 log.Error(e.Message);
             }
+
+            return Task.FromResult(0);
         }
 
         private async Task StopOpenzwaveAsync()
