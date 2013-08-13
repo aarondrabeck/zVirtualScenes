@@ -100,7 +100,7 @@ namespace zvs.Processor
             }
         }
 
-        public static string DBName = "zvsDBEFCF6.sdf";
+        public static string DBName = "zvsDBEFCF7.sdf";
         public static string DBNamePlusFullPath = Path.Combine(AppDataPath, DBName);
 
         public static bool HasDotNet45()

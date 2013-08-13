@@ -21,7 +21,7 @@ namespace zvs.Entities
     /// </summary>
     public partial class zvsContext : NotifyEntityChangeContext
     {
-        public zvsContext() : base("zvsDBEFCF6") { }
+        public zvsContext() : base("zvsDBEFCF7") { }
 
         public DbSet<Adapter> Adapters { get; set; }
         public DbSet<AdapterSetting> AdapterSettings { get; set; }
