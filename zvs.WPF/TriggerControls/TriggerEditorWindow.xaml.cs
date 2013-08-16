@@ -26,7 +26,7 @@ namespace zvs.WPF.TriggerControls
     {
         private zvsContext context;
         private Int64 DeviceValueTriggerId;
-        private DeviceValueTrigger trigger;
+        public DeviceValueTrigger Trigger;
         public bool Canceled = true;
 
         public TriggerEditorWindow(Int64 deviceValueTriggerId, zvsContext context)
@@ -45,11 +45,17 @@ namespace zvs.WPF.TriggerControls
 
         private async void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            trigger = await context.DeviceValueTriggers
+            Trigger = await context.DeviceValueTriggers
                 .Include(o => o.DeviceValue)
                 .Include(o => o.StoredCommand)
                 .Include(o => o.DeviceValue.Device)
                 .FirstOrDefaultAsync(o => o.Id == DeviceValueTriggerId);
+
+            if (Trigger == null)
+            {
+                Trigger = new DeviceValueTrigger();
+                Trigger.Name = "New Trigger";
+            }
 
             var eagarLoad2 = await context.Devices
                 .Include(o => o.Values)
@@ -65,28 +71,28 @@ namespace zvs.WPF.TriggerControls
             OperatorCmboBx.SelectedIndex = 0;
 
             //Set presets
-            if (trigger != null && trigger.DeviceValue != null)
+            if (Trigger != null && Trigger.DeviceValue != null)
             {
-                if (trigger.DeviceValue.Device != null)
-                    DeviceCmboBx.SelectedItem = trigger.DeviceValue.Device;
+                if (Trigger.DeviceValue.Device != null)
+                    DeviceCmboBx.SelectedItem = Trigger.DeviceValue.Device;
 
-                if (trigger.DeviceValue != null)
-                    ValueCmboBx.SelectedItem = trigger.DeviceValue;
+                if (Trigger.DeviceValue != null)
+                    ValueCmboBx.SelectedItem = Trigger.DeviceValue;
             }
 
             try
             {
-                OperatorCmboBx.Text = Enum.GetName(typeof(TriggerOperator), trigger.Operator);
+                OperatorCmboBx.Text = Enum.GetName(typeof(TriggerOperator), Trigger.Operator);
             }
             catch { }
 
-            if (trigger.Value != null)
-                ValueTxtBx.Text = trigger.Value;
+            if (Trigger.Value != null)
+                ValueTxtBx.Text = Trigger.Value;
 
-            if (trigger.StoredCommand != null)
+            if (Trigger.StoredCommand != null)
                 CommandSummary.Text = string.Format("{0} '{1}'",
-                    trigger.StoredCommand.TargetObjectName,
-                    trigger.StoredCommand.Description);
+                    Trigger.StoredCommand.TargetObjectName,
+                    Trigger.StoredCommand.Description);
             else
                 CommandSummary.Text = "No command selected.";
         }
@@ -123,10 +129,10 @@ namespace zvs.WPF.TriggerControls
             }
             else
             {
-                trigger.DeviceValue = dv;
+                Trigger.DeviceValue = dv;
             }
 
-            if (trigger.StoredCommand == null)
+            if (Trigger.StoredCommand == null)
             {
                 AddUpdateCommand.Focus();
                 AddUpdateCommand.BorderBrush = new SolidColorBrush(Colors.Red);
@@ -148,13 +154,13 @@ namespace zvs.WPF.TriggerControls
             }
             else
             {
-                trigger.Value = ValueTxtBx.Text;
+                Trigger.Value = ValueTxtBx.Text;
             }
 
-            trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
+            Trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
             //Update the description
-            trigger.SetDescription(context);
+            Trigger.SetDescription(context);
 
             Canceled = false;
             this.Close();
@@ -167,29 +173,29 @@ namespace zvs.WPF.TriggerControls
 
             //Send it to the command builder to get filled with a command
             CommandBuilder cbWindow;
-            if (trigger.StoredCommand == null)
+            if (Trigger.StoredCommand == null)
                 cbWindow = new CommandBuilder(context, newSC);
             else
-                cbWindow = new CommandBuilder(context, trigger.StoredCommand);
+                cbWindow = new CommandBuilder(context, Trigger.StoredCommand);
 
             cbWindow.Owner = this;
 
             if (cbWindow.ShowDialog() ?? false)
             {
-                if (trigger.StoredCommand == null) //if this was a new command, assign it.
-                    trigger.StoredCommand = newSC;
+                if (Trigger.StoredCommand == null) //if this was a new command, assign it.
+                    Trigger.StoredCommand = newSC;
                 else
-                    trigger.StoredCommand = trigger.StoredCommand;
+                    Trigger.StoredCommand = Trigger.StoredCommand;
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
                     ((App)App.Current).zvsCore.log.Error(result.Message);
             }
 
-            if (trigger.StoredCommand != null)
+            if (Trigger.StoredCommand != null)
                 CommandSummary.Text = string.Format("{0} '{1}'",
-                    trigger.StoredCommand.TargetObjectName,
-                    trigger.StoredCommand.Description);
+                    Trigger.StoredCommand.TargetObjectName,
+                    Trigger.StoredCommand.Description);
             else
                 CommandSummary.Text = "No command selected.";
         }

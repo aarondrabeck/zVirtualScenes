@@ -169,9 +169,7 @@ namespace zvs.WPF.TriggerControls
 
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
-            DeviceValueTrigger trigger = new DeviceValueTrigger();
-            trigger.Name = "New Trigger";
-            TriggerEditorWindow new_window = new TriggerEditorWindow(trigger.Id, context);
+            TriggerEditorWindow new_window = new TriggerEditorWindow(0, context);
             new_window.Owner = app.zvsWindow;
             new_window.Title = "Add Trigger";
             new_window.Show();
@@ -179,7 +177,7 @@ namespace zvs.WPF.TriggerControls
             {
                 if (!new_window.Canceled)
                 {
-                    context.DeviceValueTriggers.Add(trigger);
+                    context.DeviceValueTriggers.Add(new_window.Trigger);
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
