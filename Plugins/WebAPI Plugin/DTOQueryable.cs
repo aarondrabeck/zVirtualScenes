@@ -11,6 +11,7 @@ using System.Web.Http;
 using System.Web.Http.Filters;
 using System.Web.Mvc;
 using WebAPI.DTO;
+using zvs.Entities;
 
 namespace WebAPI
 {
@@ -21,91 +22,70 @@ namespace WebAPI
     {
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
-            if (actionExecutedContext.Response.Content != null)
-                base.OnActionExecuted(actionExecutedContext);
+            //Ignore CORS OPTION requests and others
+            if (actionExecutedContext.Request.Method != HttpMethod.Get)
+                return;
 
+            base.OnActionExecuted(actionExecutedContext);
+
+            if (actionExecutedContext.Response == null)
+                return;
+
+            //Check for errors
+            IQueryable queryable = null;
             var objectContent = actionExecutedContext.Response.Content as ObjectContent;
 
-            if (objectContent != null)
-            {
-                var type = objectContent.ObjectType;
+            if (objectContent == null)
+                return;
 
-                //We need to convert errors to be printed via the LG standard
-                if (type == typeof(HttpError))
+            if (objectContent.ObjectType == typeof(HttpError)
+                || !actionExecutedContext.Response.IsSuccessStatusCode
+                || !actionExecutedContext.Response.TryGetContentValue<IQueryable>(out queryable))
+            {
+                string ErrorMsg = string.Empty;
+
+                //We need to convert errors to be printed via the standard
+                if (objectContent.ObjectType == typeof(HttpError))
                 {
                     var value = (HttpError)objectContent.Value;
-                    string ErrorMsg = string.Empty;
                     if (value.ContainsKey("Message"))
                         ErrorMsg = value["Message"].ToString();
-                    actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(ResponseStatus.Error, actionExecutedContext.Response.StatusCode, ErrorMsg);
                 }
 
-                int limit = 100;
-                //We need to convert non-errors (iqueryable) to use the LG standard way to print a response
-                if (type.Name.StartsWith("IQueryable"))
-                {
-                    Dictionary<string, object> additionalProperties = new Dictionary<string, object>();
-
-                    var queryable = (IQueryable<object>)objectContent.Value;
-                    int count = queryable.Count();
-
-
-                    #region Send amount skipped back to the user
-                    //A bit lame string parsing the queryable here, however it is effective.
-
-                    int skipValue = 0;
-                    var expression = (Expression)queryable.Expression;
-                    int skipStartPos = expression.ToString().IndexOf(".Skip(");
-                    if (skipStartPos > 0)
-                    {
-                        var indexOfEndSkip = expression.ToString().Substring(skipStartPos + 6).IndexOf(")");
-                        var skipValueStr = expression.ToString().Substring(skipStartPos + 6, indexOfEndSkip);
-                        int.TryParse(skipValueStr, out skipValue);
-                    }
-                    additionalProperties.Add("Skipped", skipValue);
-                    #endregion
-
-                    #region Send amount of More results back to the user
-                    if (count > limit) //limit the max results globally
-                    {
-                        queryable = queryable.Take(limit);
-                        additionalProperties.Add("More", count - queryable.Count());
-                    }
-                    else
-                        additionalProperties.Add("More", 0);
-                    #endregion
-
-                    //showing
-                    additionalProperties.Add("Showing", queryable.Count());
-
-                    //Convert IQueryable<object> to List<objecDTO>
-                    List<object> DTOS = new List<object>();
-                    queryable.ToList().ForEach(o =>
-                    {
-                        var EntityType = GetObjType(o);
-
-                        //DTOFactory<TEntity> dtoFactory = new DTOFactory<TEntity>(tEntity);
-                        var dtoFactory = Activator.CreateInstance(typeof(DTOFactory<>).MakeGenericType(EntityType), new[] { o });
-
-                        var dto = dtoFactory.GetType()
-                        .GetMethod("getDTO")
-                        .Invoke(dtoFactory, null);
-
-                        DTOS.Add(dto);
-                    });
-
-                    var respose = actionExecutedContext.Request.CreateResponse(
-                        actionExecutedContext.Response.IsSuccessStatusCode ? ResponseStatus.Success : ResponseStatus.Error,
-                        actionExecutedContext.Response.StatusCode,
-                        actionExecutedContext.Response.StatusCode.ToString(),
-                        DTOS,
-                        additionalProperties);
-
-                    actionExecutedContext.Response.StatusCode = respose.StatusCode;
-                    actionExecutedContext.Response.Content = respose.Content;
-
-                }
+                actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(ResponseStatus.Error, actionExecutedContext.Response.StatusCode, ErrorMsg);
+                actionExecutedContext.Response.StatusCode = HttpStatusCode.BadRequest;
+                return;
             }
+
+            if (!(queryable is IQueryable<IIdentity>))
+            {
+                actionExecutedContext.Response = actionExecutedContext.Request.CreateResponse(ResponseStatus.Error, actionExecutedContext.Response.StatusCode, "Queryable generic type does not have a generic type of IIdentity");
+                actionExecutedContext.Response.StatusCode = HttpStatusCode.BadRequest;
+                return;
+            }
+
+            var lgQueryable = queryable as IQueryable<IIdentity>;
+
+            Dictionary<string, object> additionalProperties = new Dictionary<string, object>();
+            var inlineCount = actionExecutedContext.Request.GetInlineCount();
+            if (inlineCount != null)
+                additionalProperties.Add("Count", inlineCount);
+
+            var nextPageLink = actionExecutedContext.Request.GetNextPageLink();
+            if (nextPageLink != null)
+                additionalProperties.Add("Next", nextPageLink);
+
+            //showing
+            additionalProperties.Add("Showing", lgQueryable.Count());
+
+            var respose = actionExecutedContext.Request.CreateResponse(
+                actionExecutedContext.Response.IsSuccessStatusCode ? ResponseStatus.Success : ResponseStatus.Error,
+                actionExecutedContext.Response.StatusCode,
+                actionExecutedContext.Response.StatusCode.ToString(),
+                DTOFactory.GetDTO(lgQueryable.AsEnumerable()),
+                additionalProperties);
+
+            actionExecutedContext.Response.Content = respose.Content;
         }
 
         private Type GetObjType(object obj)

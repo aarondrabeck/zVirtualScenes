@@ -16,7 +16,7 @@ namespace zvs.Processor
         public abstract Guid PluginGuid { get; }
         public abstract string Name { get; }
         public abstract string Description { get; }
-        protected Core Core { get; private set; }
+        public Core Core { get; private set; }
 
         Logging.ILog log = Logging.LogManager.GetLogger<zvsAdapter>();
 

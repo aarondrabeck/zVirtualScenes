@@ -43,7 +43,7 @@ namespace WebAPI.Controllers
             if (!Request.Headers.Contains("X-zvsToken"))
                 throw new HttpResponseException(Request.CreateResponse(System.Net.Http.ResponseStatus.Error, System.Net.HttpStatusCode.Unauthorized, "X-zvsToken invalid"));
 
-            string tokens = WebAPIPlugin.GetSettingValue("TOKENS", db);
+            string tokens = WebAPIPlugin.TokensSettings;
             List<string> authorizedTokens = new List<string>(tokens.Split(','));
             authorizedTokens.ForEach(o => o = o.Trim());
 

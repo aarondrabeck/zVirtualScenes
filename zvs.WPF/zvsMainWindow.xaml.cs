@@ -258,7 +258,7 @@ namespace zvs.WPF
             aboutWin.ShowDialog();
         }
 
-        private void ExportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ExportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -273,10 +273,12 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportDevicesAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
+                var result = await Backup.ExportDevicesAsync(dlg.FileName);
+
+                if(result.HasError)
+                    log.Error(result.Message);
+                else
+                    log.Info(result.Message);
             }
         }
 

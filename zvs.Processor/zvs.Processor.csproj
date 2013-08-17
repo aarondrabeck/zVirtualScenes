@@ -79,6 +79,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Backup\BackFileIO.cs" />
     <Compile Include="Backup\StoredCmdBackup.cs" />
     <Compile Include="Backup\BackupTrigger.cs" />
     <Compile Include="Backup\BackupGroup.cs" />

@@ -98,12 +98,14 @@ namespace zvs.WPF.DeviceControls
                                     deviceTypeSettingValue.Value = isChecked.ToString();
                                 else
                                 {
-                                    context.DeviceTypeSettingValues.Add(new DeviceTypeSettingValue()
+                                    deviceTypeSettingValue = new DeviceTypeSettingValue()
                                     {
                                         DeviceId = device.Id,
                                         DeviceTypeSettingId = deviceTypeSetting.Id,
                                         Value = isChecked.ToString()
-                                    });
+                                    };
+
+                                    context.DeviceTypeSettingValues.Add(deviceTypeSettingValue);
                                 }
 
                                 var result = await context.TrySaveChangesAsync();
@@ -130,12 +132,13 @@ namespace zvs.WPF.DeviceControls
                                         deviceTypeSettingValue.Value = v;
                                     else
                                     {
-                                        context.DeviceTypeSettingValues.Add(new DeviceTypeSettingValue()
+                                        deviceTypeSettingValue = new DeviceTypeSettingValue()
                                         {
                                             DeviceId = device.Id,
                                             DeviceTypeSettingId = deviceTypeSetting.Id,
                                             Value = v
-                                        });
+                                        };
+                                        context.DeviceTypeSettingValues.Add(deviceTypeSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -158,12 +161,13 @@ namespace zvs.WPF.DeviceControls
                                         deviceTypeSettingValue.Value = v;
                                     else
                                     {
-                                        context.DeviceTypeSettingValues.Add(new DeviceTypeSettingValue()
+                                        deviceTypeSettingValue = new DeviceTypeSettingValue()
                                         {
                                             DeviceId = device.Id,
                                             DeviceTypeSettingId = deviceTypeSetting.Id,
                                             Value = v
-                                        });
+                                        };
+                                        context.DeviceTypeSettingValues.Add(deviceTypeSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -190,12 +194,13 @@ namespace zvs.WPF.DeviceControls
                                         deviceTypeSettingValue.Value = v;
                                     else
                                     {
-                                        context.DeviceTypeSettingValues.Add(new DeviceTypeSettingValue()
+                                        deviceTypeSettingValue = new DeviceTypeSettingValue()
                                         {
                                             DeviceId = device.Id,
                                             DeviceTypeSettingId = deviceTypeSetting.Id,
                                             Value = v
-                                        });
+                                        };
+                                        context.DeviceTypeSettingValues.Add(deviceTypeSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -241,11 +246,12 @@ namespace zvs.WPF.DeviceControls
                                 }
                                 else
                                 {
-                                    device.DeviceSettingValues.Add(new DeviceSettingValue()
+                                    deviceSettingValue = new DeviceSettingValue()
                                     {
                                         DeviceSetting = deviceSetting,
                                         Value = isChecked.ToString()
-                                    });
+                                    };
+                                    device.DeviceSettingValues.Add(deviceSettingValue);
                                 }
 
                                 var result = await context.TrySaveChangesAsync();
@@ -276,11 +282,12 @@ namespace zvs.WPF.DeviceControls
                                     }
                                     else
                                     {
-                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
+                                        deviceSettingValue = new DeviceSettingValue()
                                         {
                                             DeviceSetting = deviceSetting,
                                             Value = value
-                                        });
+                                        };
+                                        device.DeviceSettingValues.Add(deviceSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -307,11 +314,12 @@ namespace zvs.WPF.DeviceControls
                                     }
                                     else
                                     {
-                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
+                                        deviceSettingValue = new DeviceSettingValue()
                                         {
                                             DeviceSetting = deviceSetting,
                                             Value = value
-                                        });
+                                        };
+                                        device.DeviceSettingValues.Add(deviceSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -340,11 +348,12 @@ namespace zvs.WPF.DeviceControls
                                     }
                                     else
                                     {
-                                        device.DeviceSettingValues.Add(new DeviceSettingValue()
+                                        deviceSettingValue = new DeviceSettingValue()
                                         {
                                             DeviceSetting = deviceSetting,
                                             Value = value
-                                        });
+                                        };
+                                        device.DeviceSettingValues.Add(deviceSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();

@@ -87,7 +87,7 @@ namespace zvs.WPF.SceneControls
             {
                 var sceneSetting = sp;
                 var sceneSettingValue = await context.SceneSettingValues
-                    .FirstOrDefaultAsync(v => v.SceneProperty.Id == sceneSetting.Id &&
+                    .FirstOrDefaultAsync(v => v.SceneSetting.Id == sceneSetting.Id &&
                         v.SceneId == scene.Id);
 
                 string _default = sceneSettingValue == null ? sceneSetting.Value : sceneSettingValue.Value;
@@ -108,11 +108,12 @@ namespace zvs.WPF.SceneControls
                                 }
                                 else
                                 {
-                                    scene.SettingValues.Add(new SceneSettingValue()
+                                    sceneSettingValue = new SceneSettingValue()
                                     {
-                                        SceneProperty = sceneSetting,
+                                        SceneSetting = sceneSetting,
                                         Value = isChecked.ToString()
-                                    });
+                                    };
+                                    scene.SettingValues.Add(sceneSettingValue);
                                 }
 
                                 var result = await context.TrySaveChangesAsync();
@@ -138,11 +139,12 @@ namespace zvs.WPF.SceneControls
                                     }
                                     else
                                     {
-                                        scene.SettingValues.Add(new SceneSettingValue()
+                                        sceneSettingValue = new SceneSettingValue()
                                         {
-                                            SceneProperty = sceneSetting,
+                                            SceneSetting = sceneSetting,
                                             Value = value
-                                        });
+                                        };
+                                        scene.SettingValues.Add(sceneSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -168,11 +170,12 @@ namespace zvs.WPF.SceneControls
                                     }
                                     else
                                     {
-                                        scene.SettingValues.Add(new SceneSettingValue()
+                                        sceneSettingValue = new SceneSettingValue()
                                         {
-                                            SceneProperty = sceneSetting,
+                                            SceneSetting = sceneSetting,
                                             Value = value
-                                        });
+                                        };
+                                        scene.SettingValues.Add(sceneSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -198,11 +201,12 @@ namespace zvs.WPF.SceneControls
                                     }
                                     else
                                     {
-                                        scene.SettingValues.Add(new SceneSettingValue()
+                                        sceneSettingValue = new SceneSettingValue()
                                         {
-                                            SceneProperty = sceneSetting,
+                                            SceneSetting = sceneSetting,
                                             Value = value
-                                        });
+                                        };
+                                        scene.SettingValues.Add(sceneSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -228,11 +232,12 @@ namespace zvs.WPF.SceneControls
                                     }
                                     else
                                     {
-                                        scene.SettingValues.Add(new SceneSettingValue()
+                                        sceneSettingValue = new SceneSettingValue()
                                         {
-                                            SceneProperty = sceneSetting,
+                                            SceneSetting = sceneSetting,
                                             Value = value
-                                        });
+                                        };
+                                        scene.SettingValues.Add(sceneSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();
@@ -258,11 +263,12 @@ namespace zvs.WPF.SceneControls
                                    }
                                    else
                                    {
-                                       scene.SettingValues.Add(new SceneSettingValue()
+                                       sceneSettingValue = new SceneSettingValue()
                                        {
-                                           SceneProperty = sceneSetting,
+                                           SceneSetting = sceneSetting,
                                            Value = value
-                                       });
+                                       };
+                                       scene.SettingValues.Add(sceneSettingValue);
                                    }
 
                                    var result = await context.TrySaveChangesAsync();
@@ -289,11 +295,13 @@ namespace zvs.WPF.SceneControls
                                     }
                                     else
                                     {
-                                        scene.SettingValues.Add(new SceneSettingValue()
+                                        //assign sceneSettingValue so above null check is ran in the case this is called 2 times before the save changes hits.
+                                        sceneSettingValue = new SceneSettingValue()
                                         {
-                                            SceneProperty = sceneSetting,
+                                            SceneSetting = sceneSetting,
                                             Value = value
-                                        });
+                                        };
+                                        scene.SettingValues.Add(sceneSettingValue);
                                     }
 
                                     var result = await context.TrySaveChangesAsync();

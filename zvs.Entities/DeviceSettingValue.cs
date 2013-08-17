@@ -13,7 +13,7 @@ using System.Data.Entity;
 namespace zvs.Entities
 {
     [Table("DeviceSettingValues", Schema = "ZVS")]
-    public partial class DeviceSettingValue : INotifyPropertyChanged, IIdentity
+    public partial class DeviceSettingValue : INotifyPropertyChanged, IIdentity, IValidatableObject
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -70,6 +70,17 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var results = new List<ValidationResult>();
+
+            using (var context = new zvsContext())
+                if (context.DeviceSettingValues.Any(o => o.DeviceId == this.DeviceId && 
+                    o.DeviceSettingId == this.DeviceSettingId && 
+                    o.Id != this.Id))  //Check o.Id != this.Id so updates do not fail
+                    results.Add(new ValidationResult("Device Setting Value name already exists", new[] { "Name" }));
+
+            return results;
+        }
     }
 }

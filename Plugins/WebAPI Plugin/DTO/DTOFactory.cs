@@ -12,17 +12,36 @@ using zvs.Entities;
 
 namespace WebAPI.DTO
 {
-    public class DTOFactory<T> where T : IIdentity
+    public static class DTOFactory
     {
-        private T Entity;
 
-        public DTOFactory(T entity)
+        public static IEnumerable<object> GetDTO<T>(IEnumerable<T> Entities) where T : IIdentity
         {
-            Entity = entity;
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
+
+            List<object> dtos = new List<object>();
+
+            foreach (var entity in Entities)
+                dtos.Add(GetDTO(entity));
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine(string.Format("DTO Factory created IEnumerable of DTO in {0}", sw.Elapsed.ToString(TimeSpanToStringFormat.Long)));
+#endif
+
+            return dtos;
         }
 
-        public virtual object getDTO()
+        public static object GetDTO<T>(T Entity) where T : IIdentity
         {
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+#endif
+
             if (Entity == null)
                 return null;
 
@@ -31,7 +50,9 @@ namespace WebAPI.DTO
             var dtoDictionary = new Dictionary<string, object>();
 
             dtoDictionary.Add("Id", Entity.Id);
-
+#if DEBUG
+            Debug.WriteLine(string.Format("DTO Factory pre-property loop. {0}", sw.Elapsed.ToString(TimeSpanToStringFormat.Long)));
+#endif
             foreach (PropertyInfo pi in EntityType.GetProperties())
             {
                 //Hide the ConfidentialData tagged properties
@@ -58,9 +79,8 @@ namespace WebAPI.DTO
                         var innerDictionary = new Dictionary<string, object>();
 
                         //_uri
-                        innerDictionary.Add("_uri", string.Format("/{0}/{1}/{2}/{3}",
-                            "v2", //TODO: Fix this
-                            EntityType.NamePlural(),
+                        innerDictionary.Add("_uri", string.Format("/v2/{0}/{1}/{2}",
+                            Cache.SigularToPluralEntityDictionary.ContainsKey(EntityType.Name) ? Cache.SigularToPluralEntityDictionary[EntityType.Name] : EntityType.Name,
                             Entity.Id,
                             pi.Name));
 
@@ -72,9 +92,12 @@ namespace WebAPI.DTO
                     #region Print URI and types of complex types
                     if (typeof(IIdentity).IsAssignableFrom(pi.PropertyType))
                     {
-                        IIdentity NestedComplexObject = (IIdentity)pi.GetValue(Entity);
+                        //IIdentity NestedComplexObject = (IIdentity)pi.GetValue(Entity);
 
-                        if (NestedComplexObject == null)
+                        var idProperty = Entity.GetType().GetProperty(string.Format("{0}Id", pi.Name));
+                        var nestedId = idProperty != null ? idProperty.GetValue(Entity) : Entity.Id;
+
+                        if (nestedId == null)
                         {
                             dtoDictionary.Add(pi.Name, null);
                         }
@@ -82,13 +105,13 @@ namespace WebAPI.DTO
                         {
                             //Print the URI to virtual objects
                             var objectDictionary = new Dictionary<string, object>();
-                            objectDictionary.Add("Id", NestedComplexObject.Id);
-                            objectDictionary.Add("_type", NestedComplexObject.GetTypeEntityWrapperDetection().Name);
+                            objectDictionary.Add("Id", nestedId);
+                            objectDictionary.Add("_type", pi.PropertyType.Name);
                             objectDictionary.Add("_uri",
                                 string.Format("/{0}/{1}/{2}",
-                                "v2", //TODO: Fix this //EntityType.NamespaceLastSegment(),
-                                NestedComplexObject.GetTypeEntityWrapperDetection().NamePlural(),
-                                NestedComplexObject.Id));
+                                pi.PropertyType.NamespaceLastSegment(),
+                                Cache.SigularToPluralEntityDictionary.ContainsKey(pi.PropertyType.Name) ? Cache.SigularToPluralEntityDictionary[pi.PropertyType.Name] : pi.PropertyType.Name,
+                                nestedId));
 
                             dtoDictionary.Add(pi.Name, objectDictionary);
                         }
@@ -101,14 +124,16 @@ namespace WebAPI.DTO
             dtoDictionary.Add("_type", Entity.GetTypeEntityWrapperDetection().Name);
 
             //add the base _uri
-            dtoDictionary.Add("_uri", string.Format("/{0}/{1}/{2}",
-                "v2", //TODO: Fix this //Entity.GetTypeEntityWrapperDetection().NamespaceLastSegment(), 
-                Entity.GetTypeEntityWrapperDetection().NamePlural(), 
-                Entity.Id));
+            dtoDictionary.Add("_uri", string.Format("/{0}/{1}/{2}", Entity.GetTypeEntityWrapperDetection().NamespaceLastSegment(), Entity.GetTypeEntityWrapperDetection().NamePlural(), Entity.Id));
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine(string.Format("DTO Factory created single DTO in {0}", sw.Elapsed.ToString(TimeSpanToStringFormat.Long)));
+#endif
+
 
             return dtoDictionary;
+
+
         }
-
-
     }
 }

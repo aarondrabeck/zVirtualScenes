@@ -8,8 +8,8 @@ namespace zvs
 {
     public class Result
     {
-        public virtual bool HasError { get; private set; }
-        public virtual string Message { get; private set; }
+        public virtual bool HasError { get; protected set; }
+        public virtual string Message { get; protected set; }
 
         /// <summary>
         /// Result with error

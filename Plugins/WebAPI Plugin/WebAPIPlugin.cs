@@ -3,9 +3,12 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
@@ -13,7 +16,6 @@ using System.Web.Http.Controllers;
 using System.Web.Http.SelfHost;
 using System.Web.Mvc;
 using WebAPI.Configuration;
-using WebAPI.Cors;
 using zvs.Entities;
 using zvs.Processor;
 
@@ -22,116 +24,212 @@ namespace WebAPI
     [Export(typeof(zvsPlugin))]
     public class WebAPIPlugin : zvsPlugin
     {
-        public override void ProcessCommand(int queuedCommandId) { }
-        public override void Repoll(zvs.Entities.Device device) { }
-        public override void ActivateGroup(int groupID) { }
-        public override void DeactivateGroup(int groupID) { }
-        private int _port = 9999;
-        private bool _isSSL = true;
-        bool _verbose = true;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<zvsPlugin>();
 
-        public WebAPIPlugin() : base("WebAPI", "WebAPI Plug-in ALPHA 1", "This plug-in acts as a HTTP server to send respond to JSON AJAX requests using the Web API.") { }
-
-        public override void Initialize()
+        public override Guid PluginGuid
         {
-            using (zvsContext context = new zvsContext())
+            get { return Guid.Parse("6b2c505b-e50c-48c8-9159-1d75ef2efadf"); }
+        }
+
+        public override string Name
+        {
+            get { return "WebAPI Plug-in for ZVS"; }
+        }
+
+        public override string Description
+        {
+            get { return "This plug-in acts as a HTTP server to send respond to JSON AJAX requests using the Web API."; }
+        }
+
+        #region Settings
+
+        private int _PortSetting = 9909;
+        public int PortSetting
+        {
+            get { return _PortSetting; }
+            set
             {
-                DefineOrUpdateSetting(new PluginSetting
+                if (value != _PortSetting)
                 {
-                    UniqueIdentifier = "PORT",
+                    _PortSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private bool _UseSSLSetting;
+        public bool UseSSLSetting
+        {
+            get { return _UseSSLSetting; }
+            set
+            {
+                if (value != _UseSSLSetting)
+                {
+                    _UseSSLSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private string _TokensSettings;
+        public string TokensSettings
+        {
+            get { return _TokensSettings; }
+            set
+            {
+                if (value != _TokensSettings)
+                {
+                    _TokensSettings = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        private bool _VerboseSetting = false;
+        public bool VerboseSetting
+        {
+            get { return _VerboseSetting; }
+            set
+            {
+                if (value != _VerboseSetting)
+                {
+                    _VerboseSetting = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public override async Task OnSettingsCreating(PluginSettingBuilder settingBuilder)
+        {
+            var portSetting = new PluginSetting
+                {
                     Name = "HTTP Port",
                     Value = "80",
                     ValueType = DataType.INTEGER,
                     Description = "The port that HTTP will listen for commands on."
-                }, context);
+                };
 
-                DefineOrUpdateSetting(new PluginSetting
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(portSetting, o => o.PortSetting);
+
+            var sslSetting = new PluginSetting
                 {
-                    UniqueIdentifier = "SECURE",
                     Name = "HTTP Secure (SSL)",
                     Value = true.ToString(),
                     ValueType = DataType.BOOL,
                     Description = "If the HTTP Server will be over SSL."
-                }, context);
+                };
 
-                DefineOrUpdateSetting(new PluginSetting
-                {
-                    UniqueIdentifier = "TOKENS",
-                    Name = "X-zvsTokens",
-                    Value = "CC2D226814CBC713134BD9D09B892F10A9, A0689CEF6BA3AD5FAFE018F2D796FF",
-                    ValueType = DataType.STRING,
-                    Description = "A comma delimited list of X-zvsTokens.  A valid X-zvsToken must be sent in the header of each API command to authorize access."
-                }, context);
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(sslSetting, o => o.UseSSLSetting);
 
-                DefineOrUpdateSetting(new PluginSetting
+            var tokenSetting = new PluginSetting
+               {
+                   Name = "X-zvsTokens",
+                   Value = "CC2D226814CBC713134BD9D09B892F10A9, A0689CEF6BA3AD5FAFE018F2D796FF",
+                   ValueType = DataType.STRING,
+                   Description = "A comma delimited list of X-zvsTokens.  A valid X-zvsToken must be sent in the header of each API command to authorize access."
+               };
+
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(tokenSetting, o => o.TokensSettings);
+
+            var verboseSettings = new PluginSetting
                 {
-                    UniqueIdentifier = "VERBOSE",
                     Name = "Verbose Logging",
                     Value = false.ToString(),
                     ValueType = DataType.BOOL,
-                    Description = "Writes all server client communication to the log for debugging."
-                }, context);
+                    Description = "(Writes all server client communication to the log for debugging.)"
+                };
+            await settingBuilder.Plugin(this).RegisterPluginSettingAsync(verboseSettings, o => o.VerboseSetting);
+        }
 
-                string error = null;
+        public enum DeviceSettingUids
+        {
+            SHOW_IN_WEBAPI
+        }
 
-                DeviceProperty.TryAddOrEdit(new DeviceProperty
+        public override async Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new DeviceSetting
                 {
-                    UniqueIdentifier = "WebAPI_SHOW_DEVICE",
+                    UniqueIdentifier = DeviceSettingUids.SHOW_IN_WEBAPI.ToString(),
                     Name = "Show device in Web API",
                     Description = "If enabled this device will show in applications that use the Web API",
                     ValueType = DataType.BOOL,
-                    Value = "true"
-                }, context, out error);
+                    Value = Cache.SHOW_IN_WEBAPI_DEFAULT_VALUE.ToString()
+                });
+        }
 
-                SceneProperty.TryAddOrEdit(new SceneProperty
+        public enum SceneSettingUids
+        {
+            SHOW_IN_WEBAPI
+        }
+
+        public override async Task OnSceneSettingsCreating(SceneSettingBuilder settingBuilder)
+        {
+            await settingBuilder.RegisterAsync(new SceneSetting
                 {
-                    UniqueIdentifier = "WebAPI_SHOW_SCENE",
+                    UniqueIdentifier = SceneSettingUids.SHOW_IN_WEBAPI.ToString(),
                     Name = "Show scene in Web API",
                     Description = "If enabled this scene will show in applications that use the Web API",
-                    Value = "true",
+                    Value = Cache.SHOW_IN_WEBAPI_DEFAULT_VALUE.ToString(),
                     ValueType = DataType.BOOL
-                }, context, out error);
-
-                if (!string.IsNullOrEmpty(error))
-                    log.Error(error);
-
-                bool.TryParse(GetSettingValue("VERBOSE", context), out _verbose);
-                int.TryParse(GetSettingValue("PORT", context), out _port);
-                bool.TryParse(GetSettingValue("SECURE", context), out _isSSL);
-            }
+                });
         }
-        protected override void SettingChanged(string settingUniqueIdentifier, string settingValue)
+
+        #endregion
+
+        private async void HttpAPIPlugin_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (settingUniqueIdentifier == "VERBOSE")
+            if (e.PropertyName.Equals("PortSetting") || e.PropertyName.Equals("UseSSLSetting"))
             {
-                bool.TryParse(settingValue, out _verbose);
+                if (IsEnabled)
+                {
+                    await StopAsync();
+                    await StartAsync();
+                }
             }
-            else if (settingUniqueIdentifier == "PORT" || settingUniqueIdentifier == "SECURE")
+        }
+
+        public override Task StartAsync()
+        {
+            PropertyChanged += HttpAPIPlugin_PropertyChanged;
+
+            Task.Run(() =>
             {
-                if (this.Enabled)
-                    StopHTTP();
+                StartHTTP();
+            });
 
-                int.TryParse(settingValue, out _port);
-
-                if (this.Enabled)
-                    StartHTTP();
-            }
-        }
-        protected override void StartPlugin()
-        {
-            StartHTTP();
+            return Task.FromResult(0);
         }
 
-        protected override void StopPlugin()
+        public override Task StopAsync()
         {
+            PropertyChanged -= HttpAPIPlugin_PropertyChanged;
             StopHTTP();
+            return Task.FromResult(0);
         }
+
         HttpSelfHostServer server;
         public async void StartHTTP()
         {
-            var config = new SelfHostConfiguration(string.Format("http{0}://0.0.0.0:{1}", (_isSSL ? "s" : ""), _port));
-            config.EnableSSL = _isSSL;
+            Cache.SigularToPluralEntityDictionary = new Dictionary<string, string>();
+
+            //Cache all poco names in a dictionary for the DTO factory to use
+            Assembly assembly = Assembly.Load("zvs.Entities");
+            var pocoTypes = assembly.GetTypes()
+                .Where(p => p.IsClass && !p.IsDefined(typeof(CompilerGeneratedAttribute), false))
+                .ToList();
+
+            foreach (var pocoType in pocoTypes)
+            {
+                var singular = pocoType.Name;
+                var plural = pocoType.NamePlural();
+
+                if (!Cache.SigularToPluralEntityDictionary.ContainsKey(singular))
+                    Cache.SigularToPluralEntityDictionary.Add(singular, plural);
+            }
+
+            var config = new SelfHostConfiguration(string.Format("http{0}://0.0.0.0:{1}", (UseSSLSetting ? "s" : ""), PortSetting));
+            config.EnableSSL = UseSSLSetting;
 
             config.Formatters.JsonFormatter.Indent = true;
             //sends the string value of the enum rather than the int
@@ -139,8 +237,7 @@ namespace WebAPI
             config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new ContractResolver();
             config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-            //Enable CORS preflight selector...ie Respond to OPTIONS
-            config.Services.Replace(typeof(IHttpActionSelector), new CorsPreflightActionSelector());
+            config.EnableCors();
 
             config.Routes.MapHttpRoute(
                 name: "V2Route",
@@ -166,7 +263,7 @@ namespace WebAPI
             config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
 
             //BROWSERS GET JSON
-            config.Formatters[0].SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html")); 
+            config.Formatters[0].SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
 
             server = new HttpSelfHostServer(config);
 
@@ -178,11 +275,11 @@ namespace WebAPI
             {
                 await server.OpenAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 log.Error(ex.Message);
             }
-            log.InfoFormat("WebAPI Server Online on port {0} {1} SSL", _port, _isSSL ? "using" : "not using");
+            log.InfoFormat("WebAPI Server Online on port {0} {1} SSL", PortSetting, UseSSLSetting ? "using" : "not using");
         }
 
         public async void StopHTTP()
@@ -197,5 +294,9 @@ namespace WebAPI
             StartHTTP();
         }
 
+        public override Task DeviceValueChangedAsync(long deviceValueId, string newValue, string oldValue)
+        {
+            return Task.FromResult(0);
+        }
     }
 }

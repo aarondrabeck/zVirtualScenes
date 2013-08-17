@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.AspNet.Cors</id>
+    <version>5.0.0-rc1-130813</version>
+    <title>Microsoft ASP.NET Cross-Origin Support (nightly 2013 Aug 13)</title>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <licenseUrl>http://aspnetwebstack.codeplex.com/license</licenseUrl>
+    <projectUrl>http://www.asp.net/web-api</projectUrl>
+    <iconUrl>https://nugetgallery.blob.core.windows.net/icons/Microsoft.AspNet.Cors.5.0.0-rc1-130813.png</iconUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>This package contains the core components to enable Cross-Origin Resource Sharing (CORS) in ASP.NET.</description>
+    <summary>This package contains the core components to enable Cross-Origin Resource Sharing (CORS) in ASP.NET.</summary>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Microsoft AspNet Cors Cross Origin</tags>
+  </metadata>
+</package>

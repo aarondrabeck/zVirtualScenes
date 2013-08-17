@@ -21,8 +21,8 @@ namespace zvs.Entities
         public int SceneId { get; set; }
         public virtual Scene Scene { get; set; }
 
-        public int ScenePropertyId { get; set; }
-        public virtual SceneSetting SceneProperty { get; set; }
+        public int SceneSettingId { get; set; }
+        public virtual SceneSetting SceneSetting { get; set; }
 
         private string _Value;
         [StringLength(512)]
@@ -62,7 +62,7 @@ namespace zvs.Entities
             if (s2 == null)
                 return string.Empty;
 
-            SceneSettingValue spv = s2.SettingValues.FirstOrDefault(o => o.SceneProperty == property);
+            SceneSettingValue spv = s2.SettingValues.FirstOrDefault(o => o.SceneSetting == property);
                 
             //Check to see if the property has been set yet, otherwise return the default value for this property.
             if (spv != null)

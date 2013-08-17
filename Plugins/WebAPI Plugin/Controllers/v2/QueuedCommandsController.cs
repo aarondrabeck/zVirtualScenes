@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.OData;
-using WebAPI.Cors;
+
 using zvs.Entities;
 using zvs.Processor;
 using zvs.Processor.Logging;
@@ -50,22 +50,22 @@ namespace WebAPI.Controllers.v2
             get { return db.QueuedCommands; }
         }
 
-        [EnableCors]
+        
         [HttpGet]
-        [DTOQueryable]
+        [DTOQueryable(PageSize = 100)]
         public new IQueryable<QueuedCommand> Get()
         {
             return base.Get();
         }
 
-        [EnableCors]
+        
         [HttpGet]
         public new HttpResponseMessage GetById(int id)
         {
             return base.GetById(id);
         }
 
-        [EnableCors]
+        
         [HttpPost]
         public new HttpResponseMessage Add(QueuedCommand cmd)
         {
@@ -107,16 +107,16 @@ namespace WebAPI.Controllers.v2
             return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.Created, "Command queued and will be processed.");
         }
 
-        [EnableCors]
+        
         [HttpDelete]
         public new HttpResponseMessage Remove(int id)
         {
             return base.Remove(id);
         }
 
-        [EnableCors]
+        
         [HttpGet]
-        [DTOQueryable]
+        [DTOQueryable(PageSize = 100)]
         public new IQueryable<object> GetNestedCollection(int parentId, string nestedCollectionName)
         {
             return base.GetNestedCollection(parentId, nestedCollectionName);

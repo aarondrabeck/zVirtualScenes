@@ -13,12 +13,12 @@ namespace zvs.Processor
     public class CommandProcessorResult : EventArgs
     {
         public bool HasErrors { get; private set; }
-        public string Details { get; private set; }
+        public string Message { get; private set; }
 
-        public CommandProcessorResult(bool Errors, string Details)
+        public CommandProcessorResult(bool hasErrors, string message)
         {
-            this.HasErrors = Errors;
-            this.Details = Details;
+            this.HasErrors = hasErrors;
+            this.Message = message;
         }
     }
 
@@ -69,9 +69,9 @@ namespace zvs.Processor
             var result = await ProcessCommandAsync(sender, command, argument, argument2);
 
             if (result.HasErrors)
-                Core.log.Error(result.Details);
+                Core.log.Error(result.Message);
             else
-                Core.log.Info(result.Details);
+                Core.log.Info(result.Message);
             return result;
         }
 

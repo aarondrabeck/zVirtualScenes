@@ -33,6 +33,9 @@ namespace LightSwitchPlugin
     [Export(typeof(zvsPlugin))]
     public class LightSwitchPlugin : zvsPlugin
     {
+        private const bool SHOW_DEVICE_IN_LIST_DEFAULT_VALUE = true;
+        private const bool SHOW_SCENE_IN_LIST_DEFAULT_VALUE = true;
+
         public override Guid PluginGuid
         {
             get { return Guid.Parse("47f8325d-46cf-4240-a5b2-8c2fe5dc9920"); }
@@ -154,7 +157,7 @@ namespace LightSwitchPlugin
                     Name = "Show device in LightSwitch",
                     Description = "If enabled this device will show in the LightSwitch device tab.",
                     ValueType = DataType.BOOL,
-                    Value = "true"
+                    Value = SHOW_DEVICE_IN_LIST_DEFAULT_VALUE.ToString()
                 });
         }
 
@@ -170,7 +173,7 @@ namespace LightSwitchPlugin
                     UniqueIdentifier = SceneSettingUids.SHOW_IN_LIGHTSWITCH.ToString(),
                     Name = "Show scene in LightSwitch",
                     Description = "If enabled this scene will show in the LightSwitch scene tab.",
-                    Value = "true",
+                    Value = SHOW_SCENE_IN_LIST_DEFAULT_VALUE.ToString(),
                     ValueType = DataType.BOOL
                 });
         }
@@ -572,7 +575,7 @@ namespace LightSwitchPlugin
                 var commandResult = await cp.RunCommandAsync(this, command, arg1, arg2);
 
                 if (commandResult.HasErrors)
-                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Message));
                 else
                     await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
             }
@@ -602,7 +605,7 @@ namespace LightSwitchPlugin
                     CommandProcessor cp = new CommandProcessor(Core);
                     var r = await cp.RunCommandAsync(this, zvs_cmd, g.Id.ToString());
                     if (r.HasErrors)
-                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
+                        await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Message));
                     else
                         await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(result));
 
@@ -631,9 +634,9 @@ namespace LightSwitchPlugin
                 var r = await cp.RunCommandAsync(this, bcmd, sceneId.ToString());
 
                 if (r.HasErrors)
-                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Details));
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Message));
                 else
-                    await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(r.Details));
+                    await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(r.Message));
             }
         }
 
@@ -688,7 +691,7 @@ namespace LightSwitchPlugin
                 var commandResult = await cp.RunCommandAsync(this, dcmd, args.Temp);
 
                 if (commandResult.HasErrors)
-                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
+                    await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Message));
                 else
                     await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
             }
@@ -804,7 +807,7 @@ namespace LightSwitchPlugin
             var commandResult = await cp.RunCommandAsync(this, command, arg1, arg2);
 
             if (commandResult.HasErrors)
-                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Details));
+                await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(commandResult.Message));
             else
                 await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd(cmdMsg));
         }
@@ -912,16 +915,17 @@ namespace LightSwitchPlugin
         {
             using (zvsContext context = new zvsContext())
             {
-                foreach (Scene scene in await context.Scenes.OrderBy(o => o.SortOrder).ToListAsync())
-                {
-                    bool show = false;
+                var settingUid = SceneSettingUids.SHOW_IN_LIGHTSWITCH.ToString();
+                var defaultSettingShouldShow = SHOW_SCENE_IN_LIST_DEFAULT_VALUE;
 
-                    bool.TryParse(await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.SHOW_IN_LIGHTSWITCH.ToString()), out show);
-                    if (!show)
-                        continue;
+                var scenes = await context.Scenes
+                    .Where(o => (o.SettingValues.All(p => p.SceneSetting.UniqueIdentifier != settingUid) && defaultSettingShouldShow) || //Show all objects where no explicit setting has been create yet and the defaultSetting is to show
+                                 o.SettingValues.Any(p => p.SceneSetting.UniqueIdentifier == settingUid && p.Value.Equals("true"))) //Show all objects where an explicit setting has been create and set to show
+                    .OrderBy(o => o.SortOrder)
+                    .ToListAsync();
 
+                foreach (Scene scene in scenes)
                     await client.SendCommandAsync(LightSwitchProtocol.CreateSceneCmd(scene.Name, scene.Id.ToString()));
-                }
             }
         }
 
@@ -945,7 +949,12 @@ namespace LightSwitchPlugin
             using (zvsContext context = new zvsContext())
             {
                 //Get Devices
+                var settingUid = DeviceSettingUids.SHOW_IN_LIGHTSWITCH.ToString();
+                var defaultSettingShouldShow = SHOW_DEVICE_IN_LIST_DEFAULT_VALUE;
+
                 var devices = await context.Devices
+                    .Where(o => (o.DeviceSettingValues.All(p => p.DeviceSetting.UniqueIdentifier != settingUid) && defaultSettingShouldShow) || //Show all objects where no explicit setting has been create yet and the defaultSetting is to show
+                                 o.DeviceSettingValues.Any(p => p.DeviceSetting.UniqueIdentifier == settingUid && p.Value.Equals("true"))) //Show all objects where an explicit setting has been create and set to show
                     .Include(o => o.Type)
                     .OrderBy(o => o.Name)
                     .Where(o => o.Type.UniqueIdentifier != "CONTROLLER")
@@ -953,11 +962,6 @@ namespace LightSwitchPlugin
 
                 foreach (var device in devices)
                 {
-                    bool show = true;
-                    bool.TryParse(await DeviceSettingValue.GetDevicePropertyValueAsync(context, device, DeviceSettingUids.SHOW_IN_LIGHTSWITCH.ToString()), out show);
-                    if (!show)
-                        continue;
-
                     if (!ZVSTypeToLSType.ContainsKey(device.Type.UniqueIdentifier))
                         continue;
 

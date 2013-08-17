@@ -8,66 +8,61 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.OData;
-using WebAPI.Cors;
+
 using zvs.Entities;
 using zvs.Processor;
 using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers.v2
 {
-    [Documentation("v2/DeviceTypeCommands", 2.1, "All available device type commands.")]
+    [Documentation(typeof(DeviceTypeCommand), "v2/DeviceTypeCommands", 2.1, "All available device type commands.")]
     public class DeviceTypeCommandsController : zvsEntityController<DeviceTypeCommand>
     {
         public DeviceTypeCommandsController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }
 
-        protected override DbSet DBSet
-        {
-            get { return db.DeviceTypeCommands; }
-        }
-
-        [EnableCors]
+        
         [HttpGet]
-        [DTOQueryable]
-        public new IQueryable<DeviceTypeCommand> Get()
+        [DTOQueryable(PageSize = 100)]
+        public new async Task<IQueryable<DeviceTypeCommand>> Get()
         {
-            return base.Get();
+            return await base.Get();
         }
 
-        [EnableCors]
+
         [HttpGet]
-        public new HttpResponseMessage GetById(int id)
+        public new async Task<HttpResponseMessage> GetByIdAsync(int id)
         {
-            return base.GetById(id);
+            return await base.GetByIdAsync(id);
         }
 
-        [EnableCors]
+
         [HttpPost]
-        public new HttpResponseMessage Add(DeviceTypeCommand tEntityPost)
+        public new async Task<HttpResponseMessage> AddAsync(DeviceTypeCommand tEntityPost)
         {
-            return base.Add(tEntityPost);
+            return await base.AddAsync(tEntityPost);
         }
 
-        [EnableCors]
+
         [HttpPatch]
         [HttpPut]
-        public new HttpResponseMessage Update(int id, Delta<DeviceTypeCommand> device)
+        public new async Task<HttpResponseMessage> UpdateAsync(int id, Dictionary<string, object> tEntityPatch)
         {
-            return base.Update(id, device);
+            return await base.UpdateAsync(id, tEntityPatch);
         }
 
-        [EnableCors]
+
         [HttpDelete]
-        public new HttpResponseMessage Remove(int id)
+        public new async Task<HttpResponseMessage> RemoveAsync(int id)
         {
-            return base.Remove(id);
+            return await base.RemoveAsync(id);
         }
 
-        [EnableCors]
+
         [HttpGet]
-        [DTOQueryable]
-        public new IQueryable<object> GetNestedCollection(int parentId, string nestedCollectionName)
+        [DTOQueryable(PageSize = 100)]
+        public new async Task<IQueryable<object>> GetNestedCollectionsAsync(Int64 parentId, string nestedCollectionName)
         {
-            return base.GetNestedCollection(parentId, nestedCollectionName);
+             return await base.GetNestedCollectionsAsync(parentId, nestedCollectionName);
         }
     }
 }

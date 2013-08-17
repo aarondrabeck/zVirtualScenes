@@ -6,23 +6,23 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using WebAPI.Cors;
+using System.Web.Http.Cors;
 using WebAPI.DTO;
 using zvs.Processor.Logging;
 
 namespace WebAPI.Controllers.v2
 {
-    [Documentation("v2/Log", 2.1, 
+    [EnableCors("*", "*", "*")]
+    [Documentation(typeof(zvs.Processor.Logging.LogItem), "v2/Log", 2.1,
      @"Current log entries. 
 
        Send DELETE to the collection to clear the log.")]
-    public class LogItemsController : zvsController 
+    public class LogItemsController : zvsController
     {
         public LogItemsController(WebAPIPlugin webAPIPlugin) : base(webAPIPlugin) { }
 
-        [EnableCors]
         [HttpGet]
-        [DTOQueryable]
+        [DTOQueryable(PageSize = 100)]
         public IQueryable<zvs.Processor.Logging.LogItem> Get()
         {
             //Check authorization
@@ -31,7 +31,6 @@ namespace WebAPI.Controllers.v2
             return EventedLog.Items.AsQueryable();
         }
 
-        [EnableCors]
         [HttpDelete]
         public HttpResponseMessage Remove()
         {
@@ -39,21 +38,19 @@ namespace WebAPI.Controllers.v2
             DenyUnauthorized();
 
             EventedLog.Clear();
-            
+
             return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "OK");
         }
 
-        [EnableCors]
         [HttpGet]
-        public HttpResponseMessage GetById(int id)
+        public HttpResponseMessage GetByIdAsync(int id)
         {
             //Check authorization
             DenyUnauthorized();
 
             var item = EventedLog.Items.FirstOrDefault(o => o.Id == id);
 
-            DTOFactory<LogItem> dtoFactory = new DTOFactory<LogItem>(item);
-            return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "OK", dtoFactory.getDTO());
+            return Request.CreateResponse(ResponseStatus.Success, HttpStatusCode.OK, "OK", DTOFactory.GetDTO(item));
         }
 
     }
