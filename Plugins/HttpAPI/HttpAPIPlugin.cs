@@ -33,6 +33,9 @@ namespace HttpAPI
     [Export(typeof(zvsPlugin))]
     public class HttpAPIPlugin : zvsPlugin
     {
+        private const bool SHOW_DEVICE_IN_LIST_DEFAULT_VALUE = true;
+        private const bool SHOW_SCENE_IN_LIST_DEFAULT_VALUE = true;
+
         public override Guid PluginGuid
         {
             get { return Guid.Parse("779f0fe1-5281-4d22-a87c-58a4ad65efd0"); }
@@ -146,7 +149,7 @@ namespace HttpAPI
                 Name = "Show device in HTTP API",
                 Description = "If enabled this device will show in the HTTPAPI device collection.",
                 ValueType = DataType.BOOL,
-                Value = "true"
+                Value = SHOW_DEVICE_IN_LIST_DEFAULT_VALUE.ToString()
             });
         }
 
@@ -162,7 +165,7 @@ namespace HttpAPI
                 UniqueIdentifier = SceneSettingUids.SHOW_IN_HTTPAPI.ToString(),
                 Name = "Show scene in HTTP API",
                 Description = "If enabled this scene will show in the HTTPAPI scene collection.",
-                Value = "true",
+                Value = SHOW_SCENE_IN_LIST_DEFAULT_VALUE.ToString(),
                 ValueType = DataType.BOOL
             });
         }
@@ -610,36 +613,38 @@ namespace HttpAPI
                 List<object> devices = new List<object>();
                 using (zvsContext context = new zvsContext())
                 {
+                    //Get Devices
+                    var settingUid = DeviceSettingUids.SHOW_IN_HTTPAPI.ToString();
+                    var defaultSettingShouldShow = SHOW_DEVICE_IN_LIST_DEFAULT_VALUE;
+
                     var dbDevices = await context.Devices
+                        .Where(o => (o.DeviceSettingValues.All(p => p.DeviceSetting.UniqueIdentifier != settingUid) && defaultSettingShouldShow) || //Show all objects where no explicit setting has been create yet and the defaultSetting is to show
+                                     o.DeviceSettingValues.Any(p => p.DeviceSetting.UniqueIdentifier == settingUid && p.Value.Equals("true"))) //Show all objects where an explicit setting has been create and set to show
                         .Include(o => o.Type)
                         .Include(o => o.Type.Adapter)
-                        .OrderBy(o => o.Name).ToListAsync();
+                        .OrderBy(o => o.Name)
+                        .ToListAsync();
 
                     foreach (var d in dbDevices)
                     {
-                        bool show = true;
-                        bool.TryParse(await DeviceSettingValue.GetDevicePropertyValueAsync(context, d, DeviceSettingUids.SHOW_IN_HTTPAPI.ToString()), out show);
+                        var pluginName = "unknown";
 
-                        if (show)
+                        if (GuidToPluginName.ContainsKey(d.Type.Adapter.AdapterGuid))
+                            pluginName = GuidToPluginName[d.Type.Adapter.AdapterGuid];
+
+                        var device = new
                         {
-                            var pluginName = "unknown";
+                            id = d.Id,
+                            name = d.Name,
+                            on_off = d.CurrentLevelInt == 0 ? "OFF" : "ON",
+                            level = d.CurrentLevelInt,
+                            level_txt = d.CurrentLevelText,
+                            type = d.Type.UniqueIdentifier,
+                            plugin_name = pluginName
+                        };
 
-                            if (GuidToPluginName.ContainsKey(d.Type.Adapter.AdapterGuid))
-                                pluginName = GuidToPluginName[d.Type.Adapter.AdapterGuid];
+                        devices.Add(device);
 
-                            var device = new
-                            {
-                                id = d.Id,
-                                name = d.Name,
-                                on_off = d.CurrentLevelInt == 0 ? "OFF" : "ON",
-                                level = d.CurrentLevelInt,
-                                level_txt = d.CurrentLevelText,
-                                type = d.Type.UniqueIdentifier,
-                                plugin_name = pluginName
-                            };
-
-                            devices.Add(device);
-                        }
                     }
                 }
                 return new { success = true, devices = devices.ToArray() };
@@ -750,7 +755,13 @@ namespace HttpAPI
                 {
                     List<object> scenes = new List<object>();
 
+                    var settingUid = SceneSettingUids.SHOW_IN_HTTPAPI.ToString();
+                    var defaultSettingShouldShow = SHOW_SCENE_IN_LIST_DEFAULT_VALUE;
+
                     var dbScenes = await context.Scenes
+                        .Where(o => (o.SettingValues.All(p => p.SceneSetting.UniqueIdentifier != settingUid) && defaultSettingShouldShow) || //Show all objects where no explicit setting has been create yet and the defaultSetting is to show
+                                     o.SettingValues.Any(p => p.SceneSetting.UniqueIdentifier == settingUid && p.Value.Equals("true"))) //Show all objects where an explicit setting has been create and set to show
+                        .OrderBy(o => o.SortOrder)
                         .Include(o => o.Commands)
                         .ToListAsync();
 
