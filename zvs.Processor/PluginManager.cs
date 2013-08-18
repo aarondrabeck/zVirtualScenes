@@ -161,6 +161,16 @@ namespace zvs.Processor
             SetPluginProperty(plugin, pluginSetting.UniqueIdentifier, pluginSetting.Value);
         }
 
+        public zvsPlugin GetPlugin(string uniqueIdentifier)
+        {
+            return _Plugins.FirstOrDefault(p => p.Name == uniqueIdentifier);
+        }
+
+        public IEnumerable<zvsPlugin> GetPlugins()
+        {
+            return _Plugins;
+        }
+
         private void SetPluginProperty(object zvsPlugin, string PropertyName, object value)
         {
             var prop = zvsPlugin.GetType().GetProperty(PropertyName);
