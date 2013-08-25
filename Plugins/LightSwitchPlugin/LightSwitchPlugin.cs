@@ -9,7 +9,7 @@ using System.Security.Cryptography;
 using System.Data;
 using System.ComponentModel;
 using System.Linq;
-//using ZeroconfService;
+using Mono.Zeroconf;
 using zvs.Processor;
 using zvs.Entities;
 using System.Threading.Tasks;
@@ -140,7 +140,7 @@ namespace LightSwitchPlugin
 
         private HashSet<LightSwitchClient> LightSwitchClients = new HashSet<LightSwitchClient>();
         private CancellationTokenSource _cts = new CancellationTokenSource();
-        // private NetService netservice = null;
+        private Mono.Zeroconf.Providers.Bonjour.RegisterService netservice = null;
 
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<LightSwitchPlugin>();
 
@@ -252,10 +252,12 @@ namespace LightSwitchPlugin
         {
             PropertyChanged += HttpAPIPlugin_PropertyChanged;
 
+            publishZeroConf();
+
             Task.Run(() =>
                 {
+                    //Run it its own thread...
                     StartLightSwitchServer();
-                    //  publishZeroConf();
                 });
 
             return Task.FromResult(0);
@@ -267,32 +269,32 @@ namespace LightSwitchPlugin
             await StopLightSwitchServer();
         }
 
-        //private void publishZeroConf()
-        //{
-        //    if (UseBonjourSetting)
-        //    {
-        //        try
-        //        {
-        //            if (netservice == null)
-        //                PublishZeroconf();
-        //            else
-        //            {
-        //                netservice.Dispose();
-        //                PublishZeroconf();
-        //            }
+        private void publishZeroConf()
+        {
+            if (UseBonjourSetting)
+            {
+                try
+                {
+                    if (netservice == null)
+                        PublishZeroconf();
+                    else
+                    {
+                        netservice.Dispose();
+                        PublishZeroconf();
+                    }
 
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            log.Fatal(ex);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        if (netservice == null)
-        //            netservice.Dispose();
-        //    }
-        //}
+                }
+                catch (Exception ex)
+                {
+                    log.Fatal(ex);
+                }
+            }
+            else
+            {
+                if (netservice != null)
+                    netservice.Dispose();
+            }
+        }
 
         public override async Task DeviceValueChangedAsync(Int64 deviceValueId, string newValue, string oldValue)
         {
@@ -853,7 +855,7 @@ namespace LightSwitchPlugin
         {
             await BroadcastCommandAsync(LightSwitchProtocol.CreateMsgCmd("Server shutting down..."));
 
-            foreach (var client in LightSwitchClients)
+            foreach (var client in GetSafeClients())
                 client.Disconnect();
 
             _cts.Cancel();
@@ -906,8 +908,16 @@ namespace LightSwitchPlugin
         /// <param name="command">the message to send</param>
         public async Task BroadcastCommandAsync(LightSwitchCommand command)
         {
-            foreach (var client in LightSwitchClients)
+            foreach (var client in GetSafeClients())
                 await client.SendCommandAsync(command);
+        }
+
+        private LightSwitchClient[] GetSafeClients()
+        {
+            var clientCount = LightSwitchClients.Count();
+            LightSwitchClient[] clients = new LightSwitchClient[clientCount];
+            LightSwitchClients.CopyTo(clients);
+            return clients;
         }
 
         #region Lists
@@ -992,46 +1002,39 @@ namespace LightSwitchPlugin
             return result.ToString().ToUpper();
         }
 
-        //#region ZeroConf/Bonjour
+        #region ZeroConf/Bonjour
 
-        //private void PublishZeroconf()
-        //{
-        //    using (zvsContext context = new zvsContext())
-        //    {                
-        //        string domain = "";
-        //        String type = "_lightswitch._tcp.";
-        //        String name = "Lightswitch " + Environment.MachineName;
-        //        netservice = new NetService(domain, type, name, PortSetting);
-        //        netservice.AllowMultithreadedCallbacks = true;
-        //        netservice.DidPublishService += new NetService.ServicePublished(publishService_DidPublishService);
-        //        netservice.DidNotPublishService += new NetService.ServiceNotPublished(publishService_DidNotPublishService);
+        private void PublishZeroconf()
+        {
+            var name = "Lightswitch " + Environment.MachineName;
+            netservice = new Mono.Zeroconf.Providers.Bonjour.RegisterService();
+            netservice.Name = name;
 
-        //        /* HARDCODE TXT RECORD */
-        //        System.Collections.Hashtable dict = new System.Collections.Hashtable();
-        //        dict = new System.Collections.Hashtable();
-        //        dict.Add("txtvers", "1");
-        //        dict.Add("ServiceName", name);
-        //        dict.Add("MachineName", Environment.MachineName);
-        //        dict.Add("OS", Environment.OSVersion.ToString());
-        //        dict.Add("IPAddress", "127.0.0.1");
-        //        dict.Add("Version", Utils.ApplicationNameAndVersion);
-        //        netservice.TXTRecordData = NetService.DataFromTXTRecordDictionary(dict);
-        //        netservice.Publish();
-        //    }
+            netservice.RegType = "_lightswitch._tcp";
+            netservice.ReplyDomain = "";
+            netservice.Port = (short)PortSetting;
+            netservice.Response += netservice_Response;
 
-        //}
+            // TxtRecords are optional
+            TxtRecord txt_record = new TxtRecord();
+            txt_record.Add("txtvers", "1");
+            txt_record.Add("ServiceName", name);
+            txt_record.Add("MachineName", Environment.MachineName);
+            txt_record.Add("OS", Environment.OSVersion.ToString());
+            txt_record.Add("IPAddress", "127.0.0.1");
+            txt_record.Add("Version", Utils.ApplicationNameAndVersion);
+            //txt_record.Add("Password", "false");
+            netservice.TxtRecord = txt_record;
 
-        //void publishService_DidPublishService(NetService service)
-        //{
-        //    log.Info(String.Format("Published Service: domain({0}) type({1}) name({2})", service.Domain, service.Type, service.Name));
-        //}
+            netservice.Register();
+        }
 
-        //void publishService_DidNotPublishService(NetService service, DNSServiceException ex)
-        //{
-        //    log.Error(ex.Message);
-        //}
-
-        //#endregion
+        void netservice_Response(object o, RegisterServiceEventArgs args)
+        {
+            log.Info(String.Format("Published Service: isRegistered:{0},  type: {1} name:{2}", args.IsRegistered, args.Service.RegType, args.Service.Name));
+          
+        }
+        #endregion
     }
 }
 

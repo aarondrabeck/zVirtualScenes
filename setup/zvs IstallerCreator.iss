@@ -127,12 +127,11 @@ Source: "..\bin\release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; F
 
 Source: "..\bin\release\plugins\LightSwitchPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: lightswitch
 Source: "..\bin\release\plugins\LightSwitchPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: lightswitch
-;Source: "..\bin\release\plugins\dnssd.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: lightswitch
-;Source: "..\bin\release\plugins\ZeroconfService.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: openzwave
+Source: "..\bin\release\plugins\Mono.Zeroconf.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: lightswitch
+Source: "..\bin\release\plugins\Mono.Zeroconf.Providers.Bonjour.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: openzwave
 
 Source: "..\bin\release\plugins\NOAAPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: noaa
 Source: "..\bin\release\plugins\NOAAPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion ; Components: noaa
-
 
 Source: "..\bin\release\plugins\SpeechPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: speech
 Source: "..\bin\release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: speech

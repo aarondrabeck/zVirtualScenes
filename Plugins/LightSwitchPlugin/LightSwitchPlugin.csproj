@@ -41,6 +41,12 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\..\packages\EntityFramework.6.0.0-beta1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Zeroconf">
+      <HintPath>.\Mono.Zeroconf.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Zeroconf.Providers.Bonjour">
+      <HintPath>.\Mono.Zeroconf.Providers.Bonjour.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -71,6 +77,10 @@
     <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
       <Name>zvs.Processor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zvs\zvs.csproj">
+      <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
+      <Name>zvs</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
