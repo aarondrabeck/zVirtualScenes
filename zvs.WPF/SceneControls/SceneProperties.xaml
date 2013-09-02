@@ -7,8 +7,12 @@
              d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded_1" Unloaded="UserControl_Unloaded_1">
     <Grid>
         <GroupBox Name="PropertiesGrpBx" Header="Scene Properties" MinHeight="100" Margin="5">
-            <StackPanel  Name="PropertiesStkPnl" Margin="0,20,0,10"></StackPanel>
+            <Grid>
+                <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+                    <StackPanel  Name="PropertiesStkPnl" Margin="0,20,0,10"></StackPanel>
+                </ScrollViewer>
+            </Grid>
         </GroupBox>
-        
+
     </Grid>
 </UserControl>

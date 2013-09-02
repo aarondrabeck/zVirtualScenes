@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechPlugin", "Plugins\SpeechPlugin\SpeechPlugin.csproj", "{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}"
@@ -40,6 +42,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenZWave Adapter for ZVS", "Adapters\OpenZWave\OpenZWave Adapter for ZVS.csproj", "{0A43D202-F903-44C8-83E3-03A3928E9480}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI Plugin", "Plugins\WebAPI Plugin\WebAPI Plugin.csproj", "{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPhonePlugin", "Plugins\SmartPhonePlugin\SmartPhonePlugin.csproj", "{6C556723-B1E4-4A51-93A7-A49BFE179B3D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -197,6 +201,20 @@ Global
 		{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32}.Release|Win32.ActiveCfg = Release|Any CPU
 		{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32}.Release|x64.ActiveCfg = Release|Any CPU
 		{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32}.Release|x86.ActiveCfg = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|Win32.ActiveCfg = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|x64.ActiveCfg = Release|Any CPU
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -207,6 +225,7 @@ Global
 		{87DAEF88-428E-4BCA-8DFC-56889C7C30A7} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 		{F8B3CD45-0712-4388-B576-EBA5267E636C} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 		{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
+		{6C556723-B1E4-4A51-93A7-A49BFE179B3D} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 		{0A43D202-F903-44C8-83E3-03A3928E9480} = {505C4DBB-763D-488B-9CA7-BED1AC34966C}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution

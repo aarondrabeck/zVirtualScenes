@@ -23,7 +23,7 @@
 //log(details);
 
 ////Get a specific device
-//var d = h.deviceByName("Bar Lights");
+//var d = h.deviceByName("Bar Lights");F
 
 ////output some specific property of a device
 //log(d.Name);
