@@ -164,7 +164,12 @@ namespace SmartPhonePlugin
             return Task.FromResult(0);
         }
 
-        void SmartPhonePlugin_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        public bool isHome()
+        {
+            return _lastResult;
+        }
+
+        private void SmartPhonePlugin_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("CheckInterval"))
                 timerSmartPhone.Interval = _checkInterval;
