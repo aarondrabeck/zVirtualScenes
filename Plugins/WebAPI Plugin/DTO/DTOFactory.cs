@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.Entity.Design.PluralizationServices;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -29,7 +30,7 @@ namespace WebAPI.DTO
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format("DTO Factory created IEnumerable of DTO in {0}", sw.Elapsed.ToString(TimeSpanToStringFormat.Long)));
+            Debug.WriteLine(string.Format("DTO Factory created IEnumerable of DTO in {0}", sw.Elapsed.ToString()));
 #endif
 
             return dtos;
@@ -51,7 +52,7 @@ namespace WebAPI.DTO
 
             dtoDictionary.Add("Id", Entity.Id);
 #if DEBUG
-            Debug.WriteLine(string.Format("DTO Factory pre-property loop. {0}", sw.Elapsed.ToString(TimeSpanToStringFormat.Long)));
+            Debug.WriteLine(string.Format("DTO Factory pre-property loop. {0}", sw.Elapsed.ToString()));
 #endif
             foreach (PropertyInfo pi in EntityType.GetProperties())
             {
@@ -127,7 +128,7 @@ namespace WebAPI.DTO
             dtoDictionary.Add("_uri", string.Format("/{0}/{1}/{2}", Entity.GetTypeEntityWrapperDetection().NamespaceLastSegment(), Entity.GetTypeEntityWrapperDetection().NamePlural(), Entity.Id));
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine(string.Format("DTO Factory created single DTO in {0}", sw.Elapsed.ToString(TimeSpanToStringFormat.Long)));
+            Debug.WriteLine(string.Format("DTO Factory created single DTO in {0}", sw.Elapsed.ToString()));
 #endif
 
 

@@ -87,6 +87,10 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private async void UserControl_Initialized(object sender, EventArgs e)
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 await context.ScheduledTasks
@@ -97,6 +101,11 @@ namespace zvs.WPF.ScheduledTaskControls
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ScheduledTaskViewSource"];
                 myCollectionViewSource.Source = context.ScheduledTasks.Local;
             }
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine("Scheduled task grid initialized in {0}", sw.Elapsed.ToString() as object);
+#endif
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)

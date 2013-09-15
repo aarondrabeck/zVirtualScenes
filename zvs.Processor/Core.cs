@@ -34,7 +34,7 @@ namespace zvs.Processor
             log = Logging.LogManager.GetLogger<Core>();
         }
 
-        public async Task StartAsync()
+        public async void StartAsync()
         {
             log.InfoFormat("Starting Core Processor:{0}", Utils.ApplicationName);
 
@@ -92,7 +92,7 @@ namespace zvs.Processor
                 });
             }
             #endregion
-#if (release)
+#if !DEBUG
             try
             {
 #endif
@@ -100,7 +100,7 @@ namespace zvs.Processor
             await AdapterManager.LoadAdaptersAsync(this);
 
             await PluginManager.LoadPluginsAsync(this);
-#if (release)
+#if !DEBUG
             }
             catch (Exception ex)
             {

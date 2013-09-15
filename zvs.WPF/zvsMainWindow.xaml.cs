@@ -24,6 +24,7 @@ using zvs.Processor.Backup;
 using zvs.Entities;
 using zvs.WPF.JavaScript;
 using zvs.Processor.Logging;
+using System.Threading.Tasks;
 
 namespace zvs.WPF
 {
@@ -97,26 +98,29 @@ namespace zvs.WPF
 
         private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
 
             log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
 
-            ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
-            //clear the existing sort order
-            dataView.SortDescriptions.Clear();
+            Task.Run(async () =>
+            {
+                ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
+                //clear the existing sort order
+                dataView.SortDescriptions.Clear();
 
-            //create a new sort order for the sorting that is done lastly            
-            ListSortDirection dir = ListSortDirection.Ascending;
+                //create a new sort order for the sorting that is done lastly            
+                ListSortDirection dir = ListSortDirection.Ascending;
 
-            var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
-            if (option != null && option.Value == "Descending")
-                dir = ListSortDirection.Descending;
+                var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
+                if (option != null && option.Value == "Descending")
+                    dir = ListSortDirection.Descending;
 
-            dataView.SortDescriptions.Add(new SortDescription("Datetime", dir));
-            //refresh the view which in turn refresh the grid
-            dataView.Refresh();
+                dataView.SortDescriptions.Add(new SortDescription("Datetime", dir));
+                //refresh the view which in turn refresh the grid
+                dataView.Refresh();               
+            });
 
             dList1.ShowMore = false;
 

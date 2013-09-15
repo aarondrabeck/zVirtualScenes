@@ -164,6 +164,9 @@ namespace zvs.WPF.DeviceControls
                 //Load your data here and assign the result to the CollectionViewSource.
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
                 myCollectionViewSource.Source = context.Devices.Local;
+
+                myCollectionViewSource.SortDescriptions.Clear();
+                myCollectionViewSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
             }
 
 #if DEBUG
@@ -172,7 +175,9 @@ namespace zvs.WPF.DeviceControls
 #endif
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e) { }
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
 
 #if DEBUG
         ~DeviceDataGridUC()

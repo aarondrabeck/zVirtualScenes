@@ -83,6 +83,10 @@ namespace zvs.WPF.TriggerControls
 
         private async void UserControl_Initialized(object sender, EventArgs e)
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 await context.DeviceValueTriggers
@@ -94,6 +98,11 @@ namespace zvs.WPF.TriggerControls
 
                 myCollectionViewSource.Source = context.DeviceValueTriggers.Local;
             }
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine("Trigger grid initialized in {0}", sw.Elapsed.ToString() as object);
+#endif
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e) { }

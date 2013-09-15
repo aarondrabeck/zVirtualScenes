@@ -182,14 +182,17 @@ namespace zvs.WPF
             splashscreen.SetLoadingTextFormat("Initializing and migrating database");
             await Task.Delay(10);
 
-            using (zvsContext context = new zvsContext())
-            {
-                var configuration = new Configuration();
-                var migrator = new DbMigrator(configuration);
+            await Task.Run(() => 
+            { 
+                using (zvsContext context = new zvsContext())
+                {
+                    var configuration = new Configuration();
+                    var migrator = new DbMigrator(configuration);
 
-                migrator.Update();
-                context.Database.Initialize(true);
-            }
+                    migrator.Update();
+                    context.Database.Initialize(true);
+                }
+            });
             #endregion
 
             //TODO: Check for VCRedist
@@ -201,7 +204,10 @@ namespace zvs.WPF
 
             //Initialize the core
             zvsCore = new Core();
-            await zvsCore.StartAsync();
+            Task.Run(() =>  
+            { 
+                zvsCore.StartAsync();            
+            });
             #endregion
 
             //Create taskbar Icon 
@@ -287,8 +293,8 @@ namespace zvs.WPF
                 splashscreen.Show();
 
                 //TODO: REMOVE THE NEED FOR STATIC DESCIPTIONS  DB DESIGN? - CHANGE UI??
-                RefreshCommandDescripitions();
-                RefreshTriggerDescripitions();
+                //RefreshCommandDescripitions();
+                //RefreshTriggerDescripitions();
 
                 await Task.Delay(10);
                 splashscreen.SetLoadingTextFormat("Loading user interface settings");

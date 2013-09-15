@@ -138,6 +138,10 @@ namespace zvs.WPF.SceneControls
 
         private async void UserControl_Initialized(object sender, EventArgs e)
         {
+#if DEBUG
+            var sw = new Stopwatch();
+            sw.Start();
+#endif
             //Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -159,6 +163,11 @@ namespace zvs.WPF.SceneControls
 
                 myCollectionViewSource.Source = context.Scenes.Local;
             }
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine("Scene creator initialized in {0}", sw.Elapsed.ToString() as object);
+#endif
         }
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
