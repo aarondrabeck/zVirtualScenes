@@ -63,9 +63,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EntityFramework.SqlServerCompact.6.0.1\lib\net45\EntityFramework.SqlServerCompact.dll</HintPath>
     </Reference>
-    <Reference Include="ScintillaNET, Version=1.0.1601.23443, Culture=neutral">
+    <Reference Include="ScintillaNET, Version=2.5.0.0, Culture=neutral, PublicKeyToken=948d6c9751444115, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ScintillaNET v2.5\ScintillaNET.dll</HintPath>
+      <HintPath>lib\ScintillaNET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Addin.Contract" />
@@ -366,7 +366,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="zvsCert.pfx" />
     <Resource Include="Images\zvs256.ico" />
     <Resource Include="Images\zvs32.ico" />
