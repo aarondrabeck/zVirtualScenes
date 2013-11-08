@@ -40,7 +40,7 @@ namespace zvs.WPF.JavaScript
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    TestBtn.IsEnabled = !value;
+                    TestMI.IsEnabled = !value;
                 });
                 _isRunning = value;
             }
@@ -56,7 +56,7 @@ namespace zvs.WPF.JavaScript
                 InitializeComponent();
             }
         }
-#if DEBUG 
+#if DEBUG
         ~JavaScriptEditorWindow()
         {
             //Cannot write to log here, it has been disposed. 
@@ -105,62 +105,37 @@ namespace zvs.WPF.JavaScript
                 });
         }
 
-        private void CancelBtn_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void OKBtn_Click(object sender, RoutedEventArgs e)
-        {
-            Command.Name = CmdNameTxtBx.Text;
-            Command.Script = TriggerScriptEditor.Editor.Text;
-            Canceled = false;
-            this.Close();
-        }
-
-        private void TestBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isRunning)
-                Run();
-        }
-
-        private void Image_MouseUp_1(object sender, MouseButtonEventArgs e)
-        {
-            var script = "RunScene('All On');\n";
-            TriggerScriptEditor.Editor.InsertText(script);
-        }
-
-        private void Image_MouseUp_2(object sender, MouseButtonEventArgs e)
-        {
-            var script = "RunDeviceCommand('Office Light','Set Level', '99');\n";
-            TriggerScriptEditor.Editor.InsertText(script);
-        }
-
-        private void Image_MouseUp_3(object sender, MouseButtonEventArgs e)
-        {
-            var script = "RunDeviceCommand(1,'Set Level', '99');\n";
-            TriggerScriptEditor.Editor.InsertText(script);
-        }
-
-        private void Image_MouseUp_4(object sender, MouseButtonEventArgs e)
-        {
-            var script = "Delay(\"RunDeviceCommand('Office Light','Set Level', '99');\", 3000)\n";
-            TriggerScriptEditor.Editor.InsertText(script);
-        }
-
         private void TriggerScriptEditor_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.F5)
-            {
-                TestBtn_Click(TestBtn, null);
-            }
+                TestMI_Click(this, null);
+
             if (e.Key == Key.Escape)
-            {
-                CancelBtn_Click(null, null);
-            }
+                CancelMI_Click(this, null);
+
+            if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+                SaveMI_Click(this, null);
         }
 
-        private void JS_IncludeMouseUp(object sender, MouseButtonEventArgs e)
+        private void RunSceneMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "runScene('All On');\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void RunDeviceCommandMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "runDeviceCommand('Office Light','Set Level', '99');\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void AddDelayMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "delay(\"runDeviceCommand('Office Light','Set Level', '99');\", 3000);\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void AddFileMI_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.CheckFileExists = true;
@@ -179,9 +154,63 @@ namespace zvs.WPF.JavaScript
                     path = path.Replace(zvs.Processor.Utils.AppPath, ".");
                 }
 
-                var script = string.Format("require('{0}')\n", path.Replace("\\","\\\\"));
+                var script = string.Format("require('{0}')\n", path.Replace("\\", "\\\\"));
                 TriggerScriptEditor.Editor.InsertText(script);
             }
+        }
+
+        private void ExecShellMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "shell(\"http://google.com\", \"\");\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void ReportProgressMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "reportProgress(\"Hello World!\");\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void LogInfoMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "log(\"All done!\");\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void LogErrorMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "error(\"Oh Snap!\");\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void LogWarningMI_Click(object sender, RoutedEventArgs e)
+        {
+            var script = "warn(\"Warning file missing!\");\n";
+            TriggerScriptEditor.Editor.InsertText(script);
+        }
+
+        private void CancelMI_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void SaveMI_Click(object sender, RoutedEventArgs e)
+        {
+            Command.Name = CmdNameTxtBx.Text;
+            Command.Script = TriggerScriptEditor.Editor.Text;
+            Canceled = false;
+            this.Close();
+        }
+
+        private void TestMI_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isRunning)
+                Run();
+        }
+
+        private void CanceleMI_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

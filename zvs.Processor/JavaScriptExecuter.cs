@@ -98,7 +98,7 @@ namespace zvs.Processor
             engine.SetFunction("runDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
             engine.SetFunction("reportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("progress", new Action<string>(ReportProgressJS));
-            engine.SetFunction("Delay", new Action<string, double, bool>(Delay));
+            engine.SetFunction("delay", new Action<string, double, bool>(Delay));
             engine.SetFunction("error", new Action<object>(Error));
             engine.SetFunction("info", new Action<object>(Info));
             engine.SetFunction("log", new Action<object>(Info));
@@ -132,7 +132,7 @@ namespace zvs.Processor
             }
             catch (Exception exc)
             {
-                return new JavaScriptResult(true, string.Format("JSE{0} Finished with errors. {1}", id, exc.ToString()));
+                return new JavaScriptResult(true, string.Format("JSE{0} Finished with errors. {1}", id, exc.Message));
             }
             return new JavaScriptResult(false, string.Format("JSE{0} Finished without errors.", id));
         }
@@ -168,7 +168,7 @@ namespace zvs.Processor
             }
         }
 
-        //Delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
+        //delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
         public async void Delay(string script, double time, bool Async)
         {
             AutoResetEvent mutex = new AutoResetEvent(false);
@@ -243,11 +243,7 @@ namespace zvs.Processor
 
         public void Info(object Message)
         {
-            if (Message != null)
-            {
-                log.Info(Message);
-                ReportProgressJS(Message.ToString());
-            }
+            log.Info(Message);
         }
 
         public void Warning(object Message)

@@ -202,7 +202,7 @@
                         </StackPanel>
                     </TabItem.Header>
                     <Grid DataContext="{StaticResource ListViewSource}">
-                       
+
                         <DataGrid  x:Name="logListView"  Margin="0,0,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" 
                                    HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" 
@@ -248,26 +248,22 @@
 
                     </MenuItem>
                     <MenuItem Header="Commands">
-                        <MenuItem Header="Built-in">
-                            <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-                        </MenuItem>
-                        <MenuItem Header="JavaScript">
-                            <MenuItem Name="AddEditJSCmds" Header="Add / Edit" Click="AddEditJSCmds_Click_1" />
-                        </MenuItem>
+                        <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
+                        <Separator />
+                        <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
                     </MenuItem>
                     <MenuItem Header="Groups">
-                        <MenuItem Header="Activate Groups" x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
-                        <MenuItem Header="Group Editor" Click="MenuItem_Click" />
+                        <MenuItem Header="Activate Groups..." x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
+                        <MenuItem Header="Group Editor..." Click="MenuItem_Click" />
                     </MenuItem>
                     <MenuItem Header="Tools">
+                        <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
+                        <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMI" />
+                        <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
+                        <Separator />
                         <MenuItem Header="View Logs" Name="ViewLogsMI"   Click="ViewLogsMI_Click_1" />
                         <MenuItem Header="Clear Logs" Name="ClearLogsMI"   Click="ClearLogsMI_Click" />
                         <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
-                        <Separator />
-                        <MenuItem Header="Manage Plug-in" Click="ManagePluginsMI" />
-                        <MenuItem Header="Manage Adapters" Click="MenuItem_Click_1" />
-                        <MenuItem Name="SettingMI" Header="Settings" Click="SettingMI_Click_1" />
-
                     </MenuItem>
                     <MenuItem Header="Help">
                         <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
