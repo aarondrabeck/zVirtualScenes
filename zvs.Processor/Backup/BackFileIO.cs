@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,14 +12,14 @@ namespace zvs.Processor.Backup
 {
     public class BackFileIO
     {
-        public static async Task<Result> SaveAsXMLToDiskAsync<T>(IEnumerable<T> collection, string fileName)
+        public static async Task<Result> SaveAsXMLToDiskAsync<T>(T objCollection, string fileName) where T : IEnumerable
         {
             try
             {
                 using (MemoryStream stream = new MemoryStream())
                 {
                     XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
-                    xmlSerializer.Serialize(stream, collection);
+                    xmlSerializer.Serialize(stream, objCollection);
                     stream.Position = 0;
 
                     using (StreamReader reader = new StreamReader(stream))

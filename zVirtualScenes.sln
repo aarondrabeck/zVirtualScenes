@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.20623.1 VSUPREVIEW
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}"
 EndProject
@@ -44,6 +44,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI Plugin", "Plugins\WebAPI Plugin\WebAPI Plugin.csproj", "{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPhonePlugin", "Plugins\SmartPhonePlugin\SmartPhonePlugin.csproj", "{6C556723-B1E4-4A51-93A7-A49BFE179B3D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvs.Processor.Tests", "zvs.Processor.Tests\zvs.Processor.Tests.csproj", "{4A09CCBA-9754-4841-8D17-7F3C2B471B98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -215,6 +217,20 @@ Global
 		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|Win32.ActiveCfg = Release|Any CPU
 		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|x64.ActiveCfg = Release|Any CPU
 		{6C556723-B1E4-4A51-93A7-A49BFE179B3D}.Release|x86.ActiveCfg = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|Win32.ActiveCfg = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|x64.ActiveCfg = Release|Any CPU
+		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

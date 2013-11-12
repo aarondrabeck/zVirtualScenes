@@ -7,12 +7,23 @@
 	<Target Name="Build-Release">
 		<MSBuild Projects="zVirtualScenes.sln" Targets="Rebuild" Properties="Configuration=Release" />
 	</Target>
+  
+  <UsingTask
+    AssemblyFile="zvs.Processor.Tests\lib\xunit.runner.msbuild.dll"
+    TaskName="Xunit.Runner.MSBuild.xunit"/>
+
+  <Target Name="Build-RunTests">
+    <MSBuild Projects="zvs.Processor.Tests\zvs.Processor.Tests.csproj" Targets="Rebuild" Properties="Configuration=Release" />
+    <xunit Assembly="bin\tests\Release\zvs.Processor.Tests.dll" Verbose="true" TeamCity="true"/>
+  </Target>
 		
 <!--	<Target Name="Build-Release-Setup">-->
 	<Target Name="Build-Release-Setup" DependsOnTargets="Build-Release">
 		<Exec Command="&quot;C:\Program Files (x86)\Inno Setup 5\iscc.exe&quot; /v99 /dBuildPath=&quot;$(MSBuildProjectDirectory)&quot; /dAppVerName=%build.number% /dAppVersion=%build.number%  /dMyAppVersion=%build.number%  /SStandard=$p  &quot;setup\zvs IstallerCreator.iss&quot;"/>
 		
     </Target>
+  
+
 	
 </Project>
 
