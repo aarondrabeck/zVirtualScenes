@@ -69,21 +69,37 @@ namespace zvs.Processor
                     var dbPlugin = await context.Plugins
                         .FirstOrDefaultAsync(p => p.PluginGuid == zvsPlugin.PluginGuid);
 
+                    var changed = false;
+
                     if (dbPlugin == null)
                     {
                         dbPlugin = new Plugin();
                         dbPlugin.PluginGuid = zvsPlugin.PluginGuid;
                         context.Plugins.Add(dbPlugin);
+                        changed = true;
                     }
 
                     //Update Name and Description
                     zvsPlugin.IsEnabled = dbPlugin.IsEnabled;
-                    dbPlugin.Name = zvsPlugin.Name;
-                    dbPlugin.Description = zvsPlugin.Description;
 
-                    var result = await context.TrySaveChangesAsync();
-                    if (result.HasError)
-                        core.log.Error(result.Message);
+                    if (dbPlugin.Name != zvsPlugin.Name)
+                    {
+                        dbPlugin.Name = zvsPlugin.Name;
+                        changed = true;
+                    }
+
+                    if (dbPlugin.Description != zvsPlugin.Description)
+                    {
+                        dbPlugin.Description = zvsPlugin.Description;
+                        changed = true;
+                    }
+
+                    if (changed)
+                    {
+                        var result = await context.TrySaveChangesAsync();
+                        if (result.HasError)
+                            core.log.Error(result.Message);
+                    }
 
                     string msg = string.Format("Initializing '{0}'", zvsPlugin.Name);
                     Core.log.Info(msg);
@@ -101,7 +117,7 @@ namespace zvs.Processor
                     {
                         SetPluginProperty(zvsPlugin, setting.UniqueIdentifier, setting.Value);
                     }
-                    
+
                     if (dbPlugin.IsEnabled)
                         await zvsPlugin.StartAsync();
 

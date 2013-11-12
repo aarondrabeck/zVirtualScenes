@@ -7,6 +7,7 @@ using zvs.Entities;
 using System.Data.Entity;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace zvs.Processor
 {
@@ -27,29 +28,53 @@ namespace zvs.Processor
                 return;
 
             SceneSetting setting = await Context.SceneSettings
-                .Include(o=> o.Options)
+                .Include(o => o.Options)
                 .FirstOrDefaultAsync(s => s.UniqueIdentifier == sceneSetting.UniqueIdentifier);
 
+            var changed = false;
             if (setting == null)
             {
                 Context.SceneSettings.Add(sceneSetting);
+                changed = true;
             }
             else
             {
                 //Update
+                PropertyChangedEventHandler handler = (s, a) => changed = true;
+                setting.PropertyChanged += handler;
+
                 setting.Name = sceneSetting.Name;
                 setting.Description = sceneSetting.Description;
                 setting.ValueType = sceneSetting.ValueType;
                 setting.Value = sceneSetting.Value;
+                
+                setting.PropertyChanged -= handler;
 
-                 Context.SceneSettingOptions.RemoveRange(setting.Options.ToList());
-                setting.Options.Clear();
-                sceneSetting.Options.ToList().ForEach(o => setting.Options.Add(o));
+                foreach (var option in setting.Options)
+                {
+                    if (!sceneSetting.Options.Any(o => o.Name == option.Name))
+                    {
+                        sceneSetting.Options.Add(option);
+                        changed = true;
+                    }
+                }
+
+                foreach (var option in sceneSetting.Options)
+                {
+                    if (!setting.Options.Any(o => o.Name == option.Name))
+                    {
+                        Context.SceneSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
             }
-            
-            var result = await Context.TrySaveChangesAsync();
-            if (result.HasError)
-                Core.log.Error(result.Message);
+
+            if (changed)
+            {
+                var result = await Context.TrySaveChangesAsync();
+                if (result.HasError)
+                    Core.log.Error(result.Message);
+            }
         }
     }
 }

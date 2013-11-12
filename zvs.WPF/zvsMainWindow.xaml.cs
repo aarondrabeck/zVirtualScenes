@@ -98,35 +98,33 @@ namespace zvs.WPF
 
         private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
 
             log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
 
-            Task.Run(async () =>
-            {
-                ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
-                //clear the existing sort order
-                dataView.SortDescriptions.Clear();
+            System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
+            
+            ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
+            //clear the existing sort order
+            dataView.SortDescriptions.Clear();
 
-                //create a new sort order for the sorting that is done lastly            
-                ListSortDirection dir = ListSortDirection.Ascending;
+            //create a new sort order for the sorting that is done lastly            
+            var dir = ListSortDirection.Ascending;
 
-                var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
-                if (option != null && option.Value == "Descending")
-                    dir = ListSortDirection.Descending;
+            var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
+            if (option != null && option.Value == "Descending")
+                dir = ListSortDirection.Descending;
 
-                dataView.SortDescriptions.Add(new SortDescription("Datetime", dir));
-                //refresh the view which in turn refresh the grid
-                dataView.Refresh();               
-            });
+            myCollectionViewSource.SortDescriptions.Clear();
+            myCollectionViewSource.SortDescriptions.Add(new SortDescription("Datetime", dir));
 
             dList1.ShowMore = false;
 
             this.Title = Utils.ApplicationNameAndVersion;
         }
-        
+
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
             EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;
@@ -279,7 +277,7 @@ namespace zvs.WPF
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
                 var result = await Backup.ExportDevicesAsync(dlg.FileName);
 
-                if(result.HasError)
+                if (result.HasError)
                     log.Error(result.Message);
                 else
                     log.Info(result.Message);
@@ -430,7 +428,7 @@ namespace zvs.WPF
             }
         }
 
-        private void ExportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ExportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
         {
             // Configure open file dialog box
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
@@ -445,7 +443,7 @@ namespace zvs.WPF
             if (r ?? true)
             {
                 //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportScheduledTaskAsync(dlg.FileName, (result) =>
+                await Backup.ExportScheduledTaskAsync(dlg.FileName, (result) =>
                 {
                     log.Info(result);
                 });

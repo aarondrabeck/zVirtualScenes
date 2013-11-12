@@ -13,7 +13,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Media.Media3D;
 using System.ComponentModel;
-
 using System.Collections.ObjectModel;
 using zvs.Entities;
 using System.Diagnostics;
@@ -102,14 +101,19 @@ namespace zvs.WPF.DeviceControls
             this.Dispatcher.Invoke(async () =>
             {
                 //Update the primitives used in this user control
-                var entry = context.Entry(e.NewEntity);
-                entry.Entity.DeviceTypeId = e.NewEntity.DeviceTypeId;
-                entry.Entity.CurrentLevelInt = e.NewEntity.CurrentLevelInt;
-                entry.Entity.CurrentLevelText = e.NewEntity.CurrentLevelText;
-                entry.Entity.LastHeardFrom = e.NewEntity.LastHeardFrom;
-                entry.Entity.NodeNumber = e.NewEntity.NodeNumber;
-                entry.Entity.Name = e.NewEntity.Name;
-                entry.State = EntityState.Unchanged;
+                var device = context.Devices.Local.FirstOrDefault(o => o.Id == e.NewEntity.Id);
+                if (device == null)
+                    return;
+               
+                device.DeviceTypeId = e.NewEntity.DeviceTypeId;
+                device.CurrentLevelInt = e.NewEntity.CurrentLevelInt;
+                device.CurrentLevelText = e.NewEntity.CurrentLevelText;
+                device.LastHeardFrom = e.NewEntity.LastHeardFrom;
+                device.NodeNumber = e.NewEntity.NodeNumber;
+                device.Name = e.NewEntity.Name;
+
+               // var entry = context.Entry(e.NewEntity);
+               // entry.State = EntityState.Unchanged;
 
                 if (e.NewEntity.DeviceTypeId != e.OldEntity.DeviceTypeId)
                     await context.DeviceTypes.FirstOrDefaultAsync(o => o.Id == e.NewEntity.DeviceTypeId);
@@ -165,8 +169,7 @@ namespace zvs.WPF.DeviceControls
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
                 myCollectionViewSource.Source = context.Devices.Local;
 
-                myCollectionViewSource.SortDescriptions.Clear();
-                myCollectionViewSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
             }
 
 #if DEBUG
@@ -177,6 +180,10 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+            myCollectionViewSource.SortDescriptions.Clear();
+            myCollectionViewSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
+
         }
 
 #if DEBUG

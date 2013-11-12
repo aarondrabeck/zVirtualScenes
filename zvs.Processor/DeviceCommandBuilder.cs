@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using zvs.Entities;
 using System.Data.Entity;
+using System.ComponentModel;
 
 namespace zvs.Processor
 {
@@ -34,12 +35,17 @@ namespace zvs.Processor
                 .FirstOrDefaultAsync(c => c.UniqueIdentifier == deviceCommand.UniqueIdentifier &&
                 c.DeviceId == deviceCommand.DeviceId);
 
+            var changed = false;
             if (existing_dc == null)
             {
                 context.DeviceCommands.Add(deviceCommand);
+                changed = true;
             }
             else
             {
+                PropertyChangedEventHandler handler = (s, a) => changed = true;
+                existing_dc.PropertyChanged += handler;
+
                 existing_dc.ArgumentType = deviceCommand.ArgumentType;
                 existing_dc.CustomData1 = deviceCommand.CustomData1;
                 existing_dc.CustomData2 = deviceCommand.CustomData2;
@@ -48,15 +54,33 @@ namespace zvs.Processor
                 existing_dc.Help = deviceCommand.Help;
                 existing_dc.SortOrder = deviceCommand.SortOrder;
 
-                context.CommandOptions.RemoveRange(existing_dc.Options.ToList());
-                existing_dc.Options.Clear();
-                deviceCommand.Options.ToList().ForEach(o => existing_dc.Options.Add(o));
+                existing_dc.PropertyChanged -= handler;
+
+                foreach (var option in deviceCommand.Options)
+                {
+                    if (!existing_dc.Options.Any(o => o.Name == option.Name))
+                    {
+                        existing_dc.Options.Add(option);
+                        changed = true;
+                    }
+                }
+
+                foreach (var option in existing_dc.Options)
+                {
+                    if (!deviceCommand.Options.Any(o => o.Name == option.Name))
+                    {
+                        context.CommandOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
+
+                if (changed)
+                {
+                    var result = await context.TrySaveChangesAsync();
+                    if (result.HasError)
+                        Core.log.Error(result.Message);
+                }
             }
-
-            var result = await context.TrySaveChangesAsync();
-            if (result.HasError)
-                Core.log.Error(result.Message);
-
         }
     }
 }

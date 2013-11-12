@@ -204,7 +204,7 @@ namespace zvs.WPF
 
             //Initialize the core
             zvsCore = new Core();
-            Task.Run(() =>  
+            await Task.Run(() =>  
             { 
                 zvsCore.StartAsync();            
             });

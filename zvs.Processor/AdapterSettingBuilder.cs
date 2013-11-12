@@ -7,6 +7,7 @@ using zvs.Entities;
 using System.Data.Entity;
 using System.Reflection;
 using System.Linq.Expressions;
+using System.ComponentModel;
 
 namespace zvs.Processor
 {
@@ -37,32 +38,56 @@ namespace zvs.Processor
                 AdapterSettingBuilder = sb;
             }
         }
-        
+
         public async Task RegisterDeviceSettingAsync(DeviceSetting deviceSetting)
         {
             var existing_dp = await Context.DeviceSettings
-                .Include(o=> o.Options)
+                .Include(o => o.Options)
                 .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier);
 
+            var changed = false;
             if (existing_dp == null)
             {
                 Context.DeviceSettings.Add(deviceSetting);
+                changed = true;
             }
             else
             {
+                PropertyChangedEventHandler handler = (s, a) => changed = true;
+                existing_dp.PropertyChanged += handler;
+
                 existing_dp.Name = deviceSetting.Name;
                 existing_dp.Description = deviceSetting.Description;
                 existing_dp.ValueType = deviceSetting.ValueType;
                 existing_dp.Value = deviceSetting.Value;
 
-                Context.DeviceSettingOptions.RemoveRange(existing_dp.Options.ToList());
-                existing_dp.Options.Clear();
-                deviceSetting.Options.ToList().ForEach(o => existing_dp.Options.Add(o));
+                existing_dp.PropertyChanged -= handler;
+
+                foreach (var option in deviceSetting.Options)
+                {
+                    if (!existing_dp.Options.Any(o => o.Name == option.Name))
+                    {
+                        existing_dp.Options.Add(option);
+                        changed = true;
+                    }
+                }
+
+                foreach (var option in existing_dp.Options)
+                {
+                    if (!deviceSetting.Options.Any(o => o.Name == option.Name))
+                    {
+                        Context.DeviceSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
             }
 
-            var result = await Context.TrySaveChangesAsync();
-            if (result.HasError)
-                Core.log.Error(result.Message);
+            if (changed)
+            {
+                var result = await Context.TrySaveChangesAsync();
+                if (result.HasError)
+                    Core.log.Error(result.Message);
+            }
         }
 
         public async Task RegisterDeviceTypeSettingAsync(DeviceTypeSetting deviceTypeSetting)
@@ -73,32 +98,56 @@ namespace zvs.Processor
                     d.UniqueIdentifier == deviceTypeSetting.UniqueIdentifier &&
                     d.DeviceTypeId == deviceTypeSetting.DeviceTypeId);
 
+            var changed = false;
             if (existing_dp == null)
             {
                 Context.DeviceTypeSettings.Add(deviceTypeSetting);
+                changed = true;
             }
             else
             {
+                PropertyChangedEventHandler handler = (s, a) => changed = true;
+                existing_dp.PropertyChanged += handler;
+
                 existing_dp.Name = deviceTypeSetting.Name;
                 existing_dp.Description = deviceTypeSetting.Description;
                 existing_dp.ValueType = deviceTypeSetting.ValueType;
                 existing_dp.Value = deviceTypeSetting.Value;
 
-                Context.DeviceSettingOptions.RemoveRange(existing_dp.Options.ToList());
-                existing_dp.Options.Clear();
-                deviceTypeSetting.Options.ToList().ForEach(o => existing_dp.Options.Add(o));
+                existing_dp.PropertyChanged -= handler;
+
+                foreach (var option in deviceTypeSetting.Options)
+                {
+                    if (!existing_dp.Options.Any(o => o.Name == option.Name))
+                    {
+                        existing_dp.Options.Add(option);
+                        changed = true;
+                    }
+                }
+
+                foreach (var option in existing_dp.Options)
+                {
+                    if (!deviceTypeSetting.Options.Any(o => o.Name == option.Name))
+                    {
+                        Context.DeviceSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
             }
 
-            var result = await Context.TrySaveChangesAsync();
-            if (result.HasError)
-                Core.log.Error(result.Message);
+            if (changed)
+            {
+                var result = await Context.TrySaveChangesAsync();
+                if (result.HasError)
+                    Core.log.Error(result.Message);
+            }
         }
 
     }
 
     public static class AdapterTypeConfigurationExtensions
     {
-        public static async Task RegisterAdapterSettingAsync<T, R>(this zvs.Processor.AdapterSettingBuilder.AdapterTypeConfiguration<T> adsb, AdapterSetting adapterSetting, 
+        public static async Task RegisterAdapterSettingAsync<T, R>(this zvs.Processor.AdapterSettingBuilder.AdapterTypeConfiguration<T> adsb, AdapterSetting adapterSetting,
             Expression<Func<T, R>> property) where T : zvsAdapter
         {
             var propertyInfo = (property.Body as MemberExpression).Member as PropertyInfo;
@@ -116,26 +165,49 @@ namespace zvs.Processor
 
             AdapterSetting existingAdapter = await adsb.AdapterSettingBuilder.Context.AdapterSettings.FirstOrDefaultAsync(o => o.Adapter.Id == adapter.Id &&
                 o.UniqueIdentifier == adapterSetting.UniqueIdentifier);
-
+            var changed = false;
             if (existingAdapter == null)
             {
                 adapter.Settings.Add(adapterSetting);
+                changed = true;
             }
             else
             {
+
+                PropertyChangedEventHandler handler = (s, a) => changed = true;
+                existingAdapter.PropertyChanged += handler;
+
                 existingAdapter.Description = adapterSetting.Description;
                 existingAdapter.Name = adapterSetting.Name;
                 existingAdapter.ValueType = adapterSetting.ValueType;
-                adsb.AdapterSettingBuilder.Context.AdapterSettingOptions.RemoveRange(existingAdapter.Options);
+
+                existingAdapter.PropertyChanged -= handler;
+
+                foreach (var option in adapterSetting.Options)
+                {
+                    if (!existingAdapter.Options.Any(o => o.Name == option.Name))
+                    {
+                        existingAdapter.Options.Add(option);
+                        changed = true;
+                    }
+                }
 
                 foreach (var option in existingAdapter.Options)
-                    existingAdapter.Options.Add(option);
+                {
+                    if (!adapterSetting.Options.Any(o => o.Name == option.Name))
+                    {
+                        adsb.AdapterSettingBuilder.Context.AdapterSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
             }
 
-            var result = await adsb.AdapterSettingBuilder.Context.TrySaveChangesAsync();
-            if (result.HasError)
-                adsb.AdapterSettingBuilder.Core.log.Error(result.Message);
-
+            if (changed)
+            {
+                var result = await adsb.AdapterSettingBuilder.Context.TrySaveChangesAsync();
+                if (result.HasError)
+                    adsb.AdapterSettingBuilder.Core.log.Error(result.Message);
+            }
         }
     }
 }

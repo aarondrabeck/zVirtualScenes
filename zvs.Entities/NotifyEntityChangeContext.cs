@@ -105,38 +105,32 @@ namespace zvs.Entities
             List<dynamic> ModifedEntities = new List<dynamic>();
             List<object> DeletedEntities = new List<object>();
 
-            this.ChangeTracker.Entries().ToList().ForEach(o =>
+            foreach(var ent in this.ChangeTracker.Entries().ToList())
             {
-                if (o.State == EntityState.Added)
-                    AddedEntities.Add(o.Entity);
-                else if (o.State == EntityState.Modified)
+                if (ent.State == EntityState.Added)
+                    AddedEntities.Add(ent.Entity);
+                else if (ent.State == EntityState.Modified)
                     ModifedEntities.Add(new
                     {
-                        NewEntity = o.Entity,
-                        OldEntity = o.OriginalValues.ToObject()
+                        NewEntity = ent.Entity,
+                        OldEntity = ent.OriginalValues.ToObject()
                     });
-                else if (o.State == EntityState.Deleted)
-                    DeletedEntities.Add(o.Entity);
-            });
+                else if (ent.State == EntityState.Deleted)
+                    DeletedEntities.Add(ent.Entity);
+            };
 
             //Try Save Changes
             var saveChangesResult = await base.SaveChangesAsync(cancellationToken);
 
             //Report changes if SaveChanges did not throw an error.
-            AddedEntities.ForEach(o =>
-            {
-                RaiseEntityAdded(this, o);
-            });
+            foreach (var addedEnt in AddedEntities)
+                RaiseEntityAdded(this, addedEnt);
 
-            ModifedEntities.ForEach(o =>
-            {
-                RaiseEntityUpdated(this, o.NewEntity, o.OldEntity);
-            });
+            foreach (var moddedEnt in ModifedEntities)
+                RaiseEntityUpdated(this, moddedEnt.NewEntity, moddedEnt.OldEntity);
 
-            DeletedEntities.ForEach(o =>
-            {
-                RaiseEntityDeleted(this, o);
-            });
+            foreach (var deledEnt in DeletedEntities)
+                RaiseEntityDeleted(this, deledEnt);
 
             return saveChangesResult;
         }

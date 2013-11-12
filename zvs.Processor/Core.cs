@@ -97,7 +97,7 @@ namespace zvs.Processor
             {
 #endif
 
-            await AdapterManager.LoadAdaptersAsync(this);
+            AdapterManager.LoadAdaptersAsync(this);
 
             await PluginManager.LoadPluginsAsync(this);
 #if !DEBUG

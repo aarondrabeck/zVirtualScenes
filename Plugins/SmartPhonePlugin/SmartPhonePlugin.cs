@@ -282,7 +282,7 @@ namespace SmartPhonePlugin
                     return this.Ping(ip, false);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Host not found?
             }

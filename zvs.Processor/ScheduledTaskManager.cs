@@ -113,7 +113,7 @@ namespace zvs.Processor
             while (IsRunning)
             {
                 await Task.Delay(1000);
-                Debug.WriteLine("Checking for tasks to run...");
+               // Debug.WriteLine("Checking for tasks to run...");
                 CheckForTasks();
             }
         }

@@ -7,6 +7,7 @@ using zvs.Entities;
 using System.Data.Entity;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace zvs.Processor
 {
@@ -41,7 +42,7 @@ namespace zvs.Processor
 
     public static class PlugingTypeConfigurationExtensions
     {
-        public static async Task RegisterPluginSettingAsync<T,R>(this zvs.Processor.PluginSettingBuilder.PlugingTypeConfiguration<T> pspb, PluginSetting pluginSetting, 
+        public static async Task RegisterPluginSettingAsync<T, R>(this zvs.Processor.PluginSettingBuilder.PlugingTypeConfiguration<T> pspb, PluginSetting pluginSetting,
             Expression<Func<T, R>> property) where T : zvsPlugin
         {
             var propertyInfo = (property.Body as MemberExpression).Member as PropertyInfo;
@@ -57,26 +58,49 @@ namespace zvs.Processor
             if (plugin == null)
                 return;
 
+            var changed = false;
+
             var existing_ps = await pspb.PluginSettingBuilder.Context.PluginSettings.FirstOrDefaultAsync(o => o.Plugin.Id == plugin.Id && o.UniqueIdentifier == pluginSetting.UniqueIdentifier);
             if (existing_ps == null)
             {
                 plugin.Settings.Add(pluginSetting);
+                changed = true;
             }
             else
             {
-                existing_ps.Description = pluginSetting.Description;
-                existing_ps.Name = pluginSetting.Name;
-                existing_ps.ValueType = pluginSetting.ValueType;
+                PropertyChangedEventHandler handler = (s, a) => changed = true;
+                existing_ps.PropertyChanged += handler;
 
-                pspb.PluginSettingBuilder.Context.PluginSettingOptions.RemoveRange(existing_ps.Options);
+                existing_ps.Name = pluginSetting.Name;
+                existing_ps.Description = pluginSetting.Description;
+                existing_ps.ValueType = pluginSetting.ValueType;
+                existing_ps.Value = pluginSetting.Value;
+                existing_ps.PropertyChanged -= handler;
 
                 foreach (var option in pluginSetting.Options)
-                    existing_ps.Options.Add(option);
-            }
+                {
+                    if (!existing_ps.Options.Any(o => o.Name == option.Name))
+                    {
+                        existing_ps.Options.Add(option);
+                        changed = true;
+                    }
+                }
 
-            var result = await pspb.PluginSettingBuilder.Context.TrySaveChangesAsync();
-            if (result.HasError)
-                pspb.PluginSettingBuilder.Core.log.Error(result.Message);
+                foreach (var option in existing_ps.Options)
+                {
+                    if (!pluginSetting.Options.Any(o => o.Name == option.Name))
+                    {
+                        pspb.PluginSettingBuilder.Context.PluginSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
+            }
+            if (changed)
+            {
+                var result = await pspb.PluginSettingBuilder.Context.TrySaveChangesAsync();
+                if (result.HasError)
+                    pspb.PluginSettingBuilder.Core.log.Error(result.Message);
+            }
         }
     }
 }

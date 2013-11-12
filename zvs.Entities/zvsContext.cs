@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using zvs.Entities;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
+using System.Diagnostics;
 
 namespace zvs.Entities
 {
@@ -101,22 +102,28 @@ namespace zvs.Entities
 
         public async Task<Result> TrySaveChangesAsync()
         {
+            
+            Debug.WriteLine("\n\n-------------------> TrySaveChangesAsync CALLED ------------>\n\n");
+            Debug.WriteLine("StackTrace: '{0}'", Environment.StackTrace);
             try
             {
                 await SaveChangesAsync();
             }
             catch (DbEntityValidationException dbEx)
             {
+               
                 StringBuilder sb = new StringBuilder();
                 foreach (var validationErrors in dbEx.EntityValidationErrors)
                 {
                     foreach (var validationError in validationErrors.ValidationErrors)
                         sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
                 }
+                Debug.WriteLine(sb.ToString());
                 return new Result(sb.ToString());
             }
             catch (Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 return new Result(ex.GetInnerMostExceptionMessage());
             }
 

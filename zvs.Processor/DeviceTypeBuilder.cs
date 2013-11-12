@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using zvs.Entities;
 using System.Data.Entity;
+using System.ComponentModel;
 
 namespace zvs.Processor
 {
@@ -25,13 +26,17 @@ namespace zvs.Processor
                 o.Adapter.AdapterGuid == Adapter.AdapterGuid
                 && o.UniqueIdentifier == deviceType.UniqueIdentifier);
 
+            var changed = false;
             if (existing_dt == null)
             {
                 existing_dt = deviceType;
                 var adapter = await Context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == Adapter.AdapterGuid);
 
                 if (adapter != null)
+                {
                     adapter.DeviceTypes.Add(existing_dt);
+                    changed = true;
+                }
             }
             else
             {
@@ -41,7 +46,7 @@ namespace zvs.Processor
                 foreach (DeviceTypeCommand dtc in deviceType.Commands)
                 {
                     DeviceTypeCommand existing_dtc = await Context.DeviceTypeCommands
-                        .Include(o=> o.Options)
+                        .Include(o => o.Options)
                         .SingleOrDefaultAsync(o =>
                             o.DeviceTypeId == existing_dt.Id &&
                             o.UniqueIdentifier == dtc.UniqueIdentifier);
@@ -49,9 +54,14 @@ namespace zvs.Processor
                     if (existing_dtc == null)
                     {
                         existing_dt.Commands.Add(dtc);
+                        changed = true;
                     }
                     else
                     {
+
+                        PropertyChangedEventHandler handler = (s, a) => changed = true;
+                        existing_dtc.PropertyChanged += handler;
+
                         existing_dtc.Name = dtc.Name;
                         existing_dtc.Help = dtc.Help;
                         existing_dtc.CustomData1 = dtc.CustomData1;
@@ -59,16 +69,35 @@ namespace zvs.Processor
                         existing_dtc.ArgumentType = dtc.ArgumentType;
                         existing_dtc.Description = dtc.Description;
 
-                        Context.CommandOptions.RemoveRange(existing_dtc.Options.ToList());
-                        existing_dtc.Options.Clear();
-                        dtc.Options.ToList().ForEach(o => existing_dtc.Options.Add(o));
+                        existing_dtc.PropertyChanged -= handler;
+
+                        foreach (var option in dtc.Options)
+                        {
+                            if (!existing_dtc.Options.Any(o => o.Name == option.Name))
+                            {
+                                existing_dtc.Options.Add(option);
+                                changed = true;
+                            }
+                        }
+
+                        foreach (var option in existing_dtc.Options)
+                        {
+                            if (!dtc.Options.Any(o => o.Name == option.Name))
+                            {
+                                Context.CommandOptions.Local.Remove(option);
+                                changed = true;
+                            }
+                        }
                     }
                 }
             }
 
-            var result = await Context.TrySaveChangesAsync();
-            if (result.HasError)
-                Core.log.Error(result.Message);
+            if (changed)
+            {
+                var result = await Context.TrySaveChangesAsync();
+                if (result.HasError)
+                    Core.log.Error(result.Message);
+            }
 
             return existing_dt.Id;
         }
@@ -86,5 +115,6 @@ namespace zvs.Processor
         {
             return 37 * obj.Name.GetHashCode() + 19 * obj.Name.GetHashCode();
         }
+
     }
 }

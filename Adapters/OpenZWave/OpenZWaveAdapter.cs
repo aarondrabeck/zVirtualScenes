@@ -28,7 +28,6 @@ namespace OpenZWavePlugin
     {
         private async void OpenZWaveAdapter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-
             if (IsEnabled)
             {
                 await StopOpenzwaveAsync();
@@ -196,15 +195,12 @@ namespace OpenZWavePlugin
                     ValueType = DataType.BOOL
                 });
             }
-            this.PropertyChanged += OpenZWaveAdapter_PropertyChanged;
+           
         }
 
         public override async Task StartAsync()
         {
-            await Task.Run(async () =>
-                {
-                    await StartOpenzwaveAsync();
-                });
+            await StartOpenzwaveAsync();
         }
 
         public override async Task StopAsync()
@@ -357,6 +353,7 @@ namespace OpenZWavePlugin
                 return Task.FromResult(0);
             }
 
+            this.PropertyChanged += OpenZWaveAdapter_PropertyChanged;
             try
             {
                 Core.log.InfoFormat("OpenZwave driver starting on {0}", UseHIDSetting ? "HID" : "COM" + ComportSetting);
@@ -406,6 +403,8 @@ namespace OpenZWavePlugin
         {
             if (!isShuttingDown)
             {
+                this.PropertyChanged -= OpenZWaveAdapter_PropertyChanged;
+
                 isShuttingDown = true;
                 InitialPollingComplete = false;
 
@@ -873,11 +872,14 @@ namespace OpenZWavePlugin
                                 if (ozw_device == null)
                                     break;
 
-                                ozw_device.DeviceTypeId = deviceTypeId;
+                                if (ozw_device.DeviceTypeId != deviceTypeId)
+                                {
+                                    ozw_device.DeviceTypeId = deviceTypeId;
 
-                                var result = await context.TrySaveChangesAsync();
-                                if (result.HasError)
-                                    Core.log.Error(result.Message);
+                                    var result = await context.TrySaveChangesAsync();
+                                    if (result.HasError)
+                                        Core.log.Error(result.Message);
+                                }
 
                                 #region Last Event Value Storage
                                 //Node event value placeholder 
@@ -915,6 +917,7 @@ namespace OpenZWavePlugin
                         value.Help = m_manager.GetValueHelp(vid);
                         bool read_only = m_manager.IsValueReadOnly(vid);
                         node.AddValue(value);
+                        var vIdString = vid.GetId().ToString();
 
 #if DEBUG
                         Stopwatch sw = new Stopwatch();
@@ -945,7 +948,7 @@ namespace OpenZWavePlugin
                             await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
                                 DeviceId = d.Id,
-                                UniqueIdentifier = vid.GetId().ToString(),
+                                UniqueIdentifier = vIdString,
                                 Name = value.Label,
                                 Genre = value.Genre,
                                 Index = value.Index,
@@ -970,7 +973,7 @@ namespace OpenZWavePlugin
                                     ArgumentType = pType,
                                     Help = string.IsNullOrEmpty(value.Help) ? string.Empty : value.Help,
                                     CustomData1 = string.IsNullOrEmpty(value.Label) ? string.Empty : value.Label,
-                                    CustomData2 = string.IsNullOrEmpty(vid.GetId().ToString()) ? string.Empty : vid.GetId().ToString(),
+                                    CustomData2 = string.IsNullOrEmpty(vIdString) ? string.Empty : vIdString,
                                     SortOrder = EvaluateOrder(value.Genre)
                                 };
 
@@ -1067,19 +1070,26 @@ namespace OpenZWavePlugin
 
                             #region Update Device Status Properties
                             //Update Current Status Field
+                            var changed = false;
                             if (device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.THERMOSTAT.ToString())
                             {
                                 if (value.Label == "Temperature")
                                 {
                                     double level = 0;
                                     double.TryParse(data, out level);
+                                    var levelTxt = string.Format("{0}° F", level);
 
-                                    device.CurrentLevelInt = level;
-                                    device.CurrentLevelText = level + "° F";
+                                    if (device.CurrentLevelInt != level)
+                                    {
+                                        device.CurrentLevelInt = level;
+                                        changed = true;
+                                    }
 
-                                    var result = await context.TrySaveChangesAsync();
-                                    if (result.HasError)
-                                        Core.log.Error(result.Message);
+                                    if (device.CurrentLevelText != levelTxt)
+                                    {
+                                        device.CurrentLevelText = levelTxt;
+                                        changed = true;
+                                    }
                                 }
                             }
                             else if (device.Type.UniqueIdentifier == OpenzWaveDeviceTypes.SWITCH.ToString())
@@ -1089,12 +1099,20 @@ namespace OpenZWavePlugin
                                     double level = 0;
                                     if (double.TryParse(data, out level))
                                     {
-                                        device.CurrentLevelInt = level > 0 ? 100 : 0;
-                                        device.CurrentLevelText = level > 0 ? "On" : "Off";
+                                        var levelOnOff = level > 0 ? 100 : 0;
+                                        var leveltxt = level > 0 ? "On" : "Off";
 
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            Core.log.Error(result.Message);
+                                        if (device.CurrentLevelInt != levelOnOff)
+                                        {
+                                            device.CurrentLevelInt = levelOnOff;
+                                            changed = true;
+                                        }
+
+                                        if (device.CurrentLevelText != leveltxt)
+                                        {
+                                            device.CurrentLevelText = leveltxt;
+                                            changed = true;
+                                        }
                                     }
                                 }
                                 else if (value.Label == "Switch" || value.Label == "Level") //Some Intermatic devices do not set basic when changing status
@@ -1102,12 +1120,20 @@ namespace OpenZWavePlugin
                                     bool state = false;
                                     if (bool.TryParse(data, out state))
                                     {
-                                        device.CurrentLevelInt = state ? 100 : 0;
-                                        device.CurrentLevelText = state ? "On" : "Off";
+                                        var levelOnOff = state ? 100 : 0;
+                                        var leveltxt = state ? "On" : "Off";
 
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            Core.log.Error(result.Message);
+                                        if (device.CurrentLevelInt != levelOnOff)
+                                        {
+                                            device.CurrentLevelInt = levelOnOff;
+                                            changed = true;
+                                        }
+
+                                        if (device.CurrentLevelText != leveltxt)
+                                        {
+                                            device.CurrentLevelText = leveltxt;
+                                            changed = true;
+                                        }
                                     }
                                 }
 
@@ -1118,14 +1144,28 @@ namespace OpenZWavePlugin
                                 {
                                     double level = 0;
                                     double.TryParse(data, out level);
+                                    var levelInt = (int)level;
+                                    var levelTxt = level + "%";
 
-                                    device.CurrentLevelInt = (int)level;
-                                    device.CurrentLevelText = level + "%";
+                                    if (device.CurrentLevelInt != levelInt)
+                                    {
+                                        device.CurrentLevelInt = levelInt;
+                                        changed = true;
+                                    }
 
-                                    var result = await context.TrySaveChangesAsync();
-                                    if (result.HasError)
-                                        Core.log.Error(result.Message);
+                                    if (device.CurrentLevelText != levelTxt)
+                                    {
+                                        device.CurrentLevelText = levelTxt;
+                                        changed = true;
+                                    }
                                 }
+                            }
+
+                            if (changed)
+                            {
+                                var result = await context.TrySaveChangesAsync();
+                                if (result.HasError)
+                                    Core.log.Error(result.Message);
                             }
                             #endregion
 
@@ -1404,7 +1444,7 @@ namespace OpenZWavePlugin
                             if (!NodesReady.Contains(node.ID))
                                 NodesReady.Add(node.ID);
 
-                            await UpdateLastHeardFrom(node.ID);
+                            //await UpdateLastHeardFrom(node.ID);
                         }
 
                         break;
@@ -1421,7 +1461,7 @@ namespace OpenZWavePlugin
                             if (!NodesReady.Contains(node.ID))
                                 NodesReady.Add(node.ID);
 
-                            await UpdateLastHeardFrom(node.ID);
+                            //await UpdateLastHeardFrom(node.ID);
                         }
 
                         break;
@@ -1504,24 +1544,24 @@ namespace OpenZWavePlugin
                 }
         }
 
-        private async Task UpdateLastHeardFrom(byte NodeId)
-        {
-            using (zvsContext context = new zvsContext())
-            {
-                Device device = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
-                                   o.NodeNumber == NodeId);
+        //private async Task UpdateLastHeardFrom(byte NodeId)
+        //{
+        //    using (zvsContext context = new zvsContext())
+        //    {
+        //        Device device = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
+        //                           o.NodeNumber == NodeId);
 
-                if (device != null)
-                {
-                    device.LastHeardFrom = DateTime.Now;
-                }
+        //        if (device != null)
+        //        {
+        //            device.LastHeardFrom = DateTime.Now;
+        //        }
 
-                var result = await context.TrySaveChangesAsync();
-                if (result.HasError)
-                    Core.log.Error(result.Message);
-            }
+        //        var result = await context.TrySaveChangesAsync();
+        //        if (result.HasError)
+        //            Core.log.Error(result.Message);
+        //    }
 
-        }
+        //}
 
         private DataType ConvertType(ZWValueID v)
         {

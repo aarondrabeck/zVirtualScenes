@@ -68,12 +68,26 @@ namespace zvs.Entities
 
             var existing_option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == programOption.UniqueIdentifier);
 
-            if (existing_option == null)
-                context.ProgramOptions.Add(programOption);
-            else
-                existing_option.Value = programOption.Value;
+            var changed = false;
 
-            return await context.TrySaveChangesAsync();
+            if (existing_option == null)
+            {
+                context.ProgramOptions.Add(programOption);
+                changed = true;
+            }
+            else
+            {
+                if (existing_option.Value != programOption.Value)
+                {
+                    changed = true;
+                    existing_option.Value = programOption.Value;
+                }
+            }
+
+            if (changed)
+                return await context.TrySaveChangesAsync();
+
+            return new Result();
         }
 
         //TODO: MOVE TO EXTENSION METHOD

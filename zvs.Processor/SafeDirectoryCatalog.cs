@@ -38,6 +38,8 @@ namespace zvs.Processor
                     if (typelex != null)
                         LoadExceptionTypeNames.Add(typelex.TypeName);
                 }
+                catch (Exception)
+                { }
             }
         }
         public override IQueryable<ComposablePartDefinition> Parts

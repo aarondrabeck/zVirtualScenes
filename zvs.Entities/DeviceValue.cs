@@ -158,13 +158,5 @@ namespace zvs.Entities
                 this.oldValue = oldValue;
             }
         }
-
-        public static event DeviceValueAddedEventHandler DeviceValueAddedEvent = delegate { };
-        public delegate void DeviceValueAddedEventHandler(object sender, EventArgs e);
-
-        public void DeviceValueAdded(EventArgs e)
-        {
-            DeviceValueAddedEvent(this, e);
-        }
     }
 }

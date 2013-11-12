@@ -56,7 +56,7 @@ namespace zvs.WPF.Commands
             //Fill the device combo box from db
             await Context.Devices.ToListAsync();
 
-            DevicesCmboBox.ItemsSource = Context.Devices.Local;
+            DevicesCmboBox.ItemsSource = Context.Devices.Local.OrderBy(o => o.Name);
             if (DevicesCmboBox.Items.Count > 0)
                 DevicesCmboBox.SelectedIndex = 0;
 

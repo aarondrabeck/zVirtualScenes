@@ -28,71 +28,89 @@ namespace zvs.Processor
 
         private Dictionary<Guid, zvsAdapter> AdapterLookup = new Dictionary<Guid, zvsAdapter>();
 
-        public async Task LoadAdaptersAsync(Core core)
+        public void LoadAdaptersAsync(Core core)
         {
-            Core = core;
-            SafeDirectoryCatalog catalog = new SafeDirectoryCatalog("adapters");
-            CompositionContainer compositionContainer = new CompositionContainer(catalog);
-            compositionContainer.ComposeParts(this);
-
-            if (catalog.LoadExceptionTypeNames.Count > 0)
-            {
-                Core.log.WarnFormat(@"The following adapters could not be loaded because they are incompatible: {0}. To resolve this issue, update or uninstall the listed adapter's.",
-                    string.Join(", ", catalog.LoadExceptionTypeNames));
-            }
-
-            using (zvsContext context = new zvsContext())
-            {
-                // Iterate the adapters found in dlls
-                foreach (var adapter in _Adapters)
+            Task.Run(async () =>
                 {
-                    //keeps this adapter in scope 
-                    var zvsAdapter = adapter;
+                    Core = core;
+                    SafeDirectoryCatalog catalog = new SafeDirectoryCatalog("adapters");
+                    CompositionContainer compositionContainer = new CompositionContainer(catalog);
+                    compositionContainer.ComposeParts(this);
 
-                    if (!AdapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
-                        AdapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
-
-                    //Check Database for this adapter
-                    var dbAdapter = await context.Adapters
-                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
-
-                    if (dbAdapter == null)
+                    if (catalog.LoadExceptionTypeNames.Count > 0)
                     {
-                        dbAdapter = new Adapter();
-                        dbAdapter.AdapterGuid = zvsAdapter.AdapterGuid;
-                        context.Adapters.Add(dbAdapter);
+                        Core.log.WarnFormat(@"The following adapters could not be loaded because they are incompatible: {0}. To resolve this issue, update or uninstall the listed adapter's.",
+                            string.Join(", ", catalog.LoadExceptionTypeNames));
                     }
 
-                    //Update Name and Description
-                    zvsAdapter.IsEnabled = dbAdapter.IsEnabled;
-                    dbAdapter.Name = zvsAdapter.Name;
-                    dbAdapter.Description = zvsAdapter.Description;
-
-                    var result = await context.TrySaveChangesAsync();
-                    if (result.HasError)
-                        core.log.Error(result.Message);
-
-                    string msg = string.Format("Initializing '{0}'", zvsAdapter.Name);
-                    Core.log.Info(msg);
-
-                    //Plug-in need access to the core in order to use the Logger
-                    await zvsAdapter.Initialize(Core);
-
-                    //Reload just installed settings
-                    dbAdapter = await context.Adapters
-                        .Include(o => o.Settings)
-                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
-
-                    //Set plug-in settings from database values
-                    foreach (var setting in dbAdapter.Settings)
+                    using (zvsContext context = new zvsContext())
                     {
-                        SetAdapterProperty(zvsAdapter, setting.UniqueIdentifier, setting.Value);
-                    }
+                        // Iterate the adapters found in dlls
+                        foreach (var adapter in _Adapters)
+                        {
+                            //keeps this adapter in scope 
+                            var zvsAdapter = adapter;
 
-                    if (dbAdapter.IsEnabled)
-                        await zvsAdapter.StartAsync();
-                }
-            }
+                            if (!AdapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
+                                AdapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
+
+                            //Check Database for this adapter
+                            var dbAdapter = await context.Adapters
+                                .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
+
+                            var changed = false;
+                            if (dbAdapter == null)
+                            {
+                                dbAdapter = new Adapter();
+                                dbAdapter.AdapterGuid = zvsAdapter.AdapterGuid;
+                                context.Adapters.Add(dbAdapter);
+                                changed = true;
+                            }
+
+                            //Update Name and Description
+                            zvsAdapter.IsEnabled = dbAdapter.IsEnabled;
+
+                            if (dbAdapter.Name != zvsAdapter.Name)
+                            {
+                                dbAdapter.Name = zvsAdapter.Name;
+                                changed = true;
+                            }
+
+                            if (dbAdapter.Description != zvsAdapter.Description)
+                            {
+                                dbAdapter.Description = zvsAdapter.Description;
+                                changed = true;
+                            }
+
+                            if (changed)
+                            {
+                                var result = await context.TrySaveChangesAsync();
+                                if (result.HasError)
+                                    core.log.Error(result.Message);
+                            }
+
+                            string msg = string.Format("Initializing '{0}'", zvsAdapter.Name);
+                            Core.log.Info(msg);
+
+                            //Plug-in need access to the core in order to use the Logger
+                            await zvsAdapter.Initialize(Core);
+
+                            //Reload just installed settings
+                            dbAdapter = await context.Adapters
+                                .Include(o => o.Settings)
+                                .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid);
+
+                            //Set plug-in settings from database values
+                            foreach (var setting in dbAdapter.Settings)
+                            {
+                                SetAdapterProperty(zvsAdapter, setting.UniqueIdentifier, setting.Value);
+                            }
+
+                            if (dbAdapter.IsEnabled)
+                                await zvsAdapter.StartAsync();
+                        }
+                    }
+                });
         }
 
         public ReadOnlyDictionary<Guid, zvsAdapter> AdapterGuidToAdapterDictionary
