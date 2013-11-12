@@ -13,7 +13,7 @@
     TaskName="Xunit.Runner.MSBuild.xunit"/>
 
   <Target Name="Build-RunTests">
-    <MSBuild Projects="zvs.Processor.Tests\zvs.Processor.Tests.csproj" Targets="Rebuild" Properties="Configuration=Release" />
+    <MSBuild Projects="zVirtualScenes.sln" Targets="Rebuild" Properties="Configuration=Release" />
     <xunit Assembly="bin\tests\Release\zvs.Processor.Tests.dll" Verbose="true" TeamCity="true"/>
   </Target>
 		
