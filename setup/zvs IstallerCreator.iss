@@ -76,8 +76,7 @@ Source: "..\bin\release\SciLexer.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\SciLexer64.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\ScintillaNET.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\ScintillaNET.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\release\System.Data.SqlServerCe.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\release\System.Spatial.dll"; DestDir: "{app}"; Flags: ignoreversion    
+Source: "..\bin\release\System.Data.SqlServerCe.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\WPFToolkit.Extended.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zvs.dll"; DestDir: "{app}"; Flags: ignoreversion 
 Source: "..\bin\release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversion 
