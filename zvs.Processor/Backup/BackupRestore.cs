@@ -10,9 +10,16 @@ using System.Xml.Serialization;
 
 namespace zvs.Processor.Backup
 {
-    public class BackFileIO
+    public abstract class BackupRestore
     {
-        public static async Task<Result> SaveAsXMLToDiskAsync<T>(T objCollection, string fileName) where T : IEnumerable
+        public abstract string Name { get; }
+        public abstract string FileName { get; }
+
+        public abstract Task<ExportResult> ExportAsync(string fileName);
+
+        public abstract Task<RestoreSettingsResult> ImportAsync(string fileName);
+
+        protected async Task<Result> SaveAsXMLToDiskAsync<T>(T objCollection, string fileName) where T : IEnumerable
         {
             try
             {
@@ -40,7 +47,7 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public static async Task<ReadAsXMLFromDiskResult<T>> ReadAsXMLFromDiskAsync<T>(string fileName)
+        protected async Task<ReadAsXMLFromDiskResult<T>> ReadAsXMLFromDiskAsync<T>(string fileName)
         {
             Debug.WriteLine(string.Format("Loading {0}", typeof(T).Name));
 
@@ -86,6 +93,23 @@ namespace zvs.Processor.Backup
 
             public ReadAsXMLFromDiskResult(string message)
                 : base(message)
+            {
+            }
+        }
+
+        public class RestoreSettingsResult : Result
+        {
+            public string FilePath { get; private set; }
+
+            public RestoreSettingsResult(string message, string filePath)
+                : base()
+            {
+                Message = message;
+                FilePath = filePath;
+            }
+
+            public RestoreSettingsResult(string error)
+                : base(error)
             {
             }
         }

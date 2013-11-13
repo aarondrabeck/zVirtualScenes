@@ -11,21 +11,31 @@ using System.Diagnostics;
 
 namespace zvs.Processor.Backup
 {
-    public partial class Backup
+    public class DeviceBackupRestore : BackupRestore
     {
         [Serializable]
         public class DeviceBackup
         {
-            public string Name;
-            public int NodeNumber;
+            public string Name { get; set; }
+            public int NodeNumber { get; set; }
         }
 
-        public async static Task<BackFileIO.ExportResult> ExportDevicesAsync(string fileName)
+        public override string Name
         {
-            List<DeviceBackup> devices = new List<DeviceBackup>();
+            get { return "Device Names"; }
+        }
+
+        public override string FileName
+        {
+            get { return "DevicesBackup.zvs"; }
+        }
+
+        public async override Task<ExportResult> ExportAsync(string fileName)
+        {
             using (zvsContext context = new zvsContext())
             {
                 var backupDevices = await context.Devices
+                    .OrderBy(o => o.Name)
                     .Select(o => new DeviceBackup()
                     {
                         NodeNumber = o.NodeNumber,
@@ -33,18 +43,18 @@ namespace zvs.Processor.Backup
                     })
                     .ToListAsync();
 
-                var saveResult = await BackFileIO.SaveAsXMLToDiskAsync(backupDevices, fileName);
+                var saveResult = await SaveAsXMLToDiskAsync(backupDevices, fileName);
 
                 if (saveResult.HasError)
-                    return new BackFileIO.ExportResult(saveResult.Message, saveResult.HasError);
+                    return new ExportResult(saveResult.Message, saveResult.HasError);
 
-                return new BackFileIO.ExportResult(string.Format("Exported {0} device names to '{1}'", devices.Count, Path.GetFileName(fileName)), false);
+                return new ExportResult(string.Format("Exported {0} device names to {1}", backupDevices.Count, Path.GetFileName(fileName)), false);
             }
         }
 
-        public async static Task<RestoreSettingsResult> ImportDevicesAsync(string fileName)
+        public async override Task<RestoreSettingsResult> ImportAsync(string fileName)
         {
-            var result = await BackFileIO.ReadAsXMLFromDiskAsync<List<DeviceBackup>>(fileName);
+            var result = await ReadAsXMLFromDiskAsync<List<DeviceBackup>>(fileName);
 
             if (result.HasError)
                 return new RestoreSettingsResult(result.Message);
@@ -63,28 +73,16 @@ namespace zvs.Processor.Backup
                         ImportedCount++;
                     }
                 }
-                await context.SaveChangesAsync();
+
+                var saveResult = await context.TrySaveChangesAsync();
+
+                if (saveResult.HasError)
+                    return new RestoreSettingsResult(saveResult.Message);
             }
 
-            return new RestoreSettingsResult(string.Format("Imported {0} device names from '{1}'", ImportedCount, Path.GetFileName(fileName)), fileName);
-        }
-    }
-
-    public class RestoreSettingsResult : Result
-    {
-        public string Summary { get; private set; }
-        public string FilePath { get; private set; }
-
-        public RestoreSettingsResult(string summary, string filePath)
-            : base()
-        {
-            Summary = summary;
-            FilePath = filePath;
+            return new RestoreSettingsResult(string.Format("Restored {0} device names. File: '{1}'", ImportedCount, Path.GetFileName(fileName)), fileName);
         }
 
-        public RestoreSettingsResult(string error)
-            : base(error)
-        {
-        }
+        
     }
 }

@@ -25,6 +25,7 @@ using zvs.Entities;
 using zvs.WPF.JavaScript;
 using zvs.Processor.Logging;
 using System.Threading.Tasks;
+using zvs.WPF.Backup;
 
 namespace zvs.WPF
 {
@@ -260,256 +261,7 @@ namespace zvs.WPF
             aboutWin.ShowDialog();
         }
 
-        private async void ExportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "DevicesBackup"; // Default file name
-            dlg.DefaultExt = ".xml"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            // Show open file dialog box
-            bool? r = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (r ?? true)
-            {
-                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                var result = await Backup.ExportDevicesAsync(dlg.FileName);
-
-                if (result.HasError)
-                    log.Error(result.Message);
-                else
-                    log.Info(result.Message);
-            }
-        }
-
-        private async void ImportDeviceNamesMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "DevicesBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            bool? r = dlg.ShowDialog();
-
-            if (r ?? true)
-            {
-
-                var result = await Backup.ImportDevicesAsync(dlg.FileName);
-                if (result.HasError)
-                    log.Error(result.Message);
-                else
-                    log.Info(result.Summary);
-            }
-        }
-
-        private void ExportScenesMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "ScenesBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            // Show open file dialog box
-            bool? r = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (r ?? true)
-            {
-                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportScenesAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private async void ImportScenesMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "ScenesBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            bool? r = dlg.ShowDialog();
-
-            if (r ?? true)
-            {
-                await Backup.ImportScenesAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private void ExportTriggersMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "TriggersBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            // Show open file dialog box
-            bool? r = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (r ?? true)
-            {
-                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportTriggerAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private async void ImportTriggersMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "TriggersBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            bool? r = dlg.ShowDialog();
-
-            if (r ?? true)
-            {
-                await Backup.ImportTriggersAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private void ExportGroupsMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "GroupsBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            // Show open file dialog box
-            bool? r = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (r ?? true)
-            {
-                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportGroupsAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private void ImportGroupsMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "GroupsBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            bool? r = dlg.ShowDialog();
-
-            if (r ?? true)
-            {
-                Backup.ImportGroupsAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private async void ExportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "ScheduledTaskBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            // Show open file dialog box
-            bool? r = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (r ?? true)
-            {
-                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                await Backup.ExportScheduledTaskAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private async void ImportScheduledTaskMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "ScheduledTaskBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            bool? r = dlg.ShowDialog();
-
-            if (r ?? true)
-            {
-                await Backup.ImportScheduledTaskAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private void ImportJSMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.FileName = "JSCommandsBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            bool? r = dlg.ShowDialog();
-
-            if (r ?? true)
-            {
-                Backup.ImportJavaScriptAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
-        private void ExportJSMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            // Configure open file dialog box
-            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
-            dlg.FileName = "JSCommandsBackup"; // Default file name
-            dlg.DefaultExt = ".zvs"; // Default file extension
-            dlg.Filter = "Zvs Files (.zvs)|*.zvs"; // Filter files by extension
-
-            // Show open file dialog box
-            bool? r = dlg.ShowDialog();
-
-            // Process open file dialog box results
-            if (r ?? true)
-            {
-                //string path = System.IO.Path.Combine(Utils.AppDataPath, "zvsDeviceNameExport.xml");
-                Backup.ExportJavaScriptAsync(dlg.FileName, (result) =>
-                {
-                    log.Info(result);
-                });
-            }
-        }
-
+        
         private void SettingMI_Click_1(object sender, RoutedEventArgs e)
         {
             SettingWindow settingWindow = new SettingWindow();
@@ -530,9 +282,12 @@ namespace zvs.WPF
 
         }
 
-
-
-
+        private void BackupRestoreMI_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new BackupRestoreWindow();
+            window.Owner = this;
+            window.ShowDialog();
+        }
 
 
     }

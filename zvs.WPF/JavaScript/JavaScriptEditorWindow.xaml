@@ -14,7 +14,7 @@
     </Window.Resources>
     <Grid DataContext="{StaticResource jSResultViewSource}" >
 
-        <Border Height="Auto" Margin="10,63,10,219">
+        <Border Height="Auto" Margin="0,63,0,219">
             <Editor:JSEditor x:Name="TriggerScriptEditor" Width="750" Height="380"  KeyUp="TriggerScriptEditor_KeyUp" ></Editor:JSEditor>
         </Border>
 
@@ -42,7 +42,7 @@
         </Menu>
         <TextBlock HorizontalAlignment="Left" Margin="10,34,0,0" TextWrapping="Wrap" Text="Name" VerticalAlignment="Top"/>
         <TextBox Name="CmdNameTxtBx" Margin="47,29,385,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="25"/>
-        <DataGrid  x:Name="JSResultDataGrid"  Margin="10,458,10,10" Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
+        <DataGrid  x:Name="JSResultDataGrid"  Margin="0,458,0,0" Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
                    HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
             <DataGrid.Columns>

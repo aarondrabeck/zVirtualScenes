@@ -227,22 +227,7 @@
                     </MenuItem.Header>
 
                     <MenuItem Header="_File"  >
-                        <MenuItem Header="Backup" >
-                            <MenuItem Header="Device Names" x:Name="ExportDeviceNamesMI" Click="ExportDeviceNamesMI_Click_1" />
-                            <MenuItem Header="JavaScript Commands" x:Name="ExportJSMI" Click="ExportJSMI_Click_1" />
-                            <MenuItem Header="Scenes" x:Name="ExportScenesMI" Click="ExportScenesMI_Click_1" />
-                            <MenuItem Header="Triggers" x:Name="ExportTriggersMI" Click="ExportTriggersMI_Click_1" />
-                            <MenuItem Header="Groups" x:Name="ExportGroupsMI" Click="ExportGroupsMI_Click_1" />
-                            <MenuItem Header="Scheduled Tasks" x:Name="ExportScheduledTaskMI" Click="ExportScheduledTaskMI_Click_1" />
-                        </MenuItem>
-                        <MenuItem Header="Restore" >
-                            <MenuItem Header="Device Names" x:Name="ImportDeviceNamesMI" Click="ImportDeviceNamesMI_Click_1" />
-                            <MenuItem Header="JavaScript Commands" x:Name="ImportJSMI" Click="ImportJSMI_Click_1" />
-                            <MenuItem Header="Scenes" x:Name="ImportScenesMI" Click="ImportScenesMI_Click_1" />
-                            <MenuItem Header="Triggers" x:Name="ImportTriggersMI" Click="ImportTriggersMI_Click_1" />
-                            <MenuItem Header="Groups" x:Name="ImportGroupsMI" Click="ImportGroupsMI_Click_1" />
-                            <MenuItem Header="Scheduled Tasks" x:Name="ImportScheduledTaskMI" Click="ImportScheduledTaskMI_Click_1" />
-                        </MenuItem>
+                        <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMI" Click="BackupRestoreMI_Click" />
                         <Separator />
                         <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
 

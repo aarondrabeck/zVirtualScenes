@@ -94,11 +94,22 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WpfAnimatedGif">
+      <HintPath>..\packages\WpfAnimatedGif.1.4.4\lib\net\WpfAnimatedGif.dll</HintPath>
+    </Reference>
     <Reference Include="WPFToolkit.Extended">
       <HintPath>.\WPFToolkit.Extended.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Backup\BackupRestoreControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Backup\BackupRestoreWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\ChromeStyledWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -113,6 +124,12 @@
     </Page>
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Backup\BackupRestoreControl.xaml.cs">
+      <DependentUpon>BackupRestoreControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Backup\BackupRestoreWindow.xaml.cs">
+      <DependentUpon>BackupRestoreWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources\ChromeStyledWindow.xaml.cs">
       <DependentUpon>ChromeStyledWindow.xaml</DependentUpon>
@@ -376,6 +393,10 @@
     <Resource Include="Images\multipleIcon.png" />
     <Resource Include="Images\settingIcon.png" />
     <Resource Include="Images\unknown.png" />
+    <Resource Include="Images\spinner.gif" />
+    <Resource Include="Images\greencheck.png" />
+    <Resource Include="Images\blank.png" />
+    <Resource Include="Images\red_x.png" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
