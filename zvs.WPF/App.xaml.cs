@@ -225,7 +225,7 @@ namespace zvs.WPF
             base.OnStartup(e);
         }
 
-        private async void RefreshTriggerDescripitions()
+        public async Task RefreshTriggerDescripitions()
         {
             using (zvsContext context = new zvsContext())
             {
@@ -243,7 +243,7 @@ namespace zvs.WPF
             }
         }
 
-        private async void RefreshCommandDescripitions()
+        public async Task RefreshCommandDescripitions()
         {
             using (zvsContext context = new zvsContext())
             {
@@ -292,9 +292,7 @@ namespace zvs.WPF
                 splashscreen.SetLoadingText("Loading user interface");
                 splashscreen.Show();
 
-                //TODO: REMOVE THE NEED FOR STATIC DESCIPTIONS  DB DESIGN? - CHANGE UI??
-                //RefreshCommandDescripitions();
-                //RefreshTriggerDescripitions();
+               
 
                 await Task.Delay(10);
                 splashscreen.SetLoadingTextFormat("Loading user interface settings");

@@ -173,8 +173,13 @@ namespace HttpAPI
         #endregion
         public override Task StartAsync()
         {
-            GuidToPluginName.Add(Guid.Parse("70f91ca6-08bb-406a-a60f-aeb13f50aae8"), "OPENZWAVE");
-            GuidToPluginName.Add(Guid.Parse("c4e1c021-c49f-489d-88cb-ec52bbae3be5"), "THINKSTICK");
+            var zwaveKey = Guid.Parse("70f91ca6-08bb-406a-a60f-aeb13f50aae8");
+            if (!GuidToPluginName.ContainsKey(zwaveKey))
+                GuidToPluginName.Add(zwaveKey, "OPENZWAVE");
+
+            var thinkStickKey = Guid.Parse("c4e1c021-c49f-489d-88cb-ec52bbae3be5");
+            if (!GuidToPluginName.ContainsKey(thinkStickKey))
+                GuidToPluginName.Add(thinkStickKey, "THINKSTICK");
 
             StartHTTP();
             PropertyChanged += HttpAPIPlugin_PropertyChanged;

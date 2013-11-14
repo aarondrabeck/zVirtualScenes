@@ -44,6 +44,20 @@ namespace zvs.WPF.SceneControls
             zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded += SceneCreator_onEntityAdded;
             zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted += SceneCreator_onEntityDeleted;
             zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += SceneCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<StoredCommand>.onEntityUpdated += SceneCreator_onEntityUpdated;
+        }
+
+        void SceneCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<StoredCommand>())
+                    await ent.ReloadAsync();
+            }));
         }
 
         void SceneCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityUpdatedArgs e)

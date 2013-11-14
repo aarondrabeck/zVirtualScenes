@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using zvs.Processor.Backup;
 using zvs;
+using zvs.Entities;
+using System.Data.Entity;
 
 namespace zvs.WPF.Backup
 {
@@ -45,11 +47,14 @@ namespace zvs.WPF.Backup
 
         private void RestoreBackupListView_Loaded(object sender, RoutedEventArgs e)
         {
+            //note order matters here when importing
             var backupRestores = new List<BackupRestore>();
             backupRestores.Add(new DeviceBackupRestore());
             backupRestores.Add(new GroupBackupRestore());
             backupRestores.Add(new JavascriptBackupRestore());
+            backupRestores.Add(new SceneBackupRestore());
             backupRestores.Add(new TriggerBackupRestore());
+            backupRestores.Add(new ScheduledTaskBackupRestore());
 
             foreach (var backupRestore in backupRestores)
             {
@@ -57,8 +62,6 @@ namespace zvs.WPF.Backup
                 uc.BackupRestore = backupRestore;
                 RestoreBackupListView.Items.Add(uc);
             }
-
-            BackupDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         }
 
         private async void BackupBtn_Click(object sender, RoutedEventArgs e)
@@ -80,6 +83,7 @@ namespace zvs.WPF.Backup
             foreach (var uc in enabledUC)
             {
                 uc.State = BackupRestoreControl.BackupRestoreControlState.Working;
+                await Task.Delay(50);
                 var file = System.IO.Path.Combine(BackupDirectory, uc.BackupRestore.FileName);
                 var result = await uc.BackupRestore.ExportAsync(file);
 
@@ -93,6 +97,7 @@ namespace zvs.WPF.Backup
                     ((App)App.Current).zvsCore.log.Info(result.Message);
                     uc.State = BackupRestoreControl.BackupRestoreControlState.Complete;
                 }
+                await Task.Delay(50);
             }
 
             BackupBtn.IsEnabled = true;
@@ -109,7 +114,7 @@ namespace zvs.WPF.Backup
 
             await Task.Delay(100);
         }
-        private void BrowseBtn_Click(object sender, RoutedEventArgs e)
+        private async void BrowseBtn_Click(object sender, RoutedEventArgs e)
         {
             System.Windows.Forms.FolderBrowserDialog dlg = new System.Windows.Forms.FolderBrowserDialog();
             var result = dlg.ShowDialog();
@@ -117,6 +122,16 @@ namespace zvs.WPF.Backup
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 BackupDirectory = dlg.SelectedPath;
+
+                //Save selected DIR to database
+                using (var context = new zvsContext())
+                {
+                    await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
+                    {
+                        UniqueIdentifier = "BackupLocation",
+                        Value = dlg.SelectedPath
+                    });
+                }
             }
         }
 
@@ -139,6 +154,7 @@ namespace zvs.WPF.Backup
             foreach (var uc in enabledUC)
             {
                 uc.State = BackupRestoreControl.BackupRestoreControlState.Working;
+                await Task.Delay(50);
                 var file = System.IO.Path.Combine(BackupDirectory, uc.BackupRestore.FileName);
                 var result = await uc.BackupRestore.ImportAsync(file);
 
@@ -152,9 +168,26 @@ namespace zvs.WPF.Backup
                     ((App)App.Current).zvsCore.log.Info(result.Message);
                     uc.State = BackupRestoreControl.BackupRestoreControlState.Complete;
                 }
+                await Task.Delay(50);
             }
 
+            var app = (App)Application.Current;
+            await app.RefreshCommandDescripitions();
+            await app.RefreshTriggerDescripitions();
+
             BackupBtn.IsEnabled = true;
+        }
+
+        private async void this_Loaded(object sender, RoutedEventArgs e)
+        {
+            using (zvsContext context = new zvsContext())
+            {
+                var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "BackupLocation");
+                if (option != null)
+                    BackupDirectory = option.Value;
+                else
+                    BackupDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            }
         }
     }
 }

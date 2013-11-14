@@ -12,7 +12,6 @@ namespace zvs.Processor.Backup
 {
     public class JavascriptBackupRestore : BackupRestore
     {
-        [Serializable]
         public class JavaScriptBackup
         {
             public string Script { get; set; }

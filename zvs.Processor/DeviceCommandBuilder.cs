@@ -73,13 +73,12 @@ namespace zvs.Processor
                         changed = true;
                     }
                 }
-
-                if (changed)
-                {
-                    var result = await context.TrySaveChangesAsync();
-                    if (result.HasError)
-                        Core.log.Error(result.Message);
-                }
+            }
+            if (changed)
+            {
+                var result = await context.TrySaveChangesAsync();
+                if (result.HasError)
+                    Core.log.Error(result.Message);
             }
         }
     }

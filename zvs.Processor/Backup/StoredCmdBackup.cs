@@ -17,7 +17,6 @@ namespace zvs.Processor.Backup
         JavaScript = 4
     }
 
-    [Serializable]
     public class StoredCMDBackup
     {
         public Command_Types CommandType;

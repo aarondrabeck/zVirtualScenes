@@ -12,7 +12,6 @@ namespace zvs.Processor.Backup
 {
     public class TriggerBackupRestore : BackupRestore
     {
-        [Serializable]
         public class TriggerBackup
         {
             public string Name { get; set; }

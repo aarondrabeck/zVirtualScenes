@@ -12,7 +12,6 @@ namespace zvs.Processor.Backup
 {
     public class GroupBackupRestore : BackupRestore
     {
-        [Serializable]
         public class GroupBackup
         {
             public string Name { get; set; }

@@ -148,9 +148,14 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Width="150" MinWidth="150" Binding="{Binding Path=StoredCommand.TargetObjectName, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
                             <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
+                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                                    <Setter Property="TextWrapping"  Value="NoWrap" />
+
+                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="Padding" Value="5,0,0,0"/>
                                 </Style>
+                                
+                               
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridTextColumn Width="*"   MinWidth="150" 

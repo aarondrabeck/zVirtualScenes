@@ -13,7 +13,6 @@ namespace zvs.Processor.Backup
 {
     public class DeviceBackupRestore : BackupRestore
     {
-        [Serializable]
         public class DeviceBackup
         {
             public string Name { get; set; }

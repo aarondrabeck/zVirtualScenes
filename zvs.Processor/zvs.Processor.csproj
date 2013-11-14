@@ -84,7 +84,7 @@
     <Compile Include="Backup\StoredCmdBackup.cs" />
     <Compile Include="Backup\TriggerBackupRestore.cs" />
     <Compile Include="Backup\GroupBackupRestore.cs" />
-    <Compile Include="Backup\BackupScheduledTask.cs" />
+    <Compile Include="Backup\ScheduledTaskBackupRestore.cs" />
     <Compile Include="Backup\JavascriptBackupRestore.cs" />
     <Compile Include="AdapterBuilder.cs" />
     <Compile Include="CommandProcessor.cs" />
@@ -95,7 +95,7 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="PluginSettingBuilder.cs" />
     <Compile Include="DetectVCRedist.cs" />
-    <Compile Include="Backup\BackupScene.cs" />
+    <Compile Include="Backup\SceneBackupRestore.cs" />
     <Compile Include="Backup\DeviceBackupRestore.cs" />
     <Compile Include="DeviceCommandBuilder.cs" />
     <Compile Include="DeviceTypeBuilder.cs" />

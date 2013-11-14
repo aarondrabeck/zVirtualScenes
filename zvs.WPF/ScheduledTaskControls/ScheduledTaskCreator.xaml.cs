@@ -36,6 +36,20 @@ namespace zvs.WPF.ScheduledTaskControls
             zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded += ScheduledTaskCreator_onEntityAdded;
             zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
             zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<StoredCommand>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+        }
+
+        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<StoredCommand>())
+                    await ent.ReloadAsync();
+            }));
         }
 
         void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityUpdatedArgs e)

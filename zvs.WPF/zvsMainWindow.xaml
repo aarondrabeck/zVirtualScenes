@@ -162,7 +162,7 @@
                         </StackPanel>
                     </TabItem.Header>
                     <Grid>
-                        <DeviceControls:DeviceDataGridUC x:Name="dList1" VerticalAlignment="Top"  Margin="0,0,0,0" />
+                        <DeviceControls:DeviceDataGridUC x:Name="dList1" Margin="0,0,0,0" />
                     </Grid>
                 </TabItem>
                 <TabItem Height="28">
