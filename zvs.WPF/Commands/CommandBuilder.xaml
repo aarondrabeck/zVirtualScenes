@@ -50,7 +50,7 @@
                 </TabItem.Header>
                 <Grid DataContext="{StaticResource JSCmdsViewSource}">
                     <TextBlock HorizontalAlignment="Left" Margin="10,21,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="JavaScriptCmboBox" Margin="85,18,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="CommandId"/>
+                    <ComboBox x:Name="JavaScriptCmboBox" Margin="85,18,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id"/>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -146,31 +146,23 @@
                           Background="#FFF9F9F9"  >
 
                     <DataGrid.Columns>
-                        <DataGridTextColumn Width="150" MinWidth="150" Binding="{Binding Path=StoredCommand.TargetObjectName, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"  IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
+
+                        <DataGridTextColumn Width="*"   MinWidth="150" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"  >
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
-                                    <Setter Property="TextWrapping"  Value="NoWrap" />
-
-                                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="Padding" Value="5,0,0,0"/>
-                                </Style>
-                                
-                               
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Width="*"   MinWidth="150" 
-                                            Binding="{Binding Path=StoredCommand.Description,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True"  
-                                            CanUserReorder="False" CanUserSort="False"  >
-
-                            <DataGridTextColumn.ElementStyle>
-
-                                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
                                     <Setter Property="TextWrapping"  Value="NoWrap" />
-
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                                     <Setter Property="ToolTip" Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.Binding>
+                                <MultiBinding StringFormat="{}{0} {1}"  >
+                                    <Binding Path="StoredCommand.Description" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                    <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                </MultiBinding>
+                            </DataGridTextColumn.Binding>
+
                         </DataGridTextColumn>
 
 

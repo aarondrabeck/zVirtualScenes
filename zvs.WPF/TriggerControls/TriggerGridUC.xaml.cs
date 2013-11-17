@@ -36,6 +36,20 @@ namespace zvs.WPF.TriggerControls
             zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityAdded += TriggerGridUC_onEntityAdded;
             zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityDeleted += TriggerGridUC_onEntityDeleted;
             zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityUpdated += TriggerGridUC_onEntityUpdated;
+            zvsContext.ChangeNotifications<StoredCommand>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+        }
+
+        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
+        {
+            if (context == null)
+                return;
+
+            this.Dispatcher.Invoke(new Action(async () =>
+            {
+                //Reloads context from DB when modifications happen
+                foreach (var ent in context.ChangeTracker.Entries<StoredCommand>())
+                    await ent.ReloadAsync();
+            }));
         }
 
         void TriggerGridUC_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValueTrigger>.EntityUpdatedArgs e)

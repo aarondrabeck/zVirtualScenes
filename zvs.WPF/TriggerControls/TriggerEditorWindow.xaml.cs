@@ -26,7 +26,17 @@ namespace zvs.WPF.TriggerControls
     {
         private zvsContext context;
         private Int64 DeviceValueTriggerId;
-        public DeviceValueTrigger Trigger;
+
+        public DeviceValueTrigger Trigger
+        {
+            get { return (DeviceValueTrigger)GetValue(TriggerProperty); }
+            set { SetValue(TriggerProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Trigger.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TriggerProperty =
+            DependencyProperty.Register("Trigger", typeof(DeviceValueTrigger), typeof(TriggerEditorWindow), new PropertyMetadata(null));
+
         public bool Canceled = true;
 
         public TriggerEditorWindow(Int64 deviceValueTriggerId, zvsContext context)
@@ -88,13 +98,6 @@ namespace zvs.WPF.TriggerControls
 
             if (Trigger.Value != null)
                 ValueTxtBx.Text = Trigger.Value;
-
-            if (Trigger.StoredCommand != null)
-                CommandSummary.Text = string.Format("{0} '{1}'",
-                    Trigger.StoredCommand.TargetObjectName,
-                    Trigger.StoredCommand.Description);
-            else
-                CommandSummary.Text = "No command selected.";
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -192,12 +195,6 @@ namespace zvs.WPF.TriggerControls
                     ((App)App.Current).zvsCore.log.Error(result.Message);
             }
 
-            if (Trigger.StoredCommand != null)
-                CommandSummary.Text = string.Format("{0} '{1}'",
-                    Trigger.StoredCommand.TargetObjectName,
-                    Trigger.StoredCommand.Description);
-            else
-                CommandSummary.Text = "No command selected.";
         }
     }
 }

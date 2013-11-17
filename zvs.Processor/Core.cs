@@ -13,6 +13,7 @@ using zvs.Context;
 using zvs.Entities;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using System.Diagnostics;
 
 namespace zvs.Processor
 {
@@ -32,7 +33,192 @@ namespace zvs.Processor
 
             //Create a instance of the logger
             log = Logging.LogManager.GetLogger<Core>();
+
+            zvsContext.ChangeNotifications<Device>.onEntityUpdated += Core_onEntityUpdated;
+            zvsContext.ChangeNotifications<DeviceValue>.onEntityUpdated += Core_onEntityUpdated;
+            zvsContext.ChangeNotifications<Group>.onEntityUpdated += Core_onEntityUpdated;
+            zvsContext.ChangeNotifications<Scene>.onEntityUpdated += Core_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += Core_onEntityUpdated;
         }
+
+        void Core_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityUpdatedArgs e)
+        {
+            if (e.NewEntity.Name != e.OldEntity.Name)
+            {
+                Task.Run(async () =>
+                {
+                    using (var context = new zvsContext())
+                    {
+                        var storedCommands = await context.StoredCommands
+                               .Include(o => o.Command)
+                               .Where(o => o.CommandId == e.NewEntity.Id)
+                               .ToListAsync();
+
+                        foreach (var storedCommand in storedCommands)
+                            await storedCommand.SetTargetObjectNameAsync(context);
+
+                        await context.TrySaveChangesAsync();
+
+                    }
+                });
+            }
+        }
+
+        #region Keep trigger descriptions and stored command actionableObjects in sync.
+
+        void Core_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Scene>.EntityUpdatedArgs e)
+        {
+            if (e.NewEntity.Name != e.OldEntity.Name)
+            {
+                Task.Run(async () =>
+                {
+                    using (var context = new zvsContext())
+                    {
+                        string ChangedObjId = e.NewEntity.Id.ToString();
+                        var storedCommands = new List<StoredCommand>();
+
+                        //Scene Commands
+                        var Id = await context.BuiltinCommands
+                        .Where(o => o.UniqueIdentifier == "RUN_SCENE")
+                        .Select(o => o.Id)
+                        .FirstOrDefaultAsync();
+
+                        storedCommands.AddRange(await context.StoredCommands
+                               .Include(o => o.Command)
+                               .Where(o => Id == o.CommandId && o.Argument == ChangedObjId)
+                               .ToListAsync());
+
+                        foreach (var storedCommand in storedCommands)
+                            await storedCommand.SetTargetObjectNameAsync(context);
+
+                        await context.TrySaveChangesAsync();
+
+                    }
+                });
+            }
+        }
+        void Core_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Group>.EntityUpdatedArgs e)
+        {
+            if (e.NewEntity.Name != e.OldEntity.Name)
+            {
+                Task.Run(async () =>
+                {
+                    using (var context = new zvsContext())
+                    {
+                        string changeingGroupIDstr = e.NewEntity.Id.ToString();
+                        var storedCommands = new List<StoredCommand>();
+
+                        //Group Commands
+                        var GroupComandIds = await context.BuiltinCommands
+                        .Where(o => o.UniqueIdentifier == "GROUP_ON" || o.UniqueIdentifier == "GROUP_OFF")
+                        .Select(o => o.Id)
+                        .ToListAsync();
+
+                        storedCommands.AddRange(await context.StoredCommands
+                               .Include(o => o.Command)
+                               .Where(o => GroupComandIds.Contains(o.CommandId) && o.Argument == changeingGroupIDstr)
+                               .ToListAsync());
+
+                        foreach (var storedCommand in storedCommands)
+                            await storedCommand.SetTargetObjectNameAsync(context);
+
+                        await context.TrySaveChangesAsync();
+
+                    }
+                });
+            }
+        }
+        async void Core_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityUpdatedArgs e)
+        {
+            if (e.NewEntity.Name != e.OldEntity.Name)
+            {
+                await Task.Run(async () =>
+                {
+                    using (var context = new zvsContext())
+                    {
+                        var triggers = await context.DeviceValueTriggers
+                            .Include(o => o.DeviceValue)
+                            .Include(o => o.DeviceValue.Device)
+                            .Include(o => o.StoredCommand)
+                            .Where(o => o.DeviceValue.DeviceId == e.NewEntity.Id)
+                            .ToListAsync();
+
+                        foreach (var trigger in triggers)
+                            trigger.SetDescription(context);
+
+                        await context.TrySaveChangesAsync();
+                    }
+                });
+            }
+        }
+
+        void Core_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityUpdatedArgs e)
+        {
+            if (e.NewEntity.Name != e.OldEntity.Name)
+            {
+                Task.Run(async () =>
+                {
+                    var sw = new Stopwatch();
+                    sw.Start();
+
+                    using (var context = new zvsContext())
+                    {
+                        var triggers = await context.DeviceValueTriggers
+                            .Include(o => o.DeviceValue)
+                            .Include(o => o.DeviceValue.Device)
+                            .Include(o => o.StoredCommand)
+                            .Where(o => o.DeviceValue.DeviceId == e.NewEntity.Id)
+                            .ToListAsync();
+
+                        foreach (var trigger in triggers)
+                            trigger.SetDescription(context);
+
+                        string deviceIdStr = e.NewEntity.Id.ToString();
+                        var storedCommands = new List<StoredCommand>();
+
+                        //Repoll Device Commands
+                        var RepollCommandId = await context.BuiltinCommands
+                        .Where(o => o.UniqueIdentifier == "REPOLL_ME")
+                        .Select(o => o.Id)
+                        .FirstOrDefaultAsync();
+
+                            storedCommands.AddRange(await context.StoredCommands
+                                  .Include(o => o.Command)
+                                  .Where(o => RepollCommandId == o.CommandId && o.Argument == deviceIdStr)
+                                  .ToListAsync());
+
+                        //Device Type Commands                    
+                        storedCommands.AddRange(await context.StoredCommands
+                            .Where(o => o.Argument2 == deviceIdStr)
+                            .Where(o => o.Command is DeviceTypeCommand)
+                            .ToListAsync());
+
+                        //Device Commands
+                        var DeviceCommandIds = await context.DeviceCommands
+                            .Where(o => o.DeviceId == e.NewEntity.Id)
+                            .Select(o => o.Id)
+                            .ToListAsync();
+
+                        storedCommands.AddRange(await context.StoredCommands
+                                .Include(o => o.Command)
+                                .Where(o => DeviceCommandIds.Contains(o.CommandId))
+                                .ToListAsync());
+
+                        foreach (var storedCommand in storedCommands)
+                            await storedCommand.SetTargetObjectNameAsync(context);
+
+                        Debug.WriteLine("presavechanges " + sw.Elapsed.ToString());
+
+                        await context.TrySaveChangesAsync();
+
+                        sw.Stop();
+                        Debug.WriteLine("Updating device names in storedcommands and triggers took " + sw.Elapsed.ToString());
+
+                    }
+                });
+            }
+        }
+        #endregion
 
         public async void StartAsync()
         {

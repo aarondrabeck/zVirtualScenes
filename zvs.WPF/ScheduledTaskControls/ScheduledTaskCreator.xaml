@@ -98,10 +98,10 @@
 
                 <TextBlock Text="Command to Run" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,81,0,0"/>
 
-                <TextBlock x:Name="CommandSummary" FontSize="14" Height="20" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" 
+                <TextBlock FontSize="14" Height="20" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" 
                            VerticalAlignment="Top" Margin="144,100,25,0">
                     <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0} '{1}'"  >
+                        <MultiBinding StringFormat="{}{0} {1}"  >
                             <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
                             <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
                         </MultiBinding>

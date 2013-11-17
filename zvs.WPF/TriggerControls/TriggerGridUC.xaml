@@ -68,23 +68,13 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-
-                    <DataGridTextColumn Width="Auto" MinWidth="25"  Header="Trigger" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
-                                        FontSize="14" Binding="{Binding Description, StringFormat={}When {0} then}" IsReadOnly="True"   >
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter  Property="TextTrimming" Value="CharacterEllipsis" />
-                                <Setter  Property="Margin" Value="5,0" />
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-
-                    <DataGridTextColumn Width="*" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
+                    <DataGridTextColumn Width="*" Header="Description" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
                                         IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
                         <DataGridTextColumn.Binding>
-                            <MultiBinding StringFormat="{}{0} '{1}'"  >
-                                <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                            <MultiBinding StringFormat="{}When {0} then {1} {2}"  >
+                                <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
                                 <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
                             </MultiBinding>
                         </DataGridTextColumn.Binding>
                         <DataGridTextColumn.ElementStyle>

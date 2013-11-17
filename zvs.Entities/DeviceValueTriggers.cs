@@ -32,7 +32,6 @@ namespace zvs.Entities
                 {
                     _StoredCommand = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
@@ -51,7 +50,6 @@ namespace zvs.Entities
                 {
                     _DeviceValue = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
@@ -69,7 +67,6 @@ namespace zvs.Entities
                 {
                     _Operator = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
@@ -87,7 +84,6 @@ namespace zvs.Entities
                 {
                     _isEnabled = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
@@ -106,7 +102,6 @@ namespace zvs.Entities
                 {
                     _Name = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
@@ -125,7 +120,6 @@ namespace zvs.Entities
                 {
                     _Value = value;
                     NotifyPropertyChanged();
-                    NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
@@ -161,7 +155,7 @@ namespace zvs.Entities
             if (trigger.StoredCommand == null || trigger.DeviceValue == null || trigger.DeviceValue.Device == null)
                 trigger.Description = "Incomplete Trigger";
 
-            trigger.Description = string.Format("'{0}' {1} is {2} {3}", trigger.DeviceValue.Device.Name,
+            trigger.Description = string.Format("{0} {1} is {2} {3}", trigger.DeviceValue.Device.Name,
                                                         trigger.DeviceValue.Name,
                                                         trigger_op_name,
                                                         trigger.Value

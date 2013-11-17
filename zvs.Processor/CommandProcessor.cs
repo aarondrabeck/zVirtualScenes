@@ -51,19 +51,6 @@ namespace zvs.Processor
             return await RunCommandAsync(sender, sCmd.Command, sCmd.Argument, sCmd.Argument2);
         }
 
-        //public async Task<CommandProcessorResult> RunCommandAsync(object sender, int commandId, string argument = "", string argument2 = "")
-        //{
-        //    using (zvsContext context = new zvsContext())
-        //    {
-        //        var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == commandId);
-
-        //        if (command == null)
-        //            return new CommandProcessorResult(true, string.Format("Command {0} not found in database.", commandId));
-
-        //        return await RunCommandAsync(sender, command, argument, argument2);
-        //    }
-        //}
-
         public async Task<CommandProcessorResult> RunCommandAsync(object sender, Command command, string argument = "", string argument2 = "")
         {
             var result = await ProcessCommandAsync(sender, command, argument, argument2);
@@ -140,7 +127,7 @@ namespace zvs.Processor
                             command.Name,
                             string.IsNullOrEmpty(argument) ? "" : " " + argument));
 
-                    var commandAction = string.Format("{0}{1} on {2}",
+                    var commandAction = string.Format("{0}{1} {2}",
                                                            command.Name,
                                                            string.IsNullOrEmpty(argument) ? "" : " " + argument,
                                                            device.Name);

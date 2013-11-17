@@ -254,7 +254,7 @@ namespace zvs.WPF
                 foreach (var storedCommand in storedCommands)
                 {
                     await storedCommand.SetTargetObjectNameAsync(context);
-                    await storedCommand.SetDescriptionAsync(context);
+                    storedCommand.SetDescription(context);
                 }
 
                 var result = await context.TrySaveChangesAsync();

@@ -426,7 +426,7 @@ namespace zvs.WPF.Commands
                 }
 
                 await StoredCommand.SetTargetObjectNameAsync(Context);
-                await StoredCommand.SetDescriptionAsync(Context);
+                StoredCommand.SetDescription(Context);
 
                 this.DialogResult = true;
                 this.Close();
@@ -448,7 +448,7 @@ namespace zvs.WPF.Commands
                 }
 
                 await StoredCommand.SetTargetObjectNameAsync(Context);
-                await StoredCommand.SetDescriptionAsync(Context);
+                StoredCommand.SetDescription(Context);
 
                 this.DialogResult = true;
                 this.Close();
@@ -467,7 +467,7 @@ namespace zvs.WPF.Commands
                     StoredCommand.Command = (JavaScriptCommand)JavaScriptCmboBox.SelectedItem;
 
                 await StoredCommand.SetTargetObjectNameAsync(Context);
-                await StoredCommand.SetDescriptionAsync(Context);
+                StoredCommand.SetDescription(Context);
 
                 this.DialogResult = true;
                 this.Close();
