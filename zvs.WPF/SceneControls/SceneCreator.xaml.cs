@@ -715,51 +715,6 @@ namespace zvs.WPF.SceneControls
             }
         }
 
-        private async void AddJSCommand_Click_1(object sender, RoutedEventArgs e)
-        {
-            if (SceneGrid.SelectedItem is Scene)
-            {
-                Scene selected_scene = (Scene)SceneGrid.SelectedItem;
-                if (selected_scene != null)
-                {
-                    SceneCmdsGrid.SelectedItems.Clear();
-                    SceneCommand cmd = new SceneCommand();
-
-                    int? max = selected_scene.Commands.Max(o => o.SortOrder);
-                    if (max.HasValue)
-                        cmd.SortOrder = max.Value + 1;
-                    else
-                        cmd.SortOrder = 0;
-
-                    JavaScriptSelector window = new JavaScriptSelector(null, context);
-                    window.Owner = app.zvsWindow;
-
-                    if (window.ShowDialog() ?? false)
-                    {
-                        if (selected_scene.isRunning)
-                        {
-                            ShowSceneEditWarning(selected_scene.Name);
-                        }
-                        else
-                        {
-                            if (window.SelectedCommand != null)
-                            {
-                                cmd.StoredCommand.Command = window.SelectedCommand;
-                                selected_scene.Commands.Add(cmd);
-
-                                var result = await context.TrySaveChangesAsync();
-                                if (result.HasError)
-                                    ((App)App.Current).zvsCore.log.Error(result.Message);
-
-                                SceneCmdsGrid.SelectedItems.Add(cmd);
-                            }
-                        }
-                        SceneCmdsGrid.Focus();
-                    }
-                }
-            }
-        }
-
         private async void AddCommand_Click(object sender, RoutedEventArgs e)
         {
             if (SceneGrid.SelectedItem is Scene)

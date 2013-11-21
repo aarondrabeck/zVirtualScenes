@@ -143,9 +143,6 @@
       <DependentUpon>CommandBuilder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\NullableIntConverter.cs" />
-    <Compile Include="JavaScript\JavaScriptSelector.xaml.cs">
-      <DependentUpon>JavaScriptSelector.xaml</DependentUpon>
-    </Compile>
     <Compile Include="JavaScript\JavaScriptAddRemove.xaml.cs">
       <DependentUpon>JavaScriptAddRemove.xaml</DependentUpon>
     </Compile>
@@ -230,10 +227,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="DynamicActionControls\NumericControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="JavaScript\JavaScriptSelector.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

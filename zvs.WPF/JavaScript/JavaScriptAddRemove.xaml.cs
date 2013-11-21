@@ -225,5 +225,10 @@ namespace zvs.WPF.JavaScript
                 context.Dispose();
             }
         }
+
+        private void CancelBtn_Click_1(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
     }
 }

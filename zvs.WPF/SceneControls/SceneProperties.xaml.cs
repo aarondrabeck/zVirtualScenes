@@ -37,8 +37,6 @@ namespace zvs.WPF.SceneControls
             {
 
                 this._SceneID = value;
-                //TODO: CHANGE
-                //LoadCommandsAsync();
             }
         }
 

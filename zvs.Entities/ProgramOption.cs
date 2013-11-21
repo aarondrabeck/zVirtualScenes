@@ -90,15 +90,5 @@ namespace zvs.Entities
             return new Result();
         }
 
-        //TODO: MOVE TO EXTENSION METHOD
-        //public async static Task<string> GetProgramOptionAsync(zvsContext context, string UniqueIdentifier)
-        //{
-        //    ProgramOption option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == UniqueIdentifier);
-
-        //    if (option != null)
-        //        return option.Value;
-
-        //    return null;
-        //}
     }
 }
