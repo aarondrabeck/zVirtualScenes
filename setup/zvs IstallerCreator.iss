@@ -83,7 +83,8 @@ Source: "..\bin\release\zvs.Entities.dll"; DestDir: "{app}"; Flags: ignoreversio
 Source: "..\bin\release\zvs.Entities.dll.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zvs.zVirtualScenes.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\release\zVirtualScenes.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ignoreversion      
+Source: "..\bin\release\zVirtualScenes.exe.config"; DestDir: "{app}"; Flags: ignoreversion 
+Source: "..\bin\release\WpfAnimatedGif.dll"; DestDir: "{app}"; Flags: ignoreversion 
 
 ;ADAPTERS BASE
 Source: "..\bin\release\adapters\EntityFramework.dll"; DestDir: "{app}\adapters"; Flags: ignoreversion  
