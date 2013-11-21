@@ -36,19 +36,10 @@ namespace zvs.Processor
             {
                 System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 Version vrs = assembly.GetName().Version;
-                return string.Format("{0}.{1}.{2}.{3}", vrs.Major, vrs.Minor, vrs.Revision, vrs.Build);
+                return string.Format("{0}.{1}.{2}", vrs.Major, vrs.Minor, vrs.Revision, vrs.Build);
             }
         }
 
-        public static string ApplicationVersion
-        {
-            get
-            {
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                Version vrs = assembly.GetName().Version;
-                return string.Format("{0}.{1}", vrs.Major, vrs.Minor);
-            }
-        }
 
         public static string GetHostDetails
         {

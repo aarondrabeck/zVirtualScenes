@@ -20,7 +20,7 @@
                 <TextBlock FontSize="48" Foreground="#FF00AEEF" Margin="175,29,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"  
                            FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationName}}" />
                 <TextBlock FontSize="35" Foreground="#FFBDBEC0" Margin="0,86,20,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Right"
-                           FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationVersion}}" Height="61" />
+                           FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationVersionLong}}" Height="61" />
 
                 <TextBlock TextTrimming="CharacterEllipsis"  FontSize="14" Foreground="#FF707070" HorizontalAlignment="Right" Margin="0,0,113,6" Name="txtLoading" VerticalAlignment="Bottom" Width="375">Loading plugin SXXXG ...</TextBlock>
 

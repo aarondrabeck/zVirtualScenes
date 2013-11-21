@@ -53,7 +53,7 @@ helper = function () {
     this.userName = System.Environment.UserName;
 
     this.applicationName = zvs.Processor.Utils.ApplicationName;
-    this.applicationVersion = zvs.Processor.Utils.ApplicationVersion;
+    this.applicationVersion = zvs.Processor.Utils.ApplicationVersionLong;
     this.applicationNameAndVersion = zvs.Processor.Utils.ApplicationNameAndVersion;
     this.appDataPath = zvs.Processor.Utils.AppDataPath;
     this.DBNamePlusFullPath = zvs.Processor.Utils.DBNamePlusFullPath;
