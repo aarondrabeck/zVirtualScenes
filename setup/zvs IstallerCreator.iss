@@ -51,13 +51,13 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Components]
 Name: "core"; Description: "zVirtualScenes Core"; Types: full compact custom; Flags: fixed
+Name: "openzwave"; Description: "OpenZWave Adapter"; Types: full compact
 ;Name: "jabber"; Description: "Jabber Plug-in"; Types: full
 ;Name: "growl"; Description: "Growl Plug-in"; Types: full
 Name: "http"; Description: "HTTP API Plug-in"; Types: full
-;Name: "webapi"; Description: "Web API Plug-in"; Types: full
+Name: "webapi"; Description: "Web API Plug-in"; Types: full
 Name: "lightswitch"; Description: "LightSwitch Server Plug-in"; Types: full
-Name: "noaa"; Description: "NOAA Plug-in"; Types: full
-Name: "openzwave"; Description: "OpenZWave Plug-in"; Types: full compact
+Name: "noaa"; Description: "NOAA Plug-in"; Types: full   
 ;Name: "controlthink"; Description: "ControlThink Plug-in"; Types: full
 Name: "speech"; Description: "Speech Plug-in"; Types: full
 Name: "smartphone"; Description: "SmartPhone Plug-in"; Types: full
@@ -105,14 +105,13 @@ Source: "..\bin\release\adapters\config\*"; DestDir: "{app}\adapters\config"; Fl
 
 
  ;PLUGINS BASE
-Source: "..\bin\release\plugins\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  
-;Source: "..\bin\release\plugins\EntityFramework.xml"; DestDir: "{app}\plugins"; Flags: ignoreversion           
-Source: "..\bin\release\plugins\EntityFramework.SqlServer.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion          
-;Source: "..\bin\release\plugins\EntityFramework.SqlServer.xml"; DestDir: "{app}\plugins"; Flags: ignoreversion  
+Source: "..\bin\release\plugins\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion         
+Source: "..\bin\release\plugins\EntityFramework.SqlServer.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion   
 Source: "..\bin\release\plugins\Jint.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\bin\release\plugins\log4net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\bin\release\plugins\zvs.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
 Source: "..\bin\release\plugins\zvs.Entities.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion
+Source: "..\bin\release\plugins\zvs.zVirtualScenes.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion             
     
 ;Source: "..\bin\release\plugins\jabber-net.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber  
 ;Source: "..\bin\release\plugins\JabberPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion; Components: jabber  
@@ -148,18 +147,19 @@ Source: "..\bin\release\plugins\SmartPhonePlugin.dll.config"; DestDir: "{app}\pl
 ;Source: "..\bin\release\plugins\ThinkStickHIDPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: controlthink
 
 
-;Source: "..\bin\release\plugins\HttpAPI.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: webapi
-;Source: "..\bin\release\plugins\HttpAPI.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: webapi
-;Source: "..\bin\release\plugins\Microsoft.Data.Entity.Design.Extensibility.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\Microsoft.Data.OData.Contrib.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\Microsoft.Data.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\System.Net.Http.Formatting.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\System.Web.Http.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\System.Web.Http.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\System.Web.Http.SelfHost.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\WebAPIPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
-;Source: "..\bin\release\plugins\WebAPIPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\WebAPIPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: webapi
+Source: "..\bin\release\plugins\WebAPIPlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.Data.Edm.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\Microsoft.Data.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\Newtonsoft.Json.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Net.Http.Formatting.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Spatial.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Cors.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.Cors.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.OData.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.SelfHost.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
+Source: "..\bin\release\plugins\System.Web.Http.WebHost.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion  ; Components: webapi
 
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
