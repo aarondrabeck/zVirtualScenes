@@ -118,12 +118,12 @@ namespace zvs.Entities
                     foreach (var validationError in validationErrors.ValidationErrors)
                         sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
                 }
-                Debug.WriteLine(sb.ToString());
+                //Debug.WriteLine(sb.ToString());
                 return new Result(sb.ToString());
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                //Debug.WriteLine(ex.Message);
                 return new Result(ex.GetInnerMostExceptionMessage());
             }
 

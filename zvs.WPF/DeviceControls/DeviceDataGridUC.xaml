@@ -127,14 +127,14 @@
 
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn  x:Name="LevelCol" Header="Status" Width="160" MinWidth="160" MaxWidth="160" CanUserResize="False" 
+                <DataGridTemplateColumn  x:Name="LevelCol" Header="Status" Width="200" CanUserResize="True" 
                                         CanUserSort="True" SortMemberPath="current_level_int" IsReadOnly="True" >
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <Grid Margin="5,0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="55"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="150"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Name="LevelTxtBlock"  Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent" FontSize="18" VerticalAlignment="Center" TextAlignment="Center">
                                     <TextBlock.Triggers>

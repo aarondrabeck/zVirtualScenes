@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechPlugin", "Plugins\SpeechPlugin\SpeechPlugin.csproj", "{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}"
@@ -46,6 +44,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartPhonePlugin", "Plugins\SmartPhonePlugin\SmartPhonePlugin.csproj", "{6C556723-B1E4-4A51-93A7-A49BFE179B3D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvs.Processor.Tests", "zvs.Processor.Tests\zvs.Processor.Tests.csproj", "{4A09CCBA-9754-4841-8D17-7F3C2B471B98}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTAdapter", "Adapters\MQTTAdapter\MQTTAdapter.csproj", "{8947C977-F437-4601-B9E7-68AFF3E9B75F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -231,6 +231,20 @@ Global
 		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|Win32.ActiveCfg = Release|Any CPU
 		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|x64.ActiveCfg = Release|Any CPU
 		{4A09CCBA-9754-4841-8D17-7F3C2B471B98}.Release|x86.ActiveCfg = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|Win32.ActiveCfg = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|x64.ActiveCfg = Release|Any CPU
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -243,6 +257,7 @@ Global
 		{8C60A6A0-DF52-436F-AC6C-4F113B0DBF32} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 		{6C556723-B1E4-4A51-93A7-A49BFE179B3D} = {9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}
 		{0A43D202-F903-44C8-83E3-03A3928E9480} = {505C4DBB-763D-488B-9CA7-BED1AC34966C}
+		{8947C977-F437-4601-B9E7-68AFF3E9B75F} = {505C4DBB-763D-488B-9CA7-BED1AC34966C}
 	EndGlobalSection
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
