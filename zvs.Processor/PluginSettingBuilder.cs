@@ -74,7 +74,6 @@ namespace zvs.Processor
                 existing_ps.Name = pluginSetting.Name;
                 existing_ps.Description = pluginSetting.Description;
                 existing_ps.ValueType = pluginSetting.ValueType;
-                existing_ps.Value = pluginSetting.Value;
                 existing_ps.PropertyChanged -= handler;
 
                 foreach (var option in pluginSetting.Options)
