@@ -61,6 +61,7 @@ Name: "noaa"; Description: "NOAA Plug-in"; Types: full
 ;Name: "controlthink"; Description: "ControlThink Plug-in"; Types: full
 Name: "speech"; Description: "Speech Plug-in"; Types: full
 Name: "smartphone"; Description: "SmartPhone Plug-in"; Types: full
+Name: "tasker"; Description: "Android Tasker Plug-in"; Types: full
 
 [Files]
 Source: "..\bin\release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion   
@@ -140,7 +141,7 @@ Source: "..\bin\release\plugins\SpeechPlugin.dll.config"; DestDir: "{app}\plugin
 Source: "..\bin\release\plugins\SmartPhonePlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: smartphone
 Source: "..\bin\release\plugins\SmartPhonePlugin.dll.config"; DestDir: "{app}\plugins"; Flags: ignoreversion   ; Components: smartphone
 																			
-																			
+Source: "..\bin\release\plugins\AndroidTaskerPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: tasker																
 																			
 ;Source: "..\bin\release\plugins\ControlThink.ZWave.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion      ; Components: controlthink
 ;Source: "..\bin\release\plugins\ThinkStickHIDPlugin.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion     ; Components: controlthink
