@@ -96,6 +96,8 @@ namespace zvs.Processor
             engine.SetFunction("runScene", new Action<string>(RunSceneJS));
             engine.SetFunction("runDeviceCommand", new Action<double, string, string>(RunDeviceCommandJS));
             engine.SetFunction("runDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
+            engine.SetFunction("runDeviceCommand", new Action<double, int, string>(RunDeviceCommandJS));
+            engine.SetFunction("runDeviceCommand", new Action<string, int, string>(RunDeviceCommandJS));
             engine.SetFunction("reportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("progress", new Action<string>(ReportProgressJS));
             engine.SetFunction("delay", new Action<string, double, bool>(Delay));
@@ -211,11 +213,49 @@ namespace zvs.Processor
 
             RunDeviceCommand(d.Id, CommandName, Value);//TODO: ReportProgress here
         }
+        public async void RunDeviceCommandJS(string DeviceName, int CommandId, string Value)
+        {
+            Device d = null;
+            using (zvsContext context = new zvsContext())
+                d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
+
+            if (d == null)
+            {
+                ReportProgress("JSE{0} Warning cannot find device {1}", id, DeviceName);
+                return;
+            }
+
+            RunDeviceCommand(d.Id, CommandId, Value);//TODO: ReportProgress here
+        }
+
 
         //RunDeviceCommand(7,'Set Level', '99');
         public void RunDeviceCommandJS(double DeviceId, string CommandName, string Value)
         {
             RunDeviceCommand(DeviceId, CommandName, Value);
+        }
+
+        public void RunDeviceCommandJS(double DeviceId, int CommandId, string Value)
+        {
+            RunDeviceCommand(DeviceId, CommandId, Value);
+        }
+
+        private async void RunDeviceCommand(double DeviceId, int CommandID, string Value)
+        {
+            int dId = Convert.ToInt32(DeviceId);
+            using (zvsContext context = new zvsContext())
+            {
+                DeviceCommand dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == CommandID && o.DeviceId == dId);
+                if (dc == null)
+                {
+                    ReportProgress("Cannot find device command '{0}'", CommandID);
+                    return;
+                }
+
+                CommandProcessor cp = new CommandProcessor(Core);
+                // invoked on the ThreadPool, where there won’t be a SynchronizationContext
+                CommandProcessorResult result = await cp.RunCommandAsync(this, dc, Value);
+            }
         }
 
         private async void RunDeviceCommand(double DeviceId, string CommandName, string Value)
