@@ -98,6 +98,8 @@ namespace zvs.Processor
             engine.SetFunction("runDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
             engine.SetFunction("runDeviceCommand", new Action<double, int, string>(RunDeviceCommandJS));
             engine.SetFunction("runDeviceCommand", new Action<string, int, string>(RunDeviceCommandJS));
+            engine.SetFunction("runDeviceCommand", new Action<int, int, string>(RunDeviceCommandJS));
+            engine.SetFunction("runDeviceCommand", new Action<string, double, string>(RunDeviceCommandJS));
             engine.SetFunction("reportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("progress", new Action<string>(ReportProgressJS));
             engine.SetFunction("delay", new Action<string, double, bool>(Delay));
@@ -228,7 +230,6 @@ namespace zvs.Processor
             RunDeviceCommand(d.Id, CommandId, Value);//TODO: ReportProgress here
         }
 
-
         //RunDeviceCommand(7,'Set Level', '99');
         public void RunDeviceCommandJS(double DeviceId, string CommandName, string Value)
         {
@@ -240,6 +241,14 @@ namespace zvs.Processor
             RunDeviceCommand(DeviceId, CommandId, Value);
         }
 
+        private async void RunDeviceCommandJS(int DeviceId, int CommandID, string Value)
+        {
+            RunDeviceCommandJS( Convert.ToDouble(DeviceId), CommandID, Value);
+        }
+        private async void RunDeviceCommandJS(string DeviceName, double CommandID, string Value)
+        {
+            RunDeviceCommandJS(DeviceName, Convert.ToInt32(CommandID), Value);
+        }
         private async void RunDeviceCommand(double DeviceId, int CommandID, string Value)
         {
             int dId = Convert.ToInt32(DeviceId);
