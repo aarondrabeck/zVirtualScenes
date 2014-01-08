@@ -114,6 +114,8 @@ helper = function () {
             details += "CurrentLevelInt: " + device.CurrentLevelInt + "\n";
             details += "Type: " + device.Type.Name + "\n";
             details += "Values: " + this.deviceValues(device) + "\n";
+            details += "Commands:{ \n" + this.deviceCommandLog(device) + " \n}";
+			
 
         } else {
             details = "No device by that name: " + name;
@@ -142,7 +144,7 @@ helper = function () {
         var details = "";
         if (typeof device == 'string') device = this.deviceByName(device);
         for (var value in device.Values) {
-            details += value.Name + " = " + value.Value + "\n";
+            details += "("+value.Id+")" + value.Name + " = " + value.Value + "\n";
         }
         return details;
     };
@@ -188,4 +190,46 @@ helper = function () {
     this.timeDelayScene = function (delay) {
         return this.runBuiltinCommand("TIMEDELAY", delay);
     };
+
+    this.deviceById = function (id) {
+        for (var dev in zvsContext.Devices) {
+            if (dev.Id == id) return dev;
+        }
+        return undefined;
+    };
+	this.deviceCommandByName = function(dev, commandName) {
+		var commands = this.deviceCommands(dev);
+		for(var c in commands) {
+			if(c.Name == commandName) return c;
+		}
+		return undefined;
+	}
+	this.deviceCommands = function(dev) {
+		if (typeof dev == 'number') {
+			dev = this.deviceById(dev);
+		}
+		return dev.Commands;
+	}
+	this.deviceCommandLog = function(dev) {
+		var c = "";
+		var commands = this.deviceCommands(dev);
+        for(var cmd in commands) {
+			c = c + "Id=" + cmd.Id + "\n";
+			c = c + "Name=" + cmd.Name + "\n";
+			c = c + "Value=" + cmd.Value + "\n";
+			c = c + "ArgumentType=" + cmd.ArgumentType + "\n";
+			c = c + "Description=" + cmd.Description + "\n";
+			c = c + "CustomData1=" + cmd.CustomData1 + "\n";
+			c = c + "CustomData2=" + cmd.CustomData2 + "\n";
+			c = c + "Help=" + cmd.Help + "\n";
+			c = c + "Options={\n";
+			for(var opt in cmd.Options) {
+				c = c + "Option.Id=" + opt.Id + "\n";
+				c = c + "Option.Name=" + opt.Name + "\n";
+			}
+			c = c + "Options=}\n\n\n";
+		}
+		return c;	
+	}
 }
+

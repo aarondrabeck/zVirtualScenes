@@ -29,6 +29,7 @@ namespace zvs.WPF
 
         private async void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
+            EnableJavaScriptDebugger.IsChecked = zvs.Processor.JavaScriptExecuter.JavascriptDebugEnabled; 
             using (zvsContext context = new zvsContext())
             {
                 var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
@@ -74,6 +75,7 @@ namespace zvs.WPF
 
         private void BtnDone_Click(object sender, RoutedEventArgs e)
         {
+            if(EnableJavaScriptDebugger.IsChecked.HasValue) zvs.Processor.JavaScriptExecuter.JavascriptDebugEnabled = EnableJavaScriptDebugger.IsChecked.Value;
             this.Close();
         }
 

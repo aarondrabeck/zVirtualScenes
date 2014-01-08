@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using zvs.Entities;
 using System.Data.Entity;
 
@@ -67,6 +68,7 @@ namespace zvs.Processor
             id = random.Next(1, 100);
 
         }
+        public static bool JavascriptDebugEnabled { get; set; }
 
         //shell("wget.exe", "http://10.0.0.55/webcam/latest.jpg");
         private System.Diagnostics.Process Shell(string Path, string Arguments)
@@ -86,7 +88,7 @@ namespace zvs.Processor
         public async Task<JavaScriptResult> ExecuteScriptAsync(string Script, zvsContext context)
         {
             this.Context = context;
-            engine.SetDebugMode(true);
+            engine.SetDebugMode(JavascriptDebugEnabled);
             engine.DisableSecurity();
             engine.AllowClr = true;
 
@@ -94,14 +96,16 @@ namespace zvs.Processor
 
             engine.SetFunction("runScene", new Action<double>(RunSceneJS));
             engine.SetFunction("runScene", new Action<string>(RunSceneJS));
-            engine.SetFunction("runDeviceCommand", new Action<double, string, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<string, string, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<double, int, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<double, double, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<string, int, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<int, int, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<int, double, string>(RunDeviceCommandJS));
-            engine.SetFunction("runDeviceCommand", new Action<string, double, string>(RunDeviceCommandJS));
+            //engine.SetFunction("runDeviceCommand", new Action<double, string, string>(RunDeviceCommandJS));
+            //engine.SetFunction("runDeviceCommand", new Action<double, int, string>(RunDeviceCommandJS));
+            //engine.SetFunction("runDeviceCommand", new Action<double, double, string>(RunDeviceCommandJS));
+            //engine.SetFunction("runDeviceCommand", new Action<int, double, string>(RunDeviceCommandJS));
+            //engine.SetFunction("runDeviceCommand", new Action<string, double, string>(RunDeviceCommandJS));
+
+            engine.SetFunction("runDeviceNameCommandName", new Action<string, string, string>(RunDeviceNameCommandName));
+            engine.SetFunction("runDeviceNameCommandId", new Action<string, double, string>(RunDeviceNameCommandId));
+            engine.SetFunction("runDeviceIdCommandId", new Action<double, double, string>(RunDeviceIdCommandId));
+
             engine.SetFunction("reportProgress", new Action<string>(ReportProgressJS));
             engine.SetFunction("progress", new Action<string>(ReportProgressJS));
             engine.SetFunction("delay", new Action<string, double, bool>(Delay));
@@ -203,7 +207,7 @@ namespace zvs.Processor
         }
 
         //RunDeviceCommand('Office Light','Set Level', '99');
-        public async void RunDeviceCommandJS(string DeviceName, string CommandName, string Value)
+        public async void RunDeviceNameCommandName(string DeviceName, string CommandName, string Value)
         {
             Device d = null;
             using (zvsContext context = new zvsContext())
@@ -217,7 +221,7 @@ namespace zvs.Processor
 
             RunDeviceCommand(d.Id, CommandName, Value);//TODO: ReportProgress here
         }
-        public async void RunDeviceCommandJS(string DeviceName, int CommandId, string Value)
+        public async void RunDeviceNameCommandId(string DeviceName, double CommandId, string Value)
         {
             Device d = null;
             using (zvsContext context = new zvsContext())
@@ -232,39 +236,19 @@ namespace zvs.Processor
             RunDeviceCommand(d.Id, CommandId, Value);//TODO: ReportProgress here
         }
 
-        //RunDeviceCommand(7,'Set Level', '99');
-        public void RunDeviceCommandJS(double DeviceId, string CommandName, string Value)
+
+        private async void RunDeviceIdCommandId(double DeviceId, double CommandID, string Value)
         {
-            RunDeviceCommand(DeviceId, CommandName, Value);
+            RunDeviceCommand(DeviceId, CommandID, Value);
         }
 
-        public void RunDeviceCommandJS(double DeviceId, int CommandId, string Value)
+        private async void RunDeviceCommand(double DeviceId, double CommandID, string Value)
         {
-            RunDeviceCommand(DeviceId, CommandId, Value);
-        }
-        public void RunDeviceCommandJS(double DeviceId, double CommandId, string Value)
-        {
-            RunDeviceCommand(DeviceId, Convert.ToInt32(CommandId), Value);
-        }
-
-        private async void RunDeviceCommandJS(int DeviceId, int CommandID, string Value)
-        {
-            RunDeviceCommandJS( Convert.ToDouble(DeviceId), CommandID, Value);
-        }
-        private async void RunDeviceCommandJS(string DeviceName, double CommandID, string Value)
-        {
-            RunDeviceCommandJS(DeviceName, Convert.ToInt32(CommandID), Value);
-        }
-        private async void RunDeviceCommandJS(int DeviceId, double CommandID, string Value)
-        {
-            RunDeviceCommandJS(DeviceId, Convert.ToInt32(CommandID), Value);
-        }
-        private async void RunDeviceCommand(double DeviceId, int CommandID, string Value)
-        {
-            int dId = Convert.ToInt32(DeviceId);
+            int did = Convert.ToInt32(DeviceId);
+            int cid = Convert.ToInt32(CommandID);
             using (zvsContext context = new zvsContext())
             {
-                DeviceCommand dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == CommandID && o.DeviceId == dId);
+                DeviceCommand dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == cid && o.DeviceId == did);
                 if (dc == null)
                 {
                     ReportProgress("Cannot find device command '{0}'", CommandID);

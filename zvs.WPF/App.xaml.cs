@@ -42,7 +42,6 @@ namespace zvs.WPF
                 var application = new App();
                 application.Init();
                 application.Run();
-
                 // Allow single instance code to perform cleanup operations
                 SingleInstance<App>.Cleanup();
             }
