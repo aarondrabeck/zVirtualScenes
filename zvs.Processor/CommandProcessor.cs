@@ -78,10 +78,10 @@ namespace zvs.Processor
                         .Include(o => o.Device.Type.Adapter)
                         .FirstOrDefaultAsync(o => o.Id == command.Id);
 
-                    var commandAction = string.Format("{0}{1} on {2}",
+                    var commandAction = string.Format("{0}{1} ({3}) on {2} ({4})",
                                                            deviceCommand.Name,
                                                            string.IsNullOrEmpty(argument) ? "" : " " + argument,
-                                                           deviceCommand.Device.Name);
+                                                           deviceCommand.Device.Name, deviceCommand.Id, deviceCommand.Device.Id);
 
                     var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
@@ -194,7 +194,7 @@ namespace zvs.Processor
 
                                 await adapter.RepollAsync(device, context);
 
-                                string details = string.Format("Re-poll of {0} complete", device.Name);
+                                string details = string.Format("Re-poll of {0} ({1}) complete", device.Name, device.Id);
                                 return new CommandProcessorResult(false, details);
                             }
                         case "REPOLL_ALL":
@@ -247,9 +247,9 @@ namespace zvs.Processor
                                     await adapter.ActivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("{0} '{1}' complete",
+                                string details = string.Format("{0} ({2}) '{1}' complete",
                                                                  command.Name,
-                                                                 group.Name);
+                                                                 group.Name, command.Id);
 
                                 return new CommandProcessorResult(false, details);
 
@@ -273,9 +273,9 @@ namespace zvs.Processor
                                     await adapter.DeactivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("{0} '{1}' complete",
+                                string details = string.Format("{0} ({2}) '{1}' complete",
                                                                  command.Name,
-                                                                 group.Name);
+                                                                 group.Name, command.Id);
 
                                 return new CommandProcessorResult(false, details);
 
@@ -292,9 +292,9 @@ namespace zvs.Processor
                                 };
                                 SceneRunner.SceneResult sceneResult = await sr.RunSceneAsync(id);
 
-                                string details = string.Format("{0} Built-in cmd '{1}' complete",
+                                string details = string.Format("{0} Built-in cmd '{1}' ({2}) complete",
                                     sceneResult.Details,
-                                    command.Name);
+                                    command.Name, command.Id);
 
                                 return new CommandProcessorResult(sceneResult.Errors, details);
 
