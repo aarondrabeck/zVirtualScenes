@@ -65,8 +65,9 @@ namespace zvs.WPF.DeviceControls
                 {
                     //log.InfoFormat("d_cmd.ArgumentType.ToString():{0}, d_cmd.CommandId:{1}, d_cmd.CustomData1:{2}, d_cmd.CustomData2:{3}, d_cmd.Description:{4}, d_cmd.Device.Name:{5}, d_cmd.Help:{6}, d_cmd.Name:{7}, d_cmd.Options.Count:{8}, d_cmd.UniqueIdentifier:{9}, d_cmd.Value:{10}",
                     //    d_cmd.ArgumentType.ToString(), d_cmd.CommandId, d_cmd.CustomData1, d_cmd.CustomData2, d_cmd.Description, d_cmd.Device.Name, d_cmd.Help, d_cmd.Name, d_cmd.Options.Count, d_cmd.UniqueIdentifier, d_cmd.Value);
-
+                    
                     DeviceCommand device_command = d_cmd;
+                    var tip = string.Format("{0} (Device Id:{1},Command Id: {2})", d_cmd.Description, d_cmd.Device.Id, d_cmd.Id);
                     switch ((DataType)d_cmd.ArgumentType)
                     {
                         case DataType.NONE:
@@ -76,6 +77,7 @@ namespace zvs.WPF.DeviceControls
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
                                     await cp.RunCommandAsync(this, d_cmd);
                                 }, icon);
+                                bc.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(bc);
                                 break;
                             }
@@ -94,6 +96,7 @@ namespace zvs.WPF.DeviceControls
                                     CommandProcessor cp = new CommandProcessor(app.zvsCore);
                                     await cp.RunCommandAsync(this, d_cmd, isChecked.ToString());
                                 }, icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -118,6 +121,7 @@ namespace zvs.WPF.DeviceControls
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -142,6 +146,7 @@ namespace zvs.WPF.DeviceControls
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -166,6 +171,7 @@ namespace zvs.WPF.DeviceControls
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -190,6 +196,7 @@ namespace zvs.WPF.DeviceControls
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -214,6 +221,7 @@ namespace zvs.WPF.DeviceControls
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
@@ -238,6 +246,7 @@ namespace zvs.WPF.DeviceControls
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
+                                control.ToolTip = tip;
                                 DeviceCommandsStkPnl.Children.Add(control);
 
                                 break;
