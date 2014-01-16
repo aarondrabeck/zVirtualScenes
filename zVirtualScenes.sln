@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{9EDBAA9B-7C45-493F-9147-6A40D35DC3C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpeechPlugin", "Plugins\SpeechPlugin\SpeechPlugin.csproj", "{4F2A0218-0AF4-4EBA-BC2D-E982DBE37E66}"
@@ -50,6 +48,13 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTAdapter", "Adapters\MQTTAdapter\MQTTAdapter.csproj", "{8947C977-F437-4601-B9E7-68AFF3E9B75F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidTasker", "Plugins\Android Tasker\AndroidTasker.csproj", "{71BF6569-DFB8-47BE-A761-4137278DADBD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FBA3F4E1-F859-44D0-8BE0-2EBFFE5AC730}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
