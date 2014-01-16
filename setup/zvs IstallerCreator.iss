@@ -104,6 +104,9 @@ Source: "..\bin\release\adapters\OpenZWaveAdapter.dll"; DestDir: "{app}\adapters
 Source: "..\bin\release\adapters\OpenZWaveAdapter.dll.config"; DestDir: "{app}\adapters"; Flags: ignoreversion ; Components: openzwave
 Source: "..\bin\release\adapters\config\*"; DestDir: "{app}\adapters\config"; Flags: ignoreversion recursesubdirs    ; Components: openzwave
 
+;SCRIPTS
+Source: "..\bin\release\scripts\*.js"; DestDir: "{app}\scripts"; Flags: ignoreversion  ; Components: scripts
+
 
  ;PLUGINS BASE
 Source: "..\bin\release\plugins\EntityFramework.dll"; DestDir: "{app}\plugins"; Flags: ignoreversion         
