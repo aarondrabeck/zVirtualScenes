@@ -62,6 +62,7 @@ Name: "noaa"; Description: "NOAA Plug-in"; Types: full
 Name: "speech"; Description: "Speech Plug-in"; Types: full
 Name: "smartphone"; Description: "SmartPhone Plug-in"; Types: full
 Name: "tasker"; Description: "Android Tasker Plug-in"; Types: full
+Name: "scripts"; Description: "Additional JavaScript files."; Types: full
 
 [Files]
 Source: "..\bin\release\EntityFramework.dll"; DestDir: "{app}"; Flags: ignoreversion   
