@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Input;
-using System.Windows.Interop;
 
 namespace zvs.WPF
 {

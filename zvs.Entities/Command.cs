@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace zvs.Entities
 {
@@ -17,172 +12,156 @@ namespace zvs.Entities
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        private ObservableCollection<CommandOption> _Options = new ObservableCollection<CommandOption>();
+        private ObservableCollection<CommandOption> _options = new ObservableCollection<CommandOption>();
         public virtual ObservableCollection<CommandOption> Options
         {
-            get { return _Options; }
-            set { _Options = value; }
+            get { return _options; }
+            set { _options = value; }
         }
 
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("Command");
                 }
             }
         }
 
-        private string _UniqueIdentifier;
+        private string _uniqueIdentifier;
         [StringLength(255)]
         public string UniqueIdentifier
         {
             get
             {
-                return _UniqueIdentifier;
+                return _uniqueIdentifier;
             }
             set
             {
-                if (value != _UniqueIdentifier)
-                {
-                    _UniqueIdentifier = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _uniqueIdentifier) return;
+                _uniqueIdentifier = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
-                {
-                    _Value = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _value) return;
+                _value = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private DataType _ArgumentType;
+        private DataType _argumentType;
         [Required(ErrorMessage = "Argument type cannot be empty")]
         public DataType ArgumentType
         {
             get
             {
-                return _ArgumentType;
+                return _argumentType;
             }
             set
             {
-                if (value != _ArgumentType)
-                {
-                    _ArgumentType = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _argumentType) return;
+                _argumentType = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Description;
+        private string _description;
         [StringLength(1024)]
         public string Description
         {
             get
             {
-                return _Description;
+                return _description;
             }
             set
             {
-                if (value != _Description)
-                {
-                    _Description = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _description) return;
+                _description = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _CustomData1;
+        private string _customData1;
         [StringLength(255)]
         public string CustomData1
         {
             get
             {
-                return _CustomData1;
+                return _customData1;
             }
             set
             {
-                if (value != _CustomData1)
-                {
-                    _CustomData1 = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _customData1) return;
+                _customData1 = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _CustomData2;
+        private string _customData2;
         [StringLength(255)]
         public string CustomData2
         {
             get
             {
-                return _CustomData2;
+                return _customData2;
             }
             set
             {
-                if (value != _CustomData2)
-                {
-                    _CustomData2 = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _customData2) return;
+                _customData2 = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private int? _SortOrder;
+        private int? _sortOrder;
         public int? SortOrder
         {
             get
             {
-                return _SortOrder;
+                return _sortOrder;
             }
             set
             {
-                if (value != _SortOrder)
-                {
-                    _SortOrder = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _sortOrder) return;
+                _sortOrder = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Help;
+        private string _help;
         [StringLength(1024)]
         public string Help
         {
             get
             {
-                return _Help;
+                return _help;
             }
             set
             {
-                if (value != _Help)
-                {
-                    _Help = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _help) return;
+                _help = value;
+                NotifyPropertyChanged();
             }
         }
 

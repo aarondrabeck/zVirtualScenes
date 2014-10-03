@@ -6,7 +6,7 @@ namespace zvs.Processor.Logging
 {
     public class LogItem : IIdentity
     {
-        public DateTime Datetime { get { return _Event.TimeStamp; } }
+        public DateTime Datetime { get { return _event.TimeStamp; } }
         public string DatetimeLog
         {
             get
@@ -14,9 +14,9 @@ namespace zvs.Processor.Logging
                 return this.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt");
             }
         }
-        public string Description { get { return _Event.RenderedMessage; } }
-        public string Source { get { return _Event.LoggerName; } }
-        public string Urgency { get { return _Event.Level.ToString(); } }
+        public string Description { get { return _event.RenderedMessage; } }
+        public string Source { get { return _event.LoggerName; } }
+        public string Urgency { get { return _event.Level.ToString(); } }
 
         // Summary:
         //     Gets the AppDomain friendly name.
@@ -24,7 +24,7 @@ namespace zvs.Processor.Logging
         // Remarks:
         //      Gets the AppDomain friendly name.
         [ConfidentialData]
-        public string Domain { get { return _Event.Domain; } }
+        public string Domain { get { return _event.Domain; } }
         //
         // Summary:
         //     Gets the exception object used to initialize this event.
@@ -38,7 +38,7 @@ namespace zvs.Processor.Logging
         //     If there is no defined exception object for this event then null will be
         //     returned.
          [ConfidentialData]
-        public Exception ExceptionObject { get { return _Event.ExceptionObject; } }
+        public Exception ExceptionObject { get { return _event.ExceptionObject; } }
         //
         // Summary:
         //     Gets the identity of the current thread principal.
@@ -47,7 +47,7 @@ namespace zvs.Processor.Logging
         //      Calls System.Threading.Thread.CurrentPrincipal.Identity.Name to get the
         //     name of the current thread principal.
          [ConfidentialData]
-        public string Identity { get { return _Event.Identity; } }
+        public string Identity { get { return _event.Identity; } }
         //
         // Summary:
         //     Gets the location information for this logging event.
@@ -63,7 +63,7 @@ namespace zvs.Processor.Logging
         // Remarks:
         //      Gets all available caller information, in the format fully.qualified.classname.of.caller.methodName(Filename:line)
          [ConfidentialData]
-        public string LocationFullInfo { get { return _Event.LocationInformation.FullInfo; } }
+        public string LocationFullInfo { get { return _event.LocationInformation.FullInfo; } }
         //
         // Summary:
         //     Gets the line number of the caller.
@@ -71,7 +71,7 @@ namespace zvs.Processor.Logging
         // Remarks:
         //      Gets the line number of the caller.
          [ConfidentialData]
-        public string LocationLineNumber { get { return _Event.LocationInformation.LineNumber; } }
+        public string LocationLineNumber { get { return _event.LocationInformation.LineNumber; } }
         //
         // Summary:
         //     Gets the method name of the caller.
@@ -79,7 +79,7 @@ namespace zvs.Processor.Logging
         // Remarks:
         //      Gets the method name of the caller.
          [ConfidentialData]
-        public string LocationMethodName { get { return _Event.LocationInformation.MethodName; } }
+        public string LocationMethodName { get { return _event.LocationInformation.MethodName; } }
         //
         // Summary:
         //     Gets the message object used to initialize this event.
@@ -91,14 +91,14 @@ namespace zvs.Processor.Logging
         //     property must be used not this property.
         //     If there is no defined message object for this event then null will be returned.
          [ConfidentialData]
-        public object MessageObject { get { return _Event.MessageObject; } }
+        public object MessageObject { get { return _event.MessageObject; } }
         //
         // Summary:
         //     Gets the name of the current thread.
         //
         // Remarks:
         //      The collected information is cached for future use.
-        public string ThreadName { get { return _Event.ThreadName; } }
+        public string ThreadName { get { return _event.ThreadName; } }
         //
         // Summary:
         //     Gets the name of the current user.
@@ -118,12 +118,12 @@ namespace zvs.Processor.Logging
         //     This means we could speed things up almost 40 times by caching the value
         //     of the WindowsIdentity.GetCurrent().Name property, since this takes (8.04-0.20)
         //     = 7.84375 seconds.
-        public string UserName { get { return _Event.UserName; } }
+        public string UserName { get { return _event.UserName; } }
 
-        log4net.Core.LoggingEvent _Event;
+        readonly log4net.Core.LoggingEvent _event;
         public LogItem(log4net.Core.LoggingEvent Event)
         {
-            _Event = Event;
+            _event = Event;
         }
 
         public override string ToString()
@@ -139,7 +139,7 @@ namespace zvs.Processor.Logging
             }
             set
             {
-                return;
+               
             }
         }
     }

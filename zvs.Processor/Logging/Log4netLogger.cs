@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace zvs.Processor.Logging
 {
-    class log4netLogger<T> : Logging.ILog
+    class Log4NetLogger<T> : ILog
     {
 
         private log4net.ILog Logger

@@ -5,18 +5,17 @@ using System.ComponentModel.Composition.Primitives;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace zvs.Processor
 {
     public class SafeDirectoryCatalog : ComposablePartCatalog
     {
         private readonly AggregateCatalog _catalog;
-        public List<string> LoadExceptionTypeNames = new List<string>();
+        public readonly List<string> LoadErrors;
 
         public SafeDirectoryCatalog(string directory)
         {
+            LoadErrors = new List<string>();
             var files = Directory.EnumerateFiles(directory, "*.dll", SearchOption.AllDirectories);
             _catalog = new AggregateCatalog();
 
@@ -26,20 +25,20 @@ namespace zvs.Processor
                 {
                     var asmCat = new AssemblyCatalog(file);
 
-                    //Force MEF to load the plugin and figure out if there are any exports
+                    //Force MEF to load the plug-in and figure out if there are any exports
                     // good assemblies will not throw the RTLE exception and can be added to the catalog
                     if (asmCat.Parts.ToList().Count > 0)
                         _catalog.Catalogs.Add(asmCat);
                 }
                 catch (ReflectionTypeLoadException ex)
                 {
-                    var typelex = ex.LoaderExceptions.FirstOrDefault() as TypeLoadException;
-
-                    if (typelex != null)
-                        LoadExceptionTypeNames.Add(typelex.TypeName);
+                    foreach(var error in ex.LoaderExceptions)
+                        LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, error.Message));
                 }
-                catch (Exception)
-                { }
+                catch (Exception ex)
+                {
+                    LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, ex.Message));
+                }
             }
         }
         public override IQueryable<ComposablePartDefinition> Parts

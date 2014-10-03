@@ -1,8 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
 using System.Speech.Synthesis;
-using System.Collections.Generic;
-using System.Linq;
 using zvs.Processor;
 using System.Data.Entity;
 using System.ComponentModel;

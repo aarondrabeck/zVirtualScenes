@@ -1,18 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
 using System.Windows;
-using System.IO;
 using zvs.Processor;
-using System.ComponentModel;
-using zvs.Processor.Triggers;
-using System.Diagnostics;
-using System.Text;
 using Microsoft.Shell;
-using System.Windows.Shell;
-using System.Reflection;
 using zvs.Entities;
 using System.Threading.Tasks;
 using System.Data.Entity;
@@ -93,7 +83,7 @@ namespace zvs.WPF
         {
             SplashScreen splashscreen = new SplashScreen();
             splashscreen.SetLoadingTextFormat("Starting {0}", Utils.ApplicationNameAndVersion);
-            splashscreen.Show();
+            // splashscreen.Show();
             await Task.Delay(10);
 
 #if DEBUG
@@ -143,7 +133,7 @@ namespace zvs.WPF
             try
             {
                 zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");
-                Core.ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");
+                ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");
             }
             catch
             {
@@ -159,7 +149,7 @@ namespace zvs.WPF
 
             if (!Utils.HasDotNet45())
             {
-                Core.ProgramHasToClosePrompt(string.Format("Microsoft .NET Framework 4.5 Full/Extended is required to run {0}. \r\n\r\nPlease install Microsoft .NET Framework 4.5 and re-launch the application.",
+                ProgramHasToClosePrompt(string.Format("Microsoft .NET Framework 4.5 Full/Extended is required to run {0}. \r\n\r\nPlease install Microsoft .NET Framework 4.5 and re-launch the application.",
                     Utils.ApplicationName));
             }
             #endregion
@@ -171,7 +161,7 @@ namespace zvs.WPF
 
             if (!Utils.HasSQLCE4())
             {
-                Core.ProgramHasToClosePrompt(string.Format("Microsoft® SQL Server® Compact 4.0 SP1 is required to run {0}. \r\n\r\nPlease install Microsoft® SQL Server® Compact 4.0 SP1 and re-launch the application.",
+                ProgramHasToClosePrompt(string.Format("Microsoft® SQL Server® Compact 4.0 SP1 is required to run {0}. \r\n\r\nPlease install Microsoft® SQL Server® Compact 4.0 SP1 and re-launch the application.",
                     Utils.ApplicationName));
             }
             #endregion
@@ -181,8 +171,8 @@ namespace zvs.WPF
             splashscreen.SetLoadingTextFormat("Initializing and migrating database");
             await Task.Delay(10);
 
-            await Task.Run(() => 
-            { 
+            await Task.Run(() =>
+            {
                 using (zvsContext context = new zvsContext())
                 {
                     var configuration = new Configuration();
@@ -203,10 +193,18 @@ namespace zvs.WPF
 
             //Initialize the core
             zvsCore = new Core();
-            await Task.Run(() =>  
-            { 
-                zvsCore.StartAsync();            
-            });
+            try
+            {
+                await Task.Run(() =>
+                {
+                    zvsCore.StartAsync();
+                });
+            }
+            catch (Exception ex)
+            {
+                ProgramHasToClosePrompt(ex.Message);
+            }
+
             #endregion
 
             //Create taskbar Icon 
@@ -214,7 +212,7 @@ namespace zvs.WPF
             taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
 
             //close Splash Screen
-            splashscreen.Close();
+            //  splashscreen.Close();
 
 #if DEBUG
             sw.Stop();
@@ -291,7 +289,7 @@ namespace zvs.WPF
                 splashscreen.SetLoadingText("Loading user interface");
                 splashscreen.Show();
 
-               
+
 
                 await Task.Delay(10);
                 splashscreen.SetLoadingTextFormat("Loading user interface settings");
@@ -334,6 +332,28 @@ namespace zvs.WPF
         private void Application_Exit_1(object sender, ExitEventArgs e)
         {
             taskbarIcon.Dispose();
+        }
+
+        public static void ProgramHasToClosePrompt(string reason)
+        {
+
+            Window WpfBugWindow = new Window()
+            {
+                AllowsTransparency = true,
+                Background = System.Windows.Media.Brushes.Transparent,
+                WindowStyle = WindowStyle.None,
+                Top = 0,
+                Left = 0,
+                Width = 1,
+                Height = 1,
+                ShowInTaskbar = false
+            };
+            WpfBugWindow.Show();
+            if (MessageBox.Show(reason, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
+            {
+                WpfBugWindow.Close();
+                Environment.Exit(1);
+            }
         }
     }
 }

@@ -1,15 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Windows.Data;
-using System.Windows.Threading;
 using zvs.Entities;
 using System.Data.Entity;
 using System.Threading.Tasks;
-using System.Diagnostics;
 
 namespace zvs.Processor
 {

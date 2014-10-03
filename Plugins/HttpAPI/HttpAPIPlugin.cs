@@ -1,32 +1,25 @@
 ﻿using System.ComponentModel.Composition;
-using System.Net.Sockets;
 using System.Collections.Generic;
 using System;
 using System.Net;
 using System.Threading;
 using System.Text;
 using System.Security.Cryptography;
-using System.Data;
 using System.ComponentModel;
 using System.Xml;
 using System.IO;
 using System.Xml.Serialization;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Web.Script.Serialization;
 using System.Xml.Linq;
-using System.Reflection;
 using System.Web;
 using System.Collections.Specialized;
 using System.Net.Mime;
 using zvs.Processor;
 using zvs.Entities;
-using zvs.Processor.Logging;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Data.Entity;
-using zvs;
-using System.Runtime.CompilerServices;
 
 namespace HttpAPI
 {
@@ -701,7 +694,7 @@ namespace HttpAPI
                             level_txt = d.CurrentLevelText,
                             type = d.Type.UniqueIdentifier,
                             type_txt = d.Type.Name,
-                            last_heard_from = d.LastHeardFrom.HasValue ? d.LastHeardFrom.Value.ToString() : "",
+                            last_heard_from = d.LastHeardFrom.ToString(),
                             groups = sb.ToString(),
                             mode = d.Values.FirstOrDefault(o => o.Name == "Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Mode").Value,
                             fan_mode = d.Values.FirstOrDefault(o => o.Name == "Fan Mode") == null ? "" : d.Values.FirstOrDefault(o => o.Name == "Fan Mode").Value,

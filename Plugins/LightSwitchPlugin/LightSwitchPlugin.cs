@@ -6,16 +6,12 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using System.Security.Cryptography;
-using System.Data;
 using System.ComponentModel;
 using System.Linq;
 using Mono.Zeroconf;
 using zvs.Processor;
 using zvs.Entities;
 using System.Threading.Tasks;
-using System.Collections.Specialized;
-using System.IO;
-using System.Diagnostics;
 using LightSwitchPlugin.LightSwitch;
 using System.Data.Entity;
 

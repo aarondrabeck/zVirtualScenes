@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
-using System.Data;
-using System.Linq;
-using System.Threading;
 using System;
 using System.ComponentModel;
 using System.Data.Entity;
-using System.Windows.Threading;
 using zvs.Entities;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
@@ -16,43 +12,40 @@ namespace zvs.Processor
 {
     public class AdapterManager
     {
-        private const int Verbose = 10;
-        private const string Name = "Adapter Manager";
-
-        public Core Core { get; private set; }
+        private Core Core { get; set; }
 
 #pragma warning disable 649
         [ImportMany]
-        private IEnumerable<zvsAdapter> _Adapters;
+        private IEnumerable<zvsAdapter> _adapters;
 #pragma warning restore 649
 
-        private Dictionary<Guid, zvsAdapter> AdapterLookup = new Dictionary<Guid, zvsAdapter>();
+        private readonly Dictionary<Guid, zvsAdapter> _adapterLookup = new Dictionary<Guid, zvsAdapter>();
 
         public void LoadAdaptersAsync(Core core)
         {
             Task.Run(async () =>
                 {
                     Core = core;
-                    SafeDirectoryCatalog catalog = new SafeDirectoryCatalog("adapters");
-                    CompositionContainer compositionContainer = new CompositionContainer(catalog);
+                    var catalog = new SafeDirectoryCatalog("adapters");
+                    var compositionContainer = new CompositionContainer(catalog);
                     compositionContainer.ComposeParts(this);
 
-                    if (catalog.LoadExceptionTypeNames.Count > 0)
+                    if (catalog.LoadErrors.Count > 0)
                     {
-                        Core.log.WarnFormat(@"The following adapters could not be loaded because they are incompatible: {0}. To resolve this issue, update or uninstall the listed adapter's.",
-                            string.Join(", ", catalog.LoadExceptionTypeNames));
+                        Core.log.WarnFormat(@"The following plug-ins could not be loaded: {0}",
+                            string.Join(", " + Environment.NewLine, catalog.LoadErrors));
                     }
 
-                    using (zvsContext context = new zvsContext())
+                    using (var context = new zvsContext())
                     {
                         // Iterate the adapters found in dlls
-                        foreach (var adapter in _Adapters)
+                        foreach (var adapter in _adapters)
                         {
                             //keeps this adapter in scope 
                             var zvsAdapter = adapter;
 
-                            if (!AdapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
-                                AdapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
+                            if (!_adapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
+                                _adapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
 
                             //Check Database for this adapter
                             var dbAdapter = await context.Adapters
@@ -115,19 +108,19 @@ namespace zvs.Processor
 
         public ReadOnlyDictionary<Guid, zvsAdapter> AdapterGuidToAdapterDictionary
         {
-            get { return new ReadOnlyDictionary<Guid, zvsAdapter>(AdapterLookup); }
+            get { return new ReadOnlyDictionary<Guid, zvsAdapter>(_adapterLookup); }
         }
 
         public async void EnableAdapterAsync(Guid adapterGuid)
         {
-            if (AdapterLookup.ContainsKey(adapterGuid))
+            if (_adapterLookup.ContainsKey(adapterGuid))
             {
-                AdapterLookup[adapterGuid].IsEnabled = true;
-                await AdapterLookup[adapterGuid].StartAsync();
+                _adapterLookup[adapterGuid].IsEnabled = true;
+                await _adapterLookup[adapterGuid].StartAsync();
             }
 
             //Save Database Value
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var a = await context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid);
                 if (a != null)
@@ -139,14 +132,14 @@ namespace zvs.Processor
 
         public async void DisableAdapterAsync(Guid adapterGuid)
         {
-            if (AdapterLookup.ContainsKey(adapterGuid))
+            if (_adapterLookup.ContainsKey(adapterGuid))
             {
-                AdapterLookup[adapterGuid].IsEnabled = false;
-                await AdapterLookup[adapterGuid].StopAsync();
+                _adapterLookup[adapterGuid].IsEnabled = false;
+                await _adapterLookup[adapterGuid].StopAsync();
             }
 
             //Save Database Value
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var a = await context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid);
                 if (a != null)
@@ -158,19 +151,19 @@ namespace zvs.Processor
 
         public void NotifyAdapterSettingsChanged(AdapterSetting adapterSetting)
         {
-            if (!AdapterLookup.ContainsKey(adapterSetting.Adapter.AdapterGuid))
+            if (!_adapterLookup.ContainsKey(adapterSetting.Adapter.AdapterGuid))
                 return;
 
-            var adapter = AdapterLookup[adapterSetting.Adapter.AdapterGuid];
+            var adapter = _adapterLookup[adapterSetting.Adapter.AdapterGuid];
             SetAdapterProperty(adapter, adapterSetting.UniqueIdentifier, adapterSetting.Value);
         }
 
-        private void SetAdapterProperty(object zvsAdapter, string PropertyName, object value)
+        private void SetAdapterProperty(object zvsAdapter, string propertyName, object value)
         {
-            var prop = zvsAdapter.GetType().GetProperty(PropertyName);
+            var prop = zvsAdapter.GetType().GetProperty(propertyName);
             if (prop == null)
             {
-                Core.log.ErrorFormat("Cannot find property called {0} on this adapter", PropertyName);
+                Core.log.ErrorFormat("Cannot find property called {0} on this adapter", propertyName);
                 return;
             }
 
@@ -181,7 +174,7 @@ namespace zvs.Processor
             }
             catch
             {
-                Core.log.ErrorFormat("Cannot cast value on {0} on this adapter", PropertyName);
+                Core.log.ErrorFormat("Cannot cast value on {0} on this adapter", propertyName);
             }
         }
     }

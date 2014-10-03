@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using zvs.Entities;
 using System.Data.Entity;
@@ -134,7 +130,7 @@ namespace zvs.Processor
 
                     var aGuid = device.Type.Adapter.AdapterGuid;
                     if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
-                        return new CommandProcessorResult(true, string.Format("{0} failed.  Could not locate the associated plug-in.", commandAction));
+                        return new CommandProcessorResult(true, string.Format("{0} failed.  Could not locate the associated adapter.", commandAction));
 
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
 
@@ -147,7 +143,7 @@ namespace zvs.Processor
                     }
                     else
                     {
-                        string err_str = string.Format("{0} failed because the {1} plug-in is {2}",
+                        string err_str = string.Format("{0} failed because the {1} adapter is {2}",
                         commandAction,
                         device.Type.Adapter.Name,
                         adapter.IsEnabled ? "not ready" : "disabled");

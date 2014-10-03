@@ -1,15 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Win32;
-using zvs.Entities;
-using System.Data.Entity.Migrations;
-using zvs.Context.Migrations;
-using System.Data.Entity;
 
 namespace zvs.Processor
 {

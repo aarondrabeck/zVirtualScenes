@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Data.Entity;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Net;
-using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Web.Script.Serialization;
 using uPLibrary.Networking.M2Mqtt;
@@ -186,7 +184,7 @@ namespace MQTTAdapter
                             IPAddress.TryParse(HostSetting, out address);
                             if (port != 1883)
                             {
-                                client = new MqttClient(address, port);
+                                client = new MqttClient(address, port,false,new X509Certificate());
                             }
                             else
                             {

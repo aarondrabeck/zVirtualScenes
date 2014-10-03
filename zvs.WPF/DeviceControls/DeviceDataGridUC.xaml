@@ -101,6 +101,13 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+                <DataGridTextColumn MinWidth="200" Width="*" Header="Location" FontSize="14" Binding="{Binding Location, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
 
                 <DataGridTemplateColumn x:Name="GroupCol" MinWidth="100" Header="Groups" CanUserResize="True">
 

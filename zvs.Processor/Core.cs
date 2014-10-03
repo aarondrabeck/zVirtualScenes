@@ -1,15 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
 using zvs.Processor.Triggers;
-using System.Windows.Threading;
-using System.Collections.ObjectModel;
-using System.Windows;
-using System.IO;
-using Microsoft.Win32;
-using zvs.Context;
 using zvs.Entities;
 using System.Threading.Tasks;
 using System.Data.Entity;
@@ -278,21 +270,11 @@ namespace zvs.Processor
                 });
             }
             #endregion
-#if !DEBUG
-            try
-            {
-#endif
 
             AdapterManager.LoadAdaptersAsync(this);
 
             await PluginManager.LoadPluginsAsync(this);
-#if !DEBUG
-            }
-            catch (Exception ex)
-            {
-                Core.ProgramHasToClosePrompt(ex.Message);
-            }
-#endif
+
             TriggerManager = new TriggerManager(this);
             ScheduledTaskManager = new ScheduledTaskManager(this);
             ScheduledTaskManager.StartAsync();
@@ -316,25 +298,7 @@ namespace zvs.Processor
             }
         }
 
-        public static void ProgramHasToClosePrompt(string reason)
-        {
-            Window WpfBugWindow = new Window()
-            {
-                AllowsTransparency = true,
-                Background = System.Windows.Media.Brushes.Transparent,
-                WindowStyle = WindowStyle.None,
-                Top = 0,
-                Left = 0,
-                Width = 1,
-                Height = 1,
-                ShowInTaskbar = false
-            };
-            WpfBugWindow.Show();
-            if (MessageBox.Show(reason, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
-            {
-                WpfBugWindow.Close();
-                Environment.Exit(1);
-            }
-        }
+       
+       
     }
 }

@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Data;
 using OpenZWaveDotNet;
-using System.Threading;
 using System.ComponentModel;
-using System.Windows.Forms;
 using System.Linq;
 using OpenZWavePlugin.Forms;
-using System.Drawing;
-using System.Text;
-using Microsoft.Win32;
-using System.Runtime.InteropServices;
 using System.IO;
-using System.Collections.Specialized;
 using zvs.Processor;
 using System.Diagnostics;
 using zvs.Entities;
-using System.Data.Entity.Validation;
 using System.Threading.Tasks;
 using System.Data.Entity;
 

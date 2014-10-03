@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
-
-namespace zvs.Processor
+﻿namespace zvs.Processor
 {
     public static class DetectVCRedist
     {

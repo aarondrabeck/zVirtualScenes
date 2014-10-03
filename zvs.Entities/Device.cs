@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace zvs.Entities
 {
@@ -19,165 +15,177 @@ namespace zvs.Entities
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private int _NodeNumber;
+        private int _nodeNumber;
         public int NodeNumber
         {
             get
             {
-                return _NodeNumber;
+                return _nodeNumber;
             }
             set
             {
-                if (value != _NodeNumber)
+                if (value != _nodeNumber)
                 {
-                    _NodeNumber = value;
+                    _nodeNumber = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private DateTime? _LastHeardFrom;
+        private DateTime? _lastHeardFrom;
         public DateTime? LastHeardFrom
         {
             get
             {
-                return _LastHeardFrom;
+                return _lastHeardFrom;
             }
             set
             {
-                if (value != _LastHeardFrom)
+                if (value != _lastHeardFrom)
                 {
-                    _LastHeardFrom = value;
+                    _lastHeardFrom = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _CurrentLevelText;
+        private string _currentLevelText;
         [StringLength(255)]
         public string CurrentLevelText
         {
             get
             {
-                return _CurrentLevelText;
+                return _currentLevelText;
             }
             set
             {
-                if (value != _CurrentLevelText)
+                if (value != _currentLevelText)
                 {
-                    _CurrentLevelText = value;
+                    _currentLevelText = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private double? _CurrentLevelInt;
+        private double? _currentLevelInt;
         public double? CurrentLevelInt
         {
             get
             {
-                return _CurrentLevelInt;
+                return _currentLevelInt;
             }
             set
             {
-                if (value != _CurrentLevelInt)
+                if (value != _currentLevelInt)
                 {
-                    _CurrentLevelInt = value;
+                    _currentLevelInt = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private int _DeviceTypeId;
+        private int _deviceTypeId;
         public int DeviceTypeId
         {
-            get { return _DeviceTypeId; }
+            get { return _deviceTypeId; }
             set
             {
-                if (value != _DeviceTypeId)
+                if (value != _deviceTypeId)
                 {
-                    _DeviceTypeId = value;
+                    _deviceTypeId = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private DeviceType _Type;
+        private DeviceType _type;
         public virtual DeviceType Type
         {
-            get { return _Type; }
+            get { return _type; }
             set
             {
-                if (value != _Type)
+                if (value != _type)
                 {
-                    _Type = value;
+                    _type = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private ObservableCollection<DeviceCommand> _Commands = new ObservableCollection<DeviceCommand>();
+        private string _location;
+        public string Location
+        {
+            get { return _location; }
+            set
+            {
+                if (value == _location) return;
+                _location = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<DeviceCommand> _commands = new ObservableCollection<DeviceCommand>();
         [ConfidentialData]
         public virtual ObservableCollection<DeviceCommand> Commands
         {
-            get { return _Commands; }
-            set { _Commands = value; }
+            get { return _commands; }
+            set { _commands = value; }
         }
 
-        private ObservableCollection<DeviceSettingValue> _DeviceSettingValues = new ObservableCollection<DeviceSettingValue>();
+        private ObservableCollection<DeviceSettingValue> _deviceSettingValues = new ObservableCollection<DeviceSettingValue>();
         public virtual ObservableCollection<DeviceSettingValue> DeviceSettingValues
         {
-            get { return _DeviceSettingValues; }
-            set { _DeviceSettingValues = value; }
+            get { return _deviceSettingValues; }
+            set { _deviceSettingValues = value; }
         }
 
-        private ObservableCollection<DeviceTypeSettingValue> _DeviceTypeSettingValues = new ObservableCollection<DeviceTypeSettingValue>();
+        private ObservableCollection<DeviceTypeSettingValue> _deviceTypeSettingValues = new ObservableCollection<DeviceTypeSettingValue>();
         public virtual ObservableCollection<DeviceTypeSettingValue> DeviceTypeSettingValues
         {
-            get { return _DeviceTypeSettingValues; }
-            set { _DeviceTypeSettingValues = value; }
+            get { return _deviceTypeSettingValues; }
+            set { _deviceTypeSettingValues = value; }
         }
 
-        private ObservableCollection<DeviceValue> _Values = new ObservableCollection<DeviceValue>();
+        private ObservableCollection<DeviceValue> _values = new ObservableCollection<DeviceValue>();
         public virtual ObservableCollection<DeviceValue> Values
         {
-            get { return _Values; }
-            set { _Values = value; }
+            get { return _values; }
+            set { _values = value; }
         }
 
-        private ObservableCollection<Group> _Groups = new ObservableCollection<Group>();
+        private ObservableCollection<Group> _groups = new ObservableCollection<Group>();
         public virtual ObservableCollection<Group> Groups
         {
-            get { return _Groups; }
-            set { _Groups = value; }
+            get { return _groups; }
+            set { _groups = value; }
         }
 
-        private ObservableCollection<StoredCommand> _StoredCommands = new ObservableCollection<StoredCommand>();
+        private ObservableCollection<StoredCommand> _storedCommands = new ObservableCollection<StoredCommand>();
         public virtual ObservableCollection<StoredCommand> StoredCommands
         {
-            get { return _StoredCommands; }
-            set { _StoredCommands = value; }
+            get { return _storedCommands; }
+            set { _storedCommands = value; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
