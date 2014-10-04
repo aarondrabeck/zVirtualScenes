@@ -92,6 +92,7 @@
     <Compile Include="Cache.cs" />
     <Compile Include="Controllers\CommandsController.cs" />
     <Compile Include="Controllers\BuiltinCommandsController.cs" />
+    <Compile Include="Controllers\LogItemsController.cs" />
     <Compile Include="Controllers\GroupsController.cs" />
     <Compile Include="Controllers\ScenesController.cs" />
     <Compile Include="Controllers\DeviceTypeCommandsController.cs" />

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
@@ -31,5 +33,31 @@ namespace zvsWebapi2Plugin.Controllers
             var result = Get().Where(p => p.Id == key);
             return SingleResult.Create(result);
         }
+
+        public async Task<IHttpActionResult> Patch([FromODataUri] int key, Delta<Device> entityDelta)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var entity = await Context.Devices.FindAsync(key);
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            entityDelta.Patch(entity);
+            try
+            {
+                await Context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+            return Updated(entity);
+        }
     }
+
+
+
 }

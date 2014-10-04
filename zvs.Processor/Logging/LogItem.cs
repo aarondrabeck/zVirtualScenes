@@ -6,17 +6,18 @@ namespace zvs.Processor.Logging
 {
     public class LogItem : IIdentity
     {
-        public DateTime Datetime { get { return _event.TimeStamp; } }
+        public DateTimeOffset Datetime { get { return _event.TimeStamp; } }
         public string DatetimeLog
         {
             get
             {
                 return this.Datetime.ToString("MM/dd/yyyy HH:mm:ss fff tt");
             }
+            set {  }
         }
-        public string Description { get { return _event.RenderedMessage; } }
-        public string Source { get { return _event.LoggerName; } }
-        public string Urgency { get { return _event.Level.ToString(); } }
+        public string Description { get { return _event.RenderedMessage; } set { } }
+        public string Source { get { return _event.LoggerName; } set { } }
+        public string Urgency { get { return _event.Level.ToString(); } set { } }
 
         // Summary:
         //     Gets the AppDomain friendly name.
@@ -98,7 +99,7 @@ namespace zvs.Processor.Logging
         //
         // Remarks:
         //      The collected information is cached for future use.
-        public string ThreadName { get { return _event.ThreadName; } }
+         public string ThreadName { get { return _event.ThreadName; } set { } }
         //
         // Summary:
         //     Gets the name of the current user.
@@ -118,7 +119,7 @@ namespace zvs.Processor.Logging
         //     This means we could speed things up almost 40 times by caching the value
         //     of the WindowsIdentity.GetCurrent().Name property, since this takes (8.04-0.20)
         //     = 7.84375 seconds.
-        public string UserName { get { return _event.UserName; } }
+        public string UserName { get { return _event.UserName; } set { } }
 
         readonly log4net.Core.LoggingEvent _event;
         public LogItem(log4net.Core.LoggingEvent Event)

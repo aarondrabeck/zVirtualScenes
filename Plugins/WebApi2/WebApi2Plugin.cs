@@ -222,9 +222,11 @@ namespace zvsWebapi2Plugin
                
 
                 builder.EntitySet<Device>("Devices");
-                builder.EntitySet<Scene>("Groups");
+                builder.EntitySet<Group>("Groups");
                 builder.EntitySet<Scene>("Scenes");
                 builder.EntitySet<DeviceValue>("DeviceValues");
+                builder.EntitySet<zvs.Processor.Logging.LogItem>("LogItems");
+                
 
                 builder.EntitySet<Command>("Commands");
                 var cExecute = builder.EntityType<Command>().Action("Execute");
