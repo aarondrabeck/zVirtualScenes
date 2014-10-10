@@ -4,7 +4,7 @@
     {
         public static bool IsVCRedistInstalled()
         {
-            string[] strCodes = new string[]
+            var strCodes = new string[]
             {
                 "{E824E81C-80A4-3DFF-B5F9-4842A9FF5F7F}"  //C++ 2012 x86  //{E824E81C-80A4-3DFF-B5F9-4842A9FF5F7F}
               //  "{0B497B28-5243-3329-9F10-DBB18E0963E6}"//C++ 2012 x64
@@ -56,7 +56,7 @@
            };
 
             NativeMethods.INSTALLSTATE state;
-            for (int i = 0; i < strCodes.Length; i++)
+            for (var i = 0; i < strCodes.Length; i++)
             {
                 state = NativeMethods.MsiQueryProductState(strCodes[i]);
                 if (state == NativeMethods.INSTALLSTATE.INSTALLSTATE_LOCAL ||

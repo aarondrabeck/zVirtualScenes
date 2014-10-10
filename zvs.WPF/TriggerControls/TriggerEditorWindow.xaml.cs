@@ -13,8 +13,8 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerEditorWindow : Window
     {
-        private zvsContext context;
-        private Int64 DeviceValueTriggerId;
+        private readonly zvsContext _context;
+        private readonly Int64 _deviceValueTriggerId;
 
         public DeviceValueTrigger Trigger
         {
@@ -30,8 +30,8 @@ namespace zvs.WPF.TriggerControls
 
         public TriggerEditorWindow(Int64 deviceValueTriggerId, zvsContext context)
         {
-            this.context = context;
-            this.DeviceValueTriggerId = deviceValueTriggerId;
+            _context = context;
+            _deviceValueTriggerId = deviceValueTriggerId;
             InitializeComponent();
         }
 
@@ -44,27 +44,26 @@ namespace zvs.WPF.TriggerControls
 
         private async void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            Trigger = await context.DeviceValueTriggers
+            Trigger = await _context.DeviceValueTriggers
                 .Include(o => o.DeviceValue)
                 .Include(o => o.StoredCommand)
                 .Include(o => o.DeviceValue.Device)
-                .FirstOrDefaultAsync(o => o.Id == DeviceValueTriggerId);
+                .FirstOrDefaultAsync(o => o.Id == _deviceValueTriggerId);
 
             if (Trigger == null)
             {
-                Trigger = new DeviceValueTrigger();
-                Trigger.Name = "New Trigger";
+                Trigger = new DeviceValueTrigger {Name = "New Trigger"};
             }
 
-            var eagarLoad2 = await context.Devices
+            var eagarLoad2 = await _context.Devices
                 .Include(o => o.Values)
                 .ToListAsync();
 
-            var scene = await context.Scenes.ToListAsync();
+            var scene = await _context.Scenes.ToListAsync();
 
-            System.Windows.Data.CollectionViewSource deviceViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("deviceViewSource")));
+            var deviceViewSource = ((System.Windows.Data.CollectionViewSource)(FindResource("deviceViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
-            deviceViewSource.Source = context.Devices.Local;
+            deviceViewSource.Source = _context.Devices.Local;
 
             OperatorCmboBx.ItemsSource = Enum.GetValues(typeof(TriggerOperator));
             OperatorCmboBx.SelectedIndex = 0;
@@ -83,7 +82,8 @@ namespace zvs.WPF.TriggerControls
             {
                 OperatorCmboBx.Text = Enum.GetName(typeof(TriggerOperator), Trigger.Operator);
             }
-            catch { }
+            catch (Exception)
+            { }
 
             if (Trigger.Value != null)
                 ValueTxtBx.Text = Trigger.Value;
@@ -91,44 +91,41 @@ namespace zvs.WPF.TriggerControls
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void OKBtn_Click(object sender, RoutedEventArgs e)
         {
-            Device d = (Device)DeviceCmboBx.SelectedItem;
+            var d = (Device)DeviceCmboBx.SelectedItem;
             if (d == null)
             {
                 DeviceCmboBx.Focus();
                 DeviceCmboBx.BorderBrush = new SolidColorBrush(Colors.Red);
-                ColorAnimation anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
+                var anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
                 DeviceCmboBx.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 e.Handled = false;
 
                 return;
             }
 
-            DeviceValue dv = (DeviceValue)ValueCmboBx.SelectedItem;
+            var dv = (DeviceValue)ValueCmboBx.SelectedItem;
             if (dv == null)
             {
                 ValueCmboBx.Focus();
                 ValueCmboBx.BorderBrush = new SolidColorBrush(Colors.Red);
-                ColorAnimation anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
+                var anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
                 ValueCmboBx.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 e.Handled = false;
 
                 return;
             }
-            else
-            {
-                Trigger.DeviceValue = dv;
-            }
+            Trigger.DeviceValue = dv;
 
             if (Trigger.StoredCommand == null)
             {
                 AddUpdateCommand.Focus();
                 AddUpdateCommand.BorderBrush = new SolidColorBrush(Colors.Red);
-                ColorAnimation anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
+                var anim = new ColorAnimation(Color.FromArgb(255, 112, 112, 112), new Duration(TimeSpan.FromSeconds(1.5)));
                 AddUpdateCommand.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 e.Handled = false;
                 return;
@@ -138,52 +135,38 @@ namespace zvs.WPF.TriggerControls
             {
                 ValueTxtBx.Focus();
                 ValueTxtBx.Background = new SolidColorBrush(Colors.Pink);
-                ColorAnimation anim = new ColorAnimation(Colors.White, new Duration(TimeSpan.FromSeconds(1.5)));
+                var anim = new ColorAnimation(Colors.White, new Duration(TimeSpan.FromSeconds(1.5)));
                 ValueTxtBx.Background.BeginAnimation(SolidColorBrush.ColorProperty, anim);
                 e.Handled = false;
-
                 return;
             }
-            else
-            {
-                Trigger.Value = ValueTxtBx.Text;
-            }
+            Trigger.Value = ValueTxtBx.Text;
 
             Trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
             //Update the description
-            Trigger.SetDescription(context);
+            Trigger.SetDescription();
 
             Canceled = false;
-            this.Close();
+            Close();
         }
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
             //Create a Stored Command if there is not one...
-            StoredCommand newSC = new StoredCommand();
+            var newSc = new StoredCommand();
 
             //Send it to the command builder to get filled with a command
-            CommandBuilder cbWindow;
-            if (Trigger.StoredCommand == null)
-                cbWindow = new CommandBuilder(context, newSC);
-            else
-                cbWindow = new CommandBuilder(context, Trigger.StoredCommand);
+            CommandBuilder cbWindow = Trigger.StoredCommand == null ? new CommandBuilder(_context, newSc) : new CommandBuilder(_context, Trigger.StoredCommand);
 
             cbWindow.Owner = this;
 
-            if (cbWindow.ShowDialog() ?? false)
-            {
-                if (Trigger.StoredCommand == null) //if this was a new command, assign it.
-                    Trigger.StoredCommand = newSC;
-                else
-                    Trigger.StoredCommand = Trigger.StoredCommand;
+            if (!(cbWindow.ShowDialog() ?? false)) return;
+            Trigger.StoredCommand = Trigger.StoredCommand ?? newSc;
 
-                var result = await context.TrySaveChangesAsync();
-                if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
-            }
-
+            var result = await _context.TrySaveChangesAsync();
+            if (result.HasError)
+                ((App)Application.Current).zvsCore.log.Error(result.Message);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace zvs.Processor.Backup
 
         public async override Task<ExportResult> ExportAsync(string fileName)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var backupGroups = await context.Groups
                     .Include(o => o.Devices)
@@ -55,10 +55,10 @@ namespace zvs.Processor.Backup
             if (result.HasError)
                 return new RestoreSettingsResult(result.Message);
 
-            int SkippedCount = 0;
+            var SkippedCount = 0;
             var newGroups = new List<Group>();
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingGroups = await context.Groups.ToListAsync();
                 var existingDevice = await context.Devices.ToListAsync();
@@ -71,7 +71,7 @@ namespace zvs.Processor.Backup
                         continue;
                     }
 
-                    Group group = new Group();
+                    var group = new Group();
                     group.Name = backupGroup.Name;
                     var devices = existingDevice.Where(o => backupGroup.NodeNumbers.Contains(o.NodeNumber));
 

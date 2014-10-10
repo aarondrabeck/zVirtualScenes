@@ -6,59 +6,59 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("DeviceValueTriggers", Schema = "ZVS")]
-    public partial class DeviceValueTrigger : INotifyPropertyChanged, IIdentity
+    public class DeviceValueTrigger : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //No actual navigational property here
-        private StoredCommand _StoredCommand;
+        private StoredCommand _storedCommand;
         public virtual StoredCommand StoredCommand
         {
             get
             {
-                return _StoredCommand;
+                return _storedCommand;
             }
             set
             {
-                if (value != _StoredCommand)
+                if (value != _storedCommand)
                 {
-                    _StoredCommand = value;
+                    _storedCommand = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
         public int? DeviceValueId { get; set; }
-        private DeviceValue _DeviceValue;
+        private DeviceValue _deviceValue;
         public virtual DeviceValue DeviceValue
         {
             get
             {
-                return _DeviceValue;
+                return _deviceValue;
             }
             set
             {
-                if (value != _DeviceValue)
+                if (value != _deviceValue)
                 {
-                    _DeviceValue = value;
+                    _deviceValue = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private TriggerOperator _Operator;
+        private TriggerOperator _operator;
         public TriggerOperator Operator
         {
             get
             {
-                return _Operator;
+                return _operator;
             }
             set
             {
-                if (value != _Operator)
+                if (value != _operator)
                 {
-                    _Operator = value;
+                    _operator = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -81,37 +81,37 @@ namespace zvs.Entities
             }
         }
 
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
+                if (value != _value)
                 {
-                    _Value = value;
+                    _value = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -123,36 +123,32 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string _Description;
+        private string _description;
         public string Description
         {
-            get { return _Description; }
+            get { return _description; }
             set
             {
-                if (value != _Description)
+                if (value != _description)
                 {
-                    _Description = value;
+                    _description = value;
                     NotifyPropertyChanged();
                 }
             }
         }
-
-    }
-
-    public static class DeviceValueTriggerExtensionMethods
-    {
-        public static void SetDescription(this DeviceValueTrigger trigger, zvsContext context)
+        public void SetDescription()
         {
-            string trigger_op_name = trigger.Operator.ToString();
+            var triggerOpName = Operator.ToString();
 
-            if (trigger.StoredCommand == null || trigger.DeviceValue == null || trigger.DeviceValue.Device == null)
-                trigger.Description = "Incomplete Trigger";
-
-            trigger.Description = string.Format("{0} {1} is {2} {3}", trigger.DeviceValue.Device.Name,
-                                                        trigger.DeviceValue.Name,
-                                                        trigger_op_name,
-                                                        trigger.Value
-                                                        );
+            if (StoredCommand == null || DeviceValue == null || DeviceValue.Device == null)
+                Description = "Incomplete Trigger";
+            else
+                Description = string.Format("{0} {1} is {2} {3}", DeviceValue.Device.Name,
+                                                            DeviceValue.Name,
+                                                            triggerOpName,
+                                                            Value);
         }
     }
+
+  
 }

@@ -24,9 +24,9 @@ namespace zvs.WPF
             context = new zvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Plugin>.onEntityUpdated += PluginManagerWindow_onEntityUpdated;
-            zvsContext.ChangeNotifications<Plugin>.onEntityAdded += PluginManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Plugin>.onEntityDeleted += PluginManagerWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Plugin>.OnEntityUpdated += PluginManagerWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Plugin>.OnEntityAdded += PluginManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Plugin>.OnEntityDeleted += PluginManagerWindow_onEntityDeleted;
         }
 
 #if DEBUG
@@ -94,9 +94,9 @@ namespace zvs.WPF
 
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Plugin>.onEntityUpdated -= PluginManagerWindow_onEntityUpdated;
-            zvsContext.ChangeNotifications<Plugin>.onEntityAdded -= PluginManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Plugin>.onEntityDeleted -= PluginManagerWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Plugin>.OnEntityUpdated -= PluginManagerWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Plugin>.OnEntityAdded -= PluginManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Plugin>.OnEntityDeleted -= PluginManagerWindow_onEntityDeleted;
             context.Dispose();
         }
 

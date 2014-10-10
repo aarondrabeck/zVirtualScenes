@@ -9,7 +9,7 @@ using System.Data.Entity;
 namespace zvs.Entities
 {
     [Table("SceneSettingValues", Schema = "ZVS")]
-    public partial class SceneSettingValue : INotifyPropertyChanged, IIdentity
+    public class SceneSettingValue : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -20,21 +20,19 @@ namespace zvs.Entities
         public int SceneSettingId { get; set; }
         public virtual SceneSetting SceneSetting { get; set; }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
-                {
-                    _Value = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _value) return;
+                _value = value;
+                NotifyPropertyChanged();
             }
         }
 

@@ -23,7 +23,7 @@ namespace zvs.Processor
         {
             Core = core;
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var sb = new PluginSettingBuilder(core, context);
                 await OnSettingsCreating(sb);

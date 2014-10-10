@@ -3,7 +3,7 @@
 namespace zvs.Entities
 {
     [Table("DeviceTypeSettingOptions", Schema = "ZVS")]
-    public partial class DeviceTypeSettingOption : BaseOption, IIdentity
+    public class DeviceTypeSettingOption : BaseOption, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }

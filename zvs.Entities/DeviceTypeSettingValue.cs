@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("DeviceTypeSettingValues", Schema = "ZVS")]
-    public partial class DeviceTypeSettingValue : INotifyPropertyChanged, IIdentity
+    public class DeviceTypeSettingValue : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -17,19 +17,19 @@ namespace zvs.Entities
         public int DeviceTypeSettingId { get; set; }
         public virtual DeviceTypeSetting DeviceTypeSetting { get; set; }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
+                if (value != _value)
                 {
-                    _Value = value;
+                    _value = value;
                     NotifyPropertyChanged();
                 }
             }

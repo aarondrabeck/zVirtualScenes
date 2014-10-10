@@ -161,7 +161,7 @@ namespace zvs.Processor
             if (adapter == null)
                 return;
 
-            AdapterSetting existingAdapter = await adsb.AdapterSettingBuilder.Context.AdapterSettings.FirstOrDefaultAsync(o => o.Adapter.Id == adapter.Id &&
+            var existingAdapter = await adsb.AdapterSettingBuilder.Context.AdapterSettings.FirstOrDefaultAsync(o => o.Adapter.Id == adapter.Id &&
                 o.UniqueIdentifier == adapterSetting.UniqueIdentifier);
             var changed = false;
             if (existingAdapter == null)

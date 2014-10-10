@@ -58,17 +58,17 @@ namespace zvs.Processor.Triggers
         public TriggerManager(Core core)
         {
             Core = core;
-            DeviceValue.DeviceValueDataChangedEvent += new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+            DeviceValue.DeviceValueDataChangedEvent += device_values_DeviceValueDataChangedEvent;
         }
 
         public void Dispose()
         {
-            DeviceValue.DeviceValueDataChangedEvent -= new DeviceValue.ValueDataChangedEventHandler(device_values_DeviceValueDataChangedEvent);
+            DeviceValue.DeviceValueDataChangedEvent -= device_values_DeviceValueDataChangedEvent;
         }
 
         private async void device_values_DeviceValueDataChangedEvent(object sender, DeviceValue.ValueDataChangedEventArgs args)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var dv = await context.DeviceValues
                      .Include(o => o.Triggers)
@@ -78,7 +78,7 @@ namespace zvs.Processor.Triggers
                     return;
 
                 //Event Triggering
-                foreach (DeviceValueTrigger trigger in dv.Triggers.Where(t => t.isEnabled))
+                foreach (var trigger in dv.Triggers.Where(t => t.isEnabled))
                 {
                     switch (trigger.Operator)
                     {
@@ -92,8 +92,8 @@ namespace zvs.Processor.Triggers
                             }
                         case TriggerOperator.GreaterThan:
                             {
-                                double deviceValue = 0;
-                                double triggerValue = 0;
+                                double deviceValue;
+                                double triggerValue;
 
                                 if (double.TryParse(dv.Value, out deviceValue) && double.TryParse(trigger.Value, out triggerValue))
                                 {
@@ -115,8 +115,8 @@ namespace zvs.Processor.Triggers
                             }
                         case TriggerOperator.LessThan:
                             {
-                                double deviceValue = 0;
-                                double triggerValue = 0;
+                                double deviceValue;
+                                double triggerValue;
 
                                 if (double.TryParse(dv.Value, out deviceValue) && double.TryParse(trigger.Value, out triggerValue))
                                 {
@@ -163,8 +163,8 @@ namespace zvs.Processor.Triggers
                         trigger.StoredCommand.TargetObjectName,
                          trigger.StoredCommand.Description), false));
 
-            CommandProcessor cp = new CommandProcessor(Core);
-            CommandProcessorResult result = await cp.RunStoredCommandAsync(trigger, trigger.StoredCommand.Id);
+            var cp = new CommandProcessor(Core);
+            var result = await cp.RunStoredCommandAsync(trigger, trigger.StoredCommand.Id);
 
             TriggerEnd(new onTriggerEventArgs(trigger.Id, string.Format("Trigger '{0}' ended {1} errors.", trigger.Name, result.HasErrors ? "with" : "without"), false));
         }

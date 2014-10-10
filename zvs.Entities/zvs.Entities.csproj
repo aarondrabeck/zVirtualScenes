@@ -71,18 +71,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Abstracts\BaseValue.cs" />
-    <Compile Include="Abstracts\BaseOption.cs" />
+    <Compile Include="BaseValue.cs" />
+    <Compile Include="BaseOption.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="BuiltinCommand.cs" />
     <Compile Include="CommandOption.cs" />
     <Compile Include="ConfidentialDataAttribute.cs" />
-    <Compile Include="DeviceEdm.cs" />
+    <Compile Include="DeviceValueHistory.cs" />
     <Compile Include="NotifyEntityChangeContext.cs" />
     <Compile Include="PluginSettingOption.cs" />
     <Compile Include="PluginSetting.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="DeviceExtensionMethods.cs" />
     <Compile Include="DeviceTypeSettingValue.cs" />
     <Compile Include="DeviceTypeSettingOption.cs" />
     <Compile Include="DeviceTypeSetting.cs" />

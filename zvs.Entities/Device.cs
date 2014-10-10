@@ -3,12 +3,14 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace zvs.Entities
 {
     [Table("Devices", Schema = "ZVS")]
-    public partial class Device : INotifyPropertyChanged, IIdentity
+    public class Device : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -193,6 +195,56 @@ namespace zvs.Entities
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        [NotMapped]
+        public DateTimeOffset? EdmLastHeardFrom
+        {
+            // Assume the CreateOn property stores UTC time.
+            get
+            {
+                return LastHeardFrom.HasValue ? new DateTimeOffset(LastHeardFrom.Value, TimeSpan.FromHours(0)) : (DateTimeOffset?)null;
+            }
+            set
+            {
+                LastHeardFrom = value.HasValue ? value.Value.UtcDateTime : (DateTime?)null;
+            }
+        }
+
+        public async Task<string> GetDeviceTypeValueAsync(string deviceTypeSettingUniqueIdentifier, zvsContext context)
+        {
+            //check if the value has been defined by the user for this device
+            var definedSetting = await context.DeviceTypeSettingValues.FirstOrDefaultAsync(o =>
+                                        o.DeviceTypeSetting.UniqueIdentifier == deviceTypeSettingUniqueIdentifier &&
+                                        o.Device.Id == Id);
+
+            if (definedSetting != null)
+                return definedSetting.Value;
+
+            //otherwise get default for the command
+            var defaultSetting = await context.DeviceTypeSettings.FirstOrDefaultAsync(o =>
+                o.UniqueIdentifier == deviceTypeSettingUniqueIdentifier &&
+                 o.DeviceTypeId == DeviceTypeId);
+
+            return defaultSetting != null ? defaultSetting.Value : null;
+        }
+
+        public async Task<string> GetDeviceSettingAsync(string deviceSettingUniqueIdentifier, zvsContext context)
+        {
+            //check if the value has been defined by the user for this device
+            var definedSetting = await context.DeviceSettingValues.FirstOrDefaultAsync(o =>
+                                        o.DeviceSetting.UniqueIdentifier == deviceSettingUniqueIdentifier &&
+                                        o.Device.Id == Id);
+
+            if (definedSetting != null)
+                return definedSetting.Value;
+
+            //otherwise get default for the command
+            var defaultSetting = await context.DeviceTypeSettings.FirstOrDefaultAsync(o =>
+                o.UniqueIdentifier == deviceSettingUniqueIdentifier);
+
+            return defaultSetting != null ? defaultSetting.Value : null;
+        }
+    
 
     }
 }

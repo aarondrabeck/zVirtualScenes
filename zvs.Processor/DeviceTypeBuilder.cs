@@ -41,9 +41,9 @@ namespace zvs.Processor
                 existing_dt.Name = deviceType.Name;
                 existing_dt.ShowInList = deviceType.ShowInList;
 
-                foreach (DeviceTypeCommand dtc in deviceType.Commands)
+                foreach (var dtc in deviceType.Commands)
                 {
-                    DeviceTypeCommand existing_dtc = await Context.DeviceTypeCommands
+                    var existing_dtc = await Context.DeviceTypeCommands
                         .Include(o => o.Options)
                         .SingleOrDefaultAsync(o =>
                             o.DeviceTypeId == existing_dt.Id &&

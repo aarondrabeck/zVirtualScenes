@@ -6,42 +6,42 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("DbInfo", Schema = "ZVS")]
-    public partial class DbInfo : INotifyPropertyChanged, IIdentity
+    public class DbInfo : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
        
-        private string _UniqueIdentifier;
+        private string _uniqueIdentifier;
         [StringLength(255)]
         public string UniqueIdentifier
         {
             get
             {
-                return _UniqueIdentifier;
+                return _uniqueIdentifier;
             }
             set
             {
-                if (value != _UniqueIdentifier)
+                if (value != _uniqueIdentifier)
                 {
-                    _UniqueIdentifier = value;
+                    _uniqueIdentifier = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
+                if (value != _value)
                 {
-                    _Value = value;
+                    _value = value;
                     NotifyPropertyChanged();
                 }
             }

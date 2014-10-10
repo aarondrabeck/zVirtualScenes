@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Data.Entity;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -213,21 +215,25 @@ namespace zvsWebapi2Plugin
                 var builder = new ODataConventionModelBuilder();
                 var deviceType = builder.EntityType<Device>();
                 deviceType.Ignore(t => t.LastHeardFrom);
-                //deviceType.Property(t => t.EdmLastHeardFrom).Name = "LastHeardFrom";
+                deviceType.Property(t => t.EdmLastHeardFrom).Name = "LastHeardFrom";
 
                 var scheduledTaskType = builder.EntityType<ScheduledTask>();
                 scheduledTaskType.Ignore(t => t.StartTime);
-                //scheduledTaskType.Property(t => t.EdmLastHeardFrom).Name = "LastHeardFrom";
+                scheduledTaskType.Property(t => t.EdmStartTime).Name = "StartTime";
 
-               
+                var deviceValueHistoryTaskType = builder.EntityType<DeviceValueHistory>();
+                deviceValueHistoryTaskType.Ignore(t => t.DateTime);
+                deviceValueHistoryTaskType.Property(t => t.EdmDateTime).Name = "DateTime";
 
                 builder.EntitySet<Device>("Devices");
                 builder.EntitySet<Group>("Groups");
                 builder.EntitySet<Scene>("Scenes");
+                builder.EntitySet<DeviceValueHistory>("DeviceValueHistories");
+                builder.EntitySet<Scene>("SceneCommands");
+                builder.EntitySet<DeviceValueTrigger>("DeviceValueTriggers");
                 builder.EntitySet<DeviceValue>("DeviceValues");
                 builder.EntitySet<zvs.Processor.Logging.LogItem>("LogItems");
                 
-
                 builder.EntitySet<Command>("Commands");
                 var cExecute = builder.EntityType<Command>().Action("Execute");
                 cExecute.Parameter<string>("Argument");

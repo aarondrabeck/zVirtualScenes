@@ -3,20 +3,20 @@
 namespace zvs.Entities
 {
     [Table("JavaScriptCommands", Schema = "ZVS")]
-    public partial class JavaScriptCommand : Command
+    public class JavaScriptCommand : Command
     {  
-        private string _Script;
+        private string _script;
         public string Script
         {
             get
             {
-                return _Script;
+                return _script;
             }
             set
             {
-                if (value != _Script)
+                if (value != _script)
                 {
-                    _Script = value;
+                    _script = value;
                     NotifyPropertyChanged();
                 }
             }

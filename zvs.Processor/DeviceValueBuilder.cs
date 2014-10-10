@@ -22,7 +22,7 @@ namespace zvs.Processor
             var existing_dv = await context.DeviceValues.FirstOrDefaultAsync(o => o.UniqueIdentifier == deviceValue.UniqueIdentifier
                 && o.DeviceId == device.Id);
 
-            string prev_value = string.Empty;
+            var prev_value = string.Empty;
 
             if (existing_dv == null)
             {
@@ -36,7 +36,7 @@ namespace zvs.Processor
             else
             {
                 //LOG IT
-                string device_name = "Unknown";
+                var device_name = "Unknown";
                 if (String.IsNullOrEmpty(device.Name))
                     device_name = "Device #" + device.Id;
                 else

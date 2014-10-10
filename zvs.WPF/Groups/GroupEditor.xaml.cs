@@ -23,7 +23,7 @@ namespace zvs.WPF.Groups
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Device>.onEntityAdded += GroupEditor_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.OnEntityAdded += GroupEditor_onEntityAdded;
         }
 
 #if DEBUG
@@ -68,7 +68,7 @@ namespace zvs.WPF.Groups
         }
         private void GroupEditor_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Device>.onEntityAdded -= GroupEditor_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.OnEntityAdded -= GroupEditor_onEntityAdded;
             context.Dispose();
         }
 

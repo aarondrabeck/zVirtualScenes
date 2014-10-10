@@ -120,9 +120,9 @@ namespace AndroidTaskerPlugin
             };
             await settingBuilder.Plugin(this).RegisterPluginSettingAsync(verboseSetting, o => o.VerboseSetting);
 
-            zvsContext.ChangeNotifications<Scene>.onEntityUpdated += HttpAPIPlugin_onEntityUpdated;
-            zvsContext.ChangeNotifications<Scene>.onEntityDeleted += HttpAPIPlugin_onEntityDeleted;
-            zvsContext.ChangeNotifications<Scene>.onEntityAdded += HttpAPIPlugin_onEntityAdded;
+            zvsContext.ChangeNotifications<Scene>.OnEntityUpdated += HttpAPIPlugin_onEntityUpdated;
+            zvsContext.ChangeNotifications<Scene>.OnEntityDeleted += HttpAPIPlugin_onEntityDeleted;
+            zvsContext.ChangeNotifications<Scene>.OnEntityAdded += HttpAPIPlugin_onEntityAdded;
         }
 
         async void HttpAPIPlugin_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Scene>.EntityAddedArgs e)

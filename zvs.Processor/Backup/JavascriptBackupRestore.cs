@@ -37,7 +37,7 @@ namespace zvs.Processor.Backup
 
         public async override Task<ExportResult> ExportAsync(string fileName)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var backupJs = await context.JavaScriptCommands
                     .Select(o => new JavaScriptBackup()
@@ -66,12 +66,12 @@ namespace zvs.Processor.Backup
 
         public static void ExportJavaScriptAsync(string PathFileName, Action<string> Callback)
         {
-            List<JavaScriptBackup> scripts = new List<JavaScriptBackup>();
-            using (zvsContext context = new zvsContext())
+            var scripts = new List<JavaScriptBackup>();
+            using (var context = new zvsContext())
             {
-                foreach (JavaScriptCommand script in context.JavaScriptCommands)
+                foreach (var script in context.JavaScriptCommands)
                 {
-                    JavaScriptBackup scriptBackup = new JavaScriptBackup();
+                    var scriptBackup = new JavaScriptBackup();
                     scriptBackup.Script = script.Script;
                     scriptBackup.Name = script.Name;
                     scriptBackup.UniqueIdentifier = script.UniqueIdentifier;
@@ -89,7 +89,7 @@ namespace zvs.Processor.Backup
             try
             {
                 stream = File.Open(PathFileName, FileMode.Create);
-                XmlSerializer xmlSerializer = new XmlSerializer(typeof(List<JavaScriptBackup>));
+                var xmlSerializer = new XmlSerializer(typeof(List<JavaScriptBackup>));
                 xmlSerializer.Serialize(stream, scripts);
                 Callback(string.Format("Exported {0} JavaScript commands to '{1}'", scripts.Count, Path.GetFileName(PathFileName)));
             }
@@ -111,7 +111,7 @@ namespace zvs.Processor.Backup
             if (result.HasError)
                 return new RestoreSettingsResult(result.Message);
 
-            int SkippedCount = 0;
+            var SkippedCount = 0;
 
             var newJavaScriptCommands = result.Data.Select(o => new JavaScriptCommand()
             {
@@ -126,7 +126,7 @@ namespace zvs.Processor.Backup
                 SortOrder = o.SortOrder
             }).ToList();
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 foreach (var existingCommand in await context.JavaScriptCommands.ToListAsync())
                 {

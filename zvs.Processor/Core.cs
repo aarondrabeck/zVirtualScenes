@@ -26,11 +26,11 @@ namespace zvs.Processor
             //Create a instance of the logger
             log = Logging.LogManager.GetLogger<Core>();
 
-            zvsContext.ChangeNotifications<Device>.onEntityUpdated += Core_onEntityUpdated;
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityUpdated += Core_onEntityUpdated;
-            zvsContext.ChangeNotifications<Group>.onEntityUpdated += Core_onEntityUpdated;
-            zvsContext.ChangeNotifications<Scene>.onEntityUpdated += Core_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += Core_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityUpdated += Core_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += Core_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<Group>.OnEntityUpdated += Core_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<Scene>.OnEntityUpdated += Core_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += Core_onEntityUpdated;
         }
 
         void Core_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityUpdatedArgs e)
@@ -66,7 +66,7 @@ namespace zvs.Processor
                 {
                     using (var context = new zvsContext())
                     {
-                        string ChangedObjId = e.NewEntity.Id.ToString();
+                        var ChangedObjId = e.NewEntity.Id.ToString();
                         var storedCommands = new List<StoredCommand>();
 
                         //Scene Commands
@@ -97,7 +97,7 @@ namespace zvs.Processor
                 {
                     using (var context = new zvsContext())
                     {
-                        string changeingGroupIDstr = e.NewEntity.Id.ToString();
+                        var changeingGroupIDstr = e.NewEntity.Id.ToString();
                         var storedCommands = new List<StoredCommand>();
 
                         //Group Commands
@@ -136,7 +136,7 @@ namespace zvs.Processor
                             .ToListAsync();
 
                         foreach (var trigger in triggers)
-                            trigger.SetDescription(context);
+                            trigger.SetDescription();
 
                         await context.TrySaveChangesAsync();
                     }
@@ -163,9 +163,9 @@ namespace zvs.Processor
                             .ToListAsync();
 
                         foreach (var trigger in triggers)
-                            trigger.SetDescription(context);
+                            trigger.SetDescription();
 
-                        string deviceIdStr = e.NewEntity.Id.ToString();
+                        var deviceIdStr = e.NewEntity.Id.ToString();
                         var storedCommands = new List<StoredCommand>();
 
                         //Repoll Device Commands
@@ -217,7 +217,7 @@ namespace zvs.Processor
             log.InfoFormat("Starting Core Processor:{0}", Utils.ApplicationName);
 
             #region Install Base Commands and Properties
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var builtinCommandBuilder = new BuiltinCommandBuilder(null, this, context);
 
@@ -281,7 +281,7 @@ namespace zvs.Processor
 
             //TODO: MAKE A NICE INTERFACE FOR THIS
             //Install Program Options
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
                 if (option == null)

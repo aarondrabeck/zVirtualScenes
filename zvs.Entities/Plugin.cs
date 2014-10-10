@@ -13,35 +13,31 @@ namespace zvs.Entities
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
-                {
-                    _Name = value;
-                    NotifyPropertyChanged("Name");
-                }
+                if (value == _name) return;
+                _name = value;
+                NotifyPropertyChanged("Name");
             }
         }
 
-        private Guid _PluginGuid;
+        private Guid _pluginGuid;
         public Guid PluginGuid
         {
-            get { return _PluginGuid; }
+            get { return _pluginGuid; }
             set
             {
-                if (value != _PluginGuid)
-                {
-                    _PluginGuid = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _pluginGuid) return;
+                _pluginGuid = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -54,37 +50,35 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _isEnabled)
-                {
-                    _isEnabled = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _isEnabled) return;
+                _isEnabled = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Description;
+        private string _description;
         [StringLength(1024)]
         public string Description
         {
             get
             {
-                return _Description;
+                return _description;
             }
             set
             {
-                if (value != _Description)
+                if (value != _description)
                 {
-                    _Description = value;
+                    _description = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private ObservableCollection<PluginSetting> _Settings = new ObservableCollection<PluginSetting>();
+        private ObservableCollection<PluginSetting> _settings = new ObservableCollection<PluginSetting>();
         public virtual ObservableCollection<PluginSetting> Settings
         {
-            get { return _Settings; }
-            set { _Settings = value; }
+            get { return _settings; }
+            set { _settings = value; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

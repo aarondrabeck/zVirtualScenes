@@ -27,7 +27,7 @@ namespace zvs.Processor
             DeviceValueBuilder = new DeviceValueBuilder(this, core);
             DeviceCommandBuilder = new DeviceCommandBuilder(this, core);
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var dtb = new DeviceTypeBuilder(this, core, context);
                 await OnDeviceTypesCreating(dtb);

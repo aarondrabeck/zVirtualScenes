@@ -18,9 +18,9 @@ namespace zvs.WPF.JavaScript
             context = new zvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded += JavaScriptAddRemove_onEntityAdded;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += JavaScriptAddRemove_onEntityAdded;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
         }
 
 #if DEBUG
@@ -87,9 +87,9 @@ namespace zvs.WPF.JavaScript
 
         private void JavaScriptAddRemove_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded -= JavaScriptAddRemove_onEntityAdded;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= JavaScriptAddRemove_onEntityAdded;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
             context.Dispose();
         }
 

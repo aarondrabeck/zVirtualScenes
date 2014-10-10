@@ -10,7 +10,7 @@ using System.Diagnostics;
 namespace zvs.Entities
 {
     [Table("StoredCommands", Schema = "ZVS")]
-    public partial class StoredCommand : INotifyPropertyChanged, IIdentity
+    public class StoredCommand : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -35,18 +35,18 @@ namespace zvs.Entities
         public virtual ScheduledTask ScheduledTask { get; set; }
 
         public int CommandId { get; set; }
-        private Command _Command;
+        private Command _command;
         public virtual Command Command
         {
             get
             {
-                return _Command;
+                return _command;
             }
             set
             {
-                if (value != _Command)
+                if (value != _command)
                 {
-                    _Command = value;
+                    _command = value;
                     //NotifyPropertyChanged("ActionDescription");
                     //NotifyPropertyChanged("ActionableObject");
                     NotifyPropertyChanged("Command");
@@ -55,19 +55,19 @@ namespace zvs.Entities
             }
         }
 
-        private string _Argument;
+        private string _argument;
         [StringLength(512)]
         public string Argument
         {
             get
             {
-                return _Argument;
+                return _argument;
             }
             set
             {
-                if (value != _Argument)
+                if (value != _argument)
                 {
-                    _Argument = value;
+                    _argument = value;
                     NotifyPropertyChanged("Argument");
                     NotifyPropertyChanged("ActionDescription");
                     NotifyPropertyChanged("Summary");
@@ -76,19 +76,19 @@ namespace zvs.Entities
             }
         }
 
-        private string _Argument2;
+        private string _argument2;
         [StringLength(512)]
         public string Argument2
         {
             get
             {
-                return _Argument2;
+                return _argument2;
             }
             set
             {
-                if (value != _Argument2)
+                if (value != _argument2)
                 {
-                    _Argument2 = value;
+                    _argument2 = value;
                     NotifyPropertyChanged("Argument2");
                 }
             }
@@ -100,31 +100,27 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private string _TargetObjectName;
+        private string _targetObjectName;
         public string TargetObjectName
         {
-            get { return _TargetObjectName; }
+            get { return _targetObjectName; }
             set
             {
-                if (value != _TargetObjectName)
-                {
-                    _TargetObjectName = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _targetObjectName) return;
+                _targetObjectName = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Description;
+        private string _description;
         public string Description
         {
-            get { return _Description; }
+            get { return _description; }
             set
             {
-                if (value != _Description)
-                {
-                    _Description = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _description) return;
+                _description = value;
+                NotifyPropertyChanged();
             }
         }
     }

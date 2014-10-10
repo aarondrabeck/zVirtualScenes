@@ -21,10 +21,10 @@ namespace zvs.WPF.ScheduledTaskControls
         {
             context = new zvsContext();
             InitializeComponent();
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded += ScheduledTaskCreator_onEntityAdded;
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
-            zvsContext.ChangeNotifications<StoredCommand>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
         void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
@@ -122,9 +122,9 @@ namespace zvs.WPF.ScheduledTaskControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded -= ScheduledTaskCreator_onEntityAdded;
-                zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
-                zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
+                zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
+                zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
+                zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
             }
         }
 

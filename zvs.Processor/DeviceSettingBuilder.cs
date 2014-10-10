@@ -24,7 +24,7 @@ namespace zvs.Processor
                 return;
             }
 
-            DeviceSetting setting = await Context.DeviceSettings
+            var setting = await Context.DeviceSettings
                 .Include(o => o.Options)
                 .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier);
 

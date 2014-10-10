@@ -34,7 +34,7 @@ namespace zvs.Processor.Backup
         public async override Task<ExportResult> ExportAsync(string fileName)
         {
             var CmdCount = 0;
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingScenes = await context.Scenes
                     .Include(o => o.Commands)
@@ -46,9 +46,9 @@ namespace zvs.Processor.Backup
                     var sceneBackup = new SceneBackup();
                     sceneBackup.Name = s.Name;
 
-                    foreach (SceneCommand scmd in s.Commands)
+                    foreach (var scmd in s.Commands)
                     {
-                        SceneCMDBackup SceneCmdBackup = new SceneCMDBackup();
+                        var SceneCmdBackup = new SceneCMDBackup();
                         SceneCmdBackup.Order = scmd.SortOrder;
                         SceneCmdBackup.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(scmd.StoredCommand);
                         sceneBackup.Commands.Add(SceneCmdBackup);
@@ -75,11 +75,11 @@ namespace zvs.Processor.Backup
             if (result.HasError)
                 return new RestoreSettingsResult(result.Message);
 
-            int SkippedCount = 0;
+            var SkippedCount = 0;
             var newScene = new List<Scene>();
             var ImportedCmdCount = 0;
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingScenes = await context.Scenes.ToListAsync();
                 foreach (var backupScene in result.Data)

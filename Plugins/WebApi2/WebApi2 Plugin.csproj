@@ -92,8 +92,11 @@
     <Compile Include="Cache.cs" />
     <Compile Include="Controllers\CommandsController.cs" />
     <Compile Include="Controllers\BuiltinCommandsController.cs" />
+    <Compile Include="Controllers\DeviceValueHistoriesController.cs" />
+    <Compile Include="Controllers\DeviceValueTriggersController.cs" />
     <Compile Include="Controllers\LogItemsController.cs" />
     <Compile Include="Controllers\GroupsController.cs" />
+    <Compile Include="Controllers\SceneCommandsController.cs" />
     <Compile Include="Controllers\ScenesController.cs" />
     <Compile Include="Controllers\DeviceTypeCommandsController.cs" />
     <Compile Include="Controllers\DeviceCommandsController.cs" />

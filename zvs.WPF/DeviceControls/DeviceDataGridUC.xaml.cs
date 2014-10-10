@@ -25,13 +25,13 @@ namespace zvs.WPF.DeviceControls
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Device>.onEntityAdded += DeviceDataGridUC_onEntityAdded;
-            zvsContext.ChangeNotifications<Device>.onEntityDeleted += DeviceDataGridUC_onEntityDeleted;
-            zvsContext.ChangeNotifications<Device>.onEntityUpdated += DeviceDataGridUC_onEntityUpdated;
+            zvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDataGridUC_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDataGridUC_onEntityDeleted;
+            zvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDataGridUC_onEntityUpdated;
 
-            zvsContext.ChangeNotifications<Group>.onEntityAdded += DeviceDataGridUC_onEntityAdded;
-            zvsContext.ChangeNotifications<Group>.onEntityDeleted += DeviceDataGridUC_onEntityDeleted;
-            zvsContext.ChangeNotifications<Group>.onEntityUpdated += DeviceDataGridUC_onEntityUpdated;
+            zvsContext.ChangeNotifications<Group>.OnEntityAdded += DeviceDataGridUC_onEntityAdded;
+            zvsContext.ChangeNotifications<Group>.OnEntityDeleted += DeviceDataGridUC_onEntityDeleted;
+            zvsContext.ChangeNotifications<Group>.OnEntityUpdated += DeviceDataGridUC_onEntityUpdated;
 
             //TODO: LISTEN FOR CHANGES TO THE DEVICE_GROUPS LINKING TABLE
 
@@ -251,13 +251,13 @@ namespace zvs.WPF.DeviceControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.ChangeNotifications<Device>.onEntityAdded -= DeviceDataGridUC_onEntityAdded;
-                zvsContext.ChangeNotifications<Device>.onEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
-                zvsContext.ChangeNotifications<Device>.onEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
+                zvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDataGridUC_onEntityAdded;
+                zvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
+                zvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
 
-                zvsContext.ChangeNotifications<Group>.onEntityAdded -= DeviceDataGridUC_onEntityAdded;
-                zvsContext.ChangeNotifications<Group>.onEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
-                zvsContext.ChangeNotifications<Group>.onEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
+                zvsContext.ChangeNotifications<Group>.OnEntityAdded -= DeviceDataGridUC_onEntityAdded;
+                zvsContext.ChangeNotifications<Group>.OnEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
+                zvsContext.ChangeNotifications<Group>.OnEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
             }
         }
 

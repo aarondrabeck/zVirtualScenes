@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace zvs.Entities
 {
     [Table("DeviceValues", Schema = "ZVS")]
-    public partial class DeviceValue : BaseValue, IIdentity
+    public class DeviceValue : BaseValue, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -13,62 +13,69 @@ namespace zvs.Entities
         public int DeviceId { get; set; }
         public virtual Device Device { get; set; }
 
-        private ObservableCollection<DeviceValueTrigger> _Triggers = new ObservableCollection<DeviceValueTrigger>();
-        public virtual ObservableCollection<DeviceValueTrigger> Triggers
+        private ObservableCollection<DeviceValueHistory> _history = new ObservableCollection<DeviceValueHistory>();
+        public virtual ObservableCollection<DeviceValueHistory> History
         {
-            get { return _Triggers; }
-            set { _Triggers = value; }
+            get { return _history; }
+            set { _history = value; }
         }
 
-        private string _Genre;
+        private ObservableCollection<DeviceValueTrigger> _triggers = new ObservableCollection<DeviceValueTrigger>();
+        public virtual ObservableCollection<DeviceValueTrigger> Triggers
+        {
+            get { return _triggers; }
+            set { _triggers = value; }
+        }
+
+        private string _genre;
         [StringLength(255)]
         public string Genre
         {
             get
             {
-                return _Genre;
+                return _genre;
             }
             set
             {
-                if (value != _Genre)
+                if (value != _genre)
                 {
-                    _Genre = value;
+                    _genre = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _Index;
+        private string _index;
         [StringLength(255)]
         public string Index
         {
             get
             {
-                return _Index;
+                return _index;
             }
             set
             {
-                if (value != _Index)
+                if (value != _index)
                 {
-                    _Index = value;
+                    _index = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _CommandClass;
+        private string _commandClass;
         [StringLength(255)]
         public string CommandClass
         {
             get
             {
-                return _CommandClass;
+                return _commandClass;
             }
             set
             {
-                if (value != _CommandClass)
+                if (value != _commandClass)
                 {
-                    _CommandClass = value;
+                    _commandClass = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -91,37 +98,37 @@ namespace zvs.Entities
             }
         }
 
-        private string _CustomData1;
+        private string _customData1;
         [StringLength(255)]
         public string CustomData1
         {
             get
             {
-                return _CustomData1;
+                return _customData1;
             }
             set
             {
-                if (value != _CustomData1)
+                if (value != _customData1)
                 {
-                    _CustomData1 = value;
+                    _customData1 = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _CustomData2;
+        private string _customData2;
         [StringLength(255)]
         public string CustomData2
         {
             get
             {
-                return _CustomData2;
+                return _customData2;
             }
             set
             {
-                if (value != _CustomData2)
+                if (value != _customData2)
                 {
-                    _CustomData2 = value;
+                    _customData2 = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -142,14 +149,14 @@ namespace zvs.Entities
         public class ValueDataChangedEventArgs : System.EventArgs
         {
             public int DeviceValueId { get; private set; }
-            public string newValue { get; private set; }
-            public string oldValue { get; private set; }
+            public string NewValue { get; private set; }
+            public string OldValue { get; private set; }
 
-            public ValueDataChangedEventArgs(int DeviceValueId, string newValue, string oldValue)
+            public ValueDataChangedEventArgs(int deviceValueId, string newValue, string oldValue)
             {
-                this.DeviceValueId = DeviceValueId;
-                this.newValue = newValue;
-                this.oldValue = oldValue;
+                DeviceValueId = deviceValueId;
+                NewValue = newValue;
+                OldValue = oldValue;
             }
         }
     }

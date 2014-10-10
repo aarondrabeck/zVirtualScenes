@@ -224,7 +224,7 @@ namespace zvs.WPF
 
         public async Task RefreshTriggerDescripitions()
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var triggers = await context.DeviceValueTriggers
                     .Include(o => o.DeviceValue)
@@ -232,7 +232,7 @@ namespace zvs.WPF
                     .ToListAsync();
 
                 foreach (var trigger in triggers)
-                    trigger.SetDescription(context);
+                    trigger.SetDescription();
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)

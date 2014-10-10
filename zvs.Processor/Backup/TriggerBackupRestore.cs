@@ -34,7 +34,7 @@ namespace zvs.Processor.Backup
 
         public async override Task<ExportResult> ExportAsync(string fileName)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingTriggers = await context.DeviceValueTriggers
                     .Include(o => o.StoredCommand)
@@ -72,10 +72,10 @@ namespace zvs.Processor.Backup
             if (result.HasError)
                 return new RestoreSettingsResult(result.Message);
 
-            int SkippedCount = 0;
+            var SkippedCount = 0;
             var newTriggers = new List<DeviceValueTrigger>();
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingTriggers = await context.DeviceValueTriggers.ToListAsync();
 

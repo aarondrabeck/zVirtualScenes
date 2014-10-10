@@ -27,7 +27,7 @@ namespace zvs.Processor.Backup
 
         public async override Task<ExportResult> ExportAsync(string fileName)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var backupDevices = await context.Devices
                     .OrderBy(o => o.Name)
@@ -55,13 +55,13 @@ namespace zvs.Processor.Backup
                 return new RestoreSettingsResult(result.Message);
 
             var backupDevices = result.Data;
-            int ImportedCount = 0;
+            var ImportedCount = 0;
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
-                foreach (Device d in await context.Devices.ToListAsync())
+                foreach (var d in await context.Devices.ToListAsync())
                 {
-                    DeviceBackup dev = backupDevices.FirstOrDefault(o => o.NodeNumber == d.NodeNumber);
+                    var dev = backupDevices.FirstOrDefault(o => o.NodeNumber == d.NodeNumber);
                     if (dev != null)
                     {
                         d.Name = dev.Name;

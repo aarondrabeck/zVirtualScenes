@@ -7,38 +7,38 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("Scenes", Schema = "ZVS")]
-    public partial class Scene : INotifyPropertyChanged, IIdentity
+    public class Scene : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        private ObservableCollection<SceneCommand> _Commands = new ObservableCollection<SceneCommand>();
+        private ObservableCollection<SceneCommand> _commands = new ObservableCollection<SceneCommand>();
         public virtual ObservableCollection<SceneCommand> Commands
         {
-            get { return _Commands; }
-            set { _Commands = value; }
+            get { return _commands; }
+            set { _commands = value; }
         }
 
-        private ObservableCollection<SceneSettingValue> _SettingValues = new ObservableCollection<SceneSettingValue>();
+        private ObservableCollection<SceneSettingValue> _settingValues = new ObservableCollection<SceneSettingValue>();
         public virtual ObservableCollection<SceneSettingValue> SettingValues
         {
-            get { return _SettingValues; }
-            set { _SettingValues = value; }
+            get { return _settingValues; }
+            set { _settingValues = value; }
         }
         
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -61,18 +61,18 @@ namespace zvs.Entities
             }
         }
 
-        private int? _SortOrder;
+        private int? _sortOrder;
         public int? SortOrder
         {
             get
             {
-                return _SortOrder;
+                return _sortOrder;
             }
             set
             {
-                if (value != _SortOrder)
+                if (value != _sortOrder)
                 {
-                    _SortOrder = value;
+                    _sortOrder = value;
                     NotifyPropertyChanged();
                 }
             }

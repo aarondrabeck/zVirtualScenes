@@ -6,21 +6,19 @@ namespace zvs.Entities
 {
     public abstract class BaseOption : INotifyPropertyChanged
     {
-        private string _Name;
+        private string _name;
         [StringLength(512)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
-                {
-                    _Name = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _name) return;
+                _name = value;
+                NotifyPropertyChanged();
             }
         }
 

@@ -9,42 +9,42 @@ using System.Data.Entity;
 namespace zvs.Entities
 {
     [Table("ProgramOptions", Schema = "ZVS")]
-    public partial class ProgramOption : INotifyPropertyChanged, IIdentity
+    public class ProgramOption : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        private string _UniqueIdentifier;
+        private string _uniqueIdentifier;
         [StringLength(255)]
         public string UniqueIdentifier
         {
             get
             {
-                return _UniqueIdentifier;
+                return _uniqueIdentifier;
             }
             set
             {
-                if (value != _UniqueIdentifier)
+                if (value != _uniqueIdentifier)
                 {
-                    _UniqueIdentifier = value;
+                    _uniqueIdentifier = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
+                if (value != _value)
                 {
-                    _Value = value;
+                    _value = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -56,27 +56,26 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        //TODO: MOVE TO EXTENSION METHOD
         public static async Task<Result> TryAddOrEditAsync(zvsContext context, ProgramOption programOption)
         {
             if (programOption == null)
                 throw new ArgumentNullException("programOption");
 
-            var existing_option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == programOption.UniqueIdentifier);
+            var existingOption = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == programOption.UniqueIdentifier);
 
             var changed = false;
 
-            if (existing_option == null)
+            if (existingOption == null)
             {
                 context.ProgramOptions.Add(programOption);
                 changed = true;
             }
             else
             {
-                if (existing_option.Value != programOption.Value)
+                if (existingOption.Value != programOption.Value)
                 {
                     changed = true;
-                    existing_option.Value = programOption.Value;
+                    existingOption.Value = programOption.Value;
                 }
             }
 

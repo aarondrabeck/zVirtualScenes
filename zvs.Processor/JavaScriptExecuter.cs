@@ -61,7 +61,7 @@ namespace zvs.Processor
                     info.CurrentStatement.Source.Start.Line,
                     info.CurrentStatement.Source.Code.Replace(Environment.NewLine, ""));
             };
-            Random random = new Random();
+            var random = new Random();
             id = random.Next(1, 100);
 
         }
@@ -129,7 +129,7 @@ namespace zvs.Processor
                 //import them into the engine by running each script
                 //then run the engine as normal
 
-                object result = await Task<object>.Factory.StartNew(() =>
+                var result = await Task<object>.Factory.StartNew(() =>
                 {
                     return engine.Run(Script);
                 });
@@ -146,7 +146,7 @@ namespace zvs.Processor
 
         public void Require(string Script)
         {
-            string path = Script;
+            var path = Script;
             if (!System.IO.File.Exists(path))
             {
                 path = string.Format("..\\scripts\\{0}", Script);
@@ -162,7 +162,7 @@ namespace zvs.Processor
             }
             if (System.IO.File.Exists(Script))
             {
-                string s = System.IO.File.ReadAllText(Script);
+                var s = System.IO.File.ReadAllText(Script);
                 try
                 {
                     engine.Run(s);
@@ -178,17 +178,17 @@ namespace zvs.Processor
         //delay("RunDeviceCommand('Office Light','Set Level', '99');", 3000);
         public async void Delay(string script, double time, bool Async)
         {
-            AutoResetEvent mutex = new AutoResetEvent(false);
+            var mutex = new AutoResetEvent(false);
             await Task.Delay((int)time);
 
-            JavaScriptExecuter je = new JavaScriptExecuter(Sender, Core);
+            var je = new JavaScriptExecuter(Sender, Core);
             je.onReportProgress += (s, a) =>
             {
                 Core.log.Info(a.Progress);
             };
 
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            JavaScriptResult result = await je.ExecuteScriptAsync(script, Context);
+            var result = await je.ExecuteScriptAsync(script, Context);
             Core.log.Info(result.Details);
 
             mutex.Set();
@@ -207,7 +207,7 @@ namespace zvs.Processor
         public async void RunDeviceNameCommandName(string DeviceName, string CommandName, string Value)
         {
             Device d = null;
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
                 d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
 
             if (d == null)
@@ -221,7 +221,7 @@ namespace zvs.Processor
         public async void RunDeviceNameCommandId(string DeviceName, double CommandId, string Value)
         {
             Device d = null;
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
                 d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
 
             if (d == null)
@@ -241,38 +241,38 @@ namespace zvs.Processor
 
         private async void RunDeviceCommand(double DeviceId, double CommandID, string Value)
         {
-            int did = Convert.ToInt32(DeviceId);
-            int cid = Convert.ToInt32(CommandID);
-            using (zvsContext context = new zvsContext())
+            var did = Convert.ToInt32(DeviceId);
+            var cid = Convert.ToInt32(CommandID);
+            using (var context = new zvsContext())
             {
-                DeviceCommand dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == cid && o.DeviceId == did);
+                var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == cid && o.DeviceId == did);
                 if (dc == null)
                 {
                     ReportProgress("Cannot find device command '{0}'", CommandID);
                     return;
                 }
 
-                CommandProcessor cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(Core);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                CommandProcessorResult result = await cp.RunCommandAsync(this, dc, Value);
+                var result = await cp.RunCommandAsync(this, dc, Value);
             }
         }
 
         private async void RunDeviceCommand(double DeviceId, string CommandName, string Value)
         {
-            int dId = Convert.ToInt32(DeviceId);
-            using (zvsContext context = new zvsContext())
+            var dId = Convert.ToInt32(DeviceId);
+            using (var context = new zvsContext())
             {
-                DeviceCommand dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Name == CommandName && o.DeviceId == dId);
+                var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Name == CommandName && o.DeviceId == dId);
                 if (dc == null)
                 {
                     ReportProgress("Cannot find device command '{0}'", CommandName);
                     return;
                 }
 
-                CommandProcessor cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(Core);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-                CommandProcessorResult result = await cp.RunCommandAsync(this, dc, Value);
+                var result = await cp.RunCommandAsync(this, dc, Value);
             }
         }
 
@@ -295,7 +295,7 @@ namespace zvs.Processor
         public async void RunSceneJS(string SceneName)
         {
             Scene s = null;
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
                 s = await context.Scenes.FirstOrDefaultAsync(o => o.Name == SceneName);
 
             if (s == null)
@@ -305,22 +305,22 @@ namespace zvs.Processor
             }
 
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            CommandProcessorResult result = await RunSceneAsync(s.Id);
+            var result = await RunSceneAsync(s.Id);
         }
 
         //RunScene(1);
         public async void RunSceneJS(double SceneID)
         {
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
-            CommandProcessorResult result = await RunSceneAsync(SceneID);
+            var result = await RunSceneAsync(SceneID);
         }
 
         public async Task<CommandProcessorResult> RunSceneAsync(double SceneID)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
-                BuiltinCommand cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
-                CommandProcessor cp = new CommandProcessor(Core);
+                var cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
+                var cp = new CommandProcessor(Core);
                 return await cp.RunCommandAsync(this, cmd, SceneID.ToString());
             }
         }

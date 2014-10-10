@@ -22,10 +22,10 @@ namespace zvs.WPF.TriggerControls
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityAdded += TriggerGridUC_onEntityAdded;
-            zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityDeleted += TriggerGridUC_onEntityDeleted;
-            zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityUpdated += TriggerGridUC_onEntityUpdated;
-            zvsContext.ChangeNotifications<StoredCommand>.onEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityAdded += TriggerGridUC_onEntityAdded;
+            zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityDeleted += TriggerGridUC_onEntityDeleted;
+            zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated += TriggerGridUC_onEntityUpdated;
+            zvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
         void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
@@ -115,9 +115,9 @@ namespace zvs.WPF.TriggerControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityAdded -= TriggerGridUC_onEntityAdded;
-                zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityDeleted -= TriggerGridUC_onEntityDeleted;
-                zvsContext.ChangeNotifications<DeviceValueTrigger>.onEntityUpdated -= TriggerGridUC_onEntityUpdated;
+                zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityAdded -= TriggerGridUC_onEntityAdded;
+                zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityDeleted -= TriggerGridUC_onEntityDeleted;
+                zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated -= TriggerGridUC_onEntityUpdated;
             }
         }
 

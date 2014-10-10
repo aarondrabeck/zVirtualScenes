@@ -11,55 +11,49 @@ namespace zvs.Entities
         public int Id { get; set; }
 
         //No actual navigational property here
-        private StoredCommand _StoredCommand;
+        private StoredCommand _storedCommand;
         public virtual StoredCommand StoredCommand
         {
             get
             {
-                return _StoredCommand;
+                return _storedCommand;
             }
             set
             {
-                if (value != _StoredCommand)
-                {
-                    _StoredCommand = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _storedCommand) return;
+                _storedCommand = value;
+                NotifyPropertyChanged();
             }
         }
 
         public int SceneId { get; set; }
-        private Scene _Scene;
+        private Scene _scene;
         public virtual Scene Scene
         {
             get
             {
-                return _Scene;
+                return _scene;
             }
             set
             {
-                if (value != _Scene)
-                {
-                    _Scene = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _scene) return;
+                _scene = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private int? _SortOrder;
+        private int? _sortOrder;
         public int? SortOrder
         {
             get
             {
-                return _SortOrder;
+                return _sortOrder;
             }
             set
             {
-                if (value != _SortOrder)
-                {
-                    _SortOrder = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _sortOrder) return;
+                _sortOrder = value;
+                NotifyPropertyChanged();
             }
         }
 

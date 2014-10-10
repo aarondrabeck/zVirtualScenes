@@ -22,7 +22,7 @@ namespace zvs.Processor
         {
             foreach (var plugin in PluginGuidToPluginDictionary.Values.Where(o => o.IsEnabled))
             {
-                await plugin.DeviceValueChangedAsync(e.DeviceValueId, e.newValue, e.oldValue);
+                await plugin.DeviceValueChangedAsync(e.DeviceValueId, e.NewValue, e.OldValue);
             }
         }
 
@@ -97,7 +97,7 @@ namespace zvs.Processor
                             core.log.Error(result.Message);
                     }
 
-                    string msg = string.Format("Initializing '{0}'", zvsPlugin.Name);
+                    var msg = string.Format("Initializing '{0}'", zvsPlugin.Name);
                     Core.log.Info(msg);
 
                     //Plug-in need access to the core in order to use the Logger

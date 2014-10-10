@@ -7,60 +7,60 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("ScheduledTasks", Schema = "ZVS")]
-    public partial class ScheduledTask : INotifyPropertyChanged, IIdentity
+    public class ScheduledTask : INotifyPropertyChanged, IIdentity
     {
          [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         //No actual navigational property here
-        private StoredCommand _StoredCommand;
+        private StoredCommand _storedCommand;
         public virtual StoredCommand StoredCommand
         {
             get
             {
-                return _StoredCommand;
+                return _storedCommand;
             }
             set
             {
-                if (value != _StoredCommand)
+                if (value != _storedCommand)
                 {
-                    _StoredCommand = value;
+                    _storedCommand = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged("TriggerDescription");
                 }
             }
         }
 
-        private TaskFrequency _Frequency;
+        private TaskFrequency _frequency;
         public TaskFrequency Frequency
         {
             get
             {
-                return _Frequency;
+                return _frequency;
             }
             set
             {
-                if (value != _Frequency)
+                if (value != _frequency)
                 {
-                    _Frequency = value;
+                    _frequency = value;
                     NotifyPropertyChanged();                   
                 }
             }
         }
        
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -83,69 +83,84 @@ namespace zvs.Entities
             }
         }
 
-        private DateTime? _StartTime;
+
+        private DateTime? _startTime;
         public DateTime? StartTime
         {
             get
             {
-                return _StartTime;
+                return _startTime;
             }
             set
             {
-                if (value != _StartTime)
+                if (value != _startTime)
                 {
-                    _StartTime = value;
+                    _startTime = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private int? _SortOrder;
+        [NotMapped]
+        public DateTimeOffset? EdmStartTime
+        {
+            // Assume the CreateOn property stores UTC time.
+            get
+            {
+                return StartTime.HasValue ? new DateTimeOffset(StartTime.Value, TimeSpan.FromHours(0)) : (DateTimeOffset?)null;
+            }
+            set
+            {
+                StartTime = value.HasValue ? value.Value.UtcDateTime : (DateTime?)null;
+            }
+        }
+
+        private int? _sortOrder;
         public int? SortOrder
         {
             get
             {
-                return _SortOrder;
+                return _sortOrder;
             }
             set
             {
-                if (value != _SortOrder)
+                if (value != _sortOrder)
                 {
-                    _SortOrder = value;
+                    _sortOrder = value;
                     NotifyPropertyChanged();
                 }
             }
         }
         
-        private bool? _RecurMonday;
+        private bool? _recurMonday;
         public bool? RecurMonday
         {
             get
             {
-                return _RecurMonday;
+                return _recurMonday;
             }
             set
             {
-                if (value != _RecurMonday)
+                if (value != _recurMonday)
                 {
-                    _RecurMonday = value;
+                    _recurMonday = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private bool? _RecurTuesday;
+        private bool? _recurTuesday;
         public bool? RecurTuesday
         {
             get
             {
-                return _RecurTuesday;
+                return _recurTuesday;
             }
             set
             {
-                if (value != _RecurTuesday)
+                if (value != _recurTuesday)
                 {
-                    _RecurTuesday = value;
+                    _recurTuesday = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -813,10 +828,7 @@ namespace zvs.Entities
                 }
             }
         }
-
-        partial void BeforeRecurDay28Change(bool? oldValue, bool? newValue);
-        partial void AfterRecurDay28Change(bool? oldValue, bool? newValue);
-
+        
         private bool? _RecurDay29;
         public bool? RecurDay29
         {
@@ -833,9 +845,6 @@ namespace zvs.Entities
                 }
             }
         }
-
-        partial void BeforeRecurDay29Change(bool? oldValue, bool? newValue);
-        partial void AfterRecurDay29Change(bool? oldValue, bool? newValue);
 
         private bool? _RecurDay30;
         public bool? RecurDay30

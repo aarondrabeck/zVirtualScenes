@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("DeviceTypes", Schema = "ZVS")]
-    public partial class DeviceType : INotifyPropertyChanged, IIdentity
+    public class DeviceType : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -15,76 +15,76 @@ namespace zvs.Entities
         public int AdapterId { get; set; }
         public virtual Adapter Adapter { get; set; }
 
-        private ObservableCollection<Device> _Devices = new ObservableCollection<Device>();
+        private ObservableCollection<Device> _devices = new ObservableCollection<Device>();
         public virtual ObservableCollection<Device> Devices
         {
-            get { return _Devices; }
-            set { _Devices = value; }
+            get { return _devices; }
+            set { _devices = value; }
         }
 
-        private ObservableCollection<DeviceTypeSetting> _DeviceTypeSettings = new ObservableCollection<DeviceTypeSetting>();
+        private ObservableCollection<DeviceTypeSetting> _deviceTypeSettings = new ObservableCollection<DeviceTypeSetting>();
         public virtual ObservableCollection<DeviceTypeSetting> Settings
         {
-            get { return _DeviceTypeSettings; }
-            set { _DeviceTypeSettings = value; }
+            get { return _deviceTypeSettings; }
+            set { _deviceTypeSettings = value; }
         }
 
-        private ObservableCollection<DeviceTypeCommand> _Commands = new ObservableCollection<DeviceTypeCommand>();
+        private ObservableCollection<DeviceTypeCommand> _commands = new ObservableCollection<DeviceTypeCommand>();
         public virtual ObservableCollection<DeviceTypeCommand> Commands
         {
-            get { return _Commands; }
-            set { _Commands = value; }
+            get { return _commands; }
+            set { _commands = value; }
         }
 
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _UniqueIdentifier;
+        private string _uniqueIdentifier;
         [Required(ErrorMessage = "Name cannot be empty")]
         [StringLength(255)]
         public string UniqueIdentifier
         {
             get
             {
-                return _UniqueIdentifier;
+                return _uniqueIdentifier;
             }
             set
             {
-                if (value != _UniqueIdentifier)
+                if (value != _uniqueIdentifier)
                 {
-                    _UniqueIdentifier = value;
+                    _uniqueIdentifier = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private bool _ShowInList;
+        private bool _showInList;
         public bool ShowInList
         {
             get
             {
-                return _ShowInList;
+                return _showInList;
             }
             set
             {
-                if (value != _ShowInList)
+                if (value != _showInList)
                 {
-                    _ShowInList = value;
+                    _showInList = value;
                     NotifyPropertyChanged();
                 }
             }

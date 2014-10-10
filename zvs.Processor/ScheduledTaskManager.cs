@@ -36,7 +36,7 @@ namespace zvs.Processor
 
         private void ScheduledTaskBegin(onScheduledTaskEventArgs args)
         {
-            string msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
+            var msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
             if (args.Errors)
                 Core.log.Error(msg);
             else
@@ -48,7 +48,7 @@ namespace zvs.Processor
 
         private void ScheduledTaskEnd(onScheduledTaskEventArgs args)
         {
-            string msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
+            var msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
             if (args.Errors)
                 Core.log.Error(msg);
             else
@@ -63,9 +63,9 @@ namespace zvs.Processor
             Core = core;
 
             //Keep the local context in sync with other contexts
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated += ScheduledTaskManager_onEntityUpdated;
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted += ScheduledTaskManager_onEntityDeleted;
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded += ScheduledTaskManager_onEntityAdded;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskManager_onEntityUpdated;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskManager_onEntityDeleted;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskManager_onEntityAdded;
         }
 
         private async void ScheduledTaskManager_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityAddedArgs e)
@@ -85,7 +85,7 @@ namespace zvs.Processor
 
         private async Task RefreshLocalCopyOfTasksAsync()
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
                 scheduledTasks = await context.ScheduledTasks.ToListAsync();
         }
 
@@ -96,7 +96,7 @@ namespace zvs.Processor
 
         public async void StartAsync()
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
                 scheduledTasks = await context.ScheduledTasks.ToListAsync();
 
             IsRunning = true;
@@ -113,7 +113,7 @@ namespace zvs.Processor
 
         public void CheckForTasks()
         {
-            foreach (ScheduledTask task in scheduledTasks)
+            foreach (var task in scheduledTasks)
             {
                 #region Actions
                 if (task.isEnabled)
@@ -124,7 +124,7 @@ namespace zvs.Processor
                             {
                                 if (task.StartTime.HasValue && task.RecurSeconds.Value > 0)
                                 {
-                                    int sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
+                                    var sec = (int)(DateTime.Now - task.StartTime.Value).TotalSeconds;
                                     if (sec % task.RecurSeconds.Value == 0)
                                         RunTask(task.Id);
                                 }
@@ -137,7 +137,7 @@ namespace zvs.Processor
                                     //Logger.WriteToLog(Urgency.INFO,"totaldays:" + (DateTime.Now.Date - task.StartTime.Value.Date).TotalDays);
                                     if (task.RecurDays.Value > 0 && ((DateTime.Now.Date - task.StartTime.Value.Date).TotalDays % task.RecurDays.Value == 0))
                                     {
-                                        TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                        var TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                         TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds); //remove milli seconds
 
                                         //Logger.WriteToLog(Urgency.INFO,string.Format("taskTofD: {0}, nowTofD: {1}", task.StartTime.Value.TimeOfDay, TimeNowToTheSeconds));                                            
@@ -155,7 +155,7 @@ namespace zvs.Processor
                                     {
                                         if (ShouldRunToday(task))  //IF RUN THIS DAY 
                                         {
-                                            TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                            var TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                             TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
                                             if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
@@ -169,13 +169,13 @@ namespace zvs.Processor
                             {
                                 if (task.StartTime.HasValue && task.RecurMonth.HasValue && task.RecurMonth.Value > 0)
                                 {
-                                    int monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
+                                    var monthsapart = ((DateTime.Now.Year - task.StartTime.Value.Year) * 12) + DateTime.Now.Month - task.StartTime.Value.Month;
                                     //Logger.WriteToLog(Urgency.INFO,string.Format("Months Apart: {0}", monthsapart));
                                     if (task.RecurMonth.Value > 0 && monthsapart > -1 && monthsapart % task.RecurMonth.Value == 0)  //IF RUN THIS Month
                                     {
                                         if (ShouldRunThisDayOfMonth(task))  //IF RUN THIS DAY 
                                         {
-                                            TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                            var TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                             TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
                                             if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
@@ -190,7 +190,7 @@ namespace zvs.Processor
                             {
                                 if (task.StartTime.HasValue)
                                 {
-                                    TimeSpan TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
+                                    var TimeNowToTheSeconds = DateTime.Now.TimeOfDay;
                                     TimeNowToTheSeconds = new TimeSpan(TimeNowToTheSeconds.Hours, TimeNowToTheSeconds.Minutes, TimeNowToTheSeconds.Seconds);
 
                                     if (TimeNowToTheSeconds.Equals(task.StartTime.Value.TimeOfDay))
@@ -207,9 +207,9 @@ namespace zvs.Processor
 
         public void Dispose()
         {
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityUpdated -= ScheduledTaskManager_onEntityUpdated;
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityDeleted -= ScheduledTaskManager_onEntityDeleted;
-            zvsContext.ChangeNotifications<ScheduledTask>.onEntityAdded -= ScheduledTaskManager_onEntityAdded;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskManager_onEntityUpdated;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskManager_onEntityDeleted;
+            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskManager_onEntityAdded;
         }
 
         private bool ShouldRunThisDayOfMonth(ScheduledTask task)
@@ -317,7 +317,7 @@ namespace zvs.Processor
         {
             ScheduledTask _task = null;
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 _task = await context.ScheduledTasks.FirstOrDefaultAsync(o => o.Id == taskId);
 
@@ -341,7 +341,7 @@ namespace zvs.Processor
                     return;
                 }
 
-                CommandProcessor cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(Core);
                 await cp.RunStoredCommandAsync(_task, _task.StoredCommand.Id);
                 ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
                            string.Format("Task '{0}' ended.", _task.Name), false));
@@ -394,7 +394,7 @@ namespace zvs.Processor
 
         private int NumberOfWeeks(DateTime dateFrom, DateTime dateTo)
         {
-            TimeSpan Span = dateTo.Subtract(dateFrom);
+            var Span = dateTo.Subtract(dateFrom);
 
             if (Span.Days <= 7)
             {
@@ -406,9 +406,9 @@ namespace zvs.Processor
                 return 1;
             }
 
-            int Days = Span.Days - 7 + (int)dateFrom.DayOfWeek;
-            int WeekCount = 1;
-            int DayCount = 0;
+            var Days = Span.Days - 7 + (int)dateFrom.DayOfWeek;
+            var WeekCount = 1;
+            var DayCount = 0;
 
             for (WeekCount = 1; DayCount < Days; WeekCount++)
             {

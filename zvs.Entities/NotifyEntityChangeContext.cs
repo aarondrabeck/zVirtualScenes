@@ -2,45 +2,45 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 namespace zvs.Entities
 {
     public abstract class NotifyEntityChangeContext : DbContext
     {
-        //Constructors
-        public NotifyEntityChangeContext() : base() { }
-        public NotifyEntityChangeContext(string nameOrConnectionString) : base(nameOrConnectionString) { }
+        protected NotifyEntityChangeContext()
+        {
+        }
 
-        /// <summary>
-        /// Use these events for cross-context notifications
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
+        protected NotifyEntityChangeContext(string nameOrConnectionString)
+            : base(nameOrConnectionString)
+        {
+        }
+
         public static class ChangeNotifications<T>
         {
-            public static event onEntityAddedEventHandler onEntityAdded = delegate { };
-            public delegate void onEntityAddedEventHandler(object sender, EntityAddedArgs e);
+            public static event OnEntityAddedEventHandler OnEntityAdded = delegate { };
+            public delegate void OnEntityAddedEventHandler(object sender, EntityAddedArgs e);
 
-            public static event onEntityUpdatedEventHandler onEntityUpdated = delegate { };
-            public delegate void onEntityUpdatedEventHandler(object sender, EntityUpdatedArgs e);
+            public static event OnEntityUpdatedEventHandler OnEntityUpdated = delegate { };
+            public delegate void OnEntityUpdatedEventHandler(object sender, EntityUpdatedArgs e);
 
-            public static event onEntityDeletedEventHandler onEntityDeleted = delegate { };
-            public delegate void onEntityDeletedEventHandler(object sender, EntityDeletedArgs e);
+            public static event OnEntityDeletedEventHandler OnEntityDeleted = delegate { };
+            public delegate void OnEntityDeletedEventHandler(object sender, EntityDeletedArgs e);
 
             public static void RaiseEntityAdded(object sender, object addedEntity)
             {
-                onEntityAdded(sender, new EntityAddedArgs(addedEntity));
+                OnEntityAdded(sender, new EntityAddedArgs(addedEntity));
             }
 
             public static void RaiseEntityUpdated(object sender, object newEntity, object oldEntity)
             {
-                onEntityUpdated(sender, new EntityUpdatedArgs(newEntity, oldEntity));
+                OnEntityUpdated(sender, new EntityUpdatedArgs(newEntity, oldEntity));
             }
 
             public static void RaiseEntityDeleted(object sender, object deletedEntity)
             {
-                onEntityDeleted(sender, new EntityDeletedArgs(deletedEntity));
+                OnEntityDeleted(sender, new EntityDeletedArgs(deletedEntity));
             }
 
             #region Event Args
@@ -81,55 +81,58 @@ namespace zvs.Entities
 
         public static void RaiseEntityAdded(object sender, object addedEntity)
         {
-            MethodInfo RaiseEntityAdded = typeof(ChangeNotifications<>).MakeGenericType(addedEntity.GetTypeEntityWrapperDetection()).GetMethod("RaiseEntityAdded");
-            RaiseEntityAdded.Invoke(null, new object[] { sender, addedEntity });
+            var raiseEntityAdded = typeof(ChangeNotifications<>).MakeGenericType(addedEntity.GetTypeEntityWrapperDetection()).GetMethod("RaiseEntityAdded");
+            raiseEntityAdded.Invoke(null, new[] { sender, addedEntity });
         }
 
         public static void RaiseEntityUpdated(object sender, object newEntity, object oldEntity)
         {
-            MethodInfo RaiseEntityUpdated = typeof(ChangeNotifications<>).MakeGenericType(newEntity.GetTypeEntityWrapperDetection()).GetMethod("RaiseEntityUpdated");
-            RaiseEntityUpdated.Invoke(null, new object[] { sender, newEntity, oldEntity });
+            var raiseEntityUpdated = typeof(ChangeNotifications<>).MakeGenericType(newEntity.GetTypeEntityWrapperDetection()).GetMethod("RaiseEntityUpdated");
+            raiseEntityUpdated.Invoke(null, new[] { sender, newEntity, oldEntity });
         }
 
         public static void RaiseEntityDeleted(object sender, object deletedEntity)
         {
-            MethodInfo RaiseEntityDeleted = typeof(ChangeNotifications<>).MakeGenericType(deletedEntity.GetTypeEntityWrapperDetection()).GetMethod("RaiseEntityDeleted");
-            RaiseEntityDeleted.Invoke(null, new object[] { sender, deletedEntity });
+            var raiseEntityDeleted = typeof(ChangeNotifications<>).MakeGenericType(deletedEntity.GetTypeEntityWrapperDetection()).GetMethod("RaiseEntityDeleted");
+            raiseEntityDeleted.Invoke(null, new[] { sender, deletedEntity });
         }
 
         public async override Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken)
         {
             //Record Changes
-            List<object> AddedEntities = new List<object>();
-            List<dynamic> ModifedEntities = new List<dynamic>();
-            List<object> DeletedEntities = new List<object>();
+            var addedEntities = new List<object>();
+            var modifedEntities = new List<dynamic>();
+            var deletedEntities = new List<object>();
 
-            foreach(var ent in this.ChangeTracker.Entries().ToList())
+            ChangeTracker.Entries().ToList().ForEach(o =>
             {
-                if (ent.State == EntityState.Added)
-                    AddedEntities.Add(ent.Entity);
-                else if (ent.State == EntityState.Modified)
-                    ModifedEntities.Add(new
-                    {
-                        NewEntity = ent.Entity,
-                        OldEntity = ent.OriginalValues.ToObject()
-                    });
-                else if (ent.State == EntityState.Deleted)
-                    DeletedEntities.Add(ent.Entity);
-            };
+                switch (o.State)
+                {
+                    case EntityState.Added:
+                        addedEntities.Add(o.Entity);
+                        break;
+                    case EntityState.Modified:
+                        modifedEntities.Add(new
+                        {
+                            NewEntity = o.Entity,
+                            OldEntity = o.OriginalValues.ToObject()
+                        });
+                        break;
+                    case EntityState.Deleted:
+                        deletedEntities.Add(o.Entity);
+                        break;
+                }
+            });
 
             //Try Save Changes
             var saveChangesResult = await base.SaveChangesAsync(cancellationToken);
 
             //Report changes if SaveChanges did not throw an error.
-            foreach (var addedEnt in AddedEntities)
-                RaiseEntityAdded(this, addedEnt);
+            addedEntities.ForEach(o => RaiseEntityAdded(this, o));
 
-            foreach (var moddedEnt in ModifedEntities)
-                RaiseEntityUpdated(this, moddedEnt.NewEntity, moddedEnt.OldEntity);
+            modifedEntities.ForEach(o => RaiseEntityUpdated(this, o.NewEntity, o.OldEntity));
 
-            foreach (var deledEnt in DeletedEntities)
-                RaiseEntityDeleted(this, deledEnt);
+            deletedEntities.ForEach(o => RaiseEntityDeleted(this, o));
 
             return saveChangesResult;
         }
@@ -138,26 +141,23 @@ namespace zvs.Entities
         {
             return SaveChangesAsync().Result;
         }
+
+        
     }
 
-    public static class EFExtensionHelpers
+    public static class EntityFrameworkExtentions
     {
         public static Type GetTypeEntityWrapperDetection(this Object obj)
         {
             //Check for entity types here as they get wrapped in another dynamic type
-            if (obj.hasEntityWrapper())
-                return obj.GetType().BaseType;
-            else
-                return obj.GetType();
+            return obj.HasEntityWrapper() ? obj.GetType().BaseType : obj.GetType();
         }
 
-        public static bool hasEntityWrapper(this Object obj)
+        public static bool HasEntityWrapper(this Object obj)
         {
             //Check for entity types here as they get wrapped in another dynamic type
-            if (obj.GetType().Namespace != null && obj.GetType().Namespace.StartsWith("System.Data.Entity.Dynamic"))
-                return true;
-
-            return false;
+            var ns = obj.GetType().Namespace;
+            return ns != null && (ns.StartsWith("System.Data.Entity.Dynamic"));
         }
     }
 }

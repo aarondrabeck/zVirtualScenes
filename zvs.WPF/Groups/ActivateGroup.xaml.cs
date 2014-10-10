@@ -23,9 +23,9 @@ namespace zvs.WPF.Groups
             context = new zvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Group>.onEntityUpdated += ActivateGroup_onEntityUpdated;
-            zvsContext.ChangeNotifications<Group>.onEntityAdded += ActivateGroup_onEntityAdded;
-            zvsContext.ChangeNotifications<Group>.onEntityDeleted += ActivateGroup_onEntityDeleted;
+            zvsContext.ChangeNotifications<Group>.OnEntityUpdated += ActivateGroup_onEntityUpdated;
+            zvsContext.ChangeNotifications<Group>.OnEntityAdded += ActivateGroup_onEntityAdded;
+            zvsContext.ChangeNotifications<Group>.OnEntityDeleted += ActivateGroup_onEntityDeleted;
         }
 
 #if DEBUG
@@ -88,9 +88,9 @@ namespace zvs.WPF.Groups
 
         private void ActivateGroup_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Group>.onEntityUpdated -= ActivateGroup_onEntityUpdated;
-            zvsContext.ChangeNotifications<Group>.onEntityAdded -= ActivateGroup_onEntityAdded;
-            zvsContext.ChangeNotifications<Group>.onEntityDeleted -= ActivateGroup_onEntityDeleted;
+            zvsContext.ChangeNotifications<Group>.OnEntityUpdated -= ActivateGroup_onEntityUpdated;
+            zvsContext.ChangeNotifications<Group>.OnEntityAdded -= ActivateGroup_onEntityAdded;
+            zvsContext.ChangeNotifications<Group>.OnEntityDeleted -= ActivateGroup_onEntityDeleted;
             context.Dispose();
         }
 

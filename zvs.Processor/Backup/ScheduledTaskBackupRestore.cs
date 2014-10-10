@@ -76,7 +76,7 @@ namespace zvs.Processor.Backup
 
         public async override Task<ExportResult> ExportAsync(string fileName)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingSTs = await context.ScheduledTasks
                     .Include(o => o.StoredCommand)
@@ -156,10 +156,10 @@ namespace zvs.Processor.Backup
             if (result.HasError)
                 return new RestoreSettingsResult(result.Message);
 
-            int SkippedCount = 0;
+            var SkippedCount = 0;
             var newSTs = new List<ScheduledTask>();
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 var existingSTs = await context.ScheduledTasks.ToListAsync();
 
@@ -175,7 +175,7 @@ namespace zvs.Processor.Backup
                         continue;
                     }
 
-                    ScheduledTask task = new ScheduledTask();
+                    var task = new ScheduledTask();
                     task.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupST.StoredCommand);
                     task.Frequency = (TaskFrequency)backupST.Frequency;
                     task.Name = backupST.Name;

@@ -6,93 +6,83 @@ namespace zvs.Entities
 {
     public abstract class BaseValue : INotifyPropertyChanged
     {
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
-                {
-                    _Name = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _name) return;
+                _name = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _UniqueIdentifier;
+        private string _uniqueIdentifier;
         [StringLength(255)]
         public string UniqueIdentifier
         {
             get
             {
-                return _UniqueIdentifier;
+                return _uniqueIdentifier;
             }
             set
             {
-                if (value != _UniqueIdentifier)
-                {
-                    _UniqueIdentifier = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _uniqueIdentifier) return;
+                _uniqueIdentifier = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Value;
+        private string _value;
         [StringLength(512)]
         public string Value
         {
             get
             {
-                return _Value;
+                return _value;
             }
             set
             {
-                if (value != _Value)
-                {
-                    _Value = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _value) return;
+                _value = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private DataType _ValueType;
+        private DataType _valueType;
         [Required(ErrorMessage = "Value type cannot be empty")]
         public DataType ValueType
         {
             get
             {
-                return _ValueType;
+                return _valueType;
             }
             set
             {
-                if (value != _ValueType)
-                {
-                    _ValueType = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _valueType) return;
+                _valueType = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _Description;
+        private string _description;
         [StringLength(1024)]
         public string Description
         {
             get
             {
-                return _Description;
+                return _description;
             }
             set
             {
-                if (value != _Description)
-                {
-                    _Description = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _description) return;
+                _description = value;
+                NotifyPropertyChanged();
             }
         }
 

@@ -24,9 +24,9 @@ namespace zvs.WPF.AdapterManager
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Adapter>.onEntityAdded += AdapterManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Adapter>.onEntityDeleted += AdapterManagerWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Adapter>.onEntityUpdated += AdapterManagerWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Adapter>.OnEntityAdded += AdapterManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Adapter>.OnEntityDeleted += AdapterManagerWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Adapter>.OnEntityUpdated += AdapterManagerWindow_onEntityUpdated;
         }
 
         void AdapterManagerWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Adapter>.EntityUpdatedArgs e)
@@ -86,9 +86,9 @@ namespace zvs.WPF.AdapterManager
 
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Adapter>.onEntityAdded -= AdapterManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Adapter>.onEntityDeleted -= AdapterManagerWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Adapter>.onEntityUpdated -= AdapterManagerWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Adapter>.OnEntityAdded -= AdapterManagerWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Adapter>.OnEntityDeleted -= AdapterManagerWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Adapter>.OnEntityUpdated -= AdapterManagerWindow_onEntityUpdated;
             context.Dispose();
         }
 

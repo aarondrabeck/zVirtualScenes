@@ -22,7 +22,7 @@ namespace zvs.Processor
             if (sceneSetting == null)
                 return;
 
-            SceneSetting setting = await Context.SceneSettings
+            var setting = await Context.SceneSettings
                 .Include(o => o.Options)
                 .FirstOrDefaultAsync(s => s.UniqueIdentifier == sceneSetting.UniqueIdentifier);
 

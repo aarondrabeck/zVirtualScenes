@@ -7,54 +7,54 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("Groups", Schema = "ZVS")]
-    public partial class Group : INotifyPropertyChanged, IIdentity
+    public class Group : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id {get; set; }
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
 
-        private ObservableCollection<Device> _Devices = new ObservableCollection<Device>();
+        private ObservableCollection<Device> _devices = new ObservableCollection<Device>();
         public virtual ObservableCollection<Device> Devices
         {
-            get { return _Devices; }
-            set { _Devices = value; }
+            get { return _devices; }
+            set { _devices = value; }
         }
         
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _Description;
+        private string _description;
         [StringLength(1024)]
         public string Description
         {
             get
             {
-                return _Description;
+                return _description;
             }
             set
             {
-                if (value != _Description)
+                if (value != _description)
                 {
-                    _Description = value;
+                    _description = value;
                     NotifyPropertyChanged();
                 }
             }

@@ -27,9 +27,9 @@ namespace zvs.WPF.DeviceControls
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityAdded += DeviceValues_onEntityAdded;
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityUpdated += DeviceValues_onEntityUpdated;
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityDeleted += DeviceValues_onEntityDeleted;
+            zvsContext.ChangeNotifications<DeviceValue>.OnEntityAdded += DeviceValues_onEntityAdded;
+            zvsContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += DeviceValues_onEntityUpdated;
+            zvsContext.ChangeNotifications<DeviceValue>.OnEntityDeleted += DeviceValues_onEntityDeleted;
         }
                 
         private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
@@ -95,9 +95,9 @@ namespace zvs.WPF.DeviceControls
 
         private void DataGrid_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityAdded -= DeviceValues_onEntityAdded;
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityUpdated -= DeviceValues_onEntityUpdated;
-            zvsContext.ChangeNotifications<DeviceValue>.onEntityDeleted -= DeviceValues_onEntityDeleted;
+            zvsContext.ChangeNotifications<DeviceValue>.OnEntityAdded -= DeviceValues_onEntityAdded;
+            zvsContext.ChangeNotifications<DeviceValue>.OnEntityUpdated -= DeviceValues_onEntityUpdated;
+            zvsContext.ChangeNotifications<DeviceValue>.OnEntityDeleted -= DeviceValues_onEntityDeleted;
         }
 
         private async void RepollLnk_MouseDown_1(object sender, MouseButtonEventArgs e)

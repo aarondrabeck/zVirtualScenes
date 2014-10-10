@@ -20,18 +20,18 @@ namespace zvs.Processor.Backup
         {
             try
             {
-                using (MemoryStream stream = new MemoryStream())
+                using (var stream = new MemoryStream())
                 {
-                    XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+                    var xmlSerializer = new XmlSerializer(typeof(T));
                     xmlSerializer.Serialize(stream, objCollection);
                     stream.Position = 0;
 
-                    using (StreamReader reader = new StreamReader(stream))
+                    using (var reader = new StreamReader(stream))
                     {
                         var output = reader.ReadToEnd();
 
                         // Write the string to a file.
-                        using (System.IO.StreamWriter file = new System.IO.StreamWriter(fileName))
+                        using (var file = new System.IO.StreamWriter(fileName))
                             await file.WriteLineAsync(output);
                     }
                 }
@@ -55,10 +55,10 @@ namespace zvs.Processor.Backup
 
                 //Open the file written above and read values from it. 
                 //http://stackoverflow.com/questions/1127431/xmlserializer-giving-filenotfoundexception-at-constructor
-                XmlSerializer ScenesSerializer = new XmlSerializer(typeof(T));
+                var ScenesSerializer = new XmlSerializer(typeof(T));
 
                 string fileData;
-                using (StreamReader streamReader = new StreamReader(fileName))
+                using (var streamReader = new StreamReader(fileName))
                     fileData = await streamReader.ReadToEndAsync();
 
                 return new ReadAsXMLFromDiskResult<T>((T)ScenesSerializer.Deserialize(new StringReader(fileData)));

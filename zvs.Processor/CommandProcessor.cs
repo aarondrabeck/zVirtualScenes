@@ -34,7 +34,7 @@ namespace zvs.Processor
         //public Methods 
         public async Task<CommandProcessorResult> RunStoredCommandAsync(object sender, int storedCommandId)
         {
-            zvsContext context = new zvsContext();
+            var context = new zvsContext();
 
             var sCmd = await context.StoredCommands
                 .Include(o => o.Command)
@@ -61,9 +61,9 @@ namespace zvs.Processor
         //private Methods
         private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, Command command, string argument = "", string argument2 = "")
         {
-            CommandProcessorResult result = new CommandProcessorResult(true, "Failed to process command. Command type unknown.");
+            var result = new CommandProcessorResult(true, "Failed to process command. Command type unknown.");
 
-            using (zvsContext context = new zvsContext())
+            using (var context = new zvsContext())
             {
                 #region DeviceCommand
                 if (command is DeviceCommand)
@@ -89,14 +89,14 @@ namespace zvs.Processor
                     var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
                     if (adapter.IsEnabled)
                     {
-                        string details = string.Format("{0} complete", commandAction);
+                        var details = string.Format("{0} complete", commandAction);
 
                         await adapter.ProcessDeviceCommandAsync(deviceCommand.Device, deviceCommand, argument, argument2);
                         return new CommandProcessorResult(false, details);
                     }
                     else
                     {
-                        string err_str = string.Format("{0} failed because the '{1}' adapter is {2}",
+                        var err_str = string.Format("{0} failed because the '{1}' adapter is {2}",
                          commandAction,
                          deviceCommand.Device.Type.Adapter.Name,
                          adapter.IsEnabled ? "not ready" : "disabled"
@@ -136,14 +136,14 @@ namespace zvs.Processor
 
                     if (adapter.IsEnabled)
                     {
-                        string details = string.Format("{0} complete", commandAction);
+                        var details = string.Format("{0} complete", commandAction);
 
                         await adapter.ProcessDeviceTypeCommandAsync(device.Type, device, command as DeviceTypeCommand, argument);
                         return new CommandProcessorResult(false, details);
                     }
                     else
                     {
-                        string err_str = string.Format("{0} failed because the {1} adapter is {2}",
+                        var err_str = string.Format("{0} failed because the {1} adapter is {2}",
                         commandAction,
                         device.Type.Adapter.Name,
                         adapter.IsEnabled ? "not ready" : "disabled");
@@ -161,18 +161,18 @@ namespace zvs.Processor
                     {
                         case "TIMEDELAY":
                             {
-                                int delay = 0;
+                                var delay = 0;
                                 int.TryParse(argument, out delay);
 
                                 await Task.Delay(delay * 1000);
 
-                                string details = string.Format("{0} second time delay complete.", delay);
+                                var details = string.Format("{0} second time delay complete.", delay);
 
                                 return new CommandProcessorResult(false, details);
                             }
                         case "REPOLL_ME":
                             {
-                                int d_id = 0;
+                                var d_id = 0;
                                 int.TryParse(argument, out d_id);
 
                                 var device = await context.Devices
@@ -190,7 +190,7 @@ namespace zvs.Processor
 
                                 await adapter.RepollAsync(device, context);
 
-                                string details = string.Format("Re-poll of {0} ({1}) complete", device.Name, device.Id);
+                                var details = string.Format("Re-poll of {0} ({1}) complete", device.Name, device.Id);
                                 return new CommandProcessorResult(false, details);
                             }
                         case "REPOLL_ALL":
@@ -220,14 +220,14 @@ namespace zvs.Processor
                                     await adapter.RepollAsync(d, context);
                                 }
 
-                                string details = "Built-in cmd re-poll all devices complete";
+                                var details = "Built-in cmd re-poll all devices complete";
                                 return new CommandProcessorResult(false, details);
 
                             }
                         case "GROUP_ON":
                             {
                                 int g_id = int.TryParse(argument, out g_id) ? g_id : 0;
-                                Group group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
+                                var group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
 
                                 if (group == null)
                                     return new CommandProcessorResult(true, string.Format("Device type command Group On failed.  Invalid group id."));
@@ -243,7 +243,7 @@ namespace zvs.Processor
                                     await adapter.ActivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("{0} ({2}) '{1}' complete",
+                                var details = string.Format("{0} ({2}) '{1}' complete",
                                                                  command.Name,
                                                                  group.Name, command.Id);
 
@@ -253,7 +253,7 @@ namespace zvs.Processor
                         case "GROUP_OFF":
                             {
                                 int g_id = int.TryParse(argument, out g_id) ? g_id : 0;
-                                Group group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
+                                var group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
 
                                 if (group == null)
                                     return new CommandProcessorResult(true, string.Format("Device type command Group Off failed. Invalid group id."));
@@ -269,7 +269,7 @@ namespace zvs.Processor
                                     await adapter.DeactivateGroupAsync(group, context);
                                 }
 
-                                string details = string.Format("{0} ({2}) '{1}' complete",
+                                var details = string.Format("{0} ({2}) '{1}' complete",
                                                                  command.Name,
                                                                  group.Name, command.Id);
 
@@ -278,17 +278,17 @@ namespace zvs.Processor
                             }
                         case "RUN_SCENE":
                             {
-                                int id = 0;
+                                var id = 0;
                                 int.TryParse(argument, out id);
 
-                                SceneRunner sr = new SceneRunner(Core);
+                                var sr = new SceneRunner(Core);
                                 sr.onReportProgress += (s, a) =>
                                 {
                                     Core.log.Info(a.Progress);
                                 };
-                                SceneRunner.SceneResult sceneResult = await sr.RunSceneAsync(id);
+                                var sceneResult = await sr.RunSceneAsync(id);
 
-                                string details = string.Format("{0} Built-in cmd '{1}' ({2}) complete",
+                                var details = string.Format("{0} Built-in cmd '{1}' ({2}) complete",
                                     sceneResult.Details,
                                     command.Name, command.Id);
 
@@ -306,17 +306,17 @@ namespace zvs.Processor
                 #region JavaScriptCommand
                 else if (command is JavaScriptCommand)
                 {
-                    JavaScriptCommand javaScriptCommand = (JavaScriptCommand)command;
+                    var javaScriptCommand = (JavaScriptCommand)command;
 
-                    JavaScriptExecuter je = new JavaScriptExecuter(sender, Core);
+                    var je = new JavaScriptExecuter(sender, Core);
                     je.onReportProgress += (s, args) =>
                     {
                         Core.log.Info(args.Progress);
                     };
 
-                    JavaScriptExecuter.JavaScriptResult jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);
+                    var jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);
 
-                    string details = string.Format("{0}. JavaScript cmd '{1}' processed.",
+                    var details = string.Format("{0}. JavaScript cmd '{1}' processed.",
                                     jsResult.Details,
                                     command.Name);
 

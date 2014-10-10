@@ -22,9 +22,9 @@ namespace zvs.WPF
             this.DeviceID = deviceID;
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Device>.onEntityAdded += DeviceDetailsWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Device>.onEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Device>.onEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDetailsWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
         }
 
 #if DEBUG
@@ -70,9 +70,9 @@ namespace zvs.WPF
 
         private void DeviceDetailsWindow_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Device>.onEntityAdded -= DeviceDetailsWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Device>.onEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Device>.onEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
+            zvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDetailsWindow_onEntityAdded;
+            zvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
+            zvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
         }
 
         private async Task LoadDeviceAsync()

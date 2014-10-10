@@ -26,8 +26,8 @@ namespace zvs.Processor
         {
             get
             {
-                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                Version vrs = assembly.GetName().Version;
+                var assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                var vrs = assembly.GetName().Version;
                 return string.Format("{0}.{1}.{2}", vrs.Major, vrs.Minor, vrs.Build);
             }
         }
@@ -37,7 +37,7 @@ namespace zvs.Processor
         {
             get
             {
-                StringBuilder Data = new StringBuilder();
+                var Data = new StringBuilder();
                 Data.AppendLine(string.Format("OSVersion: {0}", System.Environment.OSVersion));
                 Data.AppendLine(string.Format("Is64BitOperatingSystem: {0}", System.Environment.Is64BitOperatingSystem));
                 Data.AppendLine(string.Format("MachineName: {0}", System.Environment.MachineName));
@@ -60,8 +60,8 @@ namespace zvs.Processor
         {
             get
             {
-                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string path = System.IO.Path.Combine(appData, @"zVirtualScenes");
+                var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                var path = System.IO.Path.Combine(appData, @"zVirtualScenes");
                 if (!Directory.Exists(path))
                 {
                     try { Directory.CreateDirectory(path); }
@@ -88,11 +88,11 @@ namespace zvs.Processor
 
         public static bool HasDotNet45()
         {
-            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full", false))
+            using (var rk = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full", false))
             {
                 if (rk != null)
                 {
-                    object val = rk.GetValue("Release");
+                    var val = rk.GetValue("Release");
                     if (val != null)
                         return true;
                 }
@@ -102,7 +102,7 @@ namespace zvs.Processor
 
         public static bool HasSQLCE4()
         {
-            using (RegistryKey rk = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v4.0\ENU", false))
+            using (var rk = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server Compact Edition\v4.0\ENU", false))
             {
                 if (rk != null)
                 {

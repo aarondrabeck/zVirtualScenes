@@ -8,38 +8,38 @@ using System.Runtime.CompilerServices;
 namespace zvs.Entities
 {
     [Table("Adapters", Schema = "ZVS")]
-    public partial class Adapter : INotifyPropertyChanged, IIdentity
+    public class Adapter : INotifyPropertyChanged, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        private string _Name;
+        private string _name;
         [StringLength(255)]
         public string Name
         {
             get
             {
-                return _Name;
+                return _name;
             }
             set
             {
-                if (value != _Name)
+                if (value != _name)
                 {
-                    _Name = value;
+                    _name = value;
                     NotifyPropertyChanged("Name");
                 }
             }
         }
 
-        private Guid _AdapterGuid;
+        private Guid _adapterGuid;
         public Guid AdapterGuid
         {
-            get { return _AdapterGuid; }
+            get { return _adapterGuid; }
             set
             {
-                if (value != _AdapterGuid)
+                if (value != _adapterGuid)
                 {
-                    _AdapterGuid = value;
+                    _adapterGuid = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -62,36 +62,36 @@ namespace zvs.Entities
             }
         }
 
-        private string _Description;
+        private string _description;
         [StringLength(1024)]
         public string Description
         {
             get
             {
-                return _Description;
+                return _description;
             }
             set
             {
-                if (value != _Description)
+                if (value != _description)
                 {
-                    _Description = value;
+                    _description = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private ObservableCollection<DeviceType> _DeviceTypes = new ObservableCollection<DeviceType>();
+        private ObservableCollection<DeviceType> _deviceTypes = new ObservableCollection<DeviceType>();
         public virtual ObservableCollection<DeviceType> DeviceTypes
         {
-            get { return _DeviceTypes; }
-            set { _DeviceTypes = value; }
+            get { return _deviceTypes; }
+            set { _deviceTypes = value; }
         }
 
-        private ObservableCollection<AdapterSetting> _Settings = new ObservableCollection<AdapterSetting>();
+        private ObservableCollection<AdapterSetting> _settings = new ObservableCollection<AdapterSetting>();
         public virtual ObservableCollection<AdapterSetting> Settings
         {
-            get { return _Settings; }
-            set { _Settings = value; }
+            get { return _settings; }
+            set { _settings = value; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

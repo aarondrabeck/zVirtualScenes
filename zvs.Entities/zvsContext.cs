@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
@@ -23,39 +27,29 @@ namespace zvs.Entities
         public DbSet<Adapter> Adapters { get; set; }
         public DbSet<AdapterSetting> AdapterSettings { get; set; }
         public DbSet<AdapterSettingOption> AdapterSettingOptions { get; set; }
-
         public DbSet<BuiltinCommand> BuiltinCommands { get; set; }
         public DbSet<DbInfo> DbInfo { get; set; }
-
         public DbSet<Command> Commands { get; set; }
         public DbSet<CommandOption> CommandOptions { get; set; }
-
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceCommand> DeviceCommands { get; set; }
         public DbSet<DeviceSetting> DeviceSettings { get; set; }
         public DbSet<DeviceSettingOption> DeviceSettingOptions { get; set; }
         public DbSet<DeviceSettingValue> DeviceSettingValues { get; set; }
-
         public DbSet<DeviceType> DeviceTypes { get; set; }
         public DbSet<DeviceTypeCommand> DeviceTypeCommands { get; set; }
-
         public DbSet<DeviceTypeSetting> DeviceTypeSettings { get; set; }
         public DbSet<DeviceTypeSettingValue> DeviceTypeSettingValues { get; set; }
         public DbSet<DeviceTypeSettingOption> DeviceTypeSettingOptions { get; set; }
-
         public DbSet<DeviceValue> DeviceValues { get; set; }
+        public DbSet<DeviceValueHistory> DeviceValueHistories { get; set; }
         public DbSet<DeviceValueTrigger> DeviceValueTriggers { get; set; }
-
         public DbSet<Group> Groups { get; set; }
-
         public DbSet<JavaScriptCommand> JavaScriptCommands { get; set; }
-
         public DbSet<Plugin> Plugins { get; set; }
         public DbSet<PluginSetting> PluginSettings { get; set; }
         public DbSet<PluginSettingOption> PluginSettingOptions { get; set; }
-
         public DbSet<ProgramOption> ProgramOptions { get; set; }
-
         public DbSet<Scene> Scenes { get; set; }
         public DbSet<SceneCommand> SceneCommands { get; set; }
         public DbSet<SceneSetting> SceneSettings { get; set; }
@@ -73,6 +67,11 @@ namespace zvs.Entities
             .HasMany(c => c.Groups)
             .WithMany(a => a.Devices)
             .Map(m => m.ToTable("DeviceToGroups", schemaName: "ZVS"));
+
+            modelBuilder.Entity<DeviceValueHistory>()
+                   .HasRequired(s => s.DeviceValue)
+                   .WithMany(o=> o.History)
+                   .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<DeviceType>()
                 .HasMany(o => o.Settings)
@@ -93,33 +92,53 @@ namespace zvs.Entities
                    .HasOptional(s => s.StoredCommand)
                    .WithOptionalPrincipal(a => a.SceneCommand)
                    .WillCascadeOnDelete();
+        }
 
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            //Automatically store history when a device value is changed. 
+            var history =
+                ChangeTracker.Entries<DeviceValue>()
+                    .Where(p => p.State == EntityState.Modified && p.Property("Value").IsModified)
+                    .Select(
+                        o => new DeviceValueHistory
+                        {
+                            DeviceValueId = o.Entity.Id,
+                            Value =  o.Entity.Value
+                        }).ToList();
+
+            DeviceValueHistories.AddRange(history);
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<Result> TrySaveChangesAsync()
         {
-            
-           // Debug.WriteLine("\n\n-------------------> TrySaveChangesAsync CALLED ------------>\n\n");
-            //Debug.WriteLine("StackTrace: '{0}'", Environment.StackTrace);
             try
             {
                 await SaveChangesAsync();
             }
             catch (DbEntityValidationException dbEx)
             {
-               
-                StringBuilder sb = new StringBuilder();
-                foreach (var validationErrors in dbEx.EntityValidationErrors)
+                var sb = new StringBuilder();
+                if (dbEx.EntityValidationErrors == null) return new Result(sb.ToString());
+
+                foreach (var dbEntityValidationResult in dbEx.EntityValidationErrors)
                 {
-                    foreach (var validationError in validationErrors.ValidationErrors)
-                        sb.Append(string.Format("{0}:{1}" + Environment.NewLine, validationError.PropertyName, validationError.ErrorMessage));
+                    var type = dbEntityValidationResult.Entry.Entity.GetTypeEntityWrapperDetection().Name;
+                    var entity = dbEntityValidationResult.Entry.Entity as IIdentity;
+                    sb.Append(string.Format("{0} (Id:{1}){2}", type,
+                        entity == null ? "N/A" : entity.Id.ToString(CultureInfo.InvariantCulture), Environment.NewLine));
+
+                    foreach (var error in dbEntityValidationResult.ValidationErrors)
+                    {
+                        sb.Append(string.Format("  Property Name: {0} {2}  Error: {1}{2}", error.PropertyName,
+                            error.ErrorMessage, Environment.NewLine));
+                    }
                 }
-                //Debug.WriteLine(sb.ToString());
                 return new Result(sb.ToString());
             }
             catch (Exception ex)
             {
-                //Debug.WriteLine(ex.Message);
                 return new Result(ex.GetInnerMostExceptionMessage());
             }
 
@@ -131,6 +150,4 @@ namespace zvs.Entities
             return SaveChangesAsync().Result;
         }
     }
-
-
 }

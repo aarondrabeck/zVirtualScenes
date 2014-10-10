@@ -3,7 +3,7 @@
 namespace zvs.Entities
 {
     [Table("BuiltinCommands", Schema = "ZVS")]
-    public partial class BuiltinCommand : Command
+    public class BuiltinCommand : Command
     {
         
     }

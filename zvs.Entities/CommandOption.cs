@@ -3,7 +3,7 @@
 namespace zvs.Entities
 {
     [Table("CommandOptions", Schema = "ZVS")]
-    public partial class CommandOption : BaseOption, IIdentity
+    public class CommandOption : BaseOption, IIdentity
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }

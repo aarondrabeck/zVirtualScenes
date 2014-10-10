@@ -12,11 +12,11 @@ namespace zvs.Entities
         public int PluginId { get; set; }
         public virtual Plugin Plugin { get; set; }
 
-        private ObservableCollection<PluginSettingOption> _Options = new ObservableCollection<PluginSettingOption>();
+        private ObservableCollection<PluginSettingOption> _options = new ObservableCollection<PluginSettingOption>();
         public virtual ObservableCollection<PluginSettingOption> Options
         {
-            get { return _Options; }
-            set { _Options = value; }
+            get { return _options; }
+            set { _options = value; }
         }
     }
 }

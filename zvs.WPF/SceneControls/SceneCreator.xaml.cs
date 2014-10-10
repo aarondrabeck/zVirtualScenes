@@ -29,13 +29,13 @@ namespace zvs.WPF.SceneControls
             context = new zvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Scene>.onEntityAdded += SceneCreator_onEntityAdded;
-            zvsContext.ChangeNotifications<Scene>.onEntityDeleted += SceneCreator_onEntityDeleted;
-            zvsContext.ChangeNotifications<Scene>.onEntityUpdated += SceneCreator_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded += SceneCreator_onEntityAdded;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted += SceneCreator_onEntityDeleted;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated += SceneCreator_onEntityUpdated;
-            zvsContext.ChangeNotifications<StoredCommand>.onEntityUpdated += SceneCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<Scene>.OnEntityAdded += SceneCreator_onEntityAdded;
+            zvsContext.ChangeNotifications<Scene>.OnEntityDeleted += SceneCreator_onEntityDeleted;
+            zvsContext.ChangeNotifications<Scene>.OnEntityUpdated += SceneCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += SceneCreator_onEntityAdded;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += SceneCreator_onEntityDeleted;
+            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += SceneCreator_onEntityUpdated;
+            zvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += SceneCreator_onEntityUpdated;
         }
 
         void SceneCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
@@ -184,12 +184,12 @@ namespace zvs.WPF.SceneControls
                 if (SceneCollection != null)
                     SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
 
-                zvsContext.ChangeNotifications<Scene>.onEntityAdded -= SceneCreator_onEntityAdded;
-                zvsContext.ChangeNotifications<Scene>.onEntityDeleted -= SceneCreator_onEntityDeleted;
-                zvsContext.ChangeNotifications<Scene>.onEntityUpdated -= SceneCreator_onEntityUpdated;
-                zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityAdded -= SceneCreator_onEntityAdded;
-                zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityDeleted -= SceneCreator_onEntityDeleted;
-                zvsContext.ChangeNotifications<JavaScriptCommand>.onEntityUpdated -= SceneCreator_onEntityUpdated;
+                zvsContext.ChangeNotifications<Scene>.OnEntityAdded -= SceneCreator_onEntityAdded;
+                zvsContext.ChangeNotifications<Scene>.OnEntityDeleted -= SceneCreator_onEntityDeleted;
+                zvsContext.ChangeNotifications<Scene>.OnEntityUpdated -= SceneCreator_onEntityUpdated;
+                zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= SceneCreator_onEntityAdded;
+                zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= SceneCreator_onEntityDeleted;
+                zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= SceneCreator_onEntityUpdated;
             }
             SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
         }

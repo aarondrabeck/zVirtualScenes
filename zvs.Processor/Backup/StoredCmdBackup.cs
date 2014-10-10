@@ -27,18 +27,18 @@ namespace zvs.Processor.Backup
             if (m == null)
                 return null;
 
-            StoredCMDBackup bcmd = new StoredCMDBackup();
+            var bcmd = new StoredCMDBackup();
 
             if (m.Command is BuiltinCommand)
                 bcmd.CommandType = Command_Types.Builtin;
             else if (m.Command is DeviceTypeCommand)
             {
                 bcmd.CommandType = Command_Types.DeviceType;
-                using (zvsContext context = new zvsContext())
+                using (var context = new zvsContext())
                 {
                     int d_id = int.TryParse(m.Argument2, out d_id) ? d_id : 0;
 
-                    Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == d_id);
+                    var d = await context.Devices.FirstOrDefaultAsync(o => o.Id == d_id);
                     if (d != null)
                         bcmd.NodeNumber = d.NodeNumber;
                 }
@@ -73,7 +73,7 @@ namespace zvs.Processor.Backup
             if (backupStoredCMD.CommandType == Command_Types.Device ||
                 backupStoredCMD.CommandType == Command_Types.DeviceType)
             {
-                StoredCommand sc = new StoredCommand();
+                var sc = new StoredCommand();
 
                 var device = await context.Devices
                     .Include(o => o.Commands)
@@ -120,7 +120,7 @@ namespace zvs.Processor.Backup
                 if (c == null)
                     return null;
 
-                StoredCommand sc = new StoredCommand();
+                var sc = new StoredCommand();
                 sc.Argument = backupStoredCMD.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
