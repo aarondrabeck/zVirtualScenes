@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor.Backup
@@ -32,50 +33,52 @@ namespace zvs.Processor.Backup
             get { return "TriggersBackup.zvs"; }
         }
 
-        public async override Task<ExportResult> ExportAsync(string fileName)
+        public async override Task<Result> ExportAsync(string fileName, CancellationToken cancellationToken)
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var existingTriggers = await context.DeviceValueTriggers
                     .Include(o => o.StoredCommand)
                     .Include(o => o.DeviceValue)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var backupTriggers = new List<TriggerBackup>();
                 foreach (var o in existingTriggers)
                 {
-                    var trigger = new TriggerBackup();
-                    trigger.Name = o.Name;
-                    trigger.isEnabled = o.isEnabled;
-                    trigger.DeviceValueName = o.DeviceValue.Name;
-                    trigger.NodeNumber = o.DeviceValue.Device.NodeNumber;
-                    trigger.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(o.StoredCommand);
-                    trigger.Operator = (int?)o.Operator;
-                    trigger.Value = o.Value;
+                    var trigger = new TriggerBackup
+                    {
+                        Name = o.Name,
+                        isEnabled = o.isEnabled,
+                        DeviceValueName = o.DeviceValue.Name,
+                        NodeNumber = o.DeviceValue.Device.NodeNumber,
+                        StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(o.StoredCommand),
+                        Operator = (int?) o.Operator,
+                        Value = o.Value
+                    };
                     backupTriggers.Add(trigger);
                 }
 
                 var saveResult = await SaveAsXMLToDiskAsync(backupTriggers, fileName);
 
                 if (saveResult.HasError)
-                    return new ExportResult(saveResult.Message, saveResult.HasError);
+                    return Result.ReportError(saveResult.Message);
 
-                return new ExportResult(string.Format("Exported {0} triggers to {1}", backupTriggers.Count,
-                    Path.GetFileName(fileName)), false);
+                return Result.ReportSuccessFormat("Exported {0} triggers to {1}", backupTriggers.Count,
+                    Path.GetFileName(fileName));
             }
         }
 
-        public async override Task<RestoreSettingsResult> ImportAsync(string fileName)
+        public async override Task<RestoreSettingsResult> ImportAsync(string fileName, CancellationToken cancellationToken)
         {
             var result = await ReadAsXMLFromDiskAsync<List<TriggerBackup>>(fileName);
 
             if (result.HasError)
-                return new RestoreSettingsResult(result.Message);
+                return RestoreSettingsResult.ReportError(result.Message);
 
-            var SkippedCount = 0;
+            var skippedCount = 0;
             var newTriggers = new List<DeviceValueTrigger>();
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var existingTriggers = await context.DeviceValueTriggers.ToListAsync();
 
@@ -87,7 +90,7 @@ namespace zvs.Processor.Backup
                 {
                     if (existingTriggers.Any(o => o.Name == backupTrigger.Name))
                     {
-                        SkippedCount++;
+                        skippedCount++;
                         continue;
                     }
 
@@ -96,12 +99,14 @@ namespace zvs.Processor.Backup
 
                     if (dv != null)
                     {
-                        var dvTrigger = new DeviceValueTrigger();
+                        var dvTrigger = new DeviceValueTrigger
+                        {
+                            Name = backupTrigger.Name,
+                            DeviceValue = dv,
+                            isEnabled = backupTrigger.isEnabled
+                        };
                         dvTrigger.Name = backupTrigger.Name;
-                        dvTrigger.DeviceValue = dv;
-                        dvTrigger.isEnabled = backupTrigger.isEnabled;
-                        dvTrigger.Name = backupTrigger.Name;
-                        dvTrigger.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupTrigger.StoredCommand);
+                        dvTrigger.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupTrigger.StoredCommand, cancellationToken);
                         dvTrigger.Operator = (TriggerOperator)backupTrigger.Operator;
                         dvTrigger.Value = backupTrigger.Value;
                         newTriggers.Add(dvTrigger);
@@ -112,12 +117,12 @@ namespace zvs.Processor.Backup
 
                 if (newTriggers.Count > 0)
                 {
-                    var saveResult = await context.TrySaveChangesAsync();
+                    var saveResult = await context.TrySaveChangesAsync(cancellationToken);
                     if (saveResult.HasError)
-                        return new RestoreSettingsResult(saveResult.Message);
+                        return RestoreSettingsResult.ReportError(saveResult.Message);
                 }
             }
-            return new RestoreSettingsResult(string.Format("Imported {0} triggers, skipped {1} from {2}", newTriggers.Count, SkippedCount, Path.GetFileName(fileName)), fileName);
+            return RestoreSettingsResult.ReportSuccess(string.Format("Imported {0} triggers, skipped {1} from {2}", newTriggers.Count, skippedCount, Path.GetFileName(fileName)));
         }
 
 

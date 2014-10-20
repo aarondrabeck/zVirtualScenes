@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceValues", Schema = "ZVS")]
     public class DeviceValue : BaseValue, IIdentity
@@ -37,11 +37,9 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _genre)
-                {
-                    _genre = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _genre) return;
+                _genre = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -55,11 +53,9 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _index)
-                {
-                    _index = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _index) return;
+                _index = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -73,16 +69,14 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _commandClass)
-                {
-                    _commandClass = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _commandClass) return;
+                _commandClass = value;
+                NotifyPropertyChanged();
             }
         }
 
         private bool _isReadOnly;
-        public bool isReadOnly
+        public bool IsReadOnly
         {
             get
             {
@@ -90,11 +84,9 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _isReadOnly)
-                {
-                    _isReadOnly = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _isReadOnly) return;
+                _isReadOnly = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -108,11 +100,9 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _customData1)
-                {
-                    _customData1 = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _customData1) return;
+                _customData1 = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -126,37 +116,9 @@ namespace zvs.Entities
             }
             set
             {
-                if (value != _customData2)
-                {
-                    _customData2 = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        //Events
-        /// <summary>
-        /// Called after the Value has been changed in the database
-        /// </summary>
-        public static event ValueDataChangedEventHandler DeviceValueDataChangedEvent = delegate { };
-        public delegate void ValueDataChangedEventHandler(object sender, ValueDataChangedEventArgs e);
-
-        public void DeviceValueDataChanged(ValueDataChangedEventArgs args)
-        {
-            DeviceValueDataChangedEvent(this, args);
-        }
-
-        public class ValueDataChangedEventArgs : System.EventArgs
-        {
-            public int DeviceValueId { get; private set; }
-            public string NewValue { get; private set; }
-            public string OldValue { get; private set; }
-
-            public ValueDataChangedEventArgs(int deviceValueId, string newValue, string oldValue)
-            {
-                DeviceValueId = deviceValueId;
-                NewValue = newValue;
-                OldValue = oldValue;
+                if (value == _customData2) return;
+                _customData2 = value;
+                NotifyPropertyChanged();
             }
         }
     }

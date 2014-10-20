@@ -7,8 +7,8 @@
     <ProjectGuid>{E1758D0B-5A3A-4A1B-B5DE-ACD1302F23A7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>zvs.Entities</RootNamespace>
-    <AssemblyName>zvs.Entities</AssemblyName>
+    <RootNamespace>zvs.DataModel</RootNamespace>
+    <AssemblyName>zvs.DataModel</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -78,6 +78,8 @@
     <Compile Include="CommandOption.cs" />
     <Compile Include="ConfidentialDataAttribute.cs" />
     <Compile Include="DeviceValueHistory.cs" />
+    <Compile Include="LogEntry.cs" />
+    <Compile Include="LogEntryLevel.cs" />
     <Compile Include="NotifyEntityChangeContext.cs" />
     <Compile Include="PluginSettingOption.cs" />
     <Compile Include="PluginSetting.cs" />

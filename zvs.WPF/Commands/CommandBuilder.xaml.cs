@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.WPF.DynamicActionControls;
 using System.Data.Entity;
 
@@ -16,7 +16,7 @@ namespace zvs.WPF.Commands
     /// </summary>
     public partial class CommandBuilder : Window
     {
-        private zvsContext Context;
+        private ZvsContext Context;
         private StoredCommand StoredCommand;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
 
@@ -26,7 +26,7 @@ namespace zvs.WPF.Commands
         //temp variable to save selected device command data
         private string SelectedDeviceArg = string.Empty;
 
-        public CommandBuilder(zvsContext context, StoredCommand storedCommand)
+        public CommandBuilder(ZvsContext context, StoredCommand storedCommand)
         {
             Context = context;
             StoredCommand = storedCommand;

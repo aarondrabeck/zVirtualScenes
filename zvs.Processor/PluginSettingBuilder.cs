@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,13 +12,13 @@ namespace zvs.Processor
 {
     public class PluginSettingBuilder
     {
-        public Core Core { get; private set; }
-        public zvsContext Context { get; private set; }
+        private IFeedback<LogEntry> Log { get; set; }
+        private ZvsContext Context { get; set; }
 
-        public PluginSettingBuilder(Core core, zvsContext context)
+        public PluginSettingBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            Core = core;
-            Context = context;
+            Context = zvsContext;
+            Log = log;
         }
 
         public PlugingTypeConfiguration<T> Plugin<T>(T plugin) where T : zvsPlugin
@@ -27,77 +28,74 @@ namespace zvs.Processor
 
         public class PlugingTypeConfiguration<T> where T : zvsPlugin
         {
-            public T Plugin { get; private set; }
-            public PluginSettingBuilder PluginSettingBuilder { get; private set; }
+            private T Plugin { get; set; }
+            private PluginSettingBuilder PluginSettingBuilder { get; set; }
 
             public PlugingTypeConfiguration(T plugin, PluginSettingBuilder sb)
             {
                 Plugin = plugin;
                 PluginSettingBuilder = sb;
             }
-        }
-    }
 
-    public static class PlugingTypeConfigurationExtensions
-    {
-        public static async Task RegisterPluginSettingAsync<T, R>(this zvs.Processor.PluginSettingBuilder.PlugingTypeConfiguration<T> pspb, PluginSetting pluginSetting,
-            Expression<Func<T, R>> property) where T : zvsPlugin
-        {
-            var propertyInfo = (property.Body as MemberExpression).Member as PropertyInfo;
-            if (propertyInfo == null)
+
+            public async Task RegisterPluginSettingAsync<T, R>(PluginSetting pluginSetting,
+               Expression<Func<T, R>> property, CancellationToken cancellationToken) where T : zvsPlugin
             {
-                throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
-            }
-
-            pluginSetting.UniqueIdentifier = propertyInfo.Name;
-
-            var plugin = await pspb.PluginSettingBuilder.Context.Plugins.FirstOrDefaultAsync(p => p.PluginGuid == pspb.Plugin.PluginGuid);
-
-            if (plugin == null)
-                return;
-
-            var changed = false;
-
-            var existing_ps = await pspb.PluginSettingBuilder.Context.PluginSettings.FirstOrDefaultAsync(o => o.Plugin.Id == plugin.Id && o.UniqueIdentifier == pluginSetting.UniqueIdentifier);
-            if (existing_ps == null)
-            {
-                plugin.Settings.Add(pluginSetting);
-                changed = true;
-            }
-            else
-            {
-                PropertyChangedEventHandler handler = (s, a) => changed = true;
-                existing_ps.PropertyChanged += handler;
-
-                existing_ps.Name = pluginSetting.Name;
-                existing_ps.Description = pluginSetting.Description;
-                existing_ps.ValueType = pluginSetting.ValueType;
-                existing_ps.PropertyChanged -= handler;
-
-                foreach (var option in pluginSetting.Options)
+                var memberExpression = property.Body as MemberExpression;
+                if (memberExpression != null)
                 {
-                    if (!existing_ps.Options.Any(o => o.Name == option.Name))
+                    var propertyInfo = memberExpression.Member as PropertyInfo;
+                    if (propertyInfo == null)
                     {
-                        existing_ps.Options.Add(option);
+                        throw new ArgumentException("The lambda expression 'property' should point to a valid Property");
+                    }
+
+                    pluginSetting.UniqueIdentifier = propertyInfo.Name;
+                }
+
+                var plugin = await PluginSettingBuilder.Context.Plugins.FirstOrDefaultAsync(p => p.PluginGuid == Plugin.PluginGuid, cancellationToken);
+
+                if (plugin == null)
+                    return;
+
+                var changed = false;
+
+                var existingPs = await PluginSettingBuilder.Context.PluginSettings.FirstOrDefaultAsync(o => o.Plugin.Id == plugin.Id && o.UniqueIdentifier == pluginSetting.UniqueIdentifier, cancellationToken);
+                if (existingPs == null)
+                {
+                    plugin.Settings.Add(pluginSetting);
+                    changed = true;
+                }
+                else
+                {
+                    PropertyChangedEventHandler handler = (s, a) => changed = true;
+                    existingPs.PropertyChanged += handler;
+
+                    existingPs.Name = pluginSetting.Name;
+                    existingPs.Description = pluginSetting.Description;
+                    existingPs.ValueType = pluginSetting.ValueType;
+                    existingPs.PropertyChanged -= handler;
+
+                    foreach (var option in pluginSetting.Options.Where(option => existingPs.Options.All(o => o.Name != option.Name)))
+                    {
+                        existingPs.Options.Add(option);
+                        changed = true;
+                    }
+
+                    foreach (var option in existingPs.Options.Where(option => pluginSetting.Options.All(o => o.Name != option.Name)))
+                    {
+                        PluginSettingBuilder.Context.PluginSettingOptions.Local.Remove(option);
                         changed = true;
                     }
                 }
-
-                foreach (var option in existing_ps.Options)
+                if (changed)
                 {
-                    if (!pluginSetting.Options.Any(o => o.Name == option.Name))
-                    {
-                        pspb.PluginSettingBuilder.Context.PluginSettingOptions.Local.Remove(option);
-                        changed = true;
-                    }
+                    var result = await PluginSettingBuilder.Context.TrySaveChangesAsync(cancellationToken);
+                    if (result.HasError)
+                        await PluginSettingBuilder.Log.ReportErrorAsync(result.Message,cancellationToken);
                 }
             }
-            if (changed)
-            {
-                var result = await pspb.PluginSettingBuilder.Context.TrySaveChangesAsync();
-                if (result.HasError)
-                    pspb.PluginSettingBuilder.Core.log.Error(result.Message);
-            }
         }
+
     }
 }

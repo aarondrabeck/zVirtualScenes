@@ -2,17 +2,16 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor
 {
     public class JavaScriptExecuter
     {
-        private Core Core;
-        private zvsContext Context;
+        private ZvsEngine ZvsEngine;
+        private ZvsContext Context;
         private int id;
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<JavaScriptExecuter>();
         Jint.JintEngine engine = new Jint.JintEngine();
         public object Sender { get; private set; }
 
@@ -49,9 +48,9 @@ namespace zvs.Processor
 
         #endregion
 
-        public JavaScriptExecuter(object sender, Core core)
+        public JavaScriptExecuter(object sender, ZvsEngine zvsEngine)
         {
-            Core = core;
+            ZvsEngine = zvsEngine;
             Sender = sender;
 
             engine.Step += (s, info) =>
@@ -82,7 +81,7 @@ namespace zvs.Processor
         {
             return System.IO.Path.Combine(zvs.Processor.Utils.AppPath, Path);
         }
-        public async Task<JavaScriptResult> ExecuteScriptAsync(string Script, zvsContext context)
+        public async Task<JavaScriptResult> ExecuteScriptAsync(string Script, ZvsContext context)
         {
             this.Context = context;
             engine.SetDebugMode(JavascriptDebugEnabled);
@@ -181,15 +180,15 @@ namespace zvs.Processor
             var mutex = new AutoResetEvent(false);
             await Task.Delay((int)time);
 
-            var je = new JavaScriptExecuter(Sender, Core);
+            var je = new JavaScriptExecuter(Sender, ZvsEngine);
             je.onReportProgress += (s, a) =>
             {
-                Core.log.Info(a.Progress);
+                ZvsEngine.log.Info(a.Progress);
             };
 
             // invoked on the ThreadPool, where there won’t be a SynchronizationContext
             var result = await je.ExecuteScriptAsync(script, Context);
-            Core.log.Info(result.Details);
+            ZvsEngine.log.Info(result.Details);
 
             mutex.Set();
 
@@ -207,7 +206,7 @@ namespace zvs.Processor
         public async void RunDeviceNameCommandName(string DeviceName, string CommandName, string Value)
         {
             Device d = null;
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
                 d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
 
             if (d == null)
@@ -221,7 +220,7 @@ namespace zvs.Processor
         public async void RunDeviceNameCommandId(string DeviceName, double CommandId, string Value)
         {
             Device d = null;
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
                 d = await context.Devices.FirstOrDefaultAsync(o => o.Name == DeviceName);
 
             if (d == null)
@@ -243,7 +242,7 @@ namespace zvs.Processor
         {
             var did = Convert.ToInt32(DeviceId);
             var cid = Convert.ToInt32(CommandID);
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Id == cid && o.DeviceId == did);
                 if (dc == null)
@@ -252,7 +251,7 @@ namespace zvs.Processor
                     return;
                 }
 
-                var cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(ZvsEngine);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
                 var result = await cp.RunCommandAsync(this, dc, Value);
             }
@@ -261,7 +260,7 @@ namespace zvs.Processor
         private async void RunDeviceCommand(double DeviceId, string CommandName, string Value)
         {
             var dId = Convert.ToInt32(DeviceId);
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var dc = await context.DeviceCommands.FirstOrDefaultAsync(o => o.Name == CommandName && o.DeviceId == dId);
                 if (dc == null)
@@ -270,7 +269,7 @@ namespace zvs.Processor
                     return;
                 }
 
-                var cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(ZvsEngine);
                 // invoked on the ThreadPool, where there won’t be a SynchronizationContext
                 var result = await cp.RunCommandAsync(this, dc, Value);
             }
@@ -295,7 +294,7 @@ namespace zvs.Processor
         public async void RunSceneJS(string SceneName)
         {
             Scene s = null;
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
                 s = await context.Scenes.FirstOrDefaultAsync(o => o.Name == SceneName);
 
             if (s == null)
@@ -315,12 +314,12 @@ namespace zvs.Processor
             var result = await RunSceneAsync(SceneID);
         }
 
-        public async Task<CommandProcessorResult> RunSceneAsync(double SceneID)
+        public async Task<Result> RunSceneAsync(double SceneID)
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var cmd = context.BuiltinCommands.Single(c => c.UniqueIdentifier == "RUN_SCENE");
-                var cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(ZvsEngine);
                 return await cp.RunCommandAsync(this, cmd, SceneID.ToString());
             }
         }

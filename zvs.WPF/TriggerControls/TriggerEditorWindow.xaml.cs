@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.WPF.Commands;
 using System.Data.Entity;
 
@@ -13,7 +13,7 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerEditorWindow : Window
     {
-        private readonly zvsContext _context;
+        private readonly ZvsContext _context;
         private readonly Int64 _deviceValueTriggerId;
 
         public DeviceValueTrigger Trigger
@@ -28,7 +28,7 @@ namespace zvs.WPF.TriggerControls
 
         public bool Canceled = true;
 
-        public TriggerEditorWindow(Int64 deviceValueTriggerId, zvsContext context)
+        public TriggerEditorWindow(Int64 deviceValueTriggerId, ZvsContext context)
         {
             _context = context;
             _deviceValueTriggerId = deviceValueTriggerId;
@@ -166,7 +166,7 @@ namespace zvs.WPF.TriggerControls
 
             var result = await _context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)Application.Current).zvsCore.log.Error(result.Message);
+                ((App)Application.Current).ZvsEngine.log.Error(result.Message);
         }
     }
 }

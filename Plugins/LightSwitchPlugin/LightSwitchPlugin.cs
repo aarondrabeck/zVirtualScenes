@@ -10,7 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using Mono.Zeroconf;
 using zvs.Processor;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 using LightSwitchPlugin.LightSwitch;
 using System.Data.Entity;
@@ -137,9 +137,6 @@ namespace LightSwitchPlugin
         private HashSet<LightSwitchClient> LightSwitchClients = new HashSet<LightSwitchClient>();
         private CancellationTokenSource _cts = new CancellationTokenSource();
         private Mono.Zeroconf.Providers.Bonjour.RegisterService netservice = null;
-
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<LightSwitchPlugin>();
-
         public enum DeviceSettingUids
         {
             SHOW_IN_LIGHTSWITCH
@@ -282,7 +279,7 @@ namespace LightSwitchPlugin
                 }
                 catch (Exception ex)
                 {
-                    log.Fatal(ex);
+                   ZvsEngine.Log.ReportErrorAsync(ex.Message, CancellationToken.None).Wait();
                 }
             }
             else
@@ -294,7 +291,7 @@ namespace LightSwitchPlugin
 
         public override async Task DeviceValueChangedAsync(Int64 deviceValueId, string newValue, string oldValue)
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 DeviceValue dv = await context.DeviceValues
                     .Include(o => o.Device)
@@ -482,7 +479,7 @@ namespace LightSwitchPlugin
             int deviceId = int.TryParse(args.DeviceId, out deviceId) ? deviceId : 0;
             byte level = byte.TryParse(args.Level, out level) ? level : (byte)0;
 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 Device d = await context.Devices
                     .Include(o => o.Type)
@@ -569,7 +566,7 @@ namespace LightSwitchPlugin
                 }
 
                 log.Info(cmdMsg);
-                CommandProcessor cp = new CommandProcessor(Core);
+                CommandProcessor cp = new CommandProcessor(ZvsEngine);
                 var commandResult = await cp.RunCommandAsync(this, command, arg1, arg2);
 
                 if (commandResult.HasErrors)
@@ -583,7 +580,7 @@ namespace LightSwitchPlugin
             int groupId = int.TryParse(args.ZoneId, out groupId) ? groupId : 0;
             string cmdUniqId = (args.Level.Equals("255") ? "GROUP_ON" : "GROUP_OFF");
 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 Group g = await context.Groups.FirstOrDefaultAsync(o => o.Id == groupId);
                 if (g != null)
@@ -600,7 +597,7 @@ namespace LightSwitchPlugin
                     string result = string.Format("[{0}] Ran {1} on group '{2}'", args.LightSwitchClient.RemoteEndPoint, zvs_cmd.Name, g.Name);
                     log.Info(result);
 
-                    CommandProcessor cp = new CommandProcessor(Core);
+                    CommandProcessor cp = new CommandProcessor(ZvsEngine);
                     var r = await cp.RunCommandAsync(this, zvs_cmd, g.Id.ToString());
                     if (r.HasErrors)
                         await args.LightSwitchClient.SendCommandAsync(LightSwitchProtocol.CreateErrorMsgCmd(r.Message));
@@ -616,7 +613,7 @@ namespace LightSwitchPlugin
                 args.LightSwitchClient.Disconnect();
 
             int sceneId = int.TryParse(args.SceneId, out sceneId) ? sceneId : 0;
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 BuiltinCommand bcmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                 if (bcmd == null)
@@ -628,7 +625,7 @@ namespace LightSwitchPlugin
                     return;
                 }
 
-                CommandProcessor cp = new CommandProcessor(Core);
+                CommandProcessor cp = new CommandProcessor(ZvsEngine);
                 var r = await cp.RunCommandAsync(this, bcmd, sceneId.ToString());
 
                 if (r.HasErrors)
@@ -645,7 +642,7 @@ namespace LightSwitchPlugin
 
             int deviceId = int.TryParse(args.DeviceId, out deviceId) ? deviceId : 0;
 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 Device d = await context.Devices
                     .Include(o => o.Type.Adapter)
@@ -685,7 +682,7 @@ namespace LightSwitchPlugin
 
                 var cmdMsg = string.Format("[{0}] Executed command '{1}' on '{2}'.", args.LightSwitchClient.RemoteEndPoint, dcmd.Name, d.Name);
                 log.Info(cmdMsg);
-                CommandProcessor cp = new CommandProcessor(Core);
+                CommandProcessor cp = new CommandProcessor(ZvsEngine);
                 var commandResult = await cp.RunCommandAsync(this, dcmd, args.Temp);
 
                 if (commandResult.HasErrors)
@@ -708,7 +705,7 @@ namespace LightSwitchPlugin
             string cmdMsg = string.Empty;
 
             //PLUGINNAME-0 -->CmdName,Arg 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 Device d = await context.Devices
                     .Include(o => o.Type.Adapter)
@@ -801,7 +798,7 @@ namespace LightSwitchPlugin
             }
 
             log.Info(cmdMsg);
-            CommandProcessor cp = new CommandProcessor(Core);
+            CommandProcessor cp = new CommandProcessor(ZvsEngine);
             var commandResult = await cp.RunCommandAsync(this, command, arg1, arg2);
 
             if (commandResult.HasErrors)
@@ -919,7 +916,7 @@ namespace LightSwitchPlugin
         #region Lists
         private async Task SendSceneListAsync(LightSwitchClient client)
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 var settingUid = SceneSettingUids.SHOW_IN_LIGHTSWITCH.ToString();
                 var defaultSettingShouldShow = SHOW_SCENE_IN_LIST_DEFAULT_VALUE;
@@ -937,7 +934,7 @@ namespace LightSwitchPlugin
 
         private async Task SendZoneListAsync(LightSwitchClient client)
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
                 foreach (Group g in await context.Groups.OrderBy(o => o.Name).ToListAsync())
                     await client.SendCommandAsync(LightSwitchProtocol.CreateZoneCmd(g.Name, g.Id.ToString()));
         }
@@ -952,7 +949,7 @@ namespace LightSwitchPlugin
 
         private async Task SendDeviceListAsync(LightSwitchClient client)
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 //Get Devices
                 var settingUid = DeviceSettingUids.SHOW_IN_LIGHTSWITCH.ToString();

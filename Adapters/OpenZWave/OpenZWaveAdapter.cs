@@ -8,14 +8,14 @@ using OpenZWavePlugin.Forms;
 using System.IO;
 using zvs.Processor;
 using System.Diagnostics;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
 namespace OpenZWavePlugin
 {
-    [Export(typeof(zvsAdapter))]
-    public class OpenZWaveAdapter : zvsAdapter
+    [Export(typeof(ZvsAdapter))]
+    public class OpenZWaveAdapter : ZvsAdapter
     {
         private async void OpenZWaveAdapter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -154,7 +154,7 @@ namespace OpenZWavePlugin
             await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(useHIDsetting, o => o.UseHIDSetting);
             await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
                 {
@@ -340,14 +340,14 @@ namespace OpenZWavePlugin
         {
             if (isShuttingDown)
             {
-                Core.log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
+                ZvsEngine.log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
                 return Task.FromResult(0);
             }
 
             this.PropertyChanged += OpenZWaveAdapter_PropertyChanged;
             try
             {
-                Core.log.InfoFormat("OpenZwave driver starting on {0}", UseHIDSetting ? "HID" : "COM" + ComportSetting);
+                ZvsEngine.log.InfoFormat("OpenZwave driver starting on {0}", UseHIDSetting ? "HID" : "COM" + ComportSetting);
 
                 // Environment.CurrentDirectory returns wrong directory in Service environment so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
@@ -418,7 +418,7 @@ namespace OpenZWavePlugin
                 });
 
                 isShuttingDown = false;
-                Core.log.Info("OpenZwave driver stopped");
+                ZvsEngine.log.Info("OpenZwave driver stopped");
             }
         }
         public override async Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device, DeviceTypeCommand command, string argument)
@@ -539,7 +539,7 @@ namespace OpenZWavePlugin
                 {
                     case "TURNON":
                         {
-                            using (var context = new zvsContext())
+                            using (var context = new ZvsContext())
                             {
                                 var value = await device.GetDeviceTypeValueAsync(OpenzWaveDeviceTypeSettings.DEFAULT_DIMMER_ON_LEVEL.ToString(), context);
 
@@ -681,7 +681,7 @@ namespace OpenZWavePlugin
             return Task.FromResult(0);
         }
 
-        public override Task RepollAsync(Device device, zvsContext context)
+        public override Task RepollAsync(Device device, ZvsContext context)
         {
             var nodeNumber = Convert.ToByte(device.NodeNumber);
 
@@ -695,7 +695,7 @@ namespace OpenZWavePlugin
             return Task.FromResult(0);
         }
 
-        public override async Task ActivateGroupAsync(Group group, zvsContext context)
+        public override async Task ActivateGroupAsync(Group group, ZvsContext context)
         {
             var devices = await context.Devices
                 .Include(d => d.Type)
@@ -728,7 +728,7 @@ namespace OpenZWavePlugin
             }
         }
 
-        public override async Task DeactivateGroupAsync(Group group, zvsContext context)
+        public override async Task DeactivateGroupAsync(Group group, ZvsContext context)
         {
             var devices = await context.Devices
                 .Where(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid)
@@ -757,7 +757,7 @@ namespace OpenZWavePlugin
         {
             #region Add device to database
 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 Device ozw_device = await context.Devices
                     .FirstOrDefaultAsync(d => d.Type.Adapter.AdapterGuid == this.AdapterGuid &&
@@ -780,7 +780,7 @@ namespace OpenZWavePlugin
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    Core.log.Error(result.Message);
+                    ZvsEngine.log.Error(result.Message);
             }
             #endregion
         }
@@ -853,7 +853,7 @@ namespace OpenZWavePlugin
                             if (deviceTypeId == UnknownTypeId)
                                 log.Warn("[Unknown Node Label] " + node.Label);
 
-                            using (zvsContext context = new zvsContext())
+                            using (ZvsContext context = new ZvsContext())
                             {
                                 Device ozw_device = await context.Devices
                                     .FirstOrDefaultAsync(d => d.Type.Adapter.AdapterGuid == this.AdapterGuid &&
@@ -869,7 +869,7 @@ namespace OpenZWavePlugin
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        Core.log.Error(result.Message);
+                                        ZvsEngine.log.Error(result.Message);
                                 }
 
                                 #region Last Event Value Storage
@@ -884,7 +884,7 @@ namespace OpenZWavePlugin
                                     ValueType = DataType.BYTE,
                                     CommandClass = "0",
                                     Value = "0",
-                                    isReadOnly = true
+                                    IsReadOnly = true
                                 }, ozw_device, context);
                                 #endregion
                             }
@@ -924,7 +924,7 @@ namespace OpenZWavePlugin
                             data,
                             b.ToString());
 
-                        using (zvsContext context = new zvsContext())
+                        using (ZvsContext context = new ZvsContext())
                         {
                             Device d = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
                                 o.NodeNumber == node.ID);
@@ -946,7 +946,7 @@ namespace OpenZWavePlugin
                                 CommandClass = value.CommandClassID,
                                 Value = data,
                                 ValueType = ConvertType(vid),
-                                isReadOnly = read_only
+                                IsReadOnly = read_only
                             }, d, context, true);
 
                             #region Install Dynamic Commands
@@ -1032,7 +1032,7 @@ namespace OpenZWavePlugin
 
                         Debug.WriteLine("[ValueChanged] Node:" + node.ID + ", Label:" + value.Label + ", Data:" + data);
 
-                        using (zvsContext context = new zvsContext())
+                        using (ZvsContext context = new ZvsContext())
                         {
                             Device device = await context.Devices
                                 .Include(o => o.Type)
@@ -1056,7 +1056,7 @@ namespace OpenZWavePlugin
                                 CommandClass = value.CommandClassID,
                                 Value = data,
                                 ValueType = ConvertType(vid),
-                                isReadOnly = read_only
+                                IsReadOnly = read_only
                             }, device, context);
 
                             #region Update Device Status Properties
@@ -1156,7 +1156,7 @@ namespace OpenZWavePlugin
                             {
                                 var result = await context.TrySaveChangesAsync();
                                 if (result.HasError)
-                                    Core.log.Error(result.Message);
+                                    ZvsEngine.log.Error(result.Message);
                             }
                             #endregion
 
@@ -1300,7 +1300,7 @@ namespace OpenZWavePlugin
 
                             Debug.WriteLine("[NodeNaming] Node:" + node.ID + ", Product:" + node.Product + ", Manufacturer:" + node.Manufacturer + ")");
 
-                            using (zvsContext context = new zvsContext())
+                            using (ZvsContext context = new ZvsContext())
                             {
                                 Device device = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
                                     o.NodeNumber == node.ID);
@@ -1323,7 +1323,7 @@ namespace OpenZWavePlugin
                                     ValueType = DataType.STRING,
                                     CommandClass = "0",
                                     Value = node.Manufacturer,
-                                    isReadOnly = true
+                                    IsReadOnly = true
                                 }, device, context);
 
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
@@ -1336,7 +1336,7 @@ namespace OpenZWavePlugin
                                     ValueType = DataType.STRING,
                                     CommandClass = "0",
                                     Value = node.Product,
-                                    isReadOnly = true
+                                    IsReadOnly = true
                                 }, device, context);
 
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
@@ -1349,7 +1349,7 @@ namespace OpenZWavePlugin
                                     ValueType = DataType.STRING,
                                     CommandClass = "0",
                                     Value = node.Location,
-                                    isReadOnly = true
+                                    IsReadOnly = true
                                 }, device, context);
 
                                 await DeviceValueBuilder.RegisterAsync(new DeviceValue
@@ -1362,7 +1362,7 @@ namespace OpenZWavePlugin
                                     ValueType = DataType.STRING,
                                     CommandClass = "0",
                                     Value = node.Name,
-                                    isReadOnly = true
+                                    IsReadOnly = true
                                 }, device, context);
                             }
                         }
@@ -1381,7 +1381,7 @@ namespace OpenZWavePlugin
 
                         log.Info(string.Format("[NodeEvent] Node: {0}, Event Byte: {1}", node.ID, gevent));
 
-                        using (zvsContext context = new zvsContext())
+                        using (ZvsContext context = new ZvsContext())
                         {
                             Device device = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
                                     o.NodeNumber == node.ID);
@@ -1403,7 +1403,7 @@ namespace OpenZWavePlugin
 
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
-                                Core.log.Error(result.Message);
+                                ZvsEngine.log.Error(result.Message);
 
                             //Since open wave events are differently than values changes, we need to fire the value change event every time we receive the 
                             //event regardless if it is the same value or not.
@@ -1517,7 +1517,7 @@ namespace OpenZWavePlugin
         private async Task EnablePollingOnDevices()
         {
             foreach (Node n in m_nodeList)
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     Device device = await context.Devices.FirstOrDefaultAsync(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid &&
                                     o.NodeNumber == n.ID);
@@ -1549,7 +1549,7 @@ namespace OpenZWavePlugin
 
         //        var result = await context.TrySaveChangesAsync();
         //        if (result.HasError)
-        //            Core.log.Error(result.Message);
+        //            zvsEngine.log.Error(result.Message);
         //    }
 
         //}

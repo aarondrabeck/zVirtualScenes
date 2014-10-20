@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using zvs.WPF.DynamicActionControls;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 using zvs.Processor.Logging;
 using System.Data.Entity;
@@ -20,7 +20,7 @@ namespace zvs.WPF.DeviceControls
         ILog log = LogManager.GetLogger<DeviceCommands>();
         App app = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/send_signal.png"));
-        private zvsContext context;
+        private ZvsContext context;
         private int DeviceID = 0;
 
         public DeviceCommands(int DeviceID)
@@ -31,7 +31,7 @@ namespace zvs.WPF.DeviceControls
 
         private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             await LoadCommandsAsync();
         }
 
@@ -66,7 +66,7 @@ namespace zvs.WPF.DeviceControls
                             {
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, async () =>
                                 {
-                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                     await cp.RunCommandAsync(this, d_cmd);
                                 }, icon);
                                 bc.ToolTip = tip;
@@ -85,7 +85,7 @@ namespace zvs.WPF.DeviceControls
 
                                 CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, async (isChecked) =>
                                 {
-                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                     await cp.RunCommandAsync(this, d_cmd, isChecked.ToString());
                                 }, icon);
                                 control.ToolTip = tip;
@@ -109,7 +109,7 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Decimal,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
@@ -134,7 +134,7 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Integer,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
@@ -159,7 +159,7 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Byte,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
@@ -184,7 +184,7 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Short,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
@@ -209,7 +209,7 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
@@ -234,7 +234,7 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, d_cmd, value);
                                     },
                                     icon);
@@ -257,7 +257,7 @@ namespace zvs.WPF.DeviceControls
                             {
                                 ButtonControl bc = new ButtonControl(d_cmd.Name, d_cmd.Description, async () =>
                                 {
-                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                     await cp.RunCommandAsync(this, device_type_command, null, d.Id.ToString());
                                 },
                                     icon);
@@ -276,7 +276,7 @@ namespace zvs.WPF.DeviceControls
 
                                 CheckboxControl control = new CheckboxControl(d_cmd.Name, d_cmd.Description, DefaultValue, async (isChecked) =>
                                 {
-                                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                     await cp.RunCommandAsync(this, device_type_command, isChecked.ToString(), d.Id.ToString());
                                 },
                                     icon);
@@ -300,7 +300,7 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Decimal,
                                    async (value) =>
                                    {
-                                       CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                       CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                        await cp.RunCommandAsync(this, device_type_command, value, d.Id.ToString());
                                    },
                                     icon);
@@ -324,7 +324,7 @@ namespace zvs.WPF.DeviceControls
                                    NumericControl.NumberType.Integer,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, device_type_command, value, d.Id.ToString());
                                     },
                                     icon);
@@ -348,7 +348,7 @@ namespace zvs.WPF.DeviceControls
                                     NumericControl.NumberType.Short,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, device_type_command, value, d.Id.ToString());
                                     },
                                     icon);
@@ -372,7 +372,7 @@ namespace zvs.WPF.DeviceControls
                                    NumericControl.NumberType.Byte,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, device_type_command, value, d.Id.ToString());
                                     },
                                     icon);
@@ -395,7 +395,7 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, device_type_command, value, d.Id.ToString());
                                     },
                                     icon);
@@ -419,7 +419,7 @@ namespace zvs.WPF.DeviceControls
                                     DefaultValue,
                                     async (value) =>
                                     {
-                                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                                         await cp.RunCommandAsync(this, device_type_command, value, d.Id.ToString());
                                     },
                                     icon);

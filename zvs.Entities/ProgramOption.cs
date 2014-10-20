@@ -3,10 +3,11 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("ProgramOptions", Schema = "ZVS")]
     public class ProgramOption : INotifyPropertyChanged, IIdentity
@@ -56,12 +57,12 @@ namespace zvs.Entities
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public static async Task<Result> TryAddOrEditAsync(zvsContext context, ProgramOption programOption)
+        public static async Task<Result> TryAddOrEditAsync(ZvsContext context, ProgramOption programOption, CancellationToken cancellationToken)
         {
             if (programOption == null)
                 throw new ArgumentNullException("programOption");
 
-            var existingOption = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == programOption.UniqueIdentifier);
+            var existingOption = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == programOption.UniqueIdentifier, cancellationToken);
 
             var changed = false;
 
@@ -80,9 +81,9 @@ namespace zvs.Entities
             }
 
             if (changed)
-                return await context.TrySaveChangesAsync();
+                return await context.TrySaveChangesAsync(cancellationToken);
 
-            return new Result();
+            return Result.ReportSuccess();
         }
 
     }

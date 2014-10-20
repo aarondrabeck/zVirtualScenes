@@ -1,4 +1,4 @@
-﻿namespace zvs.Entities
+﻿namespace zvs.DataModel
 {
     public interface IIdentity
     {

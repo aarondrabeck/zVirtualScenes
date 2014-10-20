@@ -3,11 +3,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Diagnostics;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("StoredCommands", Schema = "ZVS")]
     public class StoredCommand : INotifyPropertyChanged, IIdentity
@@ -15,23 +16,10 @@ namespace zvs.Entities
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //public int? DeviceValueTriggerId { get; set; }
-        //not sure how or if you can expose the ID here
         public virtual DeviceValueTrigger DeviceValueTrigger { get; set; }
 
-        public int? SceneCommandId
-        {
-            get
-            {
-                if (SceneCommand != null)
-                    return SceneCommand.Id;
-                else
-                    return null;
-            }
-        }
         public virtual SceneCommand SceneCommand { get; set; }
 
-        //public int? ScheduledTaskId { get; set; }
         public virtual ScheduledTask ScheduledTask { get; set; }
 
         public int CommandId { get; set; }
@@ -132,7 +120,7 @@ namespace zvs.Entities
         /// </summary>
         /// <param name="context"></param>
         /// <param name="storedCommand"></param>
-        public static async Task<Result> TryRemoveDependenciesAsync(this StoredCommand storedCommand, zvsContext context)
+        public static async Task<Result> TryRemoveDependenciesAsync(this StoredCommand storedCommand, ZvsContext context, CancellationToken cancellationToken)
         {
             if (storedCommand.ScheduledTask != null)
             {
@@ -150,11 +138,10 @@ namespace zvs.Entities
             //     context.SceneCommands.Local.Remove(sc.SceneCommand);
 
             context.SceneCommands.RemoveRange(await context.SceneCommands.Where(o => o.StoredCommand.Id == storedCommand.Id).ToListAsync());
-
-            return await context.TrySaveChangesAsync();
+            return await context.TrySaveChangesAsync(cancellationToken);
         }
 
-        public static void SetDescription(this StoredCommand storedCommand, zvsContext context)
+        public static void SetDescription(this StoredCommand storedCommand, ZvsContext context)
         {
             if (storedCommand.Command is BuiltinCommand)
             {
@@ -199,7 +186,7 @@ namespace zvs.Entities
             }
         }
 
-        public static async Task SetTargetObjectNameAsync(this StoredCommand storedCommand, zvsContext context)
+        public static async Task SetTargetObjectNameAsync(this StoredCommand storedCommand, ZvsContext context)
         {
             var sw = new Stopwatch();
             sw.Start();

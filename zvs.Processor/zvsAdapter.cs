@@ -1,40 +1,39 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace zvs.Processor
 {
-    public abstract class zvsAdapter : INotifyPropertyChanged
+    public abstract class ZvsAdapter : INotifyPropertyChanged
     {
         public bool IsEnabled { get; set; }
         public abstract Guid AdapterGuid { get; }
         public abstract string Name { get; }
         public abstract string Description { get; }
-        protected Core Core { get; private set; }
+        protected IFeedback<LogEntry> Log { get; private set; }
+        protected ZvsContext Context { get; set; }
         protected DeviceValueBuilder DeviceValueBuilder { get; private set; }
         protected DeviceCommandBuilder DeviceCommandBuilder { get; private set; }
 
-        Logging.ILog log = Logging.LogManager.GetLogger<zvsAdapter>();
+        public abstract Task StartAsync(CancellationToken cancellationToken);
+        public abstract Task StopAsync(CancellationToken cancellationToken);
 
-        public abstract Task StartAsync();
-        public abstract Task StopAsync();
-
-        public async Task Initialize(Core core)
+        public async Task Initialize(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            Core = core;
-            DeviceValueBuilder = new DeviceValueBuilder(this, core);
-            DeviceCommandBuilder = new DeviceCommandBuilder(this, core);
+            Context = zvsContext;
+            Log = log;
 
-            using (var context = new zvsContext())
-            {
-                var dtb = new DeviceTypeBuilder(this, core, context);
-                await OnDeviceTypesCreating(dtb);
+            DeviceValueBuilder = new DeviceValueBuilder(log, Context);
+            DeviceCommandBuilder = new DeviceCommandBuilder(log, Context);
 
-                var sb = new AdapterSettingBuilder(core, context);
-                await OnSettingsCreating(sb);
-            }
+            var dtb = new DeviceTypeBuilder(log, Context);
+            await OnDeviceTypesCreating(dtb);
+
+            var sb = new AdapterSettingBuilder(log, Context);
+            await OnSettingsCreating(sb);
         }
 
         public virtual Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
@@ -49,9 +48,9 @@ namespace zvs.Processor
 
         public abstract Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device, DeviceTypeCommand command, string argument);
         public abstract Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2);
-        public abstract Task RepollAsync(Device device, zvsContext context);
-        public abstract Task ActivateGroupAsync(Group group, zvsContext context);
-        public abstract Task DeactivateGroupAsync(Group group, zvsContext context);
+        public abstract Task RepollAsync(Device device, ZvsContext context);
+        public abstract Task ActivateGroupAsync(Group group, ZvsContext context);
+        public abstract Task DeactivateGroupAsync(Group group, ZvsContext context);
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)

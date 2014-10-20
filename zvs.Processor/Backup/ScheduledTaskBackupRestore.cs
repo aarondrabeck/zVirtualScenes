@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor.Backup
@@ -74,158 +75,162 @@ namespace zvs.Processor.Backup
             get { return "ScheduledTaskBackup.zvs"; }
         }
 
-        public async override Task<ExportResult> ExportAsync(string fileName)
+        public async override Task<Result> ExportAsync(string fileName, CancellationToken cancellationToken)
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var existingSTs = await context.ScheduledTasks
                     .Include(o => o.StoredCommand)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var backupSTs = new List<ScheduledTaskBackup>();
                 foreach (var t in existingSTs)
                 {
-                    var task = new ScheduledTaskBackup();
-                    task.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(t.StoredCommand);
-                    task.Frequency = (int)t.Frequency;
-                    task.Name = t.Name;
-                    task.isEnabled = t.isEnabled;
-                    task.RecurDay01 = t.RecurDay01;
-                    task.RecurDay02 = t.RecurDay02;
-                    task.RecurDay03 = t.RecurDay03;
-                    task.RecurDay04 = t.RecurDay04;
-                    task.RecurDay05 = t.RecurDay05;
-                    task.RecurDay06 = t.RecurDay06;
-                    task.RecurDay07 = t.RecurDay07;
-                    task.RecurDay08 = t.RecurDay08;
-                    task.RecurDay09 = t.RecurDay09;
-                    task.RecurDay10 = t.RecurDay10;
-                    task.RecurDay11 = t.RecurDay11;
-                    task.RecurDay12 = t.RecurDay12;
-                    task.RecurDay13 = t.RecurDay13;
-                    task.RecurDay14 = t.RecurDay14;
-                    task.RecurDay15 = t.RecurDay15;
-                    task.RecurDay16 = t.RecurDay16;
-                    task.RecurDay17 = t.RecurDay17;
-                    task.RecurDay18 = t.RecurDay18;
-                    task.RecurDay19 = t.RecurDay19;
-                    task.RecurDay20 = t.RecurDay20;
-                    task.RecurDay21 = t.RecurDay21;
-                    task.RecurDay22 = t.RecurDay22;
-                    task.RecurDay23 = t.RecurDay23;
-                    task.RecurDay24 = t.RecurDay24;
-                    task.RecurDay25 = t.RecurDay25;
-                    task.RecurDay26 = t.RecurDay26;
-                    task.RecurDay27 = t.RecurDay27;
-                    task.RecurDay28 = t.RecurDay28;
-                    task.RecurDay29 = t.RecurDay29;
-                    task.RecurDay30 = t.RecurDay30;
-                    task.RecurDay31 = t.RecurDay31;
-                    task.RecurDayofMonth = t.RecurDayofMonth;
-                    task.RecurDays = t.RecurDays;
-                    task.RecurEven = t.RecurEven;
-                    task.RecurFriday = t.RecurFriday;
-                    task.RecurMonday = t.RecurMonday;
-                    task.RecurSaturday = t.RecurSaturday;
-                    task.RecurMonth = t.RecurMonth;
-                    task.RecurSeconds = t.RecurSeconds;
-                    task.RecurSunday = t.RecurSunday;
-                    task.RecurThursday = t.RecurThursday;
-                    task.RecurTuesday = t.RecurTuesday;
-                    task.RecurWednesday = t.RecurWednesday;
-                    task.RecurWeeks = t.RecurWeeks;
-                    task.sortOrder = t.SortOrder;
-                    task.startTime = t.StartTime;
+                    var task = new ScheduledTaskBackup
+                    {
+                        StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(t.StoredCommand),
+                        Frequency = (int) t.Frequency,
+                        Name = t.Name,
+                        isEnabled = t.isEnabled,
+                        RecurDay01 = t.RecurDay01,
+                        RecurDay02 = t.RecurDay02,
+                        RecurDay03 = t.RecurDay03,
+                        RecurDay04 = t.RecurDay04,
+                        RecurDay05 = t.RecurDay05,
+                        RecurDay06 = t.RecurDay06,
+                        RecurDay07 = t.RecurDay07,
+                        RecurDay08 = t.RecurDay08,
+                        RecurDay09 = t.RecurDay09,
+                        RecurDay10 = t.RecurDay10,
+                        RecurDay11 = t.RecurDay11,
+                        RecurDay12 = t.RecurDay12,
+                        RecurDay13 = t.RecurDay13,
+                        RecurDay14 = t.RecurDay14,
+                        RecurDay15 = t.RecurDay15,
+                        RecurDay16 = t.RecurDay16,
+                        RecurDay17 = t.RecurDay17,
+                        RecurDay18 = t.RecurDay18,
+                        RecurDay19 = t.RecurDay19,
+                        RecurDay20 = t.RecurDay20,
+                        RecurDay21 = t.RecurDay21,
+                        RecurDay22 = t.RecurDay22,
+                        RecurDay23 = t.RecurDay23,
+                        RecurDay24 = t.RecurDay24,
+                        RecurDay25 = t.RecurDay25,
+                        RecurDay26 = t.RecurDay26,
+                        RecurDay27 = t.RecurDay27,
+                        RecurDay28 = t.RecurDay28,
+                        RecurDay29 = t.RecurDay29,
+                        RecurDay30 = t.RecurDay30,
+                        RecurDay31 = t.RecurDay31,
+                        RecurDayofMonth = t.RecurDayofMonth,
+                        RecurDays = t.RecurDays,
+                        RecurEven = t.RecurEven,
+                        RecurFriday = t.RecurFriday,
+                        RecurMonday = t.RecurMonday,
+                        RecurSaturday = t.RecurSaturday,
+                        RecurMonth = t.RecurMonth,
+                        RecurSeconds = t.RecurSeconds,
+                        RecurSunday = t.RecurSunday,
+                        RecurThursday = t.RecurThursday,
+                        RecurTuesday = t.RecurTuesday,
+                        RecurWednesday = t.RecurWednesday,
+                        RecurWeeks = t.RecurWeeks,
+                        sortOrder = t.SortOrder,
+                        startTime = t.StartTime
+                    };
                     backupSTs.Add(task);
                 }
 
                 var saveResult = await SaveAsXMLToDiskAsync(backupSTs, fileName);
 
                 if (saveResult.HasError)
-                    return new ExportResult(saveResult.Message, saveResult.HasError);
+                    return Result.ReportError(saveResult.Message);
 
-                return new ExportResult(string.Format("Exported {0} scheduled tasks to {1}", backupSTs.Count,
-                    Path.GetFileName(fileName)), false);
+                return Result.ReportSuccessFormat("Exported {0} scheduled tasks to {1}", backupSTs.Count,
+                    Path.GetFileName(fileName));
             }
         }
 
-        public async override Task<RestoreSettingsResult> ImportAsync(string fileName)
+        public async override Task<RestoreSettingsResult> ImportAsync(string fileName, CancellationToken cancellationToken)
         {
             var result = await ReadAsXMLFromDiskAsync<List<ScheduledTaskBackup>>(fileName);
 
             if (result.HasError)
-                return new RestoreSettingsResult(result.Message);
+                return RestoreSettingsResult.ReportError(result.Message);
 
-            var SkippedCount = 0;
+            var skippedCount = 0;
             var newSTs = new List<ScheduledTask>();
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
-                var existingSTs = await context.ScheduledTasks.ToListAsync();
+                var existingSTs = await context.ScheduledTasks.ToListAsync(cancellationToken);
 
                 var existingDeviceValues = await context.DeviceValues
                     .Include(o => o.Device)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
-                foreach (var backupST in result.Data)
+                foreach (var backupSt in result.Data)
                 {
-                    if (existingSTs.Any(o => o.Name == backupST.Name))
+                    if (existingSTs.Any(o => o.Name == backupSt.Name))
                     {
-                        SkippedCount++;
+                        skippedCount++;
                         continue;
                     }
 
-                    var task = new ScheduledTask();
-                    task.StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupST.StoredCommand);
-                    task.Frequency = (TaskFrequency)backupST.Frequency;
-                    task.Name = backupST.Name;
-                    task.isEnabled = backupST.isEnabled;
-                    task.RecurDay01 = backupST.RecurDay01;
-                    task.RecurDay02 = backupST.RecurDay02;
-                    task.RecurDay03 = backupST.RecurDay03;
-                    task.RecurDay04 = backupST.RecurDay04;
-                    task.RecurDay05 = backupST.RecurDay05;
-                    task.RecurDay06 = backupST.RecurDay06;
-                    task.RecurDay07 = backupST.RecurDay07;
-                    task.RecurDay08 = backupST.RecurDay08;
-                    task.RecurDay09 = backupST.RecurDay09;
-                    task.RecurDay10 = backupST.RecurDay10;
-                    task.RecurDay11 = backupST.RecurDay11;
-                    task.RecurDay12 = backupST.RecurDay12;
-                    task.RecurDay13 = backupST.RecurDay13;
-                    task.RecurDay14 = backupST.RecurDay14;
-                    task.RecurDay15 = backupST.RecurDay15;
-                    task.RecurDay16 = backupST.RecurDay16;
-                    task.RecurDay17 = backupST.RecurDay17;
-                    task.RecurDay18 = backupST.RecurDay18;
-                    task.RecurDay19 = backupST.RecurDay19;
-                    task.RecurDay20 = backupST.RecurDay20;
-                    task.RecurDay21 = backupST.RecurDay21;
-                    task.RecurDay22 = backupST.RecurDay22;
-                    task.RecurDay23 = backupST.RecurDay23;
-                    task.RecurDay24 = backupST.RecurDay24;
-                    task.RecurDay25 = backupST.RecurDay25;
-                    task.RecurDay26 = backupST.RecurDay26;
-                    task.RecurDay27 = backupST.RecurDay27;
-                    task.RecurDay28 = backupST.RecurDay28;
-                    task.RecurDay29 = backupST.RecurDay29;
-                    task.RecurDay30 = backupST.RecurDay30;
-                    task.RecurDay31 = backupST.RecurDay31;
-                    task.RecurDayofMonth = backupST.RecurDayofMonth;
-                    task.RecurDays = backupST.RecurDays;
-                    task.RecurEven = backupST.RecurEven;
-                    task.RecurFriday = backupST.RecurFriday;
-                    task.RecurMonday = backupST.RecurMonday;
-                    task.RecurSaturday = backupST.RecurSaturday;
-                    task.RecurMonth = backupST.RecurMonth;
-                    task.RecurSeconds = backupST.RecurSeconds;
-                    task.RecurSunday = backupST.RecurSunday;
-                    task.RecurThursday = backupST.RecurThursday;
-                    task.RecurTuesday = backupST.RecurTuesday;
-                    task.RecurWednesday = backupST.RecurWednesday;
-                    task.RecurWeeks = backupST.RecurWeeks;
-                    task.SortOrder = backupST.sortOrder;
-                    task.StartTime = backupST.startTime;
+                    var task = new ScheduledTask
+                    {
+                        StoredCommand = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupSt.StoredCommand,cancellationToken),
+                        Frequency = (TaskFrequency) backupSt.Frequency,
+                        Name = backupSt.Name,
+                        isEnabled = backupSt.isEnabled,
+                        RecurDay01 = backupSt.RecurDay01,
+                        RecurDay02 = backupSt.RecurDay02,
+                        RecurDay03 = backupSt.RecurDay03,
+                        RecurDay04 = backupSt.RecurDay04,
+                        RecurDay05 = backupSt.RecurDay05,
+                        RecurDay06 = backupSt.RecurDay06,
+                        RecurDay07 = backupSt.RecurDay07,
+                        RecurDay08 = backupSt.RecurDay08,
+                        RecurDay09 = backupSt.RecurDay09,
+                        RecurDay10 = backupSt.RecurDay10,
+                        RecurDay11 = backupSt.RecurDay11,
+                        RecurDay12 = backupSt.RecurDay12,
+                        RecurDay13 = backupSt.RecurDay13,
+                        RecurDay14 = backupSt.RecurDay14,
+                        RecurDay15 = backupSt.RecurDay15,
+                        RecurDay16 = backupSt.RecurDay16,
+                        RecurDay17 = backupSt.RecurDay17,
+                        RecurDay18 = backupSt.RecurDay18,
+                        RecurDay19 = backupSt.RecurDay19,
+                        RecurDay20 = backupSt.RecurDay20,
+                        RecurDay21 = backupSt.RecurDay21,
+                        RecurDay22 = backupSt.RecurDay22,
+                        RecurDay23 = backupSt.RecurDay23,
+                        RecurDay24 = backupSt.RecurDay24,
+                        RecurDay25 = backupSt.RecurDay25,
+                        RecurDay26 = backupSt.RecurDay26,
+                        RecurDay27 = backupSt.RecurDay27,
+                        RecurDay28 = backupSt.RecurDay28,
+                        RecurDay29 = backupSt.RecurDay29,
+                        RecurDay30 = backupSt.RecurDay30,
+                        RecurDay31 = backupSt.RecurDay31,
+                        RecurDayofMonth = backupSt.RecurDayofMonth,
+                        RecurDays = backupSt.RecurDays,
+                        RecurEven = backupSt.RecurEven,
+                        RecurFriday = backupSt.RecurFriday,
+                        RecurMonday = backupSt.RecurMonday,
+                        RecurSaturday = backupSt.RecurSaturday,
+                        RecurMonth = backupSt.RecurMonth,
+                        RecurSeconds = backupSt.RecurSeconds,
+                        RecurSunday = backupSt.RecurSunday,
+                        RecurThursday = backupSt.RecurThursday,
+                        RecurTuesday = backupSt.RecurTuesday,
+                        RecurWednesday = backupSt.RecurWednesday,
+                        RecurWeeks = backupSt.RecurWeeks,
+                        SortOrder = backupSt.sortOrder,
+                        StartTime = backupSt.startTime
+                    };
                     newSTs.Add(task);
                 }
 
@@ -233,12 +238,12 @@ namespace zvs.Processor.Backup
 
                 if (newSTs.Count > 0)
                 {
-                    var saveResult = await context.TrySaveChangesAsync();
+                    var saveResult = await context.TrySaveChangesAsync(cancellationToken);
                     if (saveResult.HasError)
-                        return new RestoreSettingsResult(saveResult.Message);
+                        return RestoreSettingsResult.ReportError(saveResult.Message);
                 }
             }
-            return new RestoreSettingsResult(string.Format("Imported {0} scheduled tasks, skipped {1} from {2}", newSTs.Count, SkippedCount, Path.GetFileName(fileName)), fileName);
+            return RestoreSettingsResult.ReportSuccess(string.Format("Imported {0} scheduled tasks, skipped {1} from {2}", newSTs.Count, skippedCount, Path.GetFileName(fileName)));
         }
 
     }

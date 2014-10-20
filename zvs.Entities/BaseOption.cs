@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     public abstract class BaseOption : INotifyPropertyChanged
     {

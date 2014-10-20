@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF.SceneControls
@@ -36,7 +36,7 @@ namespace zvs.WPF.SceneControls
 
         private async void ResetBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 var scene = await context.Scenes.FirstOrDefaultAsync(sc => sc.Id == SceneID);
                 if (scene != null)
@@ -45,7 +45,7 @@ namespace zvs.WPF.SceneControls
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 }
             }
         }

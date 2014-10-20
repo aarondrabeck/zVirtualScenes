@@ -4,7 +4,7 @@ using System.Speech.Synthesis;
 using zvs.Processor;
 using System.Data.Entity;
 using System.ComponentModel;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 
 namespace SpeechPlugin
@@ -103,7 +103,7 @@ namespace SpeechPlugin
 
         public override async Task DeviceValueChangedAsync(Int64 deviceValueId, string newValue, string oldValue)
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 DeviceValue dv = await context.DeviceValues.FirstOrDefaultAsync(v => v.Id == deviceValueId);
                 if (dv == null)

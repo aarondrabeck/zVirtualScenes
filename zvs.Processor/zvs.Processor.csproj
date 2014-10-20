@@ -55,10 +55,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Jint.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -88,11 +84,15 @@
     <Compile Include="Backup\GroupBackupRestore.cs" />
     <Compile Include="Backup\ScheduledTaskBackupRestore.cs" />
     <Compile Include="Backup\JavascriptBackupRestore.cs" />
-    <Compile Include="AdapterBuilder.cs" />
-    <Compile Include="CommandProcessor.cs" />
     <Compile Include="AdapterManager.cs" />
     <Compile Include="BuiltinCommandBuilder.cs" />
     <Compile Include="DeviceSettingBuilder.cs" />
+    <Compile Include="IAdapterManager.cs" />
+    <Compile Include="ICommandProcessor.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="DatabaseFeedback.cs" />
+    <Compile Include="FeedbackExtensionMethods.cs" />
+    <Compile Include="IFeedback.cs" />
     <Compile Include="SceneSettingBuilder.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="PluginSettingBuilder.cs" />
@@ -102,29 +102,21 @@
     <Compile Include="DeviceCommandBuilder.cs" />
     <Compile Include="DeviceTypeBuilder.cs" />
     <Compile Include="DeviceValueBuilder.cs" />
-    <Compile Include="JavaScriptExecuter.cs" />
-    <Compile Include="Logging\EventedLog.cs" />
-    <Compile Include="Logging\ILog.cs" />
-    <Compile Include="Logging\Log4netLogger.cs" />
-    <Compile Include="Logging\LogItem.cs" />
-    <Compile Include="Logging\LogManager.cs" />
-    <Compile Include="Logging\ObservableLog.cs" />
     <Compile Include="SafeDirectoryCatalog.cs" />
     <Compile Include="AdapterSettingBuilder.cs" />
+    <Compile Include="TriggerManager.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="zvsAdapter.cs" />
     <Compile Include="zvsPlugin.cs" />
-    <Compile Include="SceneRunner.cs" />
-    <Compile Include="ScheduledTaskManager.cs" />
-    <Compile Include="Triggers\TriggerManager.cs" />
-    <Compile Include="Core.cs" />
-    <Compile Include="PluginManager.cs" />
+    <Compile Include="zvsEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\zvs.Entities\zvs.Entities.csproj">
+    <ProjectReference Include="..\zvs.Entities\zvs.DataModel.csproj">
       <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
-      <Name>zvs.Entities</Name>
+      <Name>zvs.DataModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\zvs\zvs.csproj">
       <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>

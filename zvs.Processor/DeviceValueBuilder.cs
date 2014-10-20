@@ -1,141 +1,145 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class DeviceValueBuilder : AdapterBuilder
+    public class DeviceValueBuilder
     {
-        public DeviceValueBuilder(zvsAdapter zvsAdapter, Core core) : base(zvsAdapter, core) { }
-        public async Task RegisterAsync(DeviceValue deviceValue, Device device, zvsContext context, bool ignoreValueChange = false)
+        private IFeedback<LogEntry> Log { get; set; }
+        private ZvsContext Context { get; set; }
+        public DeviceValueBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
-
+            Context = zvsContext;
+            Log = log;
+        }
+        public async Task RegisterAsync(DeviceValue deviceValue, Device device, CancellationToken cancellationToken, bool ignoreValueChange = false)
+        {
             if (device == null)
             {
-                Core.log.Error("You must send a device when registering a device value!");
+                await Log.ReportErrorAsync("You must send a device when registering a device value!", cancellationToken);
                 return;
             }
 
-            var existing_dv = await context.DeviceValues.FirstOrDefaultAsync(o => o.UniqueIdentifier == deviceValue.UniqueIdentifier
-                && o.DeviceId == device.Id);
+            var existingDv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.UniqueIdentifier == deviceValue.UniqueIdentifier
+                && o.DeviceId == device.Id, cancellationToken);
 
-            var prev_value = string.Empty;
-
-            if (existing_dv == null)
+            if (existingDv == null)
             {
                 //NEW VALUE
-                context.DeviceValues.Add(deviceValue);
+                Context.DeviceValues.Add(deviceValue);
 
-                var result = await context.TrySaveChangesAsync();
+                var result = await Context.TrySaveChangesAsync(cancellationToken);
                 if (result.HasError)
-                    Core.log.Error(result.Message);
+                    await Log.ReportErrorAsync(result.Message, cancellationToken);
             }
             else
             {
                 //LOG IT
-                var device_name = "Unknown";
+                string deviceName;
                 if (String.IsNullOrEmpty(device.Name))
-                    device_name = "Device #" + device.Id;
+                    deviceName = "Device #" + device.Id;
                 else
-                    device_name = device.Name;
+                    deviceName = device.Name;
 
                 var changed = false;
 
                 //CHANGED VALUE
-                prev_value = existing_dv.Value;
+                var prevValue = existingDv.Value;
 
                 //values come in blank sometimes.  If they are blank, keep the DB value. 
                 if (!ignoreValueChange && !string.IsNullOrEmpty(deviceValue.Value))
                 {
-                    if (existing_dv.Value != deviceValue.Value)
+                    if (existingDv.Value != deviceValue.Value)
                     {
-                        existing_dv.Value = deviceValue.Value;
+                        existingDv.Value = deviceValue.Value;
                         changed = true;
                     }
                 }
 
-                if (existing_dv.ValueType != deviceValue.ValueType)
+                if (existingDv.ValueType != deviceValue.ValueType)
                 {
-                    Core.log.InfoFormat("{0} {1} ValueType changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.ValueType, deviceValue.ValueType);
-                    existing_dv.ValueType = deviceValue.ValueType;
+                    await Log.ReportInfoFormatAsync(cancellationToken, "{0} {1} ValueType changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.ValueType, deviceValue.ValueType);
+                    existingDv.ValueType = deviceValue.ValueType;
                     changed = true;
                 }
 
-                if (existing_dv.CommandClass != deviceValue.CommandClass)
+                if (existingDv.CommandClass != deviceValue.CommandClass)
                 {
-                    Core.log.InfoFormat("{0} {1} CommandClass changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.CommandClass, deviceValue.CommandClass);
-                    existing_dv.CommandClass = deviceValue.CommandClass;
+                    await Log.ReportInfoFormatAsync(cancellationToken, "{0} {1} CommandClass changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.CommandClass, deviceValue.CommandClass);
+                    existingDv.CommandClass = deviceValue.CommandClass;
                     changed = true;
                 }
 
-                if (existing_dv.Description != deviceValue.Description)
+                if (existingDv.Description != deviceValue.Description)
                 {
-                    Core.log.InfoFormat("{0} {1} Description changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.Description, deviceValue.Description);
-                    existing_dv.Description = deviceValue.Description;
+                    await Log.ReportInfoFormatAsync(cancellationToken, "{0} {1} Description changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.Description, deviceValue.Description);
+                    existingDv.Description = deviceValue.Description;
                     changed = true;
                 }
 
-                if (existing_dv.Name != deviceValue.Name)
+                if (existingDv.Name != deviceValue.Name)
                 {
-                    Core.log.InfoFormat("{0} {1} Name changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.Name, deviceValue.Name);
-                    existing_dv.Name = deviceValue.Name;
+                    await Log.ReportInfoFormatAsync(cancellationToken, "{0} {1} Name changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.Name, deviceValue.Name);
+                    existingDv.Name = deviceValue.Name;
                     changed = true;
                 }
 
-                if (existing_dv.Genre != deviceValue.Genre)
+                if (existingDv.Genre != deviceValue.Genre)
                 {
-                    Core.log.InfoFormat("{0} {1} Genre changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.Genre, deviceValue.Genre);
-                    existing_dv.Genre = deviceValue.Genre;
+                    await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} Genre changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.Genre, deviceValue.Genre);
+                    existingDv.Genre = deviceValue.Genre;
                     changed = true;
                 }
 
-                if (existing_dv.Index != deviceValue.Index)
+                if (existingDv.Index != deviceValue.Index)
                 {
-                    Core.log.InfoFormat("{0} {1} Index changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.Index, deviceValue.Index);
-                    existing_dv.Index = deviceValue.Index;
+                    await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} Index changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.Index, deviceValue.Index);
+                    existingDv.Index = deviceValue.Index;
                     changed = true;
                 }
 
-                if (existing_dv.isReadOnly != deviceValue.isReadOnly)
+                if (existingDv.IsReadOnly != deviceValue.IsReadOnly)
                 {
-                    Core.log.InfoFormat("{0} {1} isReadOnly changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.isReadOnly, deviceValue.isReadOnly);
-                    existing_dv.isReadOnly = deviceValue.isReadOnly;
+                    await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} isReadOnly changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.IsReadOnly, deviceValue.IsReadOnly);
+                    existingDv.IsReadOnly = deviceValue.IsReadOnly;
                     changed = true;
                 }
 
-                if (existing_dv.CustomData1 != deviceValue.CustomData1)
+                if (existingDv.CustomData1 != deviceValue.CustomData1)
                 {
-                    Core.log.InfoFormat("{0} {1} CustomData1 changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.CustomData1, deviceValue.CustomData1);
-                    existing_dv.CustomData1 = deviceValue.CustomData1;
+                    await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} CustomData1 changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.CustomData1, deviceValue.CustomData1);
+                    existingDv.CustomData1 = deviceValue.CustomData1;
                     changed = true;
                 }
 
-                if (existing_dv.CustomData2 != deviceValue.CustomData2)
+                if (existingDv.CustomData2 != deviceValue.CustomData2)
                 {
-                    Core.log.InfoFormat("{0} {1} CustomData2 changed from {2} to {3}.", device_name, deviceValue.Name, existing_dv.CustomData2, deviceValue.CustomData2);
-                    existing_dv.CustomData2 = deviceValue.CustomData2;
+                    await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} CustomData2 changed from {2} to {3}.", deviceName, deviceValue.Name, existingDv.CustomData2, deviceValue.CustomData2);
+                    existingDv.CustomData2 = deviceValue.CustomData2;
                     changed = true;
                 }
 
                 if (changed)
                 {
-                    var result = await context.TrySaveChangesAsync();
+                    var result = await Context.TrySaveChangesAsync(cancellationToken);
                     if (result.HasError)
-                        Core.log.Error(result.Message);
+                        await Log.ReportErrorAsync(result.Message, cancellationToken);
                 }
 
-                if (!ignoreValueChange && !string.IsNullOrEmpty(deviceValue.Value) && (string.IsNullOrEmpty(prev_value) || !prev_value.Equals(deviceValue.Value)))
+                if (!ignoreValueChange && !string.IsNullOrEmpty(deviceValue.Value) && (string.IsNullOrEmpty(prevValue) || !prevValue.Equals(deviceValue.Value)))
                 {
-                    if (!String.IsNullOrEmpty(prev_value))
-                        Core.log.InfoFormat("{0} {1} changed from {2} to {3}.", device_name, deviceValue.Name, prev_value, deviceValue.Value);
+                    if (!String.IsNullOrEmpty(prevValue))
+                        await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} changed from {2} to {3}.", deviceName, deviceValue.Name, prevValue, deviceValue.Value);
                     else
-                        Core.log.InfoFormat("{0} {1} changed to {2}.", device_name, deviceValue.Name, deviceValue.Value); 
+                        await Log.ReportInfoFormatAsync(cancellationToken,"{0} {1} changed to {2}.", deviceName, deviceValue.Name, deviceValue.Value); 
 
                     //Call Event
-                    deviceValue.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(existing_dv.Id, deviceValue.Value, prev_value));
+
+                    //TODO: THIS DOESN"T BLONG HERE
+                   // deviceValue.DeviceValueDataChanged(new DeviceValue.ValueDataChangedEventArgs(existingDv.Id, deviceValue.Value, prevValue));
                 }
             }
 

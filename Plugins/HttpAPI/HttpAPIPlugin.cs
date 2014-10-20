@@ -16,7 +16,7 @@ using System.Web;
 using System.Collections.Specialized;
 using System.Net.Mime;
 using zvs.Processor;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Data.Entity;
@@ -483,7 +483,7 @@ namespace HttpAPI
 
                             response.ContentType = "image/png";
                             byte[] buffer;
-                            using (var context = new zvsContext())
+                            using (var context = new ZvsContext())
                             {
                                 buffer = await ShellTile(context, color, style);
                             }
@@ -609,7 +609,7 @@ namespace HttpAPI
                 httpListenerContext.Request.HttpMethod == "GET")
             {
                 List<object> devices = new List<object>();
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     //Get Devices
                     var settingUid = DeviceSettingUids.SHOW_IN_HTTPAPI.ToString();
@@ -655,7 +655,7 @@ namespace HttpAPI
                 int id = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
 
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var d = await context.Devices
                         .Include(o => o.Type)
@@ -720,7 +720,7 @@ namespace HttpAPI
                 int id = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
 
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var deviceValues = await context.DeviceValues
                         .Where(o => o.DeviceId == id)
@@ -735,7 +735,7 @@ namespace HttpAPI
                             value = v.Value,
                             grene = v.Genre,
                             index2 = v.Index,
-                            read_only = v.isReadOnly,
+                            read_only = v.IsReadOnly,
                             label_name = v.Name,
                             type = v.ValueType,
                             id = v.Id
@@ -749,7 +749,7 @@ namespace HttpAPI
                 httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("scenes") &&
                 httpListenerContext.Request.HttpMethod == "GET")
             {
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     List<object> scenes = new List<object>();
 
@@ -792,7 +792,7 @@ namespace HttpAPI
                 int sID = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3], out sID);
 
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var scene = await context.Scenes
                         .Include(o => o.Commands)
@@ -838,7 +838,7 @@ namespace HttpAPI
                 bool.TryParse(postData["is_running"], out is_running);
                 string name = postData["name"];
 
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var scene = await context.Scenes
                         .FirstOrDefaultAsync(s => s.Id == sID);
@@ -850,7 +850,7 @@ namespace HttpAPI
                             var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                             if (cmd != null)
                             {
-                                CommandProcessor cp = new CommandProcessor(Core);
+                                CommandProcessor cp = new CommandProcessor(ZvsEngine);
                                 await Task.Run(async () => await cp.RunCommandAsync(this, cmd, sID.ToString()));
                             }
                             return new { success = true, desc = "Scene Started." };
@@ -878,7 +878,7 @@ namespace HttpAPI
 
             if (httpListenerContext.Request.Url.Segments.Length == 3 && httpListenerContext.Request.Url.Segments[2].ToLower().StartsWith("groups") && httpListenerContext.Request.HttpMethod == "GET")
             {
-                using (zvsContext db = new zvsContext())
+                using (ZvsContext db = new ZvsContext())
                 {
                     var groups = await db.Groups.Select(o => new
                              {
@@ -900,7 +900,7 @@ namespace HttpAPI
                 int gID = 0;
                 int.TryParse(httpListenerContext.Request.Url.Segments[3], out gID);
 
-                using (var db = new zvsContext())
+                using (var db = new ZvsContext())
                 {
                     var group = await db.Groups
                         .Include(o => o.Devices)
@@ -935,7 +935,7 @@ namespace HttpAPI
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (var db = new zvsContext())
+                    using (var db = new ZvsContext())
                     {
                         var d = await db.Devices
                             .Include(o => o.Commands)
@@ -988,7 +988,7 @@ namespace HttpAPI
                 int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
                 if (id > 0)
                 {
-                    using (var context = new zvsContext())
+                    using (var context = new ZvsContext())
                     {
                         var d = await context.Devices
                             .Include(o => o.Commands)
@@ -1017,7 +1017,7 @@ namespace HttpAPI
                                         if (cmd != null)
                                         {
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
-                                            CommandProcessor cp = new CommandProcessor(Core);
+                                            CommandProcessor cp = new CommandProcessor(ZvsEngine);
                                             await Task.Run(async () => await cp.RunCommandAsync(this, cmd, arg));
                                             return new { success = true };
                                         }
@@ -1039,7 +1039,7 @@ namespace HttpAPI
                                         {
 
                                             log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
-                                            CommandProcessor cp = new CommandProcessor(Core);
+                                            CommandProcessor cp = new CommandProcessor(ZvsEngine);
                                             await Task.Run(async () => await cp.RunCommandAsync(this, cmd, arg, d.Id.ToString()));
 
                                             return new { success = true };
@@ -1066,7 +1066,7 @@ namespace HttpAPI
                 httpListenerContext.Request.HttpMethod == "GET")
             {
                 List<object> bi_commands = new List<object>();
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var bCommands = await context.BuiltinCommands.Select(cmd => new
                         {
@@ -1094,7 +1094,7 @@ namespace HttpAPI
                 if (httpListenerContext.Request.Url.Segments.Length == 4)
                     int.TryParse(httpListenerContext.Request.Url.Segments[3].Replace("/", ""), out id);
 
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     BuiltinCommand cmd = null;
                     if (!string.IsNullOrEmpty(Name))
@@ -1107,7 +1107,7 @@ namespace HttpAPI
                     if (cmd != null)
                     {
                         log.Info(string.Format("[{0}] Running command {1}", ip, cmd.Name));
-                        CommandProcessor cp = new CommandProcessor(Core);
+                        CommandProcessor cp = new CommandProcessor(ZvsEngine);
                         await Task.Run(async () => await cp.RunCommandAsync(this, cmd, arg));
 
                         return new { success = true };
@@ -1148,7 +1148,7 @@ namespace HttpAPI
                 httpListenerContext.Request.HttpMethod == "POST")
             {
                 NameValueCollection postData = GetPostData(httpListenerContext.Request);
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     if (postData["password"] == PasswordSetting)
                     {
@@ -1217,7 +1217,7 @@ namespace HttpAPI
             return utf8;
         }
 
-        private async Task<byte[]> ShellTile(zvsContext context, string color, string style)
+        private async Task<byte[]> ShellTile(ZvsContext context, string color, string style)
         {
             int deviceOnCount = 0;
             int sceneRunningCount = 0;

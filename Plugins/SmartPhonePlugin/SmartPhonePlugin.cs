@@ -6,7 +6,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 
 namespace SmartPhonePlugin
@@ -183,7 +183,7 @@ namespace SmartPhonePlugin
             {
                 try
                 {
-                    using (zvsContext context = new zvsContext())
+                    using (ZvsContext context = new ZvsContext())
                     {
                         bool anyoneHome = false;
 
@@ -214,7 +214,7 @@ namespace SmartPhonePlugin
                                         var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                                         if (cmd != null)
                                         {
-                                            var cp = new CommandProcessor(Core);
+                                            var cp = new CommandProcessor(ZvsEngine);
                                             await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                                         }
                                     }
@@ -242,7 +242,7 @@ namespace SmartPhonePlugin
                                             var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                                             if (cmd != null)
                                             {
-                                                var cp = new CommandProcessor(Core);
+                                                var cp = new CommandProcessor(ZvsEngine);
                                                 await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                                             }
                                         }

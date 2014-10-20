@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.WPF.Commands;
 
 
@@ -15,16 +15,16 @@ namespace zvs.WPF.ScheduledTaskControls
     /// </summary>
     public partial class ScheduledTaskCreator : UserControl
     {
-        private zvsContext context;
+        private ZvsContext context;
         private App app = (App)Application.Current;
         public ScheduledTaskCreator()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             InitializeComponent();
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
-            zvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            ZvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
         void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
@@ -122,9 +122,9 @@ namespace zvs.WPF.ScheduledTaskControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
-                zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
-                zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
+                ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
+                ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
+                ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
             }
         }
 
@@ -148,7 +148,7 @@ namespace zvs.WPF.ScheduledTaskControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
             }
         }
 
@@ -182,7 +182,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                 ScheduledTaskDataGrid.Focus();
                 return true;
@@ -275,7 +275,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
             var result = await context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
+                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private async void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
@@ -314,7 +314,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
             var result = await context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
+                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private async void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
@@ -353,14 +353,14 @@ namespace zvs.WPF.ScheduledTaskControls
 
             var result = await context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
+                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private async void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
         {
             var result = await context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
+                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
@@ -376,7 +376,7 @@ namespace zvs.WPF.ScheduledTaskControls
             else
                 cbWindow = new CommandBuilder(context, st.StoredCommand);
 
-            cbWindow.Owner = app.zvsWindow;
+            cbWindow.Owner = app.ZvsWindow;
 
             if (cbWindow.ShowDialog() ?? false)
             {
@@ -387,7 +387,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
             }
         }
 

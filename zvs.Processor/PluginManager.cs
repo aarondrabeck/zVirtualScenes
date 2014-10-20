@@ -5,7 +5,7 @@ using System.Linq;
 using System;
 using System.ComponentModel;
 using System.Data.Entity;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
@@ -26,7 +26,7 @@ namespace zvs.Processor
             }
         }
 
-        private Core Core { get; set; }
+        private ZvsEngine ZvsEngine { get; set; }
 
 #pragma warning disable 649
         [ImportMany]
@@ -35,20 +35,20 @@ namespace zvs.Processor
 
         private readonly Dictionary<Guid, zvsPlugin> _pluginLookup = new Dictionary<Guid, zvsPlugin>();
 
-        public async Task LoadPluginsAsync(Core core)
+        public async Task LoadPluginsAsync(ZvsEngine zvsEngine)
         {
-            Core = core;
+            ZvsEngine = zvsEngine;
             var catalog = new SafeDirectoryCatalog("plugins");
             var compositionContainer = new CompositionContainer(catalog);
             compositionContainer.ComposeParts(this);
 
             if (catalog.LoadErrors.Count > 0)
             {
-                Core.log.WarnFormat(@"The following plug-ins could not be loaded: {0}",
+                ZvsEngine.log.WarnFormat(@"The following plug-ins could not be loaded: {0}",
                     string.Join(", " + Environment.NewLine, catalog.LoadErrors));
             }
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 // Iterate the plug-ins found in dlls
                 foreach (var plugin in _plugins)
@@ -94,14 +94,14 @@ namespace zvs.Processor
                     {
                         var result = await context.TrySaveChangesAsync();
                         if (result.HasError)
-                            core.log.Error(result.Message);
+                            zvsEngine.log.Error(result.Message);
                     }
 
                     var msg = string.Format("Initializing '{0}'", zvsPlugin.Name);
-                    Core.log.Info(msg);
+                    ZvsEngine.log.Info(msg);
 
-                    //Plug-in need access to the core in order to use the Logger
-                    await zvsPlugin.Initialize(Core);
+                    //Plug-in need access to the zvsEngine in order to use the Logger
+                    await zvsPlugin.Initialize(ZvsEngine);
 
                     //Reload just installed settings
                     dbPlugin = await context.Plugins
@@ -135,7 +135,7 @@ namespace zvs.Processor
             }
 
             //Save Database Value
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var a = await context.Plugins.FirstOrDefaultAsync(o => o.PluginGuid == pluginGuid);
                 if (a != null)
@@ -154,7 +154,7 @@ namespace zvs.Processor
             }
 
             //Save Database Value
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var a = await context.Plugins.FirstOrDefaultAsync(o => o.PluginGuid == pluginGuid);
                 if (a != null)
@@ -188,7 +188,7 @@ namespace zvs.Processor
             var prop = zvsPlugin.GetType().GetProperty(propertyName);
             if (prop == null)
             {
-                Core.log.ErrorFormat("Cannot find property called {0} on this plug-in", propertyName);
+                ZvsEngine.log.ErrorFormat("Cannot find property called {0} on this plug-in", propertyName);
                 return;
             }
 
@@ -199,7 +199,7 @@ namespace zvs.Processor
             }
             catch
             {
-                Core.log.ErrorFormat("Cannot cast value on {0} on this adapter", propertyName);
+                ZvsEngine.log.ErrorFormat("Cannot cast value on {0} on this adapter", propertyName);
             }
         }
     }

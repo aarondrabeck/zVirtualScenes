@@ -1,14 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Data.Entity;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.SelfHost;
 using System.Web.OData.Builder;
 using System.Web.OData.Extensions;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 using System.ComponentModel.Composition;
 
@@ -225,23 +223,23 @@ namespace zvsWebapi2Plugin
                 deviceValueHistoryTaskType.Ignore(t => t.DateTime);
                 deviceValueHistoryTaskType.Property(t => t.EdmDateTime).Name = "DateTime";
 
-                builder.EntitySet<Device>("Devices");
-                builder.EntitySet<Group>("Groups");
-                builder.EntitySet<Scene>("Scenes");
-                builder.EntitySet<DeviceValueHistory>("DeviceValueHistories");
-                builder.EntitySet<Scene>("SceneCommands");
-                builder.EntitySet<DeviceValueTrigger>("DeviceValueTriggers");
-                builder.EntitySet<DeviceValue>("DeviceValues");
-                builder.EntitySet<zvs.Processor.Logging.LogItem>("LogItems");
-                
                 builder.EntitySet<Command>("Commands");
                 var cExecute = builder.EntityType<Command>().Action("Execute");
                 cExecute.Parameter<string>("Argument");
                 cExecute.Parameter<string>("Argument2");
-
+                builder.EntitySet<BuiltinCommand>("BuiltinCommands");
+                builder.EntitySet<Device>("Devices");
                 builder.EntitySet<DeviceCommand>("DeviceCommands");
                 builder.EntitySet<DeviceTypeCommand>("DeviceTypeCommands");
-                builder.EntitySet<BuiltinCommand>("BuiltinCommands");
+                builder.EntitySet<DeviceValueTrigger>("DeviceValueTriggers");
+                builder.EntitySet<DeviceValue>("DeviceValues");
+                builder.EntitySet<DeviceValueHistory>("DeviceValueHistories");
+                builder.EntitySet<Group>("Groups");
+                builder.EntitySet<Scene>("Scenes");
+                builder.EntitySet<Scene>("SceneCommands");
+                builder.EntitySet<ScheduledTask>("ScheduledTasks");
+
+                builder.EntitySet<zvs.Processor.Logging.LogItem>("LogItems");
 
                 builder.Namespace = "Actions";
                 config.MapODataServiceRoute("ODataRoute", "odata4", builder.GetEdmModel());
@@ -256,11 +254,6 @@ namespace zvsWebapi2Plugin
 
                 // Start listening
                 await HttpSelfHostServer.OpenAsync();
-
-
-
-
-
             }
             catch (Exception e)
             {

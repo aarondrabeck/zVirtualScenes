@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor.Backup
@@ -34,7 +35,7 @@ namespace zvs.Processor.Backup
             else if (m.Command is DeviceTypeCommand)
             {
                 bcmd.CommandType = Command_Types.DeviceType;
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     int d_id = int.TryParse(m.Argument2, out d_id) ? d_id : 0;
 
@@ -63,69 +64,69 @@ namespace zvs.Processor.Backup
         /// Return null if failed to restore command.
         /// </summary>
         /// <param name="context"></param>
-        /// <param name="backupStoredCMD"></param>
+        /// <param name="backupStoredCmd"></param>
         /// <returns></returns>
-        public async static Task<StoredCommand> RestoreStoredCommandAsync(zvsContext context, StoredCMDBackup backupStoredCMD)
+        public async static Task<StoredCommand> RestoreStoredCommandAsync(ZvsContext context, StoredCMDBackup backupStoredCmd, CancellationToken cancellationToken)
         {
-            if (backupStoredCMD == null)
+            if (backupStoredCmd == null)
                 return null;
 
-            if (backupStoredCMD.CommandType == Command_Types.Device ||
-                backupStoredCMD.CommandType == Command_Types.DeviceType)
+            if (backupStoredCmd.CommandType == Command_Types.Device ||
+                backupStoredCmd.CommandType == Command_Types.DeviceType)
             {
                 var sc = new StoredCommand();
 
                 var device = await context.Devices
                     .Include(o => o.Commands)
                     .Include(o => o.Type.Commands)
-                    .FirstOrDefaultAsync(o => o.NodeNumber == backupStoredCMD.NodeNumber);
+                    .FirstOrDefaultAsync(o => o.NodeNumber == backupStoredCmd.NodeNumber, cancellationToken);
 
                 if (device == null)
                     return null;
 
                 Command c = null;
-                if (backupStoredCMD.CommandType == Command_Types.Device)
+                if (backupStoredCmd.CommandType == Command_Types.Device)
                 {
-                    c = device.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                    c = device.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCmd.UniqueIdentifier);
                 }
-                if (backupStoredCMD.CommandType == Command_Types.DeviceType)
+                if (backupStoredCmd.CommandType == Command_Types.DeviceType)
                 {
-                    c = device.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                    c = device.Type.Commands.FirstOrDefault(o => o.UniqueIdentifier == backupStoredCmd.UniqueIdentifier);
                     sc.Argument2 = device.Id.ToString();
                 }
 
                 if (c == null)
                     return null;
 
-                sc.Argument = backupStoredCMD.Argument;
+                sc.Argument = backupStoredCmd.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
 
-                var result = await context.TrySaveChangesAsync();
+                var result = await context.TrySaveChangesAsync(cancellationToken);
                 if (result.HasError)
                     return null;
 
                 return sc;
             }
-            else if (backupStoredCMD.CommandType == Command_Types.Builtin ||
-                     backupStoredCMD.CommandType == Command_Types.JavaScript)
+            else if (backupStoredCmd.CommandType == Command_Types.Builtin ||
+                     backupStoredCmd.CommandType == Command_Types.JavaScript)
             {
                 Command c = null;
-                if (backupStoredCMD.CommandType == Command_Types.Builtin)
-                    c = await context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                if (backupStoredCmd.CommandType == Command_Types.Builtin)
+                    c = await context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == backupStoredCmd.UniqueIdentifier, cancellationToken);
 
-                if (backupStoredCMD.CommandType == Command_Types.JavaScript)
-                    c = await context.JavaScriptCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == backupStoredCMD.UniqueIdentifier);
+                if (backupStoredCmd.CommandType == Command_Types.JavaScript)
+                    c = await context.JavaScriptCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == backupStoredCmd.UniqueIdentifier, cancellationToken);
 
                 if (c == null)
                     return null;
 
                 var sc = new StoredCommand();
-                sc.Argument = backupStoredCMD.Argument;
+                sc.Argument = backupStoredCmd.Argument;
                 sc.Command = c;
                 context.StoredCommands.Add(sc);
 
-                var result = await context.TrySaveChangesAsync();
+                var result = await context.TrySaveChangesAsync(cancellationToken);
                 if (result.HasError)
                     return null;
 

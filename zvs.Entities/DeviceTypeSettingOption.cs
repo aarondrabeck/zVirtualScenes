@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceTypeSettingOptions", Schema = "ZVS")]
     public class DeviceTypeSettingOption : BaseOption, IIdentity

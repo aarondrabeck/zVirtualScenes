@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor.Backup
@@ -25,49 +26,49 @@ namespace zvs.Processor.Backup
             get { return "GroupsBackup.zvs"; }
         }
 
-        public async override Task<ExportResult> ExportAsync(string fileName)
+        public async override Task<Result> ExportAsync(string fileName, CancellationToken cancellationToken)
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var backupGroups = await context.Groups
                     .Include(o => o.Devices)
-                    .Select(o => new GroupBackup()
+                    .Select(o => new GroupBackup
                     {
                         Name = o.Name,
                         NodeNumbers = o.Devices.Select(d => d.NodeNumber).ToList()
                     })
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var saveResult = await SaveAsXMLToDiskAsync(backupGroups, fileName);
 
                 if (saveResult.HasError)
-                    return new ExportResult(saveResult.Message, saveResult.HasError);
+                    return Result.ReportError(saveResult.Message);
 
-                return new ExportResult(string.Format("Exported {0} groups to {1}", backupGroups.Count,
-                    Path.GetFileName(fileName)), false);
+                return Result.ReportErrorFormat("Exported {0} groups to {1}", backupGroups.Count,
+                    Path.GetFileName(fileName));
             }
         }
 
-        public async override Task<RestoreSettingsResult> ImportAsync(string fileName)
+        public async override Task<RestoreSettingsResult> ImportAsync(string fileName, CancellationToken cancellationToken)
         {
             var result = await ReadAsXMLFromDiskAsync<List<GroupBackup>>(fileName);
 
             if (result.HasError)
-                return new RestoreSettingsResult(result.Message);
+                return RestoreSettingsResult.ReportError(result.Message);
 
-            var SkippedCount = 0;
+            var skippedCount = 0;
             var newGroups = new List<Group>();
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
-                var existingGroups = await context.Groups.ToListAsync();
-                var existingDevice = await context.Devices.ToListAsync();
+                var existingGroups = await context.Groups.ToListAsync(cancellationToken);
+                var existingDevice = await context.Devices.ToListAsync(cancellationToken);
 
                 foreach (var backupGroup in result.Data)
                 {
                     if (existingGroups.Any(o => o.Name == backupGroup.Name))
                     {
-                        SkippedCount++;
+                        skippedCount++;
                         continue;
                     }
 
@@ -85,12 +86,12 @@ namespace zvs.Processor.Backup
 
                 if (newGroups.Count > 0)
                 {
-                    var saveResult = await context.TrySaveChangesAsync();
+                    var saveResult = await context.TrySaveChangesAsync(cancellationToken);
                     if (saveResult.HasError)
-                        return new RestoreSettingsResult(saveResult.Message);
+                        return RestoreSettingsResult.ReportError(saveResult.Message);
                 }
             }
-            return new RestoreSettingsResult(string.Format("Imported {0} groups, skipped {1} from {2}", newGroups.Count, SkippedCount, Path.GetFileName(fileName)), fileName);
+            return RestoreSettingsResult.ReportSuccess(string.Format("Imported {0} groups, skipped {1} from {2}", newGroups.Count, skippedCount, Path.GetFileName(fileName)));
         }
     }
 }

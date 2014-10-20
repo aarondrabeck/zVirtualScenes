@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceSettings", Schema = "ZVS")]
     public class DeviceSetting : BaseValue, IIdentity

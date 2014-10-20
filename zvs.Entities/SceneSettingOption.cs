@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("SceneSettingOptions", Schema = "ZVS")]
     public class SceneSettingOption : BaseOption, IIdentity

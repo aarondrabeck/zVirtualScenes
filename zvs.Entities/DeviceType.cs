@@ -3,8 +3,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
+using zvs.DataModel;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceTypes", Schema = "ZVS")]
     public class DeviceType : INotifyPropertyChanged, IIdentity

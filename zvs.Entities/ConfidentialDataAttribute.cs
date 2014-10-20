@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     /// <summary>
     /// API's should obey this attribute and never expose these properties.

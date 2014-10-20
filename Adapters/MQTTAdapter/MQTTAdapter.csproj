@@ -61,9 +61,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\zvs.Entities\zvs.Entities.csproj">
+    <ProjectReference Include="..\..\zvs.Entities\zvs.DataModel.csproj">
       <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
-      <Name>zvs.Entities</Name>
+      <Name>zvs.DataModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
       <Project>{10CD1DE3-4E83-4BB0-A7CA-C774C298BE27}</Project>

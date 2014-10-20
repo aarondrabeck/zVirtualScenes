@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("SceneCommands", Schema = "ZVS")]
     public partial class SceneCommand : IIdentity
@@ -10,7 +10,7 @@ namespace zvs.Entities
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //No actual navigational property here
+        public int StoredCommandId { get; set; }
         private StoredCommand _storedCommand;
         public virtual StoredCommand StoredCommand
         {

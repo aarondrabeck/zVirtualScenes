@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceTypeSettingValues", Schema = "ZVS")]
     public class DeviceTypeSettingValue : INotifyPropertyChanged, IIdentity

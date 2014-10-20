@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF.JavaScript
@@ -11,16 +11,16 @@ namespace zvs.WPF.JavaScript
     /// </summary>
     public partial class JavaScriptAddRemove : Window, IDisposable
     {
-        private zvsContext context;
+        private ZvsContext context;
 
         public JavaScriptAddRemove()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += JavaScriptAddRemove_onEntityAdded;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += JavaScriptAddRemove_onEntityAdded;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
         }
 
 #if DEBUG
@@ -87,9 +87,9 @@ namespace zvs.WPF.JavaScript
 
         private void JavaScriptAddRemove_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= JavaScriptAddRemove_onEntityAdded;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= JavaScriptAddRemove_onEntityAdded;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
             context.Dispose();
         }
 
@@ -123,7 +123,7 @@ namespace zvs.WPF.JavaScript
 
                 var saveResult = await context.TrySaveChangesAsync();
                 if (saveResult.HasError)
-                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
 
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
                 EvaluateAddEditBtnsUsability();
@@ -144,7 +144,7 @@ namespace zvs.WPF.JavaScript
                 
                 var saveResult = await context.TrySaveChangesAsync();
                 if (saveResult.HasError)
-                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
 
                 foreach (StoredCommand sc in await context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync())
                 {
@@ -152,7 +152,7 @@ namespace zvs.WPF.JavaScript
 
                     var result = await sc.TryRemoveDependenciesAsync(context);
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 }
 
                 //Delete the Command from each Scene it is user
@@ -166,7 +166,7 @@ namespace zvs.WPF.JavaScript
 
                 saveResult = await context.TrySaveChangesAsync();
                 if (saveResult.HasError)
-                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
 
                 EvaluateAddEditBtnsUsability();
             }
@@ -188,7 +188,7 @@ namespace zvs.WPF.JavaScript
             {
                 var saveResult = await context.TrySaveChangesAsync();
                 if (saveResult.HasError)
-                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
 
                 JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
             }

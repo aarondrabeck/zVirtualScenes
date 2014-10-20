@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
 namespace zvs.Processor
 {
-    internal class ScheduledTaskManager : IDisposable
+    public class ScheduledTaskManager : IDisposable
     {
-        private Core Core;
+        private ZvsEngine ZvsEngine;
         private List<ScheduledTask> scheduledTasks = new List<ScheduledTask>();
         public bool IsRunning { get; private set; }
 
@@ -38,9 +38,9 @@ namespace zvs.Processor
         {
             var msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
             if (args.Errors)
-                Core.log.Error(msg);
+                ZvsEngine.log.Error(msg);
             else
-                Core.log.Info(msg);
+                ZvsEngine.log.Info(msg);
 
             if (onScheduledTaskBegin != null)
                 onScheduledTaskBegin(this, args);
@@ -50,22 +50,22 @@ namespace zvs.Processor
         {
             var msg = string.Format("{0}, TaskID:{1}", args.Details, args.TaskID);
             if (args.Errors)
-                Core.log.Error(msg);
+                ZvsEngine.log.Error(msg);
             else
-                Core.log.Info(msg);
+                ZvsEngine.log.Info(msg);
 
             if (onScheduledTaskEnd != null)
                 onScheduledTaskEnd(this, args);
         }
 
-        public ScheduledTaskManager(Core core)
+        public ScheduledTaskManager(ZvsEngine zvsEngine)
         {
-            Core = core;
+            ZvsEngine = zvsEngine;
 
             //Keep the local context in sync with other contexts
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskManager_onEntityUpdated;
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskManager_onEntityDeleted;
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskManager_onEntityAdded;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskManager_onEntityUpdated;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskManager_onEntityDeleted;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskManager_onEntityAdded;
         }
 
         private async void ScheduledTaskManager_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityAddedArgs e)
@@ -85,18 +85,18 @@ namespace zvs.Processor
 
         private async Task RefreshLocalCopyOfTasksAsync()
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
                 scheduledTasks = await context.ScheduledTasks.ToListAsync();
         }
 
-        public void StopAsync(Core core)
+        public void StopAsync(ZvsEngine zvsEngine)
         {
             IsRunning = false;
         }
 
         public async void StartAsync()
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
                 scheduledTasks = await context.ScheduledTasks.ToListAsync();
 
             IsRunning = true;
@@ -207,9 +207,9 @@ namespace zvs.Processor
 
         public void Dispose()
         {
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskManager_onEntityUpdated;
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskManager_onEntityDeleted;
-            zvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskManager_onEntityAdded;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskManager_onEntityUpdated;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskManager_onEntityDeleted;
+            ZvsContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskManager_onEntityAdded;
         }
 
         private bool ShouldRunThisDayOfMonth(ScheduledTask task)
@@ -317,7 +317,7 @@ namespace zvs.Processor
         {
             ScheduledTask _task = null;
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 _task = await context.ScheduledTasks.FirstOrDefaultAsync(o => o.Id == taskId);
 
@@ -341,7 +341,7 @@ namespace zvs.Processor
                     return;
                 }
 
-                var cp = new CommandProcessor(Core);
+                var cp = new CommandProcessor(ZvsEngine);
                 await cp.RunStoredCommandAsync(_task, _task.StoredCommand.Id);
                 ScheduledTaskEnd(new onScheduledTaskEventArgs(_task.Id,
                            string.Format("Task '{0}' ended.", _task.Name), false));

@@ -6,7 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.ComponentModel;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
@@ -18,20 +18,20 @@ namespace zvs.WPF.DeviceControls
     /// </summary>
     public partial class DeviceDataGridUC : UserControl, IDisposable
     {
-        private zvsContext context;
+        private ZvsContext context;
         public DeviceDataGridUC()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDataGridUC_onEntityAdded;
-            zvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDataGridUC_onEntityDeleted;
-            zvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDataGridUC_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDataGridUC_onEntityAdded;
+            ZvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDataGridUC_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDataGridUC_onEntityUpdated;
 
-            zvsContext.ChangeNotifications<Group>.OnEntityAdded += DeviceDataGridUC_onEntityAdded;
-            zvsContext.ChangeNotifications<Group>.OnEntityDeleted += DeviceDataGridUC_onEntityDeleted;
-            zvsContext.ChangeNotifications<Group>.OnEntityUpdated += DeviceDataGridUC_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Group>.OnEntityAdded += DeviceDataGridUC_onEntityAdded;
+            ZvsContext.ChangeNotifications<Group>.OnEntityDeleted += DeviceDataGridUC_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Group>.OnEntityUpdated += DeviceDataGridUC_onEntityUpdated;
 
             //TODO: LISTEN FOR CHANGES TO THE DEVICE_GROUPS LINKING TABLE
 
@@ -251,13 +251,13 @@ namespace zvs.WPF.DeviceControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDataGridUC_onEntityAdded;
-                zvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
-                zvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
+                ZvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDataGridUC_onEntityAdded;
+                ZvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
+                ZvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
 
-                zvsContext.ChangeNotifications<Group>.OnEntityAdded -= DeviceDataGridUC_onEntityAdded;
-                zvsContext.ChangeNotifications<Group>.OnEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
-                zvsContext.ChangeNotifications<Group>.OnEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
+                ZvsContext.ChangeNotifications<Group>.OnEntityAdded -= DeviceDataGridUC_onEntityAdded;
+                ZvsContext.ChangeNotifications<Group>.OnEntityDeleted -= DeviceDataGridUC_onEntityDeleted;
+                ZvsContext.ChangeNotifications<Group>.OnEntityUpdated -= DeviceDataGridUC_onEntityUpdated;
             }
         }
 
@@ -309,7 +309,7 @@ namespace zvs.WPF.DeviceControls
 
                                 var saveResult = await context.TrySaveChangesAsync();
                                 if (saveResult.HasError)
-                                    ((App)App.Current).zvsCore.log.Error(saveResult.Message);
+                                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
                             }
                             else
                                 return;
@@ -319,7 +319,7 @@ namespace zvs.WPF.DeviceControls
 
                         var r = await context.TrySaveChangesAsync();
                         if (r.HasError)
-                            ((App)App.Current).zvsCore.log.Error(r.Message);
+                            ((App)App.Current).ZvsEngine.log.Error(r.Message);
                     }
                 }
             }
@@ -380,7 +380,7 @@ namespace zvs.WPF.DeviceControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated intime for this event
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 ////device.CallOnContextUpdated();
             }
         }
@@ -389,7 +389,7 @@ namespace zvs.WPF.DeviceControls
         {
             App app = (App)Application.Current;
             DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.Id);
-            deviceDetailsWindow.Owner = app.zvsWindow;
+            deviceDetailsWindow.Owner = app.ZvsWindow;
             deviceDetailsWindow.Show();
         }
 

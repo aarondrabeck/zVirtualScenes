@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using zvs.WPF.DynamicActionControls;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
@@ -17,16 +17,16 @@ namespace zvs.WPF
     {
         private App application = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private zvsContext context;
+        private ZvsContext context;
 
         public PluginManagerWindow()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Plugin>.OnEntityUpdated += PluginManagerWindow_onEntityUpdated;
-            zvsContext.ChangeNotifications<Plugin>.OnEntityAdded += PluginManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Plugin>.OnEntityDeleted += PluginManagerWindow_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Plugin>.OnEntityUpdated += PluginManagerWindow_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Plugin>.OnEntityAdded += PluginManagerWindow_onEntityAdded;
+            ZvsContext.ChangeNotifications<Plugin>.OnEntityDeleted += PluginManagerWindow_onEntityDeleted;
         }
 
 #if DEBUG
@@ -55,7 +55,7 @@ namespace zvs.WPF
 
         private async Task GetLoadedPlugins()
         {
-            var loadedPluginsGuids = application.zvsCore.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
+            var loadedPluginsGuids = application.ZvsEngine.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
             await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
         }
 
@@ -94,9 +94,9 @@ namespace zvs.WPF
 
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Plugin>.OnEntityUpdated -= PluginManagerWindow_onEntityUpdated;
-            zvsContext.ChangeNotifications<Plugin>.OnEntityAdded -= PluginManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Plugin>.OnEntityDeleted -= PluginManagerWindow_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Plugin>.OnEntityUpdated -= PluginManagerWindow_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Plugin>.OnEntityAdded -= PluginManagerWindow_onEntityAdded;
+            ZvsContext.ChangeNotifications<Plugin>.OnEntityDeleted -= PluginManagerWindow_onEntityDeleted;
             context.Dispose();
         }
 
@@ -123,13 +123,13 @@ namespace zvs.WPF
 
                         var result = await context.TrySaveChangesAsync();
                         if (result.HasError)
-                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                         //STOP OR START
                         if (isChecked)
-                            application.zvsCore.PluginManager.EnablePluginAsync(plugin.PluginGuid);
+                            application.ZvsEngine.PluginManager.EnablePluginAsync(plugin.PluginGuid);
                         else
-                            application.zvsCore.PluginManager.DisablePluginAsync(plugin.PluginGuid);
+                            application.ZvsEngine.PluginManager.DisablePluginAsync(plugin.PluginGuid);
                     },
                 icon);
                 ControlsStkPnl.Children.Add(c);
@@ -155,9 +155,9 @@ namespace zvs.WPF
                                         pluginSettings.Value = isChecked.ToString();
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -174,9 +174,9 @@ namespace zvs.WPF
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -194,9 +194,9 @@ namespace zvs.WPF
 
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -214,9 +214,9 @@ namespace zvs.WPF
 
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -233,9 +233,9 @@ namespace zvs.WPF
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -252,9 +252,9 @@ namespace zvs.WPF
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -270,9 +270,9 @@ namespace zvs.WPF
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -289,9 +289,9 @@ namespace zvs.WPF
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);

@@ -7,7 +7,7 @@ using System.Data.Entity;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("Devices", Schema = "ZVS")]
     public class Device : INotifyPropertyChanged, IIdentity
@@ -210,7 +210,7 @@ namespace zvs.Entities
             }
         }
 
-        public async Task<string> GetDeviceTypeValueAsync(string deviceTypeSettingUniqueIdentifier, zvsContext context)
+        public async Task<string> GetDeviceTypeValueAsync(string deviceTypeSettingUniqueIdentifier, ZvsContext context)
         {
             //check if the value has been defined by the user for this device
             var definedSetting = await context.DeviceTypeSettingValues.FirstOrDefaultAsync(o =>
@@ -228,7 +228,7 @@ namespace zvs.Entities
             return defaultSetting != null ? defaultSetting.Value : null;
         }
 
-        public async Task<string> GetDeviceSettingAsync(string deviceSettingUniqueIdentifier, zvsContext context)
+        public async Task<string> GetDeviceSettingAsync(string deviceSettingUniqueIdentifier, ZvsContext context)
         {
             //check if the value has been defined by the user for this device
             var definedSetting = await context.DeviceSettingValues.FirstOrDefaultAsync(o =>

@@ -65,9 +65,9 @@
     <Compile Include="XMLSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\zvs.Entities\zvs.Entities.csproj">
+    <ProjectReference Include="..\..\zvs.Entities\zvs.DataModel.csproj">
       <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
-      <Name>zvs.Entities</Name>
+      <Name>zvs.DataModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
       <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>

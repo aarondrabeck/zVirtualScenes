@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DbInfo", Schema = "ZVS")]
     public class DbInfo : INotifyPropertyChanged, IIdentity

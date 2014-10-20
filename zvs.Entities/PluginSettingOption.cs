@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("PluginSettingOptions", Schema = "ZVS")]
     public class PluginSettingOption : BaseOption, IIdentity

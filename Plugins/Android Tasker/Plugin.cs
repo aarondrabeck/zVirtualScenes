@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using zvs.Processor;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using Newtonsoft.Json;
@@ -120,9 +120,9 @@ namespace AndroidTaskerPlugin
             };
             await settingBuilder.Plugin(this).RegisterPluginSettingAsync(verboseSetting, o => o.VerboseSetting);
 
-            zvsContext.ChangeNotifications<Scene>.OnEntityUpdated += HttpAPIPlugin_onEntityUpdated;
-            zvsContext.ChangeNotifications<Scene>.OnEntityDeleted += HttpAPIPlugin_onEntityDeleted;
-            zvsContext.ChangeNotifications<Scene>.OnEntityAdded += HttpAPIPlugin_onEntityAdded;
+            ZvsContext.ChangeNotifications<Scene>.OnEntityUpdated += HttpAPIPlugin_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Scene>.OnEntityDeleted += HttpAPIPlugin_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Scene>.OnEntityAdded += HttpAPIPlugin_onEntityAdded;
         }
 
         async void HttpAPIPlugin_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Scene>.EntityAddedArgs e)
@@ -179,7 +179,7 @@ namespace AndroidTaskerPlugin
         {
             Task.Run(async () =>
             {
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     //cache scene command
                     RunSceneCommand = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
@@ -210,7 +210,7 @@ namespace AndroidTaskerPlugin
 
         private async Task CreateSceneDictionary()
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var scenes = await context.Scenes.Select(o => new { id = o.Id, name = o.Name.ToLower() }).ToListAsync();
 
@@ -381,7 +381,7 @@ namespace AndroidTaskerPlugin
                         }
 
                         var sId = SceneCache[sceneLowerCase];
-                        CommandProcessor cp = new CommandProcessor(Core);
+                        CommandProcessor cp = new CommandProcessor(ZvsEngine);
                         await Task.Run(async () => await cp.RunCommandAsync(this, RunSceneCommand, sId.ToString()));
                         await response.SendResponse("Scene started", HttpStatusCode.OK);
                     }

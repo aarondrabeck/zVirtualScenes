@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
+using zvs.DataModel.Migrations;
 using zvs.Processor;
 using Microsoft.Shell;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 using System.Data.Entity;
-using zvs.Context.Migrations;
 using System.Data.Entity.Migrations;
 
 namespace zvs.WPF
@@ -14,74 +15,71 @@ namespace zvs.WPF
     /// <summary>
     /// interaction logic for App.xaml
     /// </summary>
-    public partial class App : Application, ISingleInstanceApp
+    public partial class App : ISingleInstanceApp
     {
-        public Core zvsCore;
-        public ZVSTaskbarIcon taskbarIcon;
-        public bool isShuttingDown = false;
-        public zvsMainWindow zvsWindow = null;
-        public Window firstWindow;
-        private System.Threading.Mutex zvsMutex = null;
-        private zvs.Processor.Logging.ILog log;
+        public CancellationTokenSource Cts { get; private set; }
+
+        bool _isMainWindowCreated;
+        public ZvsEngine ZvsEngine;
+        public ZVSTaskbarIcon TaskbarIcon;
+        public zvsMainWindow ZvsWindow;
+        private Mutex _zvsMutex;
 
         [STAThread]
         public static void Main()
         {
-            if (SingleInstance<App>.InitializeAsFirstInstance("AdvancedJumpList"))
-            {
-                var application = new App();
-                application.Init();
-                application.Run();
-                // Allow single instance code to perform cleanup operations
-                SingleInstance<App>.Cleanup();
-            }
+            if (!SingleInstance<App>.InitializeAsFirstInstance("AdvancedJumpList")) return;
+            
+            var application = new App();
+            application.Init();
+            application.Run();
+            // Allow single instance code to perform cleanup operations
+            SingleInstance<App>.Cleanup();
         }
 
         public void Init()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            Cts = new CancellationTokenSource();
         }
 
         public async Task<bool> SignalExternalCommandLineArgs(IList<string> args)
         {
             if (args == null || args.Count == 0)
                 return true;
-            if ((args.Count > 2))
+            if ((args.Count <= 2)) return true;
+            //the first index always contains the location of the exe so we need to check the second index
+            if ((args[1].ToLowerInvariant() != "-startscene")) return true;
+            var searchQuery = args[2].ToLower();
+
+            using (var context = new ZvsContext())
             {
-                //the first index always contains the location of the exe so we need to check the second index
-                if ((args[1].ToLowerInvariant() == "-startscene"))
+                Scene scene;
+                int sceneId;
+                if (int.TryParse(searchQuery, out sceneId))
+                    scene = await context.Scenes.FirstOrDefaultAsync(s => s.Id == sceneId);
+                else scene = await context.Scenes.FirstOrDefaultAsync(s => s.Name.ToLower().Equals(searchQuery));
+
+                if (scene != null)
                 {
-                    int SceneId = 0;
-                    string SearchQuery = args[2].ToLower();
-
-                    using (zvsContext context = new zvsContext())
-                    {
-                        Scene scene = null;
-                        if (int.TryParse(SearchQuery, out SceneId))
-                            scene = await context.Scenes.FirstOrDefaultAsync(s => s.Id == SceneId);
-                        else if (SearchQuery != null)
-                            scene = await context.Scenes.FirstOrDefaultAsync(s => s.Name.ToLower().Equals(SearchQuery));
-
-                        if (scene != null)
-                        {
-                            BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
-                            if (cmd != null)
-                            {
-                                CommandProcessor cp = new CommandProcessor(zvsCore);
-                                await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
-                            }
-                        }
-                        else
-                            log.InfoFormat("Cannot find scene '{0}'", SearchQuery);
-                    }
+                    var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
+                    if (cmd == null) return true;
+                    var cp = new CommandProcessor(ZvsEngine);
+                    await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                 }
+                else
+                    await ZvsEngine.Log.ReportInfoFormatAsync(Cts.Token, "Cannot find scene '{0}'", searchQuery);
             }
             return true;
         }
 
         protected async override void OnStartup(StartupEventArgs e)
         {
-            SplashScreen splashscreen = new SplashScreen();
+            var databaseFeedback = new DatabaseFeedback();
+
+            ZvsEngine = new ZvsEngine(databaseFeedback, new Processor.AdapterManager(databaseFeedback), new PluginManager(databaseFeedback), new TriggerManager(databaseFeedback), new ScheduledTaskManager(databaseFeedback));
+
+            var splashscreen = new SplashScreen();
             splashscreen.SetLoadingTextFormat("Starting {0}", Utils.ApplicationNameAndVersion);
             // splashscreen.Show();
             await Task.Delay(10);
@@ -96,10 +94,8 @@ namespace zvs.WPF
 #endif
 
             #region Create Logger
-            zvs.Processor.Logging.LogManager.ConfigureLogging();
-            log = zvs.Processor.Logging.LogManager.GetLogger<App>();
 
-            log.InfoFormat("Init Complete ({0})", (Utils.DebugMode ? "Debug Mode" : "Release Mode"));
+            await ZvsEngine.Log.ReportInfoFormatAsync(Cts.Token, "Init Complete ({0})", (Utils.DebugMode ? "Debug Mode" : "Release Mode"));
 #if DEBUG
             log.Info("--------------DUMPING ENVIRONMENT--------------");
             log.InfoFormat("AppDataPath:{0}", Utils.AppDataPath);
@@ -132,13 +128,13 @@ namespace zvs.WPF
 
             try
             {
-                zvsMutex = System.Threading.Mutex.OpenExisting("zVirtualScenesGUIMutex");
+                _zvsMutex = Mutex.OpenExisting("zVirtualScenesGUIMutex");
                 ProgramHasToClosePrompt(Utils.ApplicationName + " can't start because it is already running");
             }
             catch
             {
                 //the specified mutex doesn't exist, we should create it
-                zvsMutex = new System.Threading.Mutex(true, "zVirtualScenesGUIMutex"); //these names need to match.
+                _zvsMutex = new Mutex(true, "zVirtualScenesGUIMutex"); //these names need to match.
             }
             #endregion
 
@@ -173,7 +169,7 @@ namespace zvs.WPF
 
             await Task.Run(() =>
             {
-                using (zvsContext context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var configuration = new Configuration();
                     var migrator = new DbMigrator(configuration);
@@ -186,19 +182,16 @@ namespace zvs.WPF
 
             //TODO: Check for VCRedist
 
-            #region Start Core Services
+            #region Start zvsEngine Services
             await Task.Delay(10);
-            splashscreen.SetLoadingTextFormat("Starting core services");
+            splashscreen.SetLoadingTextFormat("Starting zvsEngine services");
             await Task.Delay(10);
 
-            //Initialize the core
-            zvsCore = new Core();
+            //Initialize the zvsEngine
+
             try
             {
-                await Task.Run(() =>
-                {
-                    zvsCore.StartAsync();
-                });
+                await Task.Run(() => ZvsEngine.StartAsync());
             }
             catch (Exception ex)
             {
@@ -208,8 +201,8 @@ namespace zvs.WPF
             #endregion
 
             //Create taskbar Icon 
-            taskbarIcon = new ZVSTaskbarIcon();
-            taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
+            TaskbarIcon = new ZVSTaskbarIcon();
+            TaskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " started", 3000, System.Windows.Forms.ToolTipIcon.Info);
 
             //close Splash Screen
             //  splashscreen.Close();
@@ -224,7 +217,7 @@ namespace zvs.WPF
 
         public async Task RefreshTriggerDescripitions()
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var triggers = await context.DeviceValueTriggers
                     .Include(o => o.DeviceValue)
@@ -236,13 +229,13 @@ namespace zvs.WPF
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    await ZvsEngine.Log.ReportErrorAsync(result.Message, Cts.Token);
             }
         }
 
         public async Task RefreshCommandDescripitions()
         {
-            using (zvsContext context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var storedCommands = await context.StoredCommands
                     .Include(o => o.Command)
@@ -256,7 +249,7 @@ namespace zvs.WPF
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    await ZvsEngine.Log.ReportErrorAsync(result.Message, Cts.Token);
             }
         }
 
@@ -272,72 +265,64 @@ namespace zvs.WPF
         }
 #endif
 
-        bool MainWindowCreated = false;
+
 
         public async void ShowzvsWindow()
         {
-            if (zvsWindow == null || !MainWindowCreated)
+            if (ZvsWindow == null || !_isMainWindowCreated)
             {
 #if DEBUG
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 #endif
+                _isMainWindowCreated = true;
 
-                MainWindowCreated = true;
-
-                SplashScreen splashscreen = new SplashScreen();
+                var splashscreen = new SplashScreen();
                 splashscreen.SetLoadingText("Loading user interface");
                 splashscreen.Show();
-
-
 
                 await Task.Delay(10);
                 splashscreen.SetLoadingTextFormat("Loading user interface settings");
                 await Task.Delay(10);
 
-                zvsWindow = new zvsMainWindow();
-                zvsWindow.Loaded += (a, s) =>
+                ZvsWindow = new zvsMainWindow();
+                ZvsWindow.Loaded += (a, s) => splashscreen.Close();
+                ZvsWindow.Closed += async (a, s) =>
                 {
-                    splashscreen.Close();
-                };
-                zvsWindow.Closed += (a, s) =>
-                {
-                    zvsWindow = null;
-                    log.InfoFormat("{0} User Interface Unloaded", Utils.ApplicationName); //, Utils.ApplicationName + " GUI");
-                    MainWindowCreated = false;
+                    ZvsWindow = null;
+                    await ZvsEngine.Log.ReportInfoFormatAsync(Cts.Token, "{0} User Interface Unloaded", Utils.ApplicationName);
+                    _isMainWindowCreated = false;
 
                 };
-                zvsWindow.Show();
+                ZvsWindow.Show();
 #if DEBUG
                 sw.Stop();
                 Debug.WriteLine("ZVS window created in {0}", sw.Elapsed.ToString() as object);
 #endif
             }
 
-            zvsWindow.Activate();
+            ZvsWindow.Activate();
         }
 
-        public void ShutdownZVS()
+        public async Task ShutdownZvs()
         {
-            if (zvsMutex != null)
-                zvsMutex.ReleaseMutex();
+            if (_zvsMutex != null)
+                _zvsMutex.ReleaseMutex();
 
-            log.Info("Shutting down");
-
-            zvs.Processor.Logging.EventedLog.Enabled = false;
-
-            Application.Current.Shutdown();
+            await ZvsEngine.Log.ReportInfoAsync("Shutting down", Cts.Token);
+            Cts.Cancel();
+            Current.Shutdown();
         }
 
         private void Application_Exit_1(object sender, ExitEventArgs e)
         {
-            taskbarIcon.Dispose();
+            TaskbarIcon.Dispose();
         }
 
-        public static void ProgramHasToClosePrompt(string reason)
+        private static void ProgramHasToClosePrompt(string reason)
         {
 
-            Window WpfBugWindow = new Window()
+            var wpfBugWindow = new Window
             {
                 AllowsTransparency = true,
                 Background = System.Windows.Media.Brushes.Transparent,
@@ -348,12 +333,12 @@ namespace zvs.WPF
                 Height = 1,
                 ShowInTaskbar = false
             };
-            WpfBugWindow.Show();
-            if (MessageBox.Show(reason, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) == MessageBoxResult.OK)
-            {
-                WpfBugWindow.Close();
-                Environment.Exit(1);
-            }
+            wpfBugWindow.Show();
+            if (MessageBox.Show(reason, Utils.ApplicationName, MessageBoxButton.OK, MessageBoxImage.Error) !=
+                MessageBoxResult.OK) return;
+
+            wpfBugWindow.Close();
+            Environment.Exit(1);
         }
     }
 }

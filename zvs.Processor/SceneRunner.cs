@@ -2,30 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor
 {
     internal class SceneRunner : IDisposable
     {
-        private zvsContext context;
+        
         private Scene _scene;
-        private int ExecutionErrors = 0;
-        private int ExecutedCommands = 0;
-        private List<SceneCommand> CommandsToExecute = new List<SceneCommand>();
-        private CommandProcessor cp;
-        private Core Core;
+        private int _executionErrors = 0;
+        private int _executedCommands = 0;
+        private List<SceneCommand> _commandsToExecute = new List<SceneCommand>();
+
+        private ICommandProcessor CommandProcessor { get; set; }
 
         /// <summary>
         /// Executes a scene asynchronously and reports progress.
         /// </summary>
-        /// <param name="InvokersName"> Name of the person executing the scene.</param>
-        public SceneRunner(Core core)
+        public SceneRunner(ICommandProcessor commandProcessor, ZvsContext zvsContext)
         {
-            Core = core;
-            cp = new CommandProcessor(core);
-            context = new zvsContext();
+            CommandProcessor = commandProcessor;
+            context = new ZvsContext();
         }
 
         #region Events
@@ -89,25 +87,25 @@ namespace zvs.Processor
             _scene.isRunning = true;
             await context.SaveChangesAsync();
 
-            ExecutionErrors = 0;
-            ExecutedCommands = 0;
+            _executionErrors = 0;
+            _executedCommands = 0;
 
-            CommandsToExecute = _scene.Commands.OrderBy(o => o.SortOrder).ToList();
+            _commandsToExecute = _scene.Commands.OrderBy(o => o.SortOrder).ToList();
 
             return await ProcessNextCommandAsync();
         }
 
         private async Task<SceneResult> ProcessNextCommandAsync()
         {
-            if (ExecutedCommands < CommandsToExecute.Count)
+            if (_executedCommands < _commandsToExecute.Count)
             {
-                var sceneCommand = CommandsToExecute[ExecutedCommands];
+                var sceneCommand = _commandsToExecute[_executedCommands];
                 var result = await cp.RunStoredCommandAsync(_scene, sceneCommand.StoredCommand.Id);
 
                 if (result.HasErrors)
-                    ExecutionErrors++;
+                    _executionErrors++;
 
-                ExecutedCommands++;
+                _executedCommands++;
 
                 //on to the next one
                 return await ProcessNextCommandAsync();
@@ -117,7 +115,7 @@ namespace zvs.Processor
                 _scene.isRunning = false;
                 await context.SaveChangesAsync();
 
-                return new SceneResult(_scene.Id, ExecutionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, ExecutionErrors));
+                return new SceneResult(_scene.Id, _executionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, _executionErrors));
             }
         }
 

@@ -3,7 +3,7 @@ using System.Data.Entity;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using zvs.Entities;
+using zvs.DataModel;
 
 
 namespace zvs.WPF.TriggerControls
@@ -13,19 +13,19 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerGridUC : UserControl
     {
-        private zvsContext context;
+        private ZvsContext context;
         private App app = (App)Application.Current;
 
         public TriggerGridUC()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityAdded += TriggerGridUC_onEntityAdded;
-            zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityDeleted += TriggerGridUC_onEntityDeleted;
-            zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated += TriggerGridUC_onEntityUpdated;
-            zvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            ZvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityAdded += TriggerGridUC_onEntityAdded;
+            ZvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityDeleted += TriggerGridUC_onEntityDeleted;
+            ZvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated += TriggerGridUC_onEntityUpdated;
+            ZvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
         void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
@@ -115,9 +115,9 @@ namespace zvs.WPF.TriggerControls
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
-                zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityAdded -= TriggerGridUC_onEntityAdded;
-                zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityDeleted -= TriggerGridUC_onEntityDeleted;
-                zvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated -= TriggerGridUC_onEntityUpdated;
+                ZvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityAdded -= TriggerGridUC_onEntityAdded;
+                ZvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityDeleted -= TriggerGridUC_onEntityDeleted;
+                ZvsContext.ChangeNotifications<DeviceValueTrigger>.OnEntityUpdated -= TriggerGridUC_onEntityUpdated;
             }
         }
 
@@ -128,7 +128,7 @@ namespace zvs.WPF.TriggerControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
             }
         }
 
@@ -141,7 +141,7 @@ namespace zvs.WPF.TriggerControls
                 if (trigger != null)
                 {
                     TriggerEditorWindow new_window = new TriggerEditorWindow(trigger.Id, context);
-                    new_window.Owner = app.zvsWindow;
+                    new_window.Owner = app.ZvsWindow;
                     new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
                     new_window.Show();
                     new_window.Closing += async (s, a) =>
@@ -150,7 +150,7 @@ namespace zvs.WPF.TriggerControls
                         {
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
-                                ((App)App.Current).zvsCore.log.Error(result.Message);
+                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
                         }
                     };
                 }
@@ -171,7 +171,7 @@ namespace zvs.WPF.TriggerControls
 
                         var result = await context.TrySaveChangesAsync();
                         if (result.HasError)
-                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
                     }
                 }
 
@@ -182,7 +182,7 @@ namespace zvs.WPF.TriggerControls
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
         {
             TriggerEditorWindow new_window = new TriggerEditorWindow(0, context);
-            new_window.Owner = app.zvsWindow;
+            new_window.Owner = app.ZvsWindow;
             new_window.Title = "Add Trigger";
             new_window.Show();
             new_window.Closing += async (s, a) =>
@@ -193,7 +193,7 @@ namespace zvs.WPF.TriggerControls
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 }
             };
         }

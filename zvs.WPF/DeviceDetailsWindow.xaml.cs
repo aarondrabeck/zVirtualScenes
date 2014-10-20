@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using zvs.WPF.DeviceControls;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF
@@ -22,9 +22,9 @@ namespace zvs.WPF
             this.DeviceID = deviceID;
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDetailsWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDetailsWindow_onEntityAdded;
+            ZvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
         }
 
 #if DEBUG
@@ -70,14 +70,14 @@ namespace zvs.WPF
 
         private void DeviceDetailsWindow_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDetailsWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDetailsWindow_onEntityAdded;
+            ZvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
         }
 
         private async Task LoadDeviceAsync()
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 Device d = await context.Devices
                     .Include(o => o.Type)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.Threading.Tasks;
 
@@ -15,15 +15,15 @@ namespace zvs.WPF.Groups
     /// </summary>
     public partial class GroupEditor : Window, IDisposable
     {
-        private zvsContext context;
+        private ZvsContext context;
 
         public GroupEditor()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Device>.OnEntityAdded += GroupEditor_onEntityAdded;
+            ZvsContext.ChangeNotifications<Device>.OnEntityAdded += GroupEditor_onEntityAdded;
         }
 
 #if DEBUG
@@ -68,7 +68,7 @@ namespace zvs.WPF.Groups
         }
         private void GroupEditor_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Device>.OnEntityAdded -= GroupEditor_onEntityAdded;
+            ZvsContext.ChangeNotifications<Device>.OnEntityAdded -= GroupEditor_onEntityAdded;
             context.Dispose();
         }
 
@@ -102,7 +102,7 @@ namespace zvs.WPF.Groups
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                 GroupCmbBx.SelectedItem = GroupCmbBx.Items.OfType<Group>().FirstOrDefault(o => o.Name == new_g.Name);
 
@@ -123,7 +123,7 @@ namespace zvs.WPF.Groups
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 }
             }
 
@@ -144,7 +144,7 @@ namespace zvs.WPF.Groups
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
             }
         }
 
@@ -192,7 +192,7 @@ namespace zvs.WPF.Groups
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                     groupsDevicesLstVw.Focus();
                 }
@@ -232,7 +232,7 @@ namespace zvs.WPF.Groups
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 }
             }
         }

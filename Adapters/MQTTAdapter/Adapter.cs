@@ -9,13 +9,13 @@ using System.Web.Script.Serialization;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 using zvs.Processor;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 
 namespace MQTTAdapter
 {
-    [Export(typeof (zvsAdapter))]
-    public class Adapter : zvsAdapter
+    [Export(typeof (ZvsAdapter))]
+    public class Adapter : ZvsAdapter
     {
         private async void Adapter_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -165,7 +165,7 @@ namespace MQTTAdapter
         {
             if (isShuttingDown)
             {
-                Core.log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
+                ZvsEngine.log.InfoFormat("{0} driver cannot start because it is still shutting down", this.Name);
                 return Task.FromResult(0);
             }
 
@@ -193,7 +193,7 @@ namespace MQTTAdapter
                             client.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
                             client.Connect(SystemTopic);
                             client.Subscribe(new string[] {"#"}, new byte[] {0});
-                            Core.log.InfoFormat("{0} connected and subscribed!", this.Name);
+                            ZvsEngine.log.InfoFormat("{0} connected and subscribed!", this.Name);
                             AddMQTTAdDevice();
                         }
                         catch (Exception e)
@@ -233,24 +233,24 @@ namespace MQTTAdapter
                     });
 
                 isShuttingDown = false;
-                Core.log.InfoFormat("{0} driver stopped", this.Name);
+                ZvsEngine.log.InfoFormat("{0} driver stopped", this.Name);
             }
         }
 
-        public override Task RepollAsync(Device device, zvsContext context)
+        public override Task RepollAsync(Device device, ZvsContext context)
         {
 
             //m_manager.RequestNodeState(m_homeId, nodeNumber);
             return Task.FromResult(0);
         }
 
-        public override Task ActivateGroupAsync(Group @group, zvsContext context)
+        public override Task ActivateGroupAsync(Group @group, ZvsContext context)
         {
             //throw new NotImplementedException();
             return null;
         }
 
-        public override Task DeactivateGroupAsync(Group @group, zvsContext context)
+        public override Task DeactivateGroupAsync(Group @group, ZvsContext context)
         {
             //throw new NotImplementedException();
             return null;
@@ -258,7 +258,7 @@ namespace MQTTAdapter
 
         private DeviceCommand motionCommand;
 
-        private void AddCommand(int deviceID, string name, zvsContext context)
+        private void AddCommand(int deviceID, string name, ZvsContext context)
         {
             context.DeviceCommands.FirstOrDefaultAsync(d => d.Name == name && d.DeviceId == deviceID).ContinueWith(
                 t =>
@@ -284,7 +284,7 @@ namespace MQTTAdapter
                         context.TrySaveChangesAsync().ContinueWith(tt =>
                             {
                                 if (tt.Result.HasError)
-                                    Core.log.Error(tt.Result.Message);
+                                    ZvsEngine.log.Error(tt.Result.Message);
 
                             }).Wait();
                     }).Wait();
@@ -292,7 +292,7 @@ namespace MQTTAdapter
         }
 
         private async Task AddOrUpdateValue(string name, string value, int deviceId, DataType dataType, string valueName,
-                                            string genre, zvsContext context)
+                                            string genre, ZvsContext context)
         {
             context.DeviceValues.FirstOrDefaultAsync(d => d.DeviceId == deviceId && d.Name == valueName)
                    .ContinueWith(t
@@ -317,7 +317,7 @@ namespace MQTTAdapter
                            context.TrySaveChangesAsync().ContinueWith(tt =>
                                {
                                    if (tt.Result.HasError)
-                                       Core.log.Error(tt.Result.Message);
+                                       ZvsEngine.log.Error(tt.Result.Message);
 
                                }).Wait();
 
@@ -332,7 +332,7 @@ namespace MQTTAdapter
 
         private async Task AddMQTTAdDevice()
         {
-            using(zvsContext context = new zvsContext())
+            using(ZvsContext context = new ZvsContext())
                 {
 
 
@@ -355,7 +355,7 @@ namespace MQTTAdapter
                                     context.TrySaveChangesAsync().ContinueWith(tt =>
                                         {
                                             if (tt.Result.HasError)
-                                                Core.log.Error(tt.Result.Message);
+                                                ZvsEngine.log.Error(tt.Result.Message);
 
                                             AddCommand(dev.Id, "Publish to Broker", context);
                                         }).Wait();
@@ -371,7 +371,7 @@ namespace MQTTAdapter
             var name = e.Topic;
             var value = System.Text.UTF8Encoding.UTF8.GetString(e.Message);
 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
 
                 context.Devices
@@ -399,7 +399,7 @@ namespace MQTTAdapter
                                             context.TrySaveChangesAsync().ContinueWith(tt =>
                                                 {
                                                     if (tt.Result.HasError)
-                                                        Core.log.Error(tt.Result.Message);
+                                                        ZvsEngine.log.Error(tt.Result.Message);
 
                                                 }).Wait();
                                         }

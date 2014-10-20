@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using zvs.Processor.Backup;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF.Backup
@@ -80,12 +80,12 @@ namespace zvs.WPF.Backup
 
                 if (result.HasError)
                 {
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
                     uc.State = BackupRestoreControl.BackupRestoreControlState.Error;
                 }
                 else
                 {
-                    ((App)App.Current).zvsCore.log.Info(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Info(result.Message);
                     uc.State = BackupRestoreControl.BackupRestoreControlState.Complete;
                 }
                 await Task.Delay(50);
@@ -115,7 +115,7 @@ namespace zvs.WPF.Backup
                 BackupDirectory = dlg.SelectedPath;
 
                 //Save selected DIR to database
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
                     {
@@ -151,12 +151,12 @@ namespace zvs.WPF.Backup
 
                 if (result.HasError)
                 {
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
                     uc.State = BackupRestoreControl.BackupRestoreControlState.Error;
                 }
                 else
                 {
-                    ((App)App.Current).zvsCore.log.Info(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Info(result.Message);
                     uc.State = BackupRestoreControl.BackupRestoreControlState.Complete;
                 }
                 await Task.Delay(50);
@@ -171,7 +171,7 @@ namespace zvs.WPF.Backup
 
         private async void this_Loaded(object sender, RoutedEventArgs e)
         {
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "BackupLocation");
                 if (option != null)

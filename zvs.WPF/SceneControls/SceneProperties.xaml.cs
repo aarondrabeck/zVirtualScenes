@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using zvs.WPF.DynamicActionControls;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF.SceneControls
@@ -16,7 +16,7 @@ namespace zvs.WPF.SceneControls
     public partial class SceneProperties : UserControl
     {
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private zvsContext context = null;
+        private ZvsContext context = null;
 
         private int _SceneID = 0;
         public int SceneID
@@ -38,7 +38,7 @@ namespace zvs.WPF.SceneControls
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 InitializeComponent();
-                context = new zvsContext();
+                context = new ZvsContext();
             }
         }
 
@@ -108,7 +108,7 @@ namespace zvs.WPF.SceneControls
 
                                 var result = await context.TrySaveChangesAsync();
                                 if (result.HasError)
-                                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
                             },
                             icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -139,7 +139,7 @@ namespace zvs.WPF.SceneControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -170,7 +170,7 @@ namespace zvs.WPF.SceneControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -201,7 +201,7 @@ namespace zvs.WPF.SceneControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -232,7 +232,7 @@ namespace zvs.WPF.SceneControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -263,7 +263,7 @@ namespace zvs.WPF.SceneControls
 
                                    var result = await context.TrySaveChangesAsync();
                                    if (result.HasError)
-                                       ((App)App.Current).zvsCore.log.Error(result.Message);
+                                       ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -296,7 +296,7 @@ namespace zvs.WPF.SceneControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);

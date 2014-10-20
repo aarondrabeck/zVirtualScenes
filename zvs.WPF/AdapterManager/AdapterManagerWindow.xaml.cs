@@ -3,8 +3,9 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using zvs.DataModel;
 using zvs.WPF.DynamicActionControls;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF.AdapterManager
@@ -16,17 +17,17 @@ namespace zvs.WPF.AdapterManager
     {
         private App application = (App)Application.Current;
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private zvsContext context;
+        private ZvsContext context;
 
         public AdapterManagerWindow()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Adapter>.OnEntityAdded += AdapterManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Adapter>.OnEntityDeleted += AdapterManagerWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Adapter>.OnEntityUpdated += AdapterManagerWindow_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Adapter>.OnEntityAdded += AdapterManagerWindow_onEntityAdded;
+            ZvsContext.ChangeNotifications<Adapter>.OnEntityDeleted += AdapterManagerWindow_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Adapter>.OnEntityUpdated += AdapterManagerWindow_onEntityUpdated;
         }
 
         void AdapterManagerWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Adapter>.EntityUpdatedArgs e)
@@ -79,16 +80,16 @@ namespace zvs.WPF.AdapterManager
 
             this.Dispatcher.Invoke(new Action(async () =>
             {
-                var loadedAdapterGuids = application.zvsCore.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
+                var loadedAdapterGuids = application.ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.Keys.ToList();
                 await context.Adapters.Where(o => loadedAdapterGuids.Contains(o.AdapterGuid)).ToListAsync();
             }));
         }
 
         private void Window_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Adapter>.OnEntityAdded -= AdapterManagerWindow_onEntityAdded;
-            zvsContext.ChangeNotifications<Adapter>.OnEntityDeleted -= AdapterManagerWindow_onEntityDeleted;
-            zvsContext.ChangeNotifications<Adapter>.OnEntityUpdated -= AdapterManagerWindow_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Adapter>.OnEntityAdded -= AdapterManagerWindow_onEntityAdded;
+            ZvsContext.ChangeNotifications<Adapter>.OnEntityDeleted -= AdapterManagerWindow_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Adapter>.OnEntityUpdated -= AdapterManagerWindow_onEntityUpdated;
             context.Dispose();
         }
 
@@ -115,13 +116,13 @@ namespace zvs.WPF.AdapterManager
 
                         var result = await context.TrySaveChangesAsync();
                         if (result.HasError)
-                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                         //STOP OR START
                         if (isChecked)
-                            application.zvsCore.AdapterManager.EnableAdapterAsync(adapter.AdapterGuid);
+                            application.ZvsEngine.AdapterManager.EnableAdapterAsync(adapter.AdapterGuid);
                         else
-                            application.zvsCore.AdapterManager.DisableAdapterAsync(adapter.AdapterGuid);
+                            application.ZvsEngine.AdapterManager.DisableAdapterAsync(adapter.AdapterGuid);
                     },
                 icon);
                 ControlsStkPnl.Children.Add(c);
@@ -147,9 +148,9 @@ namespace zvs.WPF.AdapterManager
                                         adapterSetting.Value = isChecked.ToString();
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -166,9 +167,9 @@ namespace zvs.WPF.AdapterManager
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -186,9 +187,9 @@ namespace zvs.WPF.AdapterManager
 
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -206,9 +207,9 @@ namespace zvs.WPF.AdapterManager
 
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -225,9 +226,9 @@ namespace zvs.WPF.AdapterManager
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -244,9 +245,9 @@ namespace zvs.WPF.AdapterManager
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -262,9 +263,9 @@ namespace zvs.WPF.AdapterManager
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);
@@ -281,9 +282,9 @@ namespace zvs.WPF.AdapterManager
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
                                         if (result.HasError)
-                                            ((App)App.Current).zvsCore.log.Error(result.Message);
+                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.zvsCore.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
+                                        application.ZvsEngine.AdapterManager.NotifyAdapterSettingsChanged(adapterSetting);
                                     },
                                 icon);
                                 ControlsStkPnl.Children.Add(control);

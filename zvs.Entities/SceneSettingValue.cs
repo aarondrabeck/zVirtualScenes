@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("SceneSettingValues", Schema = "ZVS")]
     public class SceneSettingValue : INotifyPropertyChanged, IIdentity
@@ -43,7 +43,7 @@ namespace zvs.Entities
         }
 
         //TODO: MOve to extension method...
-        public async static Task<string> GetPropertyValueAsync(zvsContext Context, Scene scene, string scenePropertyUniqueIdentifier)
+        public async static Task<string> GetPropertyValueAsync(ZvsContext Context, Scene scene, string scenePropertyUniqueIdentifier)
         {
             //Find the property
             SceneSetting property = await Context.SceneSettings.FirstOrDefaultAsync(p => p.UniqueIdentifier == scenePropertyUniqueIdentifier);

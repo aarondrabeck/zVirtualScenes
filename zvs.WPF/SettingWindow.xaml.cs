@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF
@@ -18,7 +18,7 @@ namespace zvs.WPF
         private async void SettingWindow_Loaded_1(object sender, RoutedEventArgs e)
         {
             EnableJavaScriptDebugger.IsChecked = zvs.Processor.JavaScriptExecuter.JavascriptDebugEnabled; 
-            using (zvsContext context = new zvsContext())
+            using (ZvsContext context = new ZvsContext())
             {
                 var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
                 if (option != null && option.Value == "Descending")
@@ -34,7 +34,7 @@ namespace zvs.WPF
             DecenLogOrderRadioBtn.IsChecked = false;
             if (!isLoading)
             {
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
                     {
@@ -50,7 +50,7 @@ namespace zvs.WPF
             AcenLogOrderRadioBtn.IsChecked = false;
             if (!isLoading)
             {
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     await ProgramOption.TryAddOrEditAsync(context, new ProgramOption()
                     {

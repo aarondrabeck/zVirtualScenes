@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceSettingValues", Schema = "ZVS")]
     public class DeviceSettingValue : INotifyPropertyChanged, IIdentity, IValidatableObject
@@ -39,7 +39,7 @@ namespace zvs.Entities
             }
         }
 
-        public static async Task<string> GetDevicePropertyValueAsync(zvsContext context, Device device, string settingName)
+        public static async Task<string> GetDevicePropertyValueAsync(ZvsContext context, Device device, string settingName)
         {
             var d2 = await context.Devices
                 .Include(o=> o.DeviceSettingValues)
@@ -67,7 +67,7 @@ namespace zvs.Entities
         {
             var results = new List<ValidationResult>();
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
                 if (context.DeviceSettingValues.Any(o => o.DeviceId == this.DeviceId && 
                     o.DeviceSettingId == DeviceSettingId && 
                     o.Id != Id))  //Check o.Id != this.Id so updates do not fail

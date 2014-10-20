@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 
 
@@ -13,7 +13,7 @@ namespace zvs.WPF.JavaScript
     public partial class JavaScriptEditorWindow : Window
     {
         private App app = (App)Application.Current;
-        private zvsContext Context;
+        private ZvsContext Context;
         private JavaScriptCommand Command;
         public bool Canceled = true;
         private ObservableCollection<JSResult> Results = new ObservableCollection<JSResult>();
@@ -33,7 +33,7 @@ namespace zvs.WPF.JavaScript
         }
 
 
-        public JavaScriptEditorWindow(zvsContext context, JavaScriptCommand command)
+        public JavaScriptEditorWindow(ZvsContext context, JavaScriptCommand command)
         {
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
@@ -70,15 +70,15 @@ namespace zvs.WPF.JavaScript
                 SetFeedBackText("Executing JavaScript...");
 
                 //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
-                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(this, app.zvsCore);
+                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(this, app.ZvsEngine);
                 jse.onReportProgress += (sender, args) =>
                 {
                     SetFeedBackText(args.Progress);
-                    app.zvsCore.log.Info(args.Progress);
+                    app.ZvsEngine.log.Info(args.Progress);
                 };
                 JavaScriptExecuter.JavaScriptResult result = await jse.ExecuteScriptAsync(script, Context);
                 isRunning = false;
-                app.zvsCore.log.Info(result.Details);
+                app.ZvsEngine.log.Info(result.Details);
                 SetFeedBackText(result.Details);
             }
         }

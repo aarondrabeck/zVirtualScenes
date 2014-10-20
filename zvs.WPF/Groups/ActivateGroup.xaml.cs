@@ -3,7 +3,7 @@ using System.Data.Entity;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 
 
@@ -15,17 +15,17 @@ namespace zvs.WPF.Groups
     public partial class ActivateGroup : Window, IDisposable
     {
         private App app = (App)Application.Current;
-        private zvsContext context;
+        private ZvsContext context;
         private bool isLoaded = false;
 
         public ActivateGroup()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Group>.OnEntityUpdated += ActivateGroup_onEntityUpdated;
-            zvsContext.ChangeNotifications<Group>.OnEntityAdded += ActivateGroup_onEntityAdded;
-            zvsContext.ChangeNotifications<Group>.OnEntityDeleted += ActivateGroup_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Group>.OnEntityUpdated += ActivateGroup_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Group>.OnEntityAdded += ActivateGroup_onEntityAdded;
+            ZvsContext.ChangeNotifications<Group>.OnEntityDeleted += ActivateGroup_onEntityDeleted;
         }
 
 #if DEBUG
@@ -88,9 +88,9 @@ namespace zvs.WPF.Groups
 
         private void ActivateGroup_Closed_1(object sender, EventArgs e)
         {
-            zvsContext.ChangeNotifications<Group>.OnEntityUpdated -= ActivateGroup_onEntityUpdated;
-            zvsContext.ChangeNotifications<Group>.OnEntityAdded -= ActivateGroup_onEntityAdded;
-            zvsContext.ChangeNotifications<Group>.OnEntityDeleted -= ActivateGroup_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Group>.OnEntityUpdated -= ActivateGroup_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Group>.OnEntityAdded -= ActivateGroup_onEntityAdded;
+            ZvsContext.ChangeNotifications<Group>.OnEntityDeleted -= ActivateGroup_onEntityDeleted;
             context.Dispose();
         }
 
@@ -107,7 +107,7 @@ namespace zvs.WPF.Groups
                 BuiltinCommand group_on_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_ON");
                 if (group_on_cmd != null)
                 {
-                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                     await cp.RunCommandAsync(this, group_on_cmd, g.Id.ToString());
                 }
             }
@@ -123,7 +123,7 @@ namespace zvs.WPF.Groups
             if (group_off_cmd == null)
                 return;
 
-            CommandProcessor cp = new CommandProcessor(app.zvsCore);
+            CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
             await cp.RunCommandAsync(this, group_off_cmd, g.Id.ToString());
         }
 

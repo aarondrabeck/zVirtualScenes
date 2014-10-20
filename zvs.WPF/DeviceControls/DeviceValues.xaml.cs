@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 
 
@@ -16,20 +16,20 @@ namespace zvs.WPF.DeviceControls
     public partial class DeviceValues : UserControl, IDisposable
     {
         private App app = (App)Application.Current;
-        private zvsContext context;
+        private ZvsContext context;
         private int DeviceID = 0;
         private Device device;
 
         public DeviceValues(int deviceID)
         {
             this.DeviceID = deviceID;
-            context = new zvsContext();
+            context = new ZvsContext();
 
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<DeviceValue>.OnEntityAdded += DeviceValues_onEntityAdded;
-            zvsContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += DeviceValues_onEntityUpdated;
-            zvsContext.ChangeNotifications<DeviceValue>.OnEntityDeleted += DeviceValues_onEntityDeleted;
+            ZvsContext.ChangeNotifications<DeviceValue>.OnEntityAdded += DeviceValues_onEntityAdded;
+            ZvsContext.ChangeNotifications<DeviceValue>.OnEntityUpdated += DeviceValues_onEntityUpdated;
+            ZvsContext.ChangeNotifications<DeviceValue>.OnEntityDeleted += DeviceValues_onEntityDeleted;
         }
                 
         private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
@@ -95,9 +95,9 @@ namespace zvs.WPF.DeviceControls
 
         private void DataGrid_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            zvsContext.ChangeNotifications<DeviceValue>.OnEntityAdded -= DeviceValues_onEntityAdded;
-            zvsContext.ChangeNotifications<DeviceValue>.OnEntityUpdated -= DeviceValues_onEntityUpdated;
-            zvsContext.ChangeNotifications<DeviceValue>.OnEntityDeleted -= DeviceValues_onEntityDeleted;
+            ZvsContext.ChangeNotifications<DeviceValue>.OnEntityAdded -= DeviceValues_onEntityAdded;
+            ZvsContext.ChangeNotifications<DeviceValue>.OnEntityUpdated -= DeviceValues_onEntityUpdated;
+            ZvsContext.ChangeNotifications<DeviceValue>.OnEntityDeleted -= DeviceValues_onEntityDeleted;
         }
 
         private async void RepollLnk_MouseDown_1(object sender, MouseButtonEventArgs e)
@@ -107,7 +107,7 @@ namespace zvs.WPF.DeviceControls
                 BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ME");
                 if (cmd != null)
                 {
-                    CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                     await cp.RunCommandAsync(this, cmd, device.Id.ToString());
                 }
             }

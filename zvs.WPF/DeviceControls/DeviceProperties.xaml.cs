@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using zvs.WPF.DynamicActionControls;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.WPF.DeviceControls
@@ -16,7 +16,7 @@ namespace zvs.WPF.DeviceControls
     public partial class DeviceProperties : UserControl
     {
         private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private zvsContext context;
+        private ZvsContext context;
         private int DeviceID = 0;
 
         public DeviceProperties(int DeviceID)
@@ -27,7 +27,7 @@ namespace zvs.WPF.DeviceControls
 
         private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             await LoadCommandsAsync();
         }
 
@@ -102,7 +102,7 @@ namespace zvs.WPF.DeviceControls
 
                                 var result = await context.TrySaveChangesAsync();
                                 if (result.HasError)
-                                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
                             },
                             icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -135,7 +135,7 @@ namespace zvs.WPF.DeviceControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -164,7 +164,7 @@ namespace zvs.WPF.DeviceControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -197,7 +197,7 @@ namespace zvs.WPF.DeviceControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -248,7 +248,7 @@ namespace zvs.WPF.DeviceControls
 
                                 var result = await context.TrySaveChangesAsync();
                                 if (result.HasError)
-                                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
                             },
                             icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -284,7 +284,7 @@ namespace zvs.WPF.DeviceControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -316,7 +316,7 @@ namespace zvs.WPF.DeviceControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -350,7 +350,7 @@ namespace zvs.WPF.DeviceControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);

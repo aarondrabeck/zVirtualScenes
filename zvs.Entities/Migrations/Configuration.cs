@@ -1,9 +1,8 @@
-namespace zvs.Context.Migrations
-{
-    using System.Data.Entity.Migrations;
-    using zvs.Entities;
+using System.Data.Entity.Migrations;
 
-    public class Configuration : DbMigrationsConfiguration<zvsContext>
+namespace zvs.DataModel.Migrations
+{
+    public class Configuration : DbMigrationsConfiguration<ZvsContext>
     {
         public Configuration()
         {
@@ -12,7 +11,7 @@ namespace zvs.Context.Migrations
             
         }
 
-        protected override void Seed(zvsContext context)
+        protected override void Seed(ZvsContext context)
         {
             //  This method will be called after migrating to the latest version.
 

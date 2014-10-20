@@ -4,7 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     public abstract class NotifyEntityChangeContext : DbContext
     {

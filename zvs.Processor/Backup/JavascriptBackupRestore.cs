@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor.Backup
@@ -35,9 +36,9 @@ namespace zvs.Processor.Backup
         }
 
 
-        public async override Task<ExportResult> ExportAsync(string fileName)
+        public async override Task<Result> ExportAsync(string fileName, CancellationToken cancellationToken)
         {
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 var backupJs = await context.JavaScriptCommands
                     .Select(o => new JavaScriptBackup()
@@ -52,35 +53,37 @@ namespace zvs.Processor.Backup
                         Help = o.Help,
                         SortOrder = o.SortOrder
                     })
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var saveResult = await SaveAsXMLToDiskAsync(backupJs, fileName);
 
                 if (saveResult.HasError)
-                    return new ExportResult(saveResult.Message, saveResult.HasError);
+                    return Result.ReportError(saveResult.Message);
 
-                return new ExportResult(string.Format("Exported {0} JavaScript commands to {1}", backupJs.Count,
-                    Path.GetFileName(fileName)), false);
+                return Result.ReportSuccessFormat("Exported {0} JavaScript commands to {1}", backupJs.Count,
+                    Path.GetFileName(fileName));
             }
         }
 
-        public static void ExportJavaScriptAsync(string PathFileName, Action<string> Callback)
+        public static void ExportJavaScriptAsync(string pathFileName, Action<string> callback)
         {
             var scripts = new List<JavaScriptBackup>();
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 foreach (var script in context.JavaScriptCommands)
                 {
-                    var scriptBackup = new JavaScriptBackup();
-                    scriptBackup.Script = script.Script;
-                    scriptBackup.Name = script.Name;
-                    scriptBackup.UniqueIdentifier = script.UniqueIdentifier;
-                    scriptBackup.ArgumentType = (int)script.ArgumentType;
-                    scriptBackup.Description = script.Description;
-                    scriptBackup.CustomData1 = script.CustomData1;
-                    scriptBackup.CustomData2 = script.CustomData2;
-                    scriptBackup.Help = script.Help;
-                    scriptBackup.SortOrder = script.SortOrder;
+                    var scriptBackup = new JavaScriptBackup
+                    {
+                        Script = script.Script,
+                        Name = script.Name,
+                        UniqueIdentifier = script.UniqueIdentifier,
+                        ArgumentType = (int) script.ArgumentType,
+                        Description = script.Description,
+                        CustomData1 = script.CustomData1,
+                        CustomData2 = script.CustomData2,
+                        Help = script.Help,
+                        SortOrder = script.SortOrder
+                    };
                     scripts.Add(scriptBackup);
                 }
             }
@@ -88,14 +91,14 @@ namespace zvs.Processor.Backup
             Stream stream = null;
             try
             {
-                stream = File.Open(PathFileName, FileMode.Create);
+                stream = File.Open(pathFileName, FileMode.Create);
                 var xmlSerializer = new XmlSerializer(typeof(List<JavaScriptBackup>));
                 xmlSerializer.Serialize(stream, scripts);
-                Callback(string.Format("Exported {0} JavaScript commands to '{1}'", scripts.Count, Path.GetFileName(PathFileName)));
+                callback(string.Format("Exported {0} JavaScript commands to '{1}'", scripts.Count, Path.GetFileName(pathFileName)));
             }
             catch (Exception e)
             {
-                Callback("Error saving " + PathFileName + ": (" + e.Message + ")");
+                callback("Error saving " + pathFileName + ": (" + e.Message + ")");
             }
             finally
             {
@@ -104,14 +107,14 @@ namespace zvs.Processor.Backup
             }
         }
 
-        public async override Task<RestoreSettingsResult> ImportAsync(string fileName)
+        public async override Task<RestoreSettingsResult> ImportAsync(string fileName, CancellationToken cancellationToken)
         {
             var result = await ReadAsXMLFromDiskAsync<List<JavaScriptBackup>>(fileName);
 
             if (result.HasError)
-                return new RestoreSettingsResult(result.Message);
+                return RestoreSettingsResult.ReportError(result.Message);
 
-            var SkippedCount = 0;
+            var skippedCount = 0;
 
             var newJavaScriptCommands = result.Data.Select(o => new JavaScriptCommand()
             {
@@ -126,29 +129,24 @@ namespace zvs.Processor.Backup
                 SortOrder = o.SortOrder
             }).ToList();
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
-                foreach (var existingCommand in await context.JavaScriptCommands.ToListAsync())
+                foreach (var duplicateCommand in (await context.JavaScriptCommands.ToListAsync(cancellationToken)).Select(existingCommand => newJavaScriptCommands.FirstOrDefault(o => o.Name == existingCommand.Name)).Where(duplicateCommand => duplicateCommand != null))
                 {
-                    var duplicateCommand = newJavaScriptCommands.FirstOrDefault(o => o.Name == existingCommand.Name);
-                    if (duplicateCommand != null)
-                    {
-                        SkippedCount++;
-                        newJavaScriptCommands.Remove(duplicateCommand);
-                        continue;
-                    }
+                    skippedCount++;
+                    newJavaScriptCommands.Remove(duplicateCommand);
                 }
 
                 context.JavaScriptCommands.AddRange(newJavaScriptCommands);
 
                 if (newJavaScriptCommands.Count > 0)
                 {
-                    var saveResult = await context.TrySaveChangesAsync();
+                    var saveResult = await context.TrySaveChangesAsync(cancellationToken);
                     if (saveResult.HasError)
-                        return new RestoreSettingsResult(saveResult.Message);
+                        return RestoreSettingsResult.ReportError(saveResult.Message);
                 }
             }
-            return new RestoreSettingsResult(string.Format("Imported {0} Javascript commands, skipped {1} from {2}", newJavaScriptCommands.Count, SkippedCount, Path.GetFileName(fileName)), fileName);
+            return RestoreSettingsResult.ReportSuccess(string.Format("Imported {0} Javascript commands, skipped {1} from {2}", newJavaScriptCommands.Count, skippedCount, Path.GetFileName(fileName)));
         }
     }
 }

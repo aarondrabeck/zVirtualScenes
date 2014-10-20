@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     /// <summary>
     /// TO UPDATE WITH CODE FIRST:
@@ -20,9 +19,12 @@ namespace zvs.Entities
     /// 
     /// Install-Package EntityFramework -Pre -ProjectName zvs.Context
     /// </summary>
-    public partial class zvsContext : NotifyEntityChangeContext
+    /// 
+
+
+    public class ZvsContext : NotifyEntityChangeContext
     {
-        public zvsContext() : base("zvsDBEFCF7") { }
+        public ZvsContext() : base("zvsDBEFCF7") { }
 
         public DbSet<Adapter> Adapters { get; set; }
         public DbSet<AdapterSetting> AdapterSettings { get; set; }
@@ -44,6 +46,7 @@ namespace zvs.Entities
         public DbSet<DeviceValue> DeviceValues { get; set; }
         public DbSet<DeviceValueHistory> DeviceValueHistories { get; set; }
         public DbSet<DeviceValueTrigger> DeviceValueTriggers { get; set; }
+        public DbSet<LogEntry> LogEntries { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<JavaScriptCommand> JavaScriptCommands { get; set; }
         public DbSet<Plugin> Plugins { get; set; }
@@ -70,7 +73,7 @@ namespace zvs.Entities
 
             modelBuilder.Entity<DeviceValueHistory>()
                    .HasRequired(s => s.DeviceValue)
-                   .WithMany(o=> o.History)
+                   .WithMany(o => o.History)
                    .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<DeviceType>()
@@ -78,20 +81,21 @@ namespace zvs.Entities
                 .WithRequired(o => o.DeviceType)
                 .WillCascadeOnDelete(false);
 
+
             modelBuilder.Entity<DeviceValueTrigger>()
                     .HasOptional(s => s.StoredCommand)
-                    .WithOptionalPrincipal(a => a.DeviceValueTrigger)
-                    .WillCascadeOnDelete();
+                    .WithOptionalDependent(a => a.DeviceValueTrigger)
+                    .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<ScheduledTask>()
                    .HasOptional(s => s.StoredCommand)
-                   .WithOptionalPrincipal(a => a.ScheduledTask)
-                   .WillCascadeOnDelete();
+                   .WithOptionalDependent(a => a.ScheduledTask)
+                   .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<SceneCommand>()
                    .HasOptional(s => s.StoredCommand)
-                   .WithOptionalPrincipal(a => a.SceneCommand)
-                   .WillCascadeOnDelete();
+                   .WithOptionalDependent(a => a.SceneCommand)
+                   .WillCascadeOnDelete(true);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
@@ -104,23 +108,23 @@ namespace zvs.Entities
                         o => new DeviceValueHistory
                         {
                             DeviceValueId = o.Entity.Id,
-                            Value =  o.Entity.Value
+                            Value = o.Entity.Value
                         }).ToList();
 
             DeviceValueHistories.AddRange(history);
             return await base.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<Result> TrySaveChangesAsync()
+        public async Task<Result> TrySaveChangesAsync(CancellationToken cancellationToken)
         {
             try
             {
-                await SaveChangesAsync();
+                await SaveChangesAsync(cancellationToken);
             }
             catch (DbEntityValidationException dbEx)
             {
                 var sb = new StringBuilder();
-                if (dbEx.EntityValidationErrors == null) return new Result(sb.ToString());
+                if (dbEx.EntityValidationErrors == null) return Result.ReportError(sb.ToString());
 
                 foreach (var dbEntityValidationResult in dbEx.EntityValidationErrors)
                 {
@@ -135,14 +139,14 @@ namespace zvs.Entities
                             error.ErrorMessage, Environment.NewLine));
                     }
                 }
-                return new Result(sb.ToString());
+                return Result.ReportError(sb.ToString());
             }
             catch (Exception ex)
             {
-                return new Result(ex.GetInnerMostExceptionMessage());
+                return Result.ReportError(ex.GetInnerMostExceptionMessage());
             }
 
-            return new Result();
+            return Result.ReportSuccess();
         }
 
         public override int SaveChanges()

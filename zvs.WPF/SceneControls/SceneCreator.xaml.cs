@@ -9,7 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using zvs.Processor;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.WPF.Commands;
 using System.Data.Entity;
 
@@ -21,21 +21,21 @@ namespace zvs.WPF.SceneControls
     /// </summary>
     public partial class SceneCreator : UserControl
     {
-        private zvsContext context;
+        private ZvsContext context;
         private ObservableCollection<Scene> SceneCollection;
         private App app = (App)Application.Current;
         public SceneCreator()
         {
-            context = new zvsContext();
+            context = new ZvsContext();
             InitializeComponent();
 
-            zvsContext.ChangeNotifications<Scene>.OnEntityAdded += SceneCreator_onEntityAdded;
-            zvsContext.ChangeNotifications<Scene>.OnEntityDeleted += SceneCreator_onEntityDeleted;
-            zvsContext.ChangeNotifications<Scene>.OnEntityUpdated += SceneCreator_onEntityUpdated;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += SceneCreator_onEntityAdded;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += SceneCreator_onEntityDeleted;
-            zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += SceneCreator_onEntityUpdated;
-            zvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += SceneCreator_onEntityUpdated;
+            ZvsContext.ChangeNotifications<Scene>.OnEntityAdded += SceneCreator_onEntityAdded;
+            ZvsContext.ChangeNotifications<Scene>.OnEntityDeleted += SceneCreator_onEntityDeleted;
+            ZvsContext.ChangeNotifications<Scene>.OnEntityUpdated += SceneCreator_onEntityUpdated;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += SceneCreator_onEntityAdded;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += SceneCreator_onEntityDeleted;
+            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += SceneCreator_onEntityUpdated;
+            ZvsContext.ChangeNotifications<StoredCommand>.OnEntityUpdated += SceneCreator_onEntityUpdated;
         }
 
         void SceneCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<StoredCommand>.EntityUpdatedArgs e)
@@ -184,12 +184,12 @@ namespace zvs.WPF.SceneControls
                 if (SceneCollection != null)
                     SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
 
-                zvsContext.ChangeNotifications<Scene>.OnEntityAdded -= SceneCreator_onEntityAdded;
-                zvsContext.ChangeNotifications<Scene>.OnEntityDeleted -= SceneCreator_onEntityDeleted;
-                zvsContext.ChangeNotifications<Scene>.OnEntityUpdated -= SceneCreator_onEntityUpdated;
-                zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= SceneCreator_onEntityAdded;
-                zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= SceneCreator_onEntityDeleted;
-                zvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= SceneCreator_onEntityUpdated;
+                ZvsContext.ChangeNotifications<Scene>.OnEntityAdded -= SceneCreator_onEntityAdded;
+                ZvsContext.ChangeNotifications<Scene>.OnEntityDeleted -= SceneCreator_onEntityDeleted;
+                ZvsContext.ChangeNotifications<Scene>.OnEntityUpdated -= SceneCreator_onEntityUpdated;
+                ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= SceneCreator_onEntityAdded;
+                ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= SceneCreator_onEntityDeleted;
+                ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= SceneCreator_onEntityUpdated;
             }
             SceneCollection.CollectionChanged -= SceneCollection_CollectionChanged;
         }
@@ -216,7 +216,7 @@ namespace zvs.WPF.SceneControls
 
             var result = await context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
+                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private async void SceneGrid_RowEditEnding(object sender, DataGridRowEditEndingEventArgs e)
@@ -231,7 +231,7 @@ namespace zvs.WPF.SceneControls
                 //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
             }
         }
 
@@ -292,7 +292,7 @@ namespace zvs.WPF.SceneControls
 
             var result = await context.TrySaveChangesAsync();
             if (result.HasError)
-                ((App)App.Current).zvsCore.log.Error(result.Message);
+                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private void SortSceneGridBySortOrder()
@@ -322,7 +322,7 @@ namespace zvs.WPF.SceneControls
                     BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                     if (cmd != null)
                     {
-                        CommandProcessor cp = new CommandProcessor(app.zvsCore);
+                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
                         await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                     }
                 }
@@ -363,7 +363,7 @@ namespace zvs.WPF.SceneControls
                             context.Scenes.Local.Add(new_scene);
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
-                                ((App)App.Current).zvsCore.log.Error(result.Message);
+                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
                         }
                     };
 
@@ -411,7 +411,7 @@ namespace zvs.WPF.SceneControls
 
                             //Send it to the command builder to get filled with a command
                             CommandBuilder cbWindow = new CommandBuilder(context, sc);
-                            cbWindow.Owner = app.zvsWindow;
+                            cbWindow.Owner = app.ZvsWindow;
 
                             if (cbWindow.ShowDialog() ?? false)
                             {
@@ -436,7 +436,7 @@ namespace zvs.WPF.SceneControls
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
-                                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                                     SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                                 }
@@ -487,7 +487,7 @@ namespace zvs.WPF.SceneControls
             }
 
             ScenePropertiesWindow new_window = new ScenePropertiesWindow(SceneID);
-            new_window.Owner = app.zvsWindow;
+            new_window.Owner = app.ZvsWindow;
             new_window.Title = string.Format("Scene '{0}' Properties", name);
             new_window.Show();
         }
@@ -503,7 +503,7 @@ namespace zvs.WPF.SceneControls
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                 SceneGrid.Focus();
                 return true;
@@ -553,7 +553,7 @@ namespace zvs.WPF.SceneControls
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)
-                        ((App)App.Current).zvsCore.log.Error(result.Message);
+                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
                 }
             }
         }
@@ -575,7 +575,7 @@ namespace zvs.WPF.SceneControls
 
                 var result = await context.TrySaveChangesAsync();
                 if (result.HasError)
-                    ((App)App.Current).zvsCore.log.Error(result.Message);
+                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
             }
         }
 
@@ -674,7 +674,7 @@ namespace zvs.WPF.SceneControls
                 {
                     //Send it to the command builder to get edited
                     CommandBuilder cbWindow = new CommandBuilder(context, cmd.StoredCommand);
-                    cbWindow.Owner = app.zvsWindow;
+                    cbWindow.Owner = app.ZvsWindow;
 
                     if (cbWindow.ShowDialog() ?? false)
                     {
@@ -686,7 +686,7 @@ namespace zvs.WPF.SceneControls
                         {
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
-                                ((App)App.Current).zvsCore.log.Error(result.Message);
+                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
                         }
                     }
                 }
@@ -721,7 +721,7 @@ namespace zvs.WPF.SceneControls
 
                     //Send it to the command builder to get filled with a command
                     CommandBuilder cbWindow = new CommandBuilder(context, sc);
-                    cbWindow.Owner = app.zvsWindow;
+                    cbWindow.Owner = app.ZvsWindow;
 
                     if (cbWindow.ShowDialog() ?? false)
                     {
@@ -747,7 +747,7 @@ namespace zvs.WPF.SceneControls
 
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
-                                ((App)App.Current).zvsCore.log.Error(result.Message);
+                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
                             SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
                         }

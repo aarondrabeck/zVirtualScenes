@@ -27,7 +27,7 @@ namespace zvs.WPF
                 ShowMainWindow,
                 new System.Windows.Forms.MenuItem("-"), 
                 new System.Windows.Forms.MenuItem("Exit " + Utils.ApplicationName, (object o,EventArgs e) =>  {
-                    app.ShutdownZVS(); 
+                    app.ShutdownZvs(); 
                 })
             });
 

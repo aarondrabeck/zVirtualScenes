@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.ComponentModel;
 
@@ -8,16 +9,16 @@ namespace zvs.Processor
 {
     public class DeviceSettingBuilder
     {
-        public Core Core { get; private set; }
-        public zvsContext Context { get; private set; }
+        private IFeedback<LogEntry> Log { get; set; }
+        private ZvsContext Context { get; set; }
 
-        public DeviceSettingBuilder(Core core, zvsContext context)
+        public DeviceSettingBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            Core = core;
-            Context = context;
+            Context = zvsContext;
+            Log = log;
         }
 
-        public async Task RegisterAsync(DeviceSetting deviceSetting)
+        public async Task RegisterAsync(DeviceSetting deviceSetting, CancellationToken cancellationToken)
         {
             if (deviceSetting == null)
             {
@@ -26,7 +27,7 @@ namespace zvs.Processor
 
             var setting = await Context.DeviceSettings
                 .Include(o => o.Options)
-                .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier);
+                .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier, cancellationToken);
 
             var changed = false;
             if (setting == null)
@@ -46,30 +47,24 @@ namespace zvs.Processor
 
                 setting.PropertyChanged -= handler;
 
-                foreach (var option in deviceSetting.Options)
+                foreach (var option in deviceSetting.Options.Where(option => setting.Options.All(o => o.Name != option.Name)))
                 {
-                    if (!setting.Options.Any(o => o.Name == option.Name))
-                    {
-                        setting.Options.Add(option);
-                        changed = true;
-                    }
+                    setting.Options.Add(option);
+                    changed = true;
                 }
 
-                foreach (var option in setting.Options)
+                foreach (var option in setting.Options.Where(option => deviceSetting.Options.All(o => o.Name != option.Name)))
                 {
-                    if (!deviceSetting.Options.Any(o => o.Name == option.Name))
-                    {
-                        Context.DeviceSettingOptions.Local.Remove(option);
-                        changed = true;
-                    }
+                    Context.DeviceSettingOptions.Local.Remove(option);
+                    changed = true;
                 }
             }
 
             if (changed)
             {
-                var result = await Context.TrySaveChangesAsync();
+                var result = await Context.TrySaveChangesAsync(cancellationToken);
                 if (result.HasError)
-                    Core.log.Error(result.Message);
+                    await Log.ReportErrorAsync(result.Message, cancellationToken);
             }
         }
     }

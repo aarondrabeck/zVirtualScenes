@@ -11,7 +11,7 @@ using zvs.Processor;
 using zvs.WPF.Groups;
 using zvs.WPF.AdapterManager;
 using System.Data.Entity;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.WPF.JavaScript;
 using zvs.Processor.Logging;
 using zvs.WPF.Backup;
@@ -24,7 +24,7 @@ namespace zvs.WPF
     public partial class zvsMainWindow : ChromeWindow
     {
         private App app = (App)Application.Current;
-        private zvsContext context;
+        private ZvsContext context;
         public WindowState lastOpenedWindowState = WindowState.Normal;
         zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<zvsMainWindow>();
 
@@ -32,7 +32,7 @@ namespace zvs.WPF
         {
             InitializeComponent();
 
-            context = new zvsContext();
+            context = new ZvsContext();
 
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
@@ -162,11 +162,11 @@ namespace zvs.WPF
 
         private void Window_Closing_1(object sender, CancelEventArgs e)
         {
-            if (!app.isShuttingDown)
+            if (!App.isShuttingDown)
             {
-                if (app.taskbarIcon != null)
+                if (app.TaskbarIcon != null)
                 {
-                    app.taskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, System.Windows.Forms.ToolTipIcon.Info);
+                    app.TaskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, System.Windows.Forms.ToolTipIcon.Info);
                 }
 
                 System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
@@ -191,13 +191,13 @@ namespace zvs.WPF
             if (cmd == null)
                 return;
 
-            CommandProcessor cp = new CommandProcessor(app.zvsCore);
+            CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
             await cp.RunCommandAsync(this, cmd);
         }
 
         private void ExitMI_Click_1(object sender, RoutedEventArgs e)
         {
-            app.ShutdownZVS();
+            app.ShutdownZvs();
         }
 
         private void ViewLogsMI_Click_1(object sender, RoutedEventArgs e)

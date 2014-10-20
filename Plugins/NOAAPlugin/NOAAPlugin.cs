@@ -4,7 +4,7 @@ using System.Timers;
 using System.ComponentModel;
 using System.Linq;
 using zvs.Processor;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Threading.Tasks;
 using System.Data.Entity;
 
@@ -237,7 +237,7 @@ namespace NOAAPlugin
             {
                 CalculateSunriseSet();
 
-                using (zvsContext context = new zvsContext())
+                using (ZvsContext context = new ZvsContext())
                 {
                     Double MinsBetweenTimeSunrise = (_sunrise.TimeOfDay - DateTime.Now.TimeOfDay).TotalMinutes;
                     log.DebugFormat("RISE: MinsBetweenTimeSunrise={0}, _sunrise={1}, DateTime.Now.TimeOfDay={2}", MinsBetweenTimeSunrise, _sunrise, DateTime.Now.TimeOfDay);
@@ -256,7 +256,7 @@ namespace NOAAPlugin
                                 BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                                 if (cmd != null)
                                 {
-                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    CommandProcessor cp = new CommandProcessor(ZvsEngine);
                                     await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                                 }
                             }
@@ -282,7 +282,7 @@ namespace NOAAPlugin
                                 BuiltinCommand cmd = context.BuiltinCommands.FirstOrDefault(c => c.UniqueIdentifier == "RUN_SCENE");
                                 if (cmd != null)
                                 {
-                                    CommandProcessor cp = new CommandProcessor(Core);
+                                    CommandProcessor cp = new CommandProcessor(ZvsEngine);
                                     await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                                 }
                             }

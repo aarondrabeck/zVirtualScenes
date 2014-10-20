@@ -1,69 +1,64 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    public class CommandProcessorResult : EventArgs
+    public class CommandProcessor : ICommandProcessor
     {
-        public bool HasErrors { get; private set; }
-        public string Message { get; private set; }
+        public IAdapterManager AdapterManager { get; private set; }
 
-        public CommandProcessorResult(bool hasErrors, string message)
-        {
-            this.HasErrors = hasErrors;
-            this.Message = message;
-        }
-    }
-
-    public class CommandProcessor
-    {
-        private Core Core;
-
+        public IFeedback<LogEntry> Log { get; private set; }
         //Constructor
-        public CommandProcessor(Core core)
+        public CommandProcessor(IAdapterManager adapterManager, IFeedback<LogEntry> log)
         {
-            if (core == null)
-                throw new ArgumentNullException("Core");
+            if (adapterManager == null)
+                throw new ArgumentNullException("adapterManager");
 
-            this.Core = core;
+            if (log == null)
+                throw new ArgumentNullException("log");
+
+            AdapterManager = adapterManager;
+            Log = log;
         }
 
         //public Methods 
-        public async Task<CommandProcessorResult> RunStoredCommandAsync(object sender, int storedCommandId)
+        public async Task<Result> RunStoredCommandAsync(object sender, int storedCommandId, CancellationToken cancellationToken)
         {
-            var context = new zvsContext();
-
-            var sCmd = await context.StoredCommands
-                .Include(o => o.Command)
-                .SingleAsync(o => o.Id == storedCommandId);
-            context.Dispose();
+            StoredCommand sCmd;
+            using (var context = new ZvsContext())
+            {
+                sCmd = await context.StoredCommands
+                    .Include(o => o.Command)
+                    .SingleAsync(o => o.Id == storedCommandId, cancellationToken);
+            }
 
             if (sCmd.Command == null)
-                return new CommandProcessorResult(true, "Failed to process stored command. StoredCommand command is null.");
+                return Result.ReportError("Failed to process stored command. StoredCommand command is null.");
 
-            return await RunCommandAsync(sender, sCmd.Command, sCmd.Argument, sCmd.Argument2);
+            return await RunCommandAsync(sender, sCmd.Command, sCmd.Argument, sCmd.Argument2, cancellationToken);
         }
 
-        public async Task<CommandProcessorResult> RunCommandAsync(object sender, Command command, string argument = "", string argument2 = "")
+        public async Task<Result> RunCommandAsync(object sender, Command command, string argument, string argument2, CancellationToken cancellationToken)
         {
-            var result = await ProcessCommandAsync(sender, command, argument, argument2);
+            var result = await ProcessCommandAsync(sender, command, argument, argument2, cancellationToken);
 
-            if (result.HasErrors)
-                Core.log.Error(result.Message);
+            if (result.HasError)
+                await Log.ReportErrorAsync(result.Message, cancellationToken);
             else
-                Core.log.Info(result.Message);
+                await Log.ReportInfoAsync(result.Message, cancellationToken);
             return result;
         }
 
         //private Methods
-        private async Task<CommandProcessorResult> ProcessCommandAsync(object sender, Command command, string argument = "", string argument2 = "")
+        private async Task<Result> ProcessCommandAsync(object sender, Command command, string argument, string argument2, CancellationToken cancellationToken)
         {
-            var result = new CommandProcessorResult(true, "Failed to process command. Command type unknown.");
+            //var result = new Res(true, "Failed to process command. Command type unknown.");
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
                 #region DeviceCommand
                 if (command is DeviceCommand)
@@ -72,7 +67,7 @@ namespace zvs.Processor
                         .Include(o => o.Device)
                         .Include(o => o.Device.Type)
                         .Include(o => o.Device.Type.Adapter)
-                        .FirstOrDefaultAsync(o => o.Id == command.Id);
+                        .FirstOrDefaultAsync(o => o.Id == command.Id, cancellationToken);
 
                     var commandAction = string.Format("{0}{1} ({3}) on {2} ({4})",
                                                            deviceCommand.Name,
@@ -80,13 +75,14 @@ namespace zvs.Processor
                                                            deviceCommand.Device.Name, deviceCommand.Id, deviceCommand.Device.Id);
 
                     var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
-                    if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
+                    var adapter = AdapterManager.GetZvsAdapterByGuid(aGuid);
+                    if (adapter== null)
                     {
-                        return new CommandProcessorResult(true, string.Format("{0} failed, device adapter is not loaded!",
+                        return Result.ReportError(string.Format("{0} failed, device adapter is not loaded!",
                             commandAction));
                     }
 
-                    var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
+                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
                     if (adapter.IsEnabled)
                     {
                         var details = string.Format("{0} complete", commandAction);
@@ -129,10 +125,10 @@ namespace zvs.Processor
                                                            device.Name);
 
                     var aGuid = device.Type.Adapter.AdapterGuid;
-                    if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
+                    if (!ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
                         return new CommandProcessorResult(true, string.Format("{0} failed.  Could not locate the associated adapter.", commandAction));
 
-                    var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
+                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
 
                     if (adapter.IsEnabled)
                     {
@@ -179,11 +175,11 @@ namespace zvs.Processor
                                     .Include(o => o.Type.Adapter)
                                     .FirstOrDefaultAsync(o => o.Type.UniqueIdentifier != "BUILTIN" && o.Id == d_id);
 
-                                if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(device.Type.Adapter.AdapterGuid))
+                                if (!ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(device.Type.Adapter.AdapterGuid))
                                 {
                                     return new CommandProcessorResult(true, string.Format("Re-poll of {0} failed, could not locate the associated adapter.", device.Name));
                                 }
-                                var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[device.Type.Adapter.AdapterGuid];
+                                var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[device.Type.Adapter.AdapterGuid];
 
                                 if (!adapter.IsEnabled)
                                     return new CommandProcessorResult(true, string.Format("Re-poll of {0} failed, adapter not enabled.", device.Name));
@@ -203,17 +199,17 @@ namespace zvs.Processor
                                 foreach (var device in devices)
                                 {
                                     var d = device;
-                                    if (!Core.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(d.Type.Adapter.AdapterGuid))
+                                    if (!ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(d.Type.Adapter.AdapterGuid))
                                     {
-                                        Core.log.WarnFormat("Re-poll all, could not locate the associated adapter for device {0}", d.Name);
+                                        ZvsEngine.log.WarnFormat("Re-poll all, could not locate the associated adapter for device {0}", d.Name);
                                         continue;
                                     }
 
-                                    var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[d.Type.Adapter.AdapterGuid];
+                                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[d.Type.Adapter.AdapterGuid];
 
                                     if (!adapter.IsEnabled)
                                     {
-                                        Core.log.WarnFormat("Re-poll all, adapter for device {0} is disabled", d.Name);
+                                        ZvsEngine.log.WarnFormat("Re-poll all, adapter for device {0} is disabled", d.Name);
                                         continue;
                                     }
 
@@ -233,9 +229,9 @@ namespace zvs.Processor
                                     return new CommandProcessorResult(true, string.Format("Device type command Group On failed.  Invalid group id."));
 
                                 //EXECUTE ON ALL API's
-                                foreach (var guid in Core.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
+                                foreach (var guid in ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
                                 {
-                                    var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[guid];
+                                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[guid];
 
                                     if (!adapter.IsEnabled)
                                         continue;
@@ -259,9 +255,9 @@ namespace zvs.Processor
                                     return new CommandProcessorResult(true, string.Format("Device type command Group Off failed. Invalid group id."));
 
                                 //EXECUTE ON ALL API's
-                                foreach (var guid in Core.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
+                                foreach (var guid in ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
                                 {
-                                    var adapter = Core.AdapterManager.AdapterGuidToAdapterDictionary[guid];
+                                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[guid];
 
                                     if (!adapter.IsEnabled)
                                         continue;
@@ -281,10 +277,10 @@ namespace zvs.Processor
                                 var id = 0;
                                 int.TryParse(argument, out id);
 
-                                var sr = new SceneRunner(Core);
+                                var sr = new SceneRunner(ZvsEngine);
                                 sr.onReportProgress += (s, a) =>
                                 {
-                                    Core.log.Info(a.Progress);
+                                    ZvsEngine.log.Info(a.Progress);
                                 };
                                 var sceneResult = await sr.RunSceneAsync(id);
 
@@ -308,10 +304,10 @@ namespace zvs.Processor
                 {
                     var javaScriptCommand = (JavaScriptCommand)command;
 
-                    var je = new JavaScriptExecuter(sender, Core);
+                    var je = new JavaScriptExecuter(sender, ZvsEngine);
                     je.onReportProgress += (s, args) =>
                     {
-                        Core.log.Info(args.Progress);
+                        ZvsEngine.log.Info(args.Progress);
                     };
 
                     var jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);

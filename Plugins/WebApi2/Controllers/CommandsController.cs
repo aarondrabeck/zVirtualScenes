@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using zvs.Entities;
+using zvs.DataModel;
 using zvs.Processor;
 
 namespace zvsWebapi2Plugin.Controllers
@@ -50,14 +50,14 @@ namespace zvsWebapi2Plugin.Controllers
 
             try
             {
-                using (var context = new zvsContext())
+                using (var context = new ZvsContext())
                 {
                     var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == key);
 
                     if (command == null)
                         return NotFound();
 
-                    var cp = new CommandProcessor(WebApi2Plugin.Core);
+                    var cp = new CommandProcessor(WebApi2Plugin.ZvsEngine);
                     var result = await cp.RunCommandAsync(this, command, arg1, arg2);
                     if (result.HasErrors)
                         return BadRequest(result.Message); 

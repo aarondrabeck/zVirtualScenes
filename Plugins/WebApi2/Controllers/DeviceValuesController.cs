@@ -2,7 +2,7 @@
 using System.Web.Http;
 using System.Web.OData;
 using System.Web.OData.Routing;
-using zvs.Entities;
+using zvs.DataModel;
 
 namespace zvsWebapi2Plugin.Controllers
 {

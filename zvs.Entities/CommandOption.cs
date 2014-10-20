@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("CommandOptions", Schema = "ZVS")]
     public class CommandOption : BaseOption, IIdentity

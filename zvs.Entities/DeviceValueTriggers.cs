@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 
-namespace zvs.Entities
+namespace zvs.DataModel
 {
     [Table("DeviceValueTriggers", Schema = "ZVS")]
     public class DeviceValueTrigger : INotifyPropertyChanged, IIdentity
@@ -11,7 +11,7 @@ namespace zvs.Entities
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        //No actual navigational property here
+        public int StoredCommandId { get; set; }
         private StoredCommand _storedCommand;
         public virtual StoredCommand StoredCommand
         {

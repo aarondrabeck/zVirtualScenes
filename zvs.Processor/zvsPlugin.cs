@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -12,28 +13,20 @@ namespace zvs.Processor
         public abstract Guid PluginGuid { get; }
         public abstract string Name { get; }
         public abstract string Description { get; }
-        public Core Core { get; private set; }
 
-        Logging.ILog log = Logging.LogManager.GetLogger<zvsAdapter>();
+        public abstract Task StartAsync(CancellationToken cancellationToken);
+        public abstract Task StopAsync(CancellationToken cancellationToken);
 
-        public abstract Task StartAsync();
-        public abstract Task StopAsync();
-
-        public async Task Initialize(Core core)
+        public async Task Initialize(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            Core = core;
+            var sb = new PluginSettingBuilder(log, zvsContext);
+            await OnSettingsCreating(sb);
 
-            using (var context = new zvsContext())
-            {
-                var sb = new PluginSettingBuilder(core, context);
-                await OnSettingsCreating(sb);
+            var ssb = new SceneSettingBuilder(log, zvsContext);
+            await OnSceneSettingsCreating(ssb);
 
-                var ssb = new SceneSettingBuilder(core, context);
-                await OnSceneSettingsCreating(ssb);
-
-                var dsb = new DeviceSettingBuilder(core, context);
-                await OnDeviceSettingsCreating(dsb);
-            }        
+            var dsb = new DeviceSettingBuilder(log, zvsContext);
+            await OnDeviceSettingsCreating(dsb);
         }
 
         public virtual Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)

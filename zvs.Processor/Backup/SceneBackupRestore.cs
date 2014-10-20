@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor.Backup
@@ -12,10 +13,10 @@ namespace zvs.Processor.Backup
         public class SceneBackup
         {
             public string Name { get; set; }
-            public List<SceneCMDBackup> Commands = new List<SceneCMDBackup>();
+            public readonly List<SceneCmdBackup> Commands = new List<SceneCmdBackup>();
         }
 
-        public class SceneCMDBackup
+        public class SceneCmdBackup
         {
             public StoredCMDBackup StoredCommand { get; set; }
             public int? Order { get; set; }
@@ -31,28 +32,29 @@ namespace zvs.Processor.Backup
             get { return "ScenesBackup.zvs"; }
         }
 
-        public async override Task<ExportResult> ExportAsync(string fileName)
+        public async override Task<Result> ExportAsync(string fileName, CancellationToken cancellationToken)
         {
-            var CmdCount = 0;
-            using (var context = new zvsContext())
+            var cmdCount = 0;
+            using (var context = new ZvsContext())
             {
                 var existingScenes = await context.Scenes
                     .Include(o => o.Commands)
-                    .ToListAsync();
+                    .ToListAsync(cancellationToken);
 
                 var backupScenes = new List<SceneBackup>();
                 foreach (var s in existingScenes)
                 {
-                    var sceneBackup = new SceneBackup();
-                    sceneBackup.Name = s.Name;
+                    var sceneBackup = new SceneBackup {Name = s.Name};
 
                     foreach (var scmd in s.Commands)
                     {
-                        var SceneCmdBackup = new SceneCMDBackup();
-                        SceneCmdBackup.Order = scmd.SortOrder;
-                        SceneCmdBackup.StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(scmd.StoredCommand);
-                        sceneBackup.Commands.Add(SceneCmdBackup);
-                        CmdCount++;
+                        var sceneCmdBackup = new SceneCmdBackup
+                        {
+                            Order = scmd.SortOrder,
+                            StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(scmd.StoredCommand)
+                        };
+                        sceneBackup.Commands.Add(sceneCmdBackup);
+                        cmdCount++;
                     }
                     backupScenes.Add(sceneBackup);
                 }
@@ -60,50 +62,51 @@ namespace zvs.Processor.Backup
                 var saveResult = await SaveAsXMLToDiskAsync(backupScenes, fileName);
 
                 if (saveResult.HasError)
-                    return new ExportResult(saveResult.Message, saveResult.HasError);
+                    return Result.ReportError(saveResult.Message);
 
-                return new ExportResult(string.Format("Exported {0} scenes with {1} scene commands to {2}", backupScenes.Count,
-                    CmdCount,
-                    Path.GetFileName(fileName)), false);
+                return Result.ReportSuccessFormat("Exported {0} scenes with {1} scene commands to {2}",
+                    backupScenes.Count,
+                    cmdCount,
+                    Path.GetFileName(fileName));
             }
         }
 
-        public async override Task<RestoreSettingsResult> ImportAsync(string fileName)
+        public async override Task<RestoreSettingsResult> ImportAsync(string fileName, CancellationToken cancellationToken)
         {
             var result = await ReadAsXMLFromDiskAsync<List<SceneBackup>>(fileName);
 
             if (result.HasError)
-                return new RestoreSettingsResult(result.Message);
+                return RestoreSettingsResult.ReportError(result.Message);
 
-            var SkippedCount = 0;
+            var skippedCount = 0;
             var newScene = new List<Scene>();
-            var ImportedCmdCount = 0;
+            var importedCmdCount = 0;
 
-            using (var context = new zvsContext())
+            using (var context = new ZvsContext())
             {
-                var existingScenes = await context.Scenes.ToListAsync();
+                var existingScenes = await context.Scenes.ToListAsync(cancellationToken);
                 foreach (var backupScene in result.Data)
                 {
                     if (existingScenes.Any(o => o.Name == backupScene.Name))
                     {
-                        SkippedCount++;
+                        skippedCount++;
                         continue;
                     }
 
                     var s = new Scene();
                     s.Name = backupScene.Name;
 
-                    foreach (var backupSceneCMD in backupScene.Commands)
+                    foreach (var backupSceneCmd in backupScene.Commands)
                     {
-                        var sc = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupSceneCMD.StoredCommand);
+                        var sc = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupSceneCmd.StoredCommand,cancellationToken);
                         if (sc != null)
                         {
                             s.Commands.Add(new SceneCommand()
                             {
                                 StoredCommand = sc,
-                                SortOrder = backupSceneCMD.Order
+                                SortOrder = backupSceneCmd.Order
                             });
-                            ImportedCmdCount++;
+                            importedCmdCount++;
                         }
                     }
                     newScene.Add(s);
@@ -113,12 +116,12 @@ namespace zvs.Processor.Backup
 
                 if (newScene.Count > 0)
                 {
-                    var saveResult = await context.TrySaveChangesAsync();
+                    var saveResult = await context.TrySaveChangesAsync(cancellationToken);
                     if (saveResult.HasError)
-                        return new RestoreSettingsResult(saveResult.Message);
+                        return RestoreSettingsResult.ReportError(saveResult.Message);
                 }
             }
-            return new RestoreSettingsResult(string.Format("Imported {0} scenes with {1} scene commands. Skipped {2} scene from {3}", newScene.Count, ImportedCmdCount, SkippedCount, Path.GetFileName(fileName)), fileName);
+            return RestoreSettingsResult.ReportSuccess(string.Format("Imported {0} scenes with {1} scene commands. Skipped {2} scene from {3}", newScene.Count, importedCmdCount, skippedCount, Path.GetFileName(fileName)));
         }
     }
 }

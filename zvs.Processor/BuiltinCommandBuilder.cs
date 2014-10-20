@@ -1,67 +1,63 @@
 ﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using zvs.Entities;
+using zvs.DataModel;
 using System.Data.Entity;
 using System.ComponentModel;
 
 namespace zvs.Processor
 {
-    public class BuiltinCommandBuilder : AdapterBuilder
+    public class BuiltinCommandBuilder
     {
-        protected zvsContext Context { get; set; }
-        public BuiltinCommandBuilder(zvsAdapter zvsAdapter, Core core, zvsContext context)
-            : base(zvsAdapter, core)
+        private IFeedback<LogEntry> Log { get; set; }
+        private ZvsContext Context { get; set; }
+        public BuiltinCommandBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            Context = context;
+            Context = zvsContext;
+            Log = log;
         }
 
-        public async Task RegisterAsync(BuiltinCommand builtinCommand)
+        public async Task RegisterAsync(BuiltinCommand builtinCommand, CancellationToken cancellationToken)
         {
-            var existing_c = await Context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == builtinCommand.UniqueIdentifier);
-            var changed = false;
-            if (existing_c == null)
+            var existingC = await Context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == builtinCommand.UniqueIdentifier, cancellationToken);
+            var havePropertiesChanged = false;
+            if (existingC == null)
             {
                 Context.BuiltinCommands.Add(builtinCommand);
-                changed = true;
+                havePropertiesChanged = true;
             }
             else
             {
-                PropertyChangedEventHandler handler = (s, a) => changed = true;
-                existing_c.PropertyChanged += handler;
+                PropertyChangedEventHandler handler = (s, a) => havePropertiesChanged = true;
+                existingC.PropertyChanged += handler;
 
-                existing_c.Name = builtinCommand.Name;
-                existing_c.CustomData1 = builtinCommand.CustomData1;
-                existing_c.CustomData2 = builtinCommand.CustomData2;
-                existing_c.ArgumentType = builtinCommand.ArgumentType;
-                existing_c.Description = builtinCommand.Description;
-                existing_c.Help = builtinCommand.Help;
+                existingC.Name = builtinCommand.Name;
+                existingC.CustomData1 = builtinCommand.CustomData1;
+                existingC.CustomData2 = builtinCommand.CustomData2;
+                existingC.ArgumentType = builtinCommand.ArgumentType;
+                existingC.Description = builtinCommand.Description;
+                existingC.Help = builtinCommand.Help;
 
-                existing_c.PropertyChanged -= handler;
+                existingC.PropertyChanged -= handler;
 
-                foreach (var option in builtinCommand.Options)
+                foreach (var option in builtinCommand.Options.Where(option => existingC.Options.All(o => o.Name != option.Name)))
                 {
-                    if (!existing_c.Options.Any(o => o.Name == option.Name))
-                    {
-                        existing_c.Options.Add(option);
-                        changed = true;
-                    }
+                    existingC.Options.Add(option);
+                    havePropertiesChanged = true;
                 }
 
-                foreach (var option in existing_c.Options)
+                foreach (var option in existingC.Options.Where(option => builtinCommand.Options.All(o => o.Name != option.Name)))
                 {
-                    if (!builtinCommand.Options.Any(o => o.Name == option.Name))
-                    {
-                        Context.CommandOptions.Local.Remove(option);
-                        changed = true;
-                    }
+                    Context.CommandOptions.Local.Remove(option);
+                    havePropertiesChanged = true;
                 }
             }
 
-            if (changed)
+            if (havePropertiesChanged)
             {
-                var result = await Context.TrySaveChangesAsync();
+                var result = await Context.TrySaveChangesAsync(cancellationToken);
                 if (result.HasError)
-                    Core.log.Error(result.Message);
+                    await Log.ReportErrorAsync(result.Message, cancellationToken);
             }
 
         }
