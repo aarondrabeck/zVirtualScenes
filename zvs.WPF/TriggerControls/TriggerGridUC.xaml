@@ -107,7 +107,7 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Basic Trigger" HorizontalAlignment="Right" Margin="0,0,5,5" Width="116" VerticalAlignment="Bottom"/>
+            <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Basic ScheduledTask" HorizontalAlignment="Right" Margin="0,0,5,5" Width="116" VerticalAlignment="Bottom"/>
         </Grid>
     </Grid>
 </UserControl>

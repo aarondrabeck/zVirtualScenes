@@ -66,8 +66,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\xunit.runner.msbuild.dll</HintPath>
     </Reference>
-    <Reference Include="zvs.Entities.Fakes">
-      <HintPath>FakesAssemblies\zvs.Entities.Fakes.dll</HintPath>
+    <Reference Include="zvs.DataModel.Fakes">
+      <HintPath>FakesAssemblies\zvs.DataModel.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="zvs.Fakes">
       <HintPath>FakesAssemblies\zvs.Fakes.dll</HintPath>
@@ -85,8 +85,10 @@
     <Compile Include="DatabaseObjectHelpers.cs" />
     <Compile Include="FileIOTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TriggerManagerTests.cs" />
+    <Compile Include="TriggerRunnerTests.cs" />
     <Compile Include="CreateFreshDbInitializer.cs" />
+    <Compile Include="ScheduledTaskTests.cs" />
+    <Compile Include="ScheduledTaskRunnerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\xunit.dll" />
@@ -113,11 +115,9 @@
     <Fakes Include="Fakes\zvs.fakes" />
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\zvs.Entities.fakes" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <Fakes Include="Fakes\EntityFramework.fakes" />
+    <Fakes Include="Fakes\zvs.DataModel.fakes" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

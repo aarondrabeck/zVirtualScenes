@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace zvs.DataModel
         protected NotifyEntityChangeContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {
+
         }
 
         public static class ChangeNotifications<T>
@@ -97,6 +99,8 @@ namespace zvs.DataModel
             raiseEntityDeleted.Invoke(null, new[] { sender, deletedEntity });
         }
 
+
+
         public async override Task<int> SaveChangesAsync(System.Threading.CancellationToken cancellationToken)
         {
             //Record Changes
@@ -108,18 +112,21 @@ namespace zvs.DataModel
             {
                 switch (o.State)
                 {
+                    //IMPORTANT: Must clone here because values could change and often do
+                    //before all events are fired and consumed. 
+
                     case EntityState.Added:
-                        addedEntities.Add(o.Entity);
+                        addedEntities.Add(o.Entity.CloneObject());
                         break;
                     case EntityState.Modified:
                         modifedEntities.Add(new
                         {
-                            NewEntity = o.Entity,
-                            OldEntity = o.OriginalValues.ToObject()
+                            NewEntity = o.Entity.CloneObject(),
+                            OldEntity = o.OriginalValues.ToObject().CloneObject()
                         });
                         break;
                     case EntityState.Deleted:
-                        deletedEntities.Add(o.Entity);
+                        deletedEntities.Add(o.Entity.CloneObject());
                         break;
                 }
             });
@@ -142,7 +149,7 @@ namespace zvs.DataModel
             return SaveChangesAsync().Result;
         }
 
-        
+
     }
 
     public static class EntityFrameworkExtentions
@@ -158,6 +165,17 @@ namespace zvs.DataModel
             //Check for entity types here as they get wrapped in another dynamic type
             var ns = obj.GetType().Namespace;
             return ns != null && (ns.StartsWith("System.Data.Entity.Dynamic"));
+        }
+
+        public static T CloneObject<T>(this T obj) where T : class
+        {
+            if (obj == null) return null;
+            System.Reflection.MethodInfo inst = obj.GetType().GetMethod("MemberwiseClone",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (inst != null)
+                return (T)inst.Invoke(obj, null);
+            else
+                return null;
         }
     }
 }

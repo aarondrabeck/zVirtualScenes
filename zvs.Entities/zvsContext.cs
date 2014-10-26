@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
+using zvs.DataModel.Tasks;
 
 namespace zvs.DataModel
 {
@@ -24,7 +25,9 @@ namespace zvs.DataModel
 
     public class ZvsContext : NotifyEntityChangeContext
     {
+        [Obsolete("Use IEntityContextConnection to create a context.")]
         public ZvsContext() : base("zvsDBEFCF7") { }
+        public ZvsContext(IEntityContextConnection entityContextConnection) : base(entityContextConnection.NameOrConnectionString) { }
 
         public DbSet<Adapter> Adapters { get; set; }
         public DbSet<AdapterSetting> AdapterSettings { get; set; }
@@ -32,6 +35,8 @@ namespace zvs.DataModel
         public DbSet<BuiltinCommand> BuiltinCommands { get; set; }
         public DbSet<DbInfo> DbInfo { get; set; }
         public DbSet<Command> Commands { get; set; }
+
+        public DbSet<CommandScheduledTask> CommandScheduledTasks { get; set; }
         public DbSet<CommandOption> CommandOptions { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceCommand> DeviceCommands { get; set; }
@@ -87,10 +92,15 @@ namespace zvs.DataModel
                     .WithOptionalDependent(a => a.DeviceValueTrigger)
                     .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<ScheduledTask>()
+            modelBuilder.Entity<CommandScheduledTask>()
                    .HasOptional(s => s.StoredCommand)
-                   .WithOptionalDependent(a => a.ScheduledTask)
+                   .WithOptionalDependent(a => a.CommandScheduledTask)
                    .WillCascadeOnDelete(true);
+
+            modelBuilder.Entity<CommandScheduledTask>()
+                .HasRequired(o=> o.ScheduledTask)
+                .WithRequiredPrincipal(o=> o.CommandScheduledTask)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<SceneCommand>()
                    .HasOptional(s => s.StoredCommand)

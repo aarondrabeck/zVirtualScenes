@@ -22,9 +22,9 @@ namespace zvs.WPF.TriggerControls
             set { SetValue(TriggerProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for Trigger.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for ScheduledTask.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TriggerProperty =
-            DependencyProperty.Register("Trigger", typeof(DeviceValueTrigger), typeof(TriggerEditorWindow), new PropertyMetadata(null));
+            DependencyProperty.Register("ScheduledTask", typeof(DeviceValueTrigger), typeof(TriggerEditorWindow), new PropertyMetadata(null));
 
         public bool Canceled = true;
 
@@ -52,7 +52,7 @@ namespace zvs.WPF.TriggerControls
 
             if (Trigger == null)
             {
-                Trigger = new DeviceValueTrigger {Name = "New Trigger"};
+                Trigger = new DeviceValueTrigger {Name = "New ScheduledTask"};
             }
 
             var eagarLoad2 = await _context.Devices

@@ -104,7 +104,7 @@ namespace zvs.WPF.TriggerControls
 
 #if DEBUG
             sw.Stop();
-            Debug.WriteLine("Trigger grid initialized in {0}", sw.Elapsed.ToString() as object);
+            Debug.WriteLine("ScheduledTask grid initialized in {0}", sw.Elapsed.ToString() as object);
 #endif
         }
 
@@ -142,7 +142,7 @@ namespace zvs.WPF.TriggerControls
                 {
                     TriggerEditorWindow new_window = new TriggerEditorWindow(trigger.Id, context);
                     new_window.Owner = app.ZvsWindow;
-                    new_window.Title = string.Format("Edit Trigger '{0}', ", trigger.Name);
+                    new_window.Title = string.Format("Edit ScheduledTask '{0}', ", trigger.Name);
                     new_window.Show();
                     new_window.Closing += async (s, a) =>
                     {
@@ -183,7 +183,7 @@ namespace zvs.WPF.TriggerControls
         {
             TriggerEditorWindow new_window = new TriggerEditorWindow(0, context);
             new_window.Owner = app.ZvsWindow;
-            new_window.Title = "Add Trigger";
+            new_window.Title = "Add ScheduledTask";
             new_window.Show();
             new_window.Closing += async (s, a) =>
             {

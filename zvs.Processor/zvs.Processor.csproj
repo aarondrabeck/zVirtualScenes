@@ -104,9 +104,16 @@
     <Compile Include="DeviceValueBuilder.cs" />
     <Compile Include="SafeDirectoryCatalog.cs" />
     <Compile Include="AdapterSettingBuilder.cs" />
-    <Compile Include="TriggerManager.cs">
+    <Compile Include="ScheduledTask\DailyTaskExtensionMethods.cs" />
+    <Compile Include="ScheduledTaskRunner.cs" />
+    <Compile Include="TriggerRunner.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ScheduledTask\IntervalTaskExtensionMethods.cs" />
+    <Compile Include="ScheduledTask\TimeHelpers.cs" />
+    <Compile Include="ScheduledTask\OneTimeTaskExtensionMethods.cs" />
+    <Compile Include="ScheduledTask\WeeklyTaskExtensionMethods.cs" />
+    <Compile Include="ScheduledTask\MonthlyTaskExtensionMethods.cs" />
     <Compile Include="zvsAdapter.cs" />
     <Compile Include="zvsPlugin.cs" />
     <Compile Include="zvsEngine.cs" />

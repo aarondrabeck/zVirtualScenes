@@ -77,7 +77,7 @@ namespace zvs.WPF
         {
             var databaseFeedback = new DatabaseFeedback();
 
-            ZvsEngine = new ZvsEngine(databaseFeedback, new Processor.AdapterManager(databaseFeedback), new PluginManager(databaseFeedback), new TriggerManager(databaseFeedback), new ScheduledTaskManager(databaseFeedback));
+            ZvsEngine = new ZvsEngine(databaseFeedback, new Processor.AdapterManager(databaseFeedback), new PluginManager(databaseFeedback), new TriggerRunner(databaseFeedback), new ScheduledTaskManager(databaseFeedback));
 
             var splashscreen = new SplashScreen();
             splashscreen.SetLoadingTextFormat("Starting {0}", Utils.ApplicationNameAndVersion);

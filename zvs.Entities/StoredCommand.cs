@@ -20,7 +20,7 @@ namespace zvs.DataModel
 
         public virtual SceneCommand SceneCommand { get; set; }
 
-        public virtual ScheduledTask ScheduledTask { get; set; }
+        public virtual CommandScheduledTask CommandScheduledTask { get; set; }
 
         public int CommandId { get; set; }
         private Command _command;
@@ -122,10 +122,10 @@ namespace zvs.DataModel
         /// <param name="storedCommand"></param>
         public static async Task<Result> TryRemoveDependenciesAsync(this StoredCommand storedCommand, ZvsContext context, CancellationToken cancellationToken)
         {
-            if (storedCommand.ScheduledTask != null)
+            if (storedCommand.CommandScheduledTask != null)
             {
-                storedCommand.ScheduledTask.isEnabled = false;
-                storedCommand.ScheduledTask = null;
+                storedCommand.CommandScheduledTask.IsEnabled = false;
+                storedCommand.CommandScheduledTask = null;
             }
 
             if (storedCommand.DeviceValueTrigger != null)

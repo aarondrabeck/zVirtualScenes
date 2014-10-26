@@ -141,7 +141,7 @@ namespace zvs.DataModel
             var triggerOpName = Operator.ToString();
 
             if (StoredCommand == null || DeviceValue == null || DeviceValue.Device == null)
-                Description = "Incomplete Trigger";
+                Description = "Incomplete ScheduledTask";
             else
                 Description = string.Format("{0} {1} is {2} {3}", DeviceValue.Device.Name,
                                                             DeviceValue.Name,

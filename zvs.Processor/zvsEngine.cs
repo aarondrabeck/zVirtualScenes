@@ -10,8 +10,8 @@ namespace zvs.Processor
         public IAdapterManager AdapterManager { get; private set; }
         private ZvsContext Context { get; set; }
         //   public PluginManager PluginManager { get; private set; }
-        //   public TriggerManager TriggerManager { get; private set; }
-        //   public ScheduledTaskManager ScheduledTaskManager { get; private set; }
+        public TriggerRunner TriggerRunner { get; private set; }
+        public ScheduledTaskRunner ScheduledTaskRunner { get; private set; }
         public IFeedback<LogEntry> Log { get; private set; }
 
         public ZvsEngine(IFeedback<LogEntry> feedback, IAdapterManager adapterManager, ZvsContext zvsContext)//, PluginManager pluginManager, TriggerManager triggerManager, ScheduledTaskManager scheduledTaskManager)
