@@ -78,12 +78,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backup\BackupRestore.cs" />
-    <Compile Include="Backup\StoredCmdBackup.cs" />
-    <Compile Include="Backup\TriggerBackupRestore.cs" />
-    <Compile Include="Backup\GroupBackupRestore.cs" />
-    <Compile Include="Backup\ScheduledTaskBackupRestore.cs" />
-    <Compile Include="Backup\JavascriptBackupRestore.cs" />
     <Compile Include="AdapterManager.cs" />
     <Compile Include="BuiltinCommandBuilder.cs" />
     <Compile Include="DeviceSettingBuilder.cs" />
@@ -93,12 +87,11 @@
     <Compile Include="DatabaseFeedback.cs" />
     <Compile Include="FeedbackExtensionMethods.cs" />
     <Compile Include="IFeedback.cs" />
+    <Compile Include="SceneRunner.cs" />
     <Compile Include="SceneSettingBuilder.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="PluginSettingBuilder.cs" />
     <Compile Include="DetectVCRedist.cs" />
-    <Compile Include="Backup\SceneBackupRestore.cs" />
-    <Compile Include="Backup\DeviceBackupRestore.cs" />
     <Compile Include="DeviceCommandBuilder.cs" />
     <Compile Include="DeviceTypeBuilder.cs" />
     <Compile Include="DeviceValueBuilder.cs" />
@@ -133,6 +126,9 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="zvsCert.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Backup\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />

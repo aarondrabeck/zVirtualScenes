@@ -12,8 +12,8 @@ namespace zvs.DataModel
         public int DeviceTypeId { get; set; }
         public virtual DeviceType DeviceType { get; set; }
 
-        private ObservableCollection<DeviceSettingOption> _options = new ObservableCollection<DeviceSettingOption>();
-        public virtual ObservableCollection<DeviceSettingOption> Options
+        private ObservableCollection<DeviceTypeSettingOption> _options = new ObservableCollection<DeviceTypeSettingOption>();
+        public virtual ObservableCollection<DeviceTypeSettingOption> Options
         {
             get { return _options; }
             set { _options = value; }

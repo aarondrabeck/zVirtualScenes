@@ -36,7 +36,7 @@ namespace zvs.DataModel
         public DbSet<DbInfo> DbInfo { get; set; }
         public DbSet<Command> Commands { get; set; }
 
-        public DbSet<CommandScheduledTask> CommandScheduledTasks { get; set; }
+        public DbSet<ZvsScheduledTask> CommandScheduledTasks { get; set; }
         public DbSet<CommandOption> CommandOptions { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceCommand> DeviceCommands { get; set; }
@@ -59,13 +59,12 @@ namespace zvs.DataModel
         public DbSet<PluginSettingOption> PluginSettingOptions { get; set; }
         public DbSet<ProgramOption> ProgramOptions { get; set; }
         public DbSet<Scene> Scenes { get; set; }
-        public DbSet<SceneCommand> SceneCommands { get; set; }
         public DbSet<SceneSetting> SceneSettings { get; set; }
         public DbSet<SceneSettingOption> SceneSettingOptions { get; set; }
         public DbSet<SceneSettingValue> SceneSettingValues { get; set; }
 
         public DbSet<ScheduledTask> ScheduledTasks { get; set; }
-        public DbSet<StoredCommand> StoredCommands { get; set; }
+        public DbSet<SceneStoredCommand> SceneStoredCommands { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -87,25 +86,11 @@ namespace zvs.DataModel
                 .WillCascadeOnDelete(false);
 
 
-            modelBuilder.Entity<DeviceValueTrigger>()
-                    .HasOptional(s => s.StoredCommand)
-                    .WithOptionalDependent(a => a.DeviceValueTrigger)
-                    .WillCascadeOnDelete(true);
-
-            modelBuilder.Entity<CommandScheduledTask>()
-                   .HasOptional(s => s.StoredCommand)
-                   .WithOptionalDependent(a => a.CommandScheduledTask)
-                   .WillCascadeOnDelete(true);
-
-            modelBuilder.Entity<CommandScheduledTask>()
-                .HasRequired(o=> o.ScheduledTask)
-                .WithRequiredPrincipal(o=> o.CommandScheduledTask)
+            modelBuilder.Entity<ZvsScheduledTask>()
+                .HasRequired(o => o.ScheduledTask)
+                .WithRequiredPrincipal(o => o.ZvsScheduledTask)
                 .WillCascadeOnDelete(true);
 
-            modelBuilder.Entity<SceneCommand>()
-                   .HasOptional(s => s.StoredCommand)
-                   .WithOptionalDependent(a => a.SceneCommand)
-                   .WillCascadeOnDelete(true);
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken)

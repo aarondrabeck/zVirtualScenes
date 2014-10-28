@@ -169,7 +169,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -184,9 +184,10 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -198,18 +199,15 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new OneTimeScheduledTask()
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20")
-                }
+                },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -226,8 +224,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
 
         }
 
@@ -238,7 +236,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -253,9 +251,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -267,19 +265,16 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new DailyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     EveryXDay = 1
-                }
+                },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -296,8 +291,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
 
         }
 
@@ -308,7 +303,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -323,9 +318,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -336,19 +331,16 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new IntervalScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     Inteval = TimeSpan.FromSeconds(5)
-                }
+                },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -365,8 +357,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands. " + commandsRun.Count);
-            Assert.IsTrue(commandsRun.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands. " + ranstoredCommands.Count);
+            Assert.IsTrue(ranstoredCommands.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
 
         }
 
@@ -377,7 +369,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -392,9 +384,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -405,20 +397,17 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new WeeklyScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    EveryXWeek = 1,
-                    ReccurDays = DaysOfWeek.All
-                }
+                 {
+                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
+                     EveryXWeek = 1,
+                     ReccurDays = DaysOfWeek.All
+                 },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -435,8 +424,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
 
         }
 
@@ -447,7 +436,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -462,9 +451,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -476,20 +465,17 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     EveryXMonth = 1,
                     ReccurDays = DaysOfMonth.All
-                }
+                },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -506,71 +492,9 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
 
-        }
-
-        [TestMethod]
-        public async Task ScheduledTaskNoCommandTest()
-        {
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "ScheduledTaskNoCommandTest" };
-            Database.SetInitializer(new CreateFreshDbInitializer());
-
-            var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
-
-            //Arrange 
-            var log = new StubIFeedback<LogEntry>
-            {
-                ReportAsyncT0CancellationToken = (e, c) =>
-                {
-                    Console.WriteLine(e.ToString());
-                    logEntries.Add(e);
-                    return Task.FromResult(0);
-                }
-            };
-
-            var commandProcessor = new StubICommandProcessor
-            {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
-                {
-                    commandsRun.Add(storedCommandId);
-                    return Task.FromResult(Result.ReportSuccess());
-                }
-            };
-            var currentTime = new StubITimeProvider { TimeGet = () => DateTime.Parse("5/21/14 15:02:20") };
-
-
-            var cts = new CancellationTokenSource();
-            var taskRunner = new ScheduledTaskRunner(log, commandProcessor, dbConnection, currentTime);
-
-
-            var commandScheduledTask = new CommandScheduledTask
-            {
-                IsEnabled = true,
-                Name = "Test Command Task",
-                ScheduledTask = new OneTimeScheduledTask
-                {
-                    StartTime = DateTime.Parse("5/20/14 15:02:20")
-                }
-            };
-
-            using (var context = new ZvsContext(dbConnection))
-            {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
-                var r = await context.TrySaveChangesAsync(cts.Token);
-                Assert.IsFalse(r.HasError, r.Message);
-            }
-
-            //Act
-            await taskRunner.StartAsync(cts.Token);
-            await Task.Delay(500);
-            await taskRunner.StopAsync(cts.Token);
-
-            //Assert
-            Assert.IsTrue(logEntries.Count(o => o.Level == LogEntryLevel.Warn) == 1, "Expected one warning.");
-            Assert.IsTrue(commandsRun.Count == 0, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -580,7 +504,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -595,9 +519,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -609,20 +533,17 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     EveryXMonth = 1,
                     ReccurDays = DaysOfMonth.All
-                }
+                },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -639,7 +560,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -649,7 +570,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -664,9 +585,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -678,20 +599,17 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     EveryXMonth = 1,
                     ReccurDays = DaysOfMonth.All
-                }
+                },
+                Command = command
             };
             using (var context = new ZvsContext(dbConnection))
             {
@@ -712,7 +630,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -722,7 +640,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -737,9 +655,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -751,20 +669,17 @@ namespace zvs.Processor.Tests
 
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
                     EveryXMonth = 1,
                     ReccurDays = DaysOfMonth.All
-                }
+                },
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -784,7 +699,7 @@ namespace zvs.Processor.Tests
             }
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -794,7 +709,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -809,9 +724,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -826,18 +741,15 @@ namespace zvs.Processor.Tests
 
             //Act
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "New Command added after start",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
                 ScheduledTask = new OneTimeScheduledTask()
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20")
-                }
+                },
+                Command = command
             };
             using (var context = new ZvsContext(dbConnection))
             {
@@ -851,7 +763,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
         }
 
 
@@ -862,7 +774,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -877,9 +789,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -892,15 +804,12 @@ namespace zvs.Processor.Tests
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20")
             };
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
-                ScheduledTask = task
+                ScheduledTask = task,
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -921,7 +830,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -931,7 +840,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -946,9 +855,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -960,15 +869,12 @@ namespace zvs.Processor.Tests
                 StartTime = DateTime.Parse("5/20/14 15:02:20")
             };
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "Test Command Task",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                },
-                ScheduledTask = task
+                ScheduledTask = task,
+                Command = command
             };
 
             using (var context = new ZvsContext(dbConnection))
@@ -988,7 +894,7 @@ namespace zvs.Processor.Tests
             }
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -998,7 +904,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -1013,9 +919,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1026,14 +932,11 @@ namespace zvs.Processor.Tests
             var taskRunner = new ScheduledTaskRunner(log, commandProcessor, dbConnection, currentTime);
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "New Command added after start",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                }
+                Command = command
             };
             using (var context = new ZvsContext(dbConnection))
             {
@@ -1061,7 +964,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Scheduled task runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -1071,7 +974,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -1086,9 +989,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1101,14 +1004,11 @@ namespace zvs.Processor.Tests
             await taskRunner.StartAsync(cts.Token);
 
             var command = new Command();
-            var commandScheduledTask = new CommandScheduledTask
+            var commandScheduledTask = new ZvsScheduledTask
             {
                 IsEnabled = true,
                 Name = "New Command added after start",
-                StoredCommand = new StoredCommand
-                {
-                    Command = command
-                }
+                Command = command
             };
             using (var context = new ZvsContext(dbConnection))
             {
@@ -1138,7 +1038,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Scheduled task runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Scheduled task runner did not run the correct amount of commands.");
         }
     }
 }

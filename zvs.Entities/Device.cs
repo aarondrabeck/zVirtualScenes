@@ -183,13 +183,6 @@ namespace zvs.DataModel
             set { _groups = value; }
         }
 
-        private ObservableCollection<StoredCommand> _storedCommands = new ObservableCollection<StoredCommand>();
-        public virtual ObservableCollection<StoredCommand> StoredCommands
-        {
-            get { return _storedCommands; }
-            set { _storedCommands = value; }
-        }
-
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {

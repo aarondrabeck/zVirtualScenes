@@ -1,147 +1,30 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Data.Entity;
 using System.Diagnostics;
 
 namespace zvs.DataModel
 {
-    [Table("StoredCommands", Schema = "ZVS")]
-    public class StoredCommand : INotifyPropertyChanged, IIdentity
+    public interface IStoredCommand
     {
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        int? CommandId { get; set; }
+        Command Command { get; set; }
 
-        public virtual DeviceValueTrigger DeviceValueTrigger { get; set; }
-
-        public virtual SceneCommand SceneCommand { get; set; }
-
-        public virtual CommandScheduledTask CommandScheduledTask { get; set; }
-
-        public int CommandId { get; set; }
-        private Command _command;
-        public virtual Command Command
-        {
-            get
-            {
-                return _command;
-            }
-            set
-            {
-                if (value != _command)
-                {
-                    _command = value;
-                    //NotifyPropertyChanged("ActionDescription");
-                    //NotifyPropertyChanged("ActionableObject");
-                    NotifyPropertyChanged("Command");
-                    NotifyPropertyChanged("Summary");
-                }
-            }
-        }
-
-        private string _argument;
         [StringLength(512)]
-        public string Argument
-        {
-            get
-            {
-                return _argument;
-            }
-            set
-            {
-                if (value != _argument)
-                {
-                    _argument = value;
-                    NotifyPropertyChanged("Argument");
-                    NotifyPropertyChanged("ActionDescription");
-                    NotifyPropertyChanged("Summary");
+        string Argument { get; set; }
 
-                }
-            }
-        }
-
-        private string _argument2;
         [StringLength(512)]
-        public string Argument2
-        {
-            get
-            {
-                return _argument2;
-            }
-            set
-            {
-                if (value != _argument2)
-                {
-                    _argument2 = value;
-                    NotifyPropertyChanged("Argument2");
-                }
-            }
-        }
+        string Argument2 { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
+        string TargetObjectName { get; set; }
 
-        private string _targetObjectName;
-        public string TargetObjectName
-        {
-            get { return _targetObjectName; }
-            set
-            {
-                if (value == _targetObjectName) return;
-                _targetObjectName = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private string _description;
-        public string Description
-        {
-            get { return _description; }
-            set
-            {
-                if (value == _description) return;
-                _description = value;
-                NotifyPropertyChanged();
-            }
-        }
+        string Description { get; set; }
     }
 
     public static class StoredCommandExtensionMethods
     {
-        /// <summary>
-        /// Helper to find where the stored command is used and remove its use.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="storedCommand"></param>
-        public static async Task<Result> TryRemoveDependenciesAsync(this StoredCommand storedCommand, ZvsContext context, CancellationToken cancellationToken)
-        {
-            if (storedCommand.CommandScheduledTask != null)
-            {
-                storedCommand.CommandScheduledTask.IsEnabled = false;
-                storedCommand.CommandScheduledTask = null;
-            }
-
-            if (storedCommand.DeviceValueTrigger != null)
-            {
-                storedCommand.DeviceValueTrigger.isEnabled = false;
-                storedCommand.DeviceValueTrigger = null;
-            }
-
-            // if (sc.SceneCommand != null)
-            //     context.SceneCommands.Local.Remove(sc.SceneCommand);
-
-            context.SceneCommands.RemoveRange(await context.SceneCommands.Where(o => o.StoredCommand.Id == storedCommand.Id).ToListAsync());
-            return await context.TrySaveChangesAsync(cancellationToken);
-        }
-
-        public static void SetDescription(this StoredCommand storedCommand, ZvsContext context)
+        public static void SetDescription(this IStoredCommand storedCommand, ZvsContext context)
         {
             if (storedCommand.Command is BuiltinCommand)
             {
@@ -186,7 +69,7 @@ namespace zvs.DataModel
             }
         }
 
-        public static async Task SetTargetObjectNameAsync(this StoredCommand storedCommand, ZvsContext context)
+        public static async Task SetTargetObjectNameAsync(this IStoredCommand storedCommand, ZvsContext context)
         {
             var sw = new Stopwatch();
             sw.Start();

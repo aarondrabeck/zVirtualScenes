@@ -18,7 +18,7 @@ namespace zvs.Processor
         bool IsRunning { get; set; }
         public TriggerRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection)
         {
-            if(log == null)
+            if (log == null)
                 throw new ArgumentNullException("log");
 
             if (commandProcessor == null)
@@ -63,22 +63,19 @@ namespace zvs.Processor
 
         async void TriggerManager_OnEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<DeviceValue>.EntityUpdatedArgs e)
         {
-            if (e.NewEntity.Value == e.OldEntity.Value) 
+            if (e.NewEntity.Value == e.OldEntity.Value)
                 return;
 
             using (var context = new ZvsContext(EntityContextConnection))
             {
-                var sendingContext = (ZvsContext)sender;
-                if (sendingContext.Database.Connection.ConnectionString != context.Database.Connection.ConnectionString)
+                var sendingContext = sender as ZvsContext;
+                if (sendingContext != null && sendingContext.Database.Connection.ConnectionString != context.Database.Connection.ConnectionString)
                     return;
-
-               
-               
 
                 //Get triggers for this value
                 var triggers = await context.DeviceValueTriggers
                     .Include(o => o.DeviceValue)
-                    .Where(o => o.DeviceValueId == e.NewEntity.Id && o.isEnabled)
+                    .Where(o => o.DeviceValueId == e.NewEntity.Id && o.IsEnabled)
                     .ToListAsync(Ct);
 
                 foreach (var trigger in triggers)
@@ -87,98 +84,94 @@ namespace zvs.Processor
                     switch (trigger.Operator)
                     {
                         case TriggerOperator.EqualTo:
-                        {
-                            Console.WriteLine("--");
-                            Console.WriteLine("Device Value: " + changedToValue);
-                            Console.WriteLine("Trigger Value: " + trigger.Value);
-                           
-                            if (changedToValue.Equals(trigger.Value))
                             {
-                                await ActivateTriggerAsync(trigger.Id, Ct);
-                            }
-                            break;
-                        }
-                        case TriggerOperator.GreaterThan:
-                        {
-                            double deviceValue;
-                            double triggerValue;
+                                Console.WriteLine("--");
+                                Console.WriteLine("Device Value: " + changedToValue);
+                                Console.WriteLine("Trigger Value: " + trigger.Value);
 
-                            if (double.TryParse(changedToValue, out deviceValue) &&
-                                double.TryParse(trigger.Value, out triggerValue))
-                            {
-                                if (deviceValue > triggerValue)
+                                if (changedToValue.Equals(trigger.Value))
                                 {
                                     await ActivateTriggerAsync(trigger.Id, Ct);
                                 }
+                                break;
                             }
-                            else
+                        case TriggerOperator.GreaterThan:
                             {
-                                await
-                                    Log.ReportWarningFormatAsync(Ct,
-                                        "Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.",
-                                        trigger.Name);
-                            }
+                                double deviceValue;
+                                double triggerValue;
 
-                            break;
-                        }
+                                if (double.TryParse(changedToValue, out deviceValue) &&
+                                    double.TryParse(trigger.Value, out triggerValue))
+                                {
+                                    if (deviceValue > triggerValue)
+                                    {
+                                        await ActivateTriggerAsync(trigger.Id, Ct);
+                                    }
+                                }
+                                else
+                                {
+                                    await
+                                        Log.ReportWarningFormatAsync(Ct,
+                                            "Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.",
+                                            trigger.Name);
+                                }
+
+                                break;
+                            }
                         case TriggerOperator.LessThan:
-                        {
-                            double deviceValue;
-                            double triggerValue;
-
-                            if (double.TryParse(changedToValue, out deviceValue) &&
-                                double.TryParse(trigger.Value, out triggerValue))
                             {
-                                if (deviceValue < triggerValue)
-                                    await ActivateTriggerAsync(trigger.Id, Ct);
+                                double deviceValue;
+                                double triggerValue;
 
-                            }
-                            else
-                            {
-                                await
-                                    Log.ReportWarningFormatAsync(Ct,
-                                        "Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.",
-                                        trigger.Name);
-                            }
+                                if (double.TryParse(changedToValue, out deviceValue) &&
+                                    double.TryParse(trigger.Value, out triggerValue))
+                                {
+                                    if (deviceValue < triggerValue)
+                                        await ActivateTriggerAsync(trigger.Id, Ct);
 
-                            break;
-                        }
+                                }
+                                else
+                                {
+                                    await
+                                        Log.ReportWarningFormatAsync(Ct,
+                                            "Trigger '{0}' failed to evaluate. Make sure the trigger value and device value is numeric.",
+                                            trigger.Name);
+                                }
+
+                                break;
+                            }
                         case TriggerOperator.NotEqualTo:
-                        {
-                            if (!changedToValue.Equals(trigger.Value))
                             {
-                                await ActivateTriggerAsync(trigger.Id, Ct);
+                                if (!changedToValue.Equals(trigger.Value))
+                                {
+                                    await ActivateTriggerAsync(trigger.Id, Ct);
+                                }
+                                break;
                             }
-                            break;
-                        }
                     }
 
                 }
             }
         }
 
-       internal async Task ActivateTriggerAsync(Int64 deviceValueTriggerId, CancellationToken cancellationToken)
+        internal async Task ActivateTriggerAsync(Int64 deviceValueTriggerId, CancellationToken cancellationToken)
         {
-           using (var context = new ZvsContext(EntityContextConnection))
-           {
-               var trigger = await context.DeviceValueTriggers
-                   .Include(o => o.StoredCommand)
-                   .FirstOrDefaultAsync(o => o.Id == deviceValueTriggerId, Ct);
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                var trigger = await context.DeviceValueTriggers
+                    .FirstOrDefaultAsync(o => o.Id == deviceValueTriggerId, Ct);
 
-               if (trigger == null)
-                   return;
+                if (trigger == null)
+                    return;
 
-               await Log.ReportInfoFormatAsync(Ct, "Trigger '{0}' caused {1} {2}.", trigger.Name,
-                   trigger.StoredCommand.TargetObjectName,
-                   trigger.StoredCommand.Description);
+                await Log.ReportInfoFormatAsync(Ct, "Trigger '{0}' caused {1} {2}.", trigger.Name,
+                    trigger.TargetObjectName,
+                    trigger.Description);
 
-               var result =
-                   await CommandProcessor.RunStoredCommandAsync(trigger, trigger.StoredCommand.Id, cancellationToken);
+                var result = await CommandProcessor.RunStoredCommandAsync(trigger, trigger, cancellationToken);
 
-               await
-                   Log.ReportInfoFormatAsync(Ct, "Trigger '{0}' ended {1} errors.", trigger.Name,
-                       result.HasError ? "with" : "without");
-           }
+                await Log.ReportInfoFormatAsync(Ct, "Trigger '{0}' ended {1} errors.", trigger.Name, result.HasError ? "with" : "without");
+            }
         }
     }
 }

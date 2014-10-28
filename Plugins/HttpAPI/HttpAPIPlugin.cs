@@ -775,7 +775,7 @@ namespace HttpAPI
                              {
                                  id = scene.Id,
                                  name = scene.Name,
-                                 is_running = scene.isRunning,
+                                 is_running = scene.IsRunning,
                                  cmd_count = scene.Commands.Count()
                              });
                         }
@@ -813,7 +813,7 @@ namespace HttpAPI
                         {
                             id = scene.Id,
                             name = scene.Name,
-                            is_running = scene.isRunning,
+                            is_running = scene.IsRunning,
                             cmd_count = scene.Commands.Count(),
                             cmds = sCmds
                         };
@@ -1235,7 +1235,7 @@ namespace HttpAPI
                 string prop = await SceneSettingValue.GetPropertyValueAsync(context, scene, SceneSettingUids.SHOW_IN_HTTPAPI.ToString());
                 bool.TryParse(prop, out show);
 
-                if (show && scene.isRunning)
+                if (show && scene.IsRunning)
                     sceneRunningCount++;
             }
 

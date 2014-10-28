@@ -347,9 +347,9 @@ namespace zvs.WPF.SceneControls
                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
                             Scene new_scene = new Scene { Name = "Copy of " + scene.Name, SortOrder = SceneGrid.Items.Count + 1 };
-                            foreach (SceneCommand sc in scene.Commands)
+                            foreach (SceneStoredCommand sc in scene.Commands)
                             {
-                                new_scene.Commands.Add(new SceneCommand
+                                new_scene.Commands.Add(new SceneStoredCommand
                                 {
                                     StoredCommand = new StoredCommand
                                     {
@@ -416,29 +416,29 @@ namespace zvs.WPF.SceneControls
                             if (cbWindow.ShowDialog() ?? false)
                             {
                                 //Create the scene command
-                                SceneCommand newSceneCommand = new SceneCommand();
+                                SceneStoredCommand newSceneStoredCommand = new SceneStoredCommand();
                                 //Set Command
-                                newSceneCommand.StoredCommand = sc;
+                                newSceneStoredCommand.StoredCommand = sc;
                                 //Set Order
                                 int? max = selected_scene.Commands.Max(o => o.SortOrder);
                                 if (max.HasValue)
-                                    newSceneCommand.SortOrder = max.Value + 1;
+                                    newSceneStoredCommand.SortOrder = max.Value + 1;
                                 else
-                                    newSceneCommand.SortOrder = 0;
+                                    newSceneStoredCommand.SortOrder = 0;
 
-                                if (selected_scene.isRunning)
+                                if (selected_scene.IsRunning)
                                 {
                                     ShowSceneEditWarning(selected_scene.Name);
                                 }
                                 else
                                 {
-                                    selected_scene.Commands.Add(newSceneCommand);
+                                    selected_scene.Commands.Add(newSceneStoredCommand);
 
                                     var result = await context.TrySaveChangesAsync();
                                     if (result.HasError)
                                         ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                    SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
+                                    SceneCmdsGrid.SelectedItems.Add(newSceneStoredCommand);
                                 }
                             }
                         }
@@ -496,7 +496,7 @@ namespace zvs.WPF.SceneControls
         {
             if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scene?", scene.Name), "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (scene.isRunning)
+                if (scene.IsRunning)
                     ShowSceneEditWarning(scene.Name);
                 else
                     context.Scenes.Local.Remove(scene);
@@ -538,13 +538,13 @@ namespace zvs.WPF.SceneControls
         {
             if (SceneCmdsGrid.SelectedItems.Count > 0)
             {
-                SceneCommand[] SelectedItemsCopy = new SceneCommand[SceneCmdsGrid.SelectedItems.Count];
+                SceneStoredCommand[] SelectedItemsCopy = new SceneStoredCommand[SceneCmdsGrid.SelectedItems.Count];
                 SceneCmdsGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
                 if (MessageBox.Show(string.Format("Are you sure you want to delete {0} selected scene command(s)?", SceneCmdsGrid.SelectedItems.Count),
                                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    foreach (SceneCommand scene_command in SelectedItemsCopy)
+                    foreach (SceneStoredCommand scene_command in SelectedItemsCopy)
                     {
                         var sceneCommand = await context.SceneCommands.FirstOrDefaultAsync(o => o.Id == scene_command.Id);
                         if (sceneCommand != null)
@@ -564,9 +564,9 @@ namespace zvs.WPF.SceneControls
             {
                 Scene selectedscene = SceneGrid.SelectedItem as Scene;
                 //normalize sort order
-                foreach (SceneCommand cmd in selectedscene.Commands)
+                foreach (SceneStoredCommand cmd in selectedscene.Commands)
                 {
-                    foreach (SceneCommand item in SceneCmdsGrid.Items)
+                    foreach (SceneStoredCommand item in SceneCmdsGrid.Items)
                     {
                         if (item.Id == cmd.Id)
                             cmd.SortOrder = SceneCmdsGrid.Items.IndexOf(item);
@@ -599,12 +599,12 @@ namespace zvs.WPF.SceneControls
         private async void SortUpSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is SceneCommand)
+            if (obj is SceneStoredCommand)
             {
-                var scene_command = (SceneCommand)obj;
+                var scene_command = (SceneStoredCommand)obj;
                 if (scene_command != null)
                 {
-                    SceneCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder - 1);
+                    SceneStoredCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder - 1);
                     if (scenecmd_we_are_replacing != null)
                         scenecmd_we_are_replacing.SortOrder++;
 
@@ -623,12 +623,12 @@ namespace zvs.WPF.SceneControls
         private async void SortDownSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is SceneCommand)
+            if (obj is SceneStoredCommand)
             {
-                var scene_command = (SceneCommand)obj;
+                var scene_command = (SceneStoredCommand)obj;
                 if (scene_command != null)
                 {
-                    SceneCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder + 1);
+                    SceneStoredCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder + 1);
                     if (scenecmd_we_are_replacing != null)
                         scenecmd_we_are_replacing.SortOrder--;
 
@@ -667,9 +667,9 @@ namespace zvs.WPF.SceneControls
         private async void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
             Object obj = ((FrameworkElement)sender).DataContext;
-            if (obj is SceneCommand)
+            if (obj is SceneStoredCommand)
             {
-                var cmd = (SceneCommand)obj;
+                var cmd = (SceneStoredCommand)obj;
                 if (cmd != null && cmd.StoredCommand != null)
                 {
                     //Send it to the command builder to get edited
@@ -678,7 +678,7 @@ namespace zvs.WPF.SceneControls
 
                     if (cbWindow.ShowDialog() ?? false)
                     {
-                        if (cmd.Scene.isRunning)
+                        if (cmd.Scene.IsRunning)
                         {
                             ShowSceneEditWarning(cmd.Scene.Name);
                         }
@@ -714,7 +714,7 @@ namespace zvs.WPF.SceneControls
                 if (selected_scene != null)
                 {
                     SceneCmdsGrid.SelectedItems.Clear();
-                    SceneCommand cmd = new SceneCommand();
+                    SceneStoredCommand cmd = new SceneStoredCommand();
 
                     //Create a Stored Command.
                     StoredCommand sc = new StoredCommand();
@@ -726,30 +726,30 @@ namespace zvs.WPF.SceneControls
                     if (cbWindow.ShowDialog() ?? false)
                     {
                         //Create the scene command
-                        SceneCommand newSceneCommand = new SceneCommand();
+                        SceneStoredCommand newSceneStoredCommand = new SceneStoredCommand();
                         //Set Command
-                        newSceneCommand.StoredCommand = sc;
+                        newSceneStoredCommand.StoredCommand = sc;
 
                         //Set Order
                         int? max = selected_scene.Commands.Max(o => o.SortOrder);
                         if (max.HasValue)
-                            newSceneCommand.SortOrder = max.Value + 1;
+                            newSceneStoredCommand.SortOrder = max.Value + 1;
                         else
-                            newSceneCommand.SortOrder = 0;
+                            newSceneStoredCommand.SortOrder = 0;
 
-                        if (selected_scene.isRunning)
+                        if (selected_scene.IsRunning)
                         {
                             ShowSceneEditWarning(selected_scene.Name);
                         }
                         else
                         {
-                            selected_scene.Commands.Add(newSceneCommand);
+                            selected_scene.Commands.Add(newSceneStoredCommand);
 
                             var result = await context.TrySaveChangesAsync();
                             if (result.HasError)
                                 ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                            SceneCmdsGrid.SelectedItems.Add(newSceneCommand);
+                            SceneCmdsGrid.SelectedItems.Add(newSceneStoredCommand);
                         }
                     }
                 }

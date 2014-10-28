@@ -135,7 +135,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -150,9 +150,10 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -164,10 +165,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var cmd = new StoredCommand
-            {
-                Command = new Command()
-            };
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -177,10 +175,10 @@ namespace zvs.Processor.Tests
                         new DeviceValueTrigger
                         {
                             Name = "trigger1",
-                            isEnabled = true,
+                            IsEnabled = true,
                             Operator = TriggerOperator.EqualTo,
                             Value = "I changed!",
-                            StoredCommand = cmd
+                            Command=cmd
                         }
                     }
             };
@@ -202,8 +200,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Trigger runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
         }
 
 
@@ -270,7 +268,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -284,9 +282,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -298,6 +296,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -306,13 +305,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.EqualTo,
                      Value = "I changed!",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -336,7 +332,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level != LogEntryLevel.Error), "Expected only info and warning type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -347,7 +343,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             var log = new StubIFeedback<LogEntry>
             {
@@ -361,9 +357,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -375,6 +371,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -383,13 +380,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = false,
+                     IsEnabled = false,
                      Operator = TriggerOperator.EqualTo,
                      Value = "I changed!",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -412,7 +406,7 @@ namespace zvs.Processor.Tests
             await triggerManager.StopAsync(cts.Token);
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level != LogEntryLevel.Error), "Expected only info and warning type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -423,7 +417,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -438,9 +432,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -451,10 +445,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var cmd = new StoredCommand
-            {
-                Command = new Command()
-            };
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -463,10 +454,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.EqualTo,
                      Value = "I changed!",
-                     StoredCommand = cmd
+                     Command = cmd
                 } }
             };
 
@@ -490,8 +481,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Trigger runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
         }
 
         [TestMethod]
@@ -502,7 +493,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             var log = new StubIFeedback<LogEntry>
             {
@@ -516,9 +507,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -530,6 +521,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -538,13 +530,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.EqualTo,
                      Value = "I changed!",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -566,7 +555,7 @@ namespace zvs.Processor.Tests
             await triggerManager.StopAsync(cts.Token);
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level != LogEntryLevel.Error), "Expected only info and warning type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -577,7 +566,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             var log = new StubIFeedback<LogEntry>
             {
@@ -591,9 +580,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -605,10 +594,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var cmd = new StoredCommand
-            {
-                Command = new Command()
-            };
+            var cmd = new Command();
 
             var dv = new DeviceValue
             {
@@ -618,10 +604,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.GreaterThan,
                      Value = "5",
-                     StoredCommand = cmd
+                     Command = cmd
                 } }
             };
 
@@ -645,8 +631,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Trigger runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
         }
 
         [TestMethod]
@@ -657,7 +643,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             var log = new StubIFeedback<LogEntry>
             {
@@ -671,9 +657,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -685,6 +671,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -693,13 +680,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.GreaterThan,
                      Value = "z",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -721,7 +705,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level != LogEntryLevel.Error), "Expected only info and warning type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -732,7 +716,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
             var log = new StubIFeedback<LogEntry>
             {
                 ReportAsyncT0CancellationToken = (e, c) =>
@@ -745,9 +729,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -759,6 +743,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -767,13 +752,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.GreaterThan,
                      Value = "6",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -796,7 +778,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level != LogEntryLevel.Error), "Expected only info and warning type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -807,7 +789,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
             var log = new StubIFeedback<LogEntry>
             {
                 ReportAsyncT0CancellationToken = (e, c) =>
@@ -820,9 +802,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -834,11 +816,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var cmd = new StoredCommand
-            {
-                Command = new Command()
-            };
-
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -847,10 +825,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.LessThan,
                      Value = "5",
-                     StoredCommand = cmd
+                     Command = cmd
                 } }
             };
 
@@ -874,8 +852,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Trigger runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
         }
 
         [TestMethod]
@@ -886,7 +864,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
             var log = new StubIFeedback<LogEntry>
             {
                 ReportAsyncT0CancellationToken = (e, c) =>
@@ -899,9 +877,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -913,10 +891,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var cmd = new StoredCommand
-            {
-                Command = new Command()
-            };
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -925,10 +900,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.LessThan,
                      Value = "1",
-                     StoredCommand = cmd
+                     Command = cmd
                 } }
             };
 
@@ -950,7 +925,7 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level != LogEntryLevel.Error), "Expected no error log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -961,7 +936,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
             var log = new StubIFeedback<LogEntry>
             {
                 ReportAsyncT0CancellationToken = (e, c) =>
@@ -974,9 +949,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -988,6 +963,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -996,13 +972,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.LessThan,
                      Value = "a",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -1020,13 +993,13 @@ namespace zvs.Processor.Tests
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
             }
-           
+
             await Task.Delay(700, cts.Token);
             await triggerManager.StopAsync(cts.Token);
 
             //Assert
             Assert.IsTrue(logEntries.Any(o => o.Level == LogEntryLevel.Warn), "Expected some warning log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -1037,7 +1010,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             var log = new StubIFeedback<LogEntry>
             {
@@ -1051,9 +1024,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1065,11 +1038,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var cmd = new StoredCommand
-            {
-                Command = new Command()
-            };
-
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -1078,10 +1047,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.NotEqualTo,
                      Value = "I changed!",
-                     StoredCommand = cmd
+                     Command = cmd
                 } }
             };
 
@@ -1104,8 +1073,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 1, "Trigger runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 1, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
         }
 
         [TestMethod]
@@ -1116,7 +1085,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             var log = new StubIFeedback<LogEntry>
             {
@@ -1130,9 +1099,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1144,6 +1113,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -1152,13 +1122,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.NotEqualTo,
                      Value = "I changed!",
-                     StoredCommand = new StoredCommand
-                     {
-                         Command = new Command()
-                     }
+                     Command = cmd
                 } }
             };
 
@@ -1181,7 +1148,7 @@ namespace zvs.Processor.Tests
             await triggerManager.StopAsync(cts.Token);
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 0, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.Count == 0, "Trigger runner did not run the correct amount of commands.");
         }
 
         [TestMethod]
@@ -1191,7 +1158,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var logEntries = new List<LogEntry>();
-            var commandsRun = new List<int>();
+            var ranstoredCommands = new List<int>();
 
             //Arrange 
             var log = new StubIFeedback<LogEntry>
@@ -1206,9 +1173,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectInt32CancellationToken = (sender, storedCommandId, cancellationToken) =>
+                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
                 {
-                    commandsRun.Add(storedCommandId);
+                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1217,10 +1184,7 @@ namespace zvs.Processor.Tests
             var triggerManager = new TriggerRunner(log, commandProcessor, dbConnection);
             await triggerManager.StartAsync(cts.Token);
 
-            var command = new StoredCommand
-            {
-                Command = new Command()
-            };
+            var cmd = new Command();
             var dv = new DeviceValue
             {
                 Value = "first value",
@@ -1229,10 +1193,10 @@ namespace zvs.Processor.Tests
                     new DeviceValueTrigger
                 {
                      Name = "trigger1",
-                     isEnabled = true,
+                     IsEnabled = true,
                      Operator = TriggerOperator.EqualTo,
                      Value = "some unique value",
-                     StoredCommand = command
+                     Command = cmd
                 } }
             };
 
@@ -1268,8 +1232,8 @@ namespace zvs.Processor.Tests
 
             //Assert
             Assert.IsTrue(logEntries.All(o => o.Level == LogEntryLevel.Info), "Expected only info type log entries");
-            Assert.IsTrue(commandsRun.Count == 2, "Trigger runner did not run the correct amount of commands.");
-            Assert.IsTrue(commandsRun.All(o => o == command.Id), "Scheduled task runner did not run the correct command.");
+            Assert.IsTrue(ranstoredCommands.Count == 2, "Trigger runner did not run the correct amount of commands.");
+            Assert.IsTrue(ranstoredCommands.All(o => o == cmd.Id), "Scheduled task runner did not run the correct command.");
         }
     }
 }

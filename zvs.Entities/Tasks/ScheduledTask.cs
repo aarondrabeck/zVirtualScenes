@@ -25,7 +25,7 @@ namespace zvs.DataModel.Tasks
             }
         }
 
-        public virtual CommandScheduledTask CommandScheduledTask { get; set; }
+        public virtual ZvsScheduledTask ZvsScheduledTask { get; set; }
 
         [NotMapped]
         public DateTimeOffset StartTimeOffset

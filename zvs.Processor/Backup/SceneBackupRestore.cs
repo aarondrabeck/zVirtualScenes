@@ -48,12 +48,13 @@ namespace zvs.Processor.Backup
 
                     foreach (var scmd in s.Commands)
                     {
-                        var sceneCmdBackup = new SceneCmdBackup
-                        {
-                            Order = scmd.SortOrder,
-                            StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(scmd.StoredCommand)
-                        };
-                        sceneBackup.Commands.Add(sceneCmdBackup);
+                        //TODO: fix
+                        //var sceneCmdBackup = new SceneCmdBackup
+                        //{
+                        //    Order = scmd.SortOrder,
+                        //    StoredCommand = await StoredCMDBackup.ConvertToBackupCommand(scmd.StoredCommand)
+                        //};
+                        //sceneBackup.Commands.Add(sceneCmdBackup);
                         cmdCount++;
                     }
                     backupScenes.Add(sceneBackup);
@@ -101,11 +102,13 @@ namespace zvs.Processor.Backup
                         var sc = await StoredCMDBackup.RestoreStoredCommandAsync(context, backupSceneCmd.StoredCommand,cancellationToken);
                         if (sc != null)
                         {
-                            s.Commands.Add(new SceneCommand()
-                            {
-                                StoredCommand = sc,
-                                SortOrder = backupSceneCmd.Order
-                            });
+
+                            //TODO: FIX
+                            //s.Commands.Add(new SceneStoredCommand()
+                            //{
+                            //    SceneStoredCommand =  sc,
+                            //    SortOrder = backupSceneCmd.Order
+                            //});
                             importedCmdCount++;
                         }
                     }

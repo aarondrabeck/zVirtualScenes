@@ -94,14 +94,14 @@
     <Compile Include="DeviceTypeSettingOption.cs" />
     <Compile Include="DeviceTypeSetting.cs" />
     <Compile Include="IIdentity.cs" />
-    <Compile Include="StoredCommand.cs" />
+    <Compile Include="IStoredCommand.cs" />
     <Compile Include="JavaScriptCommand.cs" />
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="CommandScheduledTask.cs" />
+    <Compile Include="ZvsScheduledTask.cs" />
     <Compile Include="SceneSettingOption.cs" />
     <Compile Include="SceneSettingValue.cs" />
     <Compile Include="SceneSetting.cs" />
-    <Compile Include="SceneCommand.cs" />
+    <Compile Include="SceneStoredCommand.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="ProgramOption.cs" />
     <Compile Include="DbInfo.cs" />

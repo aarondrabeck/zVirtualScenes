@@ -177,7 +177,7 @@ namespace zvs.Processor
 
                 foreach (var option in existingDp.Options.Where(option => deviceTypeSetting.Options.All(o => o.Name != option.Name)))
                 {
-                    Context.DeviceSettingOptions.Local.Remove(option);
+                    Context.DeviceTypeSettingOptions.Local.Remove(option);
                     changed = true;
                 }
             }

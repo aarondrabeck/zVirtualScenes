@@ -1,128 +1,111 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
 using System.Data.Entity;
 
 namespace zvs.Processor
 {
-    internal class SceneRunner : IDisposable
+    internal class SceneRunner
     {
-        
-        private Scene _scene;
-        private int _executionErrors = 0;
-        private int _executedCommands = 0;
-        private List<SceneCommand> _commandsToExecute = new List<SceneCommand>();
-
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        private IFeedback<LogEntry> Log { get; set; }
         private ICommandProcessor CommandProcessor { get; set; }
 
         /// <summary>
         /// Executes a scene asynchronously and reports progress.
         /// </summary>
-        public SceneRunner(ICommandProcessor commandProcessor, ZvsContext zvsContext)
+        public SceneRunner(IFeedback<LogEntry> log, ICommandProcessor commandProcessor, IEntityContextConnection entityContextConnection)
         {
+            if (log == null)
+                throw new ArgumentNullException("log");
+
+            if (commandProcessor == null)
+                throw new ArgumentNullException("commandProcessor");
+
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
             CommandProcessor = commandProcessor;
-            context = new ZvsContext();
+            Log = log;
+            EntityContextConnection = entityContextConnection;
         }
-
-        #region Events
-        public class SceneResult : EventArgs
-        {
-            public bool Errors { get; private set; }
-            public string Details { get; private set; }
-            public int SceneID { get; private set; }
-
-            public SceneResult(int SceneID, bool Errors, string Details)
-            {
-                this.SceneID = SceneID;
-                this.Errors = Errors;
-                this.Details = Details;
-            }
-        }
-
-        public delegate void onReportProgressEventHandler(object sender, onReportProgressEventArgs args);
-        public class onReportProgressEventArgs : EventArgs
-        {
-            public int SceneID { get; private set; }
-            public string Progress { get; private set; }
-
-            public onReportProgressEventArgs(int sceneID, string progress)
-            {
-                this.Progress = progress;
-                this.SceneID = sceneID;
-            }
-        }
-        /// <summary>
-        /// Called when a scene has been called to be executed.
-        /// </summary>
-        public event onReportProgressEventHandler onReportProgress = delegate { };
-        #endregion
-
-        #region Event Helper Methods
-        private void ReportProgress(onReportProgressEventArgs args)
-        {
-            onReportProgress(this, args);
-        }
-        #endregion
 
         //Methods
-        public async Task<SceneResult> RunSceneAsync(int sceneId)
+        public async Task<Result> RunSceneAsync(int sceneId, CancellationToken cancellationToken)
         {
-            _scene = await context.Scenes
-                .Include(o => o.Commands)
-                .FirstOrDefaultAsync(o => o.Id == sceneId);
-
-            if (_scene == null)
-                return new SceneResult(sceneId, true, "Failed to run scene '" + sceneId + "' because it was not found in the database!");
-
-            if (_scene.isRunning)
-                return new SceneResult(_scene.Id, true, "Failed to run scene '" + _scene.Name + "' because it is already running!");
-
-            if (_scene.Commands.Count < 1)
-                return new SceneResult(_scene.Id, true, "Failed to run scene '" + _scene.Name + "' because it has no commands!");
-
-            ReportProgress(new onReportProgressEventArgs(_scene.Id, "Scene '" + _scene.Name + "' started."));
-
-            _scene.isRunning = true;
-            await context.SaveChangesAsync();
-
-            _executionErrors = 0;
-            _executedCommands = 0;
-
-            _commandsToExecute = _scene.Commands.OrderBy(o => o.SortOrder).ToList();
-
-            return await ProcessNextCommandAsync();
-        }
-
-        private async Task<SceneResult> ProcessNextCommandAsync()
-        {
-            if (_executedCommands < _commandsToExecute.Count)
+            try
             {
-                var sceneCommand = _commandsToExecute[_executedCommands];
-                var result = await cp.RunStoredCommandAsync(_scene, sceneCommand.StoredCommand.Id);
+                using (var context = new ZvsContext(EntityContextConnection))
+                {
+                    var scene = await context.Scenes
+                        .Include(o => o.Commands)
+                        .FirstOrDefaultAsync(o => o.Id == sceneId, cancellationToken);
 
-                if (result.HasErrors)
-                    _executionErrors++;
+                    if (scene == null)
+                    {
+                        var msg =
+                            string.Format("Failed to run scene with Id of {0} because it was not found in the database",
+                                sceneId);
+                        await Log.ReportWarningAsync(msg, CancellationToken.None);
+                        return Result.ReportErrorFormat(msg);
+                    }
+                    if (scene.IsRunning)
+                    {
+                        var msg = string.Format("Failed to run scene '{0}' because it is already running", scene.Name);
+                        await Log.ReportWarningAsync(msg, CancellationToken.None);
+                        return Result.ReportErrorFormat(msg);
+                    }
 
-                _executedCommands++;
+                    if (scene.Commands.Count < 1)
+                    {
+                        var msg = string.Format("Failed to run scene '{0}' because it has no commands", scene.Name);
 
-                //on to the next one
-                return await ProcessNextCommandAsync();
+                        await Log.ReportWarningAsync(msg, CancellationToken.None);
+                        return Result.ReportErrorFormat(msg);
+                    }
+
+                    scene.IsRunning = true;
+                    await context.SaveChangesAsync(cancellationToken);
+                    await Log.ReportInfoFormatAsync(CancellationToken.None, "Scene '{0}' started execution", scene.Name);
+
+                    var commandsRunSuccessfully = 0;
+                    foreach (var command in scene.Commands.OrderBy(o => o.SortOrder))
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            throw new OperationCanceledException();
+
+                        var result = await CommandProcessor.RunStoredCommandAsync(this, command, cancellationToken);
+                        if (result.HasError)
+                        {
+                            await Log.ReportWarningAsync(result.Message, CancellationToken.None);
+                        }
+                        else
+                        {
+                            await Log.ReportInfoAsync(result.Message, CancellationToken.None);
+                            commandsRunSuccessfully++;
+                        }
+
+                    }
+
+                    scene.IsRunning = false;
+                    await context.SaveChangesAsync(cancellationToken);
+                    var summaryMsg = string.Format("Scene '{0}' completed execution with {1} of {2} commands ran successfully",
+                        scene.Name,
+                        commandsRunSuccessfully,
+                        scene.Commands.Count())
+                    ;
+                    await Log.ReportInfoAsync(summaryMsg, CancellationToken.None);
+                    return Result.ReportSuccess(summaryMsg);
+                }
             }
-            else
+            catch (OperationCanceledException)
             {
-                _scene.isRunning = false;
-                await context.SaveChangesAsync();
-
-                return new SceneResult(_scene.Id, _executionErrors > 0, string.Format("Scene '{0}' finished running with {1} errors.", _scene.Name, _executionErrors));
+                var msg = string.Format("Scene runner running scene Id {0} was cancelled", sceneId);
+                Log.ReportInfoAsync(msg, CancellationToken.None).Wait(CancellationToken.None);
+                return Result.ReportSuccessFormat(msg);
             }
         }
-
-        public void Dispose()
-        {
-            context.Dispose();
-        }
-
     }
 }

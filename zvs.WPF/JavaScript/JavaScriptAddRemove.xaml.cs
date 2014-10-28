@@ -156,7 +156,7 @@ namespace zvs.WPF.JavaScript
                 }
 
                 //Delete the Command from each Scene it is user
-                foreach (SceneCommand sc in await context.SceneCommands.ToListAsync())
+                foreach (SceneStoredCommand sc in await context.SceneCommands.ToListAsync())
                 {
                     if (sc.StoredCommand.Command == jsCommand)
                         sc.Scene.Commands.Remove(sc);

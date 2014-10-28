@@ -41,7 +41,7 @@ namespace zvs.WPF.SceneControls
                 var scene = await context.Scenes.FirstOrDefaultAsync(sc => sc.Id == SceneID);
                 if (scene != null)
                 {
-                    scene.isRunning = false;
+                    scene.IsRunning = false;
 
                     var result = await context.TrySaveChangesAsync();
                     if (result.HasError)

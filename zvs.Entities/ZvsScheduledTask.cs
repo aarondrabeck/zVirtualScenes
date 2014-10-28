@@ -2,46 +2,31 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
+using zvs.DataModel.Tasks;
 
 namespace zvs.DataModel
 {
-    [Table("DeviceValueTriggers", Schema = "ZVS")]
-    public class DeviceValueTrigger : INotifyPropertyChanged, IIdentity, IStoredCommand
+    [Table("ZvsScheduledTasks", Schema = "ZVS")]
+    public class ZvsScheduledTask : INotifyPropertyChanged, IIdentity, IStoredCommand
     {
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int? DeviceValueId { get; set; }
-        private DeviceValue _deviceValue;
-        public virtual DeviceValue DeviceValue
-        {
-            get
-            {
-                return _deviceValue;
-            }
-            set
-            {
-                if (value != _deviceValue)
-                {
-                    _deviceValue = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
 
-        private TriggerOperator _operator;
-        public TriggerOperator Operator
+        public virtual ScheduledTask ScheduledTask { get; set; }
+
+        private string _name;
+        [StringLength(255)]
+        public string Name
         {
             get
             {
-                return _operator;
+                return _name;
             }
             set
             {
-                if (value != _operator)
-                {
-                    _operator = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _name) return;
+                _name = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -54,47 +39,24 @@ namespace zvs.DataModel
             }
             set
             {
-                if (value != _isEnabled)
-                {
-                    _isEnabled = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _isEnabled) return;
+                _isEnabled = value;
+                NotifyPropertyChanged();
             }
         }
 
-        private string _name;
-        [StringLength(255)]
-        public string Name
+        private int? _sortOrder;
+        public int? SortOrder
         {
             get
             {
-                return _name;
+                return _sortOrder;
             }
             set
             {
-                if (value != _name)
-                {
-                    _name = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-
-        private string _value;
-        [StringLength(512)]
-        public string Value
-        {
-            get
-            {
-                return _value;
-            }
-            set
-            {
-                if (value != _value)
-                {
-                    _value = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _sortOrder) return;
+                _sortOrder = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -175,20 +137,5 @@ namespace zvs.DataModel
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-       
-        //public void SetDescription()
-        //{
-        //    var triggerOpName = Operator.ToString();
-
-        //    if (DeviceValueTriggerStoredCommand == null || DeviceValue == null || DeviceValue.Device == null)
-        //        Description = "Incomplete ScheduledTask";
-        //    else
-        //        Description = string.Format("{0} {1} is {2} {3}", DeviceValue.Device.Name,
-        //                                                    DeviceValue.Name,
-        //                                                    triggerOpName,
-        //                                                    Value);
-        //}
     }
-
-  
 }

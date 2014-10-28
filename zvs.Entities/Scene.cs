@@ -12,8 +12,8 @@ namespace zvs.DataModel
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        private ObservableCollection<SceneCommand> _commands = new ObservableCollection<SceneCommand>();
-        public virtual ObservableCollection<SceneCommand> Commands
+        private ObservableCollection<SceneStoredCommand> _commands = new ObservableCollection<SceneStoredCommand>();
+        public virtual ObservableCollection<SceneStoredCommand> Commands
         {
             get { return _commands; }
             set { _commands = value; }
@@ -45,7 +45,7 @@ namespace zvs.DataModel
         }
 
         private bool _isRunning;
-        public bool isRunning
+        public bool IsRunning
         {
             get
             {

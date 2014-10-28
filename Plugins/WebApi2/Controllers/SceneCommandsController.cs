@@ -14,7 +14,7 @@ namespace zvsWebapi2Plugin.Controllers
 
         [ODataRoute]
         [EnableQuery(PageSize = 50)]
-        public IQueryable<SceneCommand> Get()
+        public IQueryable<SceneStoredCommand> Get()
         {
             return Context.SceneCommands;
         }
@@ -26,7 +26,7 @@ namespace zvsWebapi2Plugin.Controllers
         }
 
         [EnableQuery]
-        public SingleResult<SceneCommand> Get([FromODataUri] long key)
+        public SingleResult<SceneStoredCommand> Get([FromODataUri] long key)
         {
             var result = Get().Where(p => p.Id == key);
             return SingleResult.Create(result);

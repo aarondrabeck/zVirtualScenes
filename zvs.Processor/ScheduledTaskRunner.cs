@@ -17,7 +17,7 @@ namespace zvs.Processor
         private CancellationTokenSource Cts { get; set; }
         private ICommandProcessor CommandProcessor { get; set; }
         private ITimeProvider TimeProvider { get; set; }
-        private IList<CommandScheduledTask> CommandScheduledTasksCache { get; set; }
+        private IList<ZvsScheduledTask> CommandScheduledTasksCache { get; set; }
         private bool UpdateCache { get; set; }
 
         public bool IsRunning { get; private set; }
@@ -52,9 +52,9 @@ namespace zvs.Processor
             await Log.ReportInfoAsync("ScheduledTask runner started", ct);
             Cts = new CancellationTokenSource();
 
-            NotifyEntityChangeContext.ChangeNotifications<CommandScheduledTask>.OnEntityUpdated += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<CommandScheduledTask>.OnEntityDeleted += OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<CommandScheduledTask>.OnEntityAdded += OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated += OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted += OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded += OnEntityChanged;
 
             NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityAdded += OnEntityChanged;
             NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityDeleted += OnEntityChanged;
@@ -87,9 +87,9 @@ namespace zvs.Processor
                 await Log.ReportWarningAsync("ScheduledTask runner is not started", ct);
                 return;
             }
-            NotifyEntityChangeContext.ChangeNotifications<CommandScheduledTask>.OnEntityUpdated -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<CommandScheduledTask>.OnEntityDeleted -= OnEntityChanged;
-            NotifyEntityChangeContext.ChangeNotifications<CommandScheduledTask>.OnEntityAdded -= OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated -= OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted -= OnEntityChanged;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded -= OnEntityChanged;
 
             NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityAdded -= OnEntityChanged;
             NotifyEntityChangeContext.ChangeNotifications<IntervalScheduledTask>.OnEntityDeleted -= OnEntityChanged;
@@ -150,16 +150,10 @@ namespace zvs.Processor
 
                     if (!needsToRun) continue;
 
-                    if (task.StoredCommand == null)
-                    {
-                        await Log.ReportWarningFormatAsync(cancellationToken, "Scheduled task '{0}' tried to run but has no stored command associated with it.", task.Name);
-                        continue;
-                    }
-
                     await Log.ReportInfoFormatAsync(cancellationToken, "Scheduled task '{0}' executed.", task.Name);
 
                     var task1 = task;
-                    await Task.Run(async () => await CommandProcessor.RunStoredCommandAsync(this, task1.StoredCommand.Id, cancellationToken), cancellationToken);
+                    await Task.Run(async () => await CommandProcessor.RunStoredCommandAsync(this, task1, cancellationToken), cancellationToken);
                 }
 
                 try
@@ -176,13 +170,12 @@ namespace zvs.Processor
             await Log.ReportInfoAsync("ScheduledTask runner stopped", CancellationToken.None);
         }
 
-        internal async Task<IList<CommandScheduledTask>> GetScheduledTasksAsync(CancellationToken cancellationToken)
+        internal async Task<IList<ZvsScheduledTask>> GetScheduledTasksAsync(CancellationToken cancellationToken)
         {
             using (var context = new ZvsContext(EntityContextConnection))
             {
                 return await context.CommandScheduledTasks
                     .Include(o => o.ScheduledTask)
-                    .Include(o => o.StoredCommand)
                     .Where(o => o.IsEnabled)
                     .ToListAsync(cancellationToken);
             }
