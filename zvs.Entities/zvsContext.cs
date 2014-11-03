@@ -35,7 +35,6 @@ namespace zvs.DataModel
         public DbSet<BuiltinCommand> BuiltinCommands { get; set; }
         public DbSet<DbInfo> DbInfo { get; set; }
         public DbSet<Command> Commands { get; set; }
-
         public DbSet<ZvsScheduledTask> CommandScheduledTasks { get; set; }
         public DbSet<CommandOption> CommandOptions { get; set; }
         public DbSet<Device> Devices { get; set; }
@@ -84,6 +83,11 @@ namespace zvs.DataModel
                 .HasMany(o => o.Settings)
                 .WithRequired(o => o.DeviceType)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Device>()
+                .HasRequired(o => o.Type)
+                .WithMany(o => o.Devices)
+            .WillCascadeOnDelete(false);
 
 
             modelBuilder.Entity<ZvsScheduledTask>()

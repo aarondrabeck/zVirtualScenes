@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace zvs.DataModel
+﻿namespace zvs.DataModel
 {
-    [Table("JavaScriptCommands", Schema = "ZVS")]
     public class JavaScriptCommand : Command
     {  
         private string _script;
@@ -14,11 +11,9 @@ namespace zvs.DataModel
             }
             set
             {
-                if (value != _script)
-                {
-                    _script = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _script) return;
+                _script = value;
+                NotifyPropertyChanged();
             }
         }
     }

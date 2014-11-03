@@ -76,7 +76,7 @@ namespace zvs.Processor
                         if (cancellationToken.IsCancellationRequested)
                             throw new OperationCanceledException();
 
-                        var result = await CommandProcessor.RunStoredCommandAsync(this, command, cancellationToken);
+                        var result = await CommandProcessor.RunCommandAsync(command.CommandId, command.Argument, command.Argument2, cancellationToken);
                         if (result.HasError)
                         {
                             await Log.ReportWarningAsync(result.Message, CancellationToken.None);

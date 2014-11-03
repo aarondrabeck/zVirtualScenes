@@ -36,6 +36,6 @@ namespace zvs.Processor
                 }
             }
         }
-        public string Souce { get; set; }
+        public string Source { get; set; }
     }
 }

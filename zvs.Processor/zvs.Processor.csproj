@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="AdapterManager.cs" />
     <Compile Include="BuiltinCommandBuilder.cs" />
+    <Compile Include="CommandProcessor.cs" />
     <Compile Include="DeviceSettingBuilder.cs" />
     <Compile Include="IAdapterManager.cs" />
     <Compile Include="ICommandProcessor.cs" />

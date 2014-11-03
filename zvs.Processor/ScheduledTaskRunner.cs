@@ -153,7 +153,7 @@ namespace zvs.Processor
                     await Log.ReportInfoFormatAsync(cancellationToken, "Scheduled task '{0}' executed.", task.Name);
 
                     var task1 = task;
-                    await Task.Run(async () => await CommandProcessor.RunStoredCommandAsync(this, task1, cancellationToken), cancellationToken);
+                    await Task.Run(async () => await CommandProcessor.RunCommandAsync(task1.CommandId, task1.Argument, task1.Argument2,  cancellationToken), cancellationToken);
                 }
 
                 try
@@ -175,6 +175,7 @@ namespace zvs.Processor
             using (var context = new ZvsContext(EntityContextConnection))
             {
                 return await context.CommandScheduledTasks
+                    .Include(o=> o.Command)
                     .Include(o => o.ScheduledTask)
                     .Where(o => o.IsEnabled)
                     .ToListAsync(cancellationToken);

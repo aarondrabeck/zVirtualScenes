@@ -151,9 +151,9 @@ namespace zvs.Processor.Tests
             var commandProcessor = new StubICommandProcessor
             {
                 
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -282,9 +282,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -357,9 +357,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -432,9 +432,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -507,9 +507,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -580,9 +580,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -657,9 +657,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -729,9 +729,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -802,9 +802,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -877,9 +877,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -949,9 +949,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1024,9 +1024,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1099,9 +1099,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -1173,9 +1173,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken =  (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if(storedCommand.CommandId.HasValue)ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };

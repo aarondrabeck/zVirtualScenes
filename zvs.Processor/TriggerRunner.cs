@@ -168,7 +168,7 @@ namespace zvs.Processor
                     trigger.TargetObjectName,
                     trigger.Description);
 
-                var result = await CommandProcessor.RunStoredCommandAsync(trigger, trigger, cancellationToken);
+                var result = await CommandProcessor.RunCommandAsync(trigger.CommandId, trigger.Argument, trigger.Argument2, cancellationToken);
 
                 await Log.ReportInfoFormatAsync(Ct, "Trigger '{0}' ended {1} errors.", trigger.Name, result.HasError ? "with" : "without");
             }

@@ -12,7 +12,7 @@ namespace zvs.Processor
             {
                 Message = string.Format(message, args),
                 Level = LogEntryLevel.Info,
-                Source = feedBack.Souce
+                Source = feedBack.Source 
             }, cancellationToken);
         }
 
@@ -22,7 +22,7 @@ namespace zvs.Processor
             {
                 Message = string.Format(message, args),
                 Level = LogEntryLevel.Warn,
-                Source = feedBack.Souce
+                Source = feedBack.Source 
             }, cancellationToken);
         }
 
@@ -32,7 +32,7 @@ namespace zvs.Processor
             {
                 Message = string.Format(message, args),
                 Level = LogEntryLevel.Error,
-                Source = feedBack.Souce
+                Source = feedBack.Source
             }, cancellationToken);
         }
 
@@ -42,7 +42,7 @@ namespace zvs.Processor
             {
                 Message = message,
                 Level = LogEntryLevel.Info,
-                Source = feedBack.Souce
+                Source = feedBack.Source
             }, cancellationToken);
         }
 
@@ -52,7 +52,7 @@ namespace zvs.Processor
             {
                 Message = message,
                 Level = LogEntryLevel.Error,
-                Source = feedBack.Souce
+                Source = feedBack.Source
             }, cancellationToken);
         }
 
@@ -62,7 +62,7 @@ namespace zvs.Processor
             {
                 Message = message,
                 Level = LogEntryLevel.Warn,
-                Source = feedBack.Souce
+                Source = feedBack.Source
             }, cancellationToken);
         }
 

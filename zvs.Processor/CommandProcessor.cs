@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,11 +11,15 @@ namespace zvs.Processor
     public class CommandProcessor : ICommandProcessor
     {
         public IAdapterManager AdapterManager { get; private set; }
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        private IFeedback<LogEntry> Log { get; set; }
 
-        public IFeedback<LogEntry> Log { get; private set; }
         //Constructor
-        public CommandProcessor(IAdapterManager adapterManager, IFeedback<LogEntry> log)
+        public CommandProcessor(IAdapterManager adapterManager, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
             if (adapterManager == null)
                 throw new ArgumentNullException("adapterManager");
 
@@ -22,303 +27,242 @@ namespace zvs.Processor
                 throw new ArgumentNullException("log");
 
             AdapterManager = adapterManager;
+            EntityContextConnection = entityContextConnection;
             Log = log;
         }
 
-        //public Methods 
-        public async Task<Result> RunStoredCommandAsync(object sender, int storedCommandId, CancellationToken cancellationToken)
+        internal async Task<Result> ExecuteDeviceCommandAsync(DeviceCommand command, string argument, string argument2, CancellationToken cancellationToken)
         {
-            StoredCommand sCmd;
-            using (var context = new ZvsContext())
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                sCmd = await context.StoredCommands
-                    .Include(o => o.Command)
-                    .SingleAsync(o => o.Id == storedCommandId, cancellationToken);
-            }
+                var deviceCommand = await context.DeviceCommands
+                    .Include(o => o.Device)
+                    .Include(o => o.Device.Type)
+                    .Include(o => o.Device.Type.Adapter)
+                    .FirstOrDefaultAsync(o => o.Id == command.Id, cancellationToken);
 
-            if (sCmd.Command == null)
-                return Result.ReportError("Failed to process stored command. StoredCommand command is null.");
+                if (deviceCommand == null)
+                    return Result.ReportErrorFormat("Cannot locate device command with id of {0}", command.Id);
 
-            return await RunCommandAsync(sender, sCmd.Command, sCmd.Argument, sCmd.Argument2, cancellationToken);
-        }
+                var commandAction = string.Format("{0}{1} ({3}) on {2} ({4})",
+                    deviceCommand.Name,
+                    string.IsNullOrEmpty(argument) ? "" : " " + argument,
+                    deviceCommand.Device.Name, deviceCommand.Id, deviceCommand.Device.Id);
 
-        public async Task<Result> RunCommandAsync(object sender, Command command, string argument, string argument2, CancellationToken cancellationToken)
-        {
-            var result = await ProcessCommandAsync(sender, command, argument, argument2, cancellationToken);
-
-            if (result.HasError)
-                await Log.ReportErrorAsync(result.Message, cancellationToken);
-            else
-                await Log.ReportInfoAsync(result.Message, cancellationToken);
-            return result;
-        }
-
-        //private Methods
-        private async Task<Result> ProcessCommandAsync(object sender, Command command, string argument, string argument2, CancellationToken cancellationToken)
-        {
-            //var result = new Res(true, "Failed to process command. Command type unknown.");
-
-            using (var context = new ZvsContext())
-            {
-                #region DeviceCommand
-                if (command is DeviceCommand)
+                var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
+                var adapter = AdapterManager.GetZvsAdapterByGuid(aGuid);
+                if (adapter == null)
                 {
-                    var deviceCommand = await context.DeviceCommands
-                        .Include(o => o.Device)
-                        .Include(o => o.Device.Type)
-                        .Include(o => o.Device.Type.Adapter)
-                        .FirstOrDefaultAsync(o => o.Id == command.Id, cancellationToken);
-
-                    var commandAction = string.Format("{0}{1} ({3}) on {2} ({4})",
-                                                           deviceCommand.Name,
-                                                           string.IsNullOrEmpty(argument) ? "" : " " + argument,
-                                                           deviceCommand.Device.Name, deviceCommand.Id, deviceCommand.Device.Id);
-
-                    var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
-                    var adapter = AdapterManager.GetZvsAdapterByGuid(aGuid);
-                    if (adapter== null)
-                    {
-                        return Result.ReportError(string.Format("{0} failed, device adapter is not loaded!",
-                            commandAction));
-                    }
-
-                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
-                    if (adapter.IsEnabled)
-                    {
-                        var details = string.Format("{0} complete", commandAction);
-
-                        await adapter.ProcessDeviceCommandAsync(deviceCommand.Device, deviceCommand, argument, argument2);
-                        return new CommandProcessorResult(false, details);
-                    }
-                    else
-                    {
-                        var err_str = string.Format("{0} failed because the '{1}' adapter is {2}",
-                         commandAction,
-                         deviceCommand.Device.Type.Adapter.Name,
-                         adapter.IsEnabled ? "not ready" : "disabled"
-                         );
-
-                        return new CommandProcessorResult(true, err_str);
-                    }
-
+                    return Result.ReportErrorFormat("{0} failed, device adapter is not loaded!",
+                        commandAction);
                 }
-                #endregion
 
-                #region DeviceTypeCommand
-                else if (command is DeviceTypeCommand)
+                if (!adapter.IsEnabled)
+                    return Result.ReportErrorFormat("{0} failed because the '{1}' adapter is disabled",
+                        commandAction,
+                        deviceCommand.Device.Type.Adapter.Name);
+
+                await adapter.ProcessDeviceCommandAsync(deviceCommand.Device, deviceCommand, argument, argument2);
+                return Result.ReportSuccessFormat("{0} complete", commandAction);
+            }
+        }
+
+        internal async Task<Result> ExecuteDeviceTypeCommandAsync(DeviceTypeCommand command, string argument, string argument2, CancellationToken cancellationToken)
+        {
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                int dId = int.TryParse(argument2, out dId) ? dId : 0;
+
+                var device = await context.Devices
+                    .Include(o => o.Type)
+                    .Include(o => o.Type.Adapter)
+                    .FirstOrDefaultAsync(o => o.Id == dId, cancellationToken);
+
+                if (device == null)
+                    return Result.ReportErrorFormat("Cannot locate device with id of {0}", dId);
+
+                var commandAction = string.Format("{0}{1} {2}",
+                                                       command.Name,
+                                                       string.IsNullOrEmpty(argument) ? "" : " " + argument,
+                                                       device.Name);
+
+                var aGuid = device.Type.Adapter.AdapterGuid;
+                var adapter = AdapterManager.GetZvsAdapterByGuid(aGuid);
+                if (adapter == null)
                 {
-                    int dId = int.TryParse(argument2, out dId) ? dId : 0;
+                    return Result.ReportErrorFormat("{0} failed, device adapter is not loaded!",
+                        commandAction);
+                }
 
-                    var device = await context.Devices
-                        .Include(o => o.Type)
-                        .Include(o => o.Type.Adapter)
-                        .FirstOrDefaultAsync(o => o.Id == dId);
-
-                    if (device == null)
-                        return new CommandProcessorResult(true, string.Format("{0}{1} failed. Invalid device id.",
-                            command.Name,
-                            string.IsNullOrEmpty(argument) ? "" : " " + argument));
-
-                    var commandAction = string.Format("{0}{1} {2}",
-                                                           command.Name,
-                                                           string.IsNullOrEmpty(argument) ? "" : " " + argument,
-                                                           device.Name);
-
-                    var aGuid = device.Type.Adapter.AdapterGuid;
-                    if (!ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(aGuid))
-                        return new CommandProcessorResult(true, string.Format("{0} failed.  Could not locate the associated adapter.", commandAction));
-
-                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[aGuid];
-
-                    if (adapter.IsEnabled)
-                    {
-                        var details = string.Format("{0} complete", commandAction);
-
-                        await adapter.ProcessDeviceTypeCommandAsync(device.Type, device, command as DeviceTypeCommand, argument);
-                        return new CommandProcessorResult(false, details);
-                    }
-                    else
-                    {
-                        var err_str = string.Format("{0} failed because the {1} adapter is {2}",
+                if (!adapter.IsEnabled)
+                    return Result.ReportErrorFormat("{0} failed because the {1} adapter is {2}",
                         commandAction,
                         device.Type.Adapter.Name,
                         adapter.IsEnabled ? "not ready" : "disabled");
 
-                        return new CommandProcessorResult(true, err_str);
-                    }
+                await adapter.ProcessDeviceTypeCommandAsync(device.Type, device, command, argument);
+                return Result.ReportSuccessFormat("{0} complete", commandAction);
+            }
+        }
 
+        internal async Task<Result> ExecuteBuiltinCommandAsync(BuiltinCommand command, string argument, string argument2, CancellationToken cancellationToken)
+        {
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                switch (command.UniqueIdentifier)
+                {
+                    case "TIMEDELAY":
+                        {
+                            int delay;
+                            int.TryParse(argument, out delay);
+                            await Task.Delay(delay * 1000, cancellationToken);
+                            return Result.ReportSuccessFormat("{0} second time delay complete", delay);
+                        }
+                    case "REPOLL_ME":
+                        {
+                            int dId;
+                            int.TryParse(argument, out dId);
+
+                            var device = await context.Devices
+                                .Include(o => o.Type.Adapter)
+                                .FirstOrDefaultAsync(o => o.Type.UniqueIdentifier != "BUILTIN" && o.Id == dId,
+                                    cancellationToken);
+
+                            var adapter = AdapterManager.GetZvsAdapterByGuid(device.Type.Adapter.AdapterGuid);
+                            if (adapter == null)
+                                return
+                                    Result.ReportErrorFormat(
+                                        "Re-poll of {0} failed, the associated adapter is not loaded", device.Name);
+
+                            if (!adapter.IsEnabled)
+                                return Result.ReportErrorFormat("Re-poll of {0} failed, adapter is disabled", device.Name);
+
+                            await adapter.RepollAsync(device);
+                            return Result.ReportSuccessFormat("Re-poll of {0} ({1}) complete", device.Name, device.Id);
+                        }
+                    case "REPOLL_ALL":
+                        {
+                            var devices = await context.Devices
+                                .Include(o => o.Type.Adapter)
+                                .Where(o => o.Type.UniqueIdentifier != "BUILTIN")
+                                .ToListAsync(cancellationToken);
+
+                            foreach (var device in devices)
+                            {
+                                await
+                                    ExecuteBuiltinCommandAsync(new BuiltinCommand { UniqueIdentifier = "REPOLL_ME" },
+                                        device.Id.ToString(CultureInfo.InvariantCulture), "", cancellationToken);
+                            }
+
+                            return Result.ReportSuccessFormat("Built-in cmd re-poll {0} devices complete", devices.Count);
+
+                        }
+                    case "GROUP_ON":
+                    case "GROUP_OFF":
+                        {
+                            int gId = int.TryParse(argument, out gId) ? gId : 0;
+                            var group = await context.Groups
+                                .FirstOrDefaultAsync(o => o.Id == gId, cancellationToken);
+
+                            if (group == null)
+                                return Result.ReportErrorFormat("Command {0} failed. Invalid group id.", command.Name);
+
+                            var adapterGuids = await context.Devices
+                                .Where(o => o.Groups.Any(g => g.Id == gId))
+                                .Select(o => o.Type.Adapter.AdapterGuid)
+                                .Distinct()
+                                .ToListAsync(cancellationToken);
+
+                            //EXECUTE ON ALL Adapters
+                            foreach (var adapter in adapterGuids.Select(adapterGuid => AdapterManager.GetZvsAdapterByGuid(adapterGuid)).Where(adapter => adapter != null && adapter.IsEnabled))
+                            {
+                                if (command.UniqueIdentifier == "GROUP_ON")
+                                    await adapter.ActivateGroupAsync(@group);
+                                else
+                                    await adapter.DeactivateGroupAsync(@group);
+                            }
+
+                            return Result.ReportSuccessFormat("{0} {2}, {1} complete",
+                                command.Name,
+                                group.Name, command.Id);
+
+                        }
+                    case "RUN_SCENE":
+                        {
+                            int id;
+                            int.TryParse(argument, out id);
+
+                            var sceneRunner = new SceneRunner(Log, this, EntityContextConnection);
+                            var sceneResult = await sceneRunner.RunSceneAsync(id, cancellationToken);
+
+                            var details = string.Format("{0} Built-in cmd '{1}' ({2}) complete",
+                                sceneResult.Message,
+                                command.Name, command.Id);
+
+                            return sceneResult.HasError ? Result.ReportError(details) : Result.ReportSuccess(details);
+                        }
+                    default:
+                        {
+                            return
+                                Result.ReportErrorFormat(
+                                    "Built-in cmd {0} failed. No logic defined for this built-in command.", command.Id);
+                        }
                 }
-                #endregion
 
-                #region BuiltinCommand
+            }
+        }
+
+        internal async Task<Result> ExecuteJavaScriptCommandAsync(JavaScriptCommand command,
+            string argument, string argument2, CancellationToken cancellationToken)
+        {
+            //var javaScriptCommand = (JavaScriptCommand)command;
+
+            //var je = new JavaScriptExecuter(sender, ZvsEngine);
+            //je.onReportProgress += (s, args) =>
+            //{
+            //    ZvsEngine.log.Info(args.Progress);
+            //};
+
+            //var jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);
+
+            //var details = string.Format("{0}. JavaScript cmd '{1}' processed.",
+            //                jsResult.Details,
+            //                command.Name);
+
+            //return new CommandProcessorResult(false, details);
+            return Result.ReportError("Not Implemented");
+        }
+
+        //private Methods
+        public async Task<Result> RunCommandAsync(int? commandId, string argument, string argument2, CancellationToken cancellationToken)
+        {
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                if (!commandId.HasValue)
+                    return Result.ReportError("No command to run");
+
+                var command = await context.Commands.FirstOrDefaultAsync(o => o.Id == commandId.Value, cancellationToken);
+
+                if (command == null)
+                    return Result.ReportErrorFormat("Command with id of {0} not found", commandId);
+
+                var result = Result.ReportError("Unknown Command Type");
+                if (command is DeviceCommand)
+                {
+                    result = await ExecuteDeviceCommandAsync(command as DeviceCommand, argument, argument2, cancellationToken);
+                }
+                else if (command is DeviceTypeCommand)
+                {
+                    result = await ExecuteDeviceTypeCommandAsync(command as DeviceTypeCommand, argument, argument2, cancellationToken);
+                }
                 else if (command is BuiltinCommand)
                 {
-                    switch (command.UniqueIdentifier)
-                    {
-                        case "TIMEDELAY":
-                            {
-                                var delay = 0;
-                                int.TryParse(argument, out delay);
-
-                                await Task.Delay(delay * 1000);
-
-                                var details = string.Format("{0} second time delay complete.", delay);
-
-                                return new CommandProcessorResult(false, details);
-                            }
-                        case "REPOLL_ME":
-                            {
-                                var d_id = 0;
-                                int.TryParse(argument, out d_id);
-
-                                var device = await context.Devices
-                                    .Include(o => o.Type.Adapter)
-                                    .FirstOrDefaultAsync(o => o.Type.UniqueIdentifier != "BUILTIN" && o.Id == d_id);
-
-                                if (!ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(device.Type.Adapter.AdapterGuid))
-                                {
-                                    return new CommandProcessorResult(true, string.Format("Re-poll of {0} failed, could not locate the associated adapter.", device.Name));
-                                }
-                                var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[device.Type.Adapter.AdapterGuid];
-
-                                if (!adapter.IsEnabled)
-                                    return new CommandProcessorResult(true, string.Format("Re-poll of {0} failed, adapter not enabled.", device.Name));
-
-                                await adapter.RepollAsync(device, context);
-
-                                var details = string.Format("Re-poll of {0} ({1}) complete", device.Name, device.Id);
-                                return new CommandProcessorResult(false, details);
-                            }
-                        case "REPOLL_ALL":
-                            {
-                                var devices = await context.Devices
-                                    .Include(o => o.Type.Adapter)
-                                    .Where(o => o.Type.UniqueIdentifier != "BUILTIN")
-                                    .ToListAsync();
-
-                                foreach (var device in devices)
-                                {
-                                    var d = device;
-                                    if (!ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.ContainsKey(d.Type.Adapter.AdapterGuid))
-                                    {
-                                        ZvsEngine.log.WarnFormat("Re-poll all, could not locate the associated adapter for device {0}", d.Name);
-                                        continue;
-                                    }
-
-                                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[d.Type.Adapter.AdapterGuid];
-
-                                    if (!adapter.IsEnabled)
-                                    {
-                                        ZvsEngine.log.WarnFormat("Re-poll all, adapter for device {0} is disabled", d.Name);
-                                        continue;
-                                    }
-
-                                    await adapter.RepollAsync(d, context);
-                                }
-
-                                var details = "Built-in cmd re-poll all devices complete";
-                                return new CommandProcessorResult(false, details);
-
-                            }
-                        case "GROUP_ON":
-                            {
-                                int g_id = int.TryParse(argument, out g_id) ? g_id : 0;
-                                var group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
-
-                                if (group == null)
-                                    return new CommandProcessorResult(true, string.Format("Device type command Group On failed.  Invalid group id."));
-
-                                //EXECUTE ON ALL API's
-                                foreach (var guid in ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
-                                {
-                                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[guid];
-
-                                    if (!adapter.IsEnabled)
-                                        continue;
-
-                                    await adapter.ActivateGroupAsync(group, context);
-                                }
-
-                                var details = string.Format("{0} ({2}) '{1}' complete",
-                                                                 command.Name,
-                                                                 group.Name, command.Id);
-
-                                return new CommandProcessorResult(false, details);
-
-                            }
-                        case "GROUP_OFF":
-                            {
-                                int g_id = int.TryParse(argument, out g_id) ? g_id : 0;
-                                var group = await context.Groups.FirstOrDefaultAsync(o => o.Id == g_id);
-
-                                if (group == null)
-                                    return new CommandProcessorResult(true, string.Format("Device type command Group Off failed. Invalid group id."));
-
-                                //EXECUTE ON ALL API's
-                                foreach (var guid in ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary.Keys)
-                                {
-                                    var adapter = ZvsEngine.AdapterManager.AdapterGuidToAdapterDictionary[guid];
-
-                                    if (!adapter.IsEnabled)
-                                        continue;
-
-                                    await adapter.DeactivateGroupAsync(group, context);
-                                }
-
-                                var details = string.Format("{0} ({2}) '{1}' complete",
-                                                                 command.Name,
-                                                                 group.Name, command.Id);
-
-                                return new CommandProcessorResult(false, details);
-
-                            }
-                        case "RUN_SCENE":
-                            {
-                                var id = 0;
-                                int.TryParse(argument, out id);
-
-                                var sr = new SceneRunner(ZvsEngine);
-                                sr.onReportProgress += (s, a) =>
-                                {
-                                    ZvsEngine.log.Info(a.Progress);
-                                };
-                                var sceneResult = await sr.RunSceneAsync(id);
-
-                                var details = string.Format("{0} Built-in cmd '{1}' ({2}) complete",
-                                    sceneResult.Details,
-                                    command.Name, command.Id);
-
-                                return new CommandProcessorResult(sceneResult.Errors, details);
-
-                            }
-                        default:
-                            {
-                                return new CommandProcessorResult(true, string.Format("Built-in cmd {0} failed. No logic defined for this built-in command.", command.Id));
-                            }
-                    }
+                    result = await ExecuteBuiltinCommandAsync(command as BuiltinCommand, argument, argument2, cancellationToken);
                 }
-                #endregion
-
-                #region JavaScriptCommand
                 else if (command is JavaScriptCommand)
                 {
-                    var javaScriptCommand = (JavaScriptCommand)command;
-
-                    var je = new JavaScriptExecuter(sender, ZvsEngine);
-                    je.onReportProgress += (s, args) =>
-                    {
-                        ZvsEngine.log.Info(args.Progress);
-                    };
-
-                    var jsResult = await je.ExecuteScriptAsync(javaScriptCommand.Script, context);
-
-                    var details = string.Format("{0}. JavaScript cmd '{1}' processed.",
-                                    jsResult.Details,
-                                    command.Name);
-
-                    return new CommandProcessorResult(false, details);
+                    result = await ExecuteJavaScriptCommandAsync(command as JavaScriptCommand, argument, argument2, cancellationToken);
                 }
-                #endregion
 
                 return result;
             }

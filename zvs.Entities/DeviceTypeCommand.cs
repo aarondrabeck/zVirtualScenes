@@ -1,8 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace zvs.DataModel
+﻿namespace zvs.DataModel
 {
-    [Table("DeviceTypeCommands", Schema = "ZVS")]
     public class DeviceTypeCommand : Command
     {
         public int DeviceTypeId { get; set; }

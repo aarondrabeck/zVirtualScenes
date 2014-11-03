@@ -6,6 +6,6 @@ namespace zvs.Processor
     public interface IFeedback<in TLogItem>
     {
         Task ReportAsync(TLogItem value, CancellationToken ct);
-        string Souce { get; set; }
+        string Source { get; set; }
     }
 }

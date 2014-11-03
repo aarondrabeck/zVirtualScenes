@@ -78,9 +78,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = (commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -119,9 +119,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -173,9 +173,9 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     return Task.FromResult(Result.ReportSuccess());
                 }
             };
@@ -225,10 +225,10 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue) ranstoredCommands.Add(storedCommand.CommandId.Value);
-                    return Task.FromResult(Result.ReportSuccessFormat("Ran command {0}", storedCommand));
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
+                    return Task.FromResult(Result.ReportSuccessFormat("Ran command Id:{0}", commandId));
                 }
             };
             var scene = new Scene
@@ -292,13 +292,13 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue)
-                        ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue)
+                        ranstoredCommands.Add(commandId.Value);
 
-                    Console.WriteLine("Ran command {0}, Id:{1}", storedCommand.CommandId, storedCommand.Description);
-                    return Task.FromResult(Result.ReportSuccessFormat("Ran command {0}, Id:{1}", storedCommand.CommandId, storedCommand.Description));
+                    Console.WriteLine("Ran command Id:{0}", commandId);
+                    return Task.FromResult(Result.ReportSuccessFormat("Ran command Id:{0}", commandId));
                 }
             };
             var scene = new Scene
@@ -391,12 +391,12 @@ namespace zvs.Processor.Tests
 
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue)
-                        ranstoredCommands.Add(storedCommand.CommandId.Value);
+                    if (commandId.HasValue)
+                        ranstoredCommands.Add(commandId.Value);
 
-                    return Task.FromResult(ranstoredCommands.Count == 2 ? Result.ReportError("Command failed to run!") : Result.ReportSuccessFormat("Ran command {0}, Id:{1}", storedCommand.CommandId, storedCommand.Description));
+                    return Task.FromResult(ranstoredCommands.Count == 2 ? Result.ReportError("Command failed to run!") : Result.ReportSuccessFormat("Ran command id {0}", commandId));
                 }
             };
             var scene = new Scene
@@ -486,17 +486,15 @@ namespace zvs.Processor.Tests
             var cts = new CancellationTokenSource();
             var commandProcessor = new StubICommandProcessor
             {
-                RunStoredCommandAsyncObjectIStoredCommandCancellationToken = async (sender, storedCommand, cancellationToken) =>
+                RunCommandAsyncNullableOfInt32StringStringCancellationToken = ( commandId, argument, argument2, cancellationToken) =>
                 {
-                    if (storedCommand.CommandId.HasValue)
-                        ranstoredCommands.Add(storedCommand.CommandId.Value);
-
+                    if (commandId.HasValue) ranstoredCommands.Add(commandId.Value);
                     if (ranstoredCommands.Count == 2)
                     {
                         cts.Cancel();
                     }
 
-                    return Result.ReportSuccessFormat("Ran command {0}, Id:{1}", storedCommand.CommandId, storedCommand.Description);
+                    return Task.FromResult(Result.ReportSuccessFormat("Ran command Id:{0}", commandId));
                 }
             };
             var scene = new Scene

@@ -48,9 +48,9 @@ namespace zvs.Processor
 
         public abstract Task ProcessDeviceTypeCommandAsync(DeviceType deviceType, Device device, DeviceTypeCommand command, string argument);
         public abstract Task ProcessDeviceCommandAsync(Device device, DeviceCommand command, string argument, string argument2);
-        public abstract Task RepollAsync(Device device, ZvsContext context);
-        public abstract Task ActivateGroupAsync(Group group, ZvsContext context);
-        public abstract Task DeactivateGroupAsync(Group group, ZvsContext context);
+        public abstract Task RepollAsync(Device device);
+        public abstract Task ActivateGroupAsync(Group group);
+        public abstract Task DeactivateGroupAsync(Group group);
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
