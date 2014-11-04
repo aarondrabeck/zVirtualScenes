@@ -87,7 +87,7 @@ namespace zvs.Processor
                 await Log.ReportInfoAsync(msg, cancellationToken);
 
                 //Plug-in need access to the zvsEngine in order to use the Logger
-                await zvsAdapter.Initialize(Log, Context);
+               // await zvsAdapter.Initialize(Log, EN);
 
                 //Reload just installed settings
                 dbAdapter = await Context.Adapters

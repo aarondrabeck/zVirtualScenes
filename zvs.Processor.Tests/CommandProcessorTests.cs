@@ -23,7 +23,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new CommandProcessor(null, new zvsEntityContextConnection(), new DatabaseFeedback());
+            new CommandProcessor(null, new zvsEntityContextConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
         [TestMethod]
@@ -33,7 +33,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var adapterManager = new StubIAdapterManager();
             //act
-            new CommandProcessor(adapterManager, null, new DatabaseFeedback());
+            new CommandProcessor(adapterManager, null, new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
 
@@ -54,7 +54,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var adapterManager = new StubIAdapterManager();
             //act
-            new CommandProcessor(adapterManager, new zvsEntityContextConnection(), new DatabaseFeedback());
+            new CommandProcessor(adapterManager, new zvsEntityContextConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
 

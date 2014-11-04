@@ -11,47 +11,58 @@ namespace zvs.Processor
     public class DeviceTypeBuilder
     {
         private IFeedback<LogEntry> Log { get; set; }
-        private ZvsContext Context { get; set; }
-
-        public DeviceTypeBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        public DeviceTypeBuilder(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
         {
-            Context = zvsContext;
+            if (log == null)
+                throw new ArgumentNullException("log");
+
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
             Log = log;
         }
 
-        public async Task<int> RegisterAsync(Guid adapterGuid, DeviceType deviceType, CancellationToken cancellationToken)
+        public async Task<Result> RegisterAsync(Guid adapterGuid, DeviceType deviceType,
+            CancellationToken cancellationToken)
         {
-            //Does device type exist? 
-            var existingDt = await Context.DeviceTypes.Include(o => o.Commands)
-                .FirstOrDefaultAsync(o =>
-                o.Adapter.AdapterGuid == adapterGuid
-                && o.UniqueIdentifier == deviceType.UniqueIdentifier, cancellationToken);
-
-            var changed = false;
-            if (existingDt == null)
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                existingDt = deviceType;
-                var adapter = await Context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid, cancellationToken);
+                //Does device type exist? 
+                var existingDt = await context.DeviceTypes
+                    .Include(o => o.Commands)
+                    .FirstOrDefaultAsync(o =>
+                        o.Adapter.AdapterGuid == adapterGuid
+                        && o.UniqueIdentifier == deviceType.UniqueIdentifier, cancellationToken);
 
-                if (adapter != null)
+                if (existingDt == null)
                 {
-                    adapter.DeviceTypes.Add(existingDt);
-                    changed = true;
+                    var adapter =
+                        await context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid, cancellationToken);
+                    if (adapter == null)
+                        return Result.ReportError("Invalid adapter GuId");
+
+                    adapter.DeviceTypes.Add(deviceType);
+                    return await context.TrySaveChangesAsync(cancellationToken);
                 }
-            }
-            else
-            {
+
+                var changed = false;
+
+                PropertyChangedEventHandler handler2 = (s, a) => changed = true;
+                existingDt.PropertyChanged += handler2;
                 existingDt.Name = deviceType.Name;
                 existingDt.ShowInList = deviceType.ShowInList;
+                existingDt.PropertyChanged -= handler2;
 
                 foreach (var dtc in deviceType.Commands)
                 {
                     var dtc1 = dtc;
-                    var existingDtc = await Context.DeviceTypeCommands
+                    var existingDtc = await context.DeviceTypeCommands
                         .Include(o => o.Options)
                         .SingleOrDefaultAsync(o =>
                             o.DeviceTypeId == existingDt.Id &&
-                            o.UniqueIdentifier == dtc1.UniqueIdentifier,cancellationToken);
+                            o.UniqueIdentifier == dtc1.UniqueIdentifier, cancellationToken);
 
                     if (existingDtc == null)
                     {
@@ -63,40 +74,35 @@ namespace zvs.Processor
 
                         PropertyChangedEventHandler handler = (s, a) => changed = true;
                         existingDtc.PropertyChanged += handler;
-
                         existingDtc.Name = dtc.Name;
                         existingDtc.Help = dtc.Help;
                         existingDtc.CustomData1 = dtc.CustomData1;
                         existingDtc.CustomData2 = dtc.CustomData2;
                         existingDtc.ArgumentType = dtc.ArgumentType;
                         existingDtc.Description = dtc.Description;
-
                         existingDtc.PropertyChanged -= handler;
 
-                        foreach (var option in dtc.Options.Where(option => existingDtc.Options.All(o => o.Name != option.Name)))
+                        var addedOptions = dtc.Options.Where(option => existingDtc.Options.All(o => o.Name != option.Name)).ToList();
+                        foreach (var option in addedOptions)
                         {
                             existingDtc.Options.Add(option);
                             changed = true;
                         }
 
-                        foreach (var option in existingDtc.Options.Where(option => dtc1.Options.All(o => o.Name != option.Name)))
+                        var removed = existingDtc.Options.Where(option => dtc1.Options.All(o => o.Name != option.Name)).ToList();
+                        foreach (var option in removed)
                         {
-                            Context.CommandOptions.Local.Remove(option);
+                            context.CommandOptions.Local.Remove(option);
                             changed = true;
                         }
                     }
                 }
-            }
 
-            if (changed)
-            {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
-            }
+                if (changed)
+                    return await context.TrySaveChangesAsync(cancellationToken);
 
-            return existingDt.Id;
+                return Result.ReportSuccess("Nothing to update");
+            }
         }
-
     }
 }

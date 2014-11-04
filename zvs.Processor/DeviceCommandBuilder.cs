@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
@@ -10,40 +11,43 @@ namespace zvs.Processor
     public class DeviceCommandBuilder
     {
         private IFeedback<LogEntry> Log { get; set; }
-        private ZvsContext Context { get; set; }
-        public DeviceCommandBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        public DeviceCommandBuilder(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
         {
-            Context = zvsContext;
+            if (log == null)
+                throw new ArgumentNullException("log");
+
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
             Log = log;
         }
-        public async Task RegisterAsync(DeviceCommand deviceCommand, CancellationToken cancellationToken)
+        public async Task<Result> RegisterAsync(int deviceId, DeviceCommand deviceCommand, CancellationToken cancellationToken)
         {
-            if (deviceCommand == null || deviceCommand.Device == null)
-            {
-                await Log.ReportErrorAsync("You must send device when registering a device command!", cancellationToken);
-                return;
-            }
+            if (deviceCommand == null)
+                return Result.ReportError("Device command is null");
 
-            if (deviceCommand.Device.Id == 0)
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                await Log.ReportErrorFormatAsync(cancellationToken, "Command builder cannot find device in database with id of {0}", deviceCommand.Device.Id);
-                return;
-            }
+                var device = await context.Devices.FirstOrDefaultAsync(o => o.Id == deviceId, cancellationToken);
 
-            //Does device type exist? 
-            var existingDc = await Context.DeviceCommands
-                .Include(o => o.Options)
-                .FirstOrDefaultAsync(c => c.UniqueIdentifier == deviceCommand.UniqueIdentifier &&
-                c.DeviceId == deviceCommand.DeviceId, cancellationToken);
+                if(device == null )
+                    return Result.ReportError("Invalid device id");
 
-            var changed = false;
-            if (existingDc == null)
-            {
-                Context.DeviceCommands.Add(deviceCommand);
-                changed = true;
-            }
-            else
-            {
+                //Does device type exist? 
+                var existingDc = await context.DeviceCommands
+                    .Include(o => o.Options)
+                    .FirstOrDefaultAsync(c => c.UniqueIdentifier == deviceCommand.UniqueIdentifier &&
+                                              c.DeviceId == deviceId, cancellationToken);
+
+                if (existingDc == null)
+                {
+                    device.Commands.Add(deviceCommand);
+                    return await context.TrySaveChangesAsync(cancellationToken);
+                }
+
+                var changed = false;
                 PropertyChangedEventHandler handler = (s, a) => changed = true;
                 existingDc.PropertyChanged += handler;
 
@@ -57,23 +61,24 @@ namespace zvs.Processor
 
                 existingDc.PropertyChanged -= handler;
 
-                foreach (var option in deviceCommand.Options.Where(option => existingDc.Options.All(o => o.Name != option.Name)))
+                var addedOptions = deviceCommand.Options.Where(option => existingDc.Options.All(o => o.Name != option.Name)).ToList();
+                foreach (var option in addedOptions)
                 {
                     existingDc.Options.Add(option);
                     changed = true;
                 }
 
-                foreach (var option in existingDc.Options.Where(option => deviceCommand.Options.All(o => o.Name != option.Name)))
+                var removedOptions = existingDc.Options.Where(option => deviceCommand.Options.All(o => o.Name != option.Name)).ToList();
+                foreach (var option in removedOptions)
                 {
-                    Context.CommandOptions.Local.Remove(option);
+                    context.CommandOptions.Local.Remove(option);
                     changed = true;
                 }
-            }
-            if (changed)
-            {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
+
+                if (changed)
+                    return await context.TrySaveChangesAsync(cancellationToken);
+
+                return Result.ReportSuccess("Nothing to update");
             }
         }
     }

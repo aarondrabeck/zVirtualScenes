@@ -83,14 +83,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseObjectHelpers.cs" />
+    <Compile Include="DeviceCommandBuilderTests.cs" />
+    <Compile Include="DeviceTypeBuilderTests.cs" />
     <Compile Include="FileIOTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SceneRunnerTests.cs" />
     <Compile Include="CommandProcessorTests.cs" />
+    <Compile Include="ChangeListenerTests.cs" />
     <Compile Include="TriggerRunnerTests.cs" />
     <Compile Include="CreateFreshDbInitializer.cs" />
     <Compile Include="ScheduledTaskTests.cs" />
     <Compile Include="ScheduledTaskRunnerTests.cs" />
+    <Compile Include="DeviceValueBuilderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\xunit.dll" />

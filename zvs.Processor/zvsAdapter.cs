@@ -14,26 +14,25 @@ namespace zvs.Processor
         public abstract string Name { get; }
         public abstract string Description { get; }
         protected IFeedback<LogEntry> Log { get; private set; }
-        protected ZvsContext Context { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; set; }
         protected DeviceValueBuilder DeviceValueBuilder { get; private set; }
         protected DeviceCommandBuilder DeviceCommandBuilder { get; private set; }
-
         public abstract Task StartAsync(CancellationToken cancellationToken);
         public abstract Task StopAsync(CancellationToken cancellationToken);
 
-        public async Task Initialize(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        public async Task Initialize(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
         {
-            Context = zvsContext;
+            EntityContextConnection = entityContextConnection;
             Log = log;
 
-            DeviceValueBuilder = new DeviceValueBuilder(log, Context);
-            DeviceCommandBuilder = new DeviceCommandBuilder(log, Context);
+            DeviceValueBuilder = new DeviceValueBuilder(log, entityContextConnection);
+            DeviceCommandBuilder = new DeviceCommandBuilder(log, entityContextConnection);
 
-            var dtb = new DeviceTypeBuilder(log, Context);
+            var dtb = new DeviceTypeBuilder(log, entityContextConnection);
             await OnDeviceTypesCreating(dtb);
 
-            var sb = new AdapterSettingBuilder(log, Context);
-            await OnSettingsCreating(sb);
+           // var sb = new AdapterSettingBuilder(log, entityContextConnection);
+          //  await OnSettingsCreating(sb);
         }
 
         public virtual Task OnSettingsCreating(AdapterSettingBuilder settingBuilder)
