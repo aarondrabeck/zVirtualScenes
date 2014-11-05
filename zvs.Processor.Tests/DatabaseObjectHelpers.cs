@@ -1,4 +1,5 @@
-﻿using zvs.DataModel;
+﻿using System;
+using zvs.DataModel;
 
 namespace zvs.Processor.Tests
 {
@@ -8,6 +9,7 @@ namespace zvs.Processor.Tests
         {
             return new Adapter
             {
+                AdapterGuid = Guid.NewGuid(),
                 Name = "Unit testing adapter",
             };
         }

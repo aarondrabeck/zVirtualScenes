@@ -9,12 +9,10 @@ namespace zvs.Processor
 {
     public class BuiltinCommandBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
         private ZvsContext Context { get; set; }
-        public BuiltinCommandBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        public BuiltinCommandBuilder( ZvsContext zvsContext)
         {
             Context = zvsContext;
-            Log = log;
         }
 
         public async Task RegisterAsync(BuiltinCommand builtinCommand, CancellationToken cancellationToken)
@@ -55,9 +53,7 @@ namespace zvs.Processor
 
             if (havePropertiesChanged)
             {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
+                //retrun await Context.TrySaveChangesAsync(cancellationToken);
             }
 
         }

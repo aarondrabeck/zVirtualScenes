@@ -19,17 +19,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
             //act
-            new DeviceValueBuilder(null, dbConnection);
-            //assert - throws exception
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorNullArg2Test()
-        {
-            //arrange 
-            //act
-            new DeviceValueBuilder(new StubIFeedback<LogEntry>(), null);
+            new DeviceValueBuilder(null);
             //assert - throws exception
         }
 
@@ -39,7 +29,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
             //act
-            var dvb = new DeviceValueBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceValueBuilder(dbConnection);
             //assert 
             Assert.IsNotNull(dvb);
         }
@@ -49,7 +39,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
-            var dvb = new DeviceValueBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceValueBuilder( dbConnection);
 
             //act
             var result = await dvb.RegisterAsync(null, new Device(), CancellationToken.None);
@@ -63,7 +53,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
-            var dvb = new DeviceValueBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceValueBuilder( dbConnection);
 
             //act
             var result = await dvb.RegisterAsync(new DeviceValue(), null, CancellationToken.None);
@@ -80,7 +70,7 @@ namespace zvs.Processor.Tests
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dvb-RegisterAsyncNewDeviceValueTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
 
-            var dvb = new DeviceValueBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceValueBuilder( dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             using (var context = new ZvsContext(dbConnection))
@@ -116,7 +106,7 @@ namespace zvs.Processor.Tests
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dvb-RegisterAsyncUpdatedDeviceValueTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
 
-            var dvb = new DeviceValueBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceValueBuilder( dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             using (var context = new ZvsContext(dbConnection))
@@ -163,7 +153,7 @@ namespace zvs.Processor.Tests
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dvb-RegisterAsyncNothingToUpdateTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
 
-            var dvb = new DeviceValueBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceValueBuilder(dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             using (var context = new ZvsContext(dbConnection))

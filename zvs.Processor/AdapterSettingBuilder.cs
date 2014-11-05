@@ -12,13 +12,15 @@ namespace zvs.Processor
 {
     public class AdapterSettingBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
-        private ZvsContext Context { get; set; }
-
-        public AdapterSettingBuilder(IFeedback<LogEntry> log, ZvsContext context)
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        private CancellationToken CancellationToken { get; set; }
+        public AdapterSettingBuilder(IEntityContextConnection entityContextConnection, CancellationToken cancellationToken)
         {
-            Log = log;
-            Context = context;
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
+            CancellationToken = cancellationToken;
         }
 
         public AdapterTypeConfiguration<T> Adapter<T>(T adapter) where T : ZvsAdapter
@@ -37,7 +39,7 @@ namespace zvs.Processor
                 AdapterSettingBuilder = sb;
             }
 
-            public async Task RegisterAdapterSettingAsync<T, R>(AdapterSetting adapterSetting,Expression<Func<T, R>> property, CancellationToken cancellationToken) where T : ZvsAdapter
+            public async Task<Result> RegisterAdapterSettingAsync(AdapterSetting adapterSetting, Expression<Func<T, Object>> property)
             {
                 var memberExpression = property.Body as MemberExpression;
                 if (memberExpression != null)
@@ -51,145 +53,154 @@ namespace zvs.Processor
                     adapterSetting.UniqueIdentifier = propertyInfo.Name;
                 }
 
-
-                var adapter = await AdapterSettingBuilder.Context.Adapters.FirstOrDefaultAsync(p => p.AdapterGuid ==Adapter.AdapterGuid, cancellationToken);
-                if (adapter == null)
-                    return;
-
-                var existingAdapter = await AdapterSettingBuilder.Context.AdapterSettings.FirstOrDefaultAsync(o => o.Adapter.Id == adapter.Id &&
-                    o.UniqueIdentifier == adapterSetting.UniqueIdentifier, cancellationToken);
-                var changed = false;
-                if (existingAdapter == null)
+                using (var context = new ZvsContext(AdapterSettingBuilder.EntityContextConnection))
                 {
-                    adapter.Settings.Add(adapterSetting);
+                    var adapter =
+                        await
+                            context.Adapters.FirstOrDefaultAsync(p => p.AdapterGuid == Adapter.AdapterGuid,
+                                AdapterSettingBuilder.CancellationToken);
+                    if (adapter == null)
+                        return Result.ReportError("Invalid Adapter");
+
+                    var existingAdapter = await context.AdapterSettings.FirstOrDefaultAsync(
+                                o => o.Adapter.Id == adapter.Id && o.UniqueIdentifier == adapterSetting.UniqueIdentifier,
+                                AdapterSettingBuilder.CancellationToken);
+                    var changed = false;
+                    if (existingAdapter == null)
+                    {
+                        adapter.Settings.Add(adapterSetting);
+                        changed = true;
+                    }
+                    else
+                    {
+
+                        PropertyChangedEventHandler handler = (s, a) => changed = true;
+                        existingAdapter.PropertyChanged += handler;
+
+                        existingAdapter.Description = adapterSetting.Description;
+                        existingAdapter.Name = adapterSetting.Name;
+                        existingAdapter.ValueType = adapterSetting.ValueType;
+
+                        existingAdapter.PropertyChanged -= handler;
+
+                        var added = adapterSetting.Options.Where(
+                            option => existingAdapter.Options.All(o => o.Name != option.Name)).ToList();
+                        foreach (var option in added)
+                        {
+                            existingAdapter.Options.Add(option);
+                            changed = true;
+                        }
+
+                        var removed = existingAdapter.Options.Where(
+                            option => adapterSetting.Options.All(o => o.Name != option.Name)).ToList();
+                        foreach (var option in removed)
+                        {
+                            context.AdapterSettingOptions.Local.Remove(option);
+                            changed = true;
+                        }
+                    }
+
+                    if (changed)
+                        return await context.TrySaveChangesAsync(AdapterSettingBuilder.CancellationToken);
+                }
+                return Result.ReportSuccess("Nothing to update");
+            }
+        }
+
+        public async Task<Result> RegisterDeviceSettingAsync(DeviceSetting deviceSetting)
+        {
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                var existingDp = await context.DeviceSettings
+                    .Include(o => o.Options)
+                    .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier, CancellationToken);
+
+                var changed = false;
+                if (existingDp == null)
+                {
+                    context.DeviceSettings.Add(deviceSetting);
                     changed = true;
                 }
                 else
                 {
-
                     PropertyChangedEventHandler handler = (s, a) => changed = true;
-                    existingAdapter.PropertyChanged += handler;
+                    existingDp.PropertyChanged += handler;
 
-                    existingAdapter.Description = adapterSetting.Description;
-                    existingAdapter.Name = adapterSetting.Name;
-                    existingAdapter.ValueType = adapterSetting.ValueType;
+                    existingDp.Name = deviceSetting.Name;
+                    existingDp.Description = deviceSetting.Description;
+                    existingDp.ValueType = deviceSetting.ValueType;
+                    existingDp.Value = deviceSetting.Value;
 
-                    existingAdapter.PropertyChanged -= handler;
+                    existingDp.PropertyChanged -= handler;
 
-                    foreach (var option in adapterSetting.Options.Where(option => existingAdapter.Options.All(o => o.Name != option.Name)))
+                    var added = deviceSetting.Options.Where(option => existingDp.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in added)
                     {
-                        existingAdapter.Options.Add(option);
+                        existingDp.Options.Add(option);
                         changed = true;
                     }
 
-                    foreach (var option in existingAdapter.Options.Where(option => adapterSetting.Options.All(o => o.Name != option.Name)))
+                    var removed = existingDp.Options.Where(option => deviceSetting.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in removed)
                     {
-                        AdapterSettingBuilder.Context.AdapterSettingOptions.Local.Remove(option);
+                        context.DeviceSettingOptions.Local.Remove(option);
                         changed = true;
                     }
                 }
 
                 if (changed)
-                {
-                    var result = await AdapterSettingBuilder.Context.TrySaveChangesAsync(cancellationToken);
-                    if (result.HasError)
-                        await AdapterSettingBuilder.Log.ReportErrorAsync(result.Message,cancellationToken);
-                }
+                    return await context.TrySaveChangesAsync(CancellationToken);
             }
+            return Result.ReportSuccess("Nothing to update");
         }
 
-        public async Task RegisterDeviceSettingAsync(DeviceSetting deviceSetting, CancellationToken cancellationToken)
+        public async Task<Result> RegisterDeviceTypeSettingAsync(DeviceTypeSetting deviceTypeSetting)
         {
-            var existingDp = await Context.DeviceSettings
-                .Include(o => o.Options)
-                .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier, cancellationToken);
-
-            var changed = false;
-            if (existingDp == null)
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                Context.DeviceSettings.Add(deviceSetting);
-                changed = true;
-            }
-            else
-            {
-                PropertyChangedEventHandler handler = (s, a) => changed = true;
-                existingDp.PropertyChanged += handler;
+                var existingDp = await context.DeviceTypeSettings
+                    .Include(o => o.Options)
+                    .FirstOrDefaultAsync(d =>
+                        d.UniqueIdentifier == deviceTypeSetting.UniqueIdentifier &&
+                        d.DeviceTypeId == deviceTypeSetting.DeviceTypeId, CancellationToken);
 
-                existingDp.Name = deviceSetting.Name;
-                existingDp.Description = deviceSetting.Description;
-                existingDp.ValueType = deviceSetting.ValueType;
-                existingDp.Value = deviceSetting.Value;
-
-                existingDp.PropertyChanged -= handler;
-
-                foreach (var option in deviceSetting.Options.Where(option => existingDp.Options.All(o => o.Name != option.Name)))
+                var changed = false;
+                if (existingDp == null)
                 {
-                    existingDp.Options.Add(option);
+                    context.DeviceTypeSettings.Add(deviceTypeSetting);
                     changed = true;
                 }
-
-                foreach (var option in existingDp.Options.Where(option => deviceSetting.Options.All(o => o.Name != option.Name)))
+                else
                 {
-                    Context.DeviceSettingOptions.Local.Remove(option);
-                    changed = true;
-                }
-            }
+                    PropertyChangedEventHandler handler = (s, a) => changed = true;
+                    existingDp.PropertyChanged += handler;
 
-            if (changed)
-            {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
+                    existingDp.Name = deviceTypeSetting.Name;
+                    existingDp.Description = deviceTypeSetting.Description;
+                    existingDp.ValueType = deviceTypeSetting.ValueType;
+                    existingDp.Value = deviceTypeSetting.Value;
+
+                    existingDp.PropertyChanged -= handler;
+
+                    var added = deviceTypeSetting.Options.Where(option => existingDp.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in added)
+                    {
+                        existingDp.Options.Add(option);
+                        changed = true;
+                    }
+
+                    var removed = existingDp.Options.Where(option => deviceTypeSetting.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in removed)
+                    {
+                        context.DeviceTypeSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
+
+                if (changed)
+                    return await context.TrySaveChangesAsync(CancellationToken);
             }
+            return Result.ReportSuccess("Nothing to update");
         }
-
-        public async Task RegisterDeviceTypeSettingAsync(DeviceTypeSetting deviceTypeSetting, CancellationToken cancellationToken)
-        {
-            var existingDp = await Context.DeviceTypeSettings
-                .Include(o => o.Options)
-                .FirstOrDefaultAsync(d =>
-                    d.UniqueIdentifier == deviceTypeSetting.UniqueIdentifier &&
-                    d.DeviceTypeId == deviceTypeSetting.DeviceTypeId, cancellationToken);
-
-            var changed = false;
-            if (existingDp == null)
-            {
-                Context.DeviceTypeSettings.Add(deviceTypeSetting);
-                changed = true;
-            }
-            else
-            {
-                PropertyChangedEventHandler handler = (s, a) => changed = true;
-                existingDp.PropertyChanged += handler;
-
-                existingDp.Name = deviceTypeSetting.Name;
-                existingDp.Description = deviceTypeSetting.Description;
-                existingDp.ValueType = deviceTypeSetting.ValueType;
-                existingDp.Value = deviceTypeSetting.Value;
-
-                existingDp.PropertyChanged -= handler;
-
-                foreach (var option in deviceTypeSetting.Options.Where(option => existingDp.Options.All(o => o.Name != option.Name)))
-                {
-                    existingDp.Options.Add(option);
-                    changed = true;
-                }
-
-                foreach (var option in existingDp.Options.Where(option => deviceTypeSetting.Options.All(o => o.Name != option.Name)))
-                {
-                    Context.DeviceTypeSettingOptions.Local.Remove(option);
-                    changed = true;
-                }
-            }
-
-            if (changed)
-            {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
-            }
-        }
-
     }
-
 }

@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using OpenZWaveDotNet;
 using System.ComponentModel;
-using System.Linq;
-using OpenZWavePlugin.Forms;
-using System.IO;
-using zvs.Processor;
-using System.Diagnostics;
-using zvs.DataModel;
-using System.Threading.Tasks;
+using System.ComponentModel.Composition;
 using System.Data.Entity;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using OpenZWaveDotNet;
+using OpenZWavePlugin;
+using OpenZWavePlugin.Forms;
+using zvs.DataModel;
+using zvs.Processor;
 
-namespace OpenZWavePlugin
+namespace OpenZWaveAdapter
 {
     [Export(typeof(ZvsAdapter))]
     public class OpenZWaveAdapter : ZvsAdapter
@@ -130,28 +132,20 @@ namespace OpenZWavePlugin
             var comSetting = new AdapterSetting
              {
                  Name = "Com Port",
-                 Value = (3).ToString(),
+                 Value = (3).ToString(CultureInfo.InvariantCulture),
                  ValueType = DataType.COMPORT,
                  Description = "The COM port that your z-wave controller is assigned to."
              };
 
-            var useHIDsetting = new AdapterSetting
-           {
-               Name = "Use HID",
-               Value = false.ToString(),
-               ValueType = DataType.BOOL,
-               Description = "Use HID rather than COM port. (use this for ControlThink Sticks)"
-           };
             var pollIntSetting = new AdapterSetting
            {
                Name = "Polling interval",
-               Value = (360).ToString(),
+               Value = (360).ToString(CultureInfo.InvariantCulture),
                ValueType = DataType.INTEGER,
                Description = "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. "
            };
 
             await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(comSetting, o => o.ComportSetting);
-            await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(useHIDsetting, o => o.UseHIDSetting);
             await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
 
             using (ZvsContext context = new ZvsContext())
@@ -186,7 +180,7 @@ namespace OpenZWavePlugin
                     ValueType = DataType.BOOL
                 });
             }
-           
+
         }
 
         public override async Task StartAsync()
@@ -200,43 +194,43 @@ namespace OpenZWavePlugin
         }
 
         //Settings Cache 
-        private bool _UseHIDSetting = false;
-        public bool UseHIDSetting
+        private bool _useHidSetting = false;
+        public bool UseHidSetting
         {
-            get { return _UseHIDSetting; }
+            get { return _useHidSetting; }
             set
             {
-                if (value != _UseHIDSetting)
+                if (value != _useHidSetting)
                 {
-                    _UseHIDSetting = value;
+                    _useHidSetting = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private string _ComportSetting = "10";
+        private string _comportSetting = "10";
         public string ComportSetting
         {
-            get { return _ComportSetting; }
+            get { return _comportSetting; }
             set
             {
-                if (value != _ComportSetting)
+                if (value != _comportSetting)
                 {
-                    _ComportSetting = value;
+                    _comportSetting = value;
                     NotifyPropertyChanged();
                 }
             }
         }
 
-        private int _PollingIntervalSetting = 0;
+        private int _pollingIntervalSetting = 0;
         public int PollingIntervalSetting
         {
-            get { return _PollingIntervalSetting; }
+            get { return _pollingIntervalSetting; }
             set
             {
-                if (value != _PollingIntervalSetting)
+                if (value != _pollingIntervalSetting)
                 {
-                    _PollingIntervalSetting = value;
+                    _pollingIntervalSetting = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -347,7 +341,7 @@ namespace OpenZWavePlugin
             this.PropertyChanged += OpenZWaveAdapter_PropertyChanged;
             try
             {
-                ZvsEngine.log.InfoFormat("OpenZwave driver starting on {0}", UseHIDSetting ? "HID" : "COM" + ComportSetting);
+                ZvsEngine.log.InfoFormat("OpenZwave driver starting on {0}", UseHidSetting ? "HID" : "COM" + ComportSetting);
 
                 // Environment.CurrentDirectory returns wrong directory in Service environment so we have to make a trick
                 string directoryName = System.IO.Path.GetDirectoryName(new System.Uri(System.Reflection.Assembly.GetExecutingAssembly().CodeBase).LocalPath);
@@ -364,7 +358,7 @@ namespace OpenZWavePlugin
                 m_manager.Create();
                 m_manager.OnNotification += NotificationHandler;
 
-                if (!UseHIDSetting)
+                if (!UseHidSetting)
                 {
                     if (ComportSetting != "0")
                     {
@@ -681,7 +675,7 @@ namespace OpenZWavePlugin
             return Task.FromResult(0);
         }
 
-        public override Task RepollAsync(Device device, ZvsContext context)
+        public override Task RepollAsync(Device device)
         {
             var nodeNumber = Convert.ToByte(device.NodeNumber);
 
@@ -695,7 +689,7 @@ namespace OpenZWavePlugin
             return Task.FromResult(0);
         }
 
-        public override async Task ActivateGroupAsync(Group group, ZvsContext context)
+        public override async Task ActivateGroupAsync(Group group )
         {
             var devices = await context.Devices
                 .Include(d => d.Type)
@@ -728,7 +722,7 @@ namespace OpenZWavePlugin
             }
         }
 
-        public override async Task DeactivateGroupAsync(Group group, ZvsContext context)
+        public override async Task DeactivateGroupAsync(Group group )
         {
             var devices = await context.Devices
                 .Where(o => o.Type.Adapter.AdapterGuid == this.AdapterGuid)

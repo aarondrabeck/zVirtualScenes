@@ -218,7 +218,7 @@ namespace zvs.Processor
             await Log.ReportInfoFormatAsync(cancellationToken, "Starting zvsEngine Processor: {0}", Utils.ApplicationName);
 
             #region Install Base Commands and Properties
-            var builtinCommandBuilder = new BuiltinCommandBuilder(Log, Context);
+            var builtinCommandBuilder = new BuiltinCommandBuilder(Context);
 
             await builtinCommandBuilder.RegisterAsync(new BuiltinCommand
             {

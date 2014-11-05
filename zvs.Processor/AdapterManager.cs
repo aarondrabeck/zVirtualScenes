@@ -12,15 +12,21 @@ namespace zvs.Processor
 {
     public class AdapterManager : IAdapterManager
     {
+        private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
-        private ZvsContext Context { get; set; }
 
         private readonly Dictionary<Guid, ZvsAdapter> _adapterLookup = new Dictionary<Guid, ZvsAdapter>();
 
-        public AdapterManager(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        public AdapterManager(IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            if (log == null)
+                throw new ArgumentNullException("log");
+
+            EntityContextConnection = entityContextConnection;
             Log = log;
-            Context = zvsContext;
         }
 
         public ZvsAdapter GetZvsAdapterByGuid(Guid adapterGuid)
@@ -40,103 +46,114 @@ namespace zvs.Processor
                     string.Join(", " + Environment.NewLine, catalog.LoadErrors));
             }
 
-            // Iterate the adapters found in dlls
-            foreach (var adapter in _adapters)
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                //keeps this adapter in scope 
-                var zvsAdapter = adapter;
-
-                if (!_adapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
-                    _adapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
-
-                //Check Database for this adapter
-                var dbAdapter = await Context.Adapters
-                    .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid, cancellationToken);
-
-                var changed = false;
-                if (dbAdapter == null)
+                // Iterate the adapters found in dlls
+                foreach (var adapter in _adapters)
                 {
-                    dbAdapter = new Adapter { AdapterGuid = zvsAdapter.AdapterGuid };
-                    Context.Adapters.Add(dbAdapter);
-                    changed = true;
-                }
+                    //keeps this adapter in scope 
+                    var zvsAdapter = adapter;
 
-                //Update Name and Description
-                zvsAdapter.IsEnabled = dbAdapter.IsEnabled;
+                    if (!_adapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
+                        _adapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
 
-                if (dbAdapter.Name != zvsAdapter.Name)
-                {
-                    dbAdapter.Name = zvsAdapter.Name;
-                    changed = true;
-                }
+                    //Check Database for this adapter
+                    var dbAdapter = await context.Adapters
+                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid, cancellationToken);
 
-                if (dbAdapter.Description != zvsAdapter.Description)
-                {
-                    dbAdapter.Description = zvsAdapter.Description;
-                    changed = true;
-                }
-
-                if (changed)
-                {
-                    var result = await Context.TrySaveChangesAsync(cancellationToken);
-                    if (result.HasError)
-                        await Log.ReportErrorAsync(result.Message, cancellationToken);
-                }
-
-                var msg = string.Format("Initializing '{0}'", zvsAdapter.Name);
-                await Log.ReportInfoAsync(msg, cancellationToken);
-
-                //Plug-in need access to the zvsEngine in order to use the Logger
-               // await zvsAdapter.Initialize(Log, EN);
-
-                //Reload just installed settings
-                dbAdapter = await Context.Adapters
-                    .Include(o => o.Settings)
-                    .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid, cancellationToken);
-
-                //Set plug-in settings from database values
-                foreach (var setting in dbAdapter.Settings)
-                {
-                    var prop = zvsAdapter.GetType().GetProperty(setting.UniqueIdentifier);
-                    if (prop == null)
+                    var changed = false;
+                    if (dbAdapter == null)
                     {
-                        await Log.ReportErrorFormatAsync(cancellationToken, "Cannot find property called {0} on this adapter", setting.UniqueIdentifier);
-                        return;
+                        dbAdapter = new Adapter { AdapterGuid = zvsAdapter.AdapterGuid };
+                        context.Adapters.Add(dbAdapter);
+                        changed = true;
                     }
 
-                    try
+                    //Update Name and Description
+                    zvsAdapter.IsEnabled = dbAdapter.IsEnabled;
+
+                    if (dbAdapter.Name != zvsAdapter.Name)
                     {
-                        var convertedValue = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(setting.Value);
-                        prop.SetValue(zvsAdapter, convertedValue);
-                    }
-                    catch
-                    {
-                        Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on {0} on this adapter", setting.UniqueIdentifier).Wait(cancellationToken);
+                        dbAdapter.Name = zvsAdapter.Name;
+                        changed = true;
                     }
 
+                    if (dbAdapter.Description != zvsAdapter.Description)
+                    {
+                        dbAdapter.Description = zvsAdapter.Description;
+                        changed = true;
+                    }
+
+                    if (changed)
+                    {
+                        var result = await context.TrySaveChangesAsync(cancellationToken);
+                        if (result.HasError)
+                            await Log.ReportErrorAsync(result.Message, cancellationToken);
+                    }
+
+                    var msg = string.Format("Initializing '{0}'", zvsAdapter.Name);
+                    await Log.ReportInfoAsync(msg, cancellationToken);
+
+                    //Plug-in need access to the zvsEngine in order to use the Logger
+                     await zvsAdapter.Initialize(Log,EntityContextConnection);
+
+                    //Reload just installed settings
+                    dbAdapter = await context.Adapters
+                        .Include(o => o.Settings)
+                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid, cancellationToken);
+
+                    //Set plug-in settings from database values
+                    foreach (var setting in dbAdapter.Settings)
+                    {
+                        var prop = zvsAdapter.GetType().GetProperty(setting.UniqueIdentifier);
+                        if (prop == null)
+                        {
+                            await
+                                Log.ReportErrorFormatAsync(cancellationToken,
+                                    "Cannot find property called {0} on this adapter", setting.UniqueIdentifier);
+                            return;
+                        }
+
+                        try
+                        {
+                            var convertedValue =
+                                TypeDescriptor.GetConverter(prop.PropertyType).ConvertFrom(setting.Value);
+                            prop.SetValue(zvsAdapter, convertedValue);
+                        }
+                        catch
+                        {
+                            Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on {0} on this adapter",
+                                setting.UniqueIdentifier).Wait(cancellationToken);
+                        }
+
+                    }
+
+                    if (dbAdapter.IsEnabled)
+                        await zvsAdapter.StartAsync();
                 }
-
-                if (dbAdapter.IsEnabled)
-                    await zvsAdapter.StartAsync(cancellationToken);
             }
 
         }
 
         public async Task EnableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
         {
+
             var adapter = GetZvsAdapterByGuid(adapterGuid);
             if (adapter == null)
                 return;
 
             adapter.IsEnabled = true;
-            await adapter.StartAsync(cancellationToken);
+            await adapter.StartAsync();
 
-            //Save Database Value
-            var a = await Context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid, cancellationToken);
-            if (a != null)
-                a.IsEnabled = true;
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                //Save Database Value
+                var a = await context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid, cancellationToken);
+                if (a != null)
+                    a.IsEnabled = true;
 
-            await Context.TrySaveChangesAsync(cancellationToken);
+                await context.TrySaveChangesAsync(cancellationToken);
+            }
         }
 
         public async Task DisableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
@@ -146,14 +163,17 @@ namespace zvs.Processor
                 return;
 
             adapter.IsEnabled = false;
-            await adapter.StopAsync(cancellationToken);
+            await adapter.StopAsync();
 
-            //Save Database Value
-            var a = await Context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid, cancellationToken);
-            if (a != null)
-                a.IsEnabled = false;
+            using (var context = new ZvsContext(EntityContextConnection))
+            {
+                //Save Database Value
+                var a = await context.Adapters.FirstOrDefaultAsync(o => o.AdapterGuid == adapterGuid, cancellationToken);
+                if (a != null)
+                    a.IsEnabled = false;
 
-            await Context.TrySaveChangesAsync(cancellationToken);
+                await context.TrySaveChangesAsync(cancellationToken);
+            }
         }
 
 
@@ -162,19 +182,6 @@ namespace zvs.Processor
         private IEnumerable<ZvsAdapter> _adapters;
 #pragma warning restore 649
 
-        //public void NotifyAdapterSettingsChanged(AdapterSetting adapterSetting)
-        //{
-        //    var adapter = GetZvsAdapterByGuid(adapterSetting.Adapter.AdapterGuid);
-        //    if (adapter == null)
-        //        return;
-
-        //    SetAdapterProperty(adapter, adapterSetting.UniqueIdentifier, adapterSetting.Value);
-        //}
-
-        //private void SetAdapterProperty(object zvsAdapter, string propertyName, object value)
-        //{
-           
-        //}
     }
 }
 

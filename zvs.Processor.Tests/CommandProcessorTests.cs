@@ -644,8 +644,7 @@ namespace zvs.Processor.Tests
 
                 //Assert
                 Assert.IsFalse(result.HasError);
-                Assert.IsTrue(groupOnIdsRequestSentToAdapter.Count == 1,
-                    "Process did not run the correct amount of commands.");
+                Assert.IsTrue(groupOnIdsRequestSentToAdapter.Count == 2,"Process did not run the correct amount of commands.");
                 Assert.IsTrue(group.Id == groupOnIdsRequestSentToAdapter[0].Id, "Ran the wrong group!");
             }
         }
@@ -701,7 +700,7 @@ namespace zvs.Processor.Tests
 
                 //Assert
                 Assert.IsFalse(result.HasError);
-                Assert.IsTrue(groupOnIdsRequestSentToAdapter.Count == 1, "Process did not run the correct amount of commands.");
+                Assert.IsTrue(groupOnIdsRequestSentToAdapter.Count == 2, "Process did not run the correct amount of commands.");
                 Assert.IsTrue(group.Id == groupOnIdsRequestSentToAdapter[0].Id, "Ran the wrong group!");
             }
         }

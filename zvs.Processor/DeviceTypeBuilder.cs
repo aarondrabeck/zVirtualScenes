@@ -10,18 +10,13 @@ namespace zvs.Processor
 {
     public class DeviceTypeBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
         private IEntityContextConnection EntityContextConnection { get; set; }
-        public DeviceTypeBuilder(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
+        public DeviceTypeBuilder(IEntityContextConnection entityContextConnection)
         {
-            if (log == null)
-                throw new ArgumentNullException("log");
-
             if (entityContextConnection == null)
                 throw new ArgumentNullException("entityContextConnection");
 
             EntityContextConnection = entityContextConnection;
-            Log = log;
         }
 
         public async Task<Result> RegisterAsync(Guid adapterGuid, DeviceType deviceType,

@@ -9,13 +9,11 @@ namespace zvs.Processor
 {
     public class DeviceSettingBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
         private ZvsContext Context { get; set; }
 
-        public DeviceSettingBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        public DeviceSettingBuilder(ZvsContext zvsContext)
         {
             Context = zvsContext;
-            Log = log;
         }
 
         public async Task RegisterAsync(DeviceSetting deviceSetting, CancellationToken cancellationToken)
@@ -62,9 +60,7 @@ namespace zvs.Processor
 
             if (changed)
             {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
+                //return await Context.TrySaveChangesAsync(cancellationToken);
             }
         }
     }

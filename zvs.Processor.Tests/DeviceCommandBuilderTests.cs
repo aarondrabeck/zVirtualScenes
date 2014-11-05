@@ -21,27 +21,17 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
             //act
-            new DeviceCommandBuilder(null, dbConnection);
+            new DeviceCommandBuilder(null);
             //assert - throws exception
         }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorNullArg2Test()
-        {
-            //arrange 
-            //act
-            new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), null);
-            //assert - throws exception
-        }
-
+       
         [TestMethod]
         public void ConstructorTest()
         {
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
             //act
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder(dbConnection);
             //assert 
             Assert.IsNotNull(dvb);
         }
@@ -51,7 +41,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             var dbConnection = new StubIEntityContextConnection();
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder( dbConnection);
 
             //act
             var result = await dvb.RegisterAsync(1, null, CancellationToken.None);
@@ -67,7 +57,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncInvalidDeviceIdTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder(dbConnection);
 
             var deviceCommand = new DeviceCommand();
 
@@ -85,7 +75,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncAddNewCommandTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder( dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             using (var context = new ZvsContext(dbConnection))
@@ -124,7 +114,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncUpdateCommandTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder( dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             var deviceCommand = new DeviceCommand
@@ -165,7 +155,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncRemovedCommandOptionsTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder( dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             var deviceCommand = new DeviceCommand
@@ -219,7 +209,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncAddedCommandOptionsTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder(dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             var deviceCommand = new DeviceCommand
@@ -277,7 +267,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "dcb-RegisterAsyncNoUpdateCommandTest" };
             Database.SetInitializer(new CreateFreshDbInitializer());
-            var dvb = new DeviceCommandBuilder(new StubIFeedback<LogEntry>(), dbConnection);
+            var dvb = new DeviceCommandBuilder( dbConnection);
 
             var device = UnitTesting.CreateFakeDevice();
             var deviceCommand = new DeviceCommand

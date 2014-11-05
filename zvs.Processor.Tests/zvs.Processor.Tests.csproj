@@ -95,6 +95,8 @@
     <Compile Include="ScheduledTaskTests.cs" />
     <Compile Include="ScheduledTaskRunnerTests.cs" />
     <Compile Include="DeviceValueBuilderTests.cs" />
+    <Compile Include="AdapterSettingBuilderTests.cs" />
+    <Compile Include="ZvsAdapterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="lib\xunit.dll" />

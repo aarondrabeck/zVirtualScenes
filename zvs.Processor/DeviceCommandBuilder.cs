@@ -10,18 +10,13 @@ namespace zvs.Processor
 {
     public class DeviceCommandBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
         private IEntityContextConnection EntityContextConnection { get; set; }
-        public DeviceCommandBuilder(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
+        public DeviceCommandBuilder(IEntityContextConnection entityContextConnection)
         {
-            if (log == null)
-                throw new ArgumentNullException("log");
-
             if (entityContextConnection == null)
                 throw new ArgumentNullException("entityContextConnection");
 
             EntityContextConnection = entityContextConnection;
-            Log = log;
         }
         public async Task<Result> RegisterAsync(int deviceId, DeviceCommand deviceCommand, CancellationToken cancellationToken)
         {

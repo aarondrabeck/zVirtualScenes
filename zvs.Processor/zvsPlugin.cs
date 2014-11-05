@@ -25,7 +25,7 @@ namespace zvs.Processor
             var ssb = new SceneSettingBuilder(log, zvsContext);
             await OnSceneSettingsCreating(ssb);
 
-            var dsb = new DeviceSettingBuilder(log, zvsContext);
+            var dsb = new DeviceSettingBuilder( zvsContext);
             await OnDeviceSettingsCreating(dsb);
         }
 

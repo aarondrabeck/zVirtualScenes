@@ -9,18 +9,13 @@ namespace zvs.Processor
 {
     public class DeviceValueBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
         private IEntityContextConnection EntityContextConnection { get; set; }
-        public DeviceValueBuilder(IFeedback<LogEntry> log, IEntityContextConnection entityContextConnection)
+        public DeviceValueBuilder( IEntityContextConnection entityContextConnection)
         {
-            if(log == null)
-                throw new ArgumentNullException("log");
-
             if (entityContextConnection == null)
                 throw new ArgumentNullException("entityContextConnection");
 
             EntityContextConnection = entityContextConnection;
-            Log = log;
         }
         public async Task<Result> RegisterAsync(DeviceValue deviceValue, Device device, CancellationToken cancellationToken, bool ignoreValueChange = false)
         {
@@ -56,8 +51,8 @@ namespace zvs.Processor
                 existingDv.IsReadOnly = deviceValue.IsReadOnly;
                 existingDv.Description = deviceValue.Description;
                 existingDv.Name = deviceValue.Name;
-                existingDv.Value = deviceValue.Value;
                 existingDv.ValueType = deviceValue.ValueType;
+                existingDv.Value = deviceValue.Value;
                 existingDv.IsReadOnly = deviceValue.IsReadOnly;
 
                 existingDv.PropertyChanged -= action;
