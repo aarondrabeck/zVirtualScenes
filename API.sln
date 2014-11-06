@@ -60,6 +60,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi2 Plugin", "Plugins\W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvs.DataModel.Tests", "zvs.Entities.Tests\zvs.DataModel.Tests.csproj", "{63B9291A-7BEF-48EC-813D-377D4BC6F246}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zvs.Processor.UnitTestAdapter", "zvs.Processor.UnitTestAdapter\zvs.Processor.UnitTestAdapter.csproj", "{F74279F0-569A-43E6-9BE6-96714E89BD0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -318,6 +320,22 @@ Global
 		{63B9291A-7BEF-48EC-813D-377D4BC6F246}.Release|Win32.ActiveCfg = Release|Any CPU
 		{63B9291A-7BEF-48EC-813D-377D4BC6F246}.Release|x64.ActiveCfg = Release|Any CPU
 		{63B9291A-7BEF-48EC-813D-377D4BC6F246}.Release|x86.ActiveCfg = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|ARM.ActiveCfg = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|x64.ActiveCfg = Release|Any CPU
+		{F74279F0-569A-43E6-9BE6-96714E89BD0C}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

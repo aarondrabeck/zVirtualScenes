@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
 using System;
 using System.Data.Entity;
+using System.Linq;
 using System.Threading;
 using zvs.DataModel;
 using System.Threading.Tasks;
@@ -12,13 +11,17 @@ namespace zvs.Processor
 {
     public class AdapterManager : IAdapterManager
     {
+        private List<ZvsAdapter> Adapters { get; set; } 
         private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
 
         private readonly Dictionary<Guid, ZvsAdapter> _adapterLookup = new Dictionary<Guid, ZvsAdapter>();
 
-        public AdapterManager(IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
+        public AdapterManager(List<ZvsAdapter> adapters, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
+            if (adapters == null)
+                throw new ArgumentNullException("adapters");
+
             if (entityContextConnection == null)
                 throw new ArgumentNullException("entityContextConnection");
 
@@ -27,6 +30,7 @@ namespace zvs.Processor
 
             EntityContextConnection = entityContextConnection;
             Log = log;
+            Adapters = adapters;
         }
 
         public ZvsAdapter GetZvsAdapterByGuid(Guid adapterGuid)
@@ -34,22 +38,12 @@ namespace zvs.Processor
             return !_adapterLookup.ContainsKey(adapterGuid) ? null : _adapterLookup[adapterGuid];
         }
 
-        public async Task LoadAdaptersAsync(CancellationToken cancellationToken)
+        public async Task InitializeAdaptersAsync(CancellationToken cancellationToken)
         {
-            var catalog = new SafeDirectoryCatalog("adapters");
-            var compositionContainer = new CompositionContainer(catalog);
-            compositionContainer.ComposeParts(this);
-
-            if (catalog.LoadErrors.Count > 0)
-            {
-                await Log.ReportWarningFormatAsync(cancellationToken, @"The following plug-ins could not be loaded: {0}",
-                    string.Join(", " + Environment.NewLine, catalog.LoadErrors));
-            }
-
             using (var context = new ZvsContext(EntityContextConnection))
             {
                 // Iterate the adapters found in dlls
-                foreach (var adapter in _adapters)
+                foreach (var adapter in Adapters)
                 {
                     //keeps this adapter in scope 
                     var zvsAdapter = adapter;
@@ -88,22 +82,27 @@ namespace zvs.Processor
                     {
                         var result = await context.TrySaveChangesAsync(cancellationToken);
                         if (result.HasError)
-                            await Log.ReportErrorAsync(result.Message, cancellationToken);
+                        {
+                            await
+                                Log.ReportErrorFormatAsync(cancellationToken,
+                                    "Adapter not loaded. Error while saving loaded '{0}' adapter to database. {1}", zvsAdapter.Name, result.Message);
+                            break;
+                        }
                     }
 
-                    var msg = string.Format("Initializing '{0}'", zvsAdapter.Name);
-                    await Log.ReportInfoAsync(msg, cancellationToken);
+                    await Log.ReportInfoFormatAsync(cancellationToken, "Initializing '{0}'", zvsAdapter.Name);
 
                     //Plug-in need access to the zvsEngine in order to use the Logger
-                     await zvsAdapter.Initialize(Log,EntityContextConnection);
+                    await zvsAdapter.Initialize(Log, EntityContextConnection);
 
                     //Reload just installed settings
-                    dbAdapter = await context.Adapters
-                        .Include(o => o.Settings)
-                        .FirstOrDefaultAsync(p => p.AdapterGuid == zvsAdapter.AdapterGuid, cancellationToken);
+                    var adapterSettings = await context.AdapterSettings
+                        .Include(o => o.Adapter)
+                        .Where(p => p.Adapter.AdapterGuid == zvsAdapter.AdapterGuid)
+                        .ToListAsync(cancellationToken);
 
                     //Set plug-in settings from database values
-                    foreach (var setting in dbAdapter.Settings)
+                    foreach (var setting in adapterSettings)
                     {
                         var prop = zvsAdapter.GetType().GetProperty(setting.UniqueIdentifier);
                         if (prop == null)
@@ -111,7 +110,7 @@ namespace zvs.Processor
                             await
                                 Log.ReportErrorFormatAsync(cancellationToken,
                                     "Cannot find property called {0} on this adapter", setting.UniqueIdentifier);
-                            return;
+                            continue;
                         }
 
                         try
@@ -122,8 +121,7 @@ namespace zvs.Processor
                         }
                         catch
                         {
-                            Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on {0} on this adapter",
-                                setting.UniqueIdentifier).Wait(cancellationToken);
+                            Log.ReportErrorFormatAsync(cancellationToken, "Cannot cast value on adapter setting {0}", setting.UniqueIdentifier).Wait(cancellationToken);
                         }
 
                     }
@@ -177,10 +175,6 @@ namespace zvs.Processor
         }
 
 
-#pragma warning disable 649
-        [ImportMany]
-        private IEnumerable<ZvsAdapter> _adapters;
-#pragma warning restore 649
 
     }
 }

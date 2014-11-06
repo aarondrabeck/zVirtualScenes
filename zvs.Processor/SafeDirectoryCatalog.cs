@@ -8,42 +8,50 @@ using System.Reflection;
 
 namespace zvs.Processor
 {
+
     public class SafeDirectoryCatalog : ComposablePartCatalog
     {
-        private readonly AggregateCatalog _catalog;
-        public readonly List<string> LoadErrors;
+        private AggregateCatalog Catalog { get; set; }
+        public List<string> LoadErrors { get; set; }
+        private string DirectoryPath { get; set; }
 
-        public SafeDirectoryCatalog(string directory)
+        public SafeDirectoryCatalog(string directoryPath)
         {
+            DirectoryPath = directoryPath;
             LoadErrors = new List<string>();
-            var files = Directory.EnumerateFiles(directory, "*.dll", SearchOption.AllDirectories);
-            _catalog = new AggregateCatalog();
-
-            foreach (var file in files)
-            {
-                try
-                {
-                    var asmCat = new AssemblyCatalog(file);
-
-                    //Force MEF to load the plug-in and figure out if there are any exports
-                    // good assemblies will not throw the RTLE exception and can be added to the catalog
-                    if (asmCat.Parts.ToList().Count > 0)
-                        _catalog.Catalogs.Add(asmCat);
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    foreach(var error in ex.LoaderExceptions)
-                        LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, error.Message));
-                }
-                catch (Exception ex)
-                {
-                    LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, ex.Message));
-                }
-            }
         }
+
         public override IQueryable<ComposablePartDefinition> Parts
         {
-            get { return _catalog.Parts; }
+            get
+            {
+                var files = Directory.EnumerateFiles(DirectoryPath, "*.dll", SearchOption.AllDirectories);
+                Catalog = new AggregateCatalog();
+
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var asmCat = new AssemblyCatalog(file);
+
+                        //Force MEF to load the plug-in and figure out if there are any exports
+                        // good assemblies will not throw the RTLE exception and can be added to the catalog
+                        if (asmCat.Parts.ToList().Count > 0)
+                            Catalog.Catalogs.Add(asmCat);
+                    }
+                    catch (ReflectionTypeLoadException ex)
+                    {
+                        foreach (var error in ex.LoaderExceptions)
+                            LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, error.Message));
+                    }
+                    catch (Exception ex)
+                    {
+                        LoadErrors.Add(string.Format("Error loading '{0}': {1}", file, ex.Message));
+                    }
+                }
+
+                return Catalog.Parts;
+            }
         }
     }
 }

@@ -269,7 +269,7 @@ namespace zvs.Processor
             }, cancellationToken);
             #endregion
 
-            await AdapterManager.LoadAdaptersAsync(cancellationToken);
+           // await AdapterManager.InitializeAdaptersAsync(cancellationToken);
             //await PluginManager.LoadPluginsAsync(this, ct);
             //await ScheduledTaskManager.StartAsync(ct);
 

@@ -41,7 +41,7 @@ namespace zvs.Processor
 
             public async Task<Result> RegisterAdapterSettingAsync(AdapterSetting adapterSetting, Expression<Func<T, Object>> property)
             {
-                var memberExpression = property.Body as MemberExpression;
+                MemberExpression memberExpression = (property.Body.NodeType == ExpressionType.Convert) ? (MemberExpression)((UnaryExpression)property.Body).Operand : property.Body as MemberExpression;
                 if (memberExpression != null)
                 {
                     var propertyInfo = memberExpression.Member as PropertyInfo;
