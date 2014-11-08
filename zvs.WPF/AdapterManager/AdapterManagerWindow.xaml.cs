@@ -106,10 +106,10 @@ namespace zvs.WPF.AdapterManager
             if (adapter != null)
             {
                 //ADD THE ENABLED BUTTON
-                CheckboxControl c = new CheckboxControl(string.Format("{0} is enabled", adapter.Name),
+                var c = new CheckboxControl(string.Format("{0} is enabled", adapter.Name),
                     "Starts and stops the selected adapter",
                     adapter.IsEnabled,
-                    async (isChecked) =>
+                    async isChecked =>
                     {
                         //Save to the database
                         adapter.IsEnabled = isChecked;
@@ -129,21 +129,21 @@ namespace zvs.WPF.AdapterManager
 
 
                 //Add all the settings
-                foreach (AdapterSetting a in adapter.Settings)
+                foreach (var a in adapter.Settings)
                 {
-                    AdapterSetting adapterSetting = a;
+                    var adapterSetting = a;
 
                     switch (adapterSetting.ValueType)
                     {
                         case DataType.BOOL:
                             {
-                                bool DefaultValue = false;
+                                var DefaultValue = false;
                                 bool.TryParse(adapterSetting.Value, out DefaultValue);
 
-                                CheckboxControl control = new CheckboxControl(adapterSetting.Name,
+                                var control = new CheckboxControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     DefaultValue,
-                                    async (isChecked) =>
+                                    async isChecked =>
                                     {
                                         adapterSetting.Value = isChecked.ToString();
                                         var result = await context.TrySaveChangesAsync();
@@ -158,11 +158,11 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.DECIMAL:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
+                                var control = new NumericControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Value,
                                     NumericControl.NumberType.Decimal,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -177,11 +177,11 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.BYTE:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
+                                var control = new NumericControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Value,
                                     NumericControl.NumberType.Byte,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
 
@@ -197,11 +197,11 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.INTEGER:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
+                                var control = new NumericControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Value,
                                     NumericControl.NumberType.Integer,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
 
@@ -217,11 +217,11 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.SHORT:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
+                                var control = new NumericControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Value,
                                     NumericControl.NumberType.Short,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -236,11 +236,11 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.COMPORT:
                             {
-                                NumericControl control = new NumericControl(adapterSetting.Name,
+                                var control = new NumericControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Value,
                                     NumericControl.NumberType.ComPort,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -255,10 +255,10 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.STRING:
                             {
-                                StringControl control = new StringControl(adapterSetting.Name,
+                                var control = new StringControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Value,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -273,11 +273,11 @@ namespace zvs.WPF.AdapterManager
                             }
                         case DataType.LIST:
                             {
-                                ComboboxControl control = new ComboboxControl(adapterSetting.Name,
+                                var control = new ComboboxControl(adapterSetting.Name,
                                     adapterSetting.Description,
                                     adapterSetting.Options.Select(o => o.Name).ToList(),
                                     adapterSetting.Value,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         adapterSetting.Value = value;
                                         var result = await context.TrySaveChangesAsync();

@@ -31,6 +31,8 @@ namespace zvs.Processor
             EntityContextConnection = entityContextConnection;
             Log = log;
             Adapters = adapters;
+
+            _adapterLookup = Adapters.ToDictionary(o => o.AdapterGuid, o => o);
         }
 
         public ZvsAdapter GetZvsAdapterByGuid(Guid adapterGuid)
@@ -47,9 +49,6 @@ namespace zvs.Processor
                 {
                     //keeps this adapter in scope 
                     var zvsAdapter = adapter;
-
-                    if (!_adapterLookup.ContainsKey(zvsAdapter.AdapterGuid))
-                        _adapterLookup.Add(zvsAdapter.AdapterGuid, zvsAdapter);
 
                     //Check Database for this adapter
                     var dbAdapter = await context.Adapters
@@ -133,12 +132,11 @@ namespace zvs.Processor
 
         }
 
-        public async Task EnableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
+        public async Task<Result> EnableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
         {
-
             var adapter = GetZvsAdapterByGuid(adapterGuid);
             if (adapter == null)
-                return;
+                return Result.ReportErrorFormat("Unable to enable adapter with Guid of {0}", adapterGuid);
 
             adapter.IsEnabled = true;
             await adapter.StartAsync();
@@ -152,13 +150,14 @@ namespace zvs.Processor
 
                 await context.TrySaveChangesAsync(cancellationToken);
             }
+            return Result.ReportSuccess();
         }
 
-        public async Task DisableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
+        public async Task<Result> DisableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
         {
             var adapter = GetZvsAdapterByGuid(adapterGuid);
             if (adapter == null)
-                return;
+                return Result.ReportErrorFormat("Unable to disable adapter with Guid of {0}", adapterGuid);
 
             adapter.IsEnabled = false;
             await adapter.StopAsync();
@@ -172,6 +171,7 @@ namespace zvs.Processor
 
                 await context.TrySaveChangesAsync(cancellationToken);
             }
+            return Result.ReportSuccess();
         }
 
 

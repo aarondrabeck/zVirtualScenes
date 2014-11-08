@@ -157,7 +157,7 @@ namespace zvs.WPF.TriggerControls
             var newSc = new StoredCommand();
 
             //Send it to the command builder to get filled with a command
-            CommandBuilder cbWindow = Trigger.StoredCommand == null ? new CommandBuilder(_context, newSc) : new CommandBuilder(_context, Trigger.StoredCommand);
+            var cbWindow = Trigger.StoredCommand == null ? new CommandBuilder(_context, newSc) : new CommandBuilder(_context, Trigger.StoredCommand);
 
             cbWindow.Owner = this;
 

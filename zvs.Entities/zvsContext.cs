@@ -64,6 +64,8 @@ namespace zvs.DataModel
 
         public DbSet<ScheduledTask> ScheduledTasks { get; set; }
         public DbSet<SceneStoredCommand> SceneStoredCommands { get; set; }
+        public DbSet<ZvsScheduledTask> ZvsScheduledTasks { get; set; }
+        
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

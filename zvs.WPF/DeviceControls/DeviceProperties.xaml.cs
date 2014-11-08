@@ -64,7 +64,7 @@ namespace zvs.WPF.DeviceControls
             foreach (var deviceTypeSetting in device.Type.Settings)
             {
                 //default 
-                string value = deviceTypeSetting.Value;
+                var value = deviceTypeSetting.Value;
 
                 //check if this settings has already been set
                 var deviceTypeSettingValue = await context.DeviceTypeSettingValues
@@ -80,11 +80,11 @@ namespace zvs.WPF.DeviceControls
                         {
                             #region CheckboxControl
                             //get the current value from the value table list
-                            bool DefaultValue = false;
+                            var DefaultValue = false;
                             bool.TryParse(value, out DefaultValue);
 
-                            CheckboxControl control = new CheckboxControl(deviceTypeSetting.Name, deviceTypeSetting.Description, DefaultValue,
-                            async (isChecked) =>
+                            var control = new CheckboxControl(deviceTypeSetting.Name, deviceTypeSetting.Description, DefaultValue,
+                            async isChecked =>
                             {
                                 if (deviceTypeSettingValue != null)
                                     deviceTypeSettingValue.Value = isChecked.ToString();
@@ -116,9 +116,9 @@ namespace zvs.WPF.DeviceControls
                     case DataType.BYTE:
                         {
                             #region NumericControl
-                            NumericControl control = new NumericControl(deviceTypeSetting.Name, deviceTypeSetting.Description, value,
+                            var control = new NumericControl(deviceTypeSetting.Name, deviceTypeSetting.Description, value,
                                 GetNumberControlType(deviceTypeSetting.ValueType),
-                                async (v) =>
+                                async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
                                         deviceTypeSettingValue.Value = v;
@@ -146,8 +146,8 @@ namespace zvs.WPF.DeviceControls
                     case DataType.STRING:
                         {
                             #region StringControl
-                            StringControl control = new StringControl(deviceTypeSetting.Name, deviceTypeSetting.Description, value,
-                                async (v) =>
+                            var control = new StringControl(deviceTypeSetting.Name, deviceTypeSetting.Description, value,
+                                async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
                                         deviceTypeSettingValue.Value = v;
@@ -176,11 +176,11 @@ namespace zvs.WPF.DeviceControls
                     case DataType.LIST:
                         {
                             #region ComboboxControl
-                            ComboboxControl control = new ComboboxControl(deviceTypeSetting.Name,
+                            var control = new ComboboxControl(deviceTypeSetting.Name,
                                 deviceTypeSetting.Description,
                                 deviceTypeSetting.Options.Select(o => o.Name).ToList(),
                                 value,
-                                async (v) =>
+                                async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
                                         deviceTypeSettingValue.Value = v;
@@ -219,7 +219,7 @@ namespace zvs.WPF.DeviceControls
                 var deviceSettingValue = await context.DeviceSettingValues.FirstOrDefaultAsync(v => v.DeviceSetting.Id == deviceSetting.Id &&
                     v.DeviceId == device.Id);
 
-                string _default = deviceSettingValue == null ? deviceSetting.Value : deviceSettingValue.Value;
+                var _default = deviceSettingValue == null ? deviceSetting.Value : deviceSettingValue.Value;
 
                 switch (deviceSetting.ValueType)
                 {
@@ -227,10 +227,10 @@ namespace zvs.WPF.DeviceControls
                         {
                             #region CheckboxControl
                             //get the current value from the value table list
-                            bool DefaultValue = false;
+                            var DefaultValue = false;
                             bool.TryParse(_default, out DefaultValue);
 
-                            CheckboxControl control = new CheckboxControl(deviceSetting.Name, deviceSetting.Description, DefaultValue, async (isChecked) =>
+                            var control = new CheckboxControl(deviceSetting.Name, deviceSetting.Description, DefaultValue, async isChecked =>
                             {
                                 if (deviceSettingValue != null)
                                 {
@@ -262,11 +262,11 @@ namespace zvs.WPF.DeviceControls
                     case DataType.BYTE:
                         {
                             #region NumericControl
-                            NumericControl control = new NumericControl(deviceSetting.Name,
+                            var control = new NumericControl(deviceSetting.Name,
                                 deviceSetting.Description,
                                 _default,
                                GetNumberControlType(deviceSetting.ValueType),
-                                async (value) =>
+                                async value =>
                                 {
                                     if (deviceSettingValue != null)
                                     {
@@ -295,10 +295,10 @@ namespace zvs.WPF.DeviceControls
                     case DataType.STRING:
                         {
                             #region StringControl
-                            StringControl control = new StringControl(deviceSetting.Name,
+                            var control = new StringControl(deviceSetting.Name,
                                 deviceSetting.Description,
                                 _default,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (deviceSettingValue != null)
                                     {
@@ -328,11 +328,11 @@ namespace zvs.WPF.DeviceControls
                     case DataType.LIST:
                         {
                             #region ComboboxControl
-                            ComboboxControl control = new ComboboxControl(deviceSetting.Name,
+                            var control = new ComboboxControl(deviceSetting.Name,
                                 deviceSetting.Description,
                                 deviceSetting.Options.Select(o => o.Name).ToList(),
                                 _default,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (deviceSettingValue != null)
                                     {

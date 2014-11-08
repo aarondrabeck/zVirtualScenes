@@ -77,9 +77,9 @@ namespace zvs.WPF
 
         private async Task LoadDeviceAsync()
         {
-            using (ZvsContext context = new ZvsContext())
+            using (var context = new ZvsContext())
             {
-                Device d = await context.Devices
+                var d = await context.Devices
                     .Include(o => o.Type)
                     .FirstOrDefaultAsync(dv => dv.Id == DeviceID);
 
@@ -128,14 +128,14 @@ namespace zvs.WPF
                 {
                     if (d.CurrentLevelInt.HasValue)
                     {
-                        double level = d.CurrentLevelInt.Value;
+                        var level = d.CurrentLevelInt.Value;
 
                         if (level >= 0 && level <= 20)
                             level = 21;
 
                         level = level / 100;
 
-                        DoubleAnimation da = new DoubleAnimation();
+                        var da = new DoubleAnimation();
                         da.From = IconImg.Opacity;
                         da.To = level;
                         da.Duration = new Duration(TimeSpan.FromSeconds(1));
@@ -148,7 +148,7 @@ namespace zvs.WPF
 
         private void SelectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ListBoxItem item = (ListBoxItem)SelectionList.SelectedItem;
+            var item = (ListBoxItem)SelectionList.SelectedItem;
             if (item != null)
             {
                 ContentStackPanel.Children.Clear();

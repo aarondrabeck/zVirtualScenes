@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
@@ -9,53 +10,67 @@ namespace zvs.Processor
 {
     public class BuiltinCommandBuilder
     {
-        private ZvsContext Context { get; set; }
-        public BuiltinCommandBuilder( ZvsContext zvsContext)
+        private IEntityContextConnection EntityContextConnection { get; set; }
+
+        public BuiltinCommandBuilder(IEntityContextConnection entityContextConnection)
         {
-            Context = zvsContext;
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
         }
 
-        public async Task RegisterAsync(BuiltinCommand builtinCommand, CancellationToken cancellationToken)
+        public async Task<Result> RegisterAsync(BuiltinCommand builtinCommand, CancellationToken cancellationToken)
         {
-            var existingC = await Context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == builtinCommand.UniqueIdentifier, cancellationToken);
-            var havePropertiesChanged = false;
-            if (existingC == null)
+            if (builtinCommand == null)
+                return Result.ReportError("builtinCommand is null");
+
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                Context.BuiltinCommands.Add(builtinCommand);
-                havePropertiesChanged = true;
-            }
-            else
-            {
-                PropertyChangedEventHandler handler = (s, a) => havePropertiesChanged = true;
-                existingC.PropertyChanged += handler;
-
-                existingC.Name = builtinCommand.Name;
-                existingC.CustomData1 = builtinCommand.CustomData1;
-                existingC.CustomData2 = builtinCommand.CustomData2;
-                existingC.ArgumentType = builtinCommand.ArgumentType;
-                existingC.Description = builtinCommand.Description;
-                existingC.Help = builtinCommand.Help;
-
-                existingC.PropertyChanged -= handler;
-
-                foreach (var option in builtinCommand.Options.Where(option => existingC.Options.All(o => o.Name != option.Name)))
+                var existingC = await context.BuiltinCommands.FirstOrDefaultAsync(o => o.UniqueIdentifier == builtinCommand.UniqueIdentifier, cancellationToken);
+                var wasModified = false;
+                if (existingC == null)
                 {
-                    existingC.Options.Add(option);
-                    havePropertiesChanged = true;
+                    context.BuiltinCommands.Add(builtinCommand);
+                    wasModified = true;
+                }
+                else
+                {
+                    PropertyChangedEventHandler handler = (s, a) => wasModified = true;
+                    existingC.PropertyChanged += handler;
+
+                    existingC.Name = builtinCommand.Name;
+                    existingC.CustomData1 = builtinCommand.CustomData1;
+                    existingC.CustomData2 = builtinCommand.CustomData2;
+                    existingC.ArgumentType = builtinCommand.ArgumentType;
+                    existingC.Description = builtinCommand.Description;
+                    existingC.Help = builtinCommand.Help;
+
+                    existingC.PropertyChanged -= handler;
+
+                    var addded =
+                        builtinCommand.Options.Where(option => existingC.Options.All(o => o.Name != option.Name))
+                            .ToList();
+                    foreach (var option in addded)
+                    {
+                        existingC.Options.Add(option);
+                        wasModified = true;
+                    }
+
+                    var removed =
+                        existingC.Options.Where(option => builtinCommand.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in removed)
+                    {
+                        context.CommandOptions.Local.Remove(option);
+                        wasModified = true;
+                    }
                 }
 
-                foreach (var option in existingC.Options.Where(option => builtinCommand.Options.All(o => o.Name != option.Name)))
-                {
-                    Context.CommandOptions.Local.Remove(option);
-                    havePropertiesChanged = true;
-                }
-            }
+                if (wasModified)
+                    return await context.TrySaveChangesAsync(cancellationToken);
 
-            if (havePropertiesChanged)
-            {
-                //retrun await Context.TrySaveChangesAsync(cancellationToken);
+                return Result.ReportSuccess("Nothing to update");
             }
-
         }
     }
 }

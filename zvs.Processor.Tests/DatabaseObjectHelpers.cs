@@ -5,6 +5,15 @@ namespace zvs.Processor.Tests
 {
     public static class UnitTesting
     {
+        public static Plugin CreateFakePlugin()
+        {
+            return new Plugin
+            {
+                PluginGuid = Guid.NewGuid(),
+                Name = "Unit testing plugin",
+            };
+        }
+
         public static Adapter CreateFakeAdapter()
         {
             return new Adapter

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,97 +15,54 @@ using zvs.WPF.AdapterManager;
 using System.Data.Entity;
 using zvs.DataModel;
 using zvs.WPF.JavaScript;
-using zvs.Processor.Logging;
-using zvs.WPF.Backup;
 
 namespace zvs.WPF
 {
     /// <summary>
     /// interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class zvsMainWindow : ChromeWindow
+    public partial class ZvsMainWindow
     {
-        private App app = (App)Application.Current;
-        private ZvsContext context;
-        public WindowState lastOpenedWindowState = WindowState.Normal;
-        zvs.Processor.Logging.ILog log = zvs.Processor.Logging.LogManager.GetLogger<zvsMainWindow>();
+        private App _app = (App)Application.Current;
+        private readonly ZvsContext _context;
+        public WindowState LastOpenedWindowState = WindowState.Normal;
 
-        public zvsMainWindow()
+        public ZvsMainWindow()
         {
             InitializeComponent();
-
-            context = new ZvsContext();
-
-            // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
-
-                myCollectionViewSource.Source = logSource;
-            }
-            zvs.Processor.Logging.EventedLog.OnLogItemsCleared += EventedLog_OnLogItemsCleared;
-
+            _context = new ZvsContext(_app.EntityContextConnection);
         }
 
-        private void EventedLog_OnLogItemsCleared(object sender, EventedLog.LogItemsClearedEventArgs e)
-        {
-            logSource.Clear();
-        }
-
-        private void EventedLog_OnLogItemArrived(object sender, EventedLog.LogItemArrivedEventArgs e)
-        {
-            if (!this.Dispatcher.HasShutdownStarted)
-            {
-                try
-                {
-                    this.Dispatcher.Invoke(new Action(() =>
-                    {
-                        logSource.Clear();
-                        foreach (var item in e.NewItems)
-                        {
-                            logSource.Add(item);
-                        }
-                        var entry = e.NewItems.LastOrDefault();
-                        if (entry != null)
-                        {
-                            StatusBarDescriptionTxt.Text = entry.Description;
-                            StatusBarSourceTxt.Text = entry.Source;
-                            StatusBarUrgencyTxt.Text = entry.Urgency.ToString();
-                        }
-                    }));
-                }
-                catch (Exception)
-                {
-                }
-            }
-        }
 #if DEBUG
-        ~zvsMainWindow()
+        ~ZvsMainWindow()
         {
             //Cannot write to log here, it has been disposed. 
             Debug.WriteLine("zvsMainWindow Deconstructed.");
         }
 #endif
 
-        private ObservableCollection<LogItem> logSource = new ObservableCollection<LogItem>();
-
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            EventedLog.OnLogItemArrived += EventedLog_OnLogItemArrived;
+            // Do not load your data at design time.
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
+            //Load your data here and assign the result to the CollectionViewSource.
+            var myCollectionViewSource = (CollectionViewSource)Resources["ListViewSource"];
+            myCollectionViewSource.Source = await _context.LogEntries
+                .OrderBy(o => o.Datetime)
+                .Take(100)
+                .ToListAsync();
 
-            log.InfoFormat("{0} User Interface Loaded", Utils.ApplicationName);//, Utils.ApplicationName + " GUI");
+            var log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Main Window" };
+            await log.ReportInfoFormatAsync(_app.Cts.Token, "{0} User Interface Loaded", Utils.ApplicationName);
 
-            System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
-            
-            ICollectionView dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
+            var dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
             //clear the existing sort order
             dataView.SortDescriptions.Clear();
 
             //create a new sort order for the sorting that is done lastly            
             var dir = ListSortDirection.Ascending;
 
-            var option = await context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
+            var option = await _context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
             if (option != null && option.Value == "Descending")
                 dir = ListSortDirection.Descending;
 
@@ -112,18 +71,15 @@ namespace zvs.WPF
 
             dList1.ShowMore = false;
 
-            this.Title = Utils.ApplicationNameAndVersion;
+            Title = Utils.ApplicationNameAndVersion;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
-            EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;
-            zvs.Processor.Logging.EventedLog.OnLogItemsCleared -= EventedLog_OnLogItemsCleared;
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -136,23 +92,22 @@ namespace zvs.WPF
             ShowOrCreateWindow<AdapterManagerWindow>();
         }
 
-        private void ManagePluginsMI(object sender, RoutedEventArgs e)
+        private void ManagePluginsMi(object sender, RoutedEventArgs e)
         {
             ShowOrCreateWindow<PluginManagerWindow>();
         }
 
         private void ShowOrCreateWindow<T>() where T : Window, new()
         {
-            var w = app.Windows.OfType<T>().FirstOrDefault();
+            var w = _app.Windows.OfType<T>().FirstOrDefault();
             if (w != null)
             {
                 w.Activate();
                 return;
             }
 
-            var new_window = new T();
-            new_window.Owner = this;
-            new_window.Show();
+            var newWindow = new T { Owner = this };
+            newWindow.Show();
         }
 
         private void ActivateGroupMI_Click_1(object sender, RoutedEventArgs e)
@@ -162,69 +117,37 @@ namespace zvs.WPF
 
         private void Window_Closing_1(object sender, CancelEventArgs e)
         {
-            if (!App.isShuttingDown)
-            {
-                if (app.TaskbarIcon != null)
-                {
-                    app.TaskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, System.Windows.Forms.ToolTipIcon.Info);
-                }
-
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["ListViewSource"];
-                myCollectionViewSource.Source = null;
-
-                EventedLog.OnLogItemArrived -= EventedLog_OnLogItemArrived;
-                log = null;
-            }
+            if (_app.Cts.IsCancellationRequested) return;
+            if (_app.TaskbarIcon != null)
+                _app.TaskbarIcon.ShowBalloonTip(Utils.ApplicationName, Utils.ApplicationNameAndVersion + " is still running", 3000, System.Windows.Forms.ToolTipIcon.Info);
         }
 
         private void MainWindow_Closed_1(object sender, EventArgs e)
         {
-            app = null;
+            _app = null;
 
-            if (context != null)
-                context.Dispose();
+            if (_context != null)
+                _context.Dispose();
         }
 
         private async void RepollAllMI_Click_1(object sender, RoutedEventArgs e)
         {
-            BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ALL");
+            var cmd = await _context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ALL");
             if (cmd == null)
                 return;
-
-            CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
-            await cp.RunCommandAsync(this, cmd);
+            await _app.ZvsEngine.RunCommandAsync(cmd.Id, string.Empty, string.Empty, CancellationToken.None);
         }
 
-        private void ExitMI_Click_1(object sender, RoutedEventArgs e)
+        private async void ExitMI_Click_1(object sender, RoutedEventArgs e)
         {
-            app.ShutdownZvs();
-        }
-
-        private void ViewLogsMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                string logFile = zvs.Processor.Logging.LogManager.DefaultLogFile;
-                if (System.IO.File.Exists(logFile))
-                {
-                    System.Diagnostics.Process.Start(logFile);
-                }
-                else
-                {
-                    MessageBox.Show("Could not resolve the log file, make sure logging is configured correctly");
-                }
-            }
-            catch
-            {
-                MessageBox.Show("Unable to launch Windows Explorer.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            if (_app != null) await _app.ShutdownZvs();
         }
 
         private void ViewDBMI_Click_1(object sender, RoutedEventArgs e)
         {
             try
             {
-                System.Diagnostics.Process.Start(Utils.AppDataPath);
+                Process.Start(Utils.AppDataPath);
             }
             catch
             {
@@ -234,51 +157,43 @@ namespace zvs.WPF
 
         private void Window_StateChanged_1(object sender, EventArgs e)
         {
-            if (WindowState != System.Windows.WindowState.Minimized)
-                lastOpenedWindowState = WindowState;
+            if (WindowState != WindowState.Minimized)
+                LastOpenedWindowState = WindowState;
 
             if (WindowState == WindowState.Minimized)
             {
-                this.Close();
+                Close();
             }
         }
 
         private void AboutMI_Click_1(object sender, RoutedEventArgs e)
         {
-            AboutWindow aboutWin = new AboutWindow();
-            aboutWin.Owner = this;
+            var aboutWin = new AboutWindow { Owner = this };
             aboutWin.ShowDialog();
         }
 
-        
         private void SettingMI_Click_1(object sender, RoutedEventArgs e)
         {
-            SettingWindow settingWindow = new SettingWindow();
-            settingWindow.Owner = this;
+            var settingWindow = new SettingWindow { Owner = this };
             settingWindow.ShowDialog();
         }
 
         private void AddEditJSCmds_Click_1(object sender, RoutedEventArgs e)
         {
-            JavaScriptAddRemove jsWindow = new JavaScriptAddRemove();
-            jsWindow.Owner = this;
+            var jsWindow = new JavaScriptAddRemove { Owner = this };
             jsWindow.ShowDialog();
         }
 
         private void ClearLogsMI_Click(object sender, RoutedEventArgs e)
         {
-            zvs.Processor.Logging.EventedLog.Clear();
-
+            //TODO: CLEAR LOG 
         }
 
         private void BackupRestoreMI_Click(object sender, RoutedEventArgs e)
         {
-            var window = new BackupRestoreWindow();
-            window.Owner = this;
+            var window = new BackupRestoreWindow { Owner = this };
             window.ShowDialog();
         }
-
-
     }
     public class ContentToMarginConverter : IValueConverter
     {
@@ -304,15 +219,15 @@ namespace zvs.WPF
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var ps = new PathSegmentCollection(4);
-            ContentPresenter cp = (ContentPresenter)value;
-            double h = cp.ActualHeight > 10 ? 1.4 * cp.ActualHeight : 10;
-            double w = cp.ActualWidth > 10 ? 1.25 * cp.ActualWidth : 10;
+            var cp = (ContentPresenter)value;
+            var h = cp.ActualHeight > 10 ? 1.4 * cp.ActualHeight : 10;
+            var w = cp.ActualWidth > 10 ? 1.25 * cp.ActualWidth : 10;
             ps.Add(new LineSegment(new Point(1, 0.7 * h), true));
             ps.Add(new BezierSegment(new Point(1, 0.9 * h), new Point(0.1 * h, h), new Point(0.3 * h, h), true));
             ps.Add(new LineSegment(new Point(w, h), true));
             ps.Add(new BezierSegment(new Point(w + 0.6 * h, h), new Point(w + h, 0), new Point(w + h * 1.3, 0), true));
-            PathFigure figure = new PathFigure(new Point(1, 0), ps, false);
-            PathGeometry geometry = new PathGeometry();
+            var figure = new PathFigure(new Point(1, 0), ps, false);
+            var geometry = new PathGeometry();
             geometry.Figures.Add(figure);
 
             return geometry;

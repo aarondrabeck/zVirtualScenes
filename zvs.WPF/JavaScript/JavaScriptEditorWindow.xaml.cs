@@ -55,7 +55,7 @@ namespace zvs.WPF.JavaScript
                 TriggerScriptEditor.Editor.AppendText(Command.Script);
 
             CmdNameTxtBx.Text = Command.Name;
-            System.Windows.Data.CollectionViewSource jSResultViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("jSResultViewSource")));
+            var jSResultViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("jSResultViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
             jSResultViewSource.Source = Results;
         }
@@ -63,14 +63,14 @@ namespace zvs.WPF.JavaScript
         private async void Run()
         {
             Results.Clear();
-            string script = TriggerScriptEditor.Editor.Text;
+            var script = TriggerScriptEditor.Editor.Text;
             if (!string.IsNullOrEmpty(script))
             {
                 isRunning = true;
                 SetFeedBackText("Executing JavaScript...");
 
                 //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
-                zvs.Processor.JavaScriptExecuter jse = new Processor.JavaScriptExecuter(this, app.ZvsEngine);
+                var jse = new Processor.JavaScriptExecuter(this, app.ZvsEngine);
                 jse.onReportProgress += (sender, args) =>
                 {
                     SetFeedBackText(args.Progress);
@@ -123,7 +123,7 @@ namespace zvs.WPF.JavaScript
 
         private void AddFileMI_Click(object sender, RoutedEventArgs e)
         {
-            Microsoft.Win32.OpenFileDialog ofd = new Microsoft.Win32.OpenFileDialog();
+            var ofd = new Microsoft.Win32.OpenFileDialog();
             ofd.CheckFileExists = true;
             ofd.DefaultExt = "js";
             ofd.InitialDirectory = zvs.Processor.Utils.AppPath;
@@ -134,7 +134,7 @@ namespace zvs.WPF.JavaScript
 
             if (!string.IsNullOrEmpty(ofd.FileName) && System.IO.File.Exists(ofd.FileName))
             {
-                string path = ofd.FileName;
+                var path = ofd.FileName;
                 if (path.StartsWith(zvs.Processor.Utils.AppPath))
                 {
                     path = path.Replace(zvs.Processor.Utils.AppPath, ".");

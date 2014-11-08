@@ -164,7 +164,7 @@ namespace zvs.WPF.SceneControls
                 SceneCollection.CollectionChanged += SceneCollection_CollectionChanged;
 
                 //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
+                var myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["sceneViewSource"];
 
                 myCollectionViewSource.Source = context.Scenes.Local;
             }
@@ -177,7 +177,7 @@ namespace zvs.WPF.SceneControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            Window parent = Window.GetWindow(this);
+            var parent = Window.GetWindow(this);
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
@@ -201,7 +201,7 @@ namespace zvs.WPF.SceneControls
             {
                 foreach (Scene s in e.NewItems)
                 {
-                    int? max = SceneCollection.Max(o => o.SortOrder);
+                    var max = SceneCollection.Max(o => o.SortOrder);
 
                     if (max.HasValue)
                     {
@@ -223,7 +223,7 @@ namespace zvs.WPF.SceneControls
         {
             if (e.EditAction == DataGridEditAction.Commit)
             {
-                Scene s = e.Row.DataContext as Scene;
+                var s = e.Row.DataContext as Scene;
                 if (s != null)
                     if (string.IsNullOrEmpty(s.Name))
                         s.Name = "New Scene";
@@ -237,7 +237,7 @@ namespace zvs.WPF.SceneControls
 
         private async void SortUp_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
             {
                 var scene = (Scene)obj;
@@ -245,7 +245,7 @@ namespace zvs.WPF.SceneControls
                 if (scene == null)
                     return;
 
-                Scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder - 1);
+                var scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder - 1);
                 if (scene_we_are_replacing != null)
                     scene_we_are_replacing.SortOrder++;
 
@@ -262,13 +262,13 @@ namespace zvs.WPF.SceneControls
 
         private async void SortDown_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
             {
                 var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    Scene scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder + 1);
+                    var scene_we_are_replacing = SceneCollection.FirstOrDefault(s => s.SortOrder == scene.SortOrder + 1);
                     if (scene_we_are_replacing != null)
                         scene_we_are_replacing.SortOrder--;
 
@@ -287,7 +287,7 @@ namespace zvs.WPF.SceneControls
         private async Task NormalizeSortOrderAsync()
         {
             //normalize sort order
-            foreach (Scene s in SceneCollection)
+            foreach (var s in SceneCollection)
                 s.SortOrder = SceneGrid.Items.IndexOf(s);
 
             var result = await context.TrySaveChangesAsync();
@@ -299,7 +299,7 @@ namespace zvs.WPF.SceneControls
         {
             SceneGrid.CancelEdit();
 
-            ICollectionView dataView = CollectionViewSource.GetDefaultView(SceneGrid.ItemsSource);
+            var dataView = CollectionViewSource.GetDefaultView(SceneGrid.ItemsSource);
             if (dataView != null)
             {
                 //clear the existing sort order
@@ -313,16 +313,16 @@ namespace zvs.WPF.SceneControls
 
         private async void ActivateScene_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
             {
                 var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
+                    var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "RUN_SCENE");
                     if (cmd != null)
                     {
-                        CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
+                        var cp = new CommandProcessor(app.ZvsEngine);
                         await cp.RunCommandAsync(this, cmd, scene.Id.ToString());
                     }
                 }
@@ -331,23 +331,23 @@ namespace zvs.WPF.SceneControls
 
         private void SceneGrid_Row_PreviewMouseRightButtonDown(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
             {
                 var scene = (Scene)obj;
                 if (scene != null)
                 {
-                    ContextMenu menu = new ContextMenu();
+                    var menu = new ContextMenu();
 
-                    MenuItem dup = new MenuItem();
+                    var dup = new MenuItem();
                     dup.Header = "Duplicate Scene";
                     dup.Click += async (s, args) =>
                     {
                         if (MessageBox.Show("Are you sure you want to duplicate this scene?",
                                        "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
-                            Scene new_scene = new Scene { Name = "Copy of " + scene.Name, SortOrder = SceneGrid.Items.Count + 1 };
-                            foreach (SceneStoredCommand sc in scene.Commands)
+                            var new_scene = new Scene { Name = "Copy of " + scene.Name, SortOrder = SceneGrid.Items.Count + 1 };
+                            foreach (var sc in scene.Commands)
                             {
                                 new_scene.Commands.Add(new SceneStoredCommand
                                 {
@@ -386,18 +386,18 @@ namespace zvs.WPF.SceneControls
         {
             if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
-                List<Device> devices = (List<Device>)e.Data.GetData("deviceList");
+                var devices = (List<Device>)e.Data.GetData("deviceList");
 
                 if (SceneGrid.SelectedItem is Scene)
                 {
-                    Scene selected_scene = (Scene)SceneGrid.SelectedItem;
+                    var selected_scene = (Scene)SceneGrid.SelectedItem;
                     if (selected_scene != null)
                     {
                         SceneCmdsGrid.SelectedItems.Clear();
 
-                        foreach (Device d in devices)
+                        foreach (var d in devices)
                         {
-                            Device d2 = await context.Devices
+                            var d2 = await context.Devices
                                 .Include(o => o.Commands)
                                 .FirstOrDefaultAsync(o => o.Id == d.Id);
 
@@ -406,21 +406,21 @@ namespace zvs.WPF.SceneControls
 
                             //Create a Stored Command.
                             //pre-fill the device with users dropped device.
-                            StoredCommand sc = new StoredCommand();
+                            var sc = new StoredCommand();
                             sc.Command = d2.Commands.FirstOrDefault();
 
                             //Send it to the command builder to get filled with a command
-                            CommandBuilder cbWindow = new CommandBuilder(context, sc);
+                            var cbWindow = new CommandBuilder(context, sc);
                             cbWindow.Owner = app.ZvsWindow;
 
                             if (cbWindow.ShowDialog() ?? false)
                             {
                                 //Create the scene command
-                                SceneStoredCommand newSceneStoredCommand = new SceneStoredCommand();
+                                var newSceneStoredCommand = new SceneStoredCommand();
                                 //Set Command
                                 newSceneStoredCommand.StoredCommand = sc;
                                 //Set Order
-                                int? max = selected_scene.Commands.Max(o => o.SortOrder);
+                                var max = selected_scene.Commands.Max(o => o.SortOrder);
                                 if (max.HasValue)
                                     newSceneStoredCommand.SortOrder = max.Value + 1;
                                 else
@@ -453,10 +453,10 @@ namespace zvs.WPF.SceneControls
 
         private async void SceneGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            DataGrid dg = sender as DataGrid;
+            var dg = sender as DataGrid;
             if (dg != null)
             {
-                DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
+                var dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
                 if (e.Key == Key.Delete)
                 {
                     e.Handled = true;
@@ -486,7 +486,7 @@ namespace zvs.WPF.SceneControls
                 }
             }
 
-            ScenePropertiesWindow new_window = new ScenePropertiesWindow(SceneID);
+            var new_window = new ScenePropertiesWindow(SceneID);
             new_window.Owner = app.ZvsWindow;
             new_window.Title = string.Format("Scene '{0}' Properties", name);
             new_window.Show();
@@ -522,10 +522,10 @@ namespace zvs.WPF.SceneControls
 
         private async void SceneCmdsGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
-            DataGrid dg = sender as DataGrid;
+            var dg = sender as DataGrid;
             if (dg != null)
             {
-                DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
+                var dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
                 if (e.Key == Key.Delete)
                 {
                     e.Handled = true;
@@ -538,13 +538,13 @@ namespace zvs.WPF.SceneControls
         {
             if (SceneCmdsGrid.SelectedItems.Count > 0)
             {
-                SceneStoredCommand[] SelectedItemsCopy = new SceneStoredCommand[SceneCmdsGrid.SelectedItems.Count];
+                var SelectedItemsCopy = new SceneStoredCommand[SceneCmdsGrid.SelectedItems.Count];
                 SceneCmdsGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
                 if (MessageBox.Show(string.Format("Are you sure you want to delete {0} selected scene command(s)?", SceneCmdsGrid.SelectedItems.Count),
                                    "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    foreach (SceneStoredCommand scene_command in SelectedItemsCopy)
+                    foreach (var scene_command in SelectedItemsCopy)
                     {
                         var sceneCommand = await context.SceneCommands.FirstOrDefaultAsync(o => o.Id == scene_command.Id);
                         if (sceneCommand != null)
@@ -562,9 +562,9 @@ namespace zvs.WPF.SceneControls
         {
             if (SceneGrid.SelectedItem is Scene)
             {
-                Scene selectedscene = SceneGrid.SelectedItem as Scene;
+                var selectedscene = SceneGrid.SelectedItem as Scene;
                 //normalize sort order
-                foreach (SceneStoredCommand cmd in selectedscene.Commands)
+                foreach (var cmd in selectedscene.Commands)
                 {
                     foreach (SceneStoredCommand item in SceneCmdsGrid.Items)
                     {
@@ -583,7 +583,7 @@ namespace zvs.WPF.SceneControls
         {
             SceneCmdsGrid.CancelEdit();
 
-            ICollectionView dataView = CollectionViewSource.GetDefaultView(SceneCmdsGrid.ItemsSource);
+            var dataView = CollectionViewSource.GetDefaultView(SceneCmdsGrid.ItemsSource);
 
             if (dataView != null)
             {
@@ -598,13 +598,13 @@ namespace zvs.WPF.SceneControls
 
         private async void SortUpSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneStoredCommand)
             {
                 var scene_command = (SceneStoredCommand)obj;
                 if (scene_command != null)
                 {
-                    SceneStoredCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder - 1);
+                    var scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder - 1);
                     if (scenecmd_we_are_replacing != null)
                         scenecmd_we_are_replacing.SortOrder++;
 
@@ -622,13 +622,13 @@ namespace zvs.WPF.SceneControls
 
         private async void SortDownSceneCmd_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneStoredCommand)
             {
                 var scene_command = (SceneStoredCommand)obj;
                 if (scene_command != null)
                 {
-                    SceneStoredCommand scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder + 1);
+                    var scenecmd_we_are_replacing = scene_command.Scene.Commands.FirstOrDefault(s => s.SortOrder == scene_command.SortOrder + 1);
                     if (scenecmd_we_are_replacing != null)
                         scenecmd_we_are_replacing.SortOrder--;
 
@@ -666,14 +666,14 @@ namespace zvs.WPF.SceneControls
 
         private async void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is SceneStoredCommand)
             {
                 var cmd = (SceneStoredCommand)obj;
                 if (cmd != null && cmd.StoredCommand != null)
                 {
                     //Send it to the command builder to get edited
-                    CommandBuilder cbWindow = new CommandBuilder(context, cmd.StoredCommand);
+                    var cbWindow = new CommandBuilder(context, cmd.StoredCommand);
                     cbWindow.Owner = app.ZvsWindow;
 
                     if (cbWindow.ShowDialog() ?? false)
@@ -695,7 +695,7 @@ namespace zvs.WPF.SceneControls
 
         private void SceneSettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is Scene)
             {
                 var s = (Scene)obj;
@@ -710,28 +710,28 @@ namespace zvs.WPF.SceneControls
         {
             if (SceneGrid.SelectedItem is Scene)
             {
-                Scene selected_scene = (Scene)SceneGrid.SelectedItem;
+                var selected_scene = (Scene)SceneGrid.SelectedItem;
                 if (selected_scene != null)
                 {
                     SceneCmdsGrid.SelectedItems.Clear();
-                    SceneStoredCommand cmd = new SceneStoredCommand();
+                    var cmd = new SceneStoredCommand();
 
                     //Create a Stored Command.
-                    StoredCommand sc = new StoredCommand();
+                    var sc = new StoredCommand();
 
                     //Send it to the command builder to get filled with a command
-                    CommandBuilder cbWindow = new CommandBuilder(context, sc);
+                    var cbWindow = new CommandBuilder(context, sc);
                     cbWindow.Owner = app.ZvsWindow;
 
                     if (cbWindow.ShowDialog() ?? false)
                     {
                         //Create the scene command
-                        SceneStoredCommand newSceneStoredCommand = new SceneStoredCommand();
+                        var newSceneStoredCommand = new SceneStoredCommand();
                         //Set Command
                         newSceneStoredCommand.StoredCommand = sc;
 
                         //Set Order
-                        int? max = selected_scene.Commands.Max(o => o.SortOrder);
+                        var max = selected_scene.Commands.Max(o => o.SortOrder);
                         if (max.HasValue)
                             newSceneStoredCommand.SortOrder = max.Value + 1;
                         else

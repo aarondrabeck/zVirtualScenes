@@ -8,12 +8,10 @@ namespace zvs.Processor
     public class DatabaseFeedback : IFeedback<LogEntry>
     {
         private IEntityContextConnection EntityContextConnection { get; set; }
-        private int MaxLogSize { get; set; }
 
-        public DatabaseFeedback(IEntityContextConnection entityContextConnection, int maxLogSize = 1000)
+        public DatabaseFeedback(IEntityContextConnection entityContextConnection)
         {
             EntityContextConnection = entityContextConnection;
-            MaxLogSize = maxLogSize;
         }
 
         public async Task ReportAsync(LogEntry value, System.Threading.CancellationToken ct)
@@ -21,10 +19,6 @@ namespace zvs.Processor
             using (var context = new ZvsContext(EntityContextConnection))
             {
                 context.LogEntries.Add(value);
-
-                //TODO: DELETE OLD LOG ENTRIES
-                // if (await context.LogEntries.CountAsync(ct) > MaxLogSize)
-                //    context.
 
                 try
                 {

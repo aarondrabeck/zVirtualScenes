@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
@@ -9,61 +10,65 @@ namespace zvs.Processor
 {
     public class SceneSettingBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
-        private ZvsContext Context { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; set; }
 
-        public SceneSettingBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        public SceneSettingBuilder(IEntityContextConnection entityContextConnection)
         {
-            Context = zvsContext;
-            Log = log;
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
         }
 
-        public async Task RegisterAsync(SceneSetting sceneSetting, CancellationToken cancellationToken)
+        public async Task<Result> RegisterAsync(SceneSetting sceneSetting, CancellationToken cancellationToken)
         {
             if (sceneSetting == null)
-                return;
+                return Result.ReportError("sceneSetting is null");
 
-            var setting = await Context.SceneSettings
-                .Include(o => o.Options)
-                .FirstOrDefaultAsync(s => s.UniqueIdentifier == sceneSetting.UniqueIdentifier, cancellationToken);
-
-            var changed = false;
-            if (setting == null)
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                Context.SceneSettings.Add(sceneSetting);
-                changed = true;
-            }
-            else
-            {
-                //Update
-                PropertyChangedEventHandler handler = (s, a) => changed = true;
-                setting.PropertyChanged += handler;
+                var existingSetting = await context.SceneSettings
+                    .Include(o => o.Options)
+                    .FirstOrDefaultAsync(s => s.UniqueIdentifier == sceneSetting.UniqueIdentifier, cancellationToken);
 
-                setting.Name = sceneSetting.Name;
-                setting.Description = sceneSetting.Description;
-                setting.ValueType = sceneSetting.ValueType;
-                setting.Value = sceneSetting.Value;
-
-                setting.PropertyChanged -= handler;
-
-                foreach (var option in setting.Options.Where(option => sceneSetting.Options.All(o => o.Name != option.Name)))
+                var changed = false;
+                if (existingSetting == null)
                 {
-                    sceneSetting.Options.Add(option);
+                    context.SceneSettings.Add(sceneSetting);
                     changed = true;
                 }
-
-                foreach (var option in sceneSetting.Options.Where(option => setting.Options.All(o => o.Name != option.Name)))
+                else
                 {
-                    Context.SceneSettingOptions.Local.Remove(option);
-                    changed = true;
-                }
-            }
+                    //Update
+                    PropertyChangedEventHandler handler = (s, a) => changed = true;
+                    existingSetting.PropertyChanged += handler;
 
-            if (changed)
-            {
-                var result = await Context.TrySaveChangesAsync(cancellationToken);
-                if (result.HasError)
-                    await Log.ReportErrorAsync(result.Message, cancellationToken);
+                    existingSetting.Name = sceneSetting.Name;
+                    existingSetting.Description = sceneSetting.Description;
+                    existingSetting.ValueType = sceneSetting.ValueType;
+                    existingSetting.Value = sceneSetting.Value;
+
+                    existingSetting.PropertyChanged -= handler;
+
+                    var added = sceneSetting.Options.Where(option => existingSetting.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in added)
+                    {
+                        existingSetting.Options.Add(option);
+                        changed = true;
+                    }
+
+                    var removed = existingSetting.Options.Where(option => sceneSetting.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in removed)
+                    {
+                        context.SceneSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
+
+                if (changed)
+                    return await context.TrySaveChangesAsync(cancellationToken);
+
+                return Result.ReportSuccess("Nothing to update");
             }
         }
     }

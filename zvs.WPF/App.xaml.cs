@@ -20,9 +20,11 @@ namespace zvs.WPF
         public CancellationTokenSource Cts { get; private set; }
 
         bool _isMainWindowCreated;
-        public ZvsEngine ZvsEngine;
-        public ZVSTaskbarIcon TaskbarIcon;
-        public zvsMainWindow ZvsWindow;
+        public ZvsEngine ZvsEngine { get; set; }
+        public ZVSTaskbarIcon TaskbarIcon { get; set; }
+        public ZvsMainWindow ZvsWindow { get; set; }
+        public IEntityContextConnection EntityContextConnection { get; set; }
+
         private Mutex _zvsMutex;
 
         [STAThread]
@@ -41,6 +43,7 @@ namespace zvs.WPF
         {
             InitializeComponent();
             Cts = new CancellationTokenSource();
+            EntityContextConnection = new zvsEntityContextConnection();
         }
 
         public async Task<bool> SignalExternalCommandLineArgs(IList<string> args)
@@ -85,7 +88,7 @@ namespace zvs.WPF
             await Task.Delay(10);
 
 #if DEBUG
-            Stopwatch sw = new Stopwatch();
+            var sw = new Stopwatch();
             sw.Start();
 #endif
 
@@ -272,7 +275,7 @@ namespace zvs.WPF
             if (ZvsWindow == null || !_isMainWindowCreated)
             {
 #if DEBUG
-                Stopwatch sw = new Stopwatch();
+                var sw = new Stopwatch();
                 sw.Start();
 #endif
                 _isMainWindowCreated = true;
@@ -285,7 +288,7 @@ namespace zvs.WPF
                 splashscreen.SetLoadingTextFormat("Loading user interface settings");
                 await Task.Delay(10);
 
-                ZvsWindow = new zvsMainWindow();
+                ZvsWindow = new ZvsMainWindow();
                 ZvsWindow.Loaded += (a, s) => splashscreen.Close();
                 ZvsWindow.Closed += async (a, s) =>
                 {

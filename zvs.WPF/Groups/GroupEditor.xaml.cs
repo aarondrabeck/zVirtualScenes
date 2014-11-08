@@ -39,7 +39,7 @@ namespace zvs.WPF.Groups
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                System.Windows.Data.CollectionViewSource groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
+                var groupsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupsViewSource")));
                 await context.Groups
                     .Include(o => o.Devices)
                     .ToListAsync();
@@ -88,12 +88,12 @@ namespace zvs.WPF.Groups
 
         private async void AddBtn_Click(object sender, RoutedEventArgs e)
         {
-            GroupNameEditor nameWindow = new GroupNameEditor(null);
+            var nameWindow = new GroupNameEditor(null);
             nameWindow.Owner = this;
 
             if (nameWindow.ShowDialog() ?? false)
             {
-                Group new_g = new Group()
+                var new_g = new Group()
                 {
                     Name = nameWindow.GroupName
                 };
@@ -111,7 +111,7 @@ namespace zvs.WPF.Groups
 
         private async void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
-            Group g = (Group)GroupCmbBx.SelectedItem;
+            var g = (Group)GroupCmbBx.SelectedItem;
             if (g != null)
             {
                 if (
@@ -131,11 +131,11 @@ namespace zvs.WPF.Groups
 
         private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            Group g = (Group)GroupCmbBx.SelectedItem;
+            var g = (Group)GroupCmbBx.SelectedItem;
             if (g == null)
                 return;
 
-            GroupNameEditor nameWindow = new GroupNameEditor(g.Name);
+            var nameWindow = new GroupNameEditor(g.Name);
             nameWindow.Owner = this;
 
             if (nameWindow.ShowDialog() ?? false)
@@ -161,16 +161,16 @@ namespace zvs.WPF.Groups
         {
             if (e.Data.GetData("deviceList") != null && e.Data.GetData("deviceList").GetType() == typeof(List<Device>))
             {
-                List<Device> devices = (List<Device>)e.Data.GetData("deviceList");
+                var devices = (List<Device>)e.Data.GetData("deviceList");
 
-                Group selected_group = (Group)GroupCmbBx.SelectedItem;
+                var selected_group = (Group)GroupCmbBx.SelectedItem;
                 if (selected_group != null)
                 {
                     groupsDevicesLstVw.SelectedItems.Clear();
 
-                    foreach (Device device in devices)
+                    foreach (var device in devices)
                     {
-                        Device d2 = await context.Devices.FirstOrDefaultAsync(o => o.Id == device.Id);
+                        var d2 = await context.Devices.FirstOrDefaultAsync(o => o.Id == device.Id);
                         if (d2 != null)
                         {
                             //If not already in the group...
@@ -216,7 +216,7 @@ namespace zvs.WPF.Groups
 
         private async Task RemoveSelectedGroupDevicesAsync()
         {
-            Group selected_group = (Group)GroupCmbBx.SelectedItem;
+            var selected_group = (Group)GroupCmbBx.SelectedItem;
             if (selected_group != null && groupsDevicesLstVw.SelectedItems.Count > 0)
             {
                 if (MessageBox.Show(string.Format("Are you sure you want to remove the {0} selected devices from this group?", groupsDevicesLstVw.SelectedItems.Count),
@@ -224,10 +224,10 @@ namespace zvs.WPF.Groups
                                          MessageBoxButton.YesNo,
                                          MessageBoxImage.Error) == MessageBoxResult.Yes)
                 {
-                    Device[] devicesToRemove = new Device[groupsDevicesLstVw.SelectedItems.Count];
+                    var devicesToRemove = new Device[groupsDevicesLstVw.SelectedItems.Count];
                     groupsDevicesLstVw.SelectedItems.CopyTo(devicesToRemove, 0);
 
-                    foreach (Device gd in devicesToRemove)
+                    foreach (var gd in devicesToRemove)
                         selected_group.Devices.Remove(gd);
 
                     var result = await context.TrySaveChangesAsync();

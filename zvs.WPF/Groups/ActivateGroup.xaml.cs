@@ -78,7 +78,7 @@ namespace zvs.WPF.Groups
         {
             await context.Groups.ToListAsync();
 
-            System.Windows.Data.CollectionViewSource groupViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupViewSource")));
+            var groupViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("groupViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
             groupViewSource.Source = context.Groups.Local;
 
@@ -101,13 +101,13 @@ namespace zvs.WPF.Groups
 
         private async void AllOnBtn_Click(object sender, RoutedEventArgs e)
         {
-            Group g = (Group)GroupsCmbBx.SelectedItem;
+            var g = (Group)GroupsCmbBx.SelectedItem;
             if (g != null)
             {
-                BuiltinCommand group_on_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_ON");
+                var group_on_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_ON");
                 if (group_on_cmd != null)
                 {
-                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
+                    var cp = new CommandProcessor(app.ZvsEngine);
                     await cp.RunCommandAsync(this, group_on_cmd, g.Id.ToString());
                 }
             }
@@ -115,15 +115,15 @@ namespace zvs.WPF.Groups
 
         private async void AllOffBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            Group g = (Group)GroupsCmbBx.SelectedItem;
+            var g = (Group)GroupsCmbBx.SelectedItem;
             if (g == null)
                 return;
 
-            BuiltinCommand group_off_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_OFF");
+            var group_off_cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "GROUP_OFF");
             if (group_off_cmd == null)
                 return;
 
-            CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
+            var cp = new CommandProcessor(app.ZvsEngine);
             await cp.RunCommandAsync(this, group_off_cmd, g.Id.ToString());
         }
 

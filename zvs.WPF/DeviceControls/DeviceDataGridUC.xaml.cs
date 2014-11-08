@@ -158,7 +158,7 @@ namespace zvs.WPF.DeviceControls
                        .ToListAsync();
 
                 //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+                var myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
                 myCollectionViewSource.Source = context.Devices.Local;
 
 
@@ -172,7 +172,7 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+            var myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
             myCollectionViewSource.SortDescriptions.Clear();
             myCollectionViewSource.SortDescriptions.Add(new SortDescription("Name", ListSortDirection.Ascending));
 
@@ -247,7 +247,7 @@ namespace zvs.WPF.DeviceControls
 
         private void UserControl_Unloaded_1(object sender, RoutedEventArgs e)
         {
-            Window parent = Window.GetWindow(this);
+            var parent = Window.GetWindow(this);
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent == null || !parent.IsActive)
             {
@@ -263,12 +263,12 @@ namespace zvs.WPF.DeviceControls
 
         public static Window FindParentWindow(DependencyObject child)
         {
-            DependencyObject parent = VisualTreeHelper.GetParent(child);
+            var parent = VisualTreeHelper.GetParent(child);
 
             //CHeck if this is the end of the tree
             if (parent == null) return null;
 
-            Window parentWindow = parent as Window;
+            var parentWindow = parent as Window;
             if (parentWindow != null)
             {
                 return parentWindow;
@@ -285,18 +285,18 @@ namespace zvs.WPF.DeviceControls
         {
             if (DeviceGrid.SelectedItems.Count > 0)
             {
-                Device[] SelectedItemsCopy = new Device[DeviceGrid.SelectedItems.Count];
+                var SelectedItemsCopy = new Device[DeviceGrid.SelectedItems.Count];
                 DeviceGrid.SelectedItems.CopyTo(SelectedItemsCopy, 0);
 
-                foreach (Device selectedDevice in SelectedItemsCopy)
+                foreach (var selectedDevice in SelectedItemsCopy)
                 {
-                    Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == selectedDevice.Id);
+                    var d = await context.Devices.FirstOrDefaultAsync(o => o.Id == selectedDevice.Id);
                     if (d != null)
                     {
                         //Check for device dependencies
-                        foreach (DeviceValueTrigger dvt in await context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id).ToListAsync())
+                        foreach (var dvt in await context.DeviceValueTriggers.Where(t => t.DeviceValue.Device.Id == d.Id).ToListAsync())
                         {
-                            MessageBoxResult result = MessageBox.Show(
+                            var result = MessageBox.Show(
                                 string.Format("Deleting device '{0}' will delete trigger '{1}', would you like continue?",
                                                 d.Name,
                                                 dvt.Name),
@@ -330,16 +330,16 @@ namespace zvs.WPF.DeviceControls
         {
             if (sender is Visual)
             {
-                HitTestResult hit = VisualTreeHelper.HitTest(sender as Visual, mousePosition);
+                var hit = VisualTreeHelper.HitTest(sender as Visual, mousePosition);
 
                 if (hit == null) return false;
 
-                DependencyObject dObj = hit.VisualHit;
+                var dObj = hit.VisualHit;
                 while (dObj != null)
                 {
                     if (dObj is Image)
                     {
-                        Image image = (Image)dObj;
+                        var image = (Image)dObj;
                         if (image.Name == "DragImage")
                             return true;
                     }
@@ -358,7 +358,7 @@ namespace zvs.WPF.DeviceControls
             {
                 if (DeviceGrid.SelectedItems.Count > 0)
                 {
-                    DataObject dataObject = new DataObject("objects", DeviceGrid.SelectedItems);
+                    var dataObject = new DataObject("objects", DeviceGrid.SelectedItems);
 
                     var devices = DeviceGrid.SelectedItems.OfType<Device>().ToList();
                     if (devices.Count > 0)
@@ -387,15 +387,15 @@ namespace zvs.WPF.DeviceControls
 
         private void OpenDeviceDetails(Device d)
         {
-            App app = (App)Application.Current;
-            DeviceDetailsWindow deviceDetailsWindow = new DeviceDetailsWindow(d.Id);
+            var app = (App)Application.Current;
+            var deviceDetailsWindow = new DeviceDetailsWindow(d.Id);
             deviceDetailsWindow.Owner = app.ZvsWindow;
             deviceDetailsWindow.Show();
         }
 
         private void SettingBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            Object obj = ((FrameworkElement)sender).DataContext;
+            var obj = ((FrameworkElement)sender).DataContext;
             if (obj is Device)
             {
                 var device = (Device)obj;
@@ -409,12 +409,12 @@ namespace zvs.WPF.DeviceControls
         string _searchstr = string.Empty;
         private void Filter_TextChanged_1(object sender, TextChangedEventArgs e)
         {
-            TextBox textbox = sender as TextBox;
+            var textbox = sender as TextBox;
             if (textbox != null)
             {
                 _searchstr = textbox.Text;
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
-                ICollectionView view = myCollectionViewSource.View;
+                var myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["devicesViewSource"];
+                var view = myCollectionViewSource.View;
                 if (!string.IsNullOrEmpty(_searchstr))
                 {
 
@@ -432,7 +432,7 @@ namespace zvs.WPF.DeviceControls
         {
             if (item is Device)
             {
-                Device d = (Device)item;
+                var d = (Device)item;
                 if (d.Name.ToLower().Contains(_searchstr.ToLower()))
                 {
                     return true;

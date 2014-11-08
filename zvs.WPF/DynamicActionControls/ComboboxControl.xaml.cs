@@ -60,7 +60,7 @@ namespace zvs.WPF.DynamicActionControls
                     SelectionChangedAction.DynamicInvoke(ComboBox.SelectedItem);
 
                     SignalImg.Opacity = 1;
-                    DoubleAnimation da = new DoubleAnimation();
+                    var da = new DoubleAnimation();
                     da.From = 1;
                     da.To = 0;
                     da.Duration = new Duration(TimeSpan.FromSeconds(.8));

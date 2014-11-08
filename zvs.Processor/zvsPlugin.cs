@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace zvs.Processor
 {
-    public abstract class zvsPlugin : INotifyPropertyChanged
+    public abstract class ZvsPlugin : INotifyPropertyChanged
     {
         public bool IsEnabled { get; set; }
         public abstract Guid PluginGuid { get; }
@@ -19,14 +19,14 @@ namespace zvs.Processor
 
         public async Task Initialize(IFeedback<LogEntry> log, ZvsContext zvsContext)
         {
-            var sb = new PluginSettingBuilder(log, zvsContext);
-            await OnSettingsCreating(sb);
+          //  var sb = new PluginSettingBuilder(log, zvsContext);
+         //   await OnSettingsCreating(sb);
 
-            var ssb = new SceneSettingBuilder(log, zvsContext);
-            await OnSceneSettingsCreating(ssb);
+         //   var ssb = new SceneSettingBuilder(zvsContext);
+        //    await OnSceneSettingsCreating(ssb);
 
-            var dsb = new DeviceSettingBuilder( zvsContext);
-            await OnDeviceSettingsCreating(dsb);
+          //  var dsb = new DeviceSettingBuilder(zvsContext);
+          //  await OnDeviceSettingsCreating(dsb);
         }
 
         public virtual Task OnDeviceSettingsCreating(DeviceSettingBuilder settingBuilder)

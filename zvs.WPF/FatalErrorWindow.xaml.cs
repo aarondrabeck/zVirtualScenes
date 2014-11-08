@@ -27,7 +27,7 @@ namespace zvs.WPF
 
         private void SendErrorBtn_Click(object sender, RoutedEventArgs e)
         {
-            string targetURL = string.Format(@"mailto:{0}?Subject={1}&Body={2}",
+            var targetURL = string.Format(@"mailto:{0}?Subject={1}&Body={2}",
                 HttpUtility.UrlEncode("zvsErrorReports@noncelabs.com"), 
                 HttpUtility.UrlEncode(Utils.ApplicationNameAndVersion + "Fatal Exception Error Report"), 
                 HttpUtility.UrlEncode(Error));

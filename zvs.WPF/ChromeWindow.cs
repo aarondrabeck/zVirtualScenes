@@ -23,10 +23,10 @@ namespace zvs.WPF
 
         void ResizeableWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            WindowInteropHelper wih = new WindowInteropHelper(this);
+            var wih = new WindowInteropHelper(this);
 
             /// Get the Handle for the Forms System Menu
-            IntPtr systemMenuHandle = NativeMethods.GetSystemMenu(wih.Handle, false);
+            var systemMenuHandle = NativeMethods.GetSystemMenu(wih.Handle, false);
 
             /// Create our new System Menu items just before the Close menu item
             // InsertMenu(systemMenuHandle, 5, MF_BYPOSITION | MF_SEPARATOR, 0, string.Empty); // <-- Add a menu separator
@@ -43,7 +43,7 @@ namespace zvs.WPF
                 NativeMethods.DeleteMenu(systemMenuHandle, NativeMethods.SC_RESTORE, NativeMethods.MF_BYCOMMAND);
 
             // Attach our WndProc handler to this Window
-            HwndSource source = HwndSource.FromHwnd(wih.Handle);
+            var source = HwndSource.FromHwnd(wih.Handle);
             source.AddHook(new HwndSourceHook(WndProc));
         }
 
@@ -51,7 +51,7 @@ namespace zvs.WPF
         {
             if (Mouse.LeftButton != MouseButtonState.Pressed)
             {
-                FrameworkElement element = e.OriginalSource as FrameworkElement;
+                var element = e.OriginalSource as FrameworkElement;
 
                 //Hack - only reset cursors if the original source isn't a drag handle
                 if (element != null && !element.Name.Contains("DragHandle"))
@@ -172,8 +172,8 @@ namespace zvs.WPF
 
         protected void ResizeIfPressed(object sender, MouseEventArgs e)
         {
-            FrameworkElement element = sender as FrameworkElement;
-            ResizeDirection direction = GetDirectionFromName(element.Name);
+            var element = sender as FrameworkElement;
+            var direction = GetDirectionFromName(element.Name);
 
             if (MinHeight > 0 &&
                 MaxHeight > 0 &&
@@ -206,13 +206,13 @@ namespace zvs.WPF
         private static ResizeDirection GetDirectionFromName(string name)
         {
             //Hack - Assumes the drag handles are all named *DragHandle
-            string enumName = name.Replace("DragHandle", "");
+            var enumName = name.Replace("DragHandle", "");
             return (ResizeDirection)Enum.Parse(typeof(ResizeDirection), enumName);
         }
 
         private void ResizeWindow(ResizeDirection direction)
         {
-            WindowInteropHelper wih = new WindowInteropHelper(this);
+            var wih = new WindowInteropHelper(this);
             NativeMethods.SendMessage(wih.Handle, NativeMethods.WM_SYSCOMMAND, (IntPtr)(61440 + direction), IntPtr.Zero);
         }
         #endregion
@@ -293,7 +293,7 @@ namespace zvs.WPF
 
                 //double pct = PointToScreen(e.GetPosition(this)).X / System.Windows.SystemParameters.PrimaryScreenWidth;
                 Top = 0;
-                Point mousePoint = this.PointToScreen(Mouse.GetPosition(this));
+                var mousePoint = this.PointToScreen(Mouse.GetPosition(this));
                 Debug.WriteLine(mousePoint.X);
                 var p = RealPixelsToWpf(this, mousePoint);
 
@@ -314,18 +314,18 @@ namespace zvs.WPF
 
         private static void WmGetMinMaxInfo(System.IntPtr hwnd, System.IntPtr lParam)
         {
-            NativeMethods.MINMAXINFO mmi = (NativeMethods.MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(NativeMethods.MINMAXINFO));
+            var mmi = (NativeMethods.MINMAXINFO)Marshal.PtrToStructure(lParam, typeof(NativeMethods.MINMAXINFO));
 
             // Adjust the maximized size and position to fit the work area of the correct monitor
-            int MONITOR_DEFAULTTONEAREST = 0x00000002;
-            System.IntPtr monitor = NativeMethods.MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+            var MONITOR_DEFAULTTONEAREST = 0x00000002;
+            var monitor = NativeMethods.MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 
             if (monitor != System.IntPtr.Zero)
             {
-                NativeMethods.MONITORINFO monitorInfo = new NativeMethods.MONITORINFO();
+                var monitorInfo = new NativeMethods.MONITORINFO();
                 NativeMethods.GetMonitorInfo(monitor, monitorInfo);
-                NativeMethods.RECT rcWorkArea = monitorInfo.rcWork;
-                NativeMethods.RECT rcMonitorArea = monitorInfo.rcMonitor;
+                var rcWorkArea = monitorInfo.rcWork;
+                var rcMonitorArea = monitorInfo.rcMonitor;
                 mmi.ptMaxPosition.x = Math.Abs(rcWorkArea.left - rcMonitorArea.left);
                 mmi.ptMaxPosition.y = Math.Abs(rcWorkArea.top - rcMonitorArea.top);
                 mmi.ptMaxSize.x = Math.Abs(rcWorkArea.right - rcWorkArea.left);
@@ -344,7 +344,7 @@ namespace zvs.WPF
         {
             if (value is bool)
             {
-                bool val = (bool)value;
+                var val = (bool)value;
                 if (val)
                     return Visibility.Visible;
                 else

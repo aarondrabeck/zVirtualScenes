@@ -50,7 +50,7 @@ namespace zvs.WPF.DeviceControls
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
                 //Load your data here and assign the result to the CollectionViewSource.
-                System.Windows.Data.CollectionViewSource myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["DeviceValueViewSource"];
+                var myCollectionViewSource = (System.Windows.Data.CollectionViewSource)this.Resources["DeviceValueViewSource"];
                 myCollectionViewSource.Source = device.Values;
             }
 
@@ -104,10 +104,10 @@ namespace zvs.WPF.DeviceControls
         {
             if (device != null)
             {
-                BuiltinCommand cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ME");
+                var cmd = await context.BuiltinCommands.FirstOrDefaultAsync(c => c.UniqueIdentifier == "REPOLL_ME");
                 if (cmd != null)
                 {
-                    CommandProcessor cp = new CommandProcessor(app.ZvsEngine);
+                    var cp = new CommandProcessor(app.ZvsEngine);
                     await cp.RunCommandAsync(this, cmd, device.Id.ToString());
                 }
             }

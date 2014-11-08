@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.ComponentModel.Composition.Hosting;
-using System.ComponentModel.Composition.Primitives;
-using System.ComponentModel.Composition.Primitives.Fakes;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.DataModel;
 using zvs.Fakes;
@@ -318,6 +311,116 @@ namespace zvs.Processor.Tests
 
             //assert 
             Assert.IsTrue(isStarted, "Adapter not started!");
+        }
+
+        [TestMethod]
+        public async Task EnableAdapterAsyncTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnableAdapterAsyncTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var log = new StubIFeedback<LogEntry>();
+            var hasStarted = false;
+            var unitTestingAdapter = new StubUnitTestAdapter
+            {
+                AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
+                NameGet = () => "Unit Testing Adapter",
+                DescriptionGet = () => "",
+                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                StartAsync01 = async () =>  hasStarted = true
+            };
+
+            var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
+
+            var adapter = new Adapter
+            {
+                AdapterGuid = Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
+            };
+            using (var context = new ZvsContext(dbConnection))
+            {
+                context.Adapters.Add(adapter);
+                await context.SaveChangesAsync(CancellationToken.None);
+            }
+
+            //act
+            var result = await adapterManager.EnableAdapterAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);
+            
+            //assert 
+            Assert.IsFalse(result.HasError, result.Message);
+            Assert.IsTrue(hasStarted, "Expected adapter startAsync to be called.");
+        }
+
+        [TestMethod]
+        public async Task EnableAdapterAsyncNotFoundTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-EnableAdapterAsyncNotFoundTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var log = new StubIFeedback<LogEntry>();
+            var adapterManager = new AdapterManager(new List<ZvsAdapter> {  }, dbConnection, log);
+
+            //act
+            var result = await adapterManager.EnableAdapterAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);
+
+            //assert 
+            Assert.IsTrue(result.HasError, result.Message);
+        }
+
+        [TestMethod]
+        public async Task DisableAdapterAsyncTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisableAdapterAsyncTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var log = new StubIFeedback<LogEntry>();
+            var hasStopped = false;
+            var unitTestingAdapter = new StubUnitTestAdapter
+            {
+                AdapterGuidGet = () => Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
+                NameGet = () => "Unit Testing Adapter",
+                DescriptionGet = () => "",
+                OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
+                StopAsync01 = async () => hasStopped = true
+            };
+
+            var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
+
+            var adapter = new Adapter
+            {
+                AdapterGuid = Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"),
+            };
+            using (var context = new ZvsContext(dbConnection))
+            {
+                context.Adapters.Add(adapter);
+                await context.SaveChangesAsync(CancellationToken.None);
+            }
+
+            //act
+            var result = await adapterManager.DisableAdapterAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);
+
+            //assert 
+            Assert.IsFalse(result.HasError, result.Message);
+            Assert.IsTrue(hasStopped, "Expected adapter StopAsync to be called.");
+        }
+
+        [TestMethod]
+        public async Task DisableAdapterAsyncNotFoundTest()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "am-DisableAdapterAsyncNotFoundTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var log = new StubIFeedback<LogEntry>();
+            var adapterManager = new AdapterManager(new List<ZvsAdapter> { }, dbConnection, log);
+
+            //act
+            var result = await adapterManager.DisableAdapterAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);
+
+            //assert 
+            Assert.IsTrue(result.HasError, result.Message);
         }
 
         public class StubUnitTestAdapter : StubZvsAdapter

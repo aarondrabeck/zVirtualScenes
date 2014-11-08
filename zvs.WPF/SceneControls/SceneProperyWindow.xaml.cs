@@ -36,7 +36,7 @@ namespace zvs.WPF.SceneControls
 
         private async void ResetBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            using (ZvsContext context = new ZvsContext())
+            using (var context = new ZvsContext())
             {
                 var scene = await context.Scenes.FirstOrDefaultAsync(sc => sc.Id == SceneID);
                 if (scene != null)

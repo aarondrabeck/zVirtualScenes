@@ -103,14 +103,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Backup\BackupRestoreControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Backup\BackupRestoreWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Resources\ChromeStyledWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -125,12 +117,6 @@
     </Page>
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Backup\BackupRestoreControl.xaml.cs">
-      <DependentUpon>BackupRestoreControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Backup\BackupRestoreWindow.xaml.cs">
-      <DependentUpon>BackupRestoreWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources\ChromeStyledWindow.xaml.cs">
       <DependentUpon>ChromeStyledWindow.xaml</DependentUpon>
@@ -583,6 +569,9 @@
     <Content Include="scripts\TriggerSceneEmail.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Backup\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

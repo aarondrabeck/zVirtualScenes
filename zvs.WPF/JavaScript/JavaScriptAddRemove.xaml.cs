@@ -36,7 +36,7 @@ namespace zvs.WPF.JavaScript
             // Do not load your data at design time.
             if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
             {
-                System.Windows.Data.CollectionViewSource CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("CmdsViewSource")));
+                var CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("CmdsViewSource")));
 
                 await context.JavaScriptCommands
                     .ToListAsync();
@@ -109,10 +109,10 @@ namespace zvs.WPF.JavaScript
 
         private async void AddBtn_Click(object sender, RoutedEventArgs e)
         {
-            JavaScriptCommand jsCommand = new JavaScriptCommand();
+            var jsCommand = new JavaScriptCommand();
             jsCommand.Name = "My JavaScript";
             jsCommand.UniqueIdentifier = Guid.NewGuid().ToString();
-            JavaScriptEditorWindow window = new JavaScriptEditorWindow(context, jsCommand);
+            var window = new JavaScriptEditorWindow(context, jsCommand);
             window.Owner = this;
 
             var result = window.ShowDialog();
@@ -132,7 +132,7 @@ namespace zvs.WPF.JavaScript
 
         private async void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
-            JavaScriptCommand jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
+            var jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
 
             if (jsCommand == null)
                 return;
@@ -148,7 +148,7 @@ namespace zvs.WPF.JavaScript
 
                 foreach (StoredCommand sc in await context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync())
                 {
-                    string error = string.Empty;
+                    var error = string.Empty;
 
                     var result = await sc.TryRemoveDependenciesAsync(context);
                     if (result.HasError)
@@ -174,12 +174,12 @@ namespace zvs.WPF.JavaScript
 
         private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            JavaScriptCommand jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
+            var jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
 
             if (jsCommand == null)
                 return;
 
-            JavaScriptEditorWindow window = new JavaScriptEditorWindow(context, jsCommand);
+            var window = new JavaScriptEditorWindow(context, jsCommand);
             window.Owner = this;
 
             var result = window.ShowDialog();

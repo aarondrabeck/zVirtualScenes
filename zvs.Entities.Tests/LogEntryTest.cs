@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zvs.Fakes;
 
-namespace zvs.Entities.Tests
+namespace zvs.DataModel.Tests
 {
     [TestClass]
     public class LogEntryTest

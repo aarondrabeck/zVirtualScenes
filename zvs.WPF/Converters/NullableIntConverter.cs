@@ -10,13 +10,13 @@ namespace zvs.WPF.Converters
             if (value == null)
                 return null;
 
-            string strVal = value.ToString();
+            var strVal = value.ToString();
 
             if (string.IsNullOrEmpty(strVal))
                 return null;
             else
             {            
-                int v = 0;
+                var v = 0;
                 if (int.TryParse(strVal, out v))
                     return v;
                 else

@@ -87,6 +87,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdapterManagerTests.cs" />
+    <Compile Include="BuiltinCommandBuilderTests.cs" />
+    <Compile Include="PluginSettingBuilderTests.cs" />
     <Compile Include="DatabaseObjectHelpers.cs" />
     <Compile Include="DeviceCommandBuilderTests.cs" />
     <Compile Include="DeviceTypeBuilderTests.cs" />
@@ -95,12 +97,15 @@
     <Compile Include="SceneRunnerTests.cs" />
     <Compile Include="CommandProcessorTests.cs" />
     <Compile Include="ChangeListenerTests.cs" />
+    <Compile Include="DeviceSettingBuilderTests.cs" />
     <Compile Include="TriggerRunnerTests.cs" />
     <Compile Include="CreateFreshDbInitializer.cs" />
     <Compile Include="ScheduledTaskTests.cs" />
     <Compile Include="ScheduledTaskRunnerTests.cs" />
     <Compile Include="DeviceValueBuilderTests.cs" />
     <Compile Include="AdapterSettingBuilderTests.cs" />
+    <Compile Include="SceneSettingBuilderTests.cs" />
+    <Compile Include="FeedbackExtensionMethodTests.cs" />
     <Compile Include="UnitTestingAdapter.cs" />
     <Compile Include="ZvsAdapterTests.cs" />
   </ItemGroup>

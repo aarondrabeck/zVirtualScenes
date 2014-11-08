@@ -113,10 +113,10 @@ namespace zvs.WPF
             if (plugin != null)
             {
                 //ADD THE ENABLED BUTTON
-                CheckboxControl c = new CheckboxControl(string.Format("{0} is enabled", plugin.Name),
+                var c = new CheckboxControl(string.Format("{0} is enabled", plugin.Name),
                     "Starts and stops the selected plug-in",
                     plugin.IsEnabled,
-                    async (isChecked) =>
+                    async isChecked =>
                     {
                         //Save to the database
                         plugin.IsEnabled = isChecked;
@@ -144,13 +144,13 @@ namespace zvs.WPF
                     {
                         case DataType.BOOL:
                             {
-                                bool DefaultValue = false;
+                                var DefaultValue = false;
                                 bool.TryParse(pluginSettings.Value, out DefaultValue);
 
-                                CheckboxControl control = new CheckboxControl(pluginSettings.Name,
+                                var control = new CheckboxControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     DefaultValue,
-                                    async (isChecked) =>
+                                    async isChecked =>
                                     {
                                         pluginSettings.Value = isChecked.ToString();
                                         var result = await context.TrySaveChangesAsync();
@@ -165,11 +165,11 @@ namespace zvs.WPF
                             }
                         case DataType.DECIMAL:
                             {
-                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                var control = new NumericControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Value,
                                     NumericControl.NumberType.Decimal,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -184,11 +184,11 @@ namespace zvs.WPF
                             }
                         case DataType.BYTE:
                             {
-                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                var control = new NumericControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Value,
                                     NumericControl.NumberType.Byte,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
 
@@ -204,11 +204,11 @@ namespace zvs.WPF
                             }
                         case DataType.INTEGER:
                             {
-                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                var control = new NumericControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Value,
                                     NumericControl.NumberType.Integer,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
 
@@ -224,11 +224,11 @@ namespace zvs.WPF
                             }
                         case DataType.SHORT:
                             {
-                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                var control = new NumericControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Value,
                                     NumericControl.NumberType.Short,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -243,11 +243,11 @@ namespace zvs.WPF
                             }
                         case DataType.COMPORT:
                             {
-                                NumericControl control = new NumericControl(pluginSettings.Name,
+                                var control = new NumericControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Value,
                                     NumericControl.NumberType.ComPort,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -262,10 +262,10 @@ namespace zvs.WPF
                             }
                         case DataType.STRING:
                             {
-                                StringControl control = new StringControl(pluginSettings.Name,
+                                var control = new StringControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Value,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();
@@ -280,11 +280,11 @@ namespace zvs.WPF
                             }
                         case DataType.LIST:
                             {
-                                ComboboxControl control = new ComboboxControl(pluginSettings.Name,
+                                var control = new ComboboxControl(pluginSettings.Name,
                                     pluginSettings.Description,
                                     pluginSettings.Options.Select(o => o.Name).ToList(),
                                     pluginSettings.Value,
-                                    async (value) =>
+                                    async value =>
                                     {
                                         pluginSettings.Value = value;
                                         var result = await context.TrySaveChangesAsync();

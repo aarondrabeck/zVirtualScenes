@@ -12,36 +12,36 @@ namespace zvs.Processor
 {
     public class PluginSettingBuilder
     {
-        private IFeedback<LogEntry> Log { get; set; }
-        private ZvsContext Context { get; set; }
-
-        public PluginSettingBuilder(IFeedback<LogEntry> log, ZvsContext zvsContext)
+        private IEntityContextConnection EntityContextConnection { get; set; }
+        private CancellationToken CancellationToken { get; set; }
+        public PluginSettingBuilder(IEntityContextConnection entityContextConnection, CancellationToken cancellationToken)
         {
-            Context = zvsContext;
-            Log = log;
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
+            CancellationToken = cancellationToken;
         }
 
-        public PlugingTypeConfiguration<T> Plugin<T>(T plugin) where T : zvsPlugin
+        public PluginTypeConfiguration<T> Plugin<T>(T plugin) where T : ZvsPlugin
         {
-            return new PlugingTypeConfiguration<T>(plugin, this);
+            return new PluginTypeConfiguration<T>(plugin, this);
         }
 
-        public class PlugingTypeConfiguration<T> where T : zvsPlugin
+        public class PluginTypeConfiguration<T> where T : ZvsPlugin
         {
             private T Plugin { get; set; }
             private PluginSettingBuilder PluginSettingBuilder { get; set; }
 
-            public PlugingTypeConfiguration(T plugin, PluginSettingBuilder sb)
+            public PluginTypeConfiguration(T plugin, PluginSettingBuilder sb)
             {
                 Plugin = plugin;
                 PluginSettingBuilder = sb;
             }
 
-
-            public async Task RegisterPluginSettingAsync<T, R>(PluginSetting pluginSetting,
-               Expression<Func<T, R>> property, CancellationToken cancellationToken) where T : zvsPlugin
+            public async Task<Result> RegisterPluginSettingAsync(PluginSetting pluginSetting, Expression<Func<T, Object>> property)
             {
-                var memberExpression = property.Body as MemberExpression;
+                MemberExpression memberExpression = (property.Body.NodeType == ExpressionType.Convert) ? (MemberExpression)((UnaryExpression)property.Body).Operand : property.Body as MemberExpression;
                 if (memberExpression != null)
                 {
                     var propertyInfo = memberExpression.Member as PropertyInfo;
@@ -53,49 +53,58 @@ namespace zvs.Processor
                     pluginSetting.UniqueIdentifier = propertyInfo.Name;
                 }
 
-                var plugin = await PluginSettingBuilder.Context.Plugins.FirstOrDefaultAsync(p => p.PluginGuid == Plugin.PluginGuid, cancellationToken);
-
-                if (plugin == null)
-                    return;
-
-                var changed = false;
-
-                var existingPs = await PluginSettingBuilder.Context.PluginSettings.FirstOrDefaultAsync(o => o.Plugin.Id == plugin.Id && o.UniqueIdentifier == pluginSetting.UniqueIdentifier, cancellationToken);
-                if (existingPs == null)
+                using (var context = new ZvsContext(PluginSettingBuilder.EntityContextConnection))
                 {
-                    plugin.Settings.Add(pluginSetting);
-                    changed = true;
-                }
-                else
-                {
-                    PropertyChangedEventHandler handler = (s, a) => changed = true;
-                    existingPs.PropertyChanged += handler;
+                    var plugin =
+                        await
+                            context.Plugins.FirstOrDefaultAsync(p => p.PluginGuid == Plugin.PluginGuid,
+                                PluginSettingBuilder.CancellationToken);
+                    if (plugin == null)
+                        return Result.ReportError("Invalid Plugin");
 
-                    existingPs.Name = pluginSetting.Name;
-                    existingPs.Description = pluginSetting.Description;
-                    existingPs.ValueType = pluginSetting.ValueType;
-                    existingPs.PropertyChanged -= handler;
-
-                    foreach (var option in pluginSetting.Options.Where(option => existingPs.Options.All(o => o.Name != option.Name)))
+                    var existingPlugin = await context.PluginSettings.FirstOrDefaultAsync(
+                                o => o.Plugin.Id == plugin.Id && o.UniqueIdentifier == pluginSetting.UniqueIdentifier,
+                                PluginSettingBuilder.CancellationToken);
+                    var changed = false;
+                    if (existingPlugin == null)
                     {
-                        existingPs.Options.Add(option);
+                        plugin.Settings.Add(pluginSetting);
                         changed = true;
                     }
-
-                    foreach (var option in existingPs.Options.Where(option => pluginSetting.Options.All(o => o.Name != option.Name)))
+                    else
                     {
-                        PluginSettingBuilder.Context.PluginSettingOptions.Local.Remove(option);
-                        changed = true;
+
+                        PropertyChangedEventHandler handler = (s, a) => changed = true;
+                        existingPlugin.PropertyChanged += handler;
+
+                        existingPlugin.Description = pluginSetting.Description;
+                        existingPlugin.Name = pluginSetting.Name;
+                        existingPlugin.ValueType = pluginSetting.ValueType;
+
+                        existingPlugin.PropertyChanged -= handler;
+
+                        var added = pluginSetting.Options.Where(
+                            option => existingPlugin.Options.All(o => o.Name != option.Name)).ToList();
+                        foreach (var option in added)
+                        {
+                            existingPlugin.Options.Add(option);
+                            changed = true;
+                        }
+
+                        var removed = existingPlugin.Options.Where(
+                            option => pluginSetting.Options.All(o => o.Name != option.Name)).ToList();
+                        foreach (var option in removed)
+                        {
+                            context.PluginSettingOptions.Local.Remove(option);
+                            changed = true;
+                        }
                     }
+
+                    if (changed)
+                        return await context.TrySaveChangesAsync(PluginSettingBuilder.CancellationToken);
                 }
-                if (changed)
-                {
-                    var result = await PluginSettingBuilder.Context.TrySaveChangesAsync(cancellationToken);
-                    if (result.HasError)
-                        await PluginSettingBuilder.Log.ReportErrorAsync(result.Message,cancellationToken);
-                }
+                return Result.ReportSuccess("Nothing to update");
             }
         }
-
     }
 }

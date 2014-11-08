@@ -129,7 +129,7 @@ namespace zvs.WPF.DynamicActionControls
                 SendCommandAction.DynamicInvoke(TextBox.Text);
 
                 SignalImg.Opacity = 1;
-                DoubleAnimation da = new DoubleAnimation();
+                var da = new DoubleAnimation();
                 da.From = 1;
                 da.To = 0;
                 da.Duration = new Duration(TimeSpan.FromSeconds(.8));
@@ -166,7 +166,7 @@ namespace zvs.WPF.DynamicActionControls
                     }
                 case NumberType.Integer:
                     {
-                        int num = 0;
+                        var num = 0;
                         if (int.TryParse(value, out num))
                         {
                             if (num >= int.MinValue && num <= int.MaxValue)
@@ -186,7 +186,7 @@ namespace zvs.WPF.DynamicActionControls
                     }
                 case NumberType.ComPort:
                     {
-                        int num = 0;
+                        var num = 0;
                         if (int.TryParse(value, out num))
                         {
                             if (num >= 0 && num <= 99)

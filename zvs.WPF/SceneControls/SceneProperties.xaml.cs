@@ -80,17 +80,17 @@ namespace zvs.WPF.SceneControls
                     .FirstOrDefaultAsync(v => v.SceneSetting.Id == sceneSetting.Id &&
                         v.SceneId == scene.Id);
 
-                string _default = sceneSettingValue == null ? sceneSetting.Value : sceneSettingValue.Value;
+                var _default = sceneSettingValue == null ? sceneSetting.Value : sceneSettingValue.Value;
 
                 switch (sceneSetting.ValueType)
                 {
                     case DataType.BOOL:
                         {
                             //get the current value from the value table list
-                            bool DefaultValue = false;
+                            var DefaultValue = false;
                             bool.TryParse(_default, out DefaultValue);
 
-                            CheckboxControl control = new CheckboxControl(sceneSetting.Name, string.Empty, DefaultValue, async (isChecked) =>
+                            var control = new CheckboxControl(sceneSetting.Name, string.Empty, DefaultValue, async isChecked =>
                             {
                                 if (sceneSettingValue != null)
                                 {
@@ -117,11 +117,11 @@ namespace zvs.WPF.SceneControls
                         }
                     case DataType.DECIMAL:
                         {
-                            NumericControl control = new NumericControl(sceneSetting.Name,
+                            var control = new NumericControl(sceneSetting.Name,
                                 string.Empty,
                                 _default,
                                 NumericControl.NumberType.Decimal,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {
@@ -148,11 +148,11 @@ namespace zvs.WPF.SceneControls
                         }
                     case DataType.INTEGER:
                         {
-                            NumericControl control = new NumericControl(sceneSetting.Name,
+                            var control = new NumericControl(sceneSetting.Name,
                                 string.Empty,
                                 _default,
                                 NumericControl.NumberType.Integer,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {
@@ -179,11 +179,11 @@ namespace zvs.WPF.SceneControls
                         }
                     case DataType.BYTE:
                         {
-                            NumericControl control = new NumericControl(sceneSetting.Name,
+                            var control = new NumericControl(sceneSetting.Name,
                                 string.Empty,
                                 _default,
                                 NumericControl.NumberType.Byte,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {
@@ -210,11 +210,11 @@ namespace zvs.WPF.SceneControls
                         }
                     case DataType.SHORT:
                         {
-                            NumericControl control = new NumericControl(sceneSetting.Name,
+                            var control = new NumericControl(sceneSetting.Name,
                                 string.Empty,
                                 _default,
                                 NumericControl.NumberType.Short,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {
@@ -242,10 +242,10 @@ namespace zvs.WPF.SceneControls
 
                     case DataType.STRING:
                         {
-                            StringControl control = new StringControl(sceneSetting.Name,
+                            var control = new StringControl(sceneSetting.Name,
                                 string.Empty,
                                 _default,
-                               async (value) =>
+                               async value =>
                                {
                                    if (sceneSettingValue != null)
                                    {
@@ -273,11 +273,11 @@ namespace zvs.WPF.SceneControls
 
                     case DataType.LIST:
                         {
-                            ComboboxControl control = new ComboboxControl(sceneSetting.Name,
+                            var control = new ComboboxControl(sceneSetting.Name,
                                 string.Empty,
                                 sceneSetting.Options.Select(o => o.Name).ToList(),
                                 _default,
-                                async (value) =>
+                                async value =>
                                 {
                                     if (sceneSettingValue != null)
                                     {

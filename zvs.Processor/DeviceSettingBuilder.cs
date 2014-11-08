@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using zvs.DataModel;
@@ -9,58 +10,64 @@ namespace zvs.Processor
 {
     public class DeviceSettingBuilder
     {
-        private ZvsContext Context { get; set; }
+        private IEntityContextConnection EntityContextConnection { get; set; }
 
-        public DeviceSettingBuilder(ZvsContext zvsContext)
+        public DeviceSettingBuilder(IEntityContextConnection entityContextConnection)
         {
-            Context = zvsContext;
+            if (entityContextConnection == null)
+                throw new ArgumentNullException("entityContextConnection");
+
+            EntityContextConnection = entityContextConnection;
         }
 
-        public async Task RegisterAsync(DeviceSetting deviceSetting, CancellationToken cancellationToken)
+        public async Task<Result> RegisterAsync(DeviceSetting deviceSetting, CancellationToken cancellationToken)
         {
             if (deviceSetting == null)
+                return Result.ReportError("deviceSetting is null");
+
+            using (var context = new ZvsContext(EntityContextConnection))
             {
-                return;
-            }
+                var setting = await context.DeviceSettings
+                    .Include(o => o.Options)
+                    .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier, cancellationToken);
 
-            var setting = await Context.DeviceSettings
-                .Include(o => o.Options)
-                .FirstOrDefaultAsync(d => d.UniqueIdentifier == deviceSetting.UniqueIdentifier, cancellationToken);
-
-            var changed = false;
-            if (setting == null)
-            {
-                Context.DeviceSettings.Add(deviceSetting);
-                changed = true;
-            }
-            else
-            {
-                PropertyChangedEventHandler handler = (s, a) => changed = true;
-                setting.PropertyChanged += handler;
-
-                setting.Name = deviceSetting.Name;
-                setting.Description = deviceSetting.Description;
-                setting.ValueType = deviceSetting.ValueType;
-                setting.Value = deviceSetting.Value;
-
-                setting.PropertyChanged -= handler;
-
-                foreach (var option in deviceSetting.Options.Where(option => setting.Options.All(o => o.Name != option.Name)))
+                var changed = false;
+                if (setting == null)
                 {
-                    setting.Options.Add(option);
+                    context.DeviceSettings.Add(deviceSetting);
                     changed = true;
                 }
-
-                foreach (var option in setting.Options.Where(option => deviceSetting.Options.All(o => o.Name != option.Name)))
+                else
                 {
-                    Context.DeviceSettingOptions.Local.Remove(option);
-                    changed = true;
-                }
-            }
+                    PropertyChangedEventHandler handler = (s, a) => changed = true;
+                    setting.PropertyChanged += handler;
 
-            if (changed)
-            {
-                //return await Context.TrySaveChangesAsync(cancellationToken);
+                    setting.Name = deviceSetting.Name;
+                    setting.Description = deviceSetting.Description;
+                    setting.ValueType = deviceSetting.ValueType;
+                    setting.Value = deviceSetting.Value;
+
+                    setting.PropertyChanged -= handler;
+
+                    var added = deviceSetting.Options.Where(option => setting.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in added)
+                    {
+                        setting.Options.Add(option);
+                        changed = true;
+                    }
+
+                    var removed = setting.Options.Where(option => deviceSetting.Options.All(o => o.Name != option.Name)).ToList();
+                    foreach (var option in removed)
+                    {
+                        context.DeviceSettingOptions.Local.Remove(option);
+                        changed = true;
+                    }
+                }
+
+                if (changed)
+                    return await context.TrySaveChangesAsync(cancellationToken);
+
+                return Result.ReportSuccess("Nothing to update");
             }
         }
     }
