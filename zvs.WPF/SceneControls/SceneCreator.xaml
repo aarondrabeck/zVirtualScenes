@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:zvs="clr-namespace:zvs.WPF"
     xmlns:local="clr-namespace:zvs.WPF.SceneControls"
-    xmlns:zvsEntities="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
+    xmlns:zvsEntities="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" 
     xmlns:DeviceControls="clr-namespace:zvs.WPF.DeviceControls" x:Class="zvs.WPF.SceneControls.SceneCreator" 
     mc:Ignorable="d" 
     Loaded="UserControl_Loaded_1" 

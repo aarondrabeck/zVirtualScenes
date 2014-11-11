@@ -11,13 +11,13 @@ namespace zvs.Processor
 {
     public class AdapterManager : IAdapterManager
     {
-        private List<ZvsAdapter> Adapters { get; set; } 
+        private IEnumerable<ZvsAdapter> Adapters { get; set; } 
         private IEntityContextConnection EntityContextConnection { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
 
         private readonly Dictionary<Guid, ZvsAdapter> _adapterLookup = new Dictionary<Guid, ZvsAdapter>();
 
-        public AdapterManager(List<ZvsAdapter> adapters, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
+        public AdapterManager(IEnumerable<ZvsAdapter> adapters, IEntityContextConnection entityContextConnection, IFeedback<LogEntry> log)
         {
             if (adapters == null)
                 throw new ArgumentNullException("adapters");
@@ -32,12 +32,19 @@ namespace zvs.Processor
             Log = log;
             Adapters = adapters;
 
+            Log.Source = "Adapter Manager";
+
             _adapterLookup = Adapters.ToDictionary(o => o.AdapterGuid, o => o);
         }
 
-        public ZvsAdapter GetZvsAdapterByGuid(Guid adapterGuid)
+        public ZvsAdapter FindZvsAdapter(Guid adapterGuid)
         {
             return !_adapterLookup.ContainsKey(adapterGuid) ? null : _adapterLookup[adapterGuid];
+        }
+
+        public IReadOnlyList<ZvsAdapter> GetZvsAdapters()
+        {
+            return Adapters.ToList();
         }
 
         public async Task InitializeAdaptersAsync(CancellationToken cancellationToken)
@@ -134,7 +141,7 @@ namespace zvs.Processor
 
         public async Task<Result> EnableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
         {
-            var adapter = GetZvsAdapterByGuid(adapterGuid);
+            var adapter = FindZvsAdapter(adapterGuid);
             if (adapter == null)
                 return Result.ReportErrorFormat("Unable to enable adapter with Guid of {0}", adapterGuid);
 
@@ -155,7 +162,7 @@ namespace zvs.Processor
 
         public async Task<Result> DisableAdapterAsync(Guid adapterGuid, CancellationToken cancellationToken)
         {
-            var adapter = GetZvsAdapterByGuid(adapterGuid);
+            var adapter = FindZvsAdapter(adapterGuid);
             if (adapter == null)
                 return Result.ReportErrorFormat("Unable to disable adapter with Guid of {0}", adapterGuid);
 

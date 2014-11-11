@@ -50,7 +50,7 @@ namespace zvs.Processor
                     deviceCommand.Device.Name, deviceCommand.Id, deviceCommand.Device.Id);
 
                 var aGuid = deviceCommand.Device.Type.Adapter.AdapterGuid;
-                var adapter = AdapterManager.GetZvsAdapterByGuid(aGuid);
+                var adapter = AdapterManager.FindZvsAdapter(aGuid);
                 if (adapter == null)
                 {
                     return Result.ReportErrorFormat("{0} failed, device adapter is not loaded!",
@@ -87,7 +87,7 @@ namespace zvs.Processor
                                                        device.Name);
 
                 var aGuid = device.Type.Adapter.AdapterGuid;
-                var adapter = AdapterManager.GetZvsAdapterByGuid(aGuid);
+                var adapter = AdapterManager.FindZvsAdapter(aGuid);
                 if (adapter == null)
                 {
                     return Result.ReportErrorFormat("{0} failed, device adapter is not loaded!",
@@ -128,7 +128,7 @@ namespace zvs.Processor
                                 .FirstOrDefaultAsync(o => o.Type.UniqueIdentifier != "BUILTIN" && o.Id == dId,
                                     cancellationToken);
 
-                            var adapter = AdapterManager.GetZvsAdapterByGuid(device.Type.Adapter.AdapterGuid);
+                            var adapter = AdapterManager.FindZvsAdapter(device.Type.Adapter.AdapterGuid);
                             if (adapter == null)
                                 return
                                     Result.ReportErrorFormat(
@@ -174,7 +174,7 @@ namespace zvs.Processor
                                 .ToListAsync(cancellationToken);
 
                             //EXECUTE ON ALL Adapters
-                            foreach (var adapter in adapterGuids.Select(adapterGuid => AdapterManager.GetZvsAdapterByGuid(adapterGuid)).Where(adapter => adapter != null && adapter.IsEnabled))
+                            foreach (var adapter in adapterGuids.Select(adapterGuid => AdapterManager.FindZvsAdapter(adapterGuid)).Where(adapter => adapter != null && adapter.IsEnabled))
                             {
                                 if (command.UniqueIdentifier == "GROUP_ON")
                                     await adapter.ActivateGroupAsync(@group);

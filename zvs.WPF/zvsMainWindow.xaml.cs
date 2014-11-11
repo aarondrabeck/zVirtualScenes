@@ -45,12 +45,15 @@ namespace zvs.WPF
         {
             // Do not load your data at design time.
             if (DesignerProperties.GetIsInDesignMode(this)) return;
-            //Load your data here and assign the result to the CollectionViewSource.
-            var myCollectionViewSource = (CollectionViewSource)Resources["ListViewSource"];
-            myCollectionViewSource.Source = await _context.LogEntries
-                .OrderBy(o => o.Datetime)
+
+            await _context.LogEntries
+                .OrderByDescending(o => o.Datetime)
                 .Take(100)
                 .ToListAsync();
+
+            //Load your data here and assign the result to the CollectionViewSource.
+            var myCollectionViewSource = (CollectionViewSource)Resources["ListViewSource"];
+            myCollectionViewSource.Source = _context.LogEntries.Local.OrderBy(o => o.Datetime);
 
             var log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Main Window" };
             await log.ReportInfoFormatAsync(_app.Cts.Token, "{0} User Interface Loaded", Utils.ApplicationName);
@@ -191,8 +194,9 @@ namespace zvs.WPF
 
         private void BackupRestoreMI_Click(object sender, RoutedEventArgs e)
         {
-            var window = new BackupRestoreWindow { Owner = this };
-            window.ShowDialog();
+            //TODO: RESTORE
+            //var window = new BackupRestoreWindow { Owner = this };
+          //  window.ShowDialog();
         }
     }
     public class ContentToMarginConverter : IValueConverter

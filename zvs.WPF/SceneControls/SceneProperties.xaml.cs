@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using zvs.Processor;
 using zvs.WPF.DynamicActionControls;
 using zvs.DataModel;
 using System.Data.Entity;
@@ -13,39 +14,27 @@ namespace zvs.WPF.SceneControls
     /// <summary>
     /// Interaction logic for SceneProperties.xaml
     /// </summary>
-    public partial class SceneProperties : UserControl
+    public partial class SceneProperties
     {
-        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private ZvsContext context = null;
-
-        private int _SceneID = 0;
-        public int SceneID
-        {
-            get
-            {
-                return this._SceneID;
-            }
-            set
-            {
-
-                this._SceneID = value;
-            }
-        }
+        private readonly BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
+        private ZvsContext Context { get; set; }
+        private IFeedback<LogEntry> Log { get; set; }
+        private readonly App _app = (App)Application.Current;
+        public int SceneId { get; set; }
 
         public SceneProperties()
         {
+            SceneId = 0;
+            Context = new ZvsContext(_app.EntityContextConnection);
+            Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Scene Properties" };
 
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                InitializeComponent();
-                context = new ZvsContext();
-            }
+            if (System.ComponentModel.DesignerProperties.GetIsInDesignMode(this)) return;
+            InitializeComponent();
         }
 
-        public SceneProperties(int SceneID)
-            : base()
+        public SceneProperties(int sceneId)
         {
-            this.SceneID = SceneID;
+            SceneId = sceneId;
         }
 
         private async void UserControl_Loaded_1(object sender, RoutedEventArgs e)
@@ -65,18 +54,18 @@ namespace zvs.WPF.SceneControls
         {
             PropertiesStkPnl.Children.Clear();
 
-            var scene = await context.Scenes
+            var scene = await Context.Scenes
                 .Include(o => o.SettingValues)
-                .FirstOrDefaultAsync(sc => sc.Id == SceneID);
+                .FirstOrDefaultAsync(sc => sc.Id == SceneId);
 
             if (scene == null)
                 return;
 
             #region Scene Properties
-            foreach (var sp in await context.SceneSettings.ToListAsync())
+            foreach (var sp in await Context.SceneSettings.ToListAsync())
             {
                 var sceneSetting = sp;
-                var sceneSettingValue = await context.SceneSettingValues
+                var sceneSettingValue = await Context.SceneSettingValues
                     .FirstOrDefaultAsync(v => v.SceneSetting.Id == sceneSetting.Id &&
                         v.SceneId == scene.Id);
 
@@ -87,10 +76,10 @@ namespace zvs.WPF.SceneControls
                     case DataType.BOOL:
                         {
                             //get the current value from the value table list
-                            var DefaultValue = false;
-                            bool.TryParse(_default, out DefaultValue);
+                            bool defaultValue;
+                            bool.TryParse(_default, out defaultValue);
 
-                            var control = new CheckboxControl(sceneSetting.Name, string.Empty, DefaultValue, async isChecked =>
+                            var control = new CheckboxControl(sceneSetting.Name, string.Empty, defaultValue, async isChecked =>
                             {
                                 if (sceneSettingValue != null)
                                 {
@@ -106,9 +95,9 @@ namespace zvs.WPF.SceneControls
                                     scene.SettingValues.Add(sceneSettingValue);
                                 }
 
-                                var result = await context.TrySaveChangesAsync();
+                                var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                 if (result.HasError)
-                                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                    await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                             },
                             icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -137,9 +126,9 @@ namespace zvs.WPF.SceneControls
                                         scene.SettingValues.Add(sceneSettingValue);
                                     }
 
-                                    var result = await context.TrySaveChangesAsync();
+                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
-                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -168,9 +157,9 @@ namespace zvs.WPF.SceneControls
                                         scene.SettingValues.Add(sceneSettingValue);
                                     }
 
-                                    var result = await context.TrySaveChangesAsync();
+                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
-                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -199,9 +188,9 @@ namespace zvs.WPF.SceneControls
                                         scene.SettingValues.Add(sceneSettingValue);
                                     }
 
-                                    var result = await context.TrySaveChangesAsync();
+                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
-                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -230,9 +219,9 @@ namespace zvs.WPF.SceneControls
                                         scene.SettingValues.Add(sceneSettingValue);
                                     }
 
-                                    var result = await context.TrySaveChangesAsync();
+                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
-                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -261,9 +250,9 @@ namespace zvs.WPF.SceneControls
                                        scene.SettingValues.Add(sceneSettingValue);
                                    }
 
-                                   var result = await context.TrySaveChangesAsync();
+                                   var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                    if (result.HasError)
-                                       ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                       await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);
@@ -294,9 +283,9 @@ namespace zvs.WPF.SceneControls
                                         scene.SettingValues.Add(sceneSettingValue);
                                     }
 
-                                    var result = await context.TrySaveChangesAsync();
+                                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
-                                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scene. {0}", result.Message);
                                 },
                                 icon);
                             PropertiesStkPnl.Children.Add(control);

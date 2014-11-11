@@ -489,12 +489,12 @@ namespace zvs.WPF.Commands
         {
             var selectedDevice = (Device)DevicesCmboBox.SelectedItem;
             DeviceArgSckPnl.Children.Clear();
-            if (DeviceCmdsCmboBox.SelectedItem == null) return;
-            var cmd = DeviceCmdsCmboBox.SelectedItem as DeviceTypeCommand;
-            if (cmd != null)
+            
+            var deviceTypeCommand = DeviceCmdsCmboBox.SelectedItem as DeviceTypeCommand;
+            if (deviceTypeCommand != null)
             {
                 #region Device Type Commands
-                switch (cmd.ArgumentType)
+                switch (deviceTypeCommand.ArgumentType)
                 {
                     case DataType.NONE:
                     {
@@ -511,7 +511,7 @@ namespace zvs.WPF.Commands
                         bool defaultValue;
                         if (!bool.TryParse(StoredCommand.Argument, out defaultValue))
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                             {
                                 bool.TryParse(dv.Value, out defaultValue);
@@ -519,7 +519,7 @@ namespace zvs.WPF.Commands
                         }
                         _selectedDeviceArg = defaultValue.ToString();
 
-                        var control = new CheckboxControl(cmd.Name, cmd.Description, defaultValue, isChecked =>
+                        var control = new CheckboxControl(deviceTypeCommand.Name, deviceTypeCommand.Description, defaultValue, isChecked =>
                         {
                             _selectedDeviceArg = isChecked.ToString();
                         }, _icon);
@@ -533,13 +533,13 @@ namespace zvs.WPF.Commands
                         decimal defaultValue;
                         if (!decimal.TryParse(StoredCommand.Argument, out defaultValue))
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                                 decimal.TryParse(dv.Value, out defaultValue);
                         }
                         _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                        var control = new NumericControl(cmd.Name,
-                            cmd.Description,
+                        var control = new NumericControl(deviceTypeCommand.Name,
+                            deviceTypeCommand.Description,
                             defaultValue.ToString(CultureInfo.InvariantCulture),
                             NumericControl.NumberType.Decimal,
                             value =>
@@ -556,13 +556,13 @@ namespace zvs.WPF.Commands
                         int defaultValue;
                         if (!int.TryParse(StoredCommand.Argument, out defaultValue))
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                                 int.TryParse(dv.Value, out defaultValue);
                         }
                         _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                        var control = new NumericControl(cmd.Name,
-                            cmd.Description,
+                        var control = new NumericControl(deviceTypeCommand.Name,
+                            deviceTypeCommand.Description,
                             defaultValue.ToString(CultureInfo.InvariantCulture),
                             NumericControl.NumberType.Integer,
                             value =>
@@ -579,13 +579,13 @@ namespace zvs.WPF.Commands
                         short defaultValue;
                         if (!short.TryParse(StoredCommand.Argument, out defaultValue))
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                                 short.TryParse(dv.Value, out defaultValue);
                         }
                         _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                        var control = new NumericControl(cmd.Name,
-                            cmd.Description,
+                        var control = new NumericControl(deviceTypeCommand.Name,
+                            deviceTypeCommand.Description,
                             defaultValue.ToString(CultureInfo.InvariantCulture),
                             NumericControl.NumberType.Short,
                             value =>
@@ -602,13 +602,13 @@ namespace zvs.WPF.Commands
                         byte defaultValue;
                         if (!byte.TryParse(StoredCommand.Argument, out defaultValue))
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                                 byte.TryParse(dv.Value, out defaultValue);
                         }
                         _selectedDeviceArg = defaultValue.ToString(CultureInfo.InvariantCulture);
-                        var control = new NumericControl(cmd.Name,
-                            cmd.Description,
+                        var control = new NumericControl(deviceTypeCommand.Name,
+                            deviceTypeCommand.Description,
                             defaultValue.ToString(CultureInfo.InvariantCulture),
                             NumericControl.NumberType.Byte,
                             value =>
@@ -629,15 +629,15 @@ namespace zvs.WPF.Commands
                         }
                         else
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                             {
                                 defaultValue = dv.Value;
                             }
                         }
                         _selectedDeviceArg = defaultValue;
-                        var control = new StringControl(cmd.Name,
-                            cmd.Description,
+                        var control = new StringControl(deviceTypeCommand.Name,
+                            deviceTypeCommand.Description,
                             defaultValue,
                             value =>
                             {
@@ -657,16 +657,16 @@ namespace zvs.WPF.Commands
                         }
                         else
                         {
-                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == dCmd.CustomData2);
+                            var dv = await Context.DeviceValues.FirstOrDefaultAsync(o => o.DeviceId == selectedDevice.Id && o.UniqueIdentifier == deviceTypeCommand.CustomData2);
                             if (dv != null)
                             {
                                 defaultValue = dv.Value;
                             }
                         }
                         _selectedDeviceArg = defaultValue;
-                        var control = new ComboboxControl(cmd.Name,
-                            cmd.Description,
-                            cmd.Options.Select(o => o.Name).ToList(),
+                        var control = new ComboboxControl(deviceTypeCommand.Name,
+                            deviceTypeCommand.Description,
+                            deviceTypeCommand.Options.Select(o => o.Name).ToList(),
                             defaultValue,
                             value =>
                             {

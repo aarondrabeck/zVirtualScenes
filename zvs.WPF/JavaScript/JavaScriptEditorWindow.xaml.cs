@@ -1,6 +1,11 @@
 ﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
+using Microsoft.Win32;
 using zvs.DataModel;
 using zvs.Processor;
 
@@ -10,21 +15,22 @@ namespace zvs.WPF.JavaScript
     /// <summary>
     /// Interaction logic for JSTriggerEditorWindow.xaml
     /// </summary>
-    public partial class JavaScriptEditorWindow : Window
+    public partial class JavaScriptEditorWindow
     {
-        private App app = (App)Application.Current;
-        private ZvsContext Context;
-        private JavaScriptCommand Command;
+        private IFeedback<LogEntry> Log { get; set; }
+        private readonly App _app = (App)Application.Current;
+        private readonly ZvsContext _context;
+        private readonly JavaScriptCommand _command;
         public bool Canceled = true;
-        private ObservableCollection<JSResult> Results = new ObservableCollection<JSResult>();
+        private readonly ObservableCollection<JSResult> _results = new ObservableCollection<JSResult>();
 
-        private bool _isRunning = false;
-        private bool isRunning
+        private bool _isRunning;
+        private bool IsRunning
         {
             get { return _isRunning; }
             set
             {
-                this.Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(() =>
                 {
                     TestMI.IsEnabled = !value;
                 });
@@ -32,15 +38,13 @@ namespace zvs.WPF.JavaScript
             }
         }
 
-
         public JavaScriptEditorWindow(ZvsContext context, JavaScriptCommand command)
         {
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
-            {
-                this.Context = context;
-                this.Command = command;
-                InitializeComponent();
-            }
+            Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "JavaScript Editor" };
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
+            _context = context;
+            _command = command;
+            InitializeComponent();
         }
 #if DEBUG
         ~JavaScriptEditorWindow()
@@ -51,44 +55,40 @@ namespace zvs.WPF.JavaScript
 #endif
         private void Window_Loaded_1(object sender, RoutedEventArgs e)
         {
-            if (Command.Script != null)
-                TriggerScriptEditor.Editor.AppendText(Command.Script);
+            if (_command.Script != null)
+                TriggerScriptEditor.Editor.AppendText(_command.Script);
 
-            CmdNameTxtBx.Text = Command.Name;
-            var jSResultViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("jSResultViewSource")));
+            CmdNameTxtBx.Text = _command.Name;
+            var jSResultViewSource = ((CollectionViewSource)(FindResource("jSResultViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
-            jSResultViewSource.Source = Results;
+            jSResultViewSource.Source = _results;
         }
 
-        private async void Run()
+        private void Run()
         {
-            Results.Clear();
+            _results.Clear();
             var script = TriggerScriptEditor.Editor.Text;
-            if (!string.IsNullOrEmpty(script))
-            {
-                isRunning = true;
-                SetFeedBackText("Executing JavaScript...");
+            if (string.IsNullOrEmpty(script)) return;
+            IsRunning = true;
+            SetFeedBackText("Executing JavaScript...");
 
-                //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
-                var jse = new Processor.JavaScriptExecuter(this, app.ZvsEngine);
-                jse.onReportProgress += (sender, args) =>
-                {
-                    SetFeedBackText(args.Progress);
-                    app.ZvsEngine.log.Info(args.Progress);
-                };
-                JavaScriptExecuter.JavaScriptResult result = await jse.ExecuteScriptAsync(script, Context);
-                isRunning = false;
-                app.ZvsEngine.log.Info(result.Details);
-                SetFeedBackText(result.Details);
-            }
+            //This is run outside of CommandProcessor because it is not a command yet.  It is for testing JavaScript
+            //TODO: enable
+            //var jse = new Processor.JavaScriptExecuter(this, _app.ZvsEngine);
+            //jse.onReportProgress += (sender, args) =>
+            //{
+            //    SetFeedBackText(args.Progress);
+            //    _app.ZvsEngine.log.Info(args.Progress);
+            //};
+            //JavaScriptExecuter.JavaScriptResult result = await jse.ExecuteScriptAsync(script, _context);
+            //IsRunning = false;
+            //_app.ZvsEngine.log.Info(result.Details);
+            //SetFeedBackText(result.Details);
         }
 
-        public void SetFeedBackText(string Text)
+        public void SetFeedBackText(string text)
         {
-            this.Dispatcher.Invoke(() =>
-                {
-                    Results.Add(new JSResult() { Description = Text });
-                });
+            Dispatcher.Invoke(() => _results.Add(new JSResult { Description = text }));
         }
 
         private void TriggerScriptEditor_KeyUp(object sender, KeyEventArgs e)
@@ -97,7 +97,7 @@ namespace zvs.WPF.JavaScript
                 TestMI_Click(this, null);
 
             if (e.Key == Key.Escape)
-                CancelMI_Click(this, null);
+                CancelMI_Click();
 
             if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
                 SaveMI_Click(this, null);
@@ -105,98 +105,98 @@ namespace zvs.WPF.JavaScript
 
         private void RunSceneMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "runScene('All On');\n";
+            const string script = "runScene('All On');\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void RunDeviceCommandMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "runDeviceCommand('Office Light','Set Level', '99');\n";
+            const string script = "runDeviceCommand('Office Light','Set Level', '99');\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void AddDelayMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "delay(\"runDeviceCommand('Office Light','Set Level', '99');\", 3000);\n";
+            const string script = "delay(\"runDeviceCommand('Office Light','Set Level', '99');\", 3000);\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void AddFileMI_Click(object sender, RoutedEventArgs e)
         {
-            var ofd = new Microsoft.Win32.OpenFileDialog();
-            ofd.CheckFileExists = true;
-            ofd.DefaultExt = "js";
-            ofd.InitialDirectory = zvs.Processor.Utils.AppPath;
-            ofd.Multiselect = true;
-            ofd.Title = "Choose a JavaScript file to include...";
+            var ofd = new OpenFileDialog
+            {
+                CheckFileExists = true,
+                DefaultExt = "js",
+                InitialDirectory = Utils.AppPath,
+                Multiselect = true,
+                Title = "Choose a JavaScript file to include..."
+            };
 
             ofd.ShowDialog(this);
 
-            if (!string.IsNullOrEmpty(ofd.FileName) && System.IO.File.Exists(ofd.FileName))
+            if (string.IsNullOrEmpty(ofd.FileName) || !File.Exists(ofd.FileName)) return;
+            var path = ofd.FileName;
+            if (path.StartsWith(Utils.AppPath))
             {
-                var path = ofd.FileName;
-                if (path.StartsWith(zvs.Processor.Utils.AppPath))
-                {
-                    path = path.Replace(zvs.Processor.Utils.AppPath, ".");
-                }
-
-                var script = string.Format("require('{0}')\n", path.Replace("\\", "\\\\"));
-                TriggerScriptEditor.Editor.InsertText(script);
+                path = path.Replace(Utils.AppPath, ".");
             }
+
+            var script = string.Format("require('{0}')\n", path.Replace("\\", "\\\\"));
+            TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void ExecShellMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "shell(\"http://google.com\", \"\");\n";
+            const string script = "shell(\"http://google.com\", \"\");\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void ReportProgressMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "reportProgress(\"Hello World!\");\n";
+            const string script = "reportProgress(\"Hello World!\");\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void LogInfoMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "log(\"All done!\");\n";
+            const string script = "log(\"All done!\");\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void LogErrorMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "error(\"Oh Snap!\");\n";
+            const string script = "error(\"Oh Snap!\");\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
         private void LogWarningMI_Click(object sender, RoutedEventArgs e)
         {
-            var script = "warn(\"Warning file missing!\");\n";
+            const string script = "warn(\"Warning file missing!\");\n";
             TriggerScriptEditor.Editor.InsertText(script);
         }
 
-        private void CancelMI_Click(object sender, RoutedEventArgs e)
+        private void CancelMI_Click()
         {
-            this.Close();
+            Close();
         }
 
         private void SaveMI_Click(object sender, RoutedEventArgs e)
         {
-            Command.Name = CmdNameTxtBx.Text;
-            Command.Script = TriggerScriptEditor.Editor.Text;
+            _command.Name = CmdNameTxtBx.Text;
+            _command.Script = TriggerScriptEditor.Editor.Text;
             Canceled = false;
-            this.Close();
+            Close();
         }
 
         private void TestMI_Click(object sender, RoutedEventArgs e)
         {
-            if (!isRunning)
+            if (!IsRunning)
                 Run();
         }
 
         private void CanceleMI_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

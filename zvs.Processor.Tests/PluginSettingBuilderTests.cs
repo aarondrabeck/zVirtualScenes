@@ -28,7 +28,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            var result = new PluginSettingBuilder(new zvsEntityContextConnection(), CancellationToken.None);
+            var result = new PluginSettingBuilder(new ZvsEntityContextConnection(), CancellationToken.None);
 
             //assert 
             Assert.IsNotNull(result);

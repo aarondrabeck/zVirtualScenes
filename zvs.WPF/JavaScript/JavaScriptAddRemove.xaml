@@ -5,7 +5,7 @@
         Title="JavaScript Commands" Height="220" Width="655" Icon="/zVirtualScenes;component/Images/zvs32.ico"
         WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" Closed="JavaScriptAddRemove_Closed_1" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" ResizeMode="NoResize">
+        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" ResizeMode="NoResize">
     <Window.Resources>
         <CollectionViewSource x:Key="CmdsViewSource" d:DesignSource="{d:DesignInstance my:JavaScriptCommand, CreateList=True}" />
     </Window.Resources>

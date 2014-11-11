@@ -2,19 +2,19 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:zvsEntities="clr-namespace:zvs.Entities;assembly=zvs.Entities" 
-             x:Class="zvs.WPF.ScheduledTaskControls.ScheduledTaskCreator"
-             xmlns:zvs="clr-namespace:zvs.WPF"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+            x:Class="zvs.WPF.ScheduledTaskControls.ScheduledTaskCreator"
             xmlns:converters="clr-namespace:zvs.WPF.Converters"
-             xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
+             xmlns:tasks="clr-namespace:zvs.DataModel.Tasks;assembly=zvs.DataModel"
              mc:Ignorable="d" 
              d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1" Initialized="UserControl_Initialized">
     <UserControl.Resources>
         <converters:NullableIntConverter x:Key="NullableIntConverter"/>
 
-        <Style x:Key="Body_Content_DataGrid_Centering"
+        <Style x:Key="BodyContentDataGridCentering"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -26,7 +26,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="Body_Hoz_Center"
+        <Style x:Key="BodyHozCenter"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -39,12 +39,12 @@
             </Setter>
         </Style>
 
-        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type System:Enum}">
+        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="zvsEntities:TaskFrequency"/>
+                <x:Type TypeName="tasks:ScheduledTaskType"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
-        <CollectionViewSource x:Key="ScheduledTaskViewSource" d:DesignSource="{d:DesignInstance {x:Type zvsEntities:ScheduledTask}, CreateList=True}"/>
+        <CollectionViewSource x:Key="ScheduledTaskViewSource" d:DesignSource="{d:DesignInstance {x:Type dataModel:ZvsScheduledTask}, CreateList=True}"/>
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
@@ -61,7 +61,7 @@
         <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"
                     HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" 
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
-                  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" SelectionMode="Single" 
+                  CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
                   PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
                   SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFF9F9F9" Margin="0,0,0,0" BorderThickness="0" >
             <DataGrid.Columns>
@@ -82,13 +82,13 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" 
-                                        Binding="{Binding isEnabled, UpdateSourceTrigger=PropertyChanged }" IsReadOnly="False" >
+                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource BodyHozCenter}" 
+                                        Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged }" IsReadOnly="False" >
                 </DataGridCheckBoxColumn>
             </DataGrid.Columns>
         </DataGrid>
 
-        <Border Name="TaskDetails" Grid.Column="1" BorderBrush="Gray" Margin="355,25,0,0" BorderThickness="0" Background="#FFFDFDFD">
+        <Border Name="TaskDetails" BorderBrush="Gray" Margin="355,25,0,0" BorderThickness="0" Background="#FFFDFDFD">
             <Grid>
                 <TextBlock Name="TaskNameTxtBl" Text="{Binding Name, StringFormat={}{0} Details}"  Margin="10,5,10,0" VerticalAlignment="Top"
                            FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis" ></TextBlock>
@@ -102,8 +102,8 @@
                            VerticalAlignment="Top" Margin="144,100,25,0">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}{0} {1}"  >
-                            <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
-                            <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                            <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                            <Binding Path="TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>

@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace zvs.Processor
 {
@@ -14,23 +15,40 @@ namespace zvs.Processor
         private IEnumerable<ZvsAdapter> Adapters { get; set; }
 #pragma warning restore 649
 
-        private async Task FindAdaptersAsync(string directoryName, CancellationToken cancellationToken)
+        public async Task<FindAdaptersResult> FindAdaptersAsync(string directoryName, CancellationToken cancellationToken)
         {
-            var catalog = new SafeDirectoryCatalog(directoryName);
-            var compositionContainer = new CompositionContainer(catalog);
-            if (catalog.LoadErrors.Count > 0)
+            return await Task.Run(() =>
             {
-                //await Log.ReportWarningFormatAsync(cancellationToken, @"The following plug-ins could not be loaded: {0}",
-                //    string.Join(", " + Environment.NewLine, catalog.LoadErrors));
-            }
+                Adapters = new List<ZvsAdapter>();
+                var catalog = new SafeDirectoryCatalog(directoryName);
+                var compositionContainer = new CompositionContainer(catalog);
 
-            try
+                try
+                {
+                    compositionContainer.ComposeParts(this);
+                }
+                catch (CompositionException compositionException)
+                {
+                    return new FindAdaptersResult(compositionException.Message);
+                }
+
+                var msg = "All adapters loaded.";
+                if (catalog.LoadErrors.Count > 0)
+                    msg = string.Format(@"The following plug-ins could not be loaded: {0}", string.Join(", " + Environment.NewLine, catalog.LoadErrors));
+                return new FindAdaptersResult(Adapters, msg);
+            }, cancellationToken);
+        }
+
+        public class FindAdaptersResult : Result
+        {
+            public IEnumerable<ZvsAdapter> Adapters { get; private set; }
+
+            public FindAdaptersResult(string errorMessage) : base(true, errorMessage) { }
+
+            public FindAdaptersResult(IEnumerable<ZvsAdapter> adapters, string message)
+                : base(false, message)
             {
-                compositionContainer.ComposeParts(this);
-            }
-            catch (CompositionException compositionException)
-            {
-                Console.WriteLine(compositionException.ToString());
+                Adapters = adapters;
             }
         }
     }

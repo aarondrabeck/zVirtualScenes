@@ -185,7 +185,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceControls\DeviceDataGridUC.xaml">
+    <Page Include="DeviceControls\DeviceDataGridUc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -271,8 +271,8 @@
     <Compile Include="DeviceControls\DeviceCommands.xaml.cs">
       <DependentUpon>DeviceCommands.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DeviceControls\DeviceDataGridUC.xaml.cs">
-      <DependentUpon>DeviceDataGridUC.xaml</DependentUpon>
+    <Compile Include="DeviceControls\DeviceDataGridUc.xaml.cs">
+      <DependentUpon>DeviceDataGridUc.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceControls\DeviceValues.xaml.cs">
       <DependentUpon>DeviceValues.xaml</DependentUpon>

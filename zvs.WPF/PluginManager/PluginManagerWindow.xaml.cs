@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,18 +16,18 @@ namespace zvs.WPF
     /// </summary>
     public partial class PluginManagerWindow : Window
     {
-        private App application = (App)Application.Current;
-        private BitmapImage icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
-        private ZvsContext context;
+        private readonly App _app = (App)Application.Current;
+        private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
+        private ZvsContext Context { get; set; }
 
         public PluginManagerWindow()
         {
-            context = new ZvsContext();
+            Context = new ZvsContext(_app.EntityContextConnection);
             InitializeComponent();
 
-            ZvsContext.ChangeNotifications<Plugin>.OnEntityUpdated += PluginManagerWindow_onEntityUpdated;
-            ZvsContext.ChangeNotifications<Plugin>.OnEntityAdded += PluginManagerWindow_onEntityAdded;
-            ZvsContext.ChangeNotifications<Plugin>.OnEntityDeleted += PluginManagerWindow_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<Plugin>.OnEntityUpdated += PluginManagerWindow_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<Plugin>.OnEntityAdded += PluginManagerWindow_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<Plugin>.OnEntityDeleted += PluginManagerWindow_onEntityDeleted;
         }
 
 #if DEBUG
@@ -49,19 +50,20 @@ namespace zvs.WPF
                 await GetLoadedPlugins();
 
                 //Only load the plug-in options for the plug-ins that are currently loaded.
-                zvsEntities2ViewSource.Source = context.Plugins.Local;
+                zvsEntities2ViewSource.Source = Context.Plugins.Local;
             }
         }
 
         private async Task GetLoadedPlugins()
         {
-            var loadedPluginsGuids = application.ZvsEngine.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
-            await context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
+            //TODO: ENABLE
+            //var loadedPluginsGuids = _app.ZvsEngine.PluginManager.PluginGuidToPluginDictionary.Keys.ToList();
+            //await Context.Plugins.Where(o => loadedPluginsGuids.Contains(o.PluginGuid)).ToListAsync();
         }
 
         void PluginManagerWindow_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Plugin>.EntityAddedArgs e)
         {
-            if (context == null)
+            if (Context == null)
                 return;
 
             this.Dispatcher.Invoke(new Action(async () =>
@@ -72,7 +74,7 @@ namespace zvs.WPF
 
         void PluginManagerWindow_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Plugin>.EntityDeletedArgs e)
         {
-            if (context == null)
+            if (Context == null)
                 return;
 
             this.Dispatcher.Invoke(new Action(async () =>
@@ -83,7 +85,7 @@ namespace zvs.WPF
 
         void PluginManagerWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Plugin>.EntityUpdatedArgs e)
         {
-            if (context == null)
+            if (Context == null)
                 return;
 
             this.Dispatcher.Invoke(new Action(async () =>
@@ -97,7 +99,7 @@ namespace zvs.WPF
             ZvsContext.ChangeNotifications<Plugin>.OnEntityUpdated -= PluginManagerWindow_onEntityUpdated;
             ZvsContext.ChangeNotifications<Plugin>.OnEntityAdded -= PluginManagerWindow_onEntityAdded;
             ZvsContext.ChangeNotifications<Plugin>.OnEntityDeleted -= PluginManagerWindow_onEntityDeleted;
-            context.Dispose();
+            Context.Dispose();
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -107,199 +109,200 @@ namespace zvs.WPF
 
         private void PluginLstVw_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.ControlsStkPnl.Children.Clear();
+            //TODO: ENABLE
+            //this.ControlsStkPnl.Children.Clear();
 
-            var plugin = (Plugin)PluginLstVw.SelectedItem;
-            if (plugin != null)
-            {
-                //ADD THE ENABLED BUTTON
-                var c = new CheckboxControl(string.Format("{0} is enabled", plugin.Name),
-                    "Starts and stops the selected plug-in",
-                    plugin.IsEnabled,
-                    async isChecked =>
-                    {
-                        //Save to the database
-                        plugin.IsEnabled = isChecked;
+            //var plugin = (Plugin)PluginLstVw.SelectedItem;
+            //if (plugin != null)
+            //{
+            //    //ADD THE ENABLED BUTTON
+            //    var c = new CheckboxControl(string.Format("{0} is enabled", plugin.Name),
+            //        "Starts and stops the selected plug-in",
+            //        plugin.IsEnabled,
+            //        async isChecked =>
+            //        {
+            //            //Save to the database
+            //            plugin.IsEnabled = isChecked;
 
-                        var result = await context.TrySaveChangesAsync();
-                        if (result.HasError)
-                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //            var result = await Context.TrySaveChangesAsync();
+            //            if (result.HasError)
+            //                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                        //STOP OR START
-                        if (isChecked)
-                            application.ZvsEngine.PluginManager.EnablePluginAsync(plugin.PluginGuid);
-                        else
-                            application.ZvsEngine.PluginManager.DisablePluginAsync(plugin.PluginGuid);
-                    },
-                icon);
-                ControlsStkPnl.Children.Add(c);
+            //            //STOP OR START
+            //            if (isChecked)
+            //                _app.ZvsEngine.PluginManager.EnablePluginAsync(plugin.PluginGuid);
+            //            else
+            //                _app.ZvsEngine.PluginManager.DisablePluginAsync(plugin.PluginGuid);
+            //        },
+            //    _icon);
+            //    ControlsStkPnl.Children.Add(c);
 
 
-                //Add all the settings
-                foreach (var a in plugin.Settings)
-                {
-                    var pluginSettings = a;
+            //    //Add all the settings
+            //    foreach (var a in plugin.Settings)
+            //    {
+            //        var pluginSettings = a;
 
-                    switch (pluginSettings.ValueType)
-                    {
-                        case DataType.BOOL:
-                            {
-                                var DefaultValue = false;
-                                bool.TryParse(pluginSettings.Value, out DefaultValue);
+            //        switch (pluginSettings.ValueType)
+            //        {
+            //            case DataType.BOOL:
+            //                {
+            //                    var DefaultValue = false;
+            //                    bool.TryParse(pluginSettings.Value, out DefaultValue);
 
-                                var control = new CheckboxControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    DefaultValue,
-                                    async isChecked =>
-                                    {
-                                        pluginSettings.Value = isChecked.ToString();
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                    var control = new CheckboxControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        DefaultValue,
+            //                        async isChecked =>
+            //                        {
+            //                            pluginSettings.Value = isChecked.ToString();
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.DECIMAL:
-                            {
-                                var control = new NumericControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Value,
-                                    NumericControl.NumberType.Decimal,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.DECIMAL:
+            //                {
+            //                    var control = new NumericControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Value,
+            //                        NumericControl.NumberType.Decimal,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.BYTE:
-                            {
-                                var control = new NumericControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Value,
-                                    NumericControl.NumberType.Byte,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.BYTE:
+            //                {
+            //                    var control = new NumericControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Value,
+            //                        NumericControl.NumberType.Byte,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
 
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.INTEGER:
-                            {
-                                var control = new NumericControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Value,
-                                    NumericControl.NumberType.Integer,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.INTEGER:
+            //                {
+            //                    var control = new NumericControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Value,
+            //                        NumericControl.NumberType.Integer,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
 
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.SHORT:
-                            {
-                                var control = new NumericControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Value,
-                                    NumericControl.NumberType.Short,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.SHORT:
+            //                {
+            //                    var control = new NumericControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Value,
+            //                        NumericControl.NumberType.Short,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.COMPORT:
-                            {
-                                var control = new NumericControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Value,
-                                    NumericControl.NumberType.ComPort,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.COMPORT:
+            //                {
+            //                    var control = new NumericControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Value,
+            //                        NumericControl.NumberType.ComPort,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.STRING:
-                            {
-                                var control = new StringControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Value,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.STRING:
+            //                {
+            //                    var control = new StringControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Value,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                        case DataType.LIST:
-                            {
-                                var control = new ComboboxControl(pluginSettings.Name,
-                                    pluginSettings.Description,
-                                    pluginSettings.Options.Select(o => o.Name).ToList(),
-                                    pluginSettings.Value,
-                                    async value =>
-                                    {
-                                        pluginSettings.Value = value;
-                                        var result = await context.TrySaveChangesAsync();
-                                        if (result.HasError)
-                                            ((App)App.Current).ZvsEngine.log.Error(result.Message);
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //            case DataType.LIST:
+            //                {
+            //                    var control = new ComboboxControl(pluginSettings.Name,
+            //                        pluginSettings.Description,
+            //                        pluginSettings.Options.Select(o => o.Name).ToList(),
+            //                        pluginSettings.Value,
+            //                        async value =>
+            //                        {
+            //                            pluginSettings.Value = value;
+            //                            var result = await Context.TrySaveChangesAsync();
+            //                            if (result.HasError)
+            //                                ((App)App.Current).ZvsEngine.log.Error(result.Message);
 
-                                        application.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
-                                    },
-                                icon);
-                                ControlsStkPnl.Children.Add(control);
-                                break;
-                            }
-                    }
-                }
-            }
+            //                            _app.ZvsEngine.PluginManager.NotifyPluginSettingsChanged(pluginSettings);
+            //                        },
+            //                    _icon);
+            //                    ControlsStkPnl.Children.Add(control);
+            //                    break;
+            //                }
+            //        }
+            //    }
+            //}
         }
     }
 }

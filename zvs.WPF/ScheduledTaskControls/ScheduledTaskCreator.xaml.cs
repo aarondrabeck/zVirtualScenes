@@ -18,7 +18,7 @@ namespace zvs.WPF.ScheduledTaskControls
     /// <summary>
     /// Interaction logic for ScheduledTaskCreator.xaml
     /// </summary>
-    public partial class ScheduledTaskCreator : UserControl
+    public partial class ScheduledTaskCreator
     {
         private readonly ZvsContext _context;
         private readonly App _app = (App)Application.Current;
@@ -28,12 +28,12 @@ namespace zvs.WPF.ScheduledTaskControls
             _context = new ZvsContext(_app.EntityContextConnection);
             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Scheduled Task Editor" };
             InitializeComponent();
-            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
-            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
-            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded += ScheduledTaskCreator_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted += ScheduledTaskCreator_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated += ScheduledTaskCreator_onEntityUpdated;
         }
 
-        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityUpdatedArgs e)
+        void ScheduledTaskCreator_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.EntityUpdatedArgs e)
         {
             if (_context == null)
                 return;
@@ -41,12 +41,12 @@ namespace zvs.WPF.ScheduledTaskControls
             Dispatcher.Invoke(new Action(async () =>
             {
                 //Reloads context from DB when modifications happen
-                foreach (var ent in _context.ChangeTracker.Entries<ScheduledTask>())
+                foreach (var ent in _context.ChangeTracker.Entries<ZvsScheduledTask>())
                     await ent.ReloadAsync();
             }));
         }
 
-        void ScheduledTaskCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityDeletedArgs e)
+        void ScheduledTaskCreator_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.EntityDeletedArgs e)
         {
             if (_context == null)
                 return;
@@ -54,12 +54,12 @@ namespace zvs.WPF.ScheduledTaskControls
             Dispatcher.Invoke(new Action(async () =>
             {
                 //Reloads context from DB when modifications happen
-                foreach (var ent in _context.ChangeTracker.Entries<ScheduledTask>())
+                foreach (var ent in _context.ChangeTracker.Entries<ZvsScheduledTask>())
                     await ent.ReloadAsync();
             }));
         }
 
-        void ScheduledTaskCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.EntityAddedArgs e)
+        void ScheduledTaskCreator_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.EntityAddedArgs e)
         {
             if (_context == null)
                 return;
@@ -87,7 +87,7 @@ namespace zvs.WPF.ScheduledTaskControls
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
                 await _context.ZvsScheduledTasks
-                    .Include(o=> o.ScheduledTask)
+                    .Include(o => o.ScheduledTask)
                     .ToListAsync();
 
                 //Load your data here and assign the result to the CollectionViewSource.
@@ -112,9 +112,9 @@ namespace zvs.WPF.ScheduledTaskControls
             var parent = Window.GetWindow(this);
             //Check if the parent window is closing  or if this is just being removed from the visual tree temporarily
             if (parent != null && parent.IsActive) return;
-            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
-            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
-            NotifyEntityChangeContext.ChangeNotifications<ScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityAdded -= ScheduledTaskCreator_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityDeleted -= ScheduledTaskCreator_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<ZvsScheduledTask>.OnEntityUpdated -= ScheduledTaskCreator_onEntityUpdated;
         }
 
         private async void ScheduledTaskDataGrid_RowEditEnding_1(object sender, DataGridRowEditEndingEventArgs e)
@@ -185,35 +185,35 @@ namespace zvs.WPF.ScheduledTaskControls
             WeeklyGpBx.Visibility = Visibility.Collapsed;
             MonthlyGpBx.Visibility = Visibility.Collapsed;
 
-            if (FrequencyCmbBx.SelectedItem != null)
+            if (FrequencyCmbBx.SelectedItem == null) return;
+            switch ((ScheduledTaskType)FrequencyCmbBx.SelectedItem)
             {
-                switch ((TaskFrequency)FrequencyCmbBx.SelectedItem)
-                {
-                    case TaskFrequency.Daily:
-                        {
-                            DailyGpBx.Visibility = Visibility.Visible;
-                            break;
-                        }
-                    case TaskFrequency.Seconds:
-                        {
-                            SecondsGpBx.Visibility = Visibility.Visible;
-                            break;
-                        }
-                    case TaskFrequency.Weekly:
-                        {
-                            WeeklyGpBx.Visibility = Visibility.Visible;
-                            break;
-                        }
-                    case TaskFrequency.Monthly:
-                        {
-                            MonthlyGpBx.Visibility = Visibility.Visible;
-                            break;
-                        }
-                }
+                case ScheduledTaskType.Daily:
+                    {
+                        DailyGpBx.Visibility = Visibility.Visible;
+                        break;
+                    }
+                case ScheduledTaskType.Interval:
+                    {
+                        SecondsGpBx.Visibility = Visibility.Visible;
+                        break;
+                    }
+                case ScheduledTaskType.Weekly:
+                    {
+                        WeeklyGpBx.Visibility = Visibility.Visible;
+                        break;
+                    }
+                case ScheduledTaskType.Monthly:
+                    {
+                        MonthlyGpBx.Visibility = Visibility.Visible;
+                        break;
+                    }
             }
         }
 
-        private async void OddTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
+       
+
+        private void OddTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             FirstChkBx.IsChecked = true;
             SecondChkBx.IsChecked = false;
@@ -246,13 +246,9 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = true;
             ThirtiethChkBx.IsChecked = false;
             ThirtyfirstChkBx.IsChecked = true;
-
-            var result = await _context.TrySaveChangesAsync();
-            if (result.HasError)
-                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
-        private async void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             FirstChkBx.IsChecked = false;
             SecondChkBx.IsChecked = true;
@@ -285,13 +281,9 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = false;
             ThirtiethChkBx.IsChecked = true;
             ThirtyfirstChkBx.IsChecked = false;
-
-            var result = await _context.TrySaveChangesAsync();
-            if (result.HasError)
-                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
-        private async void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
+        private void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
             FirstChkBx.IsChecked = false;
             SecondChkBx.IsChecked = false;
@@ -324,45 +316,30 @@ namespace zvs.WPF.ScheduledTaskControls
             TwentieninthChkBx.IsChecked = false;
             ThirtiethChkBx.IsChecked = false;
             ThirtyfirstChkBx.IsChecked = false;
-
-            var result = await _context.TrySaveChangesAsync();
-            if (result.HasError)
-                ((App)App.Current).ZvsEngine.log.Error(result.Message);
         }
 
         private async void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
         {
-            var result = await _context.TrySaveChangesAsync();
+            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
             if (result.HasError)
-                ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scheduled task. {0}", result.Message);
         }
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
-            var st = (ScheduledTask)ScheduledTaskDataGrid.SelectedItem;
-            //Create a Stored Command if there is not one...
-            var newSC = new StoredCommand();
-
+            var command = (ZvsScheduledTask)ScheduledTaskDataGrid.SelectedItem;
+            
             //Send it to the command builder to get filled with a command
-            CommandBuilder cbWindow;
-            if (st.StoredCommand == null)
-                cbWindow = new CommandBuilder(_context, newSC);
-            else
-                cbWindow = new CommandBuilder(_context, st.StoredCommand);
-
-            cbWindow.Owner = _app.ZvsWindow;
-
-            if (cbWindow.ShowDialog() ?? false)
+            var cbWindow= new CommandBuilder(_context, command)
             {
-                if (st.StoredCommand == null) //if this was a new command, assign it.
-                    st.StoredCommand = newSC;
-                else
-                    st.StoredCommand = st.StoredCommand;
+                Owner = _app.ZvsWindow
+            };
 
-                var result = await _context.TrySaveChangesAsync();
-                if (result.HasError)
-                    ((App)App.Current).ZvsEngine.log.Error(result.Message);
-            }
+            if (!(cbWindow.ShowDialog() ?? false)) return;
+
+            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scheduled task. {0}", result.Message);
         }
 
 

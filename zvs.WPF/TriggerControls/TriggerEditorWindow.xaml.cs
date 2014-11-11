@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using zvs.DataModel;
+using zvs.Processor;
 using zvs.WPF.Commands;
 using System.Data.Entity;
 
@@ -13,6 +15,8 @@ namespace zvs.WPF.TriggerControls
     /// </summary>
     public partial class TriggerEditorWindow : Window
     {
+        private IFeedback<LogEntry> Log { get; set; }
+        private readonly App _app = (App)Application.Current;
         private readonly ZvsContext _context;
         private readonly Int64 _deviceValueTriggerId;
 
@@ -30,6 +34,7 @@ namespace zvs.WPF.TriggerControls
 
         public TriggerEditorWindow(Int64 deviceValueTriggerId, ZvsContext context)
         {
+             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Scheduled Task Editor" };
             _context = context;
             _deviceValueTriggerId = deviceValueTriggerId;
             InitializeComponent();
@@ -46,20 +51,16 @@ namespace zvs.WPF.TriggerControls
         {
             Trigger = await _context.DeviceValueTriggers
                 .Include(o => o.DeviceValue)
-                .Include(o => o.StoredCommand)
                 .Include(o => o.DeviceValue.Device)
-                .FirstOrDefaultAsync(o => o.Id == _deviceValueTriggerId);
+                .FirstOrDefaultAsync(o => o.Id == _deviceValueTriggerId) ??
+                      new DeviceValueTrigger { Name = "New ScheduledTask" };
 
-            if (Trigger == null)
-            {
-                Trigger = new DeviceValueTrigger {Name = "New ScheduledTask"};
-            }
-
-            var eagarLoad2 = await _context.Devices
+            //EAGER LOAD
+            await _context.Devices
                 .Include(o => o.Values)
                 .ToListAsync();
 
-            var scene = await _context.Scenes.ToListAsync();
+            await _context.Scenes.ToListAsync();
 
             var deviceViewSource = ((System.Windows.Data.CollectionViewSource)(FindResource("deviceViewSource")));
             // Load data by setting the CollectionViewSource.Source property:
@@ -82,8 +83,10 @@ namespace zvs.WPF.TriggerControls
             {
                 OperatorCmboBx.Text = Enum.GetName(typeof(TriggerOperator), Trigger.Operator);
             }
-            catch (Exception)
-            { }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             if (Trigger.Value != null)
                 ValueTxtBx.Text = Trigger.Value;
@@ -121,7 +124,7 @@ namespace zvs.WPF.TriggerControls
             }
             Trigger.DeviceValue = dv;
 
-            if (Trigger.StoredCommand == null)
+            if (Trigger.CommandId == 0)
             {
                 AddUpdateCommand.Focus();
                 AddUpdateCommand.BorderBrush = new SolidColorBrush(Colors.Red);
@@ -145,7 +148,7 @@ namespace zvs.WPF.TriggerControls
             Trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
             //Update the description
-            Trigger.SetDescription();
+            Trigger.SetDescription(_context);
 
             Canceled = false;
             Close();
@@ -153,20 +156,13 @@ namespace zvs.WPF.TriggerControls
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
-            //Create a Stored Command if there is not one...
-            var newSc = new StoredCommand();
-
-            //Send it to the command builder to get filled with a command
-            var cbWindow = Trigger.StoredCommand == null ? new CommandBuilder(_context, newSc) : new CommandBuilder(_context, Trigger.StoredCommand);
-
-            cbWindow.Owner = this;
-
+          //Send it to the command builder to get filled with a command
+            var cbWindow = new CommandBuilder(_context, Trigger) {Owner = this};
             if (!(cbWindow.ShowDialog() ?? false)) return;
-            Trigger.StoredCommand = Trigger.StoredCommand ?? newSc;
 
-            var result = await _context.TrySaveChangesAsync();
+            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
             if (result.HasError)
-                ((App)Application.Current).ZvsEngine.log.Error(result.Message);
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving trigger command. {0}", result.Message);
         }
     }
 }

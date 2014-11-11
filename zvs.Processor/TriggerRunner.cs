@@ -30,6 +30,8 @@ namespace zvs.Processor
             CommandProcessor = commandProcessor;
             Log = log;
             EntityContextConnection = entityContextConnection;
+
+            Log.Source = "Trigger Runner";
         }
 
         public async Task StartAsync(CancellationToken ct)

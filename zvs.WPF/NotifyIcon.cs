@@ -1,33 +1,36 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Forms;
 using zvs.Processor;
+using zvs.WPF.Properties;
+using Application = System.Windows.Application;
 
 namespace zvs.WPF
 {
     public class ZVSTaskbarIcon : IDisposable
     {
-        private System.Windows.Forms.NotifyIcon Notify;
+        private NotifyIcon Notify;
         private App app = (App)Application.Current;
-        private System.Windows.Forms.MenuItem ShowMainWindow;
+        private MenuItem ShowMainWindow;
 
         public ZVSTaskbarIcon()
         {
-            ShowMainWindow = new System.Windows.Forms.MenuItem("Show " + Utils.ApplicationName, (o, e) =>
+            ShowMainWindow = new MenuItem("Show " + Utils.ApplicationName, (o, e) =>
             {
                 app.ShowzvsWindow();
             });
 
-            Notify = new System.Windows.Forms.NotifyIcon();
-            Notify.DoubleClick += new EventHandler(Notify_Click);
+            Notify = new NotifyIcon();
+            Notify.DoubleClick += Notify_Click;
             Notify.Text = Utils.ApplicationName;
-            Notify.Icon = zvs.WPF.Properties.Resources.zvs32;
+            Notify.Icon = Resources.zvs32;
             Notify.Visible = true;
-            Notify.ContextMenu = new System.Windows.Forms.ContextMenu(new System.Windows.Forms.MenuItem[] 
+            Notify.ContextMenu = new ContextMenu(new MenuItem[] 
             { 
                 ShowMainWindow,
-                new System.Windows.Forms.MenuItem("-"), 
-                new System.Windows.Forms.MenuItem("Exit " + Utils.ApplicationName, (object o,EventArgs e) =>  {
-                    app.ShutdownZvs(); 
+                new MenuItem("-"), 
+                new MenuItem("Exit " + Utils.ApplicationName, (o, e) =>  {
+                   app.ShutdownZvs(); 
                 })
             });
 
@@ -44,36 +47,34 @@ namespace zvs.WPF
             // app.ShowzvsWindow();
         }
 
-        public void ShowBalloonTip(string Title, string TipText, int timeout, System.Windows.Forms.ToolTipIcon icon)
+        public void ShowBalloonTip(string title, string tipText, int timeout, ToolTipIcon icon)
         {
             if (Notify != null)
             {
                 Notify.ShowBalloonTip(timeout,
-                                     Title,
-                                     TipText,
+                                     title,
+                                     tipText,
                                      icon);
             }
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposing) return;
+            if (Notify != null)
             {
-                if (this.Notify != null)
-                {
-                    Notify.Dispose();
-                    Notify = null;
-                }
-
-                if (this.ShowMainWindow != null)
-                    this.ShowMainWindow.Dispose();
+                Notify.Dispose();
+                Notify = null;
             }
+
+            if (ShowMainWindow != null)
+                ShowMainWindow.Dispose();
         }
     }
 }

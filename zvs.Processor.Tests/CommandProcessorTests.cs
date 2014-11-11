@@ -23,7 +23,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new CommandProcessor(null, new zvsEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new CommandProcessor(null, new ZvsEntityContextConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
         [TestMethod]
@@ -44,7 +44,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var adapterManager = new StubIAdapterManager();
             //act
-            new CommandProcessor(adapterManager, new zvsEntityContextConnection(), null);
+            new CommandProcessor(adapterManager, new ZvsEntityContextConnection(), null);
             //assert - throws exception
         }
 
@@ -54,7 +54,7 @@ namespace zvs.Processor.Tests
             //arrange 
             var adapterManager = new StubIAdapterManager();
             //act
-            new CommandProcessor(adapterManager, new zvsEntityContextConnection(), new StubIFeedback<LogEntry>());
+            new CommandProcessor(adapterManager, new ZvsEntityContextConnection(), new StubIFeedback<LogEntry>());
             //assert - throws exception
         }
 
@@ -90,7 +90,7 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => null
+                FindZvsAdapterGuid = adapterGuid => null
             };
             var ranstoredCommands = new List<int>();
             var log = new StubIFeedback<LogEntry>();
@@ -129,7 +129,7 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = false,
                 }
@@ -172,10 +172,14 @@ namespace zvs.Processor.Tests
             var commandsSendToAdapter = new List<int>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ProcessDeviceCommandAsyncDeviceDeviceCommandStringString = async (adapterDevice, command, argument, argument2) => commandsSendToAdapter.Add(command.Id)
+                    ProcessDeviceCommandAsyncDeviceDeviceCommandStringString = (adapterDevice, command, argument, argument2) =>
+                    {
+                        commandsSendToAdapter.Add(command.Id);
+                        return Task.FromResult(0);
+                    }
                 }
             };
 
@@ -238,7 +242,7 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => null
+                FindZvsAdapterGuid = adapterGuid => null
             };
             var ranstoredCommands = new List<int>();
             var log = new StubIFeedback<LogEntry>();
@@ -277,7 +281,7 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = false,
                 }
@@ -320,7 +324,7 @@ namespace zvs.Processor.Tests
             var commandsSendToAdapter = new List<int>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
                     ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = async (adapterDevice, command, argument, argument2) => commandsSendToAdapter.Add(command.Id)
@@ -399,7 +403,7 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => null
+                FindZvsAdapterGuid = adapterGuid => null
             };
             var log = new StubIFeedback<LogEntry>();
             var cts = new CancellationTokenSource();
@@ -435,7 +439,7 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = false,
                 }
@@ -475,7 +479,7 @@ namespace zvs.Processor.Tests
             var repollDeviceIdRequestSentToAdapter = new List<int>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
                     RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
@@ -517,7 +521,7 @@ namespace zvs.Processor.Tests
             var repollDeviceIdRequestSentToAdapter = new List<int>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
                     RepollAsyncDevice = async (d) => repollDeviceIdRequestSentToAdapter.Add(d.Id)
@@ -600,7 +604,7 @@ namespace zvs.Processor.Tests
             var groupOnIdsRequestSentToAdapter = new List<Group>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
                     ActivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
@@ -644,7 +648,7 @@ namespace zvs.Processor.Tests
 
                 //Assert
                 Assert.IsFalse(result.HasError);
-                Assert.IsTrue(groupOnIdsRequestSentToAdapter.Count == 2,"Process did not run the correct amount of commands.");
+                Assert.IsTrue(groupOnIdsRequestSentToAdapter.Count == 2, "Process did not run the correct amount of commands.");
                 Assert.IsTrue(group.Id == groupOnIdsRequestSentToAdapter[0].Id, "Ran the wrong group!");
             }
         }
@@ -659,7 +663,7 @@ namespace zvs.Processor.Tests
             var groupOnIdsRequestSentToAdapter = new List<Group>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
                     DeactivateGroupAsyncGroup = async (g) => groupOnIdsRequestSentToAdapter.Add(g)
@@ -715,7 +719,7 @@ namespace zvs.Processor.Tests
             var deviceCommandIds = new List<int>();
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
                     ProcessDeviceCommandAsyncDeviceDeviceCommandStringString = async (adapterDevice, command, argument, argument2) => deviceCommandIds.Add(command.Id)
@@ -858,10 +862,10 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ProcessDeviceCommandAsyncDeviceDeviceCommandStringString = async (adapterDevice, command, argument, argument2) => Task.FromResult(0)
+                    ProcessDeviceCommandAsyncDeviceDeviceCommandStringString = (adapterDevice, command, argument, argument2) => Task.FromResult(0)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -898,10 +902,10 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = async (adapterDevice, command, argument, argument2) => Task.FromResult(0)
+                    ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = (adapterDevice, command, argument, argument2) => Task.FromResult(0)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -938,10 +942,10 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = async (adapterDevice, command, argument, argument2) => Task.FromResult(0)
+                    ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = (adapterDevice, command, argument, argument2) => Task.FromResult(0)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -976,10 +980,10 @@ namespace zvs.Processor.Tests
 
             var adapterManager = new StubIAdapterManager
             {
-                GetZvsAdapterByGuidGuid = adapterGuid => new StubZvsAdapter
+                FindZvsAdapterGuid = adapterGuid => new StubZvsAdapter
                 {
                     IsEnabled = true,
-                    ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = async (adapterDevice, command, argument, argument2) => Task.FromResult(0)
+                    ProcessDeviceTypeCommandAsyncDeviceTypeDeviceDeviceTypeCommandString = (adapterDevice, command, argument, argument2) => Task.FromResult(0)
                 }
             };
             var log = new StubIFeedback<LogEntry>();
@@ -991,7 +995,7 @@ namespace zvs.Processor.Tests
             {
                 var jsCommand = new JavaScriptCommand();
                 {
-                   
+
                 }
                 context.Commands.Add(jsCommand);
                 await context.SaveChangesAsync(new CancellationToken());

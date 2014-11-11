@@ -1,26 +1,33 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Data;
 using zvs.DataModel;
 using System.Data.Entity;
+using zvs.Processor;
 
 namespace zvs.WPF.JavaScript
 {
     /// <summary>
     /// Interaction logic for GroupEditor.xaml
     /// </summary>
-    public partial class JavaScriptAddRemove : Window, IDisposable
+    public partial class JavaScriptAddRemove : IDisposable
     {
-        private ZvsContext context;
+        private ZvsContext Context { get; set; }
+        private IFeedback<LogEntry> Log { get; set; }
+        private readonly App _app = (App)Application.Current;
 
         public JavaScriptAddRemove()
         {
-            context = new ZvsContext();
+            Context = new ZvsContext(_app.EntityContextConnection);
+            Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Javascrip Editor" };
             InitializeComponent();
 
-            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += JavaScriptAddRemove_onEntityAdded;
-            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
-            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded += JavaScriptAddRemove_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated += JavaScriptAddRemove_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted += JavaScriptAddRemove_onEntityDeleted;
         }
 
 #if DEBUG
@@ -34,14 +41,14 @@ namespace zvs.WPF.JavaScript
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Do not load your data at design time.
-            if (!System.ComponentModel.DesignerProperties.GetIsInDesignMode(this))
+            if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                var CmdsViewSource = ((System.Windows.Data.CollectionViewSource)(this.FindResource("CmdsViewSource")));
+                var cmdsViewSource = ((CollectionViewSource)(FindResource("CmdsViewSource")));
 
-                await context.JavaScriptCommands
+                await Context.JavaScriptCommands
                     .ToListAsync();
 
-                CmdsViewSource.Source = context.JavaScriptCommands.Local;
+                cmdsViewSource.Source = Context.JavaScriptCommands.Local;
             }
 
             EvaluateAddEditBtnsUsability();
@@ -49,24 +56,24 @@ namespace zvs.WPF.JavaScript
 
         private void JavaScriptAddRemove_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityAddedArgs e)
         {
-            if (context == null)
+            if (Context == null)
                 return;
 
-            this.Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
-                await context.JavaScriptCommands
+                await Context.JavaScriptCommands
                    .ToListAsync();
             }));
         }
 
         void JavaScriptAddRemove_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityDeletedArgs e)
         {
-            if (context == null)
+            if (Context == null)
                 return;
-            this.Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
                 //Reloads context from DB when modifications happen
-                foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                foreach (var ent in Context.ChangeTracker.Entries<JavaScriptCommand>())
                     await ent.ReloadAsync();
             }));
         }
@@ -74,12 +81,12 @@ namespace zvs.WPF.JavaScript
 
         private void JavaScriptAddRemove_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.EntityUpdatedArgs e)
         {
-            if (context == null)
+            if (Context == null)
                 return;
-            this.Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
                 //Reloads context from DB when modifications happen
-                foreach (var ent in context.ChangeTracker.Entries<JavaScriptCommand>())
+                foreach (var ent in Context.ChangeTracker.Entries<JavaScriptCommand>())
                     await ent.ReloadAsync();
             }));
 
@@ -87,47 +94,42 @@ namespace zvs.WPF.JavaScript
 
         private void JavaScriptAddRemove_Closed_1(object sender, EventArgs e)
         {
-            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= JavaScriptAddRemove_onEntityAdded;
-            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
-            ZvsContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
-            context.Dispose();
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityAdded -= JavaScriptAddRemove_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityUpdated -= JavaScriptAddRemove_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<JavaScriptCommand>.OnEntityDeleted -= JavaScriptAddRemove_onEntityDeleted;
+            Context.Dispose();
         }
 
         private void EvaluateAddEditBtnsUsability()
         {
             if (JSCmbBx.Items.Count > 0)
             {
-                this.RemoveBtn.IsEnabled = true;
-                this.EditBtn.IsEnabled = true;
+                RemoveBtn.IsEnabled = true;
+                EditBtn.IsEnabled = true;
             }
             else
             {
-                this.RemoveBtn.IsEnabled = false;
-                this.EditBtn.IsEnabled = false;
+                RemoveBtn.IsEnabled = false;
+                EditBtn.IsEnabled = false;
             }
         }
 
         private async void AddBtn_Click(object sender, RoutedEventArgs e)
         {
-            var jsCommand = new JavaScriptCommand();
-            jsCommand.Name = "My JavaScript";
-            jsCommand.UniqueIdentifier = Guid.NewGuid().ToString();
-            var window = new JavaScriptEditorWindow(context, jsCommand);
-            window.Owner = this;
+            var jsCommand = new JavaScriptCommand {Name = "My JavaScript", UniqueIdentifier = Guid.NewGuid().ToString()};
+            var window = new JavaScriptEditorWindow(Context, jsCommand) {Owner = this};
 
-            var result = window.ShowDialog();
+            window.ShowDialog();
 
-            if (!window.Canceled)
-            {
-                context.JavaScriptCommands.Add(jsCommand);
+            if (window.Canceled) return;
+            Context.JavaScriptCommands.Add(jsCommand);
 
-                var saveResult = await context.TrySaveChangesAsync();
-                if (saveResult.HasError)
-                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
+            var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving new JavaScript command. {0}", result.Message);
 
-                JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
-                EvaluateAddEditBtnsUsability();
-            }
+            JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
+            EvaluateAddEditBtnsUsability();
         }
 
         private async void RemoveBtn_Click(object sender, RoutedEventArgs e)
@@ -141,34 +143,34 @@ namespace zvs.WPF.JavaScript
                 MessageBox.Show("Are you sure you want to delete the '" + jsCommand.Name + "' command?",
                                 "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                
-                var saveResult = await context.TrySaveChangesAsync();
-                if (saveResult.HasError)
-                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
+                //TODO: ENABLE
+                //var saveResult = await context.TrySaveChangesAsync();
+                //if (saveResult.HasError)
+                //    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
 
-                foreach (StoredCommand sc in await context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync())
-                {
-                    var error = string.Empty;
+                //foreach (StoredCommand sc in await context.StoredCommands.Where(o => o.Command.Id == jsCommand.Id).ToListAsync())
+                //{
+                //    var error = string.Empty;
 
-                    var result = await sc.TryRemoveDependenciesAsync(context);
-                    if (result.HasError)
-                        ((App)App.Current).ZvsEngine.log.Error(result.Message);
-                }
+                //    var result = await sc.TryRemoveDependenciesAsync(context);
+                //    if (result.HasError)
+                //        ((App)App.Current).ZvsEngine.log.Error(result.Message);
+                //}
 
-                //Delete the Command from each Scene it is user
-                foreach (SceneStoredCommand sc in await context.SceneCommands.ToListAsync())
-                {
-                    if (sc.StoredCommand.Command == jsCommand)
-                        sc.Scene.Commands.Remove(sc);
-                }
+                ////Delete the Command from each Scene it is user
+                //foreach (SceneStoredCommand sc in await context.SceneCommands.ToListAsync())
+                //{
+                //    if (sc.StoredCommand.Command == jsCommand)
+                //        sc.Scene.Commands.Remove(sc);
+                //}
 
-                context.JavaScriptCommands.Local.Remove(jsCommand);
+                //context.JavaScriptCommands.Local.Remove(jsCommand);
 
-                saveResult = await context.TrySaveChangesAsync();
-                if (saveResult.HasError)
-                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
+                //saveResult = await context.TrySaveChangesAsync();
+                //if (saveResult.HasError)
+                //    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
 
-                EvaluateAddEditBtnsUsability();
+                //EvaluateAddEditBtnsUsability();
             }
         }
 
@@ -179,43 +181,38 @@ namespace zvs.WPF.JavaScript
             if (jsCommand == null)
                 return;
 
-            var window = new JavaScriptEditorWindow(context, jsCommand);
-            window.Owner = this;
+            var window = new JavaScriptEditorWindow(Context, jsCommand) {Owner = this};
 
-            var result = window.ShowDialog();
+            window.ShowDialog();
 
-            if (!window.Canceled)
-            {
-                var saveResult = await context.TrySaveChangesAsync();
-                if (saveResult.HasError)
-                    ((App)App.Current).ZvsEngine.log.Error(saveResult.Message);
+            if (window.Canceled) return;
+            var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving JavaScript command. {0}", result.Message);
 
-                JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
-            }
+            JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (!disposing) return;
+            if (Context == null)
             {
-                if (this.context == null)
-                {
-                    return;
-                }
-
-                context.Dispose();
+                return;
             }
+
+            Context.Dispose();
         }
 
         private void CancelBtn_Click_1(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

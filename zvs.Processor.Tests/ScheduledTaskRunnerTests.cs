@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ScheduledTaskRunner(null, new StubICommandProcessor(), new zvsEntityContextConnection(), new CurrentTimeProvider());
+            new ScheduledTaskRunner(null, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
             //assert - throws exception
         }
         [TestMethod]
@@ -30,7 +30,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), null, new zvsEntityContextConnection(), new CurrentTimeProvider());
+            new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), null, new ZvsEntityContextConnection(), new CurrentTimeProvider());
             //assert - throws exception
         }
 
@@ -49,7 +49,7 @@ namespace zvs.Processor.Tests
         public void ConstructorPath4()
         {
             //arrange, act
-            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new zvsEntityContextConnection(), null);
+            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection(), null);
             //assert - throws exception
         }
 
@@ -57,7 +57,7 @@ namespace zvs.Processor.Tests
         public void ConstructorPath5()
         {
             //arrange, act
-            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new zvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(new StubIFeedback<LogEntry>(), new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
 
             //Assert
             Assert.IsNotNull(tm);
@@ -77,7 +77,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new zvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -102,7 +102,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new zvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -126,7 +126,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new zvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -152,7 +152,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new zvsEntityContextConnection(), new CurrentTimeProvider());
+            var tm = new ScheduledTaskRunner(log, new StubICommandProcessor(), new ZvsEntityContextConnection(), new CurrentTimeProvider());
 
             //Act
             await tm.StopAsync(cts.Token);
@@ -212,7 +212,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -279,7 +279,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -345,7 +345,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -412,7 +412,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -480,7 +480,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -548,7 +548,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -613,7 +613,7 @@ namespace zvs.Processor.Tests
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
 
@@ -684,14 +684,14 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
                 await taskRunner.StartAsync(cts.Token);
                 await Task.Delay(700, cts.Token);
 
                 //Act
-                context.CommandScheduledTasks.Remove(commandScheduledTask);
+                context.ZvsScheduledTasks.Remove(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
                 await Task.Delay(700, cts.Token);
@@ -753,7 +753,7 @@ namespace zvs.Processor.Tests
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
             }
@@ -814,7 +814,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
                 await taskRunner.StartAsync(cts.Token);
@@ -879,7 +879,7 @@ namespace zvs.Processor.Tests
 
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r.HasError, r.Message);
                 await taskRunner.StartAsync(cts.Token);
@@ -940,7 +940,7 @@ namespace zvs.Processor.Tests
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
 
@@ -1012,7 +1012,7 @@ namespace zvs.Processor.Tests
             };
             using (var context = new ZvsContext(dbConnection))
             {
-                context.CommandScheduledTasks.Add(commandScheduledTask);
+                context.ZvsScheduledTasks.Add(commandScheduledTask);
                 var r2 = await context.TrySaveChangesAsync(cts.Token);
                 Assert.IsFalse(r2.HasError, r2.Message);
 

@@ -66,6 +66,24 @@ namespace zvs.Processor
             }, cancellationToken);
         }
 
+        public static async Task ReportResultAsync(this IFeedback<LogEntry> feedBack, Result result, CancellationToken cancellationToken)
+        {
+            if (result.HasError)
+                await feedBack.ReportAsync(new LogEntry(new CurrentTimeProvider())
+                {
+                    Message = result.Message,
+                    Level = LogEntryLevel.Error,
+                    Source = feedBack.Source
+                }, cancellationToken);
+            else
+                await feedBack.ReportAsync(new LogEntry(new CurrentTimeProvider())
+                {
+                    Message = result.Message,
+                    Level = LogEntryLevel.Info,
+                    Source = feedBack.Source
+                }, cancellationToken);
+
+        }
 
     }
 }

@@ -28,7 +28,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            var result = new AdapterSettingBuilder(new zvsEntityContextConnection(), CancellationToken.None);
+            var result = new AdapterSettingBuilder(new ZvsEntityContextConnection(), CancellationToken.None);
 
             //assert 
             Assert.IsNotNull(result);

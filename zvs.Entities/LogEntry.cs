@@ -3,8 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace zvs.DataModel
 {
+    [Table("LogEntries", Schema = "ZVS")]
     public class LogEntry
     {
+        public LogEntry()
+        {
+        }
+
         public LogEntry(ITimeProvider provider)
         {
             Datetime = provider.Time;
@@ -14,6 +19,15 @@ namespace zvs.DataModel
         public int Id { get; set; }
 
         public DateTime Datetime { get; set; }
+
+        [NotMapped]
+        public DateTimeOffset StartTimeOffset
+        {
+            // Assume the CreateOn property stores UTC time.
+            get { return new DateTimeOffset(Datetime, TimeSpan.FromHours(0)); }
+            set { Datetime = value.UtcDateTime; }
+        }
+
         public string Message { get; set; }
         public string Source { get; set; }
         public LogEntryLevel Level { get; set; }

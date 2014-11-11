@@ -21,7 +21,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            new ChangeListener(null, new zvsEntityContextConnection());
+            new ChangeListener(null, new ZvsEntityContextConnection());
             //assert - throws exception
         }
 
@@ -40,7 +40,7 @@ namespace zvs.Processor.Tests
         {
             //arrange 
             //act
-            var result = new ChangeListener(new StubIFeedback<LogEntry>(), new zvsEntityContextConnection());
+            var result = new ChangeListener(new StubIFeedback<LogEntry>(), new ZvsEntityContextConnection());
             //assert 
             Assert.IsNotNull(result);
         }
@@ -60,7 +60,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new zvsEntityContextConnection());
+            var tm = new ChangeListener(log, new ZvsEntityContextConnection());
 
             //Act
             await tm.StartAsync(cts.Token);
@@ -85,7 +85,7 @@ namespace zvs.Processor.Tests
                 }
             };
             var cts = new CancellationTokenSource();
-            var tm = new ChangeListener(log, new zvsEntityContextConnection());
+            var tm = new ChangeListener(log, new ZvsEntityContextConnection());
 
             //Act
             await tm.StartAsync(cts.Token);

@@ -13,7 +13,7 @@ namespace zvs.DataModel
     /// <summary>
     /// TO UPDATE WITH CODE FIRST:
     /// 
-    /// UPDATE-DATABASE -ProjectName zvs.Entities -verbose
+    /// UPDATE-DATABASE -ProjectName zvs.DataModel -verbose
     /// 
     /// optional: -force  (force's changes if they require dataloss)
     /// optional: -script (only creates SQL, does not apply to DB)
@@ -26,7 +26,7 @@ namespace zvs.DataModel
     public class ZvsContext : NotifyEntityChangeContext
     {
         [Obsolete("Use IEntityContextConnection to create a context.")]
-        public ZvsContext() : base("zvsDBEFCF7") { }
+        public ZvsContext() : base("zvsDBEFCF8") { }
         public ZvsContext(IEntityContextConnection entityContextConnection) : base(entityContextConnection.NameOrConnectionString) { }
 
         public DbSet<Adapter> Adapters { get; set; }
@@ -35,7 +35,6 @@ namespace zvs.DataModel
         public DbSet<BuiltinCommand> BuiltinCommands { get; set; }
         public DbSet<DbInfo> DbInfo { get; set; }
         public DbSet<Command> Commands { get; set; }
-        public DbSet<ZvsScheduledTask> CommandScheduledTasks { get; set; }
         public DbSet<CommandOption> CommandOptions { get; set; }
         public DbSet<Device> Devices { get; set; }
         public DbSet<DeviceCommand> DeviceCommands { get; set; }
@@ -61,7 +60,6 @@ namespace zvs.DataModel
         public DbSet<SceneSetting> SceneSettings { get; set; }
         public DbSet<SceneSettingOption> SceneSettingOptions { get; set; }
         public DbSet<SceneSettingValue> SceneSettingValues { get; set; }
-
         public DbSet<ScheduledTask> ScheduledTasks { get; set; }
         public DbSet<SceneStoredCommand> SceneStoredCommands { get; set; }
         public DbSet<ZvsScheduledTask> ZvsScheduledTasks { get; set; }

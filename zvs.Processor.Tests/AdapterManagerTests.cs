@@ -16,6 +16,25 @@ namespace zvs.Processor.Tests
     public class AdapterManagerTests
     {
         [TestMethod]
+        public async Task TEMPTEST()
+        {
+            //Arrange 
+            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "LogEntryTest" };
+            Database.SetInitializer(new CreateFreshDbInitializer());
+
+            var log = new DatabaseFeedback(dbConnection);
+            await log.ReportInfoAsync("hello world", CancellationToken.None);
+
+            using (var context = new ZvsContext(dbConnection))
+            {
+                //Aseert
+               Assert.IsTrue(context.LogEntries.Count() == 1);
+            }
+
+        }
+
+
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorNullArg1Test()
         {
@@ -286,9 +305,12 @@ namespace zvs.Processor.Tests
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
                 OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                StartAsync01 = async () => isStarted = true
+                StartAsync01 = () =>
+                {
+                    isStarted = true;
+                    return Task.FromResult(0);
+                }
             };
-
             unitTestingAdapter.OnSettingsCreatingAdapterSettingBuilder = async (settingBuilder) =>
             {
                 var testSetting = new AdapterSetting
@@ -328,7 +350,7 @@ namespace zvs.Processor.Tests
                 NameGet = () => "Unit Testing Adapter",
                 DescriptionGet = () => "",
                 OnDeviceTypesCreatingDeviceTypeBuilder = (s) => Task.FromResult(0),
-                StartAsync01 = async () =>  hasStarted = true
+                StartAsync01 = async () => hasStarted = true
             };
 
             var adapterManager = new AdapterManager(new List<ZvsAdapter> { unitTestingAdapter }, dbConnection, log);
@@ -345,7 +367,7 @@ namespace zvs.Processor.Tests
 
             //act
             var result = await adapterManager.EnableAdapterAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);
-            
+
             //assert 
             Assert.IsFalse(result.HasError, result.Message);
             Assert.IsTrue(hasStarted, "Expected adapter startAsync to be called.");
@@ -359,7 +381,7 @@ namespace zvs.Processor.Tests
             Database.SetInitializer(new CreateFreshDbInitializer());
 
             var log = new StubIFeedback<LogEntry>();
-            var adapterManager = new AdapterManager(new List<ZvsAdapter> {  }, dbConnection, log);
+            var adapterManager = new AdapterManager(new List<ZvsAdapter> { }, dbConnection, log);
 
             //act
             var result = await adapterManager.EnableAdapterAsync(Guid.Parse("a0f912a6-b8bb-406a-360f-1eb13f50aae4"), CancellationToken.None);

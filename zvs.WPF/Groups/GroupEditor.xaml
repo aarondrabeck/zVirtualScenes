@@ -1,11 +1,11 @@
 ﻿<Window x:Class="zvs.WPF.Groups.GroupEditor"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-         xmlns:DeviceControls="clr-namespace:zvs.WPF.DeviceControls"
+         xmlns:deviceControls="clr-namespace:zvs.WPF.DeviceControls"
         Title="Group Editor" Height="426" Width="655" Icon="/zVirtualScenes;component/Images/zvs32.ico"
         WindowStartupLocation="CenterOwner" Loaded="Window_Loaded" Closed="GroupEditor_Closed_1" mc:Ignorable="d" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-        xmlns:my="clr-namespace:zvs.Entities;assembly=zvs.Entities" MinHeight="426" MinWidth="655">
+        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" MinHeight="426" MinWidth="655">
     <Window.Resources>
         <CollectionViewSource x:Key="groupsViewSource" d:DesignSource="{d:DesignInstance my:Group, CreateList=True}" />
         <CollectionViewSource x:Key="groupsgroup_devicesViewSource" Source="{Binding Path=Devices, Source={StaticResource groupsViewSource}}" />
@@ -15,7 +15,7 @@
         <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,10,161,0" Click="AddBtn_Click"></Button>
         <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,10,95,0"  VerticalAlignment="Top" Width="60" Click="EditBtn_Click" />
         <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,10,29,0" VerticalAlignment="Top" Width="60" Click="RemoveBtn_Click" />
-        <Border Margin="296,68,12,12" BorderBrush="#FFABADB3" BorderThickness="1"><DeviceControls:DeviceDataGridUC  x:Name="DeviceLst" />
+        <Border Margin="296,68,12,12" BorderBrush="#FFABADB3" BorderThickness="1"><deviceControls:DeviceDataGridUc  x:Name="DeviceLst" />
         </Border>
         <TextBlock HorizontalAlignment="Left" Name="textBlock1" Text="Groups" VerticalAlignment="Top" Margin="12,12,0,0" />
         <Image HorizontalAlignment="Left" Margin="225,133,0,0" Name="image1" Stretch="None" VerticalAlignment="Top" Source="/zVirtualScenes;component/Images/drag_arrow.png" />

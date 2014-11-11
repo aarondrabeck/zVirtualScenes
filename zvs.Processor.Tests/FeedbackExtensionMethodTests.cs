@@ -80,9 +80,10 @@ namespace zvs.Processor.Tests
             //Arrange
             IFeedback<LogEntry> log = new StubIFeedback<LogEntry>
             {
-                ReportAsyncT0CancellationToken = async (value, ct) =>
+                ReportAsyncT0CancellationToken = (value, ct) =>
                 {
                     logEntry = value;
+                    return Task.FromResult(0);
                 }
             };
 
@@ -122,9 +123,10 @@ namespace zvs.Processor.Tests
             //Arrange
             IFeedback<LogEntry> log = new StubIFeedback<LogEntry>
             {
-                ReportAsyncT0CancellationToken = async (value, ct) =>
+                ReportAsyncT0CancellationToken =  (value, ct) =>
                 {
                     logEntry = value;
+                    return Task.FromResult(0);
                 }
             };
 

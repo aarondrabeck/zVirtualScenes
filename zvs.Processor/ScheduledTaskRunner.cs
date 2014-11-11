@@ -39,6 +39,8 @@ namespace zvs.Processor
             CommandProcessor = commandProcessor;
             Log = log;
             TimeProvider = timeProvider;
+
+            Log.Source = "Scheduled Task Runner";
         }
 
         public async Task StartAsync(CancellationToken ct)
@@ -174,7 +176,7 @@ namespace zvs.Processor
         {
             using (var context = new ZvsContext(EntityContextConnection))
             {
-                return await context.CommandScheduledTasks
+                return await context.ZvsScheduledTasks
                     .Include(o=> o.Command)
                     .Include(o => o.ScheduledTask)
                     .Where(o => o.IsEnabled)

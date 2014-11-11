@@ -8,11 +8,11 @@ namespace zvs.Processor
 {
     public class ZvsEngine
     {
-        private IAdapterManager AdapterManager { get; set; }
+        public IAdapterManager AdapterManager { get; private set; }
         private IEntityContextConnection EntityContextConnection { get; set; }
         //   public PluginManager PluginManager { get; private set; }
-        private TriggerRunner TriggerRunner { get; set; }
-        private ScheduledTaskRunner ScheduledTaskRunner { get; set; }
+        public TriggerRunner TriggerRunner { get; private set; }
+        public ScheduledTaskRunner ScheduledTaskRunner { get; private set; }
         private IFeedback<LogEntry> Log { get; set; }
 
         public ZvsEngine(IFeedback<LogEntry> feedback, IAdapterManager adapterManager, IEntityContextConnection entityContextConnection, TriggerRunner triggerRunner, ScheduledTaskRunner scheduledTaskRunner)//, PluginManager pluginManager, TriggerManager triggerManager, ScheduledTaskManager scheduledTaskManager)
