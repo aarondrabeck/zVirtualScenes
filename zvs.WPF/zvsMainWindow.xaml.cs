@@ -46,34 +46,10 @@ namespace zvs.WPF
             // Do not load your data at design time.
             if (DesignerProperties.GetIsInDesignMode(this)) return;
 
-            await _context.LogEntries
-                .OrderByDescending(o => o.Datetime)
-                .Take(100)
-                .ToListAsync();
-
-            //Load your data here and assign the result to the CollectionViewSource.
-            var myCollectionViewSource = (CollectionViewSource)Resources["ListViewSource"];
-            myCollectionViewSource.Source = _context.LogEntries.Local.OrderBy(o => o.Datetime);
-
             var log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Main Window" };
             await log.ReportInfoFormatAsync(_app.Cts.Token, "{0} User Interface Loaded", Utils.ApplicationName);
-
-            var dataView = CollectionViewSource.GetDefaultView(logListView.ItemsSource);
-            //clear the existing sort order
-            dataView.SortDescriptions.Clear();
-
-            //create a new sort order for the sorting that is done lastly            
-            var dir = ListSortDirection.Ascending;
-
-            var option = await _context.ProgramOptions.FirstOrDefaultAsync(o => o.UniqueIdentifier == "LOGDIRECTION");
-            if (option != null && option.Value == "Descending")
-                dir = ListSortDirection.Descending;
-
-            myCollectionViewSource.SortDescriptions.Clear();
-            myCollectionViewSource.SortDescriptions.Add(new SortDescription("Datetime", dir));
-
+            
             dList1.ShowMore = false;
-
             Title = Utils.ApplicationNameAndVersion;
         }
 

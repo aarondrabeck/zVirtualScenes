@@ -84,6 +84,35 @@ namespace zvs.WPF
             return true;
         }
 
+        public static Adapter CreateFakeAdapter()
+        {
+            return new Adapter
+            {
+                AdapterGuid = Guid.NewGuid(),
+                Name = "Unit testing adapter",
+            };
+        }
+
+        public static DeviceType CreateFakeDeviceType()
+        {
+            return new DeviceType
+            {
+                UniqueIdentifier = "1",
+                Name = "DIMMER",
+                Adapter = CreateFakeAdapter()
+            };
+        }
+
+        public static Device CreateFakeDevice()
+        {
+            return new Device
+            {
+                Name = "Light Switch",
+                Type = CreateFakeDeviceType()
+            };
+
+        }
+
         protected async override void OnStartup(StartupEventArgs e)
         {
             var adapterLoader = new AdapterLoader();
@@ -109,6 +138,13 @@ namespace zvs.WPF
 #if (RELEASE)
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 #endif
+
+            using (var context = new ZvsContext(new ZvsEntityContextConnection()))
+            {
+                //var device = CreateFakeDevice();
+               // context.Devices.Add(device);
+                //context.SaveChanges();
+            }
 
             #region Create Logger
 
@@ -243,7 +279,7 @@ namespace zvs.WPF
                     .ToListAsync();
 
                 foreach (var trigger in triggers)
-                    trigger.SetDescription(context);
+                    trigger.SetDescription();
 
                 var result = await context.TrySaveChangesAsync(Cts.Token);
                 if (result.HasError)
@@ -261,7 +297,7 @@ namespace zvs.WPF
                 foreach (var storedCommand in storedCommands)
                 {
                     await storedCommand.SetTargetObjectNameAsync(context);
-                    storedCommand.SetDescription(context);
+                    storedCommand.SetDescription();
                 }
 
                 var result = await context.TrySaveChangesAsync(Cts.Token);

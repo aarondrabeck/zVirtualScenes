@@ -122,9 +122,6 @@
         <Style TargetType="{x:Type ListViewItem}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
-        <CollectionViewSource x:Key="ListViewSource" >
-            <!--d:DesignSource="{d:DesignInstance my:device, CreateList=True}"-->
-        </CollectionViewSource>
     </zvsWpf:ChromeWindow.Resources>
     <DockPanel Background="White">
         <StatusBar  DockPanel.Dock="Bottom" Height="30" Background="White" BorderBrush="#FFA0A0A0" BorderThickness="0 1 0 0">
@@ -199,19 +196,8 @@
                             <TextBlock FontSize="14" Text="Log" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
-                    <Grid DataContext="{StaticResource ListViewSource}">
-
-                        <DataGrid  x:Name="logListView"  Margin="0,0,0,0" Background="#FFF9F9F9"  VerticalAlignment="Stretch" 
-                                   HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
-                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" 
-                                   ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False" BorderThickness="0" >
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
-                                <DataGridTextColumn Width="75" Header="Level" Binding="{Binding Level}" IsReadOnly="True"/>
-                                <DataGridTextColumn Width="150"  Header="Source" Binding="{Binding Source}" IsReadOnly="True"/>
-                                <DataGridTextColumn Width="*"  Header="Message" Binding="{Binding Message}" IsReadOnly="True"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                    <Grid>
+                        <zvsWpf:LogUserControl/>
                     </Grid>
                 </TabItem>
             </TabControl>

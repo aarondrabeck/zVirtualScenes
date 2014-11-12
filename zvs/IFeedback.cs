@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace zvs.Processor
+namespace zvs
 {
     public interface IFeedback<in TLogItem>
     {

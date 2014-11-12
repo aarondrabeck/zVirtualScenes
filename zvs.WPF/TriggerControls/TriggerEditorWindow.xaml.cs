@@ -148,7 +148,7 @@ namespace zvs.WPF.TriggerControls
             Trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
             //Update the description
-            Trigger.SetDescription(_context);
+            Trigger.SetDescription();
 
             Canceled = false;
             Close();

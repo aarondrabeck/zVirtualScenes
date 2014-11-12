@@ -6,13 +6,13 @@ namespace zvs.DataModel.Tasks
 {
     public class IntervalScheduledTask : ScheduledTask
     {
-        public double IntervalInMiliSeconds { get; set; }
+        public double IntervalInSeconds { get; set; }
 
         [NotMapped]
         public TimeSpan Inteval
         {
-            get { return TimeSpan.FromSeconds(IntervalInMiliSeconds); } 
-            set { IntervalInMiliSeconds = value.TotalMilliseconds; }
+            get { return TimeSpan.FromSeconds(IntervalInSeconds); }
+            set { IntervalInSeconds = value.TotalSeconds; }
         }
     }
 }

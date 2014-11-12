@@ -422,7 +422,7 @@ namespace zvs.WPF.Commands
                 }
 
                 await StoredCommand.SetTargetObjectNameAsync(Context);
-                StoredCommand.SetDescription(Context);
+                StoredCommand.SetDescription();
 
                 DialogResult = true;
                 Close();
@@ -445,7 +445,7 @@ namespace zvs.WPF.Commands
                 }
 
                 await StoredCommand.SetTargetObjectNameAsync(Context);
-                StoredCommand.SetDescription(Context);
+                StoredCommand.SetDescription();
 
                 DialogResult = true;
                 Close();
@@ -465,7 +465,7 @@ namespace zvs.WPF.Commands
                     StoredCommand.Command = item;
 
                 await StoredCommand.SetTargetObjectNameAsync(Context);
-                StoredCommand.SetDescription(Context);
+                StoredCommand.SetDescription();
 
                 DialogResult = true;
                 Close();

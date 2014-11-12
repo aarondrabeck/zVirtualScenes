@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using zvs.DataModel;
 
-namespace zvs.Processor
+namespace zvs.DataModel
 {
     public class DatabaseFeedback : IFeedback<LogEntry>
     {

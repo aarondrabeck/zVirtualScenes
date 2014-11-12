@@ -92,7 +92,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 var myCollectionViewSource = (CollectionViewSource)Resources["ScheduledTaskViewSource"];
-                myCollectionViewSource.Source = _context.ScheduledTasks.Local;
+                myCollectionViewSource.Source = _context.ZvsScheduledTasks.Local;
             }
 
 #if DEBUG
@@ -185,33 +185,39 @@ namespace zvs.WPF.ScheduledTaskControls
             WeeklyGpBx.Visibility = Visibility.Collapsed;
             MonthlyGpBx.Visibility = Visibility.Collapsed;
 
+            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            if (command == null)
+                return;
+
             if (FrequencyCmbBx.SelectedItem == null) return;
             switch ((ScheduledTaskType)FrequencyCmbBx.SelectedItem)
             {
                 case ScheduledTaskType.Daily:
                     {
+                        command.ScheduledTask = new DailyScheduledTask();
                         DailyGpBx.Visibility = Visibility.Visible;
                         break;
                     }
                 case ScheduledTaskType.Interval:
                     {
+                        command.ScheduledTask = new IntervalScheduledTask();
                         SecondsGpBx.Visibility = Visibility.Visible;
                         break;
                     }
                 case ScheduledTaskType.Weekly:
                     {
+                        command.ScheduledTask = new WeeklyScheduledTask();
                         WeeklyGpBx.Visibility = Visibility.Visible;
                         break;
                     }
                 case ScheduledTaskType.Monthly:
                     {
+                        command.ScheduledTask = new MonthlyScheduledTask();
                         MonthlyGpBx.Visibility = Visibility.Visible;
                         break;
                     }
             }
         }
-
-       
 
         private void OddTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
         {
@@ -327,10 +333,12 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
         {
-            var command = (ZvsScheduledTask)ScheduledTaskDataGrid.SelectedItem;
-            
+            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            if (command == null)
+                return;
+
             //Send it to the command builder to get filled with a command
-            var cbWindow= new CommandBuilder(_context, command)
+            var cbWindow = new CommandBuilder(_context, command)
             {
                 Owner = _app.ZvsWindow
             };

@@ -106,6 +106,7 @@
     <Compile Include="AdapterSettingBuilderTests.cs" />
     <Compile Include="SceneSettingBuilderTests.cs" />
     <Compile Include="FeedbackExtensionMethodTests.cs" />
+    <Compile Include="CreateFakeData.cs" />
     <Compile Include="UnitTestingAdapter.cs" />
     <Compile Include="ZvsAdapterTests.cs" />
   </ItemGroup>

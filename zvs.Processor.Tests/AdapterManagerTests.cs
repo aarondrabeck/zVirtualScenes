@@ -16,25 +16,6 @@ namespace zvs.Processor.Tests
     public class AdapterManagerTests
     {
         [TestMethod]
-        public async Task TEMPTEST()
-        {
-            //Arrange 
-            var dbConnection = new StubIEntityContextConnection { NameOrConnectionStringGet = () => "LogEntryTest" };
-            Database.SetInitializer(new CreateFreshDbInitializer());
-
-            var log = new DatabaseFeedback(dbConnection);
-            await log.ReportInfoAsync("hello world", CancellationToken.None);
-
-            using (var context = new ZvsContext(dbConnection))
-            {
-                //Aseert
-               Assert.IsTrue(context.LogEntries.Count() == 1);
-            }
-
-        }
-
-
-        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorNullArg1Test()
         {

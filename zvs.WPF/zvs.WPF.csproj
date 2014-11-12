@@ -103,6 +103,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="LogUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\ChromeStyledWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -117,6 +121,9 @@
     </Page>
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LogUserControl.xaml.cs">
+      <DependentUpon>LogUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Resources\ChromeStyledWindow.xaml.cs">
       <DependentUpon>ChromeStyledWindow.xaml</DependentUpon>
@@ -368,6 +375,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Properties\DataSources\zvs.DataModel.LogEntry.datasource" />
     <None Include="zvsCert.pfx" />
     <Resource Include="Images\zvs256.ico" />
     <Resource Include="Images\zvs32.ico" />
@@ -387,9 +395,7 @@
     </Content>
     <None Include="Properties\DataSources\zVirtualScenesCommon.Entity.zvsEntities21.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_options.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
-    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.db_info.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device.datasource" />
     <None Include="Properties\DataSources\zVirtualScenesModel.device_commands.datasource" />
@@ -429,7 +435,6 @@
     <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
     <None Include="Properties\DataSources\zvs.WPF.JavaScript.JavaScriptAddRemove.datasource" />
     <None Include="Properties\DataSources\zvs.WPF.JavaScript.JavaScriptEditorWindow.datasource" />
-    <None Include="Properties\DataSources\zvs.WPF.JavaScript.JavaScriptSelector.datasource" />
     <None Include="Properties\DataSources\zvs.WPF.JavaScript.JSEditor.datasource" />
     <None Include="Properties\DataSources\zvs.WPF.JavaScript.JSResult.datasource" />
     <None Include="Properties\Settings.settings">

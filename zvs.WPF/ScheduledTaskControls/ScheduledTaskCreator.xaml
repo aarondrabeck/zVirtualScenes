@@ -39,7 +39,7 @@
             </Setter>
         </Style>
 
-        <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
+        <ObjectDataProvider x:Key="ScheduledTaskTypeEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="tasks:ScheduledTaskType"/>
             </ObjectDataProvider.MethodParameters>
@@ -57,7 +57,7 @@
             </Border.Background>
             <TextBlock FontSize="14" FontWeight="Bold" TextWrapping="Wrap" Text="Scenes" VerticalAlignment="Center" Margin="5,0,0,0" />
         </Border>
-        
+
         <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"
                     HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" 
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
@@ -92,14 +92,14 @@
             <Grid>
                 <TextBlock Name="TaskNameTxtBl" Text="{Binding Name, StringFormat={}{0} Details}"  Margin="10,5,10,0" VerticalAlignment="Top"
                            FontWeight="Bold" FontSize="16" TextTrimming="CharacterEllipsis" ></TextBlock>
-                <TextBlock Text="Task Frequency" VerticalAlignment="Top"  HorizontalAlignment="Left" Margin="10,131,0,0"></TextBlock>
-                <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource dataFromEnum}}"   SelectedItem="{Binding Frequency, UpdateSourceTrigger=PropertyChanged}" 
-                          VerticalAlignment="Top" Margin="10,149,0,0" HorizontalAlignment="Left" Width="176" SelectionChanged="FrequencyCmbBx_SelectionChanged" LostFocus="LostFocus_SaveChanges"></ComboBox>
+                <TextBlock Text="Task Frequency" VerticalAlignment="Top"  HorizontalAlignment="Left" Margin="10,85,0,0"></TextBlock>
+                <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource ScheduledTaskTypeEnum}}"   SelectedItem="{Binding Frequency, UpdateSourceTrigger=PropertyChanged}" 
+                          VerticalAlignment="Top" Margin="12,102,0,0" HorizontalAlignment="Left" Width="176" SelectionChanged="FrequencyCmbBx_SelectionChanged" LostFocus="LostFocus_SaveChanges"></ComboBox>
 
-                <TextBlock Text="Command to Run" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,81,0,0"/>
+                <TextBlock Text="Command to Run" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,35,0,0"/>
 
                 <TextBlock FontSize="14" Height="20" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" 
-                           VerticalAlignment="Top" Margin="144,100,25,0">
+                           VerticalAlignment="Top" Margin="144,54,25,0">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}{0} {1}"  >
                             <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
@@ -109,10 +109,10 @@
                 </TextBlock>
 
 
-                <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" VerticalAlignment="Top" Width="116" Click="AddUpdateCommand_Click" Margin="12,100,0,0" />
+                <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" VerticalAlignment="Top" Width="116" Click="AddUpdateCommand_Click" Margin="12,54,0,0" />
 
-                <TextBlock Text="Start Time" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,35,0,0"/>
-                <xctk:DateTimePicker  Value="{Binding StartTime, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="10,54,0,0" Width="325" LostFocus="LostFocus_SaveChanges" />
+                <TextBlock Text="Start Time" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="12,133,0,0"/>
+                <xctk:DateTimePicker  Value="{Binding ScheduledTask.StartTime, UpdateSourceTrigger=PropertyChanged}"  VerticalAlignment="Top" HorizontalAlignment="Left"  Margin="12,152,0,0" Width="325" LostFocus="LostFocus_SaveChanges" />
 
 
 
@@ -122,7 +122,7 @@
                     <GroupBox Name="SecondsGpBx" Header="Per Second" HorizontalAlignment="Left" Width="224">
                         <Grid>
                             <TextBlock Text="Recur every" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3,4,0,0" />
-                            <TextBox VerticalAlignment="Top" HorizontalAlignment="Left" Width="76" Margin="78,1,0,0" Text="{Binding RecurSeconds, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}}" LostFocus="LostFocus_SaveChanges"/>
+                            <TextBox VerticalAlignment="Top" HorizontalAlignment="Left" Width="76" Margin="78,1,0,0" Text="{Binding IntervalInSeconds, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource NullableIntConverter}}" LostFocus="LostFocus_SaveChanges"/>
                             <TextBlock Text="seconds" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="161,4,0,0" />
                         </Grid>
                     </GroupBox>

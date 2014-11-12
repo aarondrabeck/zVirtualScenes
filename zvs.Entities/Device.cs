@@ -90,8 +90,8 @@ namespace zvs.DataModel
             }
         }
 
-        private double? _currentLevelInt;
-        public double? CurrentLevelInt
+        private double _currentLevelInt;
+        public double CurrentLevelInt
         {
             get
             {
@@ -99,11 +99,9 @@ namespace zvs.DataModel
             }
             set
             {
-                if (value != _currentLevelInt)
-                {
-                    _currentLevelInt = value;
-                    NotifyPropertyChanged();
-                }
+                if (value == _currentLevelInt) return;
+                _currentLevelInt = value;
+                NotifyPropertyChanged();
             }
         }
 

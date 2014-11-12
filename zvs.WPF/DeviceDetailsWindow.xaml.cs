@@ -14,18 +14,20 @@ namespace zvs.WPF
     /// <summary>
     /// Interaction logic for DeviceDetails.xaml
     /// </summary>
-    public partial class DeviceDetailsWindow : Window
+    public partial class DeviceDetailsWindow
     {
-        private int DeviceID = 0;
+        private int DeviceId { get; set; } 
+        private App App { get; set; } 
 
-        public DeviceDetailsWindow(int deviceID)
+        public DeviceDetailsWindow(int deviceId)
         {
-            this.DeviceID = deviceID;
+            App = (App)Application.Current;
+            DeviceId = deviceId;
             InitializeComponent();
 
-            ZvsContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDetailsWindow_onEntityAdded;
-            ZvsContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
-            ZvsContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded += DeviceDetailsWindow_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityDeleted += DeviceDetailsWindow_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityUpdated += DeviceDetailsWindow_onEntityUpdated;
         }
 
 #if DEBUG
@@ -44,55 +46,55 @@ namespace zvs.WPF
 
         void DeviceDetailsWindow_onEntityUpdated(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityUpdatedArgs e)
         {
-            this.Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
-                if (e.NewEntity.Id == DeviceID)
+                if (e.NewEntity.Id == DeviceId)
                     await LoadDeviceAsync();
             }));
         }
 
         void DeviceDetailsWindow_onEntityDeleted(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityDeletedArgs e)
         {
-            this.Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
-                if (e.DeletedEntity.Id == DeviceID)
+                if (e.DeletedEntity.Id == DeviceId)
                     await LoadDeviceAsync();
             }));
         }
 
         void DeviceDetailsWindow_onEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<Device>.EntityAddedArgs e)
         {
-            this.Dispatcher.Invoke(new Action(async () =>
+            Dispatcher.Invoke(new Action(async () =>
             {
-                if (e.AddedEntity.Id == DeviceID)
+                if (e.AddedEntity.Id == DeviceId)
                     await LoadDeviceAsync();
             }));
         }
 
         private void DeviceDetailsWindow_Closed_1(object sender, EventArgs e)
         {
-            ZvsContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDetailsWindow_onEntityAdded;
-            ZvsContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
-            ZvsContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded -= DeviceDetailsWindow_onEntityAdded;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityDeleted -= DeviceDetailsWindow_onEntityDeleted;
+            NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityUpdated -= DeviceDetailsWindow_onEntityUpdated;
         }
 
         private async Task LoadDeviceAsync()
         {
-            using (var context = new ZvsContext())
+            using (var context = new ZvsContext(App.EntityContextConnection))
             {
                 var d = await context.Devices
                     .Include(o => o.Type)
-                    .FirstOrDefaultAsync(dv => dv.Id == DeviceID);
+                    .FirstOrDefaultAsync(dv => dv.Id == DeviceId);
 
                 if (d == null)
                 {
                     MessageBox.Show("Device not found", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    this.Close();
+                    Close();
                     return;
                 }
 
-                DeviceNameTextBlock.Text = d.Name;
-                this.Title = string.Format("'{0}' Details", d.Name);
+                DeviceNameTextBlock.Text = string.Format("{0} {1}", d.Location, d.Name);
+                Title = string.Format("{0} {1} Details", d.Location, d.Name);
                 DeviceCurrentStatus.Text = d.CurrentLevelText;
 
                 switch (d.Type.UniqueIdentifier)
@@ -114,7 +116,7 @@ namespace zvs.WPF
                         }
                     case "CONTROLLER":
                         {
-                            DeviceCurrentStatus.Visibility = System.Windows.Visibility.Collapsed;
+                            DeviceCurrentStatus.Visibility = Visibility.Collapsed;
                             IconImg.Source = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/controler.png"));
                             break;
                         }
@@ -127,21 +129,20 @@ namespace zvs.WPF
 
                 if (d.Type.UniqueIdentifier.Equals("DIMMER"))
                 {
-                    if (d.CurrentLevelInt.HasValue)
+                    var level = d.CurrentLevelInt;
+
+                    if (level >= 0 && level <= 20)
+                        level = 21;
+
+                    level = level / 100;
+
+                    var da = new DoubleAnimation
                     {
-                        var level = d.CurrentLevelInt.Value;
-
-                        if (level >= 0 && level <= 20)
-                            level = 21;
-
-                        level = level / 100;
-
-                        var da = new DoubleAnimation();
-                        da.From = IconImg.Opacity;
-                        da.To = level;
-                        da.Duration = new Duration(TimeSpan.FromSeconds(1));
-                        IconImg.BeginAnimation(OpacityProperty, da);
-                    }
+                        From = IconImg.Opacity,
+                        To = level,
+                        Duration = new Duration(TimeSpan.FromSeconds(1))
+                    };
+                    IconImg.BeginAnimation(OpacityProperty, da);
                 }
 
             }
@@ -150,28 +151,26 @@ namespace zvs.WPF
         private void SelectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var item = (ListBoxItem)SelectionList.SelectedItem;
-            if (item != null)
-            {
-                ContentStackPanel.Children.Clear();
+            if (item == null) return;
+            ContentStackPanel.Children.Clear();
 
-                if (item.Name.Equals("COMMANDS"))
-                {
-                    ContentStackPanel.Children.Add(new DeviceCommands(DeviceID));
-                }
-                else if (item.Name.Equals("PROPERTIES"))
-                {
-                    ContentStackPanel.Children.Add(new DeviceProperties(DeviceID));
-                }
-                else if (item.Name.Equals("VALUES"))
-                {
-                    ContentStackPanel.Children.Add(new DeviceValues(DeviceID));
-                }
+            if (item.Name.Equals("COMMANDS"))
+            {
+                ContentStackPanel.Children.Add(new DeviceCommands(DeviceId));
+            }
+            else if (item.Name.Equals("PROPERTIES"))
+            {
+                ContentStackPanel.Children.Add(new DeviceProperties(DeviceId));
+            }
+            else if (item.Name.Equals("VALUES"))
+            {
+                ContentStackPanel.Children.Add(new DeviceValues(DeviceId));
             }
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

@@ -24,19 +24,18 @@ namespace zvs.DataModel
 
     public static class StoredCommandExtensionMethods
     {
-        public static void SetDescription(this IStoredCommand storedCommand, ZvsContext context)
+        public static void SetDescription(this IStoredCommand storedCommand)
         {
             if (storedCommand.Command is BuiltinCommand)
             {
-                #region Built-in Command
-                BuiltinCommand bc = storedCommand.Command as BuiltinCommand;
+                // Built-in Command
+                var bc = storedCommand.Command as BuiltinCommand;
                 storedCommand.Description = bc.Name;
-                #endregion
             }
             else if (storedCommand.Command is DeviceCommand)
             {
-                #region DeviceCommand
-                DeviceCommand bc = storedCommand.Command as DeviceCommand;
+                //DeviceCommand
+                var bc = storedCommand.Command as DeviceCommand;
                 switch (bc.ArgumentType)
                 {
                     case DataType.NONE:
@@ -46,12 +45,12 @@ namespace zvs.DataModel
                         storedCommand.Description = string.Format("{0} to {1} on", bc.Name, storedCommand.Argument);
                         break;
                 }
-                #endregion
+
             }
             else if (storedCommand.Command is DeviceTypeCommand)
             {
-                #region DeviceTypeCommand
-                DeviceTypeCommand bc = storedCommand.Command as DeviceTypeCommand;
+                //DeviceTypeCommand
+                var bc = storedCommand.Command as DeviceTypeCommand;
                 switch (bc.ArgumentType)
                 {
                     case DataType.NONE:
@@ -61,7 +60,6 @@ namespace zvs.DataModel
                         storedCommand.Description = string.Format("{0} to {1} on", bc.Name, storedCommand.Argument);
                         break;
                 }
-                #endregion
             }
             else if (storedCommand.Command is JavaScriptCommand)
             {
@@ -77,27 +75,27 @@ namespace zvs.DataModel
             if (storedCommand.Command is BuiltinCommand)
             {
                 #region Built-in Command
-                BuiltinCommand bc = storedCommand.Command as BuiltinCommand;
+                var bc = storedCommand.Command as BuiltinCommand;
 
                 switch (bc.UniqueIdentifier)
                 {
                     case "REPOLL_ME":
                         {
-                            int d_id = 0;
-                            int.TryParse(storedCommand.Argument, out d_id);
+                            var dId = 0;
+                            int.TryParse(storedCommand.Argument, out dId);
 
-                            Device device_to_repoll = await context.Devices.FirstOrDefaultAsync(d => d.Id == d_id);
-                            if (device_to_repoll != null)
-                                storedCommand.TargetObjectName = device_to_repoll.Name;
+                            var deviceToRepoll = await context.Devices.FirstOrDefaultAsync(d => d.Id == dId);
+                            if (deviceToRepoll != null)
+                                storedCommand.TargetObjectName = string.Format("{0} {1}", deviceToRepoll.Location, deviceToRepoll.Name);
 
                             break;
                         }
                     case "GROUP_ON":
                     case "GROUP_OFF":
                         {
-                            int g_id = 0;
-                            int.TryParse(storedCommand.Argument, out g_id);
-                            Group g = await context.Groups.FirstOrDefaultAsync(gr => gr.Id == g_id);
+                            int gId;
+                            int.TryParse(storedCommand.Argument, out gId);
+                            var g = await context.Groups.FirstOrDefaultAsync(gr => gr.Id == gId);
                             if (g != null)
                                 storedCommand.TargetObjectName = g.Name;
 
@@ -105,12 +103,12 @@ namespace zvs.DataModel
                         }
                     case "RUN_SCENE":
                         {
-                            int SceneId = 0;
-                            int.TryParse(storedCommand.Argument, out SceneId);
+                            int sceneId;
+                            int.TryParse(storedCommand.Argument, out sceneId);
 
-                            Scene Scene = await context.Scenes.FirstOrDefaultAsync(d => d.Id == SceneId);
-                            if (Scene != null)
-                                storedCommand.TargetObjectName = Scene.Name;
+                            var scene = await context.Scenes.FirstOrDefaultAsync(d => d.Id == sceneId);
+                            if (scene != null)
+                                storedCommand.TargetObjectName = scene.Name;
                             break;
                         }
                     default:
@@ -121,24 +119,20 @@ namespace zvs.DataModel
             }
             else if (storedCommand.Command is DeviceCommand)
             {
-                var dc = storedCommand.Command as DeviceCommand;
                 var device = await context.Devices.FirstOrDefaultAsync(o => o.Commands.Any(p => p.Id == storedCommand.Command.Id));
-                storedCommand.TargetObjectName = device.Name;
+                storedCommand.TargetObjectName = string.Format("{0} {1}", device.Location, device.Name);
             }
             else if (storedCommand.Command is DeviceTypeCommand)
             {
-                int d_id = int.TryParse(storedCommand.Argument2, out d_id) ? d_id : 0;
-                Device d = await context.Devices.FirstOrDefaultAsync(o => o.Id == d_id);
+                int dId = int.TryParse(storedCommand.Argument2, out dId) ? dId : 0;
+                var d = await context.Devices.FirstOrDefaultAsync(o => o.Id == dId);
 
-                if (d != null)
-                    storedCommand.TargetObjectName = d.Name;
-                else
-                    storedCommand.TargetObjectName = "Unknown Device";
+                storedCommand.TargetObjectName = d != null ? string.Format("{0} {1}", d.Location, d.Name) : "Unknown Device";
             }
             else if (storedCommand.Command is JavaScriptCommand)
             {
-                JavaScriptCommand JSCmd = storedCommand.Command as JavaScriptCommand;
-                storedCommand.TargetObjectName = JSCmd.Name;
+                var jsCmd = storedCommand.Command as JavaScriptCommand;
+                storedCommand.TargetObjectName = jsCmd.Name;
             }
 
             sw.Stop();

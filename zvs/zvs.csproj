@@ -42,6 +42,7 @@
     <Compile Include="CurrentTimeProvider.cs" />
     <Compile Include="ExceptionExtensionMethods.cs" />
     <Compile Include="IEntityContextConnection.cs" />
+    <Compile Include="IFeedback.cs" />
     <Compile Include="ITimeProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Result.cs" />

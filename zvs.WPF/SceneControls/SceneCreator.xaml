@@ -32,7 +32,7 @@
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
 
-        <CollectionViewSource x:Key="scenescene_commandsViewSource" Source="{Binding Commands, Source={StaticResource sceneViewSource}}" >
+        <CollectionViewSource x:Key="ScenesceneCommandsViewSource" Source="{Binding Commands, Source={StaticResource sceneViewSource}}" >
             <CollectionViewSource.SortDescriptions>
                 <d:SortDescription PropertyName="SortOrder" Direction="Acending"/>
             </CollectionViewSource.SortDescriptions>
@@ -67,7 +67,7 @@
                         <DataTemplate>
                             <Image Name="img" Width="40" Height="40" Source="/zVirtualScenes;component/Images/scene64.png" />
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=isRunning}" Value="True">
+                                <DataTrigger Binding="{Binding Path=IsRunning}" Value="True">
                                     <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/scene_run64.png"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -87,7 +87,7 @@
                 <DataGridTemplateColumn MaxWidth="95" MinWidth="95" Width="95" Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="3,0">
+                            <StackPanel  Orientation="Horizontal" Margin="3,0">
                                 <Button Name="ActivateScene" Click="ActivateScene_Click_1" Height="32"  ToolTip="Activate" Padding="3,0">
                                     <Image Name="actimg" Source="../Images/run.png"></Image>
                                 </Button>
@@ -99,10 +99,10 @@
                                 </Button>
                             </StackPanel>
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=isRunning }" Value="False">
+                                <DataTrigger Binding="{Binding Path=IsRunning }" Value="False">
                                     <Setter TargetName="ActivateScene" Property="IsEnabled" Value="True"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=isRunning }" Value="True">
+                                <DataTrigger Binding="{Binding Path=IsRunning }" Value="True">
                                     <Setter TargetName="ActivateScene" Property="IsEnabled" Value="False"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Path=Commands.Count }" Value="0">
@@ -139,7 +139,7 @@
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <DataGrid MinHeight="100"  MinWidth="400" Grid.Row="0" x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
-                  ItemsSource="{Binding Source={StaticResource scenescene_commandsViewSource}}"
+                  ItemsSource="{Binding Source={StaticResource ScenesceneCommandsViewSource}}"
                 AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
                   PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource Body_Content_DataGrid_Centering}" CanUserResizeRows="False" Margin="10,31,10,0" 
@@ -153,13 +153,13 @@
                                     <Setter Property="Padding" Value="5,0,0,0"/>
                                     <Setter Property="TextWrapping"  Value="NoWrap" />
                                     <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                    <Setter Property="ToolTip" Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
+                                    <Setter Property="ToolTip" Value="{Binding Path=Description, Mode=OneWay}"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                             <DataGridTextColumn.Binding>
                                 <MultiBinding StringFormat="{}{0} {1}"  >
-                                    <Binding Path="StoredCommand.Description" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
-                                    <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                    <Binding Path="Description" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                    <Binding Path="TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
                                 </MultiBinding>
                             </DataGridTextColumn.Binding>
 

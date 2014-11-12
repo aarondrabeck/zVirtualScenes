@@ -5,6 +5,6 @@
     Renaming the file extension or editing the content of this file may   
     cause the file to be unrecognizable by the program.
 -->
-<GenericObjectDataSource DisplayName="JavaScriptSelector" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
-   <TypeInfo>zvs.WPF.JavaScript.JavaScriptSelector, zVirtualScenes, Version=3.4.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
+<GenericObjectDataSource DisplayName="LogEntry" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+   <TypeInfo>zvs.DataModel.LogEntry, zvs.DataModel, Version=8.0.1010.1, Culture=neutral, PublicKeyToken=null</TypeInfo>
 </GenericObjectDataSource>

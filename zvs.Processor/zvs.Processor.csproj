@@ -87,9 +87,7 @@
     <Compile Include="IAdapterManager.cs" />
     <Compile Include="ICommandProcessor.cs" />
     <Compile Include="Properties\Annotations.cs" />
-    <Compile Include="DatabaseFeedback.cs" />
     <Compile Include="FeedbackExtensionMethods.cs" />
-    <Compile Include="IFeedback.cs" />
     <Compile Include="SceneRunner.cs" />
     <Compile Include="SceneSettingBuilder.cs" />
     <Compile Include="NativeMethods.cs" />
