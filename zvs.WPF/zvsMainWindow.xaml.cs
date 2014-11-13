@@ -31,6 +31,17 @@ namespace zvs.WPF
         {
             InitializeComponent();
             _context = new ZvsContext(_app.EntityContextConnection);
+            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += ZvsMainWindow_OnEntityAdded;
+        }
+
+        void ZvsMainWindow_OnEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<LogEntry>.EntityAddedArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                StatusBarDescriptionTxt.Text = e.AddedEntity.Message;
+                StatusBarSourceTxt.Text = e.AddedEntity.Source;
+                StatusBarUrgencyTxt.Text = e.AddedEntity.Level.ToString();
+            });
         }
 
 #if DEBUG
@@ -48,13 +59,14 @@ namespace zvs.WPF
 
             var log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Main Window" };
             await log.ReportInfoFormatAsync(_app.Cts.Token, "{0} User Interface Loaded", Utils.ApplicationName);
-            
+
             dList1.ShowMore = false;
             Title = Utils.ApplicationNameAndVersion;
         }
 
         private void Window_Unloaded(object sender, RoutedEventArgs e)
         {
+            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded -= ZvsMainWindow_OnEntityAdded;
         }
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -162,17 +174,12 @@ namespace zvs.WPF
             var jsWindow = new JavaScriptAddRemove { Owner = this };
             jsWindow.ShowDialog();
         }
-
-        private void ClearLogsMI_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO: CLEAR LOG 
-        }
-
+       
         private void BackupRestoreMI_Click(object sender, RoutedEventArgs e)
         {
             //TODO: RESTORE
             //var window = new BackupRestoreWindow { Owner = this };
-          //  window.ShowDialog();
+            //  window.ShowDialog();
         }
     }
     public class ContentToMarginConverter : IValueConverter

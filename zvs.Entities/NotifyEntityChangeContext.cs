@@ -112,34 +112,36 @@ namespace zvs.DataModel
             {
                 switch (o.State)
                 {
-                    //IMPORTANT: Must clone here because values could change and often do
-                    //before all events are fired and consumed. 
+                   
 
                     case EntityState.Added:
-                        addedEntities.Add(o.Entity.CloneObject());
+                        addedEntities.Add(o.Entity);
                         break;
                     case EntityState.Modified:
                         modifedEntities.Add(new
                         {
-                            NewEntity = o.Entity.CloneObject(),
-                            OldEntity = o.OriginalValues.ToObject().CloneObject()
+                            NewEntity = o.Entity,
+                            OldEntity = o.OriginalValues.ToObject()
                         });
                         break;
                     case EntityState.Deleted:
-                        deletedEntities.Add(o.Entity.CloneObject());
+                        deletedEntities.Add(o.Entity);
                         break;
                 }
             });
 
             //Try Save Changes
             var saveChangesResult = await base.SaveChangesAsync(cancellationToken);
+            
+            //IMPORTANT: Must clone here because values could change and often do
+            //before all events are fired and consumed. 
 
-            //Report changes if SaveChanges did not throw an error.
-            addedEntities.ForEach(o => RaiseEntityAdded(this, o));
+            //IMPORTANT: CLONE HERE SO DATABASE CREATE PROPERTIES GET SET SUCH AS DATABASE GENERATED ID's
+            addedEntities.ForEach(o => RaiseEntityAdded(this, o.CloneObject()));
 
-            modifedEntities.ForEach(o => RaiseEntityUpdated(this, o.NewEntity, o.OldEntity));
+            modifedEntities.ForEach(o => RaiseEntityUpdated(this, o.NewEntity.CloneObject(), o.OldEntity.CloneObject()));
 
-            deletedEntities.ForEach(o => RaiseEntityDeleted(this, o));
+            deletedEntities.ForEach(o => RaiseEntityDeleted(this, o.CloneObject()));
 
             return saveChangesResult;
         }

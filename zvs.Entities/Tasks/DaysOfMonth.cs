@@ -36,6 +36,10 @@ namespace zvs.DataModel.Tasks
         Twentyninth = 1 << 28,
         Thirtieth = 1 << 29,
         Thirtyfirst = 1 << 30,
-        All = ~(-1 << 31)
+        All = ~(-1 << 31),
+        Odd = First | Third | Fifth | Seventh | Ninth | Eleventh | Thirteenth | Fiftieth | Seventeenth | Nineteenth | Twentyfirst | Twentythrid | Twentyfifth | Twentyseventh | Twentyninth | Thirtyfirst,
+        Even = Second | Fourth | Sixth | Eighth | Tenth | Twelfth | Fourteenth | Sixteenth | Eighteenth | Twentieth | Twentysecond | Twentyfourth | Twentysixth | Twentyeighth | Thirtieth
+             
+
     };
 }

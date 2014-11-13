@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using zvs.DataModel;
@@ -23,6 +24,8 @@ namespace zvs.WPF
             LogEntries = new ObservableCollection<LogEntry>();
             App = (App)Application.Current;
             InitializeComponent();
+            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += LogUserControl_OnEntityAdded;
+           
         }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -33,10 +36,7 @@ namespace zvs.WPF
 
             using (var context = new ZvsContext(App.EntityContextConnection))
             {
-                LogEntries = new ObservableCollection<LogEntry>(await context.LogEntries
-                    .OrderByDescending(o => o.Datetime)
-                    .Take(MaxEntriesToDisplay)
-                    .ToListAsync());
+                await InitialLogEntryLoad();
 
                 //Load your data here and assign the result to the CollectionViewSource.
                 var myCollectionViewSource = (CollectionViewSource)Resources["LogEntryViewSource"];
@@ -56,19 +56,38 @@ namespace zvs.WPF
                 myCollectionViewSource.SortDescriptions.Clear();
                 myCollectionViewSource.SortDescriptions.Add(new SortDescription("Datetime", dir));
             }
-            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += LogUserControl_OnEntityAdded;
+        }
+
+        private async Task InitialLogEntryLoad()
+        {
+            if (LogEntries.Any())
+                return;
+
+            using (var context = new ZvsContext(App.EntityContextConnection))
+            {
+                var entries = await context.LogEntries
+                    .OrderByDescending(o => o.Datetime)
+                    .Take(MaxEntriesToDisplay)
+                    .ToListAsync();
+
+                foreach (var entry in entries)
+                    LogEntries.Add(entry);
+            }
         }
 
         void LogUserControl_OnEntityAdded(object sender, NotifyEntityChangeContext.ChangeNotifications<LogEntry>.EntityAddedArgs e)
         {
-            //Make room for the next entry
-            if (LogEntries.Count >= MaxEntriesToDisplay)
+            Dispatcher.Invoke(() =>
             {
-                var lastEntry = LogEntries.OrderBy(o => o.Datetime).FirstOrDefault();
-                if (lastEntry != null) LogEntries.Remove(lastEntry);
-            }
+                //Make room for the next entry
+                if (LogEntries.Count >= MaxEntriesToDisplay)
+                {
+                    var lastEntry = LogEntries.OrderBy(o => o.Datetime).FirstOrDefault();
+                    if (lastEntry != null) LogEntries.Remove(lastEntry);
+                }
 
-            LogEntries.Insert(0, e.AddedEntity);
+                LogEntries.Insert(0, e.AddedEntity);
+            });
         }
 
         private void LogUserControl_OnUnloaded(object sender, RoutedEventArgs e)
@@ -79,38 +98,49 @@ namespace zvs.WPF
         private async void NextButton_Click(object sender, RoutedEventArgs e)
         {
             NextButton.IsEnabled = false;
-            var earliestEntryIdShow = LogEntries.OrderBy(o => o.Id).Select(o => o.Id).FirstOrDefault();
 
-            using (var context = new ZvsContext(App.EntityContextConnection))
+            if (!LogEntries.Any())
+                await InitialLogEntryLoad();
+            else
             {
-                var nextEntries = await context.LogEntries
-                    .Where(o => o.Id < earliestEntryIdShow)
-                    .OrderByDescending(o => o.Datetime)
-                    .Take(200)
-                    .ToListAsync();
+                var earliestEntryIdShow = LogEntries.OrderBy(o => o.Id).Select(o => o.Id).FirstOrDefault();
+                using (var context = new ZvsContext(App.EntityContextConnection))
+                {
+                    var nextEntries = await context.LogEntries
+                        .Where(o => o.Id < earliestEntryIdShow)
+                        .OrderByDescending(o => o.Datetime)
+                        .Take(200)
+                        .ToListAsync();
 
-                foreach (var entry in nextEntries)
-                    LogEntries.Add(entry);
+                    foreach (var entry in nextEntries)
+                        LogEntries.Add(entry);
+                }
             }
             NextButton.IsEnabled = true;
         }
 
-        private async void AddFakeEntriesButton_OnClick(object sender, RoutedEventArgs e)
+        private async void PurgeButton_Click(object sender, RoutedEventArgs e)
         {
+            PurgeButton.IsEnabled = false;
+            if (MessageBox.Show("Are you sure you want to delete all log entris in the database?",
+                "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+            {
+                PurgeButton.IsEnabled = true;
+                return;
+            }
+
             using (var context = new ZvsContext(App.EntityContextConnection))
             {
-                for (var i = 0; i < 1021; i++)
-                {
-                    context.LogEntries.Add(new LogEntry
-                    {
-                        Datetime = DateTime.Now,
-                        Level = LogEntryLevel.Info,
-                        Message = string.Format("hello world {0}", i),
-                        Source = "Source"
-                    });
-                }
+                context.LogEntries.RemoveRange(context.LogEntries);
                 await context.SaveChangesAsync(CancellationToken.None);
             }
+            LogEntries.Clear();
+            PurgeButton.IsEnabled = true;
+        }
+
+        private void ClearButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            LogEntries.Clear();
         }
     }
 }

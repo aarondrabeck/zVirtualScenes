@@ -2,11 +2,13 @@
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Runtime.Remoting.Contexts;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using zvs.DataModel;
 using zvs.DataModel.Tasks;
 using zvs.Processor;
@@ -130,36 +132,39 @@ namespace zvs.WPF.ScheduledTaskControls
             }
 
             //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
-            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-            if (result.HasError)
-                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error editing scheduled task name. {0}", result.Message);
+            await SaveChangesAsync();
         }
 
         private async void ScheduledTaskDataGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
-            var dg = sender as DataGrid;
-            if (dg == null) return;
-            var dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
-            if (e.Key != Key.Delete || dgr.IsEditing) return;
-            e.Handled = true;
+            DataGrid dg = sender as DataGrid;
+            if (dg != null)
+            {
+                DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
+                if (e.Key == Key.Delete && !dgr.IsEditing)
+                {
+                    e.Handled = true;
 
-            var item = dgr.Item as ZvsScheduledTask;
-            if (item == null) return;
-            var task = item;
-            e.Handled = !await DeleteTask(task);
+                    if (dgr.Item is ZvsScheduledTask)
+                    {
+                        var task = (ZvsScheduledTask)dgr.Item;
+                        if (task != null)
+                        {
+                            e.Handled = !await DeleteTask(task);
+                        }
+                    }
+                }
+            }
         }
 
         private async Task<bool> DeleteTask(ZvsScheduledTask task)
         {
-            if (
-                MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name),
+            if (MessageBox.Show(string.Format("Are you sure you want to delete the '{0}' scheduled task?", task.Name),
                     "Are you sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return false;
             _context.ZvsScheduledTasks.Local.Remove(task);
 
-            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-            if (result.HasError)
-                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error deleting scheduled task. {0}", result.Message);
+            await SaveChangesAsync();
 
             ScheduledTaskDataGrid.Focus();
             return true;
@@ -174,161 +179,139 @@ namespace zvs.WPF.ScheduledTaskControls
             }
             else
             {
+                var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+                if (command == null)
+                    return;
+
                 TaskDetails.Visibility = Visibility.Visible;
+
+                if (command.ScheduledTask is OneTimeScheduledTask)
+                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.OneTime;
+                else if (command.ScheduledTask is DailyScheduledTask)
+                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Daily;
+                else if (command.ScheduledTask is IntervalScheduledTask)
+                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Interval;
+                else if (command.ScheduledTask is WeeklyScheduledTask)
+                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Weekly;
+                else if (command.ScheduledTask is MonthlyScheduledTask)
+                    FrequencyCmbBx.SelectedItem = ScheduledTaskType.Monthly;
+
+                InsertScheduledTaskUserControl();
             }
         }
 
-        private void FrequencyCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void InsertScheduledTaskUserControl()
         {
-            DailyGpBx.Visibility = Visibility.Collapsed;
-            SecondsGpBx.Visibility = Visibility.Collapsed;
-            WeeklyGpBx.Visibility = Visibility.Collapsed;
-            MonthlyGpBx.Visibility = Visibility.Collapsed;
-
             var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
             if (command == null)
                 return;
 
-            if (FrequencyCmbBx.SelectedItem == null) return;
-            switch ((ScheduledTaskType)FrequencyCmbBx.SelectedItem)
+            TaskUserControlGrid.Children.Clear();
+            if (command.ScheduledTask is OneTimeScheduledTask)
+                TaskUserControlGrid.Children.Add(new OneTimeTaskUserControl(command.ScheduledTask as OneTimeScheduledTask));
+            else if (command.ScheduledTask is IntervalScheduledTask)
+                TaskUserControlGrid.Children.Add(new IntervalTaskUserControl(command.ScheduledTask as IntervalScheduledTask));
+            else if (command.ScheduledTask is DailyScheduledTask)
+                TaskUserControlGrid.Children.Add(new DailyTaskUserControl(command.ScheduledTask as DailyScheduledTask));
+            else if (command.ScheduledTask is WeeklyScheduledTask)
+                TaskUserControlGrid.Children.Add(new WeeklyTaskUserControl(command.ScheduledTask as WeeklyScheduledTask));
+            else if (command.ScheduledTask is MonthlyScheduledTask)
+                TaskUserControlGrid.Children.Add(new MonthlyTaskUserControl(command.ScheduledTask as MonthlyScheduledTask));
+        }
+
+        private async void FrequencyCmbBx_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var command = ScheduledTaskDataGrid.SelectedItem as ZvsScheduledTask;
+            if (command == null)
+                return;
+
+            var selectedType = FrequencyCmbBx.SelectedItem as ScheduledTaskType?;
+            if (selectedType == null) return;
+
+            switch (selectedType)
             {
-                case ScheduledTaskType.Daily:
+                case ScheduledTaskType.OneTime:
                     {
-                        command.ScheduledTask = new DailyScheduledTask();
-                        DailyGpBx.Visibility = Visibility.Visible;
+                        if (!(command.ScheduledTask is OneTimeScheduledTask))
+                        {
+                            if (command.ScheduledTask != null)
+                            {
+                                _context.ScheduledTasks.Remove(command.ScheduledTask);
+                                await SaveChangesAsync();
+                            }
+                            command.ScheduledTask = new OneTimeScheduledTask { StartTime = DateTime.Now };
+                        }
                         break;
                     }
                 case ScheduledTaskType.Interval:
                     {
-                        command.ScheduledTask = new IntervalScheduledTask();
-                        SecondsGpBx.Visibility = Visibility.Visible;
+                        if (!(command.ScheduledTask is IntervalScheduledTask))
+                        {
+                            if (command.ScheduledTask != null)
+                            {
+                                _context.ScheduledTasks.Remove(command.ScheduledTask);
+                                await SaveChangesAsync();
+                            }
+                            command.ScheduledTask = new IntervalScheduledTask { StartTime = DateTime.Now, RepeatIntervalInSeconds = 120};
+                        }
                         break;
                     }
+                case ScheduledTaskType.Daily:
+                    {
+                        if (!(command.ScheduledTask is DailyScheduledTask))
+                        {
+                            if (command.ScheduledTask != null)
+                            {
+                                _context.ScheduledTasks.Remove(command.ScheduledTask);
+                                await SaveChangesAsync();
+                            }
+                         
+                            command.ScheduledTask = new DailyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInDays = 2};
+                        }
+                        break;
+                    }
+
                 case ScheduledTaskType.Weekly:
                     {
-                        command.ScheduledTask = new WeeklyScheduledTask();
-                        WeeklyGpBx.Visibility = Visibility.Visible;
+                        if (!(command.ScheduledTask is WeeklyScheduledTask))
+                        {
+                            if (command.ScheduledTask != null)
+                            {
+                                _context.ScheduledTasks.Remove(command.ScheduledTask);
+                                await SaveChangesAsync();
+                            }
+
+                            command.ScheduledTask = new WeeklyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInWeeks = 1 };
+                        }
                         break;
                     }
                 case ScheduledTaskType.Monthly:
                     {
-                        command.ScheduledTask = new MonthlyScheduledTask();
-                        MonthlyGpBx.Visibility = Visibility.Visible;
+                        if (!(command.ScheduledTask is MonthlyScheduledTask))
+                        {
+                            if (command.ScheduledTask != null)
+                            {
+                                _context.ScheduledTasks.Remove(command.ScheduledTask);
+                                await SaveChangesAsync();
+                            }
+
+                            command.ScheduledTask = new MonthlyScheduledTask { StartTime = DateTime.Now, RepeatIntervalInMonths = 1 };
+                        }
                         break;
                     }
             }
+            InsertScheduledTaskUserControl();
         }
 
-        private void OddTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
-        {
-            FirstChkBx.IsChecked = true;
-            SecondChkBx.IsChecked = false;
-            ThirdChkBx.IsChecked = true;
-            ForthChkBx.IsChecked = false;
-            FifthChkBx.IsChecked = true;
-            SixthChkBx.IsChecked = false;
-            SeventhChkBx.IsChecked = true;
-            EightChkBx.IsChecked = false;
-            NinethChkBx.IsChecked = true;
-            TenthChkBx.IsChecked = false;
-            EleventhChkBx.IsChecked = true;
-            TwelfthChkBx.IsChecked = false;
-            ThirteenthChkBx.IsChecked = true;
-            FourteenthChkBx.IsChecked = false;
-            FifteenthChkBx.IsChecked = true;
-            SixteenthChkBx.IsChecked = false;
-            SeventeenthChkBx.IsChecked = true;
-            EighteenthChkBx.IsChecked = false;
-            NineteenthChkBx.IsChecked = true;
-            TwentiethChkBx.IsChecked = false;
-            TwentiefirstChkBx.IsChecked = true;
-            TwentiesecondChkBx.IsChecked = false;
-            TwentiethirdChkBx.IsChecked = true;
-            TwentieforthChkBx.IsChecked = false;
-            TwentiefifthChkBx.IsChecked = true;
-            TwentiesixChkBx.IsChecked = false;
-            TwentiesevenChkBx.IsChecked = true;
-            TwentieeigthChkBx.IsChecked = false;
-            TwentieninthChkBx.IsChecked = true;
-            ThirtiethChkBx.IsChecked = false;
-            ThirtyfirstChkBx.IsChecked = true;
-        }
-
-        private void EvenTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
-        {
-            FirstChkBx.IsChecked = false;
-            SecondChkBx.IsChecked = true;
-            ThirdChkBx.IsChecked = false;
-            ForthChkBx.IsChecked = true;
-            FifthChkBx.IsChecked = false;
-            SixthChkBx.IsChecked = true;
-            SeventhChkBx.IsChecked = false;
-            EightChkBx.IsChecked = true;
-            NinethChkBx.IsChecked = false;
-            TenthChkBx.IsChecked = true;
-            EleventhChkBx.IsChecked = false;
-            TwelfthChkBx.IsChecked = true;
-            ThirteenthChkBx.IsChecked = false;
-            FourteenthChkBx.IsChecked = true;
-            FifteenthChkBx.IsChecked = false;
-            SixteenthChkBx.IsChecked = true;
-            SeventeenthChkBx.IsChecked = false;
-            EighteenthChkBx.IsChecked = true;
-            NineteenthChkBx.IsChecked = false;
-            TwentiethChkBx.IsChecked = true;
-            TwentiefirstChkBx.IsChecked = false;
-            TwentiesecondChkBx.IsChecked = true;
-            TwentiethirdChkBx.IsChecked = false;
-            TwentieforthChkBx.IsChecked = true;
-            TwentiefifthChkBx.IsChecked = false;
-            TwentiesixChkBx.IsChecked = true;
-            TwentiesevenChkBx.IsChecked = false;
-            TwentieeigthChkBx.IsChecked = true;
-            TwentieninthChkBx.IsChecked = false;
-            ThirtiethChkBx.IsChecked = true;
-            ThirtyfirstChkBx.IsChecked = false;
-        }
-
-        private void ClearTxtBl_MouseDown_1(object sender, MouseButtonEventArgs e)
-        {
-            FirstChkBx.IsChecked = false;
-            SecondChkBx.IsChecked = false;
-            ThirdChkBx.IsChecked = false;
-            ForthChkBx.IsChecked = false;
-            FifthChkBx.IsChecked = false;
-            SixthChkBx.IsChecked = false;
-            SeventhChkBx.IsChecked = false;
-            EightChkBx.IsChecked = false;
-            NinethChkBx.IsChecked = false;
-            TenthChkBx.IsChecked = false;
-            EleventhChkBx.IsChecked = false;
-            TwelfthChkBx.IsChecked = false;
-            ThirteenthChkBx.IsChecked = false;
-            FourteenthChkBx.IsChecked = false;
-            FifteenthChkBx.IsChecked = false;
-            SixteenthChkBx.IsChecked = false;
-            SeventeenthChkBx.IsChecked = false;
-            EighteenthChkBx.IsChecked = false;
-            NineteenthChkBx.IsChecked = false;
-            TwentiethChkBx.IsChecked = false;
-            TwentiefirstChkBx.IsChecked = false;
-            TwentiesecondChkBx.IsChecked = false;
-            TwentiethirdChkBx.IsChecked = false;
-            TwentieforthChkBx.IsChecked = false;
-            TwentiefifthChkBx.IsChecked = false;
-            TwentiesixChkBx.IsChecked = false;
-            TwentiesevenChkBx.IsChecked = false;
-            TwentieeigthChkBx.IsChecked = false;
-            TwentieninthChkBx.IsChecked = false;
-            ThirtiethChkBx.IsChecked = false;
-            ThirtyfirstChkBx.IsChecked = false;
-        }
-
-        private async void LostFocus_SaveChanges(object sender, RoutedEventArgs e)
+        private async Task SaveChangesAsync()
         {
             var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
             if (result.HasError)
                 await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scheduled task. {0}", result.Message);
+
+            SignalImg.Opacity = 1;
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);  
         }
 
         private async void AddUpdateCommand_Click(object sender, RoutedEventArgs e)
@@ -345,11 +328,12 @@ namespace zvs.WPF.ScheduledTaskControls
 
             if (!(cbWindow.ShowDialog() ?? false)) return;
 
-            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-            if (result.HasError)
-                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scheduled task. {0}", result.Message);
+            await SaveChangesAsync();
         }
 
-
+        private async void TaskUserControlGrid_OnLostFocus(object sender, RoutedEventArgs e)
+        {
+            await SaveChangesAsync();
+        }
     }
 }

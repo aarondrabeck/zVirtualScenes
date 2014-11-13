@@ -152,7 +152,7 @@ namespace zvs.Processor
 
                     if (!needsToRun) continue;
 
-                    await Log.ReportInfoFormatAsync(cancellationToken, "Scheduled task '{0}' executed.", task.Name);
+                    await Log.ReportInfoFormatAsync(cancellationToken, "Scheduled task '{0}' executed", task.Name);
 
                     var task1 = task;
                     await Task.Run(async () => await CommandProcessor.RunCommandAsync(task1.CommandId, task1.Argument, task1.Argument2,  cancellationToken), cancellationToken);

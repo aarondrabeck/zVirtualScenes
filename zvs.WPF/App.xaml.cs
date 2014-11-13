@@ -45,7 +45,7 @@ namespace zvs.WPF
             // Allow single instance code to perform cleanup operations
             SingleInstance<App>.Cleanup();
         }
-        
+
         public void Init()
         {
             Cts = new CancellationTokenSource();
@@ -127,7 +127,7 @@ namespace zvs.WPF
 
             var splashscreen = new SplashScreen();
             splashscreen.SetLoadingTextFormat("Starting {0}", Utils.ApplicationNameAndVersion);
-             splashscreen.Show();
+            splashscreen.Show();
             await Task.Delay(10);
 
 #if DEBUG
@@ -141,8 +141,8 @@ namespace zvs.WPF
 
             using (var context = new ZvsContext(new ZvsEntityContextConnection()))
             {
-                //var device = CreateFakeDevice();
-               // context.Devices.Add(device);
+                var device = CreateFakeDevice();
+                //context.Devices.Add(device);
                 //context.SaveChanges();
             }
 

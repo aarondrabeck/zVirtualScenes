@@ -8,12 +8,12 @@ namespace zvs.Processor.ScheduledTask
         {
             var monthsapart = ((timeProvider.Time.Year - task.StartTime.Year) * 12) + timeProvider.Time.Month - task.StartTime.Month;
 
-            if (task.EveryXMonth <= 0 || monthsapart <= -1 || monthsapart % task.EveryXMonth != 0) return false;
+            if (task.RepeatIntervalInMonths <= 0 || monthsapart <= -1 || monthsapart % task.RepeatIntervalInMonths != 0) return false;
 
             var dayOfMonth = timeProvider.Time.Day;
             var daysOfMonth = (DaysOfMonth)(1 << (dayOfMonth - 1));
 
-            return task.ReccurDays.HasFlag(daysOfMonth) && TimeHelpers.AreTimesEqualToTheSecond(timeProvider.Time, task.StartTime);
+            return task.DaysOfMonthToActivate.HasFlag(daysOfMonth) && TimeHelpers.AreTimesEqualToTheSecond(timeProvider.Time, task.StartTime);
         }
     }
 }

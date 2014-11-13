@@ -2,6 +2,6 @@
 {
     public class DailyScheduledTask : ScheduledTask
     {
-        public int EveryXDay { get; set; }
+        public int RepeatIntervalInDays { get; set; }
     }
 }

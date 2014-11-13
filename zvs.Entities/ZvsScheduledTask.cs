@@ -9,7 +9,6 @@ namespace zvs.DataModel
     [Table("ZvsScheduledTasks", Schema = "ZVS")]
     public class ZvsScheduledTask : INotifyPropertyChanged, IIdentity, IStoredCommand
     {
-        
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 

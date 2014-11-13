@@ -122,6 +122,8 @@
     <Compile Include="AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DaysOfMonthValueConverter.cs" />
+    <Compile Include="DaysOfWeekValueConverter.cs" />
     <Compile Include="LogUserControl.xaml.cs">
       <DependentUpon>LogUserControl.xaml</DependentUpon>
     </Compile>
@@ -156,6 +158,21 @@
     </Compile>
     <Compile Include="SceneControls\SceneProperyWindow.xaml.cs">
       <DependentUpon>SceneProperyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScheduledTaskControls\MonthlyTaskUserControl.xaml.cs">
+      <DependentUpon>MonthlyTaskUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScheduledTaskControls\WeeklyTaskUserControl.xaml.cs">
+      <DependentUpon>WeeklyTaskUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScheduledTaskControls\DailyTaskUserControl.xaml.cs">
+      <DependentUpon>DailyTaskUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScheduledTaskControls\IntervalTaskUserControl.xaml.cs">
+      <DependentUpon>IntervalTaskUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ScheduledTaskControls\OneTimeTaskUserControl.xaml.cs">
+      <DependentUpon>OneTimeTaskUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ScheduledTaskControls\ScheduledTaskCreator.xaml.cs">
       <DependentUpon>ScheduledTaskCreator.xaml</DependentUpon>
@@ -249,6 +266,26 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Themes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ScheduledTaskControls\MonthlyTaskUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ScheduledTaskControls\WeeklyTaskUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ScheduledTaskControls\DailyTaskUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ScheduledTaskControls\IntervalTaskUserControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ScheduledTaskControls\OneTimeTaskUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

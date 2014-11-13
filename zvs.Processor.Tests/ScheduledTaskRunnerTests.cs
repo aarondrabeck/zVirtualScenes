@@ -272,7 +272,7 @@ namespace zvs.Processor.Tests
                 ScheduledTask = new DailyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    EveryXDay = 1
+                    RepeatIntervalInDays = 1
                 },
                 Command = command
             };
@@ -404,8 +404,8 @@ namespace zvs.Processor.Tests
                 ScheduledTask = new WeeklyScheduledTask
                  {
                      StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                     EveryXWeek = 1,
-                     ReccurDays = DaysOfWeek.All
+                     RepeatIntervalInWeeks = 1,
+                     DaysOfWeekToActivate = DaysOfWeek.All
                  },
                 Command = command
             };
@@ -472,8 +472,8 @@ namespace zvs.Processor.Tests
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    EveryXMonth = 1,
-                    ReccurDays = DaysOfMonth.All
+                    RepeatIntervalInMonths = 1,
+                    DaysOfMonthToActivate = DaysOfMonth.All
                 },
                 Command = command
             };
@@ -540,8 +540,8 @@ namespace zvs.Processor.Tests
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    EveryXMonth = 1,
-                    ReccurDays = DaysOfMonth.All
+                    RepeatIntervalInMonths = 1,
+                    DaysOfMonthToActivate = DaysOfMonth.All
                 },
                 Command = command
             };
@@ -606,8 +606,8 @@ namespace zvs.Processor.Tests
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    EveryXMonth = 1,
-                    ReccurDays = DaysOfMonth.All
+                    RepeatIntervalInMonths = 1,
+                    DaysOfMonthToActivate = DaysOfMonth.All
                 },
                 Command = command
             };
@@ -676,8 +676,8 @@ namespace zvs.Processor.Tests
                 ScheduledTask = new MonthlyScheduledTask
                 {
                     StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                    EveryXMonth = 1,
-                    ReccurDays = DaysOfMonth.All
+                    RepeatIntervalInMonths = 1,
+                    DaysOfMonthToActivate = DaysOfMonth.All
                 },
                 Command = command
             };

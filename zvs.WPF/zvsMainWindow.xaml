@@ -175,7 +175,7 @@
                     <TabItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <Image Height="18" Source="Images/trigger.png"  />
-                            <TextBlock FontSize="14" Text="ScheduledTasks" Margin="6 0 0 0" VerticalAlignment="Center" />
+                            <TextBlock FontSize="14" Text="Triggers" Margin="6 0 0 0" VerticalAlignment="Center" />
                         </StackPanel>
                     </TabItem.Header>
                     <triggerControl:TriggerGridUc x:Name="triggerControl"></triggerControl:TriggerGridUc>
@@ -229,7 +229,6 @@
                         <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
                         <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
                         <Separator />
-                        <MenuItem Header="Clear Logs" Name="ClearLogsMI"   Click="ClearLogsMI_Click" />
                         <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
                     </MenuItem>
                     <MenuItem Header="Help">

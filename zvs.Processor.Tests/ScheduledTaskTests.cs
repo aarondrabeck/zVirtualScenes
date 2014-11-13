@@ -45,7 +45,7 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 0
+                RepeatIntervalInWeeks = 0
             };
 
             //act
@@ -63,7 +63,7 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 0
+                RepeatIntervalInMonths = 0
             };
 
             //act
@@ -99,7 +99,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 0
+                RepeatIntervalInDays = 0
             };
 
             //act
@@ -117,7 +117,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -136,7 +136,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -155,7 +155,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -174,7 +174,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -193,7 +193,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -212,7 +212,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -231,7 +231,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20").AddMilliseconds(100),
-                EveryXDay = 1
+                RepeatIntervalInDays = 1
             };
             
 
@@ -250,7 +250,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 3
+                RepeatIntervalInDays = 3
             };
             
 
@@ -269,7 +269,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 3
+                RepeatIntervalInDays = 3
             };
             
 
@@ -288,7 +288,7 @@ namespace zvs.Processor.Tests
             var task = new DailyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXDay = 3
+                RepeatIntervalInDays = 3
             };
             
 
@@ -308,8 +308,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 1,
-                ReccurDays = DaysOfWeek.All
+                RepeatIntervalInWeeks = 1,
+                DaysOfWeekToActivate = DaysOfWeek.All
             };
             
 
@@ -328,8 +328,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 1,
-                ReccurDays = DaysOfWeek.Friday
+                RepeatIntervalInWeeks = 1,
+                DaysOfWeekToActivate = DaysOfWeek.Friday
             };
             
 
@@ -348,8 +348,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 1,
-                ReccurDays = DaysOfWeek.Sunday
+                RepeatIntervalInWeeks = 1,
+                DaysOfWeekToActivate = DaysOfWeek.Sunday
             };
             
 
@@ -368,8 +368,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 2,
-                ReccurDays = DaysOfWeek.Sunday
+                RepeatIntervalInWeeks = 2,
+                DaysOfWeekToActivate = DaysOfWeek.Sunday
             };
             
 
@@ -388,8 +388,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 2,
-                ReccurDays = DaysOfWeek.Sunday
+                RepeatIntervalInWeeks = 2,
+                DaysOfWeekToActivate = DaysOfWeek.Sunday
             };
             
 
@@ -408,8 +408,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 2,
-                ReccurDays = DaysOfWeek.Sunday
+                RepeatIntervalInWeeks = 2,
+                DaysOfWeekToActivate = DaysOfWeek.Sunday
             };
             
 
@@ -428,8 +428,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 2,
-                ReccurDays = DaysOfWeek.Sunday
+                RepeatIntervalInWeeks = 2,
+                DaysOfWeekToActivate = DaysOfWeek.Sunday
             };
             
 
@@ -448,8 +448,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 1,
-                ReccurDays = DaysOfWeek.All
+                RepeatIntervalInWeeks = 1,
+                DaysOfWeekToActivate = DaysOfWeek.All
             };
             
 
@@ -468,8 +468,8 @@ namespace zvs.Processor.Tests
             var task = new WeeklyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXWeek = 1,
-                ReccurDays = DaysOfWeek.All
+                RepeatIntervalInWeeks = 1,
+                DaysOfWeekToActivate = DaysOfWeek.All
             };
             
 
@@ -488,8 +488,8 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 1,
-                ReccurDays = DaysOfMonth.Fifth
+                RepeatIntervalInMonths = 1,
+                DaysOfMonthToActivate = DaysOfMonth.Fifth
             };
             
 
@@ -508,8 +508,8 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 1,
-                ReccurDays = DaysOfMonth.Fifth
+                RepeatIntervalInMonths = 1,
+                DaysOfMonthToActivate = DaysOfMonth.Fifth
             };
             
 
@@ -528,8 +528,8 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 2,
-                ReccurDays = DaysOfMonth.Fifth
+                RepeatIntervalInMonths = 2,
+                DaysOfMonthToActivate = DaysOfMonth.Fifth
             };
             
 
@@ -548,8 +548,8 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 2,
-                ReccurDays = DaysOfMonth.Fifth
+                RepeatIntervalInMonths = 2,
+                DaysOfMonthToActivate = DaysOfMonth.Fifth
             };
             
 
@@ -568,8 +568,8 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 2,
-                ReccurDays = DaysOfMonth.All
+                RepeatIntervalInMonths = 2,
+                DaysOfMonthToActivate = DaysOfMonth.All
             };
             
 
@@ -588,8 +588,8 @@ namespace zvs.Processor.Tests
             var task = new MonthlyScheduledTask
             {
                 StartTime = DateTime.Parse("5/20/14 15:02:20"),
-                EveryXMonth = 2,
-                ReccurDays = DaysOfMonth.All
+                RepeatIntervalInMonths = 2,
+                DaysOfMonthToActivate = DaysOfMonth.All
             };
             
 

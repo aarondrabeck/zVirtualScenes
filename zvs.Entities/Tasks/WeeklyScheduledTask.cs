@@ -2,7 +2,7 @@
 {
     public class WeeklyScheduledTask : ScheduledTask
     {
-        public int EveryXWeek { get; set; }
-        public DaysOfWeek ReccurDays { get; set; }
+        public int RepeatIntervalInWeeks { get; set; }
+        public DaysOfWeek DaysOfWeekToActivate { get; set; }
     }
 }

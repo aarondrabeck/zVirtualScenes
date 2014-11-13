@@ -8,6 +8,11 @@ namespace zvs.DataModel.Tasks
     [Table("ScheduledTasks", Schema = "ZVS")]
     public abstract class ScheduledTask : INotifyPropertyChanged, IIdentity
     {
+        protected ScheduledTask()
+        {
+            StartTime = new DateTime();
+        }
+
         public int Id { get; set; }
 
         private DateTime _startTime;

@@ -1,0 +1,40 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:tasks="clr-namespace:zvs.DataModel.Tasks;assembly=zvs.DataModel"
+             xmlns:wpf="clr-namespace:zvs.WPF"
+             x:Class="zvs.WPF.ScheduledTaskControls.WeeklyTaskUserControl"
+             x:Name="This"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500">
+    <UserControl.Resources>
+        <wpf:DaysOfWeekValueConverter x:Key="DaysOfWeekConverter" />
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical">
+        <GroupBox Header="Start Time" >
+            <xctk:DateTimePicker Value="{Binding WeeklyScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" Margin="10"/>
+        </GroupBox>
+        <GroupBox  Header="Interval" Margin="0 10" >
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="Repeat every"/>
+                <TextBox  Margin="10,0,10,0" Width="76" Text="{Binding WeeklyScheduledTask.RepeatIntervalInWeeks, ElementName=This, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Text="weeks" />
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Days to Activate" >
+            <Grid>
+                <CheckBox Content="Monday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Monday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,8,0,0" />
+                <CheckBox Content="Tuesday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Tuesday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,28,0,0" />
+                <CheckBox Content="Wednesday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Wednesday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,48,0,0" />
+                <CheckBox Content="Thursday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Thursday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,68,0,0" />
+                <CheckBox Content="Friday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Friday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,88,0,0"/>
+                <CheckBox Content="Saturday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate, ElementName=This, Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Saturday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="125,8,0,0"/>
+                <CheckBox Content="Sunday" IsChecked="{Binding Path=WeeklyScheduledTask.DaysOfWeekToActivate,  ElementName=This,Converter={StaticResource DaysOfWeekConverter}, ConverterParameter={x:Static tasks:DaysOfWeek.Sunday}}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="125,28,0,0"/>
+            </Grid>
+        </GroupBox>
+
+    </StackPanel>
+</UserControl>
