@@ -19,13 +19,13 @@ namespace zvs.WPF
         private App App { get; set; }
         private ObservableCollection<LogEntry> LogEntries { get; set; }
         private const int MaxEntriesToDisplay = 400;
+        private bool IsSubscribed { get; set; }
+
         public LogUserControl()
         {
             LogEntries = new ObservableCollection<LogEntry>();
             App = (App)Application.Current;
             InitializeComponent();
-            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += LogUserControl_OnEntityAdded;
-           
         }
 
         private async void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -33,6 +33,12 @@ namespace zvs.WPF
             // Do not load your data at design time.
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
+
+            if (!IsSubscribed)
+            {
+                NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += LogUserControl_OnEntityAdded;
+                IsSubscribed = true;
+            }
 
             using (var context = new ZvsContext(App.EntityContextConnection))
             {
@@ -92,7 +98,9 @@ namespace zvs.WPF
 
         private void LogUserControl_OnUnloaded(object sender, RoutedEventArgs e)
         {
+            if (!IsSubscribed) return;
             NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded -= LogUserControl_OnEntityAdded;
+            IsSubscribed = false;
         }
 
         private async void NextButton_Click(object sender, RoutedEventArgs e)

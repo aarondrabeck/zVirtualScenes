@@ -20,7 +20,7 @@ namespace zvs.WPF.AdapterManager
     {
         private IFeedback<LogEntry> Log { get; set; }
         private readonly App _app = (App)Application.Current;
-        private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://_app:,,,/zVirtualScenes;component/Images/save_check.png"));
+        private readonly BitmapImage _icon = new BitmapImage(new Uri("pack://application:,,,/zVirtualScenes;component/Images/save_check.png"));
         private readonly ZvsContext _context;
 
         public AdapterManagerWindow()

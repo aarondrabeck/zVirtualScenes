@@ -81,7 +81,7 @@ namespace zvs.Processor.Tests
             //assert 
             Console.WriteLine(result.Message);
             Assert.IsFalse(result.HasError);
-
+            Assert.IsTrue(dt.Id > 0, "Expected device type to have a database generated Id");
         }
 
         [TestMethod]

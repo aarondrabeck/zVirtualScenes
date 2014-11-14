@@ -17,7 +17,7 @@ namespace zvs.Processor
 
             EntityContextConnection = entityContextConnection;
         }
-        public async Task<Result> RegisterAsync(DeviceValue deviceValue, Device device, CancellationToken cancellationToken, bool ignoreValueChange = false)
+        public async Task<Result> RegisterAsync(DeviceValue deviceValue, Device device, CancellationToken cancellationToken)
         {
             if (deviceValue == null)
                 return Result.ReportError("You must send a device value when registering a device value!");

@@ -14,7 +14,7 @@ namespace zvs.Processor
         public abstract string Name { get; }
         public abstract string Description { get; }
         protected IFeedback<LogEntry> Log { get; private set; }
-        private IEntityContextConnection EntityContextConnection { get; set; }
+        protected IEntityContextConnection EntityContextConnection { get; set; }
         protected DeviceValueBuilder DeviceValueBuilder { get; private set; }
         protected DeviceCommandBuilder DeviceCommandBuilder { get; private set; }
         public abstract Task StartAsync();
@@ -54,7 +54,7 @@ namespace zvs.Processor
         public abstract Task DeactivateGroupAsync(Group group);
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        internal void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        public void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
