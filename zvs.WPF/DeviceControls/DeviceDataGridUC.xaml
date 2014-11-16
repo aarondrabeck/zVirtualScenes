@@ -4,13 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" 
+             d:DesignHeight="300" d:DesignWidth="500" 
              xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
              Loaded="UserControl_Loaded" 
              Initialized="UserControl_Initialized"
            Unloaded="UserControl_Unloaded_1" >
     <UserControl.Resources>
-        <Style x:Key="Body_Content_DataGrid_Centering"
+        <Style x:Key="ZvsFont">
+            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
+        </Style>
+        <Style x:Key="BodyContentDataGridCentering"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -24,7 +27,7 @@
         </Style>
         <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:Device, CreateList=True}">
         </CollectionViewSource>
-        <Style x:Key="Body_Hoz_Center"
+        <Style x:Key="BodyHozCenter"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -41,12 +44,16 @@
     </UserControl.Resources>
 
     <Grid PreviewKeyDown="Grid_PreviewKeyDown_1" DataContext="{StaticResource devicesViewSource}">
-     
-        <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource Body_Content_DataGrid_Centering}" HorizontalGridLinesBrush="#FFE2E2E2" 
+        <Border VerticalAlignment="Top" Background="#FF00B1D8" Height="5"></Border>
+        <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource BodyContentDataGridCentering}" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False" 
                   ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" 
                   RowEditEnding="DeviceGrid_RowEditEnding" 
-                  RowHeaderWidth="0" AllowDrop="True" Margin="0,0,0,30"   Background="#FFF9F9F9" BorderThickness="0 0 0 0" >
+                  RowHeaderWidth="0" AllowDrop="True" Margin="0,5,0,40" Background="#FFFFFF" BorderThickness="0 0 0 0" >
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFF0F0F0"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+            </DataGrid.Resources>
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn MaxWidth="15" MinWidth="15" Width="15"  Header="" CanUserResize="False" CanUserReorder="False">
@@ -60,32 +67,35 @@
                 <DataGridTemplateColumn SortMemberPath="Type.Name" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Image Name="img" Width="35" Height="35" Source="/zVirtualScenes;component/Images/20radio.png" Margin="5,0" />
+                            <TextBlock Name="imgFont" HorizontalAlignment="Center" Margin="5 0"  Text="&#xe006;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
                             <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="UNKNOWN">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/unknown.png"/>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Unknown">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe006;"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="THERMOSTAT">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/thermometer.png"/>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Thermostat">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe00a;"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="DIMMER">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/bulb.png"/>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Dimmer">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe004;"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="SWITCH">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/switch.png"/>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Switch">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe009;"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="CONTROLLER">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/controler.png"/>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Controller">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe000;"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="DOORLOCK">
-                                    <Setter TargetName="img" Property="Source" Value="pack://application:,,,/zVirtualScenes;component/Images/doorlock.png"/>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Doorlock">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe003;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Sensor">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe007;"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="DeviceTypeCol" CellStyle="{StaticResource Body_Hoz_Center}" Width="150" MinWidth="50" Header="Type" 
+                <DataGridTextColumn x:Name="DeviceTypeCol" CellStyle="{StaticResource BodyHozCenter}" Width="150" MinWidth="50" Header="Type" 
                                     Binding="{Binding Path=Type.Name}" IsReadOnly="True" >
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
@@ -159,13 +169,13 @@
                             </Grid>
                             <DataTemplate.Triggers>
 
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="THERMOSTAT">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Thermostat">
                                     <Setter TargetName="LevelProgressBr" Property="Foreground" Value="#FF0088DE"/>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="CONTROLLER">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Controller">
                                     <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="DOORLOCK">
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Doorlock">
                                     <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -173,17 +183,17 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn x:Name="DateCol" CellStyle="{StaticResource Body_Hoz_Center}" Header="Last Repoll" Width="140" MinWidth="140" MaxWidth="140" 
+                <DataGridTextColumn x:Name="DateCol" CellStyle="{StaticResource BodyHozCenter}" Header="Last Repoll" Width="140" MinWidth="140" MaxWidth="140" 
                                     Binding="{Binding LastHeardFrom}" IsReadOnly="True" FontSize="12" />
 
-                <DataGridTextColumn x:Name="NodeID" CellStyle="{StaticResource Body_Hoz_Center}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
+                <DataGridTextColumn x:Name="NodeID" CellStyle="{StaticResource BodyHozCenter}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
                                     CanUserResize="False" CanUserReorder="True"  FontSize="14" />
 
                 <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-                            <Button Name="SettingBtn" Width="32" Height="32" Click="SettingBtn_Click_1" ToolTip="Device Details">
-                                <Image Cursor="Hand"   Source="/zVirtualScenes;component/Images/settings.png" Margin="0,0,0,0"  />
+                            <Button Name="SettingBtn"  Click="SettingBtn_Click_1" ToolTip="Device Details" Width="32" Height="32" Background="Transparent" BorderBrush="{x:Null}"  BorderThickness="0"  Margin="3,0">
+                                <Image Cursor="Hand" Height="25" Source="/zVirtualScenes;component/Images/settingIcon.png" Margin="0,0,0,0"  />
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -191,13 +201,8 @@
 
             </DataGrid.Columns>
         </DataGrid>
-        <Border   VerticalAlignment="Bottom" Height="30"  Margin="0"  >
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="White" Offset="0.969"/>
-                    <GradientStop Color="#FFF2F3F5"/>
-                </LinearGradientBrush>
-            </Border.Background>
+        <Border   VerticalAlignment="Bottom" Height="40"  Margin="0"   >
+            
             <Grid>
 
                 <Grid.ColumnDefinitions>
@@ -205,11 +210,10 @@
                     <ColumnDefinition Width="175"  />
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Filter"  VerticalAlignment="Center" Margin="5,0"></TextBlock>
-                <TextBox Name="Filter" Height="22" TextChanged="Filter_TextChanged_1" Grid.Column="1" Margin="0,0,5,0"  ></TextBox>
-                <CheckBox Name="ShowMoreBtn" HorizontalAlignment="Right"  VerticalAlignment="Center" Checked="ShowMoreBtn_Checked_1"  
-                          Unchecked="ShowMoreBtn_Unchecked_1"  IsChecked="False" 
-                      Content="More Details" Grid.Column="2" Margin="0,0,5,0"/>
+                <TextBlock Text="Filter"  VerticalAlignment="Center" Margin="5,0" FontSize="14"  ></TextBlock>
+                <TextBox Name="Filter" VerticalContentAlignment="Center" TextChanged="Filter_TextChanged_1" Grid.Column="1" Margin="5"  FontSize="14"  ></TextBox>
+                <CheckBox Name="ShowMoreBtn" HorizontalAlignment="Right"  VerticalAlignment="Center" Checked="ShowMoreBtn_Checked_1"   FontSize="14"  
+                          Unchecked="ShowMoreBtn_Unchecked_1"  IsChecked="False" Content="More Details" Grid.Column="2" Margin="0,0,5,0"/>
 
             </Grid>
         </Border>

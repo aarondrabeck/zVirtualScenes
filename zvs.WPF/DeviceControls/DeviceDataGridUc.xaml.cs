@@ -128,7 +128,7 @@ namespace zvs.WPF.DeviceControls
             Dispatcher.Invoke(new Action(async () =>
             {
                 Context.Devices.Local.Remove(e.DeletedEntity);
-                Context.Entry(e.DeletedEntity).State = EntityState.Unchanged;
+                //Context.Entry(e.DeletedEntity).State = EntityState.Unchanged;
 
                 //Reloads context from DB when modifications happen
                 foreach (var ent in Context.ChangeTracker.Entries<Device>())

@@ -11,13 +11,13 @@
         <CollectionViewSource x:Key="groupsgroup_devicesViewSource" Source="{Binding Path=Devices, Source={StaticResource groupsViewSource}}" />
     </Window.Resources>
     <Grid DataContext="{StaticResource groupsViewSource}">
-        <ComboBox DisplayMemberPath="Name"  Name="GroupCmbBx" VerticalAlignment="Top" Margin="57,10,227,0" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" SelectionChanged="GroupCmbBx_SelectionChanged"></ComboBox>
-        <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,10,161,0" Click="AddBtn_Click"></Button>
-        <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,10,95,0"  VerticalAlignment="Top" Width="60" Click="EditBtn_Click" />
-        <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,10,29,0" VerticalAlignment="Top" Width="60" Click="RemoveBtn_Click" />
+        <ComboBox DisplayMemberPath="Name"  Name="GroupCmbBx" VerticalAlignment="Top" Margin="66,10,218,0" Padding="10 5" Background="#FFCCCCCC" FontSize="14" FontWeight="Medium"  ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id" SelectionChanged="GroupCmbBx_SelectionChanged"></ComboBox>
+        <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="0,10,161,0" Click="AddBtn_Click" ></Button>
+        <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,10,108,0"  VerticalAlignment="Top" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Click="EditBtn_Click" />
+        <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,10,29,0" VerticalAlignment="Top" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Click="RemoveBtn_Click" />
         <Border Margin="296,68,12,12" BorderBrush="#FFABADB3" BorderThickness="1"><deviceControls:DeviceDataGridUc  x:Name="DeviceLst" />
         </Border>
-        <TextBlock HorizontalAlignment="Left" Name="textBlock1" Text="Groups" VerticalAlignment="Top" Margin="12,12,0,0" />
+        <TextBlock HorizontalAlignment="Left" Name="textBlock1" Text="Groups" VerticalAlignment="Top" Margin="12,15,0,0" FontSize="14" FontWeight="Medium"/>
         <Image HorizontalAlignment="Left" Margin="225,133,0,0" Name="image1" Stretch="None" VerticalAlignment="Top" Source="/zVirtualScenes;component/Images/drag_arrow.png" />
         <TextBlock Height="85" HorizontalAlignment="Left" Margin="206,182,0,0" Name="textBlock2" Text="Drag and drop to add devices to groups " VerticalAlignment="Top" TextWrapping="Wrap" Width="83" TextAlignment="Center" />
         <TextBlock HorizontalAlignment="Left" Margin="296,51,0,0" Name="textBlock3" Text="All Devices" VerticalAlignment="Top" />

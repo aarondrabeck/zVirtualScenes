@@ -120,12 +120,12 @@ namespace zvs.DataModel
                     case EntityState.Modified:
                         modifedEntities.Add(new
                         {
-                            NewEntity = o.Entity,
-                            OldEntity = o.OriginalValues.ToObject()
+                            NewEntity = o.Entity.CloneObject(),
+                            OldEntity = o.OriginalValues.ToObject().CloneObject()
                         });
                         break;
                     case EntityState.Deleted:
-                        deletedEntities.Add(o.Entity);
+                        deletedEntities.Add(o.Entity.CloneObject());
                         break;
                 }
             });
@@ -139,9 +139,9 @@ namespace zvs.DataModel
             //IMPORTANT: CLONE HERE SO DATABASE CREATE PROPERTIES GET SET SUCH AS DATABASE GENERATED ID's
             addedEntities.ForEach(o => RaiseEntityAdded(this, o.CloneObject()));
 
-            modifedEntities.ForEach(o => RaiseEntityUpdated(this, o.NewEntity.CloneObject(), o.OldEntity.CloneObject()));
+            modifedEntities.ForEach(o => RaiseEntityUpdated(this, o.NewEntity, o.OldEntity));
 
-            deletedEntities.ForEach(o => RaiseEntityDeleted(this, o.CloneObject()));
+            deletedEntities.ForEach(o => RaiseEntityDeleted(this, o));
 
             return saveChangesResult;
         }

@@ -8,8 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500">
     <StackPanel Orientation="Vertical">
-        <GroupBox Header="Start Time" >
-            <xctk:DateTimePicker Value="{Binding OneTimeScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" Margin="10"/>
-        </GroupBox>
+        <TextBlock Text="Start Time" Margin="10 0 0 0" FontSize="16" />
+        <xctk:DateTimePicker Value="{Binding OneTimeScheduledTask.StartTime, ElementName=This, UpdateSourceTrigger=PropertyChanged}" Width="300" HorizontalAlignment="Left" FontSize="14"   Margin="10 5 10 10"/>
     </StackPanel>
 </UserControl>

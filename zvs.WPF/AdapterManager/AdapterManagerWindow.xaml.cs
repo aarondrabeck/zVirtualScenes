@@ -263,7 +263,7 @@ namespace zvs.WPF.AdapterManager
                                 adapterSetting.Value,
                                 async value =>
                                 {
-                                    adapterSetting.Value = value;
+                                    adapterSetting.Value = value.ToString();
                                     var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
                                     if (result.HasError)
                                         await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving adapter setting. {0}", result.Message);

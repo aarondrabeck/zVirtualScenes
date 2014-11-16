@@ -214,7 +214,7 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue,
                                     async value =>
                                     {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value, string.Empty, CancellationToken.None);
+                                        await _app.ZvsEngine.RunCommandAsync(deviceCommand.Id, value.ToString(), string.Empty, CancellationToken.None);
                                     },
                                     _icon) { ToolTip = tip };
                                 DeviceCommandsStkPnl.Children.Add(control);
@@ -390,7 +390,7 @@ namespace zvs.WPF.DeviceControls
                                     defaultValue,
                                     async value =>
                                     {
-                                        await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value, d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
+                                        await _app.ZvsEngine.RunCommandAsync(deviceTypeCommand.Id, value.ToString(), d.Id.ToString(CultureInfo.InvariantCulture), CancellationToken.None);
                                     },
                                     _icon);
                                 TypeCommandsStkPnl.Children.Add(control);

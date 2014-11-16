@@ -9,16 +9,21 @@
     <UserControl.Resources>
         <CollectionViewSource x:Key="LogEntryViewSource" d:DesignSource="{d:DesignInstance {x:Type DataModel:LogEntry}, CreateList=True}"/>
     </UserControl.Resources>
-    <DockPanel>
-        <Grid DockPanel.Dock="Bottom" >
-            <Button Name="PurgeButton" Content="Purge Log" Padding="10 2" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="PurgeButton_Click" ></Button>
-            <Button Name="ClearButton" Content="Clear Log" Padding="10 2" Margin="90 5 5 5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="ClearButton_OnClick" ></Button>
-            <Button Name="NextButton" Content="Previous 200" Padding="10 2" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="NextButton_Click"></Button>
-        </Grid>
-        <DataGrid  x:Name="LogDataGrid" Background="#FFF9F9F9"  VerticalAlignment="Stretch" 
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Border VerticalAlignment="Top" Background="#FFD5CFC4" Height="5"></Border>
+        <DataGrid Grid.Row="1"  x:Name="LogDataGrid"  VerticalAlignment="Stretch" Background="White"
                                    HorizontalAlignment="Stretch" AutoGenerateColumns="False" HorizontalGridLinesBrush="#FFE2E2E2" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" 
                                    ItemsSource="{Binding Source={StaticResource LogEntryViewSource}}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False" BorderThickness="0" >
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFF0F0F0"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+            </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTextColumn Width="140"  Header="Date" Binding="{Binding Datetime}" IsReadOnly="True" SortDirection="Descending" />
                 <DataGridTextColumn Width="75" Header="Level" Binding="{Binding Level}" IsReadOnly="True"/>
@@ -26,7 +31,11 @@
                 <DataGridTextColumn Width="*"  Header="Message" Binding="{Binding Message}" IsReadOnly="True"/>
             </DataGrid.Columns>
         </DataGrid>
-
-    </DockPanel>
+        <Grid Grid.Row="2" DockPanel.Dock="Bottom" Background="White">
+            <Button Name="PurgeButton" Content="Purge Log" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="PurgeButton_Click" ></Button>
+            <Button Name="ClearButton" Content="Clear Log" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="100 5 5 5" VerticalAlignment="Bottom" HorizontalAlignment="Left" Click="ClearButton_OnClick" ></Button>
+            <Button Name="NextButton" Content="Previous 200" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Margin="5" VerticalAlignment="Bottom" HorizontalAlignment="Right" Click="NextButton_Click"></Button>
+        </Grid>
+    </Grid>
 
 </UserControl>

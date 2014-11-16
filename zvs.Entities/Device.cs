@@ -17,7 +17,7 @@ namespace zvs.DataModel
 
         public override string ToString()
         {
-            return Name;
+            return string.Format("{0} {1}", Location, Name);
         }
 
         private string _name;
@@ -235,7 +235,7 @@ namespace zvs.DataModel
 
             return defaultSetting != null ? defaultSetting.Value : null;
         }
-    
+
 
     }
 }

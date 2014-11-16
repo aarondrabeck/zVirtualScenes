@@ -190,14 +190,14 @@ namespace zvs.WPF.DeviceControls
                                 async v =>
                                 {
                                     if (deviceTypeSettingValue != null)
-                                        deviceTypeSettingValue.Value = v;
+                                        deviceTypeSettingValue.Value = v.ToString();
                                     else
                                     {
-                                        deviceTypeSettingValue = new DeviceTypeSettingValue()
+                                        deviceTypeSettingValue = new DeviceTypeSettingValue
                                         {
                                             DeviceId = device.Id,
                                             DeviceTypeSettingId = setting.Id,
-                                            Value = v
+                                            Value = v.ToString()
                                         };
                                         Context.DeviceTypeSettingValues.Add(deviceTypeSettingValue);
                                     }
@@ -343,14 +343,14 @@ namespace zvs.WPF.DeviceControls
                                 {
                                     if (deviceSettingValue != null)
                                     {
-                                        deviceSettingValue.Value = value;
+                                        deviceSettingValue.Value = value.ToString();
                                     }
                                     else
                                     {
-                                        deviceSettingValue = new DeviceSettingValue()
+                                        deviceSettingValue = new DeviceSettingValue
                                         {
                                             DeviceSetting = deviceSetting,
-                                            Value = value
+                                            Value = value.ToString()
                                         };
                                         device.DeviceSettingValues.Add(deviceSettingValue);
                                     }

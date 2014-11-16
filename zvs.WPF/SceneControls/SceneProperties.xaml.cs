@@ -270,7 +270,7 @@ namespace zvs.WPF.SceneControls
                                 {
                                     if (sceneSettingValue != null)
                                     {
-                                        sceneSettingValue.Value = value;
+                                        sceneSettingValue.Value = value.ToString();
                                     }
                                     else
                                     {
@@ -278,7 +278,7 @@ namespace zvs.WPF.SceneControls
                                         sceneSettingValue = new SceneSettingValue()
                                         {
                                             SceneSetting = sceneSetting,
-                                            Value = value
+                                            Value = value.ToString()
                                         };
                                         scene.SettingValues.Add(sceneSettingValue);
                                     }

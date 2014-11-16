@@ -79,7 +79,7 @@ namespace zvs.Processor
                     .FirstOrDefaultAsync(o => o.Id == dId, cancellationToken);
 
                 if (device == null)
-                    return Result.ReportErrorFormat("Cannot locate device with id of {0}", dId);
+                    return Result.ReportErrorFormat("Cannot find device with id of {0}", dId);
 
                 var commandAction = string.Format("{0}{1} {2}",
                                                        command.Name,
@@ -127,6 +127,9 @@ namespace zvs.Processor
                                 .Include(o => o.Type.Adapter)
                                 .FirstOrDefaultAsync(o => o.Type.UniqueIdentifier != "BUILTIN" && o.Id == dId,
                                     cancellationToken);
+
+                            if (device == null)
+                                return Result.ReportErrorFormat("Cannot find device with id of {0}", dId);
 
                             var adapter = AdapterManager.FindZvsAdapter(device.Type.Adapter.AdapterGuid);
                             if (adapter == null)

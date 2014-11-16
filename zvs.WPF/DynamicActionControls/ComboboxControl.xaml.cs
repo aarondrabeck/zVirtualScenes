@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 
@@ -12,61 +15,58 @@ namespace zvs.WPF.DynamicActionControls
     /// </summary>
     public partial class ComboboxControl : UserControl
     {
-        private string name = string.Empty;
-        private string Description = string.Empty;
-        private Action<string> SelectionChangedAction = null;
-        private bool isLoaded = false;
-        List<string> OptionObjects = new List<string>();
-        string SelectedObject = string.Empty;
+        private string TitleName { get; set; }
+        private string Description { get; set; }
+        Func<object, Task> SelectionChangedAction { get; set; }
+        private bool IsReady { get; set; }
+        IEnumerable<object> ComboValues { get; set; }
+        object SelectedValue { get; set; }
 
-        public ComboboxControl(string Name, string Description, List<string> OptionObjects, string SelectedObject, Action<string> SelectionChangedAction, BitmapImage icon)
+        public ComboboxControl(string titleName, string description, IEnumerable<object> comboValues, object selectedValue, Func<object, Task> selectionChangedAction, ImageSource icon)
         {
-            this.name = Name;
-            this.Description = Description;
-            this.OptionObjects = OptionObjects;
-            this.SelectedObject = SelectedObject;
-            this.SelectionChangedAction = SelectionChangedAction;
+            TitleName = string.Empty;
+            Description = string.Empty;
+            ComboValues = new List<object>();
+            SelectedValue = string.Empty;
+
+            TitleName = titleName;
+            Description = description;
+            ComboValues = comboValues;
+            SelectedValue = selectedValue;
+            SelectionChangedAction = selectionChangedAction;
             InitializeComponent();
 
-            this.SignalImg.Source = icon;
+            SignalImg.Source = icon;
         }
 
         private void UserControl_Loaded_1(object sender, RoutedEventArgs e)
         {
-            isLoaded = false;
+            IsReady = false;
 
-            foreach (object option in OptionObjects)
-            {
+            foreach (var option in ComboValues)
                 ComboBox.Items.Add(option);
-            }
-            ComboBox.SelectedValue = SelectedObject;
-                        
-            if (string.IsNullOrEmpty(Description))
-                DescTxt.Visibility = System.Windows.Visibility.Collapsed;
 
-            NameTxt.Text = name;
+            ComboBox.SelectedValue = SelectedValue;
+
+            if (string.IsNullOrEmpty(Description))
+                DescTxt.Visibility = Visibility.Collapsed;
+
+            NameTxt.Text = TitleName;
             ComboBox.ToolTip = Description;
             DescTxt.Text = Description;
 
-            isLoaded = true;
-        } 
+            IsReady = true;
+        }
 
-        private void ComboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
+        private async void ComboBox_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
         {
-            if (isLoaded)
-            {
-                if (SelectionChangedAction != null && ComboBox.SelectedItem != null)
-                {
-                    SelectionChangedAction.DynamicInvoke(ComboBox.SelectedItem);
+            if (!IsReady) return;
+            if (SelectionChangedAction == null || ComboBox.SelectedItem == null) return;
+            await SelectionChangedAction(ComboBox.SelectedItem);
 
-                    SignalImg.Opacity = 1;
-                    var da = new DoubleAnimation();
-                    da.From = 1;
-                    da.To = 0;
-                    da.Duration = new Duration(TimeSpan.FromSeconds(.8));
-                    SignalImg.BeginAnimation(OpacityProperty, da);
-                }
-            }
+            SignalImg.Opacity = 1;
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
         }
     }
 }

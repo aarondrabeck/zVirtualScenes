@@ -11,7 +11,9 @@
     Unloaded="UserControl_Unloaded_1"
     Initialized="UserControl_Initialized">
     <UserControl.Resources>
-
+        <Style x:Key="ZvsFont">
+            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
+        </Style>
         <Style x:Key="Body_Hoz_Center"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
@@ -41,20 +43,26 @@
 
     <Grid >
         <Grid.RowDefinitions>
-            <RowDefinition Height="1*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" DataContext="{StaticResource device_value_triggersViewSource}">
+        <Border VerticalAlignment="Top" Background="#B173C9" Height="5"></Border>
+        <Grid Grid.Row="1" DataContext="{StaticResource device_value_triggersViewSource}">
          
             <DataGrid x:Name="TriggerGrid" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
                   HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
                   AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
-                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,33" BorderThickness="0" >
+                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,40" BorderThickness="0" >
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFF0F0F0"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserSort="False" CanUserResize="False" CanUserReorder="False" IsReadOnly="True">
                         <DataGridTemplateColumn.CellTemplate >
                             <DataTemplate>
-                                <Image Name="img" Width="35" Height="35" Source="/zVirtualScenes;component/Images/trigger.png" Margin="5,0" />
+                                <TextBlock Margin="6 0 6 0 " Text="&#xe002;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -107,7 +115,7 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Basic ScheduledTask" HorizontalAlignment="Right" Margin="0,0,5,5" Width="116" VerticalAlignment="Bottom"/>
+            <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Trigger" HorizontalAlignment="Right" Margin="0,0,5,5"  VerticalAlignment="Bottom" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
         </Grid>
     </Grid>
 </UserControl>

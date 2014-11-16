@@ -321,10 +321,19 @@ namespace OpenZWaveAdapter
                Description = "The frequency in which devices are polled for level status on your network.  Set high to avoid excessive network traffic. "
            };
 
-            await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(comSetting, o => o.ComportSetting);
-            await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
+            var comPortSettingResult =  await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(comSetting, o => o.ComportSetting);
+            if (comPortSettingResult.HasError)
+                await
+                    Log.ReportErrorFormatAsync(CancellationToken,
+                        "An error occured when registering the comport adapter setting. {0}", comPortSettingResult.Message);
 
-            await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
+            var pollIntSettingResult =  await settingBuilder.Adapter(this).RegisterAdapterSettingAsync(pollIntSetting, o => o.PollingIntervalSetting);
+            if (pollIntSettingResult.HasError)
+                await
+                    Log.ReportErrorFormatAsync(CancellationToken,
+                        "An error occured when registering the polling adapter setting. {0}", pollIntSettingResult.Message);
+
+            var dimmerOnResult = await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
             {
                 UniqueIdentifier = OpenzWaveDeviceTypeSettings.DefaultDimmerOnLevel.ToString(),
                 DeviceTypeId = DimmerTypeId,
@@ -333,8 +342,10 @@ namespace OpenZWaveAdapter
                 Value = "99",//default value
                 ValueType = DataType.BYTE
             });
+            if (dimmerOnResult.HasError)
+                await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering the dimmer level setting. {0}", dimmerOnResult.Message);
 
-            await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
+            var repollLevelSetting = await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
             {
                 UniqueIdentifier = OpenzWaveDeviceTypeSettings.EnableRepollOnLevelChange.ToString(),
                 DeviceTypeId = DimmerTypeId,
@@ -343,8 +354,10 @@ namespace OpenZWaveAdapter
                 Value = true.ToString(), //default value
                 ValueType = DataType.BOOL
             });
+            if (repollLevelSetting.HasError)
+                await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering the re-poll setting. {0}", repollLevelSetting.Message);
 
-            await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
+            var repollSetting = await settingBuilder.RegisterDeviceTypeSettingAsync(new DeviceTypeSetting
             {
                 UniqueIdentifier = OpenzWaveDeviceTypeSettings.RepollingEnabled.ToString(),
                 DeviceTypeId = DimmerTypeId,
@@ -353,6 +366,8 @@ namespace OpenZWaveAdapter
                 Value = false.ToString(), //default value
                 ValueType = DataType.BOOL
             });
+            if (repollSetting.HasError)
+                await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering the re-poll setting. {0}", repollSetting.Message);
 
         }
 
@@ -1045,7 +1060,7 @@ namespace OpenZWaveAdapter
 
                                 #region Last Event Value Storage
                                 //Node event value placeholder 
-                                await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                                var lastEventResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
                                     DeviceId = ozwDevice.Id,
                                     UniqueIdentifier = LastEventNameValueId,
@@ -1057,6 +1072,8 @@ namespace OpenZWaveAdapter
                                     Value = "0",
                                     IsReadOnly = true
                                 }, ozwDevice, CancellationToken);
+                                if (lastEventResult.HasError)
+                                    await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering the last event value. {0}", lastEventResult.Message);
                                 #endregion
                             }
                         }
@@ -1109,7 +1126,7 @@ namespace OpenZWaveAdapter
                             }
 
                             //Values are 'unknown' at this point so don't report a value change. 
-                            await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                            var valueSaveResult =  await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
                                 DeviceId = d.Id,
                                 UniqueIdentifier = vIdString,
@@ -1121,6 +1138,8 @@ namespace OpenZWaveAdapter
                                 ValueType = ConvertType(vid),
                                 IsReadOnly = readOnly
                             }, d, CancellationToken);
+                            if (valueSaveResult.HasError)
+                                await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering device value. {0}", valueSaveResult.Message);
 
                             #region Install Dynamic Commands
 
@@ -1151,7 +1170,9 @@ namespace OpenZWaveAdapter
                                             dynamicDc.Options.Add(new CommandOption { Name = option });
                                 }
 
-                                await DeviceCommandBuilder.RegisterAsync(d.Id, dynamicDc, CancellationToken);
+                                var saveDynamicResult = await DeviceCommandBuilder.RegisterAsync(d.Id, dynamicDc, CancellationToken);
+                                if (saveDynamicResult.HasError)
+                                    await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when registering dynamic command. {0}", saveDynamicResult.Message);
 
                             }
                             #endregion
@@ -1221,7 +1242,7 @@ namespace OpenZWaveAdapter
                             }
 
                             //Update device value
-                            await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                           var deviceValueResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                             {
                                 DeviceId = device.Id,
                                 UniqueIdentifier = vid.GetId().ToString(CultureInfo.InvariantCulture),
@@ -1233,6 +1254,8 @@ namespace OpenZWaveAdapter
                                 ValueType = ConvertType(vid),
                                 IsReadOnly = readOnly
                             }, device, CancellationToken);
+                           if (deviceValueResult.HasError)
+                               await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating device values. {0}", deviceValueResult.Message);
 
                             #region Update Device Status Properties
                             //Update Current Status Field
@@ -1483,7 +1506,7 @@ namespace OpenZWaveAdapter
 
                                 //lets store the manufacturer name and product name in the values table.   
                                 //Giving ManufacturerName a random value_id 9999058723211334120                                                           
-                                await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                                var mNameResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
                                     DeviceId = device.Id,
                                     UniqueIdentifier = manufacturerNameValueId,
@@ -1495,8 +1518,10 @@ namespace OpenZWaveAdapter
                                     Value = node.Manufacturer,
                                     IsReadOnly = true
                                 }, device, CancellationToken);
+                                if (mNameResult.HasError)
+                                    await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating manufacturing name value. {0}", mNameResult.Message);
 
-                                await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                                var productNameResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
                                     DeviceId = device.Id,
                                     UniqueIdentifier = productNameValueId,
@@ -1508,8 +1533,11 @@ namespace OpenZWaveAdapter
                                     Value = node.Product,
                                     IsReadOnly = true
                                 }, device, CancellationToken);
+                                if (productNameResult.HasError)
+                                    await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating product name value. {0}", productNameResult.Message);
 
-                                await DeviceValueBuilder.RegisterAsync(new DeviceValue
+
+                                var nodeResult =  await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
                                     DeviceId = device.Id,
                                     UniqueIdentifier = nodeLocationValueId,
@@ -1521,8 +1549,10 @@ namespace OpenZWaveAdapter
                                     Value = node.Location,
                                     IsReadOnly = true
                                 }, device, CancellationToken);
+                                if (nodeResult.HasError)
+                                    await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating node location value. {0}", nodeResult.Message);
 
-                                await DeviceValueBuilder.RegisterAsync(new DeviceValue
+                                var nodeNameResult = await DeviceValueBuilder.RegisterAsync(new DeviceValue
                                 {
                                     DeviceId = device.Id,
                                     UniqueIdentifier = nodeNameValueId,
@@ -1534,6 +1564,8 @@ namespace OpenZWaveAdapter
                                     Value = node.Name,
                                     IsReadOnly = true
                                 }, device, CancellationToken);
+                                if (nodeNameResult.HasError)
+                                    await Log.ReportErrorFormatAsync(CancellationToken, "An error occured when updating node name value. {0}", nodeNameResult.Message);
                             }
                         }
 

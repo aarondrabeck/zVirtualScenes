@@ -102,7 +102,7 @@ namespace zvs.WPF.JavaScript
 
         private void EvaluateAddEditBtnsUsability()
         {
-            if (JSCmbBx.Items.Count > 0)
+            if (JsCmbBx.Items.Count > 0)
             {
                 RemoveBtn.IsEnabled = true;
                 EditBtn.IsEnabled = true;
@@ -128,13 +128,13 @@ namespace zvs.WPF.JavaScript
             if (result.HasError)
                 await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving new JavaScript command. {0}", result.Message);
 
-            JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
+            JsCmbBx.SelectedItem = JsCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
             EvaluateAddEditBtnsUsability();
         }
 
         private async void RemoveBtn_Click(object sender, RoutedEventArgs e)
         {
-            var jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
+            var jsCommand = (JavaScriptCommand)JsCmbBx.SelectedItem;
 
             if (jsCommand == null)
                 return;
@@ -176,7 +176,7 @@ namespace zvs.WPF.JavaScript
 
         private async void EditBtn_Click(object sender, RoutedEventArgs e)
         {
-            var jsCommand = (JavaScriptCommand)JSCmbBx.SelectedItem;
+            var jsCommand = (JavaScriptCommand)JsCmbBx.SelectedItem;
 
             if (jsCommand == null)
                 return;
@@ -190,7 +190,7 @@ namespace zvs.WPF.JavaScript
             if (result.HasError)
                 await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving JavaScript command. {0}", result.Message);
 
-            JSCmbBx.SelectedItem = JSCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
+            JsCmbBx.SelectedItem = JsCmbBx.Items.OfType<JavaScriptCommand>().FirstOrDefault(o => o.Name == jsCommand.Name);
         }
 
         public void Dispose()

@@ -28,11 +28,11 @@
         	Text="JavaScript Commands"/>
         </Grid>
         <Grid Grid.Row="1">
-            <ComboBox DisplayMemberPath="Name"  Name="JSCmbBx" VerticalAlignment="Center" 
+            <ComboBox DisplayMemberPath="Name"  Name="JsCmbBx" VerticalAlignment="Center" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC"
                       Margin="10,0,10,52" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="CommandId"></ComboBox>
-            <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Margin="0,52,142,0" Click="AddBtn_Click"></Button>
-            <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,52,76,0"  VerticalAlignment="Top" Width="60" Click="EditBtn_Click" />
-            <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,52,10,0" VerticalAlignment="Top" Width="60" Click="RemoveBtn_Click" />
+            <Button Name="AddBtn" Content="Add" VerticalAlignment="Top" HorizontalAlignment="Right"  Margin="0,52,142,0" Click="AddBtn_Click" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0"></Button>
+            <Button Name="EditBtn" Content="Edit" HorizontalAlignment="Right" Margin="0,52,90,0"  VerticalAlignment="Top" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Click="EditBtn_Click" />
+            <Button Name="RemoveBtn" Content="Remove" HorizontalAlignment="Right" Margin="0,52,10,0" VerticalAlignment="Top" FontSize="14" FontWeight="Medium" Background="#FFCCCCCC" Padding="10 5"  BorderBrush="{x:Null}"  BorderThickness="0" Click="RemoveBtn_Click" />
 
         </Grid>
         <Grid Background="#FFF0F0F0" Grid.Row="2">

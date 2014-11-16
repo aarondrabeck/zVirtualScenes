@@ -11,33 +11,33 @@
         <CollectionViewSource x:Key="deviceDeviceValueViewSource" Source="{Binding Values, Source={StaticResource deviceViewSource}}"/>
     </Window.Resources>
     <Grid DataContext="{StaticResource deviceViewSource}">
-        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" >
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0,0" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                    <GradientStop Color="#FF8FAEEE" Offset="0"/>
-                    <GradientStop Color="#FF6687DC" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
-
-        </Rectangle>
-        <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" Text="Select device and trigger" VerticalAlignment="Top"/>
+        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Fill="#FF006AA4" />
+        <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,8,0,0" TextWrapping="Wrap" Text="Select Device and Trigger" VerticalAlignment="Top"/>
         <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="10,54,0,0" TextWrapping="Wrap" Text="When" VerticalAlignment="Top"/>
-        <ComboBox x:Name="DeviceCmboBx" DisplayMemberPath="Name" HorizontalAlignment="Left" Margin="73,52,0,0" VerticalAlignment="Top" Width="288" ItemsSource="{Binding}" SelectedValuePath="CurrentLevelInt"/>
-        <ComboBox x:Name="ValueCmboBx" DisplayMemberPath="Name" HorizontalAlignment="Left" Margin="73,86,0,0" VerticalAlignment="Top" Width="170" ItemsSource="{Binding Source={StaticResource deviceDeviceValueViewSource}}" SelectedValuePath="CommandClass"/>
-        <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="256,88,0,0" TextWrapping="Wrap" Text="is" VerticalAlignment="Top"/>
-        <ComboBox  x:Name="OperatorCmboBx" HorizontalAlignment="Left" Margin="280,86,0,0" VerticalAlignment="Top" Width="115"/>
-        <TextBox x:Name="ValueTxtBx" HorizontalAlignment="Left" Margin="408,86,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="130"/>
-        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,123,0,0" >
-            <Rectangle.Fill>
-                <LinearGradientBrush EndPoint="0,0" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                    <GradientStop Color="#FF8FAEEE" Offset="0"/>
-                    <GradientStop Color="#FF6687DC" Offset="1"/>
-                </LinearGradientBrush>
-            </Rectangle.Fill>
+        <ComboBox x:Name="DeviceCmboBx" Height="25"  HorizontalAlignment="Left" 
+                  Margin="73,52,0,0" VerticalAlignment="Top" Width="288" ItemsSource="{Binding}" 
+                  SelectedValuePath="CurrentLevelInt" Background="#FFCCCCCC">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} {1}">
+                                <Binding Path="Location" />
+                                <Binding Path="Name" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
-        </Rectangle>
-        <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,131,0,0" TextWrapping="Wrap" Text="Select a command to run" VerticalAlignment="Top"/>
-        <TextBlock Height="20" FontSize="14" Margin="141,174,10,0" TextWrapping="NoWrap" 
+        <ComboBox x:Name="ValueCmboBx" Height="25" Background="#FFCCCCCC" DisplayMemberPath="Name" HorizontalAlignment="Left" Margin="73,86,0,0" VerticalAlignment="Top" Width="170" ItemsSource="{Binding Source={StaticResource deviceDeviceValueViewSource}}" SelectedValuePath="CommandClass"/>
+        <TextBlock HorizontalAlignment="Left" FontSize="14" Margin="256,88,0,0" TextWrapping="Wrap" Text="is" VerticalAlignment="Top"/>
+        <ComboBox  x:Name="OperatorCmboBx" Height="25" HorizontalAlignment="Left" Margin="280,86,0,0" VerticalAlignment="Top" Width="115" Background="#FFCCCCCC"/>
+        <TextBox x:Name="ValueTxtBx" Height="25" HorizontalAlignment="Left" Margin="408,87,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="130"  FontSize="14"/>
+        <Rectangle Height="40" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="0,123,0,0" Fill="#FF0B6EB5"  />
+        <TextBlock HorizontalAlignment="Left" FontSize="18" Foreground="White" Margin="10,131,0,0" TextWrapping="Wrap" Text="Select a Command to Run" VerticalAlignment="Top"/>
+        <TextBlock Height="20" FontSize="14" Margin="144,178,7,0" TextWrapping="NoWrap" 
                    TextTrimming="CharacterEllipsis" VerticalAlignment="Top" >
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}{0} {1}"  >
@@ -46,11 +46,9 @@
                 </MultiBinding>
             </TextBlock.Text>
         </TextBlock>
-        <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" Margin="10,174,0,0" VerticalAlignment="Top" Width="116" Click="AddUpdateCommand_Click" />
+        <Button x:Name="AddUpdateCommand" Content="Select Command" HorizontalAlignment="Left" Margin="10,174,0,0" VerticalAlignment="Top" Click="AddUpdateCommand_Click"  FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+        <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Click="CancelBtn_Click"  FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+        <Button Name="OkBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,81,8" Click="OKBtn_Click" VerticalAlignment="Bottom"  FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
 
-        <Rectangle Height="40" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Fill="#FFF0F0F0" />
-        <Button Name="CancelBtn" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,8" VerticalAlignment="Bottom" Width="75" Click="CancelBtn_Click"/>
-        <Button Name="OKBtn" Content="OK" HorizontalAlignment="Right" Margin="0,0,99,8" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
-        
     </Grid>
 </Window>

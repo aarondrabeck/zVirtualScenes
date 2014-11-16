@@ -409,6 +409,12 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="fonts\flaticon3.eot" />
+    <Resource Include="fonts\flaticon3.ttf" />
+    <None Include="fonts\flaticon3.woff" />
+    <None Include="fonts\flaticon4.eot" />
+    <Resource Include="fonts\flaticon4.ttf" />
+    <None Include="fonts\flaticon4.woff" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -424,6 +430,8 @@
     <Resource Include="Images\greencheck.png" />
     <Resource Include="Images\blank.png" />
     <Resource Include="Images\red_x.png" />
+    <Content Include="fonts\flaticon3.svg" />
+    <Content Include="fonts\flaticon4.svg" />
     <Content Include="log4net.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

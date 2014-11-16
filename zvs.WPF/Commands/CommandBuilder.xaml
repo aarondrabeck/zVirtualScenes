@@ -9,7 +9,7 @@
         <CollectionViewSource x:Key="JSCmdsViewSource" d:DesignSource="{d:DesignInstance my:JavaScriptCommand, CreateList=True}" />
     </Window.Resources>
     <Grid>
-        <TabControl Style="{StaticResource VerticalTabControl}" TabStripPlacement="Left" Margin="2,2,2,46">
+        <TabControl Style="{StaticResource VerticalTabControl}" Margin="2,2,2,46">
             <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}" >
                 <TabItem.Header >
                     <StackPanel HorizontalAlignment="Center"  >
@@ -19,7 +19,20 @@
                 </TabItem.Header>
                 <Grid>
                     <TextBlock HorizontalAlignment="Left" Margin="10,18,0,0" TextWrapping="Wrap" Text="Device" VerticalAlignment="Top"/>
-                    <ComboBox x:Name="DevicesCmboBox" Margin="85,15,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="DevicesCmboBox_SelectionChanged_1"/>
+                    <ComboBox x:Name="DevicesCmboBox" Margin="85,15,12,0" VerticalAlignment="Top"  SelectionChanged="DevicesCmboBox_SelectionChanged_1">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="Location" />
+                                            <Binding Path="Name" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
                     <TextBlock HorizontalAlignment="Left" Margin="10,51,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
                     <ComboBox Name="DeviceCmdsCmboBox" Margin="85,48,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="DeviceCmdsCmboBox_SelectionChanged_1"/>
@@ -54,7 +67,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button Name="CloseBtn" Content="Close" Click="Close_Click_1" Width="75" Height="20" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10"></Button>
-        <Button x:Name="OKBtn"  Content="OK" HorizontalAlignment="Right" Margin="0,0,103,10" VerticalAlignment="Bottom" Width="75" Click="OKBtn_Click"/>
+        <Button Name="CloseBtn" Content="Close" Click="Close_Click_1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,9" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"></Button>
+        <Button x:Name="OKBtn"  Content="OK" HorizontalAlignment="Right" Margin="0,0,73,9" VerticalAlignment="Bottom"  Click="OKBtn_Click" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
     </Grid>
 </Window>

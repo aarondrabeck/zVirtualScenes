@@ -31,6 +31,9 @@
     </zvsWpf:ChromeWindow.CommandBindings>
 
     <zvsWpf:ChromeWindow.Resources>
+        <Style x:Key="ZvsFont">
+            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
+        </Style>
         <zvsWpf:ContentToPathConverter x:Key="content2PathConverter"/>
         <zvsWpf:ContentToMarginConverter x:Key="content2MarginConverter"/>
 
@@ -50,7 +53,7 @@
         </LinearGradientBrush>
 
         <!-- TabControl style -->
-        <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
+        <!--<Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -72,9 +75,9 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
+        </Style>-->
         <!-- TabItem style -->
-        <Style x:Key="{x:Type TabItem}" TargetType="{x:Type TabItem}">
+        <!--<Style x:Key="{x:Type TabItem}" TargetType="{x:Type TabItem}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -118,10 +121,10 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-        <Style TargetType="{x:Type ListViewItem}">
+        </Style>-->
+        <!--<Style TargetType="{x:Type ListViewItem}">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        </Style>
+        </Style>-->
     </zvsWpf:ChromeWindow.Resources>
     <DockPanel Background="White">
         <StatusBar  DockPanel.Dock="Bottom" Height="30" Background="White" BorderBrush="#FFA0A0A0" BorderThickness="0 1 0 0">
@@ -148,52 +151,52 @@
 
         </StatusBar>
         <Grid >
-            <TabControl Margin="0 5 0 0" BorderThickness="0 1 0 0" Style="{StaticResource TabControlStyle}" >
-                <TabItem  Height="28">
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="20" Source="Images/radio.png"  />
-                            <TextBlock FontSize="14"  Text="Devices" Margin="6 0 0 0" VerticalAlignment="Center" />
+            <TabControl Margin="0 30 0 0" Style="{StaticResource ZvsVerticalTabControl}" >
+                <TabItem  Height="90" Style="{StaticResource DeviceTabItem}">
+                    <TabItem.Header >
+                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe004;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" Text="Devices"/>
                         </StackPanel>
                     </TabItem.Header>
                     <Grid>
                         <deviceControls:DeviceDataGridUc x:Name="dList1" Margin="0,0,0,0" />
                     </Grid>
                 </TabItem>
-                <TabItem Height="28">
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="20" Source="Images/scene64.png"  />
-                            <TextBlock FontSize="14" Text="Scenes" Margin="6 0 0 0" VerticalAlignment="Center" />
+                <TabItem  Height="90" Style="{StaticResource SceneTabItem}">
+                    <TabItem.Header >
+                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe005;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" Text="Scenes"/>
                         </StackPanel>
                     </TabItem.Header>
 
                     <sceneControls:SceneCreator x:Name="SceneControl" />
 
                 </TabItem>
-                <TabItem Height="28">
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="18" Source="Images/trigger.png"  />
-                            <TextBlock FontSize="14" Text="Triggers" Margin="6 0 0 0" VerticalAlignment="Center" />
+                <TabItem  Height="90" Style="{StaticResource TriggersTabItem}">
+                    <TabItem.Header >
+                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe002;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" Text="Triggers"/>
                         </StackPanel>
                     </TabItem.Header>
                     <triggerControl:TriggerGridUc x:Name="triggerControl"></triggerControl:TriggerGridUc>
                 </TabItem>
-                <TabItem Height="28">
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="22" Source="Images/scheduled_task.png"  />
-                            <TextBlock FontSize="14" Text="Scheduled Tasks" Margin="6 0 0 0" VerticalAlignment="Center" />
+                <TabItem  Height="90" Style="{StaticResource TasksTabItem}">
+                    <TabItem.Header >
+                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe008;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" Text="Scheduled Tasks"/>
                         </StackPanel>
                     </TabItem.Header>
                     <scheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></scheduledTaskControls:ScheduledTaskCreator>
                 </TabItem>
-                <TabItem Height="28">
-                    <TabItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Height="18" Source="Images/log.png"  />
-                            <TextBlock FontSize="14" Text="Log" Margin="6 0 0 0" VerticalAlignment="Center" />
+                <TabItem  Height="90" Style="{StaticResource LogTabItem}">
+                    <TabItem.Header >
+                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe001;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" Text="Logs"/>
                         </StackPanel>
                     </TabItem.Header>
                     <Grid>
