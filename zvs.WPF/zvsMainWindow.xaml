@@ -31,9 +31,6 @@
     </zvsWpf:ChromeWindow.CommandBindings>
 
     <zvsWpf:ChromeWindow.Resources>
-        <Style x:Key="ZvsFont">
-            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
-        </Style>
         <zvsWpf:ContentToPathConverter x:Key="content2PathConverter"/>
         <zvsWpf:ContentToMarginConverter x:Key="content2MarginConverter"/>
 
@@ -166,7 +163,7 @@
                 <TabItem  Height="90" Style="{StaticResource SceneTabItem}">
                     <TabItem.Header >
                         <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
-                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe005;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe005;" Style="{DynamicResource ZvsFont}" FontFamily="flaticon"  FontSize="35" />
                             <TextBlock Foreground="White" Text="Scenes"/>
                         </StackPanel>
                     </TabItem.Header>

@@ -23,21 +23,26 @@
             </Setter.Value>
         </Setter>
     </Style>
-
+    <Style x:Key="ZvsFont" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontFamily" Value="pack://application:,,,/fonts/flaticon" />
+    </Style>
+    <!--Devices-->
+    <SolidColorBrush x:Key="DeviceBrush" Color="#2CAFE7" />
+    <SolidColorBrush x:Key="DeviceSelectedBrush" Color="#FF87D2F1" />
     <Style x:Key="DeviceTabItem" TargetType="{x:Type TabItem}">
-      
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border x:Name="PART_Border" BorderThickness="3"   Margin="5 0 0 0" BorderBrush="#2CAFE7" Background="#2CAFE7">
+                    <Border x:Name="PART_Border" BorderThickness="3"   Margin="5 0 0 0" BorderBrush="{DynamicResource DeviceBrush}" Background="{DynamicResource DeviceBrush}">
                         <ContentPresenter ContentSource="Header" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FF1C7297" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource DeviceSelectedBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FF1C7297" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource DeviceSelectedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -45,41 +50,47 @@
         </Setter>
     </Style>
 
+    <!--Scenes-->
+    <SolidColorBrush x:Key="SceneBrush" Color="#9EC974" />
+    <SolidColorBrush x:Key="SceneSelectedBrush" Color="#FFC4EE9C" />
     <Style x:Key="SceneTabItem" TargetType="{x:Type TabItem}">
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="#9EC974" Background="#9EC974">
+                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="{DynamicResource SceneBrush}" Background="{DynamicResource SceneBrush}">
                         <ContentPresenter ContentSource="Header" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FF779B54" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource SceneSelectedBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FF779B54" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource SceneSelectedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-
+    
+    <!--Tiggers-->
+    <SolidColorBrush x:Key="TriggerBrush" Color="#B173C9" />
+    <SolidColorBrush x:Key="TriggerSelectedBrush" Color="#FFE49EFF" />
     <Style x:Key="TriggersTabItem" TargetType="{x:Type TabItem}">
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="#B173C9" Background="#B173C9">
+                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="{DynamicResource TriggerBrush}" Background="{DynamicResource TriggerBrush}">
                         <ContentPresenter ContentSource="Header" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FF714B80" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource TriggerSelectedBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FF714B80" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource TriggerSelectedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -87,20 +98,23 @@
         </Setter>
     </Style>
 
+    <!--Scenes-->
+    <SolidColorBrush x:Key="TaskBrush" Color="#FD605C" />
+    <SolidColorBrush x:Key="TaskSelectedBrush" Color="#FFFD9E9B" />
     <Style x:Key="TasksTabItem" TargetType="{x:Type TabItem}">
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="#FD605C" Background="#FD605C">
+                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="{DynamicResource TaskBrush}" Background="{DynamicResource TaskBrush}">
                         <ContentPresenter ContentSource="Header" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FFB23C39" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource TaskSelectedBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#FFB23C39" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource TaskSelectedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -108,20 +122,23 @@
         </Setter>
     </Style>
 
+    <!--Log-->
+    <SolidColorBrush x:Key="LogBrush" Color="#FFD5CFC4" />
+    <SolidColorBrush x:Key="LogSelectedBrush" Color="WhiteSmoke" />
     <Style x:Key="LogTabItem" TargetType="{x:Type TabItem}">
 
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabItem}">
-                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="#FFD5CFC4" Background="#FFD5CFC4">
+                    <Border x:Name="PART_Border" BorderThickness="3"  Margin="5 5 0 0" BorderBrush="{DynamicResource LogBrush}" Background="{DynamicResource LogBrush}">
                         <ContentPresenter ContentSource="Header" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#999" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource LogSelectedBrush}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="#999" />
+                            <Setter TargetName="PART_Border" Property="BorderBrush" Value="{DynamicResource LogSelectedBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -151,7 +168,7 @@
         <Setter Property="Margin" Value="0" />
         <Setter Property="Padding" Value="0"    />
         <Setter Property="Background" Value="White" />
-        
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TabControl}">
@@ -178,14 +195,10 @@
                         <Grid Name="ContentPanel" 
                           KeyboardNavigation.TabIndex="2" 
                           KeyboardNavigation.TabNavigation="Local" 
-                          KeyboardNavigation.DirectionalNavigation="Contained" Margin="0 0 5 0"
+                          KeyboardNavigation.DirectionalNavigation="Contained" Margin="0 0 0 0"
                           Grid.Column="0" 
                           Grid.Row="1">
-                            <Border Background="{TemplateBinding Background}"
-                                BorderBrush="#FFD5CFC4" 
-                                BorderThickness="1 0"
-                                 >
-                                <ContentPresenter Content="{TemplateBinding SelectedContent}" 
+                            <ContentPresenter Content="{TemplateBinding SelectedContent}" 
                                               ContentTemplate="{TemplateBinding SelectedContentTemplate}" 
                                               ContentStringFormat="{TemplateBinding SelectedContentStringFormat}" 
                                               ContentSource="SelectedContent" 
@@ -193,7 +206,6 @@
                                               
                                               SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" 
                             />
-                            </Border>
                         </Grid>
                     </Grid>
 
@@ -235,7 +247,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="VerticalTabControl" TargetType="{x:Type TabControl}">
         <Setter Property="TabStripPlacement" Value="Left" />
         <Setter Property="Margin" Value="2" />

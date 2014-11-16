@@ -11,8 +11,37 @@
     Unloaded="UserControl_Unloaded_1"
     Initialized="UserControl_Initialized">
     <UserControl.Resources>
-        <Style x:Key="ZvsFont">
-            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
+
+
+        <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground"  Value="White" />
+            <Setter Property="Background"  Value="{DynamicResource TriggerBrush}" />
+            <Setter Property="BorderBrush"  Value="{DynamicResource TriggerSelectedBrush}" />
+            <Setter Property="BorderThickness"  Value="0 0 0 1" />
+            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="Padding"  Value="5" />
+        </Style>
+        <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground"  Value="White" />
+            <Setter Property="Background"  Value="{DynamicResource TriggerBrush}" />
+            <Setter Property="BorderBrush"  Value="{DynamicResource TriggerSelectedBrush}" />
+            <Setter Property="BorderThickness"  Value="0 0 0 1" />
+            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding"  Value="5" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background"  Value="{DynamicResource TriggerSelectedBrush}" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Ascending">
+                    <Setter Property="FontWeight"  Value="Medium" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Descending">
+                    <Setter Property="FontWeight"  Value="Medium" />
+                </Trigger>
+            </Style.Triggers>
+
+
         </Style>
         <Style x:Key="Body_Hoz_Center"
         TargetType="{x:Type DataGridCell}">
@@ -41,25 +70,26 @@
         <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:DeviceValueTrigger}, CreateList=True}"/>
     </UserControl.Resources>
 
-    <Grid >
+    <Grid  Background="White">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Border VerticalAlignment="Top" Background="#B173C9" Height="5"></Border>
-        <Grid Grid.Row="1" DataContext="{StaticResource device_value_triggersViewSource}">
-         
-            <DataGrid x:Name="TriggerGrid" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
+
+        <Grid  DataContext="{StaticResource device_value_triggersViewSource}">
+
+            <DataGrid x:Name="TriggerGrid" Background="Transparent" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
                   HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
-                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
-                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,40" BorderThickness="0" >
+                 AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
+                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,40" RowBackground="White" BorderThickness="0" >
                 <DataGrid.Resources>
-                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFF0F0F0"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE49EFF"/>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
                 </DataGrid.Resources>
+
                 <DataGrid.Columns>
 
-                    <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserSort="False" CanUserResize="False" CanUserReorder="False" IsReadOnly="True">
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" 
+                                            CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                         <DataGridTemplateColumn.CellTemplate >
                             <DataTemplate>
                                 <TextBlock Margin="6 0 6 0 " Text="&#xe002;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
@@ -67,7 +97,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn MinWidth="200" Width="200" Header="Name" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
+                    <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" MinWidth="200" Width="200"   Header="Name" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
                                     FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -75,9 +105,10 @@
                                 <Setter  Property="Margin" Value="5,0" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
+
                     </DataGridTextColumn>
-                    <DataGridTextColumn Width="*" Header="Description" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
-                                        IsReadOnly="True"  CanUserReorder="False" CanUserSort="False" >
+                    <DataGridTextColumn Width="*" HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  Header="Description" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
+                                        IsReadOnly="True" CanUserReorder="False" CanUserSort="False" >
                         <DataGridTextColumn.Binding>
                             <MultiBinding StringFormat="{}When {0} then {1} {2}"  >
                                 <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
@@ -87,7 +118,7 @@
                         </DataGridTextColumn.Binding>
                         <DataGridTextColumn.ElementStyle>
 
-                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Style TargetType="{x:Type TextBlock}"  BasedOn="{StaticResource {x:Type TextBlock}}">
                                 <Setter Property="TextWrapping" Value="NoWrap" />
                                 <Setter Property="Padding" Value="5,0,0,0"/>
                                 <Setter Property="Height" Value="20" />
@@ -100,15 +131,16 @@
                     </DataGridTextColumn>
 
 
-                    <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding isEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
+                    <DataGridCheckBoxColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Enabled" MinWidth="75" Width="75"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
 
                     </DataGridCheckBoxColumn>
 
-                    <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="40" MinWidth="40" Width="40"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  MaxWidth="60" MinWidth="60" Width="60"  Header="" CanUserResize="False" CanUserReorder="False">
                         <DataGridTemplateColumn.CellTemplate >
                             <DataTemplate>
-                                <Button Name="SettingBtn" Width="32" Height="32" Click="SettingBtn_Click_1"  ToolTip="Device Details">
-                                    <Image Cursor="Hand"   Source="/zVirtualScenes;component/Images/settings.png" Margin="0,0,0,0"  />
+                                <Button Name="SettingBtn"  Click="SettingBtn_Click_1" ToolTip="Trigger Settings" Padding="3" Background="Transparent" 
+                                        HorizontalAlignment="Center" BorderBrush="{x:Null}"  BorderThickness="0"   >
+                                    <TextBlock  Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="25" />
                                 </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

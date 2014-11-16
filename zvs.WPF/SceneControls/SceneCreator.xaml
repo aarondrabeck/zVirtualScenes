@@ -11,10 +11,6 @@
     Initialized="UserControl_Initialized" d:DesignHeight="600" d:DesignWidth="800">
 
     <UserControl.Resources>
-        <Style x:Key="ZvsFont">
-            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
-        </Style>
-
         <Style x:Key="BodyContentDataGridCentering"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
@@ -40,16 +36,19 @@
         </CollectionViewSource>
 
     </UserControl.Resources>
-    <Grid DataContext="{StaticResource sceneViewSource}">
-        <Border VerticalAlignment="Top" Background="#9EC974" Height="5"></Border>
-        <DataGrid BorderBrush="#FFD5CFC4" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" HeadersVisibility="None" 
-                  GridLinesVisibility="Horizontal"   Background="White" Margin="0 5 0 0"
+
+    <Grid DataContext="{StaticResource sceneViewSource}" >
+        <Grid Background="{DynamicResource SceneBrush}" Height="35"  Width="355" VerticalAlignment="Top" HorizontalAlignment="Left" >
+            <TextBlock FontSize="18" Foreground="White" Margin="10 7 0 0"  TextTrimming="CharacterEllipsis"  
+                                       TextWrapping="Wrap" Text="Scene" />
+        </Grid>
+        <DataGrid BorderBrush="#9EC974" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" 
+                  AlternatingRowBackground="#FFFFFF" HeadersVisibility="None" GridLinesVisibility="Horizontal"   Background="White" Margin="0 35 0 0 "
                   HorizontalAlignment="Left"  Width="355"   ItemsSource="{Binding}" RowHeight="45"
                  AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
                   CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" SelectionChanged="SceneGrid_SelectionChanged">
-
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFF0F0F0"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFC4EE9C"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
             </DataGrid.Resources>
             <DataGrid.RowStyle>
@@ -57,7 +56,6 @@
                     <EventSetter  Event="PreviewMouseRightButtonDown" Handler="SceneGrid_Row_PreviewMouseRightButtonDown"/>
                 </Style>
             </DataGrid.RowStyle>
-
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
@@ -124,40 +122,41 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn x:Name="SceneSettingsCol" MaxWidth="45" MinWidth="45" Width="45"  Header="" CanUserResize="False" CanUserReorder="False">
+                <DataGridTemplateColumn x:Name="SceneSettingsCol" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
-
-                            <Button Name="SceneSettingBtn" ToolTip="Scene Settings" Width="32" Height="32" Background="Transparent" BorderBrush="{x:Null}"  BorderThickness="0"  Margin="3,0" Click="SceneSettingBtn_Click_1">
-                                <Image Cursor="Hand" Height="25" Source="/zVirtualScenes;component/Images/settingIcon.png" Margin="0,0,0,0"  />
+                            <Button Name="SettingBtn"  Click="SceneSettingBtn_Click_1" ToolTip="Scene Settings" Padding="3" Background="Transparent" BorderBrush="{x:Null}"
+                                    BorderThickness="0" HorizontalAlignment="Center">
+                                <TextBlock Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="25" />
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
-
         </DataGrid>
-        <Border Name="SceneCommandGrid"  Margin="355,5,0,0"   Background="#FFFDFDFD" >
-            <Border Margin="15" BorderThickness="1" BorderBrush="#FFD5CFC4" >
-                <Grid>
+        <Border Name="SceneCommandGrid"  Margin="355,0,0,0" Background="#FFFDFDFD"   >
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
                     <RowDefinition Height="*"></RowDefinition>
                     <RowDefinition Height="Auto"></RowDefinition>
                 </Grid.RowDefinitions>
-                <Grid Background="#FFF9F9F9" Height="40" >
+                <Grid Background="{DynamicResource SceneBrush}" Height="35" >
                     <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
                                    HorizontalAlignment="Right" Opacity="0"></Image>
-                    <TextBlock FontSize="20" Foreground="Black" Margin="10,0,40,0"  TextTrimming="CharacterEllipsis"  
+                    <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0"  TextTrimming="CharacterEllipsis"  
                                        TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Commands, FallbackValue=Commands}" VerticalAlignment="Center"/>
                 </Grid>
-                    <DataGrid Grid.Row="1"  MinHeight="100" BorderThickness="0 1 0 0" BorderBrush="#FFD5CFC4"   x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
+                <DataGrid Grid.Row="1"  MinHeight="100" BorderThickness="0" BorderBrush="#FFD5CFC4"   x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
                 ItemsSource="{Binding Source={StaticResource ScenesceneCommandsViewSource}}"
                 AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="#FFE2E2E2" 
-                AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
+               AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
                 PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserResizeRows="False"
                 Margin="0" Background="White"  >
-
+                    <DataGrid.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFC4EE9C"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    </DataGrid.Resources>
                     <DataGrid.Columns>
 
                         <DataGridTextColumn Width="*"   MinWidth="150" IsReadOnly="True" CanUserReorder="False" CanUserSort="False"  >
@@ -206,9 +205,15 @@
                         <DataGridTemplateColumn x:Name="SettingsCol" MaxWidth="25" MinWidth="25" Width="25"  Header="" CanUserResize="False" CanUserReorder="False">
                             <DataGridTemplateColumn.CellTemplate >
                                 <DataTemplate>
-                                    <Button Name="SettingBtn" ToolTip="Command Settings" Width="21" Height="32" BorderBrush="{x:Null}" Background="Transparent"  BorderThickness="0" Click="SettingBtn_Click_1" Margin="3,0">
-                                        <Image Cursor="Hand"  Source="/zVirtualScenes;component/Images/settingIcon.png" Margin="0,0,0,0"  />
+
+
+
+                                    <Button Name="SettingBtn"  Click="SettingBtn_Click_1" ToolTip="Scene Settings" Padding="3" Background="Transparent" BorderBrush="{x:Null}"
+                                    BorderThickness="0" HorizontalAlignment="Center">
+                                        <TextBlock Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="20" />
                                     </Button>
+
+
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -217,8 +222,7 @@
                 </DataGrid>
                 <Button Grid.Row="2"  Name="AddCommand"  Content="Add Command" 
                          HorizontalAlignment="Right"  VerticalAlignment="Bottom" Margin="10" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0" Click="AddCommand_Click" />
-                </Grid>
-            </Border>
+            </Grid>
         </Border>
     </Grid>
 

@@ -4,18 +4,40 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
             x:Class="zvs.WPF.ScheduledTaskControls.ScheduledTaskCreator"
-            xmlns:converters="clr-namespace:zvs.WPF.Converters"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
              xmlns:tasks="clr-namespace:zvs.DataModel.Tasks;assembly=zvs.DataModel"
              mc:Ignorable="d" 
              d:DesignHeight="934.025" d:DesignWidth="1037" Loaded="UserControl_Loaded_1" Unloaded="ScheduledTaskCreator_Unloaded_1" Initialized="UserControl_Initialized">
     <UserControl.Resources>
-        <converters:NullableIntConverter x:Key="NullableIntConverter"/>
-        <Style x:Key="ZvsFont">
-            <Setter Property="TextElement.FontFamily"  Value="pack://application:,,,/fonts/flaticon" />
+        <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground"  Value="White" />
+            <Setter Property="Background"  Value="{DynamicResource TaskBrush}" />
+            <Setter Property="BorderBrush"  Value="{DynamicResource TaskSelectedBrush}" />
+            <Setter Property="BorderThickness"  Value="0 0 0 1" />
+            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="Padding"  Value="5" />
         </Style>
-
+        <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground"  Value="White" />
+            <Setter Property="Background"  Value="{DynamicResource TaskBrush}" />
+            <Setter Property="BorderBrush"  Value="{DynamicResource TaskSelectedBrush}" />
+            <Setter Property="BorderThickness"  Value="0 0 0 1" />
+            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding"  Value="5" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background"  Value="{DynamicResource TaskSelectedBrush}" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Ascending">
+                    <Setter Property="FontWeight"  Value="Medium" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Descending">
+                    <Setter Property="FontWeight"  Value="Medium" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="BodyContentDataGridCentering"
         TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
@@ -50,19 +72,18 @@
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
-        <Border VerticalAlignment="Top" Background="#FD605C" Height="5"></Border>
-        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False" BorderBrush="#FFD5CFC4" BorderThickness="0 0 1 0"
-                    HorizontalGridLinesBrush="#FFE2E2E2" AlternatingRowBackground="#FFFFFCFC" 
+        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" BorderBrush="#FD605C"
+                    HorizontalGridLinesBrush="#FFE2E2E2"  AlternatingRowBackground="#FFFFFF"
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
                   CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
-                  PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
-                  SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFFFFF" Margin="0,5,0,0"   >
+                 RowHeaderWidth="0" PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
+                  SelectionChanged="ScheduledTaskDataGrid_SelectionChanged" Background="#FFFFFF" >
             <DataGrid.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFF0F0F0"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFFD9E9B"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
             </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTemplateColumn MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>
                             <TextBlock Margin="6 0 6 0 " Text="&#xe008;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
@@ -70,7 +91,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Width="*" MinWidth="50" FontSize="16" Header="Scheduled Task" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
+                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*" MinWidth="50" FontSize="16" Header="Scheduled Task" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
                             <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -78,27 +99,25 @@
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
 
-                <DataGridCheckBoxColumn Header="Enabled" MinWidth="55" Width="55"  CellStyle="{StaticResource BodyHozCenter}" 
+                <DataGridCheckBoxColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Enabled" MinWidth="75" Width="75"  CellStyle="{StaticResource BodyHozCenter}" 
                                         Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged }" IsReadOnly="False" >
                 </DataGridCheckBoxColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Grid  Margin="350,5,0,0" Background="#FFFDFDFD">
-            <Grid  Margin="15" >
-                <Border Name="TaskDetails"  BorderThickness="1" BorderBrush="#FFD5CFC4" LostFocus="TaskUserControlGrid_OnLostFocus">
+        <Grid  Margin="350,0,0,0" Background="#FFFDFDFD">
+            <Grid >
+                <Border Name="TaskDetails"   LostFocus="TaskUserControlGrid_OnLostFocus">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <Border BorderThickness="0 0 0 1" BorderBrush="#FFD5CFC4" >
-                        <Grid Background="#FFF9F9F9"  Height="40">
+                        <Grid Background="{DynamicResource TaskBrush}"  Height="35">
                             <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
                                    HorizontalAlignment="Right" Opacity="0"></Image>
-                            <TextBlock FontSize="20" Foreground="Black" Margin="10,0,40,0" TextTrimming="CharacterEllipsis"  
+                            <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0" TextTrimming="CharacterEllipsis"  
                                        TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Details, FallbackValue=New Task}" VerticalAlignment="Center"/>
                         </Grid>
-                        </Border>
                         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" >
                             <StackPanel Orientation="Vertical" >
                                 <TextBlock Text="Task Frequency" Margin="10 15 0 0" FontSize="16" />

@@ -58,7 +58,7 @@
 
             <DataGrid Grid.Row="2" x:Name="JSResultDataGrid"  Background="#FFF9F9F9" HeadersVisibility="None"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch" AutoGenerateColumns="False" 
                    HorizontalGridLinesBrush="#FFE2E2E2" 
-                  AlternatingRowBackground="#FFFFFCFC" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
+                  AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" ItemsSource="{Binding}" SelectionUnit="FullRow" SelectionMode="Single" CanUserAddRows="False"  >
                 <DataGrid.Columns>
                     <DataGridTextColumn Width="*"  Header="Description" Binding="{Binding Description}" IsReadOnly="True" />
                 </DataGrid.Columns>
