@@ -50,6 +50,7 @@
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF87D2F1"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFDAF3FD" />
                 <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
                     <Setter Property="Foreground"  Value="White" />
                     <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
@@ -160,7 +161,7 @@
 
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}"   x:Name="LevelCol" Header="Status" Width="200" CanUserResize="True" 
+                <DataGridTemplateColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"   x:Name="LevelCol" Header="Status" Width="200" CanUserResize="True" 
                                         CanUserSort="True" SortMemberPath="current_level_int" IsReadOnly="True" >
                     <DataGridTemplateColumn.CellTemplate >
                         <DataTemplate>

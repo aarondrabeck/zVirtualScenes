@@ -1,0 +1,23 @@
+﻿<Window x:Class="zvs.WPF.Groups.DeviceMultiselectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DeviceMultiselectWindow" Height="300" Width="300" Loaded="DeviceMultiselectWindow_OnLoaded">
+    <Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="10,18,0,0" TextWrapping="Wrap" Text="Device" VerticalAlignment="Top" Width="41"/>
+        <ComboBox x:Name="DevicesCmboBox" Margin="51,15,10,0" VerticalAlignment="Top" >
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} {1}">
+                                <Binding Path="Location" />
+                                <Binding Path="Name" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+    </Grid>
+</Window>

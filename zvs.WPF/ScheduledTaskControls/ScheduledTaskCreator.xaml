@@ -38,30 +38,6 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="BodyContentDataGridCentering"
-        TargetType="{x:Type DataGridCell}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center" />
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="BodyHozCenter"
-        TargetType="{x:Type DataGridCell}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
 
         <ObjectDataProvider x:Key="ScheduledTaskTypeEnum" MethodName="GetValues" ObjectType="{x:Type system:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -72,8 +48,8 @@
     </UserControl.Resources>
 
     <Grid DataContext="{StaticResource ScheduledTaskViewSource}">
-        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" BorderBrush="#FD605C"
-                    HorizontalGridLinesBrush="#FFE2E2E2"  AlternatingRowBackground="#FFFFFF"
+        <DataGrid x:Name="ScheduledTaskDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" BorderBrush="{DynamicResource TaskBrush}"
+                    HorizontalGridLinesBrush="{DynamicResource TaskSelectedBrush}"  AlternatingRowBackground="#FFFFFF"
                   GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
                   CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
                  RowHeaderWidth="0" PreviewKeyDown="ScheduledTaskDataGrid_PreviewKeyDown_1" RowEditEnding="ScheduledTaskDataGrid_RowEditEnding_1" 
@@ -81,6 +57,7 @@
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFFD9E9B"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFFFD7D5" />
             </DataGrid.Resources>
             <DataGrid.Columns>
                 <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
@@ -118,7 +95,7 @@
                             <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0" TextTrimming="CharacterEllipsis"  
                                        TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Details, FallbackValue=New Task}" VerticalAlignment="Center"/>
                         </Grid>
-                        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" >
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" >
                             <StackPanel Orientation="Vertical" >
                                 <TextBlock Text="Task Frequency" Margin="10 15 0 0" FontSize="16" />
                                 <ComboBox Name="FrequencyCmbBx" ItemsSource="{Binding Source={StaticResource ScheduledTaskTypeEnum}}" Margin="10 5 0 0" 

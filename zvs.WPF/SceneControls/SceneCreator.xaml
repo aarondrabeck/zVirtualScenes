@@ -42,7 +42,7 @@
             <TextBlock FontSize="18" Foreground="White" Margin="10 7 0 0"  TextTrimming="CharacterEllipsis"  
                                        TextWrapping="Wrap" Text="Scene" />
         </Grid>
-        <DataGrid BorderBrush="#9EC974" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="#FFE2E2E2" 
+        <DataGrid BorderBrush="#9EC974" BorderThickness="0 0 1 0" AllowDrop="True" Name="SceneGrid" HorizontalGridLinesBrush="{DynamicResource SceneBrush}" 
                   AlternatingRowBackground="#FFFFFF" HeadersVisibility="None" GridLinesVisibility="Horizontal"   Background="White" Margin="0 35 0 0 "
                   HorizontalAlignment="Left"  Width="355"   ItemsSource="{Binding}" RowHeight="45"
                  AutoGenerateColumns="False" PreviewKeyDown="SceneGrid_PreviewKeyDown" RowEditEnding="SceneGrid_RowEditEnding"
@@ -50,6 +50,7 @@
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFC4EE9C"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFF0FFE2" />
             </DataGrid.Resources>
             <DataGrid.RowStyle>
                 <Style TargetType="{x:Type DataGridRow}">
@@ -147,15 +148,16 @@
                     <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0"  TextTrimming="CharacterEllipsis"  
                                        TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Commands, FallbackValue=Commands}" VerticalAlignment="Center"/>
                 </Grid>
-                <DataGrid Grid.Row="1"  MinHeight="100" BorderThickness="0" BorderBrush="#FFD5CFC4"   x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
+                <DataGrid Grid.Row="1"  MinHeight="100" BorderThickness="0"   x:Name="SceneCmdsGrid" CanUserAddRows="False" HeadersVisibility="None" 
                 ItemsSource="{Binding Source={StaticResource ScenesceneCommandsViewSource}}"
-                AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="#FFE2E2E2" 
+                AllowDrop="True" DragOver="SceneCmdsGrid_DragOver_1" Drop="SceneCmdsGrid_Drop_1" HorizontalGridLinesBrush="{DynamicResource SceneBrush}" 
                AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="29" AutoGenerateColumns="False" 
                 PreviewKeyDown="SceneCmdsGrid_PreviewKeyDown_1" CellStyle="{StaticResource BodyContentDataGridCentering}" CanUserResizeRows="False"
                 Margin="0" Background="White"  >
                     <DataGrid.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFC4EE9C"/>
                         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFF0FFE2" />
                     </DataGrid.Resources>
                     <DataGrid.Columns>
 

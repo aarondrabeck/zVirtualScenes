@@ -9,6 +9,7 @@
     xmlns:sceneControls="clr-namespace:zvs.WPF.SceneControls" 
     xmlns:triggerControl="clr-namespace:zvs.WPF.TriggerControls"
     xmlns:scheduledTaskControls="clr-namespace:zvs.WPF.ScheduledTaskControls"
+    xmlns:groups="clr-namespace:zvs.WPF.Groups"
     Title="MainWindow" 
     MinWidth="800" 
     MinHeight="570" 
@@ -189,6 +190,17 @@
                     </TabItem.Header>
                     <scheduledTaskControls:ScheduledTaskCreator x:Name="scheduletaskControl"></scheduledTaskControls:ScheduledTaskCreator>
                 </TabItem>
+                <TabItem  Height="90" Style="{StaticResource GroupsTabItem}" >
+                    <TabItem.Header >
+                        <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
+                            <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe00c;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                            <TextBlock Foreground="White" Text="Groups"/>
+                        </StackPanel>
+                    </TabItem.Header>
+                    <Grid>
+                        <groups:GroupEditorUserControl/>
+                    </Grid>
+                </TabItem>
                 <TabItem  Height="90" Style="{StaticResource LogTabItem}">
                     <TabItem.Header >
                         <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
@@ -219,10 +231,6 @@
                         <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
                         <Separator />
                         <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-                    </MenuItem>
-                    <MenuItem Header="Groups">
-                        <MenuItem Header="Activate Groups..." x:Name="ActivateGroupMI" Click="ActivateGroupMI_Click_1" />
-                        <MenuItem Header="Group Editor..." Click="MenuItem_Click" />
                     </MenuItem>
                     <MenuItem Header="Tools">
                         <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />

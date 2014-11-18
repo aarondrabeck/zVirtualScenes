@@ -137,7 +137,7 @@ namespace zvs.WPF.ScheduledTaskControls
 
         private async void ScheduledTaskDataGrid_PreviewKeyDown_1(object sender, KeyEventArgs e)
         {
-            DataGrid dg = sender as DataGrid;
+            var dg = sender as DataGrid;
             if (dg != null)
             {
                 DataGridRow dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));

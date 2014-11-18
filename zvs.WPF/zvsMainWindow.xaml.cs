@@ -75,7 +75,7 @@ namespace zvs.WPF
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            ShowOrCreateWindow<GroupEditor>();
+          //  ShowOrCreateWindow<GroupEditor>();
         }
 
         private void MenuItem_Click_1(object sender, RoutedEventArgs e)
@@ -99,11 +99,6 @@ namespace zvs.WPF
 
             var newWindow = new T { Owner = this };
             newWindow.Show();
-        }
-
-        private void ActivateGroupMI_Click_1(object sender, RoutedEventArgs e)
-        {
-            ShowOrCreateWindow<ActivateGroup>();
         }
 
         private void Window_Closing_1(object sender, CancelEventArgs e)

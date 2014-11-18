@@ -1,0 +1,148 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" 
+             xmlns:deviceControls="clr-namespace:zvs.WPF.DeviceControls"
+             xmlns:wpf="clr-namespace:zvs.WPF"
+             x:Class="zvs.WPF.Groups.GroupEditorUserControl" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="700" Loaded="GroupEditorUserControl_OnLoaded" Unloaded="GroupEditorUserControl_OnUnloaded">
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="GroupsViewSource" d:DesignSource="{d:DesignInstance {x:Type dataModel:Group}, CreateList=True}" />
+        <CollectionViewSource x:Key="Groupsgroup_devicesViewSource" Source="{Binding Devices, Source={StaticResource GroupsViewSource}}" />
+        <wpf:ActionableGroupConverter x:Key="IsActionableGroup"/>
+    </UserControl.Resources>
+    <Grid DataContext="{StaticResource GroupsViewSource}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350" />
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <DataGrid x:Name="GroupsDataGrid" Width="350" ItemsSource="{Binding}" AllowDrop="False"  BorderThickness="0 0 1 0" BorderBrush="{DynamicResource GroupBrush}"
+                    HorizontalGridLinesBrush="{DynamicResource GroupBrush}"  AlternatingRowBackground="#FFFFFF"
+                  GridLinesVisibility="Horizontal"  HorizontalAlignment="Left" RowHeight="45" AutoGenerateColumns="False"  
+                  CellStyle="{StaticResource BodyContentDataGridCentering}" SelectionMode="Single" 
+                 RowHeaderWidth="0" 
+                  PreviewKeyDown="GroupsDataGrid_OnPreviewKeyDown" 
+                  RowEditEnding="GroupsDataGrid_OnRowEditEnding" 
+                  SelectionChanged="GroupsDataGrid_OnSelectionChanged" 
+                  Background="#FFFFFF" >
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFFFD582"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFFFD582" />
+                <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Foreground"  Value="White" />
+                    <Setter Property="Background"  Value="{DynamicResource GroupBrush}" />
+                    <Setter Property="BorderBrush"  Value="{DynamicResource GroupSelectedBrush}" />
+                    <Setter Property="BorderThickness"  Value="0 0 0 1" />
+                    <Setter Property="FontSize"  Value="18" />
+                    <Setter Property="Padding"  Value="5" />
+                </Style>
+                <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Foreground"  Value="White" />
+                    <Setter Property="Background"  Value="{DynamicResource GroupBrush}" />
+                    <Setter Property="BorderBrush"  Value="{DynamicResource GroupSelectedBrush}" />
+                    <Setter Property="BorderThickness"  Value="0 0 0 1" />
+                    <Setter Property="FontSize"  Value="18" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Padding"  Value="5" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background"  Value="{DynamicResource GroupSelectedBrush}" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Ascending">
+                            <Setter Property="FontWeight"  Value="Medium" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Descending">
+                            <Setter Property="FontWeight"  Value="Medium" />
+                        </Trigger>
+                    </Style.Triggers>
+
+
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <TextBlock Margin="6 0 6 0 " Text="&#xe00c;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Width="*" MinWidth="50" FontSize="16" Header="Groups" Binding="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"  CanUserReorder="False" CanUserSort="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTemplateColumn  HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  MaxWidth="80" MinWidth="80" Width="80"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Button Name="TurnOnButton" Click="TurnOnButton_OnClick" Content="Turn On" ToolTip="Turn On Group" BorderBrush="{x:Null}"  Padding="10 5" Background="#FFCCCCCC" 
+                                FontSize="14" FontWeight="Medium"  BorderThickness="0" HorizontalAlignment="Center">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="IsEnabled" Value="True" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Converter={StaticResource IsActionableGroup}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn  HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  MaxWidth="80" MinWidth="80" Width="80"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Button Name="TurnOffButton" Click="TurnOffButton_OnClick" Content="Turn Off" ToolTip="Turn Off Group" BorderBrush="{x:Null}"  Padding="10 5" Background="#FFCCCCCC" 
+                                FontSize="14" FontWeight="Medium"  BorderThickness="0" HorizontalAlignment="Center">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="IsEnabled" Value="True" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Converter={StaticResource IsActionableGroup}}" Value="True">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Background="{DynamicResource GroupBrush}"  Height="35">
+                <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
+                                   HorizontalAlignment="Right" Opacity="0"></Image>
+                <TextBlock FontSize="18" Foreground="White" Margin="10,0,40,0" TextTrimming="CharacterEllipsis"  
+                                       TextWrapping="Wrap" Text="{Binding Name, StringFormat={}{0} Members, FallbackValue=New Group Members}" VerticalAlignment="Center"/>
+            </Grid>
+            <Grid Grid.Row="1" Name="DetailsPanel">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ListView Margin="10 10 10 5" x:Name="GroupsDevicesLstVw" ItemsSource="{Binding Source={StaticResource Groupsgroup_devicesViewSource}}"  DisplayMemberPath="Name" AllowDrop="False" 
+                          PreviewKeyDown="groupsDevicesLstVw_PreviewKeyDown"  />
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="Remove Selected" Padding="10 5" Background="#FFCCCCCC" FontSize="14" FontWeight="Medium" x:Name="RemoveSelected" BorderThickness="0" HorizontalAlignment="Center" Margin="5" Click="RemoveSelected_OnClick" />
+                    <Button Content="Add Devices" Padding="10 5" Background="#FFCCCCCC" FontSize="14" FontWeight="Medium" x:Name="AddDeviceButton" BorderThickness="0" HorizontalAlignment="Center" Margin="5" Click="AddDeviceButton_OnClick" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

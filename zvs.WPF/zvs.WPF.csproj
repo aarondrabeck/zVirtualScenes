@@ -103,6 +103,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Groups\DeviceMultiselectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Groups\GroupEditorUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LogUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -124,6 +132,13 @@
     </Compile>
     <Compile Include="DaysOfMonthValueConverter.cs" />
     <Compile Include="DaysOfWeekValueConverter.cs" />
+    <Compile Include="Groups\DeviceMultiselectWindow.xaml.cs">
+      <DependentUpon>DeviceMultiselectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Groups\GroupEditorUserControl.xaml.cs">
+      <DependentUpon>GroupEditorUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ActionableGroupConverter.cs" />
     <Compile Include="LogUserControl.xaml.cs">
       <DependentUpon>LogUserControl.xaml</DependentUpon>
     </Compile>
@@ -253,18 +268,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Groups\ActivateGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Groups\GroupEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Groups\GroupNameEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Resources\Themes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -338,15 +341,6 @@
     </Compile>
     <Compile Include="DynamicActionControls\NumericControl.xaml.cs">
       <DependentUpon>NumericControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Groups\ActivateGroup.xaml.cs">
-      <DependentUpon>ActivateGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Groups\GroupEditor.xaml.cs">
-      <DependentUpon>GroupEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Groups\GroupNameEditor.xaml.cs">
-      <DependentUpon>GroupNameEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="zvsMainWindow.xaml.cs">
       <DependentUpon>zvsMainWindow.xaml</DependentUpon>
