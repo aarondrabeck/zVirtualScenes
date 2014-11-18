@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{E1758D0B-5A3A-4A1B-B5DE-ACD1302F23A7}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>zvs.DataModel</RootNamespace>
+    <AssemblyName>zvs.DataModel</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>zvsCert.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServerCompact, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EntityFramework.SqlServerCompact.6.1.1\lib\net45\EntityFramework.SqlServerCompact.dll</HintPath>
+    </Reference>
+    <Reference Include="LinqKit">
+      <HintPath>..\packages\LINQKit.1.1.1\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Data.Edm, Version=5.6.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.Data.Edm.5.6.2\lib\net40\Microsoft.Data.Edm.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.SqlServer.Compact.4.0.8876.1\lib\net40\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseValue.cs" />
+    <Compile Include="BaseOption.cs" />
+    <Compile Include="Command.cs" />
+    <Compile Include="BuiltinCommand.cs" />
+    <Compile Include="CommandOption.cs" />
+    <Compile Include="ConfidentialDataAttribute.cs" />
+    <Compile Include="DatabaseFeedback.cs" />
+    <Compile Include="Tasks\ScheduledTaskType.cs" />
+    <Compile Include="Tasks\DailyScheduledTask.cs" />
+    <Compile Include="Tasks\DaysOfMonth.cs" />
+    <Compile Include="Tasks\DaysOfWeek.cs" />
+    <Compile Include="DeviceValueHistory.cs" />
+    <Compile Include="Tasks\IntervalScheduledTask.cs" />
+    <Compile Include="LogEntry.cs" />
+    <Compile Include="LogEntryLevel.cs" />
+    <Compile Include="Tasks\MonthlyScheduledTask.cs" />
+    <Compile Include="NotifyEntityChangeContext.cs" />
+    <Compile Include="Tasks\OneTimeScheduledTask.cs" />
+    <Compile Include="PluginSettingOption.cs" />
+    <Compile Include="PluginSetting.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="DeviceTypeSettingValue.cs" />
+    <Compile Include="DeviceTypeSettingOption.cs" />
+    <Compile Include="DeviceTypeSetting.cs" />
+    <Compile Include="IIdentity.cs" />
+    <Compile Include="IStoredCommand.cs" />
+    <Compile Include="JavaScriptCommand.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="ZvsScheduledTask.cs" />
+    <Compile Include="SceneSettingOption.cs" />
+    <Compile Include="SceneSettingValue.cs" />
+    <Compile Include="SceneSetting.cs" />
+    <Compile Include="SceneStoredCommand.cs" />
+    <Compile Include="Scene.cs" />
+    <Compile Include="ProgramOption.cs" />
+    <Compile Include="DbInfo.cs" />
+    <Compile Include="DeviceTypeCommand.cs" />
+    <Compile Include="DeviceValueTriggers.cs" />
+    <Compile Include="DeviceValue.cs" />
+    <Compile Include="DeviceCommand.cs" />
+    <Compile Include="DeviceSettingOption.cs" />
+    <Compile Include="DeviceSettingValue.cs" />
+    <Compile Include="DeviceSetting.cs" />
+    <Compile Include="DeviceType.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="Device.cs" />
+    <Compile Include="TriggerOperator.cs" />
+    <Compile Include="AdapterSettingOption.cs" />
+    <Compile Include="DataType.cs" />
+    <Compile Include="AdapterSetting.cs" />
+    <Compile Include="Adapter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tasks\ScheduledTask.cs" />
+    <Compile Include="Tasks\WeeklyScheduledTask.cs" />
+    <Compile Include="zvsContext.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="zvsCert.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\zvs\zvs.csproj">
+      <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
+      <Name>zvs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    if not exist "$(TargetDir)x86" md "$(TargetDir)x86"
+    xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\x86\*.*" "$(TargetDir)x86"
+    if not exist "$(TargetDir)amd64" md "$(TargetDir)amd64"
+    xcopy /s /y "$(SolutionDir)packages\Microsoft.SqlServer.Compact.4.0.8876.1\NativeBinaries\amd64\*.*" "$(TargetDir)amd64"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

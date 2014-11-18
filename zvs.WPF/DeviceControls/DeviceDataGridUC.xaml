@@ -1,0 +1,240 @@
+﻿<UserControl x:Class="zvs.WPF.DeviceControls.DeviceDataGridUc"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="500" 
+             xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
+             Loaded="UserControl_Loaded" 
+             Initialized="UserControl_Initialized"
+           Unloaded="UserControl_Unloaded_1" >
+    <UserControl.Resources>
+        <Style x:Key="BodyContentDataGridCentering"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <CollectionViewSource x:Key="devicesViewSource" d:DesignSource="{d:DesignInstance my:Device, CreateList=True}">
+        </CollectionViewSource>
+        <Style x:Key="BodyHozCenter"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+    </UserControl.Resources>
+
+    <Grid PreviewKeyDown="Grid_PreviewKeyDown_1" DataContext="{StaticResource devicesViewSource}">
+        <DataGrid x:Name="DeviceGrid" CanUserAddRows="False"  CellStyle="{StaticResource BodyContentDataGridCentering}" 
+                  HorizontalGridLinesBrush="#FFE2E2E2" 
+                  AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="45" AutoGenerateColumns="False" 
+                  ItemsSource="{Binding}" PreviewMouseLeftButtonDown="DeviceGrid_PreviewMouseLeftButtonDown" 
+                  RowEditEnding="DeviceGrid_RowEditEnding" 
+                  RowHeaderWidth="0" AllowDrop="True" Margin="0,0,0,40" Background="#FFFFFF" BorderThickness="0 0 0 0" >
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FF87D2F1"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFDAF3FD" />
+                <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Foreground"  Value="White" />
+                    <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
+                    <Setter Property="BorderBrush"  Value="{DynamicResource DeviceSelectedBrush}" />
+                    <Setter Property="BorderThickness"  Value="0 0 0 1" />
+                    <Setter Property="FontSize"  Value="18" />
+                    <Setter Property="Padding"  Value="5" />
+                </Style>
+                <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+                    <Setter Property="Foreground"  Value="White" />
+                    <Setter Property="Background"  Value="{DynamicResource DeviceBrush}" />
+                    <Setter Property="BorderBrush"  Value="{DynamicResource DeviceSelectedBrush}" />
+                    <Setter Property="BorderThickness"  Value="0 0 0 1" />
+                    <Setter Property="FontSize"  Value="18" />
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Padding"  Value="5" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background"  Value="{DynamicResource DeviceSelectedBrush}" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Ascending">
+                            <Setter Property="FontWeight"  Value="Medium" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="Descending">
+                            <Setter Property="FontWeight"  Value="Medium" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" SortMemberPath="Type.Name" MaxWidth="50" MinWidth="50" Width="50"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <TextBlock Cursor="Hand" ToolTip="Drag" Name="imgFont" HorizontalAlignment="Center" Margin="5 0"  Text="&#xe006;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Unknown">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe006;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Thermostat">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe00a;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Dimmer">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe004;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Switch">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe009;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Controller">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe000;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Doorlock">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe003;"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier, UpdateSourceTrigger=PropertyChanged}" Value="Sensor">
+                                    <Setter TargetName="imgFont" Property="Text" Value="&#xe007;"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn  HeaderStyle="{StaticResource SelectionDataGridHeader}" x:Name="DeviceTypeCol" CellStyle="{StaticResource BodyHozCenter}" Width="150" MinWidth="50" Header="Type" 
+                                    Binding="{Binding Path=Type.Name}" IsReadOnly="True" >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" MinWidth="200" Width="*" Header="Name" FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn MinWidth="200" Width="*" HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Location" FontSize="14" Binding="{Binding Location, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False"   >
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+
+                <DataGridTemplateColumn x:Name="GroupCol" HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MinWidth="100" Header="Groups" CanUserResize="True">
+
+                    <DataGridTemplateColumn.CellTemplate >
+
+                        <DataTemplate>
+
+                            <ComboBox x:Name="GroupsCmbBox" ItemsSource="{Binding Path=Groups}" SelectedIndex="0" Margin="5,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ComboBox>
+
+                            <DataTemplate.Triggers>
+
+                                <DataTrigger Binding="{Binding Path=Groups.Count}" Value="0">
+                                    <Setter TargetName="GroupsCmbBox" Property="Visibility" Value="Hidden"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn HeaderStyle="{StaticResource SelectionDataGridHeader}"   x:Name="LevelCol" Header="Status" Width="200" CanUserResize="True" 
+                                        CanUserSort="True" SortMemberPath="current_level_int" IsReadOnly="True" >
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Grid Margin="5,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="150"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Name="LevelTxtBlock"  Text="{Binding CurrentLevelText, NotifyOnTargetUpdated=True}" Background="Transparent"
+                                           FontSize="18" VerticalAlignment="Center" TextAlignment="Center" >
+                                    <TextBlock.Triggers>
+                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0" To="LightBlue" />
+                                                    <ColorAnimation Storyboard.TargetProperty="(TextBlock.Background).(SolidColorBrush.Color)" Duration="0:0:0.5" From="LightBlue" To="Transparent" BeginTime="0:0:0.3" />
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </TextBlock.Triggers>
+                                </TextBlock>
+                                <ProgressBar  Name="LevelProgressBr" Foreground="White" Value="{Binding CurrentLevelInt}" Grid.Column="1" Height="20" Opacity="6" Margin="3,0,0,0" />
+                            </Grid>
+                            <DataTemplate.Triggers>
+
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Thermostat">
+                                    <Setter TargetName="LevelProgressBr" Property="Foreground" Value="#FF0088DE"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Controller">
+                                    <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=Type.UniqueIdentifier}" Value="Doorlock">
+                                    <Setter TargetName="LevelProgressBr" Property="Visibility" Value="Collapsed"></Setter>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTextColumn x:Name="DateCol" HeaderStyle="{StaticResource SelectionDataGridHeader}"   CellStyle="{StaticResource BodyHozCenter}" Header="Last Repoll" Width="140" MinWidth="140" MaxWidth="140" 
+                                    Binding="{Binding LastHeardFrom}" IsReadOnly="True" FontSize="12" />
+
+                <DataGridTextColumn x:Name="NodeID" HeaderStyle="{StaticResource SelectionDataGridHeader}"   CellStyle="{StaticResource BodyHozCenter}"  MinWidth="50"  Width="25" Header="Id" Binding="{Binding NodeNumber}" IsReadOnly="True" 
+                                    CanUserResize="False" CanUserReorder="True"  FontSize="14" />
+
+                <DataGridTemplateColumn x:Name="SettingsCol" HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  MaxWidth="60" MinWidth="60" Width="60"  Header="" CanUserResize="False" CanUserReorder="False">
+                    <DataGridTemplateColumn.CellTemplate >
+                        <DataTemplate>
+                            <Button Name="SettingBtn"  Click="SettingBtn_Click_1" ToolTip="Device Settings" Padding="3" Background="Transparent" BorderBrush="{x:Null}"  BorderThickness="0"  Margin="3,0">
+                                <TextBlock Margin="6 0 6 0 " Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="25" />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+        <Border   VerticalAlignment="Bottom" Height="40"  Margin="0"   >
+
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="175"  />
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Filter"  VerticalAlignment="Center" Margin="5,0" FontSize="14"  ></TextBlock>
+                <TextBox Name="Filter" VerticalContentAlignment="Center" TextChanged="Filter_TextChanged_1" Grid.Column="1" Margin="5"  FontSize="14"  ></TextBox>
+                <CheckBox Name="ShowMoreBtn" HorizontalAlignment="Right"  VerticalAlignment="Center" Checked="ShowMoreBtn_Checked_1"   FontSize="14"  
+                          Unchecked="ShowMoreBtn_Unchecked_1"  IsChecked="False" Content="More Details" Grid.Column="2" Margin="0,0,5,0"/>
+
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
+

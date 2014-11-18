@@ -1,0 +1,30 @@
+﻿<Window x:Class="zvs.WPF.SplashScreen"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:zvsProc="clr-namespace:zvs.Processor;assembly=zvs.zVirtualScenes"
+         Title="ACM Splash Screen" 
+        Background="Transparent"  
+        AllowsTransparency="True"
+        WindowStyle="None" 
+        ShowInTaskbar="False" 
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="CanResize" 
+        Width="520" Height="320">
+    <Border  >
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Opacity=".4" />
+        </Border.Effect>
+        <Border BorderThickness="1" BorderBrush="#FF117DBB" Background="#FFFFFF" Width="500" Height="300">
+            <Grid>
+                <Image HorizontalAlignment="Left" Height="128" Width="128"  VerticalAlignment="Top"  Source="zvs256.ico" Margin="17,17,0,0" />
+                <TextBlock FontSize="48" Foreground="#FF00AEEF" Margin="175,29,0,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Left"  
+                           FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationName}}" />
+                <TextBlock FontSize="35" Foreground="#FFBDBEC0" Margin="0,86,20,0" TextWrapping="Wrap" VerticalAlignment="Top" HorizontalAlignment="Right"
+                           FontFamily="Segoe UI" Text="{Binding Source={x:Static zvsProc:Utils.ApplicationVersionLong}}" Height="61" />
+
+                <TextBlock TextTrimming="CharacterEllipsis"  FontSize="14" Foreground="#FF707070" HorizontalAlignment="Right" Margin="0,0,113,6" Name="txtLoading" VerticalAlignment="Bottom" Width="375">Loading plugin SXXXG ...</TextBlock>
+
+            </Grid>
+        </Border>
+    </Border>
+</Window>

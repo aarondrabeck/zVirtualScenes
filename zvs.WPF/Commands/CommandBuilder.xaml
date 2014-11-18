@@ -1,0 +1,73 @@
+﻿<Window x:Class="zvs.WPF.Commands.CommandBuilder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:my="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" mc:Ignorable="d" 
+        Title="Command Builder" Height="350" Width="600" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded_1">
+    <Window.Resources>
+        <CollectionViewSource x:Key="JSCmdsViewSource" d:DesignSource="{d:DesignInstance my:JavaScriptCommand, CreateList=True}" />
+    </Window.Resources>
+    <Grid>
+        <TabControl Style="{StaticResource VerticalTabControl}" Margin="2,2,2,46">
+            <TabItem Name="DeviceTab" Style="{StaticResource VerticalTabItem}" >
+                <TabItem.Header >
+                    <StackPanel HorizontalAlignment="Center"  >
+                        <Image Source="/zVirtualScenes;component/Images/radio.png" Height="32" Width="32" Margin="5"></Image>
+                        <TextBlock  Text="Device"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <TextBlock HorizontalAlignment="Left" Margin="10,18,0,0" TextWrapping="Wrap" Text="Device" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="DevicesCmboBox" Margin="85,15,12,0" VerticalAlignment="Top"  SelectionChanged="DevicesCmboBox_SelectionChanged_1">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="Location" />
+                                            <Binding Path="Name" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock HorizontalAlignment="Left" Margin="10,51,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
+                    <ComboBox Name="DeviceCmdsCmboBox" Margin="85,48,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="DeviceCmdsCmboBox_SelectionChanged_1"/>
+                    <StackPanel Name="DeviceArgSckPnl" HorizontalAlignment="Left" Height="49" Margin="58,86,0,0" VerticalAlignment="Top" Width="369"/>
+                    <TextBlock  HorizontalAlignment="Left" Margin="10,85,0,0" TextWrapping="Wrap" Text="Arg" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Name="BuiltinTab" Style="{StaticResource VerticalTabItem}" >
+                <TabItem.Header>
+                    <StackPanel HorizontalAlignment="Center"  >
+                        <Image Source="/zVirtualScenes;component/Images/zvs32.ico" Height="32" Width="32" Margin="5"></Image>
+                        <TextBlock Text="Built-in"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid>
+                    <TextBlock HorizontalAlignment="Left" Margin="12,21,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
+                    <ComboBox Name="BuiltinCmdsCmboBox" Margin="87,18,10,0" VerticalAlignment="Top" DisplayMemberPath="Name" SelectionChanged="BuiltinCmdsCmboBox_SelectionChanged_1"/>
+                    <StackPanel Name="BuiltinArgSckPnl" HorizontalAlignment="Left" Height="49" Margin="60,56,0,0" VerticalAlignment="Top" Width="369"/>
+                    <TextBlock  HorizontalAlignment="Left" Margin="12,55,0,0" TextWrapping="Wrap" Text="Arg" VerticalAlignment="Top"/>
+                </Grid>
+            </TabItem>
+            <TabItem Name="JavaScriptTab" Style="{StaticResource VerticalTabItem}">
+                <TabItem.Header>
+                    <StackPanel HorizontalAlignment="Center"  >
+                        <Image Source="/zVirtualScenes;component/Images/JavaScriptIcon.png" Height="32" Width="32" Margin="5"></Image>
+                        <TextBlock Text="JavaScript"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid DataContext="{StaticResource JSCmdsViewSource}">
+                    <TextBlock HorizontalAlignment="Left" Margin="10,21,0,0" TextWrapping="Wrap" Text="Commands" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="JavaScriptCmboBox" Margin="85,18,12,0" VerticalAlignment="Top" DisplayMemberPath="Name" ItemsSource="{Binding ., UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Id"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Button Name="CloseBtn" Content="Close" Click="Close_Click_1"  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,9" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"></Button>
+        <Button x:Name="OKBtn"  Content="OK" HorizontalAlignment="Right" Margin="0,0,73,9" VerticalAlignment="Bottom"  Click="OKBtn_Click" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+    </Grid>
+</Window>

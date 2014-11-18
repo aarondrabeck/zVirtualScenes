@@ -1,0 +1,154 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:zVirtualScenesModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" 
+             x:Class="zvs.WPF.TriggerControls.TriggerGridUc" 
+             mc:Ignorable="d" 
+             d:DesignHeight="489" d:DesignWidth="627" 
+    Loaded="UserControl_Loaded_1" 
+    Unloaded="UserControl_Unloaded_1"
+    Initialized="UserControl_Initialized">
+    <UserControl.Resources>
+
+
+        <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground"  Value="White" />
+            <Setter Property="Background"  Value="{DynamicResource TriggerBrush}" />
+            <Setter Property="BorderBrush"  Value="{DynamicResource TriggerSelectedBrush}" />
+            <Setter Property="BorderThickness"  Value="0 0 0 1" />
+            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="Padding"  Value="5" />
+        </Style>
+        <Style x:Key="SelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Foreground"  Value="White" />
+            <Setter Property="Background"  Value="{DynamicResource TriggerBrush}" />
+            <Setter Property="BorderBrush"  Value="{DynamicResource TriggerSelectedBrush}" />
+            <Setter Property="BorderThickness"  Value="0 0 0 1" />
+            <Setter Property="FontSize"  Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding"  Value="5" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background"  Value="{DynamicResource TriggerSelectedBrush}" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Ascending">
+                    <Setter Property="FontWeight"  Value="Medium" />
+                </Trigger>
+                <Trigger Property="SortDirection" Value="Descending">
+                    <Setter Property="FontWeight"  Value="Medium" />
+                </Trigger>
+            </Style.Triggers>
+
+
+        </Style>
+        <Style x:Key="Body_Hoz_Center"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="Body_Content_DataGrid_Vertical_Centering"
+        TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <CollectionViewSource x:Key="device_value_triggersViewSource" d:DesignSource="{d:DesignInstance {x:Type zVirtualScenesModel:DeviceValueTrigger}, CreateList=True}"/>
+    </UserControl.Resources>
+
+    <Grid  Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid  DataContext="{StaticResource device_value_triggersViewSource}">
+
+            <DataGrid x:Name="TriggerGrid" Background="Transparent" ItemsSource="{Binding}" RowEditEnding="TriggerGrid_RowEditEnding"                  
+                  HorizontalGridLinesBrush="#FFE2E2E2" RowHeaderWidth="0" CanUserAddRows="False" CanUserDeleteRows="True" 
+                 AlternatingRowBackground="#FFFFFF" GridLinesVisibility="Horizontal" RowHeight="40" AutoGenerateColumns="False"
+                 PreviewKeyDown="Grid_PreviewKeyDown_1" HorizontalAlignment="Center" Margin="0,0,0,40" RowBackground="White" BorderThickness="0" >
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFE49EFF"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black"/>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey }" Color="#FFEED5F7" />
+                </DataGrid.Resources>
+
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}" MaxWidth="50" MinWidth="50" Width="50"  Header="" 
+                                            CanUserResize="False" CanUserReorder="False" CanUserSort="False">
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate>
+                                <TextBlock Margin="6 0 6 0 " Text="&#xe002;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="36" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" MinWidth="200" Width="200"   Header="Name" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" 
+                                    FontSize="14" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                <Setter  Property="Margin" Value="5,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  Header="Description" MinWidth="25" CellStyle="{StaticResource Body_Content_DataGrid_Vertical_Centering}" FontSize="14" 
+                                        IsReadOnly="True" CanUserReorder="False" CanUserSort="False" >
+                        <DataGridTextColumn.Binding>
+                            <MultiBinding StringFormat="{}When {0} then {1} {2}"  >
+                                <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
+                                <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                            </MultiBinding>
+                        </DataGridTextColumn.Binding>
+                        <DataGridTextColumn.ElementStyle>
+
+                            <Style TargetType="{x:Type TextBlock}"  BasedOn="{StaticResource {x:Type TextBlock}}">
+                                <Setter Property="TextWrapping" Value="NoWrap" />
+                                <Setter Property="Padding" Value="5,0,0,0"/>
+                                <Setter Property="Height" Value="20" />
+                                <Setter Property="TextTrimming"  Value="CharacterEllipsis"/>
+                                <Setter Property="ToolTip"  Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
+                                <Setter Property="Padding" Value="5,0,0,0"/>
+                            </Style>
+
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+
+
+                    <DataGridCheckBoxColumn HeaderStyle="{StaticResource SelectionDataGridHeader}" Header="Enabled" MinWidth="75" Width="75"  CellStyle="{StaticResource Body_Hoz_Center}" Binding="{Binding IsEnabled, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="False" >
+
+                    </DataGridCheckBoxColumn>
+
+                    <DataGridTemplateColumn HeaderStyle="{StaticResource NoSelectionDataGridHeader}"  MaxWidth="60" MinWidth="60" Width="60"  Header="" CanUserResize="False" CanUserReorder="False">
+                        <DataGridTemplateColumn.CellTemplate >
+                            <DataTemplate>
+                                <Button Name="SettingBtn"  Click="SettingBtn_Click_1" ToolTip="Trigger Settings" Padding="3" Background="Transparent" 
+                                        HorizontalAlignment="Center" BorderBrush="{x:Null}"  BorderThickness="0"   >
+                                    <TextBlock  Text="&#xe00B;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="25" />
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Trigger" HorizontalAlignment="Right" Margin="0,0,5,5"  VerticalAlignment="Bottom" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
+        </Grid>
+    </Grid>
+</UserControl>

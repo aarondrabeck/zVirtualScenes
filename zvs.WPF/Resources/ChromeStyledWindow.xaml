@@ -1,0 +1,180 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:zvsWPF="clr-namespace:zvs.WPF"
+                    x:Class="zvs.WPF.ChromeStyledWindow"
+                    >
+
+    <SolidColorBrush Color="#FF86B0DB" x:Key="MetroColor"/>
+    <SolidColorBrush Color="#FF707070" x:Key="HeaderTitleColor"/>
+    <SolidColorBrush Color="#FF1E1E1E" x:Key="HeaderButtonColor"/>
+    <SolidColorBrush Color="#FFFCFCFC" x:Key="HeaderButtonBGMouseOverColor"/>
+
+    <!-- Border defining the frame of the Window -->
+    <Style x:Key="ChromewindowBorder" TargetType="Border">
+        <!--<Setter Property="Background" Value="#FFEFEFF2" />-->
+        <Setter Property="BorderBrush" Value="{StaticResource MetroColor}" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+
+    <zvsWPF:ResizeableToVisibilityConverter x:Key="ResizeableToVisibilityConverter"/>
+
+    <!-- Window Template -->
+    <ControlTemplate x:Key="ChromeWindowTemplate" TargetType="{x:Type zvsWPF:ChromeWindow}">
+        <Grid>
+            <Border Name="ChromeWindowFrame" Style="{StaticResource ChromewindowBorder}">
+                <DockPanel >
+                    <!-- The title bar. -->
+                    <DockPanel Name="TitleBar" DockPanel.Dock="Top" Background="White" LastChildFill="True">
+                        <Image Name="TitleBarIcon"
+                            DockPanel.Dock="Left"
+                            Width="25" 
+                            Height="25" 
+                            Margin="5 3 0 0"
+                            Source="{Binding Icon, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+                            <Image.Style>
+                                <Style TargetType="Image">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowWindowIcon, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Image.Style>
+                        </Image>
+
+                        <StackPanel DockPanel.Dock="Right" 
+                                    Margin="10 0 0 0" 
+                                    HorizontalAlignment="Right" 
+                                    Orientation="Horizontal" 
+                                    SnapsToDevicePixels="True" 
+                                    WindowChrome.IsHitTestVisibleInChrome="True">
+
+                            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True" 
+                                        Orientation="Horizontal" 
+                                        SnapsToDevicePixels="True" 
+                                        Visibility="{Binding ResizeMode, Converter={StaticResource ResizeableToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}">
+
+                                <Button Name="MinimizeWindowButton" 
+                                        Style="{DynamicResource TransparentButton}" 
+                                        Width="28"
+                                        Command="{x:Static zvsWPF:ChromeWindow.onMinimizeCommand}" >
+                                    <Rectangle Height="3" Width="10" VerticalAlignment="Bottom" Margin="0,8,0,0" Fill="{StaticResource HeaderButtonColor}"/>
+                                </Button>
+
+                                <Button Name="MaximizeWindowButton" 
+                                        Command="{x:Static zvsWPF:ChromeWindow.onMaximizeCommand}" 
+                                        Width="28" >
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition  Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Normal"/>
+                                                        <Condition  Binding="{Binding EnableMaximize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition  Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Minimized"/>
+                                                        <Condition  Binding="{Binding EnableMaximize, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <Path Fill="{StaticResource HeaderButtonColor}" Data="M0,0 L11,0 11,11 0,11 z M10,3 L1,3 1,10 10,10 z" Stretch="Uniform" Width="11"/>
+
+                                </Button>
+
+                                <Button Name="RestoreWindowButton"                                         
+                                        Width="28" 
+                                        Command="{x:Static zvsWPF:ChromeWindow.onRestoreCommand}" 
+                                        >
+                                    <Path Fill="{StaticResource HeaderButtonColor}" Data="M132,70L139,70 139,77 132,77 132,70z M133,72L138,72 138,76 133,76 133,72z M135,67L142,67 142,74 139,74 139,73 141,73 141,69 136,69 136,70 135,70 135,67z" Stretch="Uniform" Width="11"/>
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource TransparentButton}">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition  Binding="{Binding WindowState, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="Maximized"/>
+                                                        <Condition  Binding="{Binding EnableRestore, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <MultiDataTrigger.Setters>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger.Setters>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                            </StackPanel>
+
+                            <Button Name="CloseWindowButton" 
+                                    Style="{DynamicResource TransparentButton}" 
+                                    Width="28"
+                                    Command="{x:Static zvsWPF:ChromeWindow.onCloseCommand}" >
+                                <Path Data="M0,0 L1,1 M0,1 L1,0" Stretch="Fill" Stroke="{StaticResource HeaderButtonColor}" StrokeThickness="2.5" Width="11" Height="11" />
+                            </Button>
+
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding Title, RelativeSource={RelativeSource TemplatedParent}, FallbackValue='Chrome Styled Window'}" 
+                               VerticalAlignment="Center" 
+                               FontSize="16" 
+                               HorizontalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"
+                               Foreground="{StaticResource HeaderTitleColor}" 
+                               Margin="10 0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowWindowTitle, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </DockPanel>
+
+                    <!-- The window content. -->
+                    <Border >
+                        <AdornerDecorator>
+                            <ContentPresenter />
+                        </AdornerDecorator>
+                    </Border>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </ControlTemplate>
+
+    <!-- Chrome Window Style -->
+    <Style x:Key="ChromeWindowStyle" TargetType="Window">
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome GlassFrameThickness="1" CornerRadius="0" UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>
+
+        <!--<Setter Property="Opacity" Value="0.95" />-->
+        <Setter Property="AllowsTransparency" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="WindowStyle" Value="None" />
+        <Setter Property="Template" Value="{StaticResource ChromeWindowTemplate}" />
+    </Style>
+
+</ResourceDictionary>

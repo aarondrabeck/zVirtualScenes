@@ -1,0 +1,161 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{0A43D202-F903-44C8-83E3-03A3928E9480}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenZWaveAdapter</RootNamespace>
+    <AssemblyName>OpenZWaveAdapter</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\debug\adapters\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\release\adapters\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer">
+      <HintPath>..\..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenZWaveDotNet, Version=1.0.4772.40113, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\OpenZWaveDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Forms\ControllerCommandDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ControllerCommandDlg.Designer.cs">
+      <DependentUpon>ControllerCommandDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Node.cs" />
+    <Compile Include="OpenZWaveAdapter.cs" />
+    <Compile Include="OpenzWaveDeviceTypes.cs" />
+    <Compile Include="OpenzWaveDeviceTypeSettings.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Value.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\ControllerCommandDlg.resx">
+      <DependentUpon>ControllerCommandDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\zvs.Entities\zvs.DataModel.csproj">
+      <Project>{e1758d0b-5a3a-4a1b-b5de-acd1302f23a7}</Project>
+      <Name>zvs.DataModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zvs.Processor\zvs.Processor.csproj">
+      <Project>{10cd1de3-4e83-4bb0-a7ca-c774c298be27}</Project>
+      <Name>zvs.Processor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\zvs\zvs.csproj">
+      <Project>{26f2b6c6-0325-415c-bb0f-314c69f44d5a}</Project>
+      <Name>zvs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que+BuiltinCommandRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.builtin_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.db_info.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que+DeviceCommandRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_propertys.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_property_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_property_values.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_types.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que+DeviceTypeCommandRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_type_command_que.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+DeviceValueAddedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventArgs.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values+ValueDataChangedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_values.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers+TRIGGER_OPERATORS.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers+TRIGGER_TYPE.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.device_value_triggers.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.group.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.group_devices.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.onContextUpdatedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin_settings.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.plugin_setting_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.program_options.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneModifiedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneRunCompleteEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene+SceneRunStartedEventHandler.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_commands.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property_option.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scene_property_value.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks+frequencys.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.scheduled_tasks.datasource" />
+    <None Include="Properties\DataSources\zVirtualScenesModel.zvsLocalDBEntities.datasource" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(ProjectDir)build\postbuild.bat" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
