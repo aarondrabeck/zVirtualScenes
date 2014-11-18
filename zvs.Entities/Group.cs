@@ -12,11 +12,6 @@ namespace zvs.DataModel
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int Id {get; set; }
 
-        public override string ToString()
-        {
-            return Name;
-        }
-
         private ObservableCollection<Device> _devices = new ObservableCollection<Device>();
         public virtual ObservableCollection<Device> Devices
         {

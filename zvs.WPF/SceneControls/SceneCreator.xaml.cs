@@ -584,7 +584,6 @@ namespace zvs.WPF.SceneControls
 
         private void SceneGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             if (SceneGrid.SelectedItem == null || SceneGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
             {
                 SceneCommandGrid.Visibility = Visibility.Hidden;

@@ -4,13 +4,17 @@ using System.Windows.Data;
 
 namespace zvs.WPF
 {
-    public class ActionableGroupConverter : IValueConverter
+    public class IsPlaceholderConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter,
             CultureInfo culture)
         {
-            return ((value is DataModel.Group && ((DataModel.Group) value).Devices.Count == 0) ||
-                    value != null && value.ToString() == "{DataGrid.NewItemPlaceholder}");
+            var val = value;
+            if (val == null)
+                return false;
+
+            var itemName = val.ToString();
+            return itemName.Equals("{DataGrid.NewItemPlaceholder}") || itemName.Equals("{NewItemPlaceholder}");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter,

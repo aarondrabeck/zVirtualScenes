@@ -165,10 +165,14 @@ namespace zvs.Processor
                         {
                             int gId = int.TryParse(argument, out gId) ? gId : 0;
                             var group = await context.Groups
+                                .Include(o=> o.Devices)
                                 .FirstOrDefaultAsync(o => o.Id == gId, cancellationToken);
 
                             if (group == null)
-                                return Result.ReportErrorFormat("Command {0} failed. Invalid group id.", command.Name);
+                                return Result.ReportErrorFormat("Command {0} failed. Invalid group id", command.Name);
+
+                            if (group.Devices.Count < 1)
+                                return Result.ReportErrorFormat("No devices found in the {0} group", command.Name);
 
                             var adapterGuids = await context.Devices
                                 .Where(o => o.Groups.Any(g => g.Id == gId))

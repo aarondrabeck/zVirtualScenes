@@ -23,11 +23,11 @@ namespace zvs.WPF.Groups
     {
         private ZvsContext Context { get; set; }
         private IFeedback<LogEntry> Log { get; set; }
-        private readonly App _app = (App) Application.Current;
+        private readonly App _app = (App)Application.Current;
 
         public GroupEditorUserControl()
         {
-            Log = new DatabaseFeedback(_app.EntityContextConnection) {Source = "Group Editor"};
+            Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Group Editor" };
             InitializeComponent();
             NotifyEntityChangeContext.ChangeNotifications<Device>.OnEntityAdded += GroupEditor_onEntityAdded;
         }
@@ -46,7 +46,7 @@ namespace zvs.WPF.Groups
             // Do not load your data at design time.
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
-                var groupsViewSource = ((CollectionViewSource) (FindResource("GroupsViewSource")));
+                var groupsViewSource = ((CollectionViewSource)(FindResource("GroupsViewSource")));
                 await Context.Groups
                     .Include(o => o.Devices)
                     .ToListAsync();
@@ -135,12 +135,12 @@ namespace zvs.WPF.Groups
         {
             var dg = sender as DataGrid;
             if (dg == null) return;
-            var dgr = (DataGridRow) (dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
+            var dgr = (DataGridRow)(dg.ItemContainerGenerator.ContainerFromIndex(dg.SelectedIndex));
             if (e.Key != Key.Delete || dgr.IsEditing) return;
             e.Handled = true;
 
             if (!(dgr.Item is Group)) return;
-            var @group = (Group) dgr.Item;
+            var @group = (Group)dgr.Item;
             if (@group != null)
             {
                 e.Handled = !await DeleteTask(@group);
@@ -178,30 +178,33 @@ namespace zvs.WPF.Groups
         {
             var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
             if (result.HasError)
-                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving scheduled task. {0}", result.Message);
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving group. {0}", result.Message);
 
             SignalImg.Opacity = 1;
-            var da = new DoubleAnimation {From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8))};
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
             SignalImg.BeginAnimation(OpacityProperty, da);
         }
 
-        private void GroupsDataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void AddDeviceButton_OnClick(object sender, RoutedEventArgs e)
         {
-            if (GroupsDataGrid.SelectedItem == null ||
-                GroupsDataGrid.SelectedItem.ToString().Equals("{NewItemPlaceholder}"))
-            {
-                DetailsPanel.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                DetailsPanel.Visibility = Visibility.Visible;
-            }
-        }
+            var group = GroupsDataGrid.SelectedItem as Group;
+            if (group == null) return;
 
-        private void AddDeviceButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            var device = new DeviceMultiselectWindow(new ZvsEntityContextConnection());
-            device.ShowDialog();
+            var deviceWindow = new DeviceMultiselectWindow(new ZvsEntityContextConnection(), group.Devices.Select(o => o.Id).ToList())
+            {
+                Owner = Window.GetWindow(this)
+            };
+            var result = deviceWindow.ShowDialog();
+            if (!result.HasValue || !result.Value) return;
+
+            var selectDeviceIds = deviceWindow.SelectedDevices.Select(o => o.Id);
+            var devicesToAdd = await Context.Devices.Where(o => selectDeviceIds.Contains(o.Id) && o.Groups.All(p => p.Id != group.Id)).ToListAsync();
+
+            foreach (var device in devicesToAdd)
+            {
+                group.Devices.Add(device);
+            }
+            await SaveChangesAsync();
         }
 
         private async void TurnOffButton_OnClick(object sender, RoutedEventArgs e)

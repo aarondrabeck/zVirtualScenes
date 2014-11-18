@@ -3,16 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" 
-             xmlns:deviceControls="clr-namespace:zvs.WPF.DeviceControls"
-             xmlns:wpf="clr-namespace:zvs.WPF"
+             xmlns:dataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel"
+    xmlns:wpf="clr-namespace:zvs.WPF"
              x:Class="zvs.WPF.Groups.GroupEditorUserControl" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700" Loaded="GroupEditorUserControl_OnLoaded" Unloaded="GroupEditorUserControl_OnUnloaded">
     <UserControl.Resources>
         <CollectionViewSource x:Key="GroupsViewSource" d:DesignSource="{d:DesignInstance {x:Type dataModel:Group}, CreateList=True}" />
         <CollectionViewSource x:Key="Groupsgroup_devicesViewSource" Source="{Binding Devices, Source={StaticResource GroupsViewSource}}" />
-        <wpf:ActionableGroupConverter x:Key="IsActionableGroup"/>
+        <wpf:IsPlaceholderConverter x:Key="IsPlaceholder"/>
     </UserControl.Resources>
     <Grid DataContext="{StaticResource GroupsViewSource}">
         <Grid.ColumnDefinitions>
@@ -27,7 +26,6 @@
                  RowHeaderWidth="0" 
                   PreviewKeyDown="GroupsDataGrid_OnPreviewKeyDown" 
                   RowEditEnding="GroupsDataGrid_OnRowEditEnding" 
-                  SelectionChanged="GroupsDataGrid_OnSelectionChanged" 
                   Background="#FFFFFF" >
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#FFFFD582"/>
@@ -89,7 +87,7 @@
                                     <Style TargetType="Button">
                                         <Setter Property="IsEnabled" Value="True" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Converter={StaticResource IsActionableGroup}}" Value="True">
+                                            <DataTrigger Binding="{Binding Converter={StaticResource IsPlaceholder}}" Value="True">
                                                 <Setter Property="IsEnabled" Value="False" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -108,7 +106,7 @@
                                     <Style TargetType="Button">
                                         <Setter Property="IsEnabled" Value="True" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Converter={StaticResource IsActionableGroup}}" Value="True">
+                                            <DataTrigger Binding="{Binding Converter={StaticResource IsPlaceholder}}" Value="True">
                                                 <Setter Property="IsEnabled" Value="False" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -121,10 +119,21 @@
             </DataGrid.Columns>
         </DataGrid>
         <Grid Grid.Column="1">
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Visibility" Value="Visible" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SelectedItem, ElementName=GroupsDataGrid, Converter={StaticResource IsPlaceholder}}" Value="True">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid Background="{DynamicResource GroupBrush}"  Height="35">
                 <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="0 0 10 0" VerticalAlignment="Center"
                                    HorizontalAlignment="Right" Opacity="0"></Image>
@@ -136,11 +145,25 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListView Margin="10 10 10 5" x:Name="GroupsDevicesLstVw" ItemsSource="{Binding Source={StaticResource Groupsgroup_devicesViewSource}}"  DisplayMemberPath="Name" AllowDrop="False" 
-                          PreviewKeyDown="groupsDevicesLstVw_PreviewKeyDown"  />
+                <ListView Margin="10 10 10 5" FontSize="14" x:Name="GroupsDevicesLstVw" ItemsSource="{Binding Source={StaticResource Groupsgroup_devicesViewSource}}" AllowDrop="False" 
+                          PreviewKeyDown="groupsDevicesLstVw_PreviewKeyDown"  >
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} {1}" >
+                                        <Binding Path="Location" />
+                                        <Binding Path="Name" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+
+                    </ListBox.ItemTemplate>
+                </ListView>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="Remove Selected" Padding="10 5" Background="#FFCCCCCC" FontSize="14" FontWeight="Medium" x:Name="RemoveSelected" BorderThickness="0" HorizontalAlignment="Center" Margin="5" Click="RemoveSelected_OnClick" />
-                    <Button Content="Add Devices" Padding="10 5" Background="#FFCCCCCC" FontSize="14" FontWeight="Medium" x:Name="AddDeviceButton" BorderThickness="0" HorizontalAlignment="Center" Margin="5" Click="AddDeviceButton_OnClick" />
+                    <Button Content="Add Devices..." Padding="10 5" Background="#FFCCCCCC" FontSize="14" FontWeight="Medium" x:Name="AddDeviceButton" BorderThickness="0" HorizontalAlignment="Center" Margin="5" Click="AddDeviceButton_OnClick" />
                 </StackPanel>
             </Grid>
         </Grid>
