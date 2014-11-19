@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Diagnostics;
@@ -94,9 +93,7 @@ namespace zvs.WPF.Groups
                     foreach (var gd in devicesToRemove)
                         selectedGroup.Devices.Remove(gd);
 
-                    var result = await Context.TrySaveChangesAsync(_app.Cts.Token);
-                    if (result.HasError)
-                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving group. {0}", result.Message);
+                    await SaveChangesAsync();
                 }
             }
         }

@@ -172,7 +172,7 @@ namespace zvs.Processor
                                 return Result.ReportErrorFormat("Command {0} failed. Invalid group id", command.Name);
 
                             if (group.Devices.Count < 1)
-                                return Result.ReportErrorFormat("No devices found in the {0} group", command.Name);
+                                return Result.ReportErrorFormat("Unable to {0} {1}, no devices found in the group", command.Name, group.Name);
 
                             var adapterGuids = await context.Devices
                                 .Where(o => o.Groups.Any(g => g.Id == gId))

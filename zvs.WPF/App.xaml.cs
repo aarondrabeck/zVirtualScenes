@@ -222,15 +222,7 @@ namespace zvs.WPF
                 device.Values.Add(value);
                 context.Devices.Add(device);
 
-              
-                //        Unknown,
-                //Controller,
-                //Switch,
-                //Dimmer,
-                //Thermostat,
-                //Doorlock,
-                //Sensor
-              //   context.SaveChanges();
+               // context.SaveChanges();
             }
 
             #region Create Logger

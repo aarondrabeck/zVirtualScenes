@@ -149,7 +149,7 @@
 
         </StatusBar>
         <Grid >
-            <TabControl Margin="0 30 0 0" Style="{StaticResource ZvsVerticalTabControl}" >
+            <TabControl Margin="0 5 0 0" Style="{StaticResource ZvsVerticalTabControl}" >
                 <TabItem  Height="90" Style="{StaticResource DeviceTabItem}">
                     <TabItem.Header >
                         <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
@@ -161,6 +161,8 @@
                         <deviceControls:DeviceDataGridUc x:Name="dList1" Margin="0,0,0,0" />
                     </Grid>
                 </TabItem>
+
+
                 <TabItem  Height="90" Style="{StaticResource SceneTabItem}">
                     <TabItem.Header >
                         <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center" Margin="5">
@@ -211,39 +213,53 @@
                     <Grid>
                         <zvsWpf:LogUserControl/>
                     </Grid>
+
                 </TabItem>
+
+                <TabItem  Height="90" Style="{StaticResource SettingTabItem}" >
+                    <TabItem.Header >
+                        <Menu  Background="{DynamicResource SettingBrush}" >
+                            <Menu.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                                </ItemsPanelTemplate>
+                            </Menu.ItemsPanel>
+                            <MenuItem >
+                                <MenuItem.Header>
+                                    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="17 0 0 0" >
+                                        <TextBlock Foreground="White" TextAlignment="Center" Text="&#xe00b;" Style="{DynamicResource ZvsFont}"  FontFamily="flaticon" FontSize="35" />
+                                        <TextBlock Foreground="White" Text="Settings"/>
+                                    </StackPanel>
+                                </MenuItem.Header>
+
+                                <MenuItem Header="_File"  >
+                                    <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMI" Click="BackupRestoreMI_Click" />
+                                    <Separator />
+                                    <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
+
+                                </MenuItem>
+                                <MenuItem Header="Commands">
+                                    <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
+                                    <Separator />
+                                    <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
+                                </MenuItem>
+                                <MenuItem Header="Tools">
+                                    <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
+                                    <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
+                                    <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
+                                    <Separator />
+                                    <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
+                                </MenuItem>
+                                <MenuItem Header="Help">
+                                    <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
+                                </MenuItem>
+                            </MenuItem>
+                        </Menu>
+                    </TabItem.Header>
+                </TabItem>
+
             </TabControl>
-            <Menu VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 1 3 0" Background="White">
-                <MenuItem >
-                    <MenuItem.Header>
-                        <Grid>
-                            <Image Width="25" Height="25" Source="Images/settingIcon.png" />
-                        </Grid>
-                    </MenuItem.Header>
 
-                    <MenuItem Header="_File"  >
-                        <MenuItem Header="Backup and Restore..." x:Name="BackupRestoreMI" Click="BackupRestoreMI_Click" />
-                        <Separator />
-                        <MenuItem Name="ExitMI" Header="Exit zVirtualScenes" Click="ExitMI_Click_1" />
-
-                    </MenuItem>
-                    <MenuItem Header="Commands">
-                        <MenuItem Name="AddEditJSCmds" Header="Add / Edit JavaScript Commands..." Click="AddEditJSCmds_Click_1" />
-                        <Separator />
-                        <MenuItem Name="RepollAllMI" Header="Repoll All" Click="RepollAllMI_Click_1" />
-                    </MenuItem>
-                    <MenuItem Header="Tools">
-                        <MenuItem Header="Manage Adapters..." Click="MenuItem_Click_1" />
-                        <MenuItem Header="Manage Plug-ins..." Click="ManagePluginsMi" />
-                        <MenuItem Name="SettingMI" Header="Settings..." Click="SettingMI_Click_1" />
-                        <Separator />
-                        <MenuItem Header="View Database" Name="ViewDBMI"   Click="ViewDBMI_Click_1" />
-                    </MenuItem>
-                    <MenuItem Header="Help">
-                        <MenuItem Name="AboutMI" Header="About zVirtualScenes" Click="AboutMI_Click_1" />
-                    </MenuItem>
-                </MenuItem>
-            </Menu>
         </Grid>
     </DockPanel>
 </zvsWpf:ChromeWindow>

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:DataModel="clr-namespace:zvs.DataModel;assembly=zvs.DataModel" x:Class="zvs.WPF.LogUserControl" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded" Unloaded="LogUserControl_OnUnloaded">
+             d:DesignHeight="300" d:DesignWidth="300" Loaded="UserControl_Loaded" Initialized="LogUserControl_OnInitialized" Unloaded="LogUserControl_OnUnloaded">
     <UserControl.Resources>
         <Style x:Key="NoSelectionDataGridHeader" TargetType="{x:Type DataGridColumnHeader}">
             <Setter Property="Foreground"  Value="White" />

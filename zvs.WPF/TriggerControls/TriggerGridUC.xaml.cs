@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using zvs.DataModel;
 using zvs.Processor;
 
@@ -114,9 +116,7 @@ namespace zvs.WPF.TriggerControls
             if (e.EditAction != DataGridEditAction.Commit) return;
             //have to add , UpdateSourceTrigger=PropertyChanged to have the data updated in time for this event
 
-            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-            if (result.HasError)
-                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving trigger. {0}", result.Message);
+            await SaveChangesAsync();
         }
 
         private void AddTriggerBtn_Click(object sender, RoutedEventArgs e)
@@ -128,9 +128,7 @@ namespace zvs.WPF.TriggerControls
                 if (newWindow.Canceled) return;
                 _context.DeviceValueTriggers.Add(newWindow.Trigger);
 
-                var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-                if (result.HasError)
-                    await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error adding trigger. {0}", result.Message);
+                await SaveChangesAsync();
             };
         }
 
@@ -149,9 +147,7 @@ namespace zvs.WPF.TriggerControls
             newWindow.Closing += async (s, a) =>
             {
                 if (newWindow.Canceled) return;
-                var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-                if (result.HasError)
-                    await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error creating trigger. {0}", result.Message);
+                await SaveChangesAsync();
             };
         }
 
@@ -165,16 +161,22 @@ namespace zvs.WPF.TriggerControls
                     MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     _context.DeviceValueTriggers.Local.Remove(trigger);
-
-                    var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
-                    if (result.HasError)
-                        await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error deleting trigger. {0}", result.Message);
+                    await SaveChangesAsync();
                 }
             }
 
             e.Handled = true;
         }
 
-      
+        private async Task SaveChangesAsync()
+        {
+            var result = await _context.TrySaveChangesAsync(_app.Cts.Token);
+            if (result.HasError)
+                await Log.ReportErrorFormatAsync(_app.Cts.Token, "Error saving trigger. {0}", result.Message);
+
+            SignalImg.Opacity = 1;
+            var da = new DoubleAnimation { From = 1, To = 0, Duration = new Duration(TimeSpan.FromSeconds(.8)) };
+            SignalImg.BeginAnimation(OpacityProperty, da);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ namespace zvs.WPF
         private App App { get; set; }
         private ObservableCollection<LogEntry> LogEntries { get; set; }
         private const int MaxEntriesToDisplay = 400;
-        private bool IsSubscribed { get; set; }
 
         public LogUserControl()
         {
@@ -28,22 +28,25 @@ namespace zvs.WPF
             InitializeComponent();
         }
 
-        private async void UserControl_Loaded(object sender, RoutedEventArgs e)
+#if DEBUG
+        ~LogUserControl()
+        {
+            //Cannot write to log here, it has been disposed. 
+            Debug.WriteLine("LogUserControl Deconstructed");
+        }
+#endif
+
+        private async void LogUserControl_OnInitialized(object sender, EventArgs e)
         {
             // Do not load your data at design time.
             if (DesignerProperties.GetIsInDesignMode(this))
                 return;
 
-            if (!IsSubscribed)
-            {
-                NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += LogUserControl_OnEntityAdded;
-                IsSubscribed = true;
-            }
+            await InitialLogEntryLoad();
+            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded += LogUserControl_OnEntityAdded;
 
             using (var context = new ZvsContext(App.EntityContextConnection))
             {
-                await InitialLogEntryLoad();
-
                 //Load your data here and assign the result to the CollectionViewSource.
                 var myCollectionViewSource = (CollectionViewSource)Resources["LogEntryViewSource"];
                 myCollectionViewSource.Source = LogEntries;
@@ -64,11 +67,19 @@ namespace zvs.WPF
             }
         }
 
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+        }
+
+
+        private void LogUserControl_OnUnloaded(object sender, RoutedEventArgs e)
+        {
+        }
+
         private async Task InitialLogEntryLoad()
         {
-            if (LogEntries.Any())
-                return;
-
+            LogEntries.Clear();
             using (var context = new ZvsContext(App.EntityContextConnection))
             {
                 var entries = await context.LogEntries
@@ -96,12 +107,6 @@ namespace zvs.WPF
             });
         }
 
-        private void LogUserControl_OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            if (!IsSubscribed) return;
-            NotifyEntityChangeContext.ChangeNotifications<LogEntry>.OnEntityAdded -= LogUserControl_OnEntityAdded;
-            IsSubscribed = false;
-        }
 
         private async void NextButton_Click(object sender, RoutedEventArgs e)
         {
@@ -150,5 +155,7 @@ namespace zvs.WPF
         {
             LogEntries.Clear();
         }
+
+
     }
 }

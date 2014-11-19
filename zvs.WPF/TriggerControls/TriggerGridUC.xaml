@@ -112,9 +112,9 @@
                                         IsReadOnly="True" CanUserReorder="False" CanUserSort="False" >
                         <DataGridTextColumn.Binding>
                             <MultiBinding StringFormat="{}When {0} then {1} {2}"  >
+                                <Binding Path="TriggerDescription" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
                                 <Binding Path="Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
-                                <Binding Path="StoredCommand.Description" FallbackValue="Unknow" Mode="OneWay" UpdateSourceTrigger="PropertyChanged" />
-                                <Binding Path="StoredCommand.TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
+                                <Binding Path="TargetObjectName" FallbackValue="Unknown" Mode="OneWay" UpdateSourceTrigger="PropertyChanged"/>
                             </MultiBinding>
                         </DataGridTextColumn.Binding>
                         <DataGridTextColumn.ElementStyle>
@@ -124,7 +124,7 @@
                                 <Setter Property="Padding" Value="5,0,0,0"/>
                                 <Setter Property="Height" Value="20" />
                                 <Setter Property="TextTrimming"  Value="CharacterEllipsis"/>
-                                <Setter Property="ToolTip"  Value="{Binding Path=StoredCommand.Description, Mode=OneWay}"/>
+                                <Setter Property="ToolTip"  Value="{Binding Path=Description, Mode=OneWay}"/>
                                 <Setter Property="Padding" Value="5,0,0,0"/>
                             </Style>
 
@@ -148,6 +148,8 @@
                     </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
+            <Image Name="SignalImg" Source="../Images/send_signal.png" Height="15" Margin="5,0,0,5"  VerticalAlignment="Bottom"
+                                   HorizontalAlignment="Left" Opacity="0"></Image>
             <Button Click="AddTriggerBtn_Click"  Name="AddTriggerBtn" Content="Add Trigger" HorizontalAlignment="Right" Margin="0,0,5,5"  VerticalAlignment="Bottom" FontSize="14" Padding="10 5" FontWeight="Medium" Background="#FFCCCCCC" BorderBrush="{x:Null}"  BorderThickness="0"/>
         </Grid>
     </Grid>

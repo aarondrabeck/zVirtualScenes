@@ -26,15 +26,15 @@ namespace zvs.WPF.TriggerControls
             set { SetValue(TriggerProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for ScheduledTask.  This enables animation, styling, binding, etc...
+        // Using a DependencyProperty as the backing store for Trigger.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TriggerProperty =
-            DependencyProperty.Register("ScheduledTask", typeof(DeviceValueTrigger), typeof(TriggerEditorWindow), new PropertyMetadata(null));
+            DependencyProperty.Register("Trigger", typeof(DeviceValueTrigger), typeof(TriggerEditorWindow), new PropertyMetadata(null));
 
         public bool Canceled = true;
 
         public TriggerEditorWindow(Int64 deviceValueTriggerId, ZvsContext context)
         {
-             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Scheduled Task Editor" };
+             Log = new DatabaseFeedback(_app.EntityContextConnection) { Source = "Trigger Editor" };
             _context = context;
             _deviceValueTriggerId = deviceValueTriggerId;
             InitializeComponent();
@@ -53,7 +53,7 @@ namespace zvs.WPF.TriggerControls
                 .Include(o => o.DeviceValue)
                 .Include(o => o.DeviceValue.Device)
                 .FirstOrDefaultAsync(o => o.Id == _deviceValueTriggerId) ??
-                      new DeviceValueTrigger { Name = "New ScheduledTask" };
+                      new DeviceValueTrigger { Name = "New Trigger" };
 
             //EAGER LOAD
             await _context.Devices
@@ -148,7 +148,7 @@ namespace zvs.WPF.TriggerControls
             Trigger.Operator = (TriggerOperator)OperatorCmboBx.SelectedItem;
 
             //Update the description
-            Trigger.SetDescription();
+            Trigger.SetTriggerDescription();
 
             Canceled = false;
             Close();

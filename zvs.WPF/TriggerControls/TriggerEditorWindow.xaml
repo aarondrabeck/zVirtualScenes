@@ -41,8 +41,8 @@
                    TextTrimming="CharacterEllipsis" VerticalAlignment="Top" >
             <TextBlock.Text>
                 <MultiBinding StringFormat="{}{0} {1}"  >
-                    <Binding Path="Trigger.StoredCommand.Description" ElementName="this" FallbackValue=""/>
-                    <Binding Path="Trigger.StoredCommand.TargetObjectName" ElementName="this" FallbackValue="No command selected."/>
+                    <Binding Path="Trigger.Description" ElementName="this" FallbackValue=""/>
+                    <Binding Path="Trigger.TargetObjectName" ElementName="this" FallbackValue="No command selected."/>
                 </MultiBinding>
             </TextBlock.Text>
         </TextBlock>

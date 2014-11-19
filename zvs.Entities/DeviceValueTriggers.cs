@@ -175,19 +175,31 @@ namespace zvs.DataModel
         {
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
-       
-        //public void SetDescription()
-        //{
-        //    var triggerOpName = Operator.ToString();
 
-        //    if (DeviceValueTriggerStoredCommand == null || DeviceValue == null || DeviceValue.Device == null)
-        //        Description = "Incomplete ScheduledTask";
-        //    else
-        //        Description = string.Format("{0} {1} is {2} {3}", DeviceValue.Device.Name,
-        //                                                    DeviceValue.Name,
-        //                                                    triggerOpName,
-        //                                                    Value);
-        //}
+        private string _triggerDescription;
+        public string TriggerDescription
+        {
+            get { return _triggerDescription; }
+            set
+            {
+                if (value == _triggerDescription) return;
+                _triggerDescription = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public void SetTriggerDescription()
+        {
+            var triggerOpName = Operator.ToString();
+
+            if (DeviceValue == null || DeviceValue.Device == null)
+                TriggerDescription = "Incomplete ScheduledTask";
+            else
+                TriggerDescription = string.Format("{0} {1} is {2} {3}", DeviceValue.Device.Name,
+                                                            DeviceValue.Name,
+                                                            triggerOpName,
+                                                            Value);
+        }
     }
 
   
